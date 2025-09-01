@@ -1,0 +1,24 @@
+{
+    "name": "pcclondon/foodbank-manager",
+    "description": "FoodBank Manager WordPress plugin.",
+    "type": "wordpress-plugin",
+    "license": "GPL-3.0-or-later",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "FoodBankManager\\": "includes/"
+        }
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.7",
+        "phpstan/phpstan": "^1.10"
+    },
+    "suggest": {
+        "dompdf/dompdf": "^2.0",
+        "woocommerce/action-scheduler": "^3.6"
+    },
+    "scripts": {
+        "phpcs": "phpcs",
+        "phpstan": "phpstan"
+    }
+}
