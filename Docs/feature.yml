@@ -1,0 +1,118 @@
+name: Feature request
+description: Propose a new feature or enhancement for FoodBank Manager.
+title: "feat: <short description>"
+labels: ["type:feature"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for proposing a feature! Please fill out the sections below. 
+        Link to the PRD whenever possible (`docs/PRD-pcc-foodbank-manager.md`).
+  - type: input
+    id: summary
+    attributes:
+      label: Summary
+      description: One sentence description of the feature.
+      placeholder: "Add attendance heatmap to reports"
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement & goals
+      description: What problem does this solve? Who benefits? What does success look like?
+      placeholder: |
+        Problem: Managers need a quick visual to spot peak times.
+        Goals: Faster staffing decisions; identify bottlenecks.
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope areas
+      description: Select all relevant areas for this feature.
+      options:
+        - label: Front-end (forms)
+        - label: Front-end dashboard
+        - label: Attendance
+        - label: Admin (wp-admin)
+        - label: Builder
+        - label: Emails
+        - label: Exports / PDF
+        - label: GDPR / Privacy
+        - label: Diagnostics
+        - label: DB / Migrations
+        - label: REST API
+        - label: Security / Encryption
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: Describe the design/approach at a high level. Include UI notes and API changes if any.
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: List any alternative approaches you explored.
+  - type: textarea
+    id: prd_refs
+    attributes:
+      label: PRD references
+      description: Link to specific sections in the PRD that motivate/define this feature.
+      placeholder: "See §6 Attendance Module, §13 Reporting"
+  - type: textarea
+    id: security_privacy
+    attributes:
+      label: Security & Privacy impact
+      description: Data collected? Sensitive fields? Encryption required? Capability checks? Any risk of PII in logs?
+  - type: checkboxes
+    id: nfrs
+    attributes:
+      label: Non-functional requirements to consider
+      options:
+        - label: Performance (server-side pagination / indexing)
+        - label: Accessibility (labels, ARIA, keyboard, contrast)
+        - label: Internationalization (EN/PT strings)
+        - label: Compatibility (WP 6.x+, PHP 8.1+)
+        - label: Backward compatibility (schema / API)
+        - label: Observability (diagnostics / logging)
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: Bullet list. What must be true for this to be complete?
+      placeholder: |
+        - [ ] Heatmap renders for selected date range
+        - [ ] Works on mobile and desktop
+        - [ ] Exports reflect selected filters
+    validations:
+      required: true
+  - type: textarea
+    id: tasks
+    attributes:
+      label: Tasks checklist
+      description: Break down into sub-tasks (dev, tests, docs).
+      value: |
+        - [ ] UX/UI
+        - [ ] Backend
+        - [ ] REST
+        - [ ] Tests
+        - [ ] Docs
+  - type: input
+    id: design_link
+    attributes:
+      label: Design / mockups link (optional)
+      placeholder: "Figma / Screenshot URL"
+  - type: textarea
+    id: testing
+    attributes:
+      label: Testing plan
+      description: Unit/integration/manual tests; devices/browsers.
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies / blockers
+      description: Other issues, libraries, or sequencing constraints.
+  - type: markdown
+    attributes:
+      value: |
+        **After creating:** Set the Milestone (M1–M6) and apply relevant labels (see `ISSUES-pcc-foodbank-manager.md`).
