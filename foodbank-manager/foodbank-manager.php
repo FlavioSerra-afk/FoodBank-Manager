@@ -9,6 +9,8 @@
  * License URI: https://www.gnu.org/licenses/gpl-3.0.html
  * Text Domain: foodbank-manager
  * Domain Path: /languages
+ *
+ * @package FoodBankManager
  */
 
 declare(strict_types=1);
@@ -17,32 +19,35 @@ namespace FoodBankManager;
 
 use FoodBankManager\Core\Plugin;
 
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
-if (file_exists(__DIR__ . '/vendor/autoload.php')) {
-    require __DIR__ . '/vendor/autoload.php';
+if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
+	require __DIR__ . '/vendor/autoload.php';
 } else {
-    add_action('admin_notices', function (): void {
-        echo '<div class="notice notice-warning"><p>' . \esc_html__('FoodBank Manager dependencies not installed.', 'foodbank-manager') . '</p></div>';
-    });
+	add_action(
+		'admin_notices',
+		function (): void {
+			echo '<div class="notice notice-warning"><p>' . \esc_html__( 'FoodBank Manager dependencies not installed.', 'foodbank-manager' ) . '</p></div>';
+		}
+	);
 }
 
 /**
  * Activation hook.
  */
 function activate(): void {
-    Plugin::get_instance()->activate();
+	Plugin::get_instance()->activate();
 }
-register_activation_hook(__FILE__, __NAMESPACE__ . '\\activate');
+register_activation_hook( __FILE__, __NAMESPACE__ . '\\activate' );
 
 /**
  * Deactivation hook.
  */
 function deactivate(): void {
-    Plugin::get_instance()->deactivate();
+	Plugin::get_instance()->deactivate();
 }
-register_deactivation_hook(__FILE__, __NAMESPACE__ . '\\deactivate');
+register_deactivation_hook( __FILE__, __NAMESPACE__ . '\\deactivate' );
 
 Plugin::get_instance()->init();
