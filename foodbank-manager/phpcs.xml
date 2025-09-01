@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<ruleset name="FoodBank Manager">
+    <rule ref="WordPress"/>
+    <arg name="basepath" value="."/>
+    <arg name="extensions" value="php"/>
+    <file>includes</file>
+    <file>foodbank-manager.php</file>
+</ruleset>
