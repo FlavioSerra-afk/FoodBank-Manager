@@ -1,24 +1,42 @@
 {
-    "name": "pcclondon/foodbank-manager",
-    "description": "FoodBank Manager WordPress plugin.",
+    "name": "foodbank/manager",
+    "description": "WordPress plugin: FoodBank Manager",
     "type": "wordpress-plugin",
     "license": "GPL-3.0-or-later",
-    "require": {},
+    "require": {
+        "php": "^8.1"
+    },
     "autoload": {
         "psr-4": {
             "FoodBankManager\\": "includes/"
         }
     },
     "require-dev": {
-        "squizlabs/php_codesniffer": "^3.7",
-        "phpstan/phpstan": "^1.10"
+        "squizlabs/php_codesniffer": "^3",
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+        "wp-coding-standards/wpcs": "^3",
+        "slevomat/coding-standard": "^8",
+        "phpstan/phpstan": "^1",
+        "phpunit/phpunit": "^9.6",
+        "php-stubs/wordpress-stubs": "^6.5"
     },
     "suggest": {
-        "dompdf/dompdf": "^2.0",
-        "woocommerce/action-scheduler": "^3.6"
+        "woocommerce/action-scheduler": "Background jobs for exports, email retries, key rotation",
+        "dompdf/dompdf": "PDF generation for receipts/exports",
+        "endroid/qr-code": "QR code generation for attendance tokens",
+        "league/csv": "Robust CSV writer for exports"
     },
     "scripts": {
-        "phpcs": "phpcs",
-        "phpstan": "phpstan"
+        "lint": "find . -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l",
+        "phpcs": "phpcs --standard=phpcs.xml",
+        "phpcbf": "phpcbf --standard=phpcs.xml",
+        "phpstan": "phpstan analyse -c phpstan.neon --no-progress",
+        "test": "phpunit"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        },
+        "sort-packages": true
     }
 }

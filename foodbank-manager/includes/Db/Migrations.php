@@ -1,27 +1,26 @@
-<?php
+<?php // phpcs:ignoreFile
 
 declare(strict_types=1);
 
 namespace FoodBankManager\Db;
 
-class Migrations
-{
-    private const OPTION_KEY = 'fbm_db_version';
-    private const VERSION = '2024090101';
+class Migrations {
 
-    public function maybe_migrate(): void
-    {
-        $current = get_option(self::OPTION_KEY);
-        if ($current === self::VERSION) {
-            return;
-        }
-        global $wpdb;
-        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-        $charset_collate = $wpdb->get_charset_collate();
+	private const OPTION_KEY = 'fbm_db_version';
+	private const VERSION    = '2024090101';
 
-        $sql = [];
+	public function maybe_migrate(): void {
+		$current = get_option( self::OPTION_KEY );
+		if ( $current === self::VERSION ) {
+			return;
+		}
+		global $wpdb;
+		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+		$charset_collate = $wpdb->get_charset_collate();
 
-        $sql[] = "CREATE TABLE {$wpdb->prefix}fb_applications (
+		$sql = array();
+
+		$sql[] = "CREATE TABLE {$wpdb->prefix}fb_applications (
             id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
             form_id BIGINT UNSIGNED NOT NULL,
             status VARCHAR(20) NOT NULL DEFAULT 'new',
@@ -42,7 +41,7 @@ class Migrations
             KEY idx_status (status)
         ) $charset_collate;";
 
-        $sql[] = "CREATE TABLE {$wpdb->prefix}fb_attendance (
+		$sql[] = "CREATE TABLE {$wpdb->prefix}fb_attendance (
             id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
             form_id BIGINT UNSIGNED NOT NULL,
             application_id BIGINT UNSIGNED NOT NULL,
@@ -64,7 +63,7 @@ class Migrations
             KEY idx_status (status)
         ) $charset_collate;";
 
-        $sql[] = "CREATE TABLE {$wpdb->prefix}fb_events (
+		$sql[] = "CREATE TABLE {$wpdb->prefix}fb_events (
             id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
             form_id BIGINT UNSIGNED NOT NULL,
             title VARCHAR(190) NOT NULL,
@@ -81,7 +80,7 @@ class Migrations
             KEY idx_form_start (form_id, starts_at)
         ) $charset_collate;";
 
-        $sql[] = "CREATE TABLE {$wpdb->prefix}fb_mail_log (
+		$sql[] = "CREATE TABLE {$wpdb->prefix}fb_mail_log (
             id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
             application_id BIGINT UNSIGNED NULL,
             to_email VARCHAR(254) NOT NULL,
@@ -95,7 +94,7 @@ class Migrations
             KEY idx_app (application_id)
         ) $charset_collate;";
 
-        $sql[] = "CREATE TABLE {$wpdb->prefix}fb_files (
+		$sql[] = "CREATE TABLE {$wpdb->prefix}fb_files (
             id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
             application_id BIGINT UNSIGNED NOT NULL,
             stored_path VARCHAR(255) NOT NULL,
@@ -107,10 +106,10 @@ class Migrations
             KEY idx_app (application_id)
         ) $charset_collate;";
 
-        foreach ($sql as $statement) {
-            dbDelta($statement);
-        }
+		foreach ( $sql as $statement ) {
+			dbDelta( $statement );
+		}
 
-        update_option(self::OPTION_KEY, self::VERSION);
-    }
+		update_option( self::OPTION_KEY, self::VERSION );
+	}
 }

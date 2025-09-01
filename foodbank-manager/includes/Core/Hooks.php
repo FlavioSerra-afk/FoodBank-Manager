@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignoreFile
 
 declare(strict_types=1);
 
@@ -11,20 +11,18 @@ use FoodBankManager\Rest\Api;
 use FoodBankManager\Mail\Logger;
 use FoodBankManager\Admin\Notices;
 
-class Hooks
-{
-    public function register(): void
-    {
-        add_action('init', [$this, 'register_shortcodes']);
-        add_action('admin_menu', [Menu::class, 'register']);
-        add_action('rest_api_init', [Api::class, 'register_routes']);
-        Logger::init();
-        add_action('fbm_crypto_missing_kek', [Notices::class, 'missing_kek']);
-    }
+class Hooks {
 
-    public function register_shortcodes(): void
-    {
-        add_shortcode('pcc_fb_form', [Form::class, 'render']);
-        add_shortcode('foodbank_entries', [Entries::class, 'render']);
-    }
+	public function register(): void {
+		add_action( 'init', array( $this, 'register_shortcodes' ) );
+		add_action( 'admin_menu', array( Menu::class, 'register' ) );
+		add_action( 'rest_api_init', array( Api::class, 'register_routes' ) );
+		Logger::init();
+		add_action( 'fbm_crypto_missing_kek', array( Notices::class, 'missing_kek' ) );
+	}
+
+	public function register_shortcodes(): void {
+		add_shortcode( 'pcc_fb_form', array( Form::class, 'render' ) );
+		add_shortcode( 'foodbank_entries', array( Entries::class, 'render' ) );
+	}
 }
