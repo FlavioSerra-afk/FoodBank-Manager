@@ -1,8 +1,41 @@
 <?xml version="1.0"?>
 <ruleset name="FoodBank Manager">
-    <rule ref="WordPress"/>
-    <arg name="basepath" value="."/>
-    <arg name="extensions" value="php"/>
-    <file>includes</file>
-    <file>foodbank-manager.php</file>
+  <description>WordPress coding standards for FoodBank Manager (namespaced, modern PHP).</description>
+
+  <file>./</file>
+  <exclude-pattern>vendor/*</exclude-pattern>
+  <exclude-pattern>dist/*</exclude-pattern>
+  <exclude-pattern>node_modules/*</exclude-pattern>
+  <exclude-pattern>.github/*</exclude-pattern>
+  <exclude-pattern>bin/*</exclude-pattern>
+  <exclude-pattern>tests/*</exclude-pattern>
+
+  <!-- Primary standards -->
+  <rule ref="WordPress-Extra">
+    <exclude name="WordPress.PHP.YodaConditions"/>
+    <exclude name="WordPress.NamingConventions.PrefixAllGlobals"/>
+    <exclude name="WordPress.Files.FileName"/>
+    <exclude name="WordPress.NamingConventions.ValidFunctionName"/>
+    <exclude name="WordPress.NamingConventions.ValidVariableName"/>
+  </rule>
+  <rule ref="WordPress-Docs"/>
+  <rule ref="PHPCompatibilityWP"/>
+
+  <!-- Target platforms -->
+  <config name="testVersion" value="8.1-8.3"/>
+  <config name="minimum_supported_wp_version" value="6.0"/>
+
+  <!-- Project-specific tuning -->
+  <rule ref="Generic.Files.LineLength">
+    <properties>
+      <property name="lineLimit" value="140"/>
+      <property name="absoluteLineLimit" value="200"/>
+      <property name="ignoreComments" value="true"/>
+    </properties>
+  </rule>
+
+  <!-- Escaping rules must be STRICT -->
+  <rule ref="WordPress.Security.EscapeOutput"/>
+  <rule ref="WordPress.Security.NonceVerification"/>
+  <rule ref="WordPress.Security.ValidatedSanitizedInput"/>
 </ruleset>

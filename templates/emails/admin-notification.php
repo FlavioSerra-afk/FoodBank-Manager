@@ -2,7 +2,7 @@
 namespace FoodBankManager\Emails;
 
 if ( ! defined( 'ABSPATH' ) ) {
-    exit;
+	exit;
 }
 ?>
 <p><?php esc_html_e( 'New application received.', 'foodbank-manager' ); ?></p>

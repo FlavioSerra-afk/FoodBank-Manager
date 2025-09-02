@@ -2,14 +2,14 @@
 namespace FoodBankManager\Admin;
 
 if ( ! defined( 'ABSPATH' ) ) {
-    exit;
+	exit;
 }
 
 if ( ! current_user_can( 'fb_read_entries' ) && ! current_user_can( 'manage_options' ) ) {
-    wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ) );
+	wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ) );
 }
 ?>
 <div class="wrap">
-    <h1><?php \esc_html_e('Dashboard', 'foodbank-manager'); ?></h1>
-    <p><?php \esc_html_e('Coming soon.', 'foodbank-manager'); ?></p>
+	<h1><?php \esc_html_e( 'Dashboard', 'foodbank-manager' ); ?></h1>
+	<p><?php \esc_html_e( 'Coming soon.', 'foodbank-manager' ); ?></p>
 </div>

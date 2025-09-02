@@ -1,55 +1,59 @@
 {
-    "name": "foodbank/manager",
-    "description": "WordPress plugin: FoodBank Manager",
-    "type": "wordpress-plugin",
-    "license": "GPL-3.0-or-later",
-    "require": {
-        "php": "^8.1",
-        "endroid/qr-code": "^4",
-        "league/csv": "^9"
+  "name": "foodbank/manager",
+  "description": "WordPress plugin: FoodBank Manager",
+  "type": "wordpress-plugin",
+  "license": "GPL-3.0-or-later",
+  "require": {
+    "php": "^8.1",
+    "endroid/qr-code": "^4",
+    "league/csv": "^9"
+  },
+  "autoload": {
+    "psr-4": {
+      "FoodBankManager\\": "includes/"
+    }
+  },
+  "require-dev": {
+    "cebe/markdown": "^1.2",
+    "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+    "paragonie/sodium_compat": "^1",
+    "php-stubs/wordpress-stubs": "^6.5",
+    "phpcompatibility/php-compatibility": "^9",
+    "phpcompatibility/phpcompatibility-wp": "^2",
+    "phpstan/phpstan": "^1",
+    "phpunit/phpunit": "^9.6",
+    "slevomat/coding-standard": "^8",
+    "squizlabs/php_codesniffer": "^3",
+    "symfony/console": "^6",
+    "symfony/process": "^6",
+    "wp-coding-standards/wpcs": "^3"
+  },
+  "suggest": {
+    "woocommerce/action-scheduler": "Background jobs for exports, email retries, key rotation",
+    "dompdf/dompdf": "PDF generation for receipts/exports",
+    "endroid/qr-code": "QR code generation for attendance tokens",
+    "league/csv": "Robust CSV writer for exports"
+  },
+  "scripts": {
+    "lint": "find . -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l",
+    "phpcs": "phpcs --standard=phpcs.xml --report=summary --report-width=120",
+    "phpcbf": "phpcbf --standard=phpcs.xml",
+    "phpstan": "phpstan analyse -c phpstan.neon --no-progress",
+    "test": "phpunit",
+    "release:patch": "php bin/bump-version.php patch && php bin/changelog.php",
+    "release:minor": "php bin/bump-version.php minor && php bin/changelog.php",
+    "release:major": "php bin/bump-version.php major && php bin/changelog.php",
+    "release:set": "php bin/bump-version.php set",
+    "release:tagless": "php bin/bump-version.php patch --no-tag && php bin/changelog.php",
+    "build:zip": "bash -lc 'rm -rf dist && mkdir -p dist/foodbank-manager && rsync -a --exclude=.git --exclude=.github --exclude=node_modules --exclude=dist ./ dist/foodbank-manager/ && cd dist && zip -r foodbank-manager.zip foodbank-manager'",
+    "cs:report": "phpcs --standard=phpcs.xml -q --report=full --report-file=./phpcs-report.txt",
+    "cs:fix": "composer phpcbf && composer phpcs || true"
+  },
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
     },
-    "autoload": {
-        "psr-4": {
-            "FoodBankManager\\": "includes/"
-        }
-    },
-    "require-dev": {
-        "cebe/markdown": "^1.2",
-        "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
-        "paragonie/sodium_compat": "^1",
-        "php-stubs/wordpress-stubs": "^6.5",
-        "phpstan/phpstan": "^1",
-        "phpunit/phpunit": "^9.6",
-        "slevomat/coding-standard": "^8",
-        "squizlabs/php_codesniffer": "^3",
-        "symfony/console": "^6",
-        "symfony/process": "^6",
-        "wp-coding-standards/wpcs": "^3"
-    },
-    "suggest": {
-        "woocommerce/action-scheduler": "Background jobs for exports, email retries, key rotation",
-        "dompdf/dompdf": "PDF generation for receipts/exports",
-        "endroid/qr-code": "QR code generation for attendance tokens",
-        "league/csv": "Robust CSV writer for exports"
-    },
-    "scripts": {
-        "lint": "find . -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l",
-        "phpcs": "vendor/bin/phpcs --report=summary --standard=phpcs.xml",
-        "phpcbf": "phpcbf --standard=phpcs.xml",
-        "phpstan": "phpstan analyse -c phpstan.neon --no-progress",
-        "test": "phpunit",
-        "release:patch": "php bin/bump-version.php patch && php bin/changelog.php",
-        "release:minor": "php bin/bump-version.php minor && php bin/changelog.php",
-        "release:major": "php bin/bump-version.php major && php bin/changelog.php",
-        "release:set": "php bin/bump-version.php set",
-        "release:tagless": "php bin/bump-version.php patch --no-tag && php bin/changelog.php",
-        "build:zip": "bash -lc 'rm -rf dist && mkdir -p dist/foodbank-manager && rsync -a --exclude=.git --exclude=.github --exclude=node_modules --exclude=dist ./ dist/foodbank-manager/ && cd dist && zip -r foodbank-manager.zip foodbank-manager'"
-    },
-    "config": {
-        "allow-plugins": {
-            "dealerdirect/phpcodesniffer-composer-installer": true
-        },
-        "sort-packages": true
-    },
-    "version": "0.1.1"
+    "sort-packages": true
+  },
+  "version": "0.1.1"
 }
