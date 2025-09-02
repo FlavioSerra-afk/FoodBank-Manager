@@ -11,6 +11,7 @@ A secure, mobile‑first WordPress plugin for Food Bank applications, encrypted 
 - [`Docs/API.md`](Docs/API.md)
 - [`Docs/DB_SCHEMA.md`](Docs/DB_SCHEMA.md)
 - [`Docs/LocalDev.md`](Docs/LocalDev.md)
+- [PHPCS Ignores & Suppressed Issues](./PHPCS-Ignores.md)
 
 ```bash
 composer phpcs && composer phpstan -- --memory-limit=1G && composer test
