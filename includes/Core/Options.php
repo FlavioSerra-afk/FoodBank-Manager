@@ -53,8 +53,31 @@ class Options {
 				'retention_months' => 24,
 				'anonymise_files'  => 'delete',
 			),
+			'theme'      => array(
+				'frontend' => self::theme_defaults(),
+				'admin'    => self::theme_defaults(),
+			),
 			'encryption' => array(),
 		);
+	}
+
+		/**
+		 * Default theme values.
+		 *
+		 * @return array<string,mixed>
+		 */
+	private static function theme_defaults(): array {
+			return array(
+				'preset'      => 'clean',
+				'accent'      => '#3b82f6',
+				'radius'      => 12,
+				'shadow'      => 'md',
+				'font_family' => 'system',
+				'density'     => 'comfortable',
+				'dark_mode'   => 'auto',
+				'custom_css'  => '',
+				'load_font'   => false,
+			);
 	}
 
 	/**
@@ -162,11 +185,63 @@ class Options {
 		}
 		$merged['attendance']['types'] = $types ?: array( 'in_person' );
 
-		$merged['privacy']['retention_months'] = max( 0, (int) ( $merged['privacy']['retention_months'] ?? 24 ) );
-		$merged['privacy']['anonymise_files']  = in_array( $merged['privacy']['anonymise_files'], array( 'delete', 'keep', 'move' ), true ) ? $merged['privacy']['anonymise_files'] : 'delete';
+				$merged['privacy']['retention_months'] = max( 0, (int) ( $merged['privacy']['retention_months'] ?? 24 ) );
+				$merged['privacy']['anonymise_files']  = in_array( $merged['privacy']['anonymise_files'], array( 'delete', 'keep', 'move' ), true ) ? $merged['privacy']['anonymise_files'] : 'delete';
 
-		unset( $merged['encryption'] );
+				$merged['theme']['frontend'] = self::sanitize_theme( (array) ( $merged['theme']['frontend'] ?? array() ) );
+				$merged['theme']['admin']    = self::sanitize_theme( (array) ( $merged['theme']['admin'] ?? array() ) );
 
-		return update_option( self::KEY, $merged );
+				unset( $merged['encryption'] );
+
+				return update_option( self::KEY, $merged );
+	}
+
+		/**
+		 * Sanitize theme settings.
+		 *
+		 * @param array<string,mixed> $data Raw theme settings.
+		 * @return array<string,mixed>
+		 */
+	private static function sanitize_theme( array $data ): array {
+			$out     = self::theme_defaults();
+			$presets = array( 'clean', 'classic', 'contrast', 'compact', 'large' );
+		if ( isset( $data['preset'] ) && in_array( $data['preset'], $presets, true ) ) {
+				$out['preset'] = $data['preset'];
+		}
+
+			$accent = (string) ( $data['accent'] ?? '' );
+		if ( preg_match( '/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/', $accent ) ) {
+					$out['accent'] = $accent;
+		}
+
+			$out['radius'] = max( 0, min( 20, (int) ( $data['radius'] ?? 12 ) ) );
+
+			$shadows = array( 'none', 'sm', 'md', 'lg' );
+		if ( isset( $data['shadow'] ) && in_array( $data['shadow'], $shadows, true ) ) {
+					$out['shadow'] = $data['shadow'];
+		}
+
+				$fonts = array( 'system', 'inter', 'roboto', 'georgia' );
+		if ( isset( $data['font_family'] ) && in_array( $data['font_family'], $fonts, true ) ) {
+				$out['font_family'] = $data['font_family'];
+		}
+
+				$densities = array( 'compact', 'comfortable', 'spacious' );
+		if ( isset( $data['density'] ) && in_array( $data['density'], $densities, true ) ) {
+				$out['density'] = $data['density'];
+		}
+
+				$dark = array( 'off', 'on', 'auto' );
+		if ( isset( $data['dark_mode'] ) && in_array( $data['dark_mode'], $dark, true ) ) {
+				$out['dark_mode'] = $data['dark_mode'];
+		}
+
+               $css = (string) ( $data['custom_css'] ?? '' );
+               $css = substr( $css, 0, 10000 );
+               $out['custom_css'] = function_exists( 'wp_strip_all_tags' ) ? wp_strip_all_tags( $css ) : strip_tags( $css );
+
+				$out['load_font'] = ! empty( $data['load_font'] );
+
+				return $out;
 	}
 }

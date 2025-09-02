@@ -2,11 +2,11 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; }
 ?>
-<div class="fbm-attendance-manager">
-	<div class="fbm-tabs">
-	<button type="button" data-tab="manual" class="active"><?php echo esc_html__( 'Manual', 'foodbank-manager' ); ?></button>
-	<button type="button" data-tab="scan"><?php echo esc_html__( 'Scan', 'foodbank-manager' ); ?></button>
-	</div>
+<div class="fbm-attendance-manager fbm-card">
+        <div class="fbm-tabs">
+        <button type="button" data-tab="manual" class="fbm-btn fbm-btn--primary active"><?php echo esc_html__( 'Manual', 'foodbank-manager' ); ?></button>
+        <button type="button" data-tab="scan" class="fbm-btn"><?php echo esc_html__( 'Scan', 'foodbank-manager' ); ?></button>
+        </div>
 	<div id="fbm-tab-manual" class="fbm-tab">
 	<p><label><?php esc_html_e( 'Token', 'foodbank-manager' ); ?> <input type="text" id="fbm-token" /></label></p>
 	<p><label><?php esc_html_e( 'Application ID', 'foodbank-manager' ); ?> <input type="number" id="fbm-app" /></label></p>
@@ -19,13 +19,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</select>
 	</label></p>
 	<p>
-		<button type="button" id="fbm-checkin"><?php esc_html_e( 'Check-in', 'foodbank-manager' ); ?></button>
-		<button type="button" id="fbm-noshow"><?php esc_html_e( 'Mark no-show', 'foodbank-manager' ); ?></button>
-	</p>
+                <button type="button" id="fbm-checkin" class="fbm-btn fbm-btn--primary"><?php esc_html_e( 'Check-in', 'foodbank-manager' ); ?></button>
+                <button type="button" id="fbm-noshow" class="fbm-btn"><?php esc_html_e( 'Mark no-show', 'foodbank-manager' ); ?></button>
+        </p>
 	<div id="fbm-message"></div>
 	</div>
 	<div id="fbm-tab-scan" class="fbm-tab" style="display:none;">
-	<p><button type="button" id="fbm-start-scan"><?php esc_html_e( 'Start camera scan', 'foodbank-manager' ); ?></button></p>
+        <p><button type="button" id="fbm-start-scan" class="fbm-btn fbm-btn--primary"><?php esc_html_e( 'Start camera scan', 'foodbank-manager' ); ?></button></p>
 	<div id="fbm-scanner" style="width:240px;height:240px;display:none;"></div>
 	<div id="fbm-scan-error" style="display:none;" class="fbm-error"><?php esc_html_e( 'Camera not available.', 'foodbank-manager' ); ?></div>
 	</div>
