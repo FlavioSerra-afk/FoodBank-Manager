@@ -6,7 +6,6 @@ namespace FoodBankManager\Core;
 
 use FoodBankManager\Shortcodes\Form;
 use FoodBankManager\Shortcodes\Entries;
-use FoodBankManager\Admin\Menu;
 use FoodBankManager\Rest\Api;
 use FoodBankManager\Mail\Logger;
 use FoodBankManager\Admin\Notices;
@@ -15,7 +14,6 @@ class Hooks {
 
 	public function register(): void {
 		add_action( 'init', array( $this, 'register_shortcodes' ) );
-		add_action( 'admin_menu', array( Menu::class, 'register' ) );
 		add_action( 'rest_api_init', array( Api::class, 'register_routes' ) );
 		Logger::init();
 		add_action( 'fbm_crypto_missing_kek', array( Notices::class, 'missing_kek' ) );

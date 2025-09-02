@@ -4,61 +4,51 @@ declare(strict_types=1);
 
 namespace FoodBankManager\Admin;
 
-class Menu {
+final class Menu {
+    public static function register(): void {
+        add_action('admin_menu', [__CLASS__, 'addMenu']);
+    }
 
-	public static function register(): void {
-		add_menu_page(
-			__( 'FoodBank', 'foodbank-manager' ),
-			__( 'FoodBank', 'foodbank-manager' ),
-			'fb_read_entries',
-			'fbm_dashboard',
-			array( self::class, 'render_dashboard' ),
-			'dashicons-carrot',
-			20
-		);
-		add_submenu_page( 'fbm_dashboard', __( 'Dashboard', 'foodbank-manager' ), __( 'Dashboard', 'foodbank-manager' ), 'fb_read_entries', 'fbm_dashboard', array( self::class, 'render_dashboard' ) );
-		add_submenu_page( 'fbm_dashboard', __( 'Attendance', 'foodbank-manager' ), __( 'Attendance', 'foodbank-manager' ), 'attendance_view', 'fbm_attendance', array( self::class, 'render_attendance' ) );
-		add_submenu_page( 'fbm_dashboard', __( 'Database', 'foodbank-manager' ), __( 'Database', 'foodbank-manager' ), 'fb_read_entries', 'fbm_database', array( self::class, 'render_database' ) );
-		add_submenu_page( 'fbm_dashboard', __( 'Forms', 'foodbank-manager' ), __( 'Forms', 'foodbank-manager' ), 'fb_manage_forms', 'fbm_forms', array( self::class, 'render_forms' ) );
-		add_submenu_page( 'fbm_dashboard', __( 'Email Templates', 'foodbank-manager' ), __( 'Email Templates', 'foodbank-manager' ), 'fb_manage_emails', 'fbm_emails', array( self::class, 'render_emails' ) );
-		add_submenu_page( 'fbm_dashboard', __( 'Settings', 'foodbank-manager' ), __( 'Settings', 'foodbank-manager' ), 'fb_manage_settings', 'fbm_settings', array( self::class, 'render_settings' ) );
-		add_submenu_page( 'fbm_dashboard', __( 'Diagnostics', 'foodbank-manager' ), __( 'Diagnostics', 'foodbank-manager' ), 'fb_manage_settings', 'fbm_diagnostics', array( self::class, 'render_diagnostics' ) );
-	}
+    public static function addMenu(): void {
+        $cap = current_user_can('fb_read_entries') ? 'fb_read_entries' : 'manage_options';
 
-	private static function render_template( string $template ): void {
-		$path = dirname( __DIR__, 2 ) . '/templates/admin/' . $template . '.php';
-		if ( file_exists( $path ) ) {
-			include $path;
-		} else {
-			echo \esc_html__( 'Template missing.', 'foodbank-manager' );
-		}
-	}
+        add_menu_page(
+            __('FoodBank', 'foodbank-manager'),
+            __('FoodBank', 'foodbank-manager'),
+            $cap,
+            'fbm-dashboard',
+            [__CLASS__, 'renderDashboard'],
+            'dashicons-clipboard',
+            58
+        );
 
-	public static function render_dashboard(): void {
-		self::render_template( 'dashboard' );
-	}
+        self::submenu($cap, 'fbm-dashboard', 'fbm-attendance',   __('Attendance', 'foodbank-manager'),   [__CLASS__, 'renderAttendance']);
+        self::submenu($cap, 'fbm-dashboard', 'fbm-database',     __('Database', 'foodbank-manager'),     [__CLASS__, 'renderDatabase']);
+        self::submenu($cap, 'fbm-dashboard', 'fbm-forms',        __('Forms', 'foodbank-manager'),        [__CLASS__, 'renderForms']);
+        self::submenu($cap, 'fbm-dashboard', 'fbm-emails',       __('Email Templates', 'foodbank-manager'), [__CLASS__, 'renderEmails']);
+        self::submenu($cap, 'fbm-dashboard', 'fbm-settings',     __('Settings', 'foodbank-manager'),     [__CLASS__, 'renderSettings']);
+        self::submenu($cap, 'fbm-dashboard', 'fbm-diagnostics',  __('Diagnostics', 'foodbank-manager'),  [__CLASS__, 'renderDiagnostics']);
+    }
 
-	public static function render_attendance(): void {
-		self::render_template( 'attendance' );
-	}
+    private static function submenu(string $cap, string $parent, string $slug, string $title, callable $cb): void {
+        add_submenu_page($parent, $title, $title, $cap, $slug, $cb, 10);
+    }
 
-	public static function render_database(): void {
-		self::render_template( 'database' );
-	}
+    private static function safeInclude(string $template): void {
+        $path = \FBM_PATH . 'templates/admin/' . $template;
+        if (is_readable($path)) {
+            require $path;
+        } else {
+            echo '<div class="wrap"><h1>' . esc_html__('FoodBank', 'foodbank-manager') . '</h1><p>'
+               . esc_html__('Template missing:', 'foodbank-manager') . ' ' . esc_html($template) . '</p></div>';
+        }
+    }
 
-	public static function render_forms(): void {
-		self::render_template( 'forms' );
-	}
-
-	public static function render_emails(): void {
-		self::render_template( 'emails' );
-	}
-
-	public static function render_settings(): void {
-		self::render_template( 'settings' );
-	}
-
-	public static function render_diagnostics(): void {
-		self::render_template( 'diagnostics' );
-	}
+    public static function renderDashboard(): void  { self::safeInclude('dashboard.php'); }
+    public static function renderAttendance(): void { self::safeInclude('attendance.php'); }
+    public static function renderDatabase(): void   { self::safeInclude('database.php'); }
+    public static function renderForms(): void      { self::safeInclude('forms.php'); }
+    public static function renderEmails(): void     { self::safeInclude('emails.php'); }
+    public static function renderSettings(): void   { self::safeInclude('settings.php'); }
+    public static function renderDiagnostics(): void{ self::safeInclude('diagnostics.php'); }
 }

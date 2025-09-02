@@ -1,8 +1,12 @@
 <?php
 namespace FoodBankManager\Admin;
 
-if (! defined('ABSPATH')) {
+if ( ! defined( 'ABSPATH' ) ) {
     exit;
+}
+
+if ( ! current_user_can( 'fb_manage_emails' ) && ! current_user_can( 'manage_options' ) ) {
+    wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ) );
 }
 ?>
 <div class="wrap">
