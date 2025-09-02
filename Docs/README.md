@@ -2,8 +2,16 @@
 
 A secure, mobile‑first WordPress plugin for Food Bank applications, encrypted data storage, operational dashboards, and **attendance tracking** with QR codes.
 
-> Full PRD: [`Docs/PRD-foodbank-manager.md`](Docs/PRD-foodbank-manager.md)  
+> Full PRD: [`Docs/PRD-foodbank-manager.md`](Docs/PRD-foodbank-manager.md)
 > Companion issues list: [`ISSUES-foodbank-manager.md`](ISSUES-foodbank-manager.md)
+
+## Start here
+- [`Docs/Architecture.md`](Docs/Architecture.md)
+- [`Docs/Agents.md`](Docs/Agents.md)
+
+```bash
+composer phpcs && composer phpstan -- --memory-limit=1G && composer test
+```
 
 ---
 
