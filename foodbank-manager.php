@@ -52,11 +52,14 @@ add_action(
 	'admin_notices',
 	static function () {
 		if ( ! class_exists( \FoodBankManager\Core\Plugin::class ) ) {
-						$notice = esc_html__(
-							'Autoloader not found. Please install using the Release ZIP from GitHub (which includes the vendor/ folder), or run composer install before activation.',
-							'foodbank-manager'
-						);
-						printf( '<div class="notice notice-error"><p><strong>FoodBank Manager:</strong> %s</p></div>', esc_html( $notice ) );
+						$notice = esc_html__( 'Autoloader not found.', 'foodbank-manager' ) . ' '
+								. esc_html__( 'Please install using the Release ZIP from GitHub.', 'foodbank-manager' ) . ' '
+								. esc_html__( 'The ZIP includes the vendor/ folder.', 'foodbank-manager' ) . ' '
+								. esc_html__( 'Alternatively, run composer install before activation.', 'foodbank-manager' );
+				printf(
+					'<div class="notice notice-error"><p><strong>FoodBank Manager:</strong> %s</p></div>',
+					esc_html( $notice )
+				);
 		}
 	}
 );

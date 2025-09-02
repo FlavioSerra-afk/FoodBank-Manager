@@ -99,19 +99,19 @@ class Options {
 	/**
 	 * Retrieve a setting using dot notation path.
 	 *
-	 * @param string $path    Dot notation path.
-	 * @param mixed  $default Default value if missing.
+	 * @param string $path          Dot notation path.
+	 * @param mixed  $default_value Default value if missing.
 	 * @return mixed
 	 */
-	public static function get( string $path, $default = null ) {
-		$settings = self::all();
+	public static function get( string $path, $default_value = null ) {
+			$settings = self::all();
 		foreach ( explode( '.', $path ) as $segment ) {
 			if ( ! is_array( $settings ) || ! array_key_exists( $segment, $settings ) ) {
-				return $default;
+				return $default_value;
 			}
-			$settings = $settings[ $segment ];
+				$settings = $settings[ $segment ];
 		}
-		return $settings;
+			return $settings;
 	}
 
 		/**
@@ -150,24 +150,28 @@ class Options {
 		 * Persist an array of settings, merged with defaults.
 		 * Values are sanitized based on known structure.
 		 *
-		 * @param array<string,mixed> $new Settings from request.
+		 * @param array<string,mixed> $new_settings Settings from request.
 		 * @return bool
 		 */
-	public static function saveAll( array $new ): bool {
-		$defaults = self::defaults();
-		$merged   = array_replace_recursive( $defaults, $new );
+	public static function saveAll( array $new_settings ): bool {
+			$defaults = self::defaults();
+			$merged   = array_replace_recursive( $defaults, $new_settings );
 
-			// Basic sanitization.
+		// Basic sanitization.
 		$merged['general']['org_name']    = sanitize_text_field( (string) ( $merged['general']['org_name'] ?? '' ) );
 		$merged['general']['logo_id']     = (int) ( $merged['general']['logo_id'] ?? 0 );
 		$merged['general']['date_format'] = sanitize_text_field( (string) ( $merged['general']['date_format'] ?? '' ) );
 
-		$merged['forms']['captcha_provider']         = in_array( $merged['forms']['captcha_provider'], array( 'off', 'recaptcha', 'turnstile' ), true ) ? $merged['forms']['captcha_provider'] : 'off';
+			$merged['forms']['captcha_provider']     = in_array(
+				$merged['forms']['captcha_provider'],
+				array( 'off', 'recaptcha', 'turnstile' ),
+				true
+			) ? $merged['forms']['captcha_provider'] : 'off';
 		$merged['forms']['captcha_site_key']         = sanitize_text_field( (string) ( $merged['forms']['captcha_site_key'] ?? '' ) );
 		$merged['forms']['captcha_secret']           = sanitize_text_field( (string) ( $merged['forms']['captcha_secret'] ?? '' ) );
 		$merged['forms']['honeypot']                 = ! empty( $merged['forms']['honeypot'] );
-		$merged['forms']['rate_limit_per_ip']        = max( 0, (int) ( $merged['forms']['rate_limit_per_ip'] ?? 60 ) );
-		$merged['forms']['consent_text']             = wp_kses_post( (string) ( $merged['forms']['consent_text'] ?? '' ) );
+			$merged['forms']['rate_limit_per_ip']    = max( 0, (int) ( $merged['forms']['rate_limit_per_ip'] ?? 60 ) );
+			$merged['forms']['consent_text']         = wp_kses_post( (string) ( $merged['forms']['consent_text'] ?? '' ) );
 		$merged['forms']['success_redirect_page_id'] = (int) ( $merged['forms']['success_redirect_page_id'] ?? 0 );
 
 		$merged['files']['max_size_mb'] = max( 1, (int) ( $merged['files']['max_size_mb'] ?? 5 ) );
@@ -175,9 +179,9 @@ class Options {
 		if ( ! is_array( $mimes ) ) {
 			$mimes = array_filter( array_map( 'sanitize_text_field', array_map( 'trim', explode( ',', (string) $mimes ) ) ) );
 		}
-		$merged['files']['allowed_mimes'] = $mimes;
-		$merged['files']['storage']       = $merged['files']['storage'] === 'local' ? 'local' : 'uploads';
-		$merged['files']['local_path']    = rtrim( sanitize_text_field( (string) ( $merged['files']['local_path'] ?? '' ) ) );
+		$merged['files']['allowed_mimes']  = $mimes;
+			$merged['files']['storage']    = $merged['files']['storage'] === 'local' ? 'local' : 'uploads';
+			$merged['files']['local_path'] = rtrim( sanitize_text_field( (string) ( $merged['files']['local_path'] ?? '' ) ) );
 
 		$merged['emails']['from_name']        = sanitize_text_field( (string) ( $merged['emails']['from_name'] ?? '' ) );
 		$email                                = sanitize_email( (string) ( $merged['emails']['from_email'] ?? '' ) );
@@ -186,16 +190,20 @@ class Options {
 		$merged['emails']['admin_recipients'] = sanitize_text_field( (string) ( $merged['emails']['admin_recipients'] ?? '' ) );
 
 		$merged['attendance']['policy_days'] = max( 1, (int) ( $merged['attendance']['policy_days'] ?? 7 ) );
-		$types                               = $merged['attendance']['types'];
+			$types                           = $merged['attendance']['types'];
 		if ( ! is_array( $types ) ) {
-			$types = array_filter( array_map( 'sanitize_key', explode( ',', (string) $types ) ) );
+				$types = array_filter( array_map( 'sanitize_key', explode( ',', (string) $types ) ) );
 		} else {
-			$types = array_map( 'sanitize_key', $types );
+				$types = array_map( 'sanitize_key', $types );
 		}
 			$merged['attendance']['types'] = $types ? $types : array( 'in_person' );
 
 			$merged['privacy']['retention_months'] = max( 0, (int) ( $merged['privacy']['retention_months'] ?? 24 ) );
-			$merged['privacy']['anonymise_files']  = in_array( $merged['privacy']['anonymise_files'], array( 'delete', 'keep', 'move' ), true ) ? $merged['privacy']['anonymise_files'] : 'delete';
+			$merged['privacy']['anonymise_files']  = in_array(
+				$merged['privacy']['anonymise_files'],
+				array( 'delete', 'keep', 'move' ),
+				true
+			) ? $merged['privacy']['anonymise_files'] : 'delete';
 
 			$merged['theme']['frontend'] = self::sanitize_theme( (array) ( $merged['theme']['frontend'] ?? array() ) );
 			$merged['theme']['admin']    = self::sanitize_theme( (array) ( $merged['theme']['admin'] ?? array() ) );
@@ -247,7 +255,7 @@ class Options {
 
 				$css               = (string) ( $data['custom_css'] ?? '' );
 				$css               = substr( $css, 0, 10000 );
-				$out['custom_css'] = function_exists( 'wp_strip_all_tags' ) ? wp_strip_all_tags( $css ) : strip_tags( $css ); // phpcs:ignore WordPress.WP.AlternativeFunctions.strip_tags -- Fallback when WordPress is unavailable.
+				$out['custom_css'] = function_exists( 'wp_strip_all_tags' ) ? wp_strip_all_tags( $css ) : strip_tags( $css ); // phpcs:ignore WordPress.WP.AlternativeFunctions.strip_tags_strip_tags -- Fallback when WordPress is unavailable.
 
 				$out['load_font'] = ! empty( $data['load_font'] );
 

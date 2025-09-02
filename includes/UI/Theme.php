@@ -126,7 +126,7 @@ class Theme {
 					'inter'  => 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap',
 					'roboto' => 'https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap',
 				);
-				wp_enqueue_style( 'fbm-font-' . $which, $map[ $family ] );
+				wp_enqueue_style( 'fbm-font-' . $which, $map[ $family ], array(), Plugin::FBM_VERSION );
 		}
 	}
 }

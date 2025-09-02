@@ -24,11 +24,15 @@ class Templates {
 		return array(
 			'applicant_confirmation' => array(
 				'subject' => 'We received your application — Ref {{reference}}',
-				'body'    => '<p>Hi {{first_name}},</p><p>We received your application. Reference: {{reference}}</p>{{summary_table}}',
+				'body'    => '<p>Hi {{first_name}},</p>'
+						. '<p>We received your application. Reference: {{reference}}</p>'
+						. '{{summary_table}}',
 			),
 			'admin_notification'     => array(
 				'subject' => 'New application received (Ref {{reference}})',
-				'body'    => '<p>New application from {{first_name}} {{last_name}}</p>{{summary_table}}<p><a href="{{application_link}}">View entry</a></p>',
+				'body'    => '<p>New application from {{first_name}} {{last_name}}</p>'
+						. '{{summary_table}}'
+						. '<p><a href="{{application_link}}">View entry</a></p>',
 			),
 		);
 	}
@@ -49,12 +53,12 @@ class Templates {
 	/**
 	 * Save templates.
 	 *
-	 * @param array<string,array{subject:string,body:string}> $new Templates.
+	 * @param array<string,array{subject:string,body:string}> $new_templates Templates.
 	 * @return bool
 	 */
-	public static function saveAll( array $new ): bool {
-		$templates = self::getAll();
-		foreach ( $new as $key => $tpl ) {
+	public static function saveAll( array $new_templates ): bool {
+			$templates = self::getAll();
+		foreach ( $new_templates as $key => $tpl ) {
 			$key = sanitize_key( $key );
 			if ( ! isset( $templates[ $key ] ) ) {
 				continue;
@@ -66,7 +70,7 @@ class Templates {
 				'body'    => $body,
 			);
 		}
-		return update_option( self::OPTION_KEY, $templates );
+			return update_option( self::OPTION_KEY, $templates );
 	}
 
 	/**
