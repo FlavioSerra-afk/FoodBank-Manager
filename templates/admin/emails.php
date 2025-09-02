@@ -51,7 +51,7 @@ $templates = Templates::getAll();
 		);
 		?>
 		" target="_blank"><?php esc_html_e( 'Preview', 'foodbank-manager' ); ?></a></p>
-		<?php submit_button( __( 'Save Templates', 'foodbank-manager' ) ); ?>
+				<?php submit_button( esc_html__( 'Save Templates', 'foodbank-manager' ) ); ?>
 	</form>
 	<hr />
 	<h2><?php esc_html_e( 'Send Test', 'foodbank-manager' ); ?></h2>
@@ -61,8 +61,8 @@ $templates = Templates::getAll();
 		<p>
 			<label><?php esc_html_e( 'Template', 'foodbank-manager' ); ?>
 				<select name="test_template">
-					<option value="applicant_confirmation">Applicant Confirmation</option>
-					<option value="admin_notification">Admin Notification</option>
+										<option value="applicant_confirmation"><?php esc_html_e( 'Applicant Confirmation', 'foodbank-manager' ); ?></option>
+										<option value="admin_notification"><?php esc_html_e( 'Admin Notification', 'foodbank-manager' ); ?></option>
 				</select>
 			</label>
 		</p>
@@ -71,7 +71,7 @@ $templates = Templates::getAll();
 				<input type="email" name="test_email" value="<?php echo esc_attr( wp_get_current_user()->user_email ); ?>" class="regular-text" />
 			</label>
 		</p>
-		<?php submit_button( __( 'Send Test', 'foodbank-manager' ) ); ?>
+				<?php submit_button( esc_html__( 'Send Test', 'foodbank-manager' ) ); ?>
 	</form>
 	<hr />
 	<h2><?php esc_html_e( 'Variables', 'foodbank-manager' ); ?></h2>

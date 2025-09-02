@@ -19,4 +19,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 <p><?php printf( esc_html__( 'Submitted at %s', 'foodbank-manager' ), esc_html( $created_at ) ); ?></p>
 <p><?php esc_html_e( 'Entry URL:', 'foodbank-manager' ); ?> <?php echo esc_url( $entry_url ); ?></p>
 <p><?php esc_html_e( 'Summary:', 'foodbank-manager' ); ?></p>
-<?php echo $summary_table; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+<?php
+$safe_summary = wp_kses_post( $summary_table );
+// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $safe_summary is sanitized via wp_kses_post().
+echo $safe_summary;
+?>

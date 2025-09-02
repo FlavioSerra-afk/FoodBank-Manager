@@ -94,7 +94,7 @@ else :
 		<input type="hidden" name="action" value="fbm_export_single" />
 		<input type="hidden" name="id" value="<?php echo esc_attr( (string) $r['id'] ); ?>" />
 			<?php wp_nonce_field( 'fbm_db_single_export_' . $r['id'] ); ?>
-		<button type="submit" class="button-link">CSV</button>
+				<button type="submit" class="button-link"><?php esc_html_e( 'CSV', 'foodbank-manager' ); ?></button>
 		</form>
 	<?php endif; ?>
 		<?php if ( current_user_can( 'fb_delete_entries' ) ) : ?>

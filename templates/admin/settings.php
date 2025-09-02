@@ -45,13 +45,20 @@ $settings = Options::all();
 				<tr>
 					<th><?php esc_html_e( 'CAPTCHA provider', 'foodbank-manager' ); ?></th>
 					<td>
-						<select name="fbm_settings[forms][captcha_provider]">
-							<?php foreach ( array( 'off', 'recaptcha', 'turnstile' ) as $p ) : ?>
-								<option value="<?php echo esc_attr( $p ); ?>" <?php selected( $settings['forms']['captcha_provider'], $p ); ?>><?php echo esc_html( $p ); ?></option>
-							<?php endforeach; ?>
-						</select>
-					</td>
-				</tr>
+                                                <?php
+                                                $captcha_providers = array(
+                                                        'off'       => __( 'Off', 'foodbank-manager' ),
+                                                        'recaptcha' => __( 'reCAPTCHA', 'foodbank-manager' ),
+                                                        'turnstile' => __( 'Turnstile', 'foodbank-manager' ),
+                                                );
+                                                ?>
+                                                <select name="fbm_settings[forms][captcha_provider]">
+                                                        <?php foreach ( $captcha_providers as $p => $label ) : ?>
+                                                                <option value="<?php echo esc_attr( $p ); ?>" <?php selected( $settings['forms']['captcha_provider'], $p ); ?>><?php echo esc_html( $label ); ?></option>
+                                                        <?php endforeach; ?>
+                                                </select>
+                                        </td>
+                                </tr>
 				<tr>
 					<th><label for="captcha_site_key"><?php esc_html_e( 'CAPTCHA Site Key', 'foodbank-manager' ); ?></label></th>
 					<td><input type="text" name="fbm_settings[forms][captcha_site_key]" id="captcha_site_key" value="<?php echo esc_attr( $settings['forms']['captcha_site_key'] ); ?>" class="regular-text" /></td>
@@ -101,13 +108,13 @@ $settings = Options::all();
 				<tr>
 					<th><?php esc_html_e( 'Storage', 'foodbank-manager' ); ?></th>
 					<td>
-						<select name="fbm_settings[files][storage]">
-							<option value="uploads" <?php selected( $settings['files']['storage'], 'uploads' ); ?>>uploads</option>
-							<option value="local" <?php selected( $settings['files']['storage'], 'local' ); ?>>local</option>
-						</select>
-						<p><input type="text" name="fbm_settings[files][local_path]" value="<?php echo esc_attr( $settings['files']['local_path'] ); ?>" class="regular-text" /></p>
-					</td>
-				</tr>
+                                                <select name="fbm_settings[files][storage]">
+                                                        <option value="uploads" <?php selected( $settings['files']['storage'], 'uploads' ); ?>><?php esc_html_e( 'uploads', 'foodbank-manager' ); ?></option>
+                                                        <option value="local" <?php selected( $settings['files']['storage'], 'local' ); ?>><?php esc_html_e( 'local', 'foodbank-manager' ); ?></option>
+                                                </select>
+                                                <p><input type="text" name="fbm_settings[files][local_path]" value="<?php echo esc_attr( $settings['files']['local_path'] ); ?>" class="regular-text" /></p>
+                                        </td>
+                                </tr>
 			</table>
 		</div>
 		<div id="emails" class="tab-section" style="display:none;">
@@ -129,9 +136,9 @@ $settings = Options::all();
 				<tr><th><label for="retention_months"><?php esc_html_e( 'Retention months', 'foodbank-manager' ); ?></label></th><td><input type="number" id="retention_months" name="fbm_settings[privacy][retention_months]" value="<?php echo esc_attr( $settings['privacy']['retention_months'] ); ?>" class="small-text" /></td></tr>
 				<tr><th><label for="anonymise_files"><?php esc_html_e( 'Files policy', 'foodbank-manager' ); ?></label></th><td>
 					<select name="fbm_settings[privacy][anonymise_files]" id="anonymise_files">
-						<option value="delete" <?php selected( $settings['privacy']['anonymise_files'], 'delete' ); ?>>delete</option>
-						<option value="keep" <?php selected( $settings['privacy']['anonymise_files'], 'keep' ); ?>>keep</option>
-						<option value="move" <?php selected( $settings['privacy']['anonymise_files'], 'move' ); ?>>move</option>
+                                                <option value="delete" <?php selected( $settings['privacy']['anonymise_files'], 'delete' ); ?>><?php esc_html_e( 'delete', 'foodbank-manager' ); ?></option>
+                                                <option value="keep" <?php selected( $settings['privacy']['anonymise_files'], 'keep' ); ?>><?php esc_html_e( 'keep', 'foodbank-manager' ); ?></option>
+                                                <option value="move" <?php selected( $settings['privacy']['anonymise_files'], 'move' ); ?>><?php esc_html_e( 'move', 'foodbank-manager' ); ?></option>
 					</select></td></tr>
 			</table>
 		</div>
@@ -139,7 +146,7 @@ $settings = Options::all();
 			<p><?php esc_html_e( 'Encryption status is read-only.', 'foodbank-manager' ); ?></p>
 			<table class="form-table">
 				<tr><th><?php esc_html_e( 'KEK configured', 'foodbank-manager' ); ?></th><td><?php echo defined( 'FBM_KEK_BASE64' ) && constant( 'FBM_KEK_BASE64' ) ? '✅' : '❌'; ?></td></tr>
-				<tr><th><?php esc_html_e( 'Sodium', 'foodbank-manager' ); ?></th><td><?php echo extension_loaded( 'sodium' ) ? 'native' : ( class_exists( 'ParagonIE\\Sodium\\Compat' ) ? 'polyfill' : 'none' ); ?></td></tr>
+                                <tr><th><?php esc_html_e( 'Sodium', 'foodbank-manager' ); ?></th><td><?php echo extension_loaded( 'sodium' ) ? esc_html__( 'native', 'foodbank-manager' ) : ( class_exists( 'ParagonIE\\Sodium\\Compat' ) ? esc_html__( 'polyfill', 'foodbank-manager' ) : esc_html__( 'none', 'foodbank-manager' ) ); ?></td></tr>
 			</table>
 		</div>
 		<?php submit_button(); ?>

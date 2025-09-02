@@ -55,14 +55,14 @@ value="1" <?php checked( isset( $role_caps[ $role_key ][ $cap ] ) ? (bool) $role
 					<?php endforeach; ?>
 				</tbody>
 			</table>
-			<?php submit_button( __( 'Save', 'foodbank-manager' ) ); ?>
+						<?php submit_button( esc_html__( 'Save', 'foodbank-manager' ) ); ?>
 		</form>
 	<?php elseif ( $tab === 'users' ) : ?>
 		<form method="get">
 			<input type="hidden" name="page" value="fbm-permissions" />
 			<input type="hidden" name="tab" value="users" />
 			<p><input type="search" name="user_search" value="<?php echo esc_attr( $search ); ?>" />
-			<?php submit_button( __( 'Search', 'foodbank-manager' ), 'secondary', '', false ); ?></p>
+						<?php submit_button( esc_html__( 'Search', 'foodbank-manager' ), 'secondary', '', false ); ?></p>
 		</form>
 		<?php if ( ! empty( $users ) ) : ?>
 			<form method="post">
@@ -92,7 +92,7 @@ value="1" <?php checked( isset( $meta[ $cap ] ) ? (bool) $meta[ $cap ] : false )
 <?php endforeach; ?>
 					</tbody>
 				</table>
-				<?php submit_button( __( 'Save', 'foodbank-manager' ) ); ?>
+								<?php submit_button( esc_html__( 'Save', 'foodbank-manager' ) ); ?>
 			</form>
 		<?php endif; ?>
 	<?php elseif ( $tab === 'import' ) : ?>
@@ -105,13 +105,13 @@ value="1" <?php checked( isset( $meta[ $cap ] ) ? (bool) $meta[ $cap ] : false )
 		<form method="post" enctype="multipart/form-data">
 			<?php wp_nonce_field( 'fbm_perm_import' ); ?>
 			<input type="file" name="import_json" accept="application/json" />
-			<?php submit_button( __( 'Import', 'foodbank-manager' ) ); ?>
+						<?php submit_button( esc_html__( 'Import', 'foodbank-manager' ) ); ?>
 		</form>
 	<?php else : ?>
 		<form method="post">
 			<?php wp_nonce_field( 'fbm_perm_reset' ); ?>
 			<p><?php \esc_html_e( 'This will remove all role mappings and user overrides.', 'foodbank-manager' ); ?></p>
-			<?php submit_button( __( 'Reset to defaults', 'foodbank-manager' ), 'delete' ); ?>
+						<?php submit_button( esc_html__( 'Reset to defaults', 'foodbank-manager' ), 'delete' ); ?>
 		</form>
 	<?php endif; ?>
 </div>
