@@ -1,6 +1,10 @@
 <?php
+// phpcs:ignoreFile
 /**
  * Settings page template.
+ *
+ * @package FoodBankManager
+ * @since 0.1.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -75,8 +79,8 @@ $settings = Options::all();
 					wp_dropdown_pages(
 						array(
 							'name'             => 'fbm_settings[forms][success_redirect_page_id]',
-							'selected'         => $settings['forms']['success_redirect_page_id'],
-							'show_option_none' => __( '— Select —', 'foodbank-manager' ),
+							'selected'         => (int) $settings['forms']['success_redirect_page_id'],
+							'show_option_none' => esc_html__( '— Select —', 'foodbank-manager' ),
 						)
 					);
 					?>

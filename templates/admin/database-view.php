@@ -1,11 +1,22 @@
 <?php
+/**
+ * Database entry view template.
+ *
+ * @package FoodBankManager
+ * @since 0.1.1
+ */
+
 use FoodBankManager\Security\Helpers;
 use FoodBankManager\Security\Crypto;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; }
-$data = json_decode( (string) ( $entry['data_json'] ?? '' ), true ) ?: array();
-$pii  = Crypto::decryptSensitive( (string) ( $entry['pii_encrypted_blob'] ?? '' ) );
+	exit;
+}
+$data = json_decode( (string) ( $entry['data_json'] ?? '' ), true );
+if ( ! is_array( $data ) ) {
+	$data = array();
+}
+$pii = Crypto::decryptSensitive( (string) ( $entry['pii_encrypted_blob'] ?? '' ) );
 if ( ! $can_sensitive ) {
 	$pii['email']     = Helpers::mask_email( $pii['email'] ?? '' );
 	$data['postcode'] = Helpers::mask_postcode( $data['postcode'] ?? '' );

@@ -1,4 +1,11 @@
 <?php
+/**
+ * Permissions page template.
+ *
+ * @package FoodBankManager
+ * @since 0.1.1
+ */
+
 namespace FoodBankManager\Admin;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -30,16 +37,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 					</tr>
 				</thead>
 				<tbody>
-					<?php foreach ( $roles as $role_key => $role ) : ?>
-						<tr>
-							<td><?php echo esc_html( $role['name'] ); ?></td>
-							<?php if ( $role_key === 'administrator' ) : ?>
-								<td colspan="<?php echo (int) count( $caps ); ?>"><?php \esc_html_e( 'Administrator always has all permissions.', 'foodbank-manager' ); ?></td>
-							<?php else : ?>
-								<?php foreach ( $caps as $cap ) : ?>
-									<td><input type="checkbox" name="role_caps[<?php echo esc_attr( $role_key ); ?>][<?php echo esc_attr( $cap ); ?>]" value="1" <?php checked( isset( $role_caps[ $role_key ][ $cap ] ) ? (bool) $role_caps[ $role_key ][ $cap ] : false ); ?> /></td>
-								<?php endforeach; ?>
-							<?php endif; ?>
+		<?php foreach ( $roles as $role_key => $role_data ) : ?>
+<tr>
+<td><?php echo esc_html( $role_data['name'] ); ?></td>
+			<?php if ( $role_key === 'administrator' ) : ?>
+<td colspan="<?php echo (int) count( $caps ); ?>"><?php \esc_html_e( 'Administrator always has all permissions.', 'foodbank-manager' ); ?></td>
+<?php else : ?>
+	<?php foreach ( $caps as $cap ) : ?>
+<td>
+<input type="checkbox"
+name="role_caps[<?php echo esc_attr( $role_key ); ?>][<?php echo esc_attr( $cap ); ?>]"
+value="1" <?php checked( isset( $role_caps[ $role_key ][ $cap ] ) ? (bool) $role_caps[ $role_key ][ $cap ] : false ); ?> />
+</td>
+<?php endforeach; ?>
+<?php endif; ?>
 						</tr>
 					<?php endforeach; ?>
 				</tbody>
@@ -66,24 +77,31 @@ if ( ! defined( 'ABSPATH' ) ) {
 						</tr>
 					</thead>
 					<tbody>
-						<?php foreach ( $users as $u ) : ?>
-							<?php $meta = get_user_meta( $u->ID, 'fbm_user_caps', true ); ?>
-							<tr>
-								<td><?php echo esc_html( $u->user_login ); ?></td>
-								<?php foreach ( $caps as $cap ) : ?>
-									<td><input type="checkbox" name="user_caps[<?php echo esc_attr( (string) $u->ID ); ?>][<?php echo esc_attr( $cap ); ?>]" value="1" <?php checked( isset( $meta[ $cap ] ) ? (bool) $meta[ $cap ] : false ); ?> /></td>
-								<?php endforeach; ?>
-							</tr>
-						<?php endforeach; ?>
+			<?php foreach ( $users as $u ) : ?>
+				<?php $meta = get_user_meta( $u->ID, 'fbm_user_caps', true ); ?>
+<tr>
+<td><?php echo esc_html( $u->user_login ); ?></td>
+				<?php foreach ( $caps as $cap ) : ?>
+<td>
+<input type="checkbox"
+name="user_caps[<?php echo esc_attr( (string) $u->ID ); ?>][<?php echo esc_attr( $cap ); ?>]"
+value="1" <?php checked( isset( $meta[ $cap ] ) ? (bool) $meta[ $cap ] : false ); ?> />
+</td>
+<?php endforeach; ?>
+</tr>
+<?php endforeach; ?>
 					</tbody>
 				</table>
 				<?php submit_button( __( 'Save', 'foodbank-manager' ) ); ?>
 			</form>
 		<?php endif; ?>
 	<?php elseif ( $tab === 'import' ) : ?>
-		<h3><?php \esc_html_e( 'Export', 'foodbank-manager' ); ?></h3>
-		<p><a href="<?php echo esc_url( wp_nonce_url( '?page=fbm-permissions&tab=import&export=1', 'fbm_perm_import' ) ); ?>" class="button"><?php \esc_html_e( 'Download JSON', 'foodbank-manager' ); ?></a></p>
-		<h3><?php \esc_html_e( 'Import', 'foodbank-manager' ); ?></h3>
+<h3><?php \esc_html_e( 'Export', 'foodbank-manager' ); ?></h3>
+		<?php $export_url = esc_url( wp_nonce_url( '?page=fbm-permissions&tab=import&export=1', 'fbm_perm_import' ) ); ?>
+<p>
+<a href="<?php echo esc_url( $export_url ); ?>" class="button"><?php \esc_html_e( 'Download JSON', 'foodbank-manager' ); ?></a>
+</p>
+<h3><?php \esc_html_e( 'Import', 'foodbank-manager' ); ?></h3>
 		<form method="post" enctype="multipart/form-data">
 			<?php wp_nonce_field( 'fbm_perm_import' ); ?>
 			<input type="file" name="import_json" accept="application/json" />

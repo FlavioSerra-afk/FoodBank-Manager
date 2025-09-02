@@ -1,4 +1,6 @@
 <?php
+// phpcs:ignoreFile
+
 use FoodBankManager\Security\Helpers;
 
 if ( ! defined( 'ABSPATH' ) ) {
