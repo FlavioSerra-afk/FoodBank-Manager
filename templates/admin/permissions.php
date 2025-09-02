@@ -9,24 +9,31 @@
 namespace FoodBankManager\Admin;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit;
+		exit;
 }
+$perms_base = menu_page_url( 'fbm-permissions', false );
 ?>
 <div class="wrap">
 	<h1><?php \esc_html_e( 'Permissions', 'foodbank-manager' ); ?></h1>
 	<?php if ( ! empty( $notice ) ) : ?>
 		<div class="notice notice-success"><p><?php echo esc_html( $notice ); ?></p></div>
 	<?php endif; ?>
-	<h2 class="nav-tab-wrapper">
-		<a href="?page=fbm-permissions&amp;tab=roles" class="nav-tab <?php echo $tab === 'roles' ? 'nav-tab-active' : ''; ?>"><?php \esc_html_e( 'Roles', 'foodbank-manager' ); ?></a>
-		<a href="?page=fbm-permissions&amp;tab=users" class="nav-tab <?php echo $tab === 'users' ? 'nav-tab-active' : ''; ?>"><?php \esc_html_e( 'Users', 'foodbank-manager' ); ?></a>
-		<a href="?page=fbm-permissions&amp;tab=import" class="nav-tab <?php echo $tab === 'import' ? 'nav-tab-active' : ''; ?>"><?php \esc_html_e( 'Import/Export', 'foodbank-manager' ); ?></a>
-		<a href="?page=fbm-permissions&amp;tab=reset" class="nav-tab <?php echo $tab === 'reset' ? 'nav-tab-active' : ''; ?>"><?php \esc_html_e( 'Reset', 'foodbank-manager' ); ?></a>
-	</h2>
+<h2 class="nav-tab-wrapper">
+<a href="<?php echo esc_url( $perms_base ); ?>"
+class="nav-tab <?php echo esc_attr( $tab === 'roles' ? 'nav-tab-active' : '' ); ?>"><?php \esc_html_e( 'Roles', 'foodbank-manager' ); ?></a>
+<a href="<?php echo esc_url( add_query_arg( 'tab', 'users', $perms_base ) ); ?>"
+class="nav-tab <?php echo esc_attr( $tab === 'users' ? 'nav-tab-active' : '' ); ?>"><?php \esc_html_e( 'Users', 'foodbank-manager' ); ?></a>
+<a href="<?php echo esc_url( add_query_arg( 'tab', 'import', $perms_base ) ); ?>"
+class="nav-tab <?php echo esc_attr( $tab === 'import' ? 'nav-tab-active' : '' ); ?>">
+<?php \esc_html_e( 'Import/Export', 'foodbank-manager' ); ?>
+</a>
+<a href="<?php echo esc_url( add_query_arg( 'tab', 'reset', $perms_base ) ); ?>"
+class="nav-tab <?php echo esc_attr( $tab === 'reset' ? 'nav-tab-active' : '' ); ?>"><?php \esc_html_e( 'Reset', 'foodbank-manager' ); ?></a>
+</h2>
 
 	<?php if ( $tab === 'roles' ) : ?>
 		<form method="post">
-			<?php wp_nonce_field( 'fbm_perm_roles' ); ?>
+		<?php wp_nonce_field( 'fbm_perm_roles', '_wpnonce' ); ?>
 			<table class="widefat">
 				<thead>
 					<tr>
@@ -41,7 +48,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 <tr>
 <td><?php echo esc_html( $role_data['name'] ); ?></td>
 			<?php if ( $role_key === 'administrator' ) : ?>
-<td colspan="<?php echo (int) count( $caps ); ?>"><?php \esc_html_e( 'Administrator always has all permissions.', 'foodbank-manager' ); ?></td>
+<td colspan="<?php echo (int) count( $caps ); ?>">
+				<?php \esc_html_e( 'Administrator always has all permissions.', 'foodbank-manager' ); ?>
+</td>
 <?php else : ?>
 	<?php foreach ( $caps as $cap ) : ?>
 <td>
@@ -66,7 +75,7 @@ value="1" <?php checked( isset( $role_caps[ $role_key ][ $cap ] ) ? (bool) $role
 		</form>
 		<?php if ( ! empty( $users ) ) : ?>
 			<form method="post">
-				<?php wp_nonce_field( 'fbm_perm_users' ); ?>
+			<?php wp_nonce_field( 'fbm_perm_users', '_wpnonce' ); ?>
 				<table class="widefat">
 					<thead>
 						<tr>
@@ -103,13 +112,13 @@ value="1" <?php checked( isset( $meta[ $cap ] ) ? (bool) $meta[ $cap ] : false )
 </p>
 <h3><?php \esc_html_e( 'Import', 'foodbank-manager' ); ?></h3>
 		<form method="post" enctype="multipart/form-data">
-			<?php wp_nonce_field( 'fbm_perm_import' ); ?>
+		<?php wp_nonce_field( 'fbm_perm_import', '_wpnonce' ); ?>
 			<input type="file" name="import_json" accept="application/json" />
 						<?php submit_button( esc_html__( 'Import', 'foodbank-manager' ) ); ?>
 		</form>
 	<?php else : ?>
 		<form method="post">
-			<?php wp_nonce_field( 'fbm_perm_reset' ); ?>
+		<?php wp_nonce_field( 'fbm_perm_reset', '_wpnonce' ); ?>
 			<p><?php \esc_html_e( 'This will remove all role mappings and user overrides.', 'foodbank-manager' ); ?></p>
 						<?php submit_button( esc_html__( 'Reset to defaults', 'foodbank-manager' ), 'delete' ); ?>
 		</form>

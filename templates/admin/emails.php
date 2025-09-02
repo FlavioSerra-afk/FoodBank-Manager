@@ -19,9 +19,18 @@ $templates = Templates::getAll();
 	<form method="post" action="">
 		<?php wp_nonce_field( 'fbm_emails_save', 'fbm_emails_nonce' ); ?>
 		<h2><?php esc_html_e( 'Applicant Confirmation', 'foodbank-manager' ); ?></h2>
-		<p><label><?php esc_html_e( 'Subject', 'foodbank-manager' ); ?><br />
-			<input type="text" name="templates[applicant_confirmation][subject]" value="<?php echo esc_attr( $templates['applicant_confirmation']['subject'] ); ?>" class="regular-text" /></label></p>
-		<?php wp_editor( $templates['applicant_confirmation']['body'], 'fbm_applicant_body', array( 'textarea_name' => 'templates[applicant_confirmation][body]' ) ); ?>
+<p><label><?php esc_html_e( 'Subject', 'foodbank-manager' ); ?><br />
+<input type="text" name="templates[applicant_confirmation][subject]"
+value="<?php echo esc_attr( $templates['applicant_confirmation']['subject'] ); ?>" class="regular-text" /></label></p>
+<?php
+wp_editor(
+	$templates['applicant_confirmation']['body'],
+	'fbm_applicant_body',
+	array(
+		'textarea_name' => 'templates[applicant_confirmation][body]',
+	)
+);
+?>
 		<p><a class="button" href="
 		<?php
 		echo esc_url(
@@ -36,9 +45,18 @@ $templates = Templates::getAll();
 		" target="_blank"><?php esc_html_e( 'Preview', 'foodbank-manager' ); ?></a></p>
 		<hr />
 		<h2><?php esc_html_e( 'Admin Notification', 'foodbank-manager' ); ?></h2>
-		<p><label><?php esc_html_e( 'Subject', 'foodbank-manager' ); ?><br />
-			<input type="text" name="templates[admin_notification][subject]" value="<?php echo esc_attr( $templates['admin_notification']['subject'] ); ?>" class="regular-text" /></label></p>
-		<?php wp_editor( $templates['admin_notification']['body'], 'fbm_admin_body', array( 'textarea_name' => 'templates[admin_notification][body]' ) ); ?>
+<p><label><?php esc_html_e( 'Subject', 'foodbank-manager' ); ?><br />
+<input type="text" name="templates[admin_notification][subject]"
+value="<?php echo esc_attr( $templates['admin_notification']['subject'] ); ?>" class="regular-text" /></label></p>
+<?php
+wp_editor(
+	$templates['admin_notification']['body'],
+	'fbm_admin_body',
+	array(
+		'textarea_name' => 'templates[admin_notification][body]',
+	)
+);
+?>
 		<p><a class="button" href="
 		<?php
 		echo esc_url(
@@ -61,14 +79,15 @@ $templates = Templates::getAll();
 		<p>
 			<label><?php esc_html_e( 'Template', 'foodbank-manager' ); ?>
 				<select name="test_template">
-										<option value="applicant_confirmation"><?php esc_html_e( 'Applicant Confirmation', 'foodbank-manager' ); ?></option>
-										<option value="admin_notification"><?php esc_html_e( 'Admin Notification', 'foodbank-manager' ); ?></option>
+<option value="applicant_confirmation"><?php esc_html_e( 'Applicant Confirmation', 'foodbank-manager' ); ?></option>
+<option value="admin_notification"><?php esc_html_e( 'Admin Notification', 'foodbank-manager' ); ?></option>
 				</select>
 			</label>
 		</p>
 		<p>
 			<label><?php esc_html_e( 'Email', 'foodbank-manager' ); ?>
-				<input type="email" name="test_email" value="<?php echo esc_attr( wp_get_current_user()->user_email ); ?>" class="regular-text" />
+<input type="email" name="test_email"
+value="<?php echo esc_attr( wp_get_current_user()->user_email ); ?>" class="regular-text" />
 			</label>
 		</p>
 				<?php submit_button( esc_html__( 'Send Test', 'foodbank-manager' ) ); ?>
