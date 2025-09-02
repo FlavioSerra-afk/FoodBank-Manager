@@ -24,4 +24,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<?php endif; ?>
 <?php endif; ?>
 <p><?php esc_html_e( 'Summary:', 'foodbank-manager' ); ?></p>
-<?php echo $summary_table; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+<?php
+$safe_summary = wp_kses_post( $summary_table );
+// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $safe_summary is sanitized via wp_kses_post().
+echo $safe_summary;
+?>

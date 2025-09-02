@@ -11,6 +11,7 @@ namespace FoodBankManager\Admin;
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+// Dashboard content placeholder.
 
 if ( ! current_user_can( 'fb_read_entries' ) && ! current_user_can( 'manage_options' ) ) {
 	wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ) );

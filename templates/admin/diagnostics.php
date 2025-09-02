@@ -19,5 +19,10 @@ if ( ! current_user_can( 'fb_manage_settings' ) && ! current_user_can( 'manage_o
 <div class="wrap">
 	<h1><?php \esc_html_e( 'Diagnostics', 'foodbank-manager' ); ?></h1>
 	<p><?php \esc_html_e( 'Coming soon.', 'foodbank-manager' ); ?></p>
-	<p><?php echo \esc_html( 'Sodium: ' . ( \extension_loaded( 'sodium' ) ? 'native' : ( \class_exists( '\\ParagonIE_Sodium_Compat' ) ? 'polyfill' : 'none' ) ) ); ?></p>
+		<?php
+		$sodium_mode = \extension_loaded( 'sodium' )
+			? esc_html__( 'native', 'foodbank-manager' )
+			: ( \class_exists( '\\ParagonIE_Sodium_Compat' ) ? esc_html__( 'polyfill', 'foodbank-manager' ) : esc_html__( 'none', 'foodbank-manager' ) );
+		?>
+		<p><?php echo esc_html__( 'Sodium:', 'foodbank-manager' ) . ' ' . esc_html( $sodium_mode ); ?></p>
 </div>

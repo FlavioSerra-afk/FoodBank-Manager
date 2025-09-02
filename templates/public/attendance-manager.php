@@ -23,7 +23,7 @@ exit;
         <p><label><?php esc_html_e( 'Type', 'foodbank-manager' ); ?>
                 <select id="fbm-type">
                 <?php foreach ( $type_opts as $t ) : ?>
-                        <option value="<?php echo esc_attr( $t ); ?>"><?php echo esc_html( ucfirst( str_replace( '_', ' ', $t ) ) ); ?></option>
+                        <option value="<?php echo esc_attr( $t ); ?>"><?php echo esc_html( translate( ucfirst( str_replace( '_', ' ', $t ) ), 'foodbank-manager' ) ); ?></option>
                 <?php endforeach; ?>
                 </select>
         </label></p>
@@ -61,7 +61,7 @@ exit;
                 const msg = document.getElementById('fbm-message');
                 msg.innerHTML = '';
                 const w = document.createElement('div');
-                w.textContent = 'Policy: last attended '+j.policy_warning.last_attended_at+' (<'+j.policy_warning.rule_days+'d).';
+                w.textContent = '<?php echo esc_js( __( 'Policy: last attended', 'foodbank-manager' ) ); ?> '+j.policy_warning.last_attended_at+' (<'+j.policy_warning.rule_days+'d).';
                 const ov = document.createElement('div');
                 ov.innerHTML = '<label><input type="checkbox" id="fbm-ov"> <?php echo esc_js( __( 'Override', 'foodbank-manager' ) ); ?></label> <input type="text" id="fbm-ov-note" placeholder="<?php echo esc_js( __( 'Note', 'foodbank-manager' ) ); ?>" /><button id="fbm-ov-submit"><?php echo esc_js( __( 'Confirm', 'foodbank-manager' ) ); ?></button>';
                 msg.appendChild(w); msg.appendChild(ov);

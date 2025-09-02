@@ -61,7 +61,7 @@ if ( ! $can_sensitive ) {
 	<input type="hidden" name="action" value="fbm_export_single" />
 	<input type="hidden" name="id" value="<?php echo esc_attr( (string) $entry['id'] ); ?>" />
 	<?php wp_nonce_field( 'fbm_db_single_export_' . $entry['id'] ); ?>
-	<button class="button">CSV</button>
+		<button class="button"><?php esc_html_e( 'CSV', 'foodbank-manager' ); ?></button>
 </form>
 <?php endif; ?>
 <?php if ( current_user_can( 'fb_delete_entries' ) ) : ?>
