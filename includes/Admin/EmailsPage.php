@@ -23,7 +23,7 @@ class EmailsPage {
 	 * @since 0.1.1
 	 */
 	public static function route(): void {
-		if ( ! current_user_can( 'fb_manage_emails' ) && ! current_user_can( 'manage_options' ) ) {
+		if ( ! current_user_can( 'fb_manage_emails' ) && ! current_user_can( 'manage_options' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
 			wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ), '', array( 'response' => 403 ) );
 		}
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only preview; template sanitized in handler.
@@ -43,7 +43,7 @@ class EmailsPage {
 	 */
 	private static function handle_post(): void {
 		check_admin_referer( 'fbm_admin_action', '_fbm_nonce' );
-		if ( ! current_user_can( 'manage_options' ) && ! current_user_can( 'fb_manage_emails' ) ) {
+		if ( ! current_user_can( 'manage_options' ) && ! current_user_can( 'fb_manage_emails' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
 			wp_die( esc_html__( 'You do not have permission to perform this action.', 'foodbank-manager' ) );
 		}
 		$action = sanitize_key( (string) ( $_POST['fbm_email_action'] ?? '' ) );
