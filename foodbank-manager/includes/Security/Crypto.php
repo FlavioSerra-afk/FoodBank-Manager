@@ -6,7 +6,7 @@ namespace FoodBankManager\Security;
 
 class Crypto {
 
-	private const KEK_CONSTANT = 'PCC_FBM_KEK_BASE64';
+	private const KEK_CONSTANT = 'FBM_KEK_BASE64';
 
 	private static function get_kek(): ?string {
 		$kek_b64 = defined( self::KEK_CONSTANT ) ? constant( self::KEK_CONSTANT ) : null;

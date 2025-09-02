@@ -1,6 +1,6 @@
 # FoodBank Manager — Product Requirements Document (PRD)
 
-**Repo file:** `docs/PRD-foodbank-manager.md`  
+**Repo file:** `Docs/PRD-foodbank-manager.md`  
 **Project:** FoodBank Manager (WordPress plugin)  
 **Owner:** Portuguese Community Centre London  
 **Version:** 1.0 (initial)  
