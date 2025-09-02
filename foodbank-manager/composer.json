@@ -16,6 +16,7 @@
     "require-dev": {
         "cebe/markdown": "^1.2",
         "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+        "paragonie/sodium_compat": "^1",
         "php-stubs/wordpress-stubs": "^6.5",
         "phpstan/phpstan": "^1",
         "phpunit/phpunit": "^9.6",
@@ -33,7 +34,7 @@
     },
     "scripts": {
         "lint": "find . -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l",
-        "phpcs": "phpcs --standard=phpcs.xml",
+        "phpcs": "vendor/bin/phpcs --report=summary --standard=phpcs.xml",
         "phpcbf": "phpcbf --standard=phpcs.xml",
         "phpstan": "phpstan analyse -c phpstan.neon --no-progress",
         "test": "phpunit",
