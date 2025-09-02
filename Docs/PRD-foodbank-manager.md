@@ -106,12 +106,18 @@ Roles map to WordPress **capabilities** (granular; see §10 Security).
 - Compatible with SMTP/transactional providers via site’s chosen plugin.
 
 ### 5.5 Admin (wp-admin) Interface
-- **Menu:** FoodBank → **Dashboard**, **Attendance**, **Database**, **Forms**, **Email Templates**, **Settings**, **Diagnostics**.
+- **Menu:** FoodBank → **Dashboard**, **Attendance**, **Database**, **Forms**, **Email Templates**, **Settings**, **Permissions**, **Diagnostics**.
 - **Database list:** filters (date, status, city, postcode, has file, consent), column chooser, pagination.
 - **Entry view:** all fields, internal notes, status (new/review/approved/declined/archived), actions: Edit, PDF, CSV, Delete (with confirm).
 - **Email Templates:** WYSIWYG editor, variables list, preview, send test.
 - **Settings:** branding, date/time, email defaults, spam protection keys, file policy, retention/anonymisation, encryption controls (see §10).
 - **Diagnostics:** email logs, resend, environment checks (PHP/WP version, cron, transport).
+- **Permissions:** map capabilities to roles and set per-user overrides.
+
+**Permissions tab — Acceptance Criteria**
+- Admins can map caps to roles (except Administrator which is fixed).
+- Admins can set per-user overrides.
+- Import/Export and Reset actions exist with nonces and warnings.
 - **Attendance** — see detailed spec below.
 
 #### Attendance (Admin Tab)

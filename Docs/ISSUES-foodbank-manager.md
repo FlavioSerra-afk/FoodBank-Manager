@@ -60,6 +60,20 @@ Use alongside the PRD: `PRD-foodbank-manager.md`.
   - **Labels:** area:auth, type:feature, security
   - **PRD Refs:** §3, §10.1
 
+**Issue: Permissions manager**
+- **Title:** feat(auth): permissions manager for roles and users
+- **Body:**
+  - **Description:** Add Permissions tab to map plugin caps to roles (Administrator fixed) and set per-user overrides with JSON import/export and reset.
+  - **Tasks:**
+    - [ ] Role mapping UI and storage
+    - [ ] User override resolver
+    - [ ] Import/export and reset actions
+    - [ ] Follow-ups: granular Settings page integration, audit log for permission changes, multisite network mapping
+  - **Acceptance Criteria:**
+    - Administrator always retains all capabilities
+  - **Labels:** area:auth, type:feature, security
+  - **PRD Refs:** §5.5 Permissions
+
 **Issue: Security middleware (nonces, sanitization, escaping)**
 - **Title:** feat(security): nonces & sanitization utilities
 - **Body:**

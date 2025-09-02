@@ -27,6 +27,7 @@ final class Menu {
         self::submenu($cap, 'fbm-dashboard', 'fbm-forms',        __('Forms', 'foodbank-manager'),        [__CLASS__, 'renderForms']);
         self::submenu($cap, 'fbm-dashboard', 'fbm-emails',       __('Email Templates', 'foodbank-manager'), [__CLASS__, 'renderEmails']);
         self::submenu($cap, 'fbm-dashboard', 'fbm-settings',     __('Settings', 'foodbank-manager'),     [__CLASS__, 'renderSettings']);
+        self::submenu('fb_manage_permissions', 'fbm-dashboard', 'fbm-permissions', __('Permissions', 'foodbank-manager'), [\FoodBankManager\Admin\PermissionsPage::class, 'route']);
         self::submenu($cap, 'fbm-dashboard', 'fbm-diagnostics',  __('Diagnostics', 'foodbank-manager'),  [__CLASS__, 'renderDiagnostics']);
     }
 
