@@ -49,7 +49,8 @@ if (!defined('ABSPATH')) { exit; }
         'visits_range'=>__('Visits (Range)','foodbank-manager'),
         'noshows_range'=>__('No-shows (Range)','foodbank-manager'),
         'visits_12m'=>__('Visits (12m)','foodbank-manager'),
-        'policy_badge'=>__('Policy','foodbank-manager')
+        'policy_badge'=>__('Policy','foodbank-manager'),
+        'timeline'=>__('Timeline','foodbank-manager')
       );
       foreach ($cols as $key=>$label) {
         $order = ($filters['orderby']===$key && $filters['order']==='ASC') ? 'DESC':'ASC';
@@ -71,6 +72,7 @@ if (!defined('ABSPATH')) { exit; }
       <td><?php echo esc_html((string)$r['noshows_range']); ?></td>
       <td><?php echo esc_html((string)$r['visits_12m']); ?></td>
       <td><?php echo $r['policy_badge']==='warning' ? '<span class="badge badge-warning">'.esc_html__('Warning','foodbank-manager').'</span>' : ''; ?></td>
+      <td><button type="button" class="button fbm-timeline-btn" data-app="<?php echo esc_attr((string)$r['application_id']); ?>"><?php esc_html_e('Timeline','foodbank-manager'); ?></button></td>
     </tr>
   <?php endforeach; endif; ?>
   </tbody>
@@ -113,3 +115,32 @@ if (!defined('ABSPATH')) { exit; }
 </form>
 <?php endif; ?>
 </div>
+<div id="fbm-timeline-modal" style="display:none;position:fixed;top:10%;left:10%;right:10%;background:#fff;border:1px solid #ccc;padding:10px;max-height:70%;overflow:auto;z-index:1000;">
+  <button type="button" id="fbm-timeline-close" style="float:right;">&times;</button>
+  <ul id="fbm-timeline-list"></ul>
+</div>
+<script>
+(function(){
+  const nonce='<?php echo esc_js( wp_create_nonce('wp_rest') ); ?>';
+  const endpoint='<?php echo esc_url_raw( rest_url('pcc-fb/v1/attendance/timeline') ); ?>';
+  document.querySelectorAll('.fbm-timeline-btn').forEach(btn=>{
+    btn.addEventListener('click',async()=>{
+      const app=btn.dataset.app;
+      const res=await fetch(endpoint+'?application_id='+app,{headers:{'X-WP-Nonce':nonce}});
+      if(!res.ok)return;
+      const data=await res.json();
+      const list=document.getElementById('fbm-timeline-list');
+      list.innerHTML='';
+      data.records.forEach(r=>{
+        const li=document.createElement('li');
+        li.textContent=r.attendance_at+' \u2022 '+r.status+' \u2022 '+r.type+' \u2022 '+r.manager+(r.override?' \u2022 override':'');
+        list.appendChild(li);
+      });
+      document.getElementById('fbm-timeline-modal').style.display='block';
+    });
+  });
+  document.getElementById('fbm-timeline-close').addEventListener('click',()=>{
+    document.getElementById('fbm-timeline-modal').style.display='none';
+  });
+})();
+</script>
