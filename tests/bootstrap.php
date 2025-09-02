@@ -30,3 +30,9 @@ if (! function_exists('wp_json_encode')) {
         return json_encode($data);
     }
 }
+
+if (! function_exists('current_time')) {
+    function current_time(string $type, bool $gmt = false) {
+        return gmdate('Y-m-d H:i:s');
+    }
+}

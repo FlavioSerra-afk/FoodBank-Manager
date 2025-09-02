@@ -29,6 +29,7 @@ final class AttendanceRepo {
      *   @type array  $type        Optional ['in_person','delivery',...]
      *   @type int    $manager_id  Optional recorded_by_user_id
      *   @type bool   $policy_only Optional
+     *   @type bool   $include_voided Optional defaults false
      *   @type int    $policy_days Frequency window (e.g., 7)
      *   @type int    $page        1-based
      *   @type int    $per_page    25/50/100
@@ -50,6 +51,9 @@ final class AttendanceRepo {
 
         $where = ["1=1"];
         $params = [];
+        if (empty($args['include_voided'])) {
+            $where[] = 't.is_void = 0';
+        }
 
         // Filter build (only indexed columns where possible)
         if (!empty($args['form_id']))  { $where[] = "a.form_id = %d";  $params[] = (int)$args['form_id']; }
@@ -158,6 +162,75 @@ final class AttendanceRepo {
         $total         = (int)$wpdb->get_var($preparedCount);
 
         return ['rows' => $rows, 'total' => $total];
+    }
+
+    public static function timeline(int $applicationId, string $from, string $to, bool $includeVoided=false): array {
+        global $wpdb;
+        $att   = $wpdb->prefix . 'fb_attendance';
+        $notes = $wpdb->prefix . 'fb_attendance_notes';
+        $where = ['t.application_id = %d'];
+        $params = [$applicationId];
+        if ($from !== '') { $where[] = 't.attendance_at >= %s'; $params[] = $from; }
+        if ($to   !== '') { $where[] = 't.attendance_at <= %s'; $params[] = $to; }
+        if (!$includeVoided) { $where[] = 't.is_void = 0'; }
+        $whereSql = implode(' AND ', $where);
+        $sql = "SELECT t.id,t.status,t.attendance_at,t.event_id,t.type,t.method,t.recorded_by_user_id,t.is_void,t.void_reason,t.void_by_user_id,t.void_at FROM {$att} t WHERE {$whereSql} ORDER BY t.attendance_at ASC";
+        $rows = $wpdb->get_results($wpdb->prepare($sql, $params), 'ARRAY_A') ?: [];
+        if (empty($rows)) { return []; }
+        $ids = array_map('intval', array_column($rows, 'id'));
+        $in  = implode(',', array_fill(0, count($ids), '%d'));
+        $noteSql = "SELECT attendance_id,user_id,note_text,created_at FROM {$notes} WHERE attendance_id IN ($in) ORDER BY created_at ASC";
+        $noteRows = $wpdb->get_results($wpdb->prepare($noteSql, $ids), 'ARRAY_A') ?: [];
+        $grouped = [];
+        foreach ($noteRows as $n) {
+            $grouped[(int)$n['attendance_id']][] = $n;
+        }
+        foreach ($rows as &$r) {
+            $r['notes'] = $grouped[(int)$r['id']] ?? [];
+        }
+        return $rows;
+    }
+
+    public static function setVoid(int $attendanceId, bool $void, ?string $reason, int $actorId, string $nowUtc): bool {
+        global $wpdb;
+        if ($void) {
+            $data = [
+                'is_void'        => 1,
+                'void_reason'    => $reason,
+                'void_by_user_id'=> $actorId,
+                'void_at'        => $nowUtc,
+            ];
+        } else {
+            $data = [
+                'is_void'        => 0,
+                'void_reason'    => null,
+                'void_by_user_id'=> null,
+                'void_at'        => null,
+            ];
+        }
+        $updated = $wpdb->update(
+            $wpdb->prefix . 'fb_attendance',
+            $data,
+            ['id' => $attendanceId],
+            ['%d','%s','%d','%s'],
+            ['%d']
+        );
+        return $updated !== false;
+    }
+
+    public static function addNote(int $attendanceId, int $userId, string $note, string $nowUtc): bool {
+        global $wpdb;
+        $inserted = $wpdb->insert(
+            $wpdb->prefix . 'fb_attendance_notes',
+            [
+                'attendance_id' => $attendanceId,
+                'user_id'       => $userId,
+                'note_text'     => $note,
+                'created_at'    => $nowUtc,
+            ],
+            ['%d','%d','%s','%s']
+        );
+        return $inserted !== false;
     }
 }
 
