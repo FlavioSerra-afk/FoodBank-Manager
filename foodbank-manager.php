@@ -7,6 +7,7 @@
  * Requires PHP: 8.1
  * Author: Portuguese Community Centre London
  * Text Domain: foodbank-manager
+ * Domain Path: /languages
  *
  * @package FoodBankManager
  */
