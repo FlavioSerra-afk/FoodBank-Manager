@@ -12,13 +12,16 @@
         }
     },
     "require-dev": {
-        "squizlabs/php_codesniffer": "^3",
+        "cebe/markdown": "^1.2",
         "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
-        "wp-coding-standards/wpcs": "^3",
-        "slevomat/coding-standard": "^8",
+        "php-stubs/wordpress-stubs": "^6.5",
         "phpstan/phpstan": "^1",
         "phpunit/phpunit": "^9.6",
-        "php-stubs/wordpress-stubs": "^6.5"
+        "slevomat/coding-standard": "^8",
+        "squizlabs/php_codesniffer": "^3",
+        "symfony/console": "^6",
+        "symfony/process": "^6",
+        "wp-coding-standards/wpcs": "^3"
     },
     "suggest": {
         "woocommerce/action-scheduler": "Background jobs for exports, email retries, key rotation",
@@ -31,12 +34,18 @@
         "phpcs": "phpcs --standard=phpcs.xml",
         "phpcbf": "phpcbf --standard=phpcs.xml",
         "phpstan": "phpstan analyse -c phpstan.neon --no-progress",
-        "test": "phpunit"
+        "test": "phpunit",
+        "release:patch": "php bin/bump-version.php patch && php bin/changelog.php",
+        "release:minor": "php bin/bump-version.php minor && php bin/changelog.php",
+        "release:major": "php bin/bump-version.php major && php bin/changelog.php",
+        "release:set": "php bin/bump-version.php set",
+        "release:tagless": "php bin/bump-version.php patch --no-tag && php bin/changelog.php"
     },
     "config": {
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true
         },
         "sort-packages": true
-    }
+    },
+    "version": "0.1.1"
 }

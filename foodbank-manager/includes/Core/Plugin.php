@@ -10,7 +10,10 @@ use FoodBankManager\Rest\Api;
 use FoodBankManager\Db\Migrations;
 use FoodBankManager\Auth\Roles;
 
-class Plugin {
+final class Plugin {
+
+    public const FBM_VERSION = '0.1.1';
+
 
 	private static ?Plugin $instance = null;
 
