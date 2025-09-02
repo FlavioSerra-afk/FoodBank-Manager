@@ -28,8 +28,8 @@ class TokenService {
 	 * @param string $token Token string.
 	 * @return array|null Payload array or null on failure.
 	 */
-	public static function validate( string $token ): ?array {
-		$parts = explode( '.', $token );
+        public static function validate( string $token, ?int $max_age = null ): ?array {
+                $parts = explode( '.', $token );
 		if ( 2 !== count( $parts ) ) {
 			return null;
 		}
@@ -41,7 +41,13 @@ class TokenService {
 		if ( ! hash_equals( $calc, (string) $parts[1] ) ) {
 			return null;
 		}
-		$data = json_decode( $payload, true );
-		return is_array( $data ) ? $data : null;
-	}
+                $data = json_decode( $payload, true );
+                if ( ! is_array( $data ) ) {
+                        return null;
+                }
+                if ( null !== $max_age && isset( $data['t'] ) && $data['t'] < time() - $max_age ) {
+                        return null;
+                }
+                return $data;
+        }
 }
