@@ -26,4 +26,11 @@ final class TokenServiceTest extends TestCase {
         $expired = base64_encode($payload_json) . '.' . hash_hmac('sha256', $payload_json, wp_salt('auth'));
         $this->assertNull(TokenService::validate($expired, 10));
     }
+
+    public function testFutureToken(): void {
+        $payload = ['a' => 123, 't' => time() + 20];
+        $payload_json = wp_json_encode($payload);
+        $future = base64_encode($payload_json) . '.' . hash_hmac('sha256', $payload_json, wp_salt('auth'));
+        $this->assertNotNull(TokenService::validate($future, 30));
+    }
 }
