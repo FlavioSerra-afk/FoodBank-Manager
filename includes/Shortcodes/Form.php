@@ -5,9 +5,13 @@ declare(strict_types=1);
 namespace FoodBankManager\Shortcodes;
 
 use FoodBankManager\Security\Helpers;
+use FoodBankManager\UI\Theme;
+use FoodBankManager\Core\Options;
 
 class Form {
     public static function render( array $atts = array() ): string {
+        Theme::enqueue_front();
+
         $atts = shortcode_atts(
             array(
                 'id' => '1',
@@ -72,7 +76,11 @@ class Form {
         // TODO(PRD §5.1 Anti-spam): integrate CAPTCHA
         echo '<p><button type="submit">' . esc_html__( 'Submit', 'foodbank-manager' ) . '</button></p>';
         echo '</form>';
-        return (string) ob_get_clean();
+        $content = (string) ob_get_clean();
+        $density = Options::get( 'theme.frontend.density', 'comfortable' );
+        $dark    = Options::get( 'theme.frontend.dark_mode', 'auto' );
+        $dark_cl = $dark === 'on' ? ' fbm-dark' : ( $dark === 'off' ? ' fbm-light' : '' );
+        return '<div class="fbm-scope fbm-density-' . esc_attr( $density ) . $dark_cl . '">' . $content . '</div>';
     }
 
     private static function text_field( string $name, string $label, bool $required, array $errors ): void {

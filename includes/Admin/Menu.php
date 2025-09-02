@@ -27,6 +27,7 @@ final class Menu {
         self::submenu($cap, 'fbm-dashboard', 'fbm-forms',        __('Forms', 'foodbank-manager'),        [__CLASS__, 'renderForms']);
         self::submenu($cap, 'fbm-dashboard', 'fbm-emails',       __('Email Templates', 'foodbank-manager'), [__CLASS__, 'renderEmails']);
         self::submenu($cap, 'fbm-dashboard', 'fbm-settings',     __('Settings', 'foodbank-manager'),     [__CLASS__, 'renderSettings']);
+        self::submenu($cap, 'fbm-dashboard', 'fbm-theme',        __('Design & Theme', 'foodbank-manager'), [__CLASS__, 'renderTheme']);
         self::submenu('fb_manage_permissions', 'fbm-dashboard', 'fbm-permissions', __('Permissions', 'foodbank-manager'), [\FoodBankManager\Admin\PermissionsPage::class, 'route']);
         self::submenu($cap, 'fbm-dashboard', 'fbm-diagnostics',  __('Diagnostics', 'foodbank-manager'),  [__CLASS__, 'renderDiagnostics']);
     }
@@ -51,5 +52,6 @@ final class Menu {
     public static function renderForms(): void      { self::safeInclude('forms.php'); }
     public static function renderEmails(): void     { self::safeInclude('emails.php'); }
     public static function renderSettings(): void   { self::safeInclude('settings.php'); }
+    public static function renderTheme(): void      { self::safeInclude('theme.php'); }
     public static function renderDiagnostics(): void{ self::safeInclude('diagnostics.php'); }
 }

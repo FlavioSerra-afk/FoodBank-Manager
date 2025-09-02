@@ -41,7 +41,16 @@ final class Plugin {
                         add_action('load-foodbank_page_fbm-attendance', [\FoodBankManager\Admin\AttendancePage::class, 'route']);
                         add_action('load-foodbank_page_fbm-permissions', [\FoodBankManager\Admin\PermissionsPage::class, 'route']);
                         add_action('load-foodbank_page_fbm-settings', [\FoodBankManager\Admin\SettingsPage::class, 'route']);
+                        add_action('load-foodbank_page_fbm-theme', [\FoodBankManager\Admin\ThemePage::class, 'route']);
                         add_action('load-foodbank_page_fbm-emails', [\FoodBankManager\Admin\EmailsPage::class, 'route']);
+                        add_action(
+                                'admin_enqueue_scripts',
+                                static function ( string $hook ): void {
+                                        if ( strpos( $hook, 'fbm' ) !== false ) {
+                                                \FoodBankManager\UI\Theme::enqueue_admin();
+                                        }
+                                }
+                        );
                 }
 
                 add_action( 'admin_post_nopriv_fbm_submit', array( FormSubmitController::class, 'handle' ) );
