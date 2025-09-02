@@ -1,53 +1,89 @@
 <?php
 /**
  * Plugin Name: FoodBank Manager
- * Plugin URI: https://pcclondon.uk/
- * Description: Secure management of Food Bank applications and attendance.
+ * Description: Secure forms, encrypted storage, dashboards, and attendance tracking for food banks.
  * Version: 0.1.1
+ * Requires at least: 6.0
+ * Requires PHP: 8.1
  * Author: Portuguese Community Centre London
- * License: GPL-3.0-or-later
- * License URI: https://www.gnu.org/licenses/gpl-3.0.html
  * Text Domain: foodbank-manager
- * Domain Path: /languages
  *
  * @package FoodBankManager
  */
 
-declare(strict_types=1);
+declare( strict_types=1 );
 
 namespace FoodBankManager;
-
-use FoodBankManager\Core\Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
-	require __DIR__ . '/vendor/autoload.php';
+// Paths/URLs.
+define( 'FBM_FILE', __FILE__ );
+define( 'FBM_PATH', plugin_dir_path( __FILE__ ) );
+define( 'FBM_URL', plugin_dir_url( __FILE__ ) );
+
+// Try Composer autoloader first.
+$autoload = FBM_PATH . 'vendor/autoload.php';
+if ( file_exists( $autoload ) ) {
+	require_once $autoload;
 } else {
-	add_action(
-		'admin_notices',
-		function (): void {
-			echo '<div class="notice notice-warning"><p>' . \esc_html__( 'FoodBank Manager dependencies not installed.', 'foodbank-manager' ) . '</p></div>';
+	// Lightweight PSR-4 autoloader for our namespace so activation never fatals.
+	spl_autoload_register(
+		static function ( $class_name ): void {
+			$prefix = __NAMESPACE__ . '\\';
+			if ( strpos( $class_name, $prefix ) !== 0 ) {
+				return;
+			}
+			$rel  = substr( $class_name, strlen( $prefix ) );
+			$rel  = str_replace( '\\', DIRECTORY_SEPARATOR, $rel );
+			$file = FBM_PATH . 'includes/' . $rel . '.php';
+			if ( is_readable( $file ) ) {
+				require $file;
+			}
 		}
 	);
 }
 
-/**
- * Activation hook.
- */
-function activate(): void {
-	Plugin::get_instance()->activate();
+// If our core class still isn't available, show a safe admin notice and bail (no fatals).
+add_action(
+	'admin_notices',
+	static function () {
+		if ( ! class_exists( \FoodBankManager\Core\Plugin::class ) ) {
+			echo '<div class="notice notice-error"><p><strong>FoodBank Manager:</strong> Autoloader not found. Please install using the <em>Release ZIP</em> from GitHub (which includes the <code>vendor/</code> folder), or run <code>composer install</code> before activation.</p></div>';
+		}
+	}
+);
+if ( ! class_exists( \FoodBankManager\Core\Plugin::class ) ) {
+	return;
 }
-register_activation_hook( __FILE__, __NAMESPACE__ . '\\activate' );
 
-/**
- * Deactivation hook.
- */
-function deactivate(): void {
-	Plugin::get_instance()->deactivate();
-}
-register_deactivation_hook( __FILE__, __NAMESPACE__ . '\\deactivate' );
+// Boot plugin after all plugins load.
+add_action(
+	'plugins_loaded',
+	static function (): void {
+		$plugin = new \FoodBankManager\Core\Plugin();
+		if ( method_exists( $plugin, 'boot' ) ) {
+			$plugin->boot();
+		}
+	}
+);
 
-Plugin::get_instance()->init();
+// Activation/Deactivation hooks guarded against missing classes.
+register_activation_hook(
+	__FILE__,
+	static function (): void {
+		if ( class_exists( \FoodBankManager\Core\Plugin::class ) && method_exists( \FoodBankManager\Core\Plugin::class, 'activate' ) ) {
+			\FoodBankManager\Core\Plugin::activate();
+		}
+	}
+);
+register_deactivation_hook(
+	__FILE__,
+	static function (): void {
+		if ( class_exists( \FoodBankManager\Core\Plugin::class ) && method_exists( \FoodBankManager\Core\Plugin::class, 'deactivate' ) ) {
+			\FoodBankManager\Core\Plugin::deactivate();
+		}
+	}
+);
