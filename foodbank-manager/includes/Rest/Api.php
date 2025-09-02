@@ -56,10 +56,61 @@ class Api {
 			);
 		}
 
-		// TODO(PRD §5.3): validate files via wp_handle_upload().
+                $file_ids = array();
+                $files    = $request->get_file_params();
+                $allowed  = (array) \FoodBankManager\Core\Options::get( 'upload_mimes', array( 'jpg' => 'image/jpeg', 'png' => 'image/png', 'pdf' => 'application/pdf' ) );
+                $max_size = (int) \FoodBankManager\Core\Options::get( 'upload_max_bytes', 2 * 1024 * 1024 );
+                $offroot  = (string) \FoodBankManager\Core\Options::get( 'upload_offroot_path', '' );
+                foreach ( $files as $file ) {
+                        if ( $file['error'] !== UPLOAD_ERR_OK || $file['size'] > $max_size ) {
+                                continue;
+                        }
+                        $type = wp_check_filetype( $file['name'], $allowed );
+                        if ( empty( $type['ext'] ) || empty( $type['type'] ) ) {
+                                continue;
+                        }
+                        $override = array(
+                                'test_form' => false,
+                                'unique_filename_callback' => function ( $dir, $name, $ext ) {
+                                        return wp_unique_filename( $dir, wp_generate_password( 12, false ) . $ext );
+                                },
+                        );
+                        if ( $offroot && is_dir( $offroot ) ) {
+                                $filter = static function ( $dirs ) use ( $offroot ) {
+                                        $dirs['path']    = $offroot;
+                                        $dirs['basedir'] = $offroot;
+                                        $dirs['url']     = $offroot;
+                                        $dirs['baseurl'] = $offroot;
+                                        return $dirs;
+                                };
+                                add_filter( 'upload_dir', $filter );
+                        }
+                        $uploaded = wp_handle_upload( $file, $override );
+                        if ( isset( $filter ) ) {
+                                remove_filter( 'upload_dir', $filter );
+                        }
+                        if ( isset( $uploaded['file'] ) ) {
+                                global $wpdb;
+                                $sha = hash_file( 'sha256', $uploaded['file'] );
+                                $wpdb->insert(
+                                        $wpdb->prefix . 'fb_files',
+                                        array(
+                                                'application_id' => 0,
+                                                'stored_path'    => $uploaded['file'],
+                                                'original_name'  => $file['name'],
+                                                'mime'           => $uploaded['type'] ?? '',
+                                                'size_bytes'     => (int) $file['size'],
+                                                'sha256'         => $sha,
+                                                'created_at'     => current_time( 'mysql' ),
+                                        ),
+                                        array( '%d', '%s', '%s', '%s', '%d', '%s', '%s' )
+                                );
+                                $file_ids[] = (int) $wpdb->insert_id;
+                        }
+                }
 
-		global $wpdb;
-		$table        = $wpdb->prefix . 'fb_applications';
+                global $wpdb;
+                $table        = $wpdb->prefix . 'fb_applications';
 		$data_json    = wp_json_encode(
 			array(
 				'first_name' => $first,
@@ -90,26 +141,44 @@ class Api {
 			),
 			array( '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s' )
 		);
-		$app_id = (int) $wpdb->insert_id;
+                $app_id = (int) $wpdb->insert_id;
+                if ( $file_ids ) {
+                        $wpdb->update( $wpdb->prefix . 'fb_files', array( 'application_id' => $app_id ), array( 'id' => $file_ids ), array( '%d' ), array( '%d' ) );
+                }
 
-		self::send_applicant_email( $email, $app_id, $first );
-		self::send_admin_email( $app_id, $first, $last, $email, $postcode );
+                self::send_applicant_email( $email, $app_id, $first );
+                self::send_admin_email( $app_id, $first, $last, $email, $postcode );
 
-		return new WP_REST_Response(
-			array(
-				'application_id' => $app_id,
-			),
-			201
-		);
-	}
+                return new WP_REST_Response(
+                        array(
+                                'id'         => $app_id,
+                                'reference'  => (string) $app_id,
+                                'created_at' => $now,
+                                'file_ids'   => $file_ids,
+                        ),
+                        201
+                );
+        }
 
-	private static function send_applicant_email( string $to, int $app_id, string $first_name ): void {
-		$subject = sprintf( __( 'We received your application — Ref %d', 'foodbank-manager' ), $app_id );
-		ob_start();
-		include dirname( __DIR__, 2 ) . '/templates/emails/applicant-confirmation.php';
-		$message = ob_get_clean();
-		wp_mail( $to, $subject, $message, array( 'Content-Type: text/html; charset=UTF-8' ) );
-	}
+        private static function send_applicant_email( string $to, int $app_id, string $first_name ): void {
+                $subject = sprintf( __( 'We received your application — Ref %d', 'foodbank-manager' ), $app_id );
+                $token   = \FoodBankManager\Attendance\TokenService::generate( $app_id );
+                $qr_code_url = '';
+                if ( \FoodBankManager\Core\Options::get( 'email_qr_enabled', true ) ) {
+                        if ( class_exists( \Endroid\QrCode\QrCode::class ) && class_exists( \Endroid\QrCode\Writer\PngWriter::class ) ) {
+                                $qr     = new \Endroid\QrCode\QrCode( $token );
+                                $writer = new \Endroid\QrCode\Writer\PngWriter();
+                                $qr_code_url = 'data:image/png;base64,' . base64_encode( $writer->write( $qr )->getString() );
+                        } else {
+                                $qr_code_url = $token;
+                        }
+                        $qr_code_url = apply_filters( 'fbm_qr_code_url', $qr_code_url, $app_id, $token );
+                }
+                ob_start();
+                include dirname( __DIR__, 2 ) . '/templates/emails/applicant-confirmation.php';
+                $message = ob_get_clean();
+                wp_mail( $to, $subject, $message, array( 'Content-Type: text/html; charset=UTF-8' ) );
+        }
 
 	private static function send_admin_email( int $app_id, string $first, string $last, string $email, string $postcode ): void {
 		$to      = (string) get_option( 'admin_email' );

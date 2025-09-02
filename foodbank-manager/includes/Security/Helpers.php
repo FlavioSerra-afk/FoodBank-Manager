@@ -21,7 +21,31 @@ class Helpers {
 		return sanitize_text_field( $value );
 	}
 
-	public static function esc_html( string $value ): string {
-		return esc_html( $value );
-	}
+        public static function esc_html( string $value ): string {
+                return esc_html( $value );
+        }
+
+        public static function mask_email( string $email ): string {
+                $email = sanitize_email( $email );
+                if ( $email === '' ) {
+                        return '';
+                }
+                $parts = explode( '@', $email );
+                if ( count( $parts ) !== 2 ) {
+                        return '';
+                }
+                $user = substr( $parts[0], 0, 1 ) . '***';
+                return $user . '@' . $parts[1];
+        }
+
+        public static function mask_postcode( string $postcode ): string {
+                $postcode = strtoupper( trim( $postcode ) );
+                $parts    = preg_split( '/\s+/', $postcode );
+                if ( count( $parts ) !== 2 ) {
+                        return $postcode;
+                }
+                $first  = substr( $parts[0], 0, 2 ) . '*';
+                $second = substr( $parts[1], 0, 1 ) . '**';
+                return $first . ' ' . $second;
+        }
 }

@@ -1,12 +1,41 @@
 <?php
 namespace FoodBankManager\Admin;
 
-if (! defined('ABSPATH')) {
-    exit;
+use FoodBankManager\Security\Helpers;
+use FoodBankManager\Security\Crypto;
+
+if ( ! defined( 'ABSPATH' ) ) {
+        exit;
+}
+
+if ( isset( $_GET['export'] ) && $_GET['export'] === 'csv' && current_user_can( 'fb_export_entries' ) ) {
+        Helpers::require_nonce( 'fbm_db_export' );
+        global $wpdb;
+        $rows = $wpdb->get_results( "SELECT id, data_json, pii_encrypted_blob FROM {$wpdb->prefix}fb_applications LIMIT 100", ARRAY_A );
+        $mask = ! ( isset( $_GET['mask'] ) && $_GET['mask'] === '0' && current_user_can( 'read_sensitive' ) );
+        header( 'Content-Type: text/csv' );
+        header( 'Content-Disposition: attachment; filename=applications.csv' );
+        $out = fopen( 'php://output', 'w' );
+        fputcsv( $out, array( 'ID', 'First name', 'Last name', 'Email', 'Postcode' ) );
+        foreach ( $rows as $r ) {
+                $data  = json_decode( (string) $r['data_json'], true );
+                $pii   = Crypto::decryptSensitive( (string) $r['pii_encrypted_blob'] );
+                $first = $data['first_name'] ?? '';
+                $last  = $pii['last_name'] ?? '';
+                $email = $pii['email'] ?? '';
+                $pc    = $data['postcode'] ?? '';
+                if ( $mask ) {
+                        $email = Helpers::mask_email( $email );
+                        $pc    = Helpers::mask_postcode( $pc );
+                }
+                fputcsv( $out, array( $r['id'], $first, $last, $email, $pc ) );
+        }
+        fclose( $out );
+        exit;
 }
 ?>
 <div class="wrap">
-    <h1><?php \esc_html_e('Database', 'foodbank-manager'); ?></h1>
+    <h1><?php \esc_html_e( 'Database', 'foodbank-manager' ); ?></h1>
     <form method="get" class="fbm-filters">
         <label><?php \esc_html_e('Date', 'foodbank-manager'); ?> <input type="date" name="filter_date" /></label>
         <label><?php \esc_html_e('Status', 'foodbank-manager'); ?>
@@ -32,4 +61,7 @@ if (! defined('ABSPATH')) {
         </tbody>
     </table>
     <div class="tablenav"><div class="tablenav-pages"><?php \esc_html_e('Pagination placeholder.', 'foodbank-manager'); ?></div></div>
+    <?php if ( current_user_can( 'fb_export_entries' ) ) : ?>
+        <p><a href="<?php echo esc_url( add_query_arg( array( 'export' => 'csv', '_wpnonce' => wp_create_nonce( 'fbm_db_export' ) ) ) ); ?>" class="button">&nbsp;<?php \esc_html_e( 'Export CSV', 'foodbank-manager' ); ?></a></p>
+    <?php endif; ?>
 </div>
