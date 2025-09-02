@@ -6,6 +6,7 @@ namespace FoodBankManager\Core;
 
 use FoodBankManager\Db\Migrations;
 use FoodBankManager\Auth\Roles;
+use FoodBankManager\Http\FormSubmitController;
 
 final class Plugin {
 
@@ -34,6 +35,9 @@ final class Plugin {
                 if ( is_admin() ) {
                         \FoodBankManager\Admin\Menu::register();
                 }
+
+                add_action( 'admin_post_nopriv_fbm_submit', array( FormSubmitController::class, 'handle' ) );
+                add_action( 'admin_post_fbm_submit', array( FormSubmitController::class, 'handle' ) );
 
                 add_action(
                         'admin_init',
