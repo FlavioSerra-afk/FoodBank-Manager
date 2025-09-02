@@ -36,6 +36,7 @@ final class Plugin {
                         \FoodBankManager\Admin\Menu::register();
                         add_action('load-toplevel_page_fbm-dashboard', [\FoodBankManager\Admin\DatabasePage::class, 'route']);
                         add_action('load-foodbank_page_fbm-database', [\FoodBankManager\Admin\DatabasePage::class, 'route']);
+                        add_action('load-foodbank_page_fbm-attendance', [\FoodBankManager\Admin\AttendancePage::class, 'route']);
                 }
 
                 add_action( 'admin_post_nopriv_fbm_submit', array( FormSubmitController::class, 'handle' ) );

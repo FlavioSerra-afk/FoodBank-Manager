@@ -22,7 +22,7 @@ final class Menu {
             58
         );
 
-        self::submenu($cap, 'fbm-dashboard', 'fbm-attendance',   __('Attendance', 'foodbank-manager'),   [__CLASS__, 'renderAttendance']);
+        self::submenu($cap, 'fbm-dashboard', 'fbm-attendance',   __('Attendance', 'foodbank-manager'),   [\FoodBankManager\Admin\AttendancePage::class, 'route']);
         self::submenu($cap, 'fbm-dashboard', 'fbm-database',     __('Database', 'foodbank-manager'),     [\FoodBankManager\Admin\DatabasePage::class, 'route']);
         self::submenu($cap, 'fbm-dashboard', 'fbm-forms',        __('Forms', 'foodbank-manager'),        [__CLASS__, 'renderForms']);
         self::submenu($cap, 'fbm-dashboard', 'fbm-emails',       __('Email Templates', 'foodbank-manager'), [__CLASS__, 'renderEmails']);
