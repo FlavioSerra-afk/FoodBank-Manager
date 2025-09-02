@@ -9,6 +9,10 @@ if ( ! defined( 'ABSPATH' ) ) {
         exit;
 }
 
+if ( ! current_user_can( 'attendance_view' ) && ! current_user_can( 'manage_options' ) ) {
+        wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ) );
+}
+
 $range   = isset( $_GET['range'] ) ? (int) $_GET['range'] : 7;
 $now     = current_time( 'mysql' );
 $from    = gmdate( 'Y-m-d H:i:s', strtotime( '-' . $range . ' days', strtotime( $now ) ) );

@@ -8,6 +8,10 @@ if ( ! defined( 'ABSPATH' ) ) {
         exit;
 }
 
+if ( ! current_user_can( 'fb_read_entries' ) && ! current_user_can( 'manage_options' ) ) {
+        wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ) );
+}
+
 if ( isset( $_GET['export'] ) && $_GET['export'] === 'csv' && current_user_can( 'fb_export_entries' ) ) {
         Helpers::require_nonce( 'fbm_db_export' );
         global $wpdb;

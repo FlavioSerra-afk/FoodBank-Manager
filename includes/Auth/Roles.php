@@ -4,70 +4,80 @@ declare(strict_types=1);
 
 namespace FoodBankManager\Auth;
 
-class Roles {
+final class Roles {
+    /**
+     * Return all plugin capabilities.
+     *
+     * @return string[]
+     */
+    public static function caps(): array {
+        return [
+            'fb_read_entries',
+            'fb_edit_entries',
+            'fb_delete_entries',
+            'fb_export_entries',
+            'fb_manage_forms',
+            'fb_manage_settings',
+            'fb_manage_emails',
+            'fb_manage_encryption',
+            'attendance_checkin',
+            'attendance_view',
+            'attendance_export',
+            'attendance_admin',
+            'read_sensitive',
+        ];
+    }
 
-	private const ROLES = array(
-		'foodbank_viewer'  => array(
-			'label' => 'FoodBank Viewer',
-			'caps'  => array(
-				'read'               => true,
-				'fb_read_entries'    => true,
-				'fb_export_entries'  => true,
-				'attendance_checkin' => true,
-				'attendance_view'    => true,
-				'attendance_export'  => true,
-			),
-		),
-		'foodbank_manager' => array(
-			'label' => 'FoodBank Manager',
-			'caps'  => array(
-				'read'               => true,
-				'fb_read_entries'    => true,
-				'fb_edit_entries'    => true,
-				'fb_delete_entries'  => true,
-				'fb_export_entries'  => true,
-				'attendance_checkin' => true,
-				'attendance_view'    => true,
-				'attendance_export'  => true,
-				'attendance_admin'   => true,
-			),
-		),
-	);
+    /**
+     * Activate roles and grant capabilities to Administrator.
+     */
+    public static function activate(): void {
+        // Viewer role.
+        add_role(
+            'foodbank_viewer',
+            'FoodBank Viewer',
+            [
+                'read'               => true,
+                'fb_read_entries'    => true,
+                'fb_export_entries'  => true,
+                'attendance_checkin' => true,
+                'attendance_view'    => true,
+                'attendance_export'  => true,
+            ]
+        );
 
-	private const ADMIN_CAPS = array(
-		'fb_manage_forms',
-		'fb_manage_settings',
-		'fb_manage_emails',
-		'fb_manage_encryption',
-	);
+        // Manager role.
+        add_role(
+            'foodbank_manager',
+            'FoodBank Manager',
+            [
+                'read'               => true,
+                'fb_read_entries'    => true,
+                'fb_edit_entries'    => true,
+                'fb_delete_entries'  => true,
+                'fb_export_entries'  => true,
+                'attendance_checkin' => true,
+                'attendance_view'    => true,
+                'attendance_export'  => true,
+                'attendance_admin'   => true,
+            ]
+        );
 
-	public function register(): void {
-		foreach ( self::ROLES as $role => $data ) {
-			add_role( $role, $data['label'], $data['caps'] );
-		}
-		$admin = get_role( 'administrator' );
-		if ( $admin ) {
-			foreach ( self::ADMIN_CAPS as $cap ) {
-				$admin->add_cap( $cap );
-			}
-			foreach ( self::ROLES['foodbank_manager']['caps'] as $cap => $grant ) {
-				$admin->add_cap( $cap );
-			}
-		}
-	}
+        self::grantCapsToAdmin();
+    }
 
-	public static function uninstall(): void {
-		foreach ( array_keys( self::ROLES ) as $role ) {
-			remove_role( $role );
-		}
-		$admin = get_role( 'administrator' );
-		if ( $admin ) {
-			foreach ( self::ADMIN_CAPS as $cap ) {
-				$admin->remove_cap( $cap );
-			}
-			foreach ( self::ROLES['foodbank_manager']['caps'] as $cap => $grant ) {
-				$admin->remove_cap( $cap );
-			}
-		}
-	}
+    /**
+     * Ensure Administrator role always has all plugin capabilities.
+     */
+    public static function grantCapsToAdmin(): void {
+        $admin = get_role('administrator');
+        if (! $admin) {
+            return;
+        }
+        foreach (self::caps() as $cap) {
+            if (! $admin->has_cap($cap)) {
+                $admin->add_cap($cap);
+            }
+        }
+    }
 }
