@@ -3,7 +3,7 @@
  * Plugin Name: FoodBank Manager
  * Plugin URI: https://pcclondon.uk/
  * Description: Secure management of Food Bank applications and attendance.
- * Version: 0.1.0
+ * Version: 0.1.1
  * Author: Portuguese Community Centre London
  * License: GPL-3.0-or-later
  * License URI: https://www.gnu.org/licenses/gpl-3.0.html
