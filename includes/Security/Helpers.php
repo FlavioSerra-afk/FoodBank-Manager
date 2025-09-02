@@ -34,7 +34,7 @@ class Helpers {
                 if ( count( $parts ) !== 2 ) {
                         return '';
                 }
-                $user = substr( $parts[0], 0, 1 ) . '***';
+                $user = mb_substr( $parts[0], 0, 1 ) . '***';
                 return $user . '@' . $parts[1];
         }
 
@@ -44,8 +44,8 @@ class Helpers {
                 if ( count( $parts ) !== 2 ) {
                         return $postcode;
                 }
-                $first  = substr( $parts[0], 0, 2 ) . '*';
-                $second = substr( $parts[1], 0, 1 ) . '**';
+                $first  = mb_substr( $parts[0], 0, 2 ) . '*';
+                $second = mb_substr( $parts[1], 0, 1 ) . '**';
                 return $first . ' ' . $second;
         }
 }

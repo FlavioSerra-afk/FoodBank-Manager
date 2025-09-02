@@ -23,7 +23,7 @@ final class Menu {
         );
 
         self::submenu($cap, 'fbm-dashboard', 'fbm-attendance',   __('Attendance', 'foodbank-manager'),   [__CLASS__, 'renderAttendance']);
-        self::submenu($cap, 'fbm-dashboard', 'fbm-database',     __('Database', 'foodbank-manager'),     [__CLASS__, 'renderDatabase']);
+        self::submenu($cap, 'fbm-dashboard', 'fbm-database',     __('Database', 'foodbank-manager'),     [\FoodBankManager\Admin\DatabasePage::class, 'route']);
         self::submenu($cap, 'fbm-dashboard', 'fbm-forms',        __('Forms', 'foodbank-manager'),        [__CLASS__, 'renderForms']);
         self::submenu($cap, 'fbm-dashboard', 'fbm-emails',       __('Email Templates', 'foodbank-manager'), [__CLASS__, 'renderEmails']);
         self::submenu($cap, 'fbm-dashboard', 'fbm-settings',     __('Settings', 'foodbank-manager'),     [__CLASS__, 'renderSettings']);
@@ -46,7 +46,7 @@ final class Menu {
 
     public static function renderDashboard(): void  { self::safeInclude('dashboard.php'); }
     public static function renderAttendance(): void { self::safeInclude('attendance.php'); }
-    public static function renderDatabase(): void   { self::safeInclude('database.php'); }
+    public static function renderDatabase(): void   { \FoodBankManager\Admin\DatabasePage::route(); }
     public static function renderForms(): void      { self::safeInclude('forms.php'); }
     public static function renderEmails(): void     { self::safeInclude('emails.php'); }
     public static function renderSettings(): void   { self::safeInclude('settings.php'); }
