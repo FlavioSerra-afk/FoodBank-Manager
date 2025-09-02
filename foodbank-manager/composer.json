@@ -42,7 +42,8 @@
         "release:minor": "php bin/bump-version.php minor && php bin/changelog.php",
         "release:major": "php bin/bump-version.php major && php bin/changelog.php",
         "release:set": "php bin/bump-version.php set",
-        "release:tagless": "php bin/bump-version.php patch --no-tag && php bin/changelog.php"
+        "release:tagless": "php bin/bump-version.php patch --no-tag && php bin/changelog.php",
+        "build:zip": "bash -lc 'rm -rf dist && mkdir -p dist/foodbank-manager && rsync -a --exclude=.git --exclude=.github --exclude=node_modules --exclude=dist ./ dist/foodbank-manager/ && cd dist && zip -r foodbank-manager.zip foodbank-manager'"
     },
     "config": {
         "allow-plugins": {

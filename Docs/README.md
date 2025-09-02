@@ -24,6 +24,14 @@ A secure, mobile‑first WordPress plugin for Food Bank applications, encrypted 
 - PHP **libsodium** (bundled in PHP 7.2+)
 - Database: MySQL/MariaDB (utf8mb4)
 
+## Installation
+
+Do not use “Code → Download ZIP”.
+
+Instead, go to Releases and download foodbank-manager.zip.
+
+Alternatively build locally with `composer build:zip` and upload that ZIP.
+
 ## 🚀 Install (dev)
 1. Clone into `wp-content/plugins/foodbank-manager`.
 2. Install PHP deps:
