@@ -33,6 +33,6 @@ We aim to acknowledge reports **within 2 working days**.
 - Run WordPress 6.x+ and PHP 8.1+
 - Enforce **HTTPS** and strong admin passwords, enable **2FA**
 - Configure **SMTP** and monitor **Diagnostics → Email**
-- Set **PCC_FBM_KEK_BASE64** in `wp-config.php` (don’t commit secrets)
+- Set **FBM_KEK_BASE64** in `wp-config.php` (don’t commit secrets) If you previously set `PCC_FBM_KEK_BASE64` in `wp-config.php`, rename it to `FBM_KEK_BASE64`.
 - Enable CAPTCHA and server‑side verification
 - Keep your WordPress, themes, plugins, and this plugin **up to date**

@@ -25,7 +25,7 @@ This document explains how to set up your environment, coding standards, and the
 - Attendance tracking with QR
 - GDPR-aligned consent, SAR, and retention tooling
 
-Refer to the PRD at `docs/PRD-pcc-foodbank-manager.md`.
+Refer to the PRD at `Docs/PRD-pcc-foodbank-manager.md`.
 
 ## Code of Conduct
 We recommend adopting the [Contributor Covenant](https://www.contributor-covenant.org/) (add `CODE_OF_CONDUCT.md`).
@@ -60,7 +60,7 @@ wp-env start
 - **Encryption KEK**: Set via environment or `wp-config.php`:
   ```php
   // wp-config.php
-  define('PCC_FBM_KEK_BASE64', 'base64-encoded-32-byte-key');
+  define('FBM_KEK_BASE64', 'base64-encoded-32-byte-key');
   ```
   Do **not** commit keys. Rotate via admin tool (see PRD §10.2).
 

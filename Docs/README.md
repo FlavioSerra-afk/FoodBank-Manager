@@ -2,7 +2,7 @@
 
 A secure, mobile‑first WordPress plugin for Food Bank applications, encrypted data storage, operational dashboards, and **attendance tracking** with QR codes.
 
-> Full PRD: [`docs/PRD-foodbank-manager.md`](docs/PRD-foodbank-manager.md)  
+> Full PRD: [`Docs/PRD-foodbank-manager.md`](Docs/PRD-foodbank-manager.md)  
 > Companion issues list: [`ISSUES-foodbank-manager.md`](ISSUES-foodbank-manager.md)
 
 ---
@@ -58,7 +58,7 @@ A secure, mobile‑first WordPress plugin for Food Bank applications, encrypted 
 5. Try **Attendance → Scan** (QR embedded in confirmation email).
 
 ## 📚 Docs
-- **PRD:** [`docs/PRD-foodbank-manager.md`](docs/PRD-foodbank-manager.md)
+- **PRD:** [`Docs/PRD-foodbank-manager.md`](Docs/PRD-foodbank-manager.md)
 - **Issues plan:** [`ISSUES-foodbank-manager.md`](ISSUES-foodbank-manager.md)
 - **Contributing:** [`CONTRIBUTING.md`](CONTRIBUTING.md)
 - **Security policy:** [`SECURITY.md`](SECURITY.md)
