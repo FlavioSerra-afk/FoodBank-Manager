@@ -12,6 +12,7 @@ use FoodBankManager\Attendance\TokenService;
 use FoodBankManager\Attendance\AttendanceRepo;
 use FoodBankManager\Attendance\Policy;
 use FoodBankManager\Core\Options;
+use FoodBankManager\Logging\Audit;
 use wpdb;
 
 class AttendanceController {
@@ -76,6 +77,36 @@ class AttendanceController {
                                 ),
                         )
                 );
+
+                register_rest_route(
+                        'pcc-fb/v1',
+                        '/attendance/void',
+                        array(
+                                'methods'             => 'POST',
+                                'callback'            => array( $this, 'void' ),
+                                'permission_callback' => array( $this, 'check_admin_permissions' ),
+                        )
+                );
+
+                register_rest_route(
+                        'pcc-fb/v1',
+                        '/attendance/unvoid',
+                        array(
+                                'methods'             => 'POST',
+                                'callback'            => array( $this, 'unvoid' ),
+                                'permission_callback' => array( $this, 'check_admin_permissions' ),
+                        )
+                );
+
+                register_rest_route(
+                        'pcc-fb/v1',
+                        '/attendance/note',
+                        array(
+                                'methods'             => 'POST',
+                                'callback'            => array( $this, 'note' ),
+                                'permission_callback' => array( $this, 'check_admin_permissions' ),
+                        )
+                );
         }
 
         public function check_write_permissions(): bool {
@@ -84,6 +115,10 @@ class AttendanceController {
 
         public function check_view_permissions(): bool {
                 return Permissions::user_can( 'attendance_view' );
+        }
+
+        public function check_admin_permissions(): bool {
+                return Permissions::user_can( 'attendance_admin' );
         }
 
         public function checkin( WP_REST_Request $request ): WP_REST_Response {
@@ -252,36 +287,54 @@ class AttendanceController {
                 }
                 $from = (string) $request->get_param( 'from' );
                 $to   = (string) $request->get_param( 'to' );
-                global $wpdb;
-                $att    = $wpdb->prefix . 'fb_attendance';
-                $events = $wpdb->prefix . 'fb_events';
-                $users  = $wpdb->users;
-                $where  = array( 't.application_id = %d' );
-                $params = array( $application_id );
-                if ( $from !== '' ) {
-                        $where[] = 't.attendance_at >= %s';
-                        $params[] = $from;
+                $include_voided = (bool) $request->get_param( 'include_voided' );
+                $rows = AttendanceRepo::timeline( $application_id, $from, $to, $include_voided );
+                return new WP_REST_Response( array( 'records' => $rows ), 200 );
+        }
+
+        public function void( WP_REST_Request $request ): WP_REST_Response {
+                $nonce = $request->get_header( 'x-wp-nonce' );
+                if ( ! $nonce || ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+                        return new WP_REST_Response( array( 'error' => array( 'code' => 'fbm_invalid_nonce', 'message' => __( 'Invalid nonce', 'foodbank-manager' ) ) ), 403 );
                 }
-                if ( $to !== '' ) {
-                        $where[] = 't.attendance_at <= %s';
-                        $params[] = $to;
+                $attendance_id = (int) $request->get_param( 'attendance_id' );
+                $reason = Helpers::sanitize_text( (string) $request->get_param( 'reason' ) );
+                $now = current_time( 'mysql', true );
+                $ok = AttendanceRepo::setVoid( $attendance_id, true, $reason !== '' ? $reason : null, get_current_user_id(), $now );
+                if ( $ok ) {
+                        Audit::log( 'attendance_void', 'attendance', $attendance_id, get_current_user_id(), array( 'reason' => $reason ) );
                 }
-                $where_sql = implode( ' AND ', $where );
-                $sql       = "SELECT t.attendance_at,t.status,t.type,t.method,t.notes,u.display_name,e.title AS event_title FROM {$att} t LEFT JOIN {$users} u ON u.ID=t.recorded_by_user_id LEFT JOIN {$events} e ON e.id=t.event_id WHERE {$where_sql} ORDER BY t.attendance_at DESC LIMIT 50";
-                $rows      = $wpdb->get_results( $wpdb->prepare( $sql, $params ), 'ARRAY_A' ) ?: array();
-                $records   = array();
-                foreach ( $rows as $row ) {
-                        $records[] = array(
-                                'attendance_at' => $row['attendance_at'],
-                                'event'         => $row['event_title'] ?? '',
-                                'type'          => $row['type'],
-                                'status'        => $row['status'],
-                                'method'        => $row['method'],
-                                'manager'       => $row['display_name'] ?? '',
-                                'override'      => $row['notes'] !== null && $row['notes'] !== '',
-                                'note'          => $row['notes'],
-                        );
+                return new WP_REST_Response( array( 'ok' => $ok, 'attendance_id' => $attendance_id, 'is_void' => 1 ), 200 );
+        }
+
+        public function unvoid( WP_REST_Request $request ): WP_REST_Response {
+                $nonce = $request->get_header( 'x-wp-nonce' );
+                if ( ! $nonce || ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+                        return new WP_REST_Response( array( 'error' => array( 'code' => 'fbm_invalid_nonce', 'message' => __( 'Invalid nonce', 'foodbank-manager' ) ) ), 403 );
                 }
-                return new WP_REST_Response( array( 'records' => $records ), 200 );
+                $attendance_id = (int) $request->get_param( 'attendance_id' );
+                $now = current_time( 'mysql', true );
+                $ok = AttendanceRepo::setVoid( $attendance_id, false, null, get_current_user_id(), $now );
+                if ( $ok ) {
+                        Audit::log( 'attendance_unvoid', 'attendance', $attendance_id, get_current_user_id(), array() );
+                }
+                return new WP_REST_Response( array( 'ok' => $ok, 'attendance_id' => $attendance_id, 'is_void' => 0 ), 200 );
+        }
+
+        public function note( WP_REST_Request $request ): WP_REST_Response {
+                $nonce = $request->get_header( 'x-wp-nonce' );
+                if ( ! $nonce || ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+                        return new WP_REST_Response( array( 'error' => array( 'code' => 'fbm_invalid_nonce', 'message' => __( 'Invalid nonce', 'foodbank-manager' ) ) ), 403 );
+                }
+                $attendance_id = (int) $request->get_param( 'attendance_id' );
+                $note = Helpers::sanitize_text( (string) $request->get_param( 'note' ) );
+                $now = current_time( 'mysql', true );
+                $ok = AttendanceRepo::addNote( $attendance_id, get_current_user_id(), $note, $now );
+                if ( $ok ) {
+                        Audit::log( 'attendance_note', 'attendance', $attendance_id, get_current_user_id(), array( 'preview' => mb_substr( $note, 0, 100 ) ) );
+                        $id = (int) $GLOBALS['wpdb']->insert_id;
+                        return new WP_REST_Response( array( 'ok' => true, 'note_id' => $id ), 200 );
+                }
+                return new WP_REST_Response( array( 'ok' => false ), 500 );
         }
 }

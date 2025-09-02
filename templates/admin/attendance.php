@@ -34,6 +34,7 @@ if (!defined('ABSPATH')) { exit; }
     </label>
     <label><?php esc_html_e('Manager ID','foodbank-manager'); ?> <input type="number" name="manager_id" value="<?php echo isset($filters['manager_id']) ? esc_attr((string)$filters['manager_id']) : ''; ?>" /></label>
     <label><input type="checkbox" name="policy_only" value="1" <?php checked(!empty($filters['policy_only'])); ?> /> <?php esc_html_e('Policy only','foodbank-manager'); ?></label>
+    <label><input type="checkbox" name="include_voided" value="1" <?php checked($include_voided); ?> /> <?php esc_html_e('Include voided','foodbank-manager'); ?></label>
     <button class="button"><?php esc_html_e('Filter','foodbank-manager'); ?></button>
   </div>
 </form>
@@ -96,6 +97,7 @@ if (!defined('ABSPATH')) { exit; }
       <input type="hidden" name="preset" value="<?php echo esc_attr($preset); ?>" />
       <input type="hidden" name="range_from" value="<?php echo esc_attr($range_from); ?>" />
       <input type="hidden" name="range_to" value="<?php echo esc_attr($range_to); ?>" />
+      <?php if ($include_voided): ?><input type="hidden" name="include_voided" value="1" /><?php endif; ?>
       <select name="per_page" onchange="document.getElementById('fbm-perpage-form').submit();">
         <option value="25" <?php selected($per_page,25); ?>>25</option>
         <option value="50" <?php selected($per_page,50); ?>>50</option>
@@ -107,6 +109,7 @@ if (!defined('ABSPATH')) { exit; }
 <?php if (current_user_can('attendance_export')): ?>
 <form method="post" class="fbm-export">
   <input type="hidden" name="action" value="fbm_att_export" />
+  <?php if ($include_voided): ?><input type="hidden" name="include_voided" value="1" /><?php endif; ?>
   <?php if ($can_sensitive): ?>
     <label><input type="checkbox" name="unmask" value="1" /> <?php esc_html_e('Unmask','foodbank-manager'); ?></label>
   <?php endif; ?>
@@ -123,17 +126,53 @@ if (!defined('ABSPATH')) { exit; }
 (function(){
   const nonce='<?php echo esc_js( wp_create_nonce('wp_rest') ); ?>';
   const endpoint='<?php echo esc_url_raw( rest_url('pcc-fb/v1/attendance/timeline') ); ?>';
+  const includeVoided=<?php echo $include_voided ? 'true' : 'false'; ?>;
+  const canAdmin=<?php echo current_user_can('attendance_admin') ? 'true' : 'false'; ?>;
+  const voidUrl='<?php echo esc_url_raw( rest_url('pcc-fb/v1/attendance/void') ); ?>';
+  const unvoidUrl='<?php echo esc_url_raw( rest_url('pcc-fb/v1/attendance/unvoid') ); ?>';
+  const noteUrl='<?php echo esc_url_raw( rest_url('pcc-fb/v1/attendance/note') ); ?>';
   document.querySelectorAll('.fbm-timeline-btn').forEach(btn=>{
     btn.addEventListener('click',async()=>{
       const app=btn.dataset.app;
-      const res=await fetch(endpoint+'?application_id='+app,{headers:{'X-WP-Nonce':nonce}});
+      const res=await fetch(endpoint+'?application_id='+app+(includeVoided?'&include_voided=1':''),{headers:{'X-WP-Nonce':nonce}});
       if(!res.ok)return;
       const data=await res.json();
       const list=document.getElementById('fbm-timeline-list');
       list.innerHTML='';
       data.records.forEach(r=>{
         const li=document.createElement('li');
-        li.textContent=r.attendance_at+' \u2022 '+r.status+' \u2022 '+r.type+' \u2022 '+r.manager+(r.override?' \u2022 override':'');
+        li.textContent=r.attendance_at+' \u2022 '+r.status+' \u2022 '+r.type+' \u2022 '+r.recorded_by_user_id;
+        if(r.is_void){li.textContent+=' \u2022 void';}
+        if(canAdmin){
+          const btnV=document.createElement('button');
+          btnV.textContent=r.is_void?'Unvoid':'Void';
+          btnV.addEventListener('click',async()=>{
+            const reason=r.is_void?'':prompt('Reason');
+            const url=r.is_void?unvoidUrl:voidUrl;
+            const body=r.is_void?{attendance_id:r.id}:{attendance_id:r.id,reason:reason};
+            await fetch(url,{method:'POST',headers:{'Content-Type':'application/json','X-WP-Nonce':nonce},body:JSON.stringify(body)});
+            btn.click();
+          });
+          li.appendChild(btnV);
+          const btnN=document.createElement('button');
+          btnN.textContent='Note';
+          btnN.addEventListener('click',async()=>{
+            const note=prompt('Note');
+            if(!note)return;
+            await fetch(noteUrl,{method:'POST',headers:{'Content-Type':'application/json','X-WP-Nonce':nonce},body:JSON.stringify({attendance_id:r.id,note:note})});
+            btn.click();
+          });
+          li.appendChild(btnN);
+        }
+        if(r.notes){
+          const ul=document.createElement('ul');
+          r.notes.forEach(n=>{
+            const ni=document.createElement('li');
+            ni.textContent=n.note_text+' ('+n.created_at+')';
+            ul.appendChild(ni);
+          });
+          li.appendChild(ul);
+        }
         list.appendChild(li);
       });
       document.getElementById('fbm-timeline-modal').style.display='block';

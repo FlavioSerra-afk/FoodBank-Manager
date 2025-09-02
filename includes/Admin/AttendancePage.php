@@ -79,6 +79,9 @@ final class AttendancePage {
         if ( ! empty( $_GET['policy_only'] ) ) {
             $args['policy_only'] = true;
         }
+        if ( ! empty( $_GET['include_voided'] ) ) {
+            $args['include_voided'] = true;
+        }
 
         $args['page'] = isset( $_GET['paged'] ) ? max( 1, (int) $_GET['paged'] ) : ( isset( $_GET['page'] ) ? max( 1, (int) $_GET['page'] ) : 1 );
 
@@ -153,7 +156,7 @@ final class AttendancePage {
         $can_sensitive        = current_user_can( 'read_sensitive' );
         $mask                 = ! ( $can_sensitive && isset( $_REQUEST['unmask'] ) );
         $rows                 = self::decorateRows( $data['rows'], ! $can_sensitive || $mask );
-        CsvExporter::streamAttendancePeople( $rows, $mask );
+        CsvExporter::streamAttendancePeople( $rows, $mask, ! empty( $filters['include_voided'] ) );
         exit;
     }
 
@@ -167,6 +170,7 @@ final class AttendancePage {
         $preset        = $filters['preset'];
         $range_from    = $filters['range_from'];
         $range_to      = $filters['range_to'];
+        $include_voided = ! empty( $filters['include_voided'] );
         $can_sensitive = current_user_can( 'read_sensitive' );
         require FBM_PATH . 'templates/admin/attendance.php';
     }

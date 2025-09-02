@@ -7,7 +7,7 @@ namespace FoodBankManager\Db;
 class Migrations {
 
 	private const OPTION_KEY = 'fbm_db_version';
-	private const VERSION    = '2024090101';
+        private const VERSION    = '2024091501';
 
 	public function maybe_migrate(): void {
 		$current = get_option( self::OPTION_KEY );
@@ -41,7 +41,7 @@ class Migrations {
             KEY idx_status (status)
         ) $charset_collate;";
 
-		$sql[] = "CREATE TABLE {$wpdb->prefix}fb_attendance (
+                $sql[] = "CREATE TABLE {$wpdb->prefix}fb_attendance (
             id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
             form_id BIGINT UNSIGNED NOT NULL,
             application_id BIGINT UNSIGNED NOT NULL,
@@ -52,6 +52,10 @@ class Migrations {
             method VARCHAR(20) NOT NULL,
             recorded_by_user_id BIGINT UNSIGNED NOT NULL,
             notes TEXT NULL,
+            is_void TINYINT(1) NOT NULL DEFAULT 0,
+            void_reason VARCHAR(255) NULL,
+            void_by_user_id BIGINT UNSIGNED NULL,
+            void_at DATETIME NULL,
             token_hash CHAR(64) NULL,
             source_ip VARBINARY(16) NULL,
             device VARCHAR(64) NULL,
@@ -61,6 +65,28 @@ class Migrations {
             KEY idx_app_time (application_id, attendance_at),
             KEY idx_event_time (event_id, attendance_at),
             KEY idx_status (status)
+        ) $charset_collate;";
+
+                $sql[] = "CREATE TABLE {$wpdb->prefix}fb_attendance_notes (
+            id BIGINT(20) UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+            attendance_id BIGINT(20) UNSIGNED NOT NULL,
+            user_id BIGINT(20) UNSIGNED NOT NULL,
+            note_text TEXT NOT NULL,
+            created_at DATETIME NOT NULL,
+            KEY idx_attendance (attendance_id),
+            KEY idx_created (created_at)
+        ) $charset_collate;";
+
+                $sql[] = "CREATE TABLE {$wpdb->prefix}fb_audit_log (
+            id BIGINT(20) UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+            actor_user_id BIGINT(20) UNSIGNED NOT NULL,
+            action VARCHAR(64) NOT NULL,
+            target_type VARCHAR(32) NOT NULL,
+            target_id BIGINT(20) UNSIGNED NOT NULL,
+            details_json LONGTEXT NULL,
+            created_at DATETIME NOT NULL,
+            KEY idx_target (target_type, target_id),
+            KEY idx_created (created_at)
         ) $charset_collate;";
 
 		$sql[] = "CREATE TABLE {$wpdb->prefix}fb_events (

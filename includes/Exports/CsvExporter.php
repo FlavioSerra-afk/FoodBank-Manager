@@ -52,7 +52,7 @@ class CsvExporter {
      * @param array<int,array> $rows
      * @param bool             $maskPII default true
      */
-    public static function streamAttendancePeople( array $rows, bool $maskPII = true, string $filename = 'fbm-attendance.csv' ): void {
+    public static function streamAttendancePeople( array $rows, bool $maskPII = true, bool $includeVoided = false, string $filename = 'fbm-attendance.csv' ): void {
         if ( headers_sent() ) {
             return;
         }
@@ -61,6 +61,9 @@ class CsvExporter {
         echo "\xEF\xBB\xBF";
 
         $header = array( 'Application ID', 'Name', 'Email', 'Postcode', 'Last Attended', 'Visits (Range)', 'No-shows (Range)', 'Visits (12m)', 'Policy' );
+        if ($includeVoided) {
+            $header[] = 'Voided';
+        }
         if ( class_exists( '\\League\\Csv\\Writer' ) ) {
             $csv = \League\Csv\Writer::createFromFileObject( new \SplTempFileObject() );
             if ( ! empty( $rows ) ) {
@@ -70,7 +73,7 @@ class CsvExporter {
                         $row['email']    = Helpers::mask_email( (string) ( $row['email'] ?? '' ) );
                         $row['postcode'] = Helpers::mask_postcode( (string) ( $row['postcode'] ?? '' ) );
                     }
-                    $csv->insertOne( array(
+                    $rowOut = array(
                         $row['application_id'] ?? '',
                         $row['name'] ?? '',
                         $row['email'] ?? '',
@@ -80,7 +83,11 @@ class CsvExporter {
                         $row['noshows_range'] ?? '',
                         $row['visits_12m'] ?? '',
                         $row['policy_badge'] ?? '',
-                    ) );
+                    );
+                    if ($includeVoided) {
+                        $rowOut[] = !empty($row['is_void']) ? 'Yes' : 'No';
+                    }
+                    $csv->insertOne($rowOut);
                 }
             }
             $csv->output( $filename );
@@ -93,7 +100,7 @@ class CsvExporter {
                         $row['email']    = Helpers::mask_email( (string) ( $row['email'] ?? '' ) );
                         $row['postcode'] = Helpers::mask_postcode( (string) ( $row['postcode'] ?? '' ) );
                     }
-                    fputcsv( $out, array(
+                    $rowOut = array(
                         $row['application_id'] ?? '',
                         $row['name'] ?? '',
                         $row['email'] ?? '',
@@ -103,7 +110,11 @@ class CsvExporter {
                         $row['noshows_range'] ?? '',
                         $row['visits_12m'] ?? '',
                         $row['policy_badge'] ?? '',
-                    ) );
+                    );
+                    if ($includeVoided) {
+                        $rowOut[] = !empty($row['is_void']) ? 'Yes' : 'No';
+                    }
+                    fputcsv($out, $rowOut);
                 }
             }
             fclose( $out );
