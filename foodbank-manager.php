@@ -70,20 +70,27 @@ add_action(
 	}
 );
 
-// Activation/Deactivation hooks guarded against missing classes.
-register_activation_hook(
-	__FILE__,
-	static function (): void {
-		if ( class_exists( \FoodBankManager\Core\Plugin::class ) && method_exists( \FoodBankManager\Core\Plugin::class, 'activate' ) ) {
-			\FoodBankManager\Core\Plugin::activate();
+// Activation/Deactivation hooks using instance wrappers.
+if ( ! function_exists( __NAMESPACE__ . '\\pcc_fbm_activate' ) ) {
+		/**
+		 * Wrapper for plugin activation.
+		 */
+	function pcc_fbm_activate(): void {
+			$plugin = new \FoodBankManager\Core\Plugin();
+			$plugin->activate();
+	}
+}
+register_activation_hook( __FILE__, __NAMESPACE__ . '\\pcc_fbm_activate' );
+
+if ( ! function_exists( __NAMESPACE__ . '\\pcc_fbm_deactivate' ) ) {
+		/**
+		 * Wrapper for plugin deactivation.
+		 */
+	function pcc_fbm_deactivate(): void {
+			$plugin = new \FoodBankManager\Core\Plugin();
+		if ( method_exists( $plugin, 'deactivate' ) ) {
+				$plugin->deactivate();
 		}
 	}
-);
-register_deactivation_hook(
-	__FILE__,
-	static function (): void {
-		if ( class_exists( \FoodBankManager\Core\Plugin::class ) && method_exists( \FoodBankManager\Core\Plugin::class, 'deactivate' ) ) {
-			\FoodBankManager\Core\Plugin::deactivate();
-		}
-	}
-);
+}
+register_deactivation_hook( __FILE__, __NAMESPACE__ . '\\pcc_fbm_deactivate' );
