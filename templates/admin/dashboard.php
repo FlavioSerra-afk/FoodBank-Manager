@@ -1,4 +1,11 @@
 <?php
+/**
+ * Admin dashboard template.
+ *
+ * @package FoodBankManager
+ * @since 0.1.1
+ */
+
 namespace FoodBankManager\Admin;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -10,6 +17,6 @@ if ( ! current_user_can( 'fb_read_entries' ) && ! current_user_can( 'manage_opti
 }
 ?>
 <div class="wrap">
-	<h1><?php \esc_html_e( 'Dashboard', 'foodbank-manager' ); ?></h1>
-	<p><?php \esc_html_e( 'Coming soon.', 'foodbank-manager' ); ?></p>
+		<h1><?php \esc_html_e( 'Dashboard', 'foodbank-manager' ); ?></h1>
+		<p><?php \esc_html_e( 'Coming soon.', 'foodbank-manager' ); ?></p>
 </div>

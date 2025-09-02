@@ -1,6 +1,9 @@
 <?php
 /**
  * Email templates page.
+ *
+ * @package FoodBankManager
+ * @since 0.1.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

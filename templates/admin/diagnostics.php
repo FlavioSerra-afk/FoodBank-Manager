@@ -1,4 +1,11 @@
 <?php
+/**
+ * Diagnostics template.
+ *
+ * @package FoodBankManager
+ * @since 0.1.1
+ */
+
 namespace FoodBankManager\Admin;
 
 if ( ! defined( 'ABSPATH' ) ) {

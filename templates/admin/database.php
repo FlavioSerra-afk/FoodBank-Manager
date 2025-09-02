@@ -1,4 +1,11 @@
 <?php
+/**
+ * Database listing template.
+ *
+ * @package FoodBankManager
+ * @since 0.1.1
+ */
+
 use FoodBankManager\Security\Helpers;
 use FoodBankManager\Security\Crypto;
 
@@ -47,7 +54,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<?php
 else :
 	foreach ( $rows as $r ) :
-		$data     = json_decode( (string) ( $r['data_json'] ?? '' ), true ) ?: array();
+		$data = json_decode( (string) ( $r['data_json'] ?? '' ), true );
+		if ( ! is_array( $data ) ) {
+			$data = array();
+		}
 		$pii      = Crypto::decryptSensitive( (string) ( $r['pii_encrypted_blob'] ?? '' ) );
 		$name     = trim( ( $data['first_name'] ?? '' ) . ' ' . ( $pii['last_name'] ?? '' ) );
 		$email    = $pii['email'] ?? '';
