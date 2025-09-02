@@ -1,8 +1,13 @@
 <?php
 namespace FoodBankManager\Emails;
 
-if (! defined('ABSPATH')) {
+if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 ?>
-<p><?php \esc_html_e('A new application has been received.', 'foodbank-manager'); ?></p>
+<p><?php esc_html_e( 'New application received.', 'foodbank-manager' ); ?></p>
+<p><?php printf( esc_html__( 'Reference: FBM-%d', 'foodbank-manager' ), (int) $application_id ); ?></p>
+<p><?php printf( esc_html__( 'Submitted at %s', 'foodbank-manager' ), esc_html( $created_at ) ); ?></p>
+<p><?php esc_html_e( 'Entry URL:', 'foodbank-manager' ); ?> <?php echo esc_url( $entry_url ); ?></p>
+<p><?php esc_html_e( 'Summary:', 'foodbank-manager' ); ?></p>
+<?php echo $summary_table; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
