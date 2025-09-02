@@ -156,7 +156,7 @@ endif;
 	<?php if ( $can_sensitive ) : ?>
 	<label><input type="checkbox" name="unmask" value="1" /> <?php esc_html_e( 'Unmask', 'foodbank-manager' ); ?></label>
 	<?php endif; ?>
-	<?php wp_nonce_field( 'fbm_att_export' ); ?>
+        <?php wp_nonce_field( 'fbm_att_export', '_wpnonce' ); ?>
 	<button type="submit" class="button"><?php esc_html_e( 'Export CSV', 'foodbank-manager' ); ?></button>
 </form>
 <?php endif; ?>

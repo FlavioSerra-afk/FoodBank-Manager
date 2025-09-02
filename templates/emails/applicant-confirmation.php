@@ -14,8 +14,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 <?php // translators: %s: Applicant first name. ?>
 <p><?php printf( esc_html__( 'Hi %s,', 'foodbank-manager' ), esc_html( $first_name ) ); ?></p>
-<?php // translators: 1: Submission time, 2: Application ID. ?>
-<p><?php printf( esc_html__( 'We received your application on %1$s. Your reference is FBM-%2$d.', 'foodbank-manager' ), esc_html( $created_at ), (int) $application_id ); ?></p>
+<p>
+<?php
+printf(
+// translators: 1: Submission time, 2: Application ID.
+	esc_html__( 'We received your application on %1$s. Your reference is FBM-%2$d.', 'foodbank-manager' ),
+	esc_html( $created_at ),
+	(int) $application_id
+);
+?>
+</p>
 <?php if ( ! empty( $qr_code_url ) ) : ?>
 		<?php if ( strpos( $qr_code_url, 'data:image' ) === 0 ) : ?>
 				<p><img src="<?php echo esc_url( $qr_code_url ); ?>" alt="<?php esc_attr_e( 'QR Code', 'foodbank-manager' ); ?>" /></p>

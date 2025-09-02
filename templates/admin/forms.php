@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 // Forms management placeholder.
 
+// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom plugin capability.
 if ( ! current_user_can( 'fb_manage_forms' ) && ! current_user_can( 'manage_options' ) ) {
 	wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ) );
 }

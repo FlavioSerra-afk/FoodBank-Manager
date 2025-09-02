@@ -17,22 +17,46 @@ if ( ! defined( 'ABSPATH' ) ) {
 <form method="get">
 	<input type="hidden" name="page" value="fbm-database" />
 	<div class="fbm-filters">
-	<label><?php esc_html_e( 'From', 'foodbank-manager' ); ?> <input type="date" name="date_from" value="<?php echo esc_attr( $filters['date_from'] ?? '' ); ?>" /></label>
-	<label><?php esc_html_e( 'To', 'foodbank-manager' ); ?> <input type="date" name="date_to" value="<?php echo esc_attr( $filters['date_to'] ?? '' ); ?>" /></label>
-	<label><?php esc_html_e( 'Status', 'foodbank-manager' ); ?>
-		<select name="status">
-		<option value=""><?php esc_html_e( 'All', 'foodbank-manager' ); ?></option>
-		<option value="new" <?php selected( $filters['status'] ?? '', 'new' ); ?>><?php esc_html_e( 'New', 'foodbank-manager' ); ?></option>
-		<option value="approved" <?php selected( $filters['status'] ?? '', 'approved' ); ?>><?php esc_html_e( 'Approved', 'foodbank-manager' ); ?></option>
-		<option value="archived" <?php selected( $filters['status'] ?? '', 'archived' ); ?>><?php esc_html_e( 'Archived', 'foodbank-manager' ); ?></option>
-		</select>
-	</label>
-	<label><input type="checkbox" name="has_file" value="1" <?php checked( $filters['has_file'] ); ?> /> <?php esc_html_e( 'Has file', 'foodbank-manager' ); ?></label>
-	<label><input type="checkbox" name="consent" value="1" <?php checked( $filters['consent'] ); ?> /> <?php esc_html_e( 'Consent', 'foodbank-manager' ); ?></label>
-	<label><?php esc_html_e( 'Search', 'foodbank-manager' ); ?> <input type="text" name="search" value="<?php echo esc_attr( $filters['search'] ?? '' ); ?>" /></label>
+		<label>
+				<?php esc_html_e( 'From', 'foodbank-manager' ); ?>
+				<input type="date" name="date_from" value="<?php echo esc_attr( $filters['date_from'] ?? '' ); ?>" />
+		</label>
+		<label>
+				<?php esc_html_e( 'To', 'foodbank-manager' ); ?>
+				<input type="date" name="date_to" value="<?php echo esc_attr( $filters['date_to'] ?? '' ); ?>" />
+		</label>
+		<label><?php esc_html_e( 'Status', 'foodbank-manager' ); ?>
+				<select name="status">
+				<option value=""><?php esc_html_e( 'All', 'foodbank-manager' ); ?></option>
+				<option value="new" <?php selected( $filters['status'] ?? '', 'new' ); ?>>
+						<?php esc_html_e( 'New', 'foodbank-manager' ); ?>
+				</option>
+				<option value="approved" <?php selected( $filters['status'] ?? '', 'approved' ); ?>>
+						<?php esc_html_e( 'Approved', 'foodbank-manager' ); ?>
+				</option>
+				<option value="archived" <?php selected( $filters['status'] ?? '', 'archived' ); ?>>
+						<?php esc_html_e( 'Archived', 'foodbank-manager' ); ?>
+				</option>
+				</select>
+		</label>
+		<label>
+				<input type="checkbox" name="has_file" value="1" <?php checked( $filters['has_file'] ); ?> />
+				<?php esc_html_e( 'Has file', 'foodbank-manager' ); ?>
+		</label>
+		<label>
+				<input type="checkbox" name="consent" value="1" <?php checked( $filters['consent'] ); ?> />
+				<?php esc_html_e( 'Consent', 'foodbank-manager' ); ?>
+		</label>
+		<label>
+				<?php esc_html_e( 'Search', 'foodbank-manager' ); ?>
+				<input type="text" name="search" value="<?php echo esc_attr( $filters['search'] ?? '' ); ?>" />
+		</label>
 	<?php if ( $can_sensitive ) : ?>
-		<label><input type="checkbox" name="unmask" value="1" <?php checked( $unmask ); ?> /> <?php esc_html_e( 'Unmask sensitive fields', 'foodbank-manager' ); ?></label>
-		<?php wp_nonce_field( 'fbm_db_unmask' ); ?>
+				<label>
+						<input type="checkbox" name="unmask" value="1" <?php checked( $unmask ); ?> />
+						<?php esc_html_e( 'Unmask sensitive fields', 'foodbank-manager' ); ?>
+				</label>
+				<?php wp_nonce_field( 'fbm_db_unmask', '_wpnonce' ); ?>
 	<?php endif; ?>
 	<button class="button"><?php esc_html_e( 'Filter', 'foodbank-manager' ); ?></button>
 	</div>
@@ -89,22 +113,31 @@ else :
 		);
 		?>
 				"><?php esc_html_e( 'View', 'foodbank-manager' ); ?></a>
-		<?php if ( current_user_can( 'fb_export_entries' ) ) : ?>
-	| <form method="post" style="display:inline">
-		<input type="hidden" name="action" value="fbm_export_single" />
-		<input type="hidden" name="id" value="<?php echo esc_attr( (string) $r['id'] ); ?>" />
-			<?php wp_nonce_field( 'fbm_db_single_export_' . $r['id'] ); ?>
-				<button type="submit" class="button-link"><?php esc_html_e( 'CSV', 'foodbank-manager' ); ?></button>
-		</form>
-	<?php endif; ?>
-		<?php if ( current_user_can( 'fb_delete_entries' ) ) : ?>
-	| <form method="post" style="display:inline" onsubmit="return confirm('<?php echo esc_js( __( 'Are you sure?', 'foodbank-manager' ) ); ?>');">
-		<input type="hidden" name="action" value="fbm_delete_entry" />
-		<input type="hidden" name="id" value="<?php echo esc_attr( (string) $r['id'] ); ?>" />
-			<?php wp_nonce_field( 'fbm_db_delete_' . $r['id'] ); ?>
-		<button type="submit" class="button-link"><?php esc_html_e( 'Delete', 'foodbank-manager' ); ?></button>
-		</form>
-	<?php endif; ?>
+		<?php
+// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
+		if ( current_user_can( 'fb_export_entries' ) ) :
+			?>
+		| <form method="post" style="display:inline">
+				<input type="hidden" name="action" value="fbm_export_single" />
+				<input type="hidden" name="id" value="<?php echo esc_attr( (string) $r['id'] ); ?>" />
+						<?php wp_nonce_field( 'fbm_db_single_export_' . $r['id'], '_wpnonce' ); ?>
+								<button type="submit" class="button-link"><?php esc_html_e( 'CSV', 'foodbank-manager' ); ?></button>
+				</form>
+			<?php
+endif;
+// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
+		if ( current_user_can( 'fb_delete_entries' ) ) :
+			?>
+| <form method="post" style="display:inline"
+onsubmit="return confirm('<?php echo esc_js( __( 'Are you sure?', 'foodbank-manager' ) ); ?>');">
+				<input type="hidden" name="action" value="fbm_delete_entry" />
+				<input type="hidden" name="id" value="<?php echo esc_attr( (string) $r['id'] ); ?>" />
+						<?php wp_nonce_field( 'fbm_db_delete_' . $r['id'], '_wpnonce' ); ?>
+				<button type="submit" class="button-link"><?php esc_html_e( 'Delete', 'foodbank-manager' ); ?></button>
+				</form>
+			<?php
+endif;
+		?>
 </td>
 </tr>
 		<?php
@@ -138,19 +171,16 @@ $base_url    = remove_query_arg( 'paged' );
 	</form>
 	</div>
 </div>
-<?php if ( current_user_can( 'fb_export_entries' ) ) : ?>
-<p><a class="button" href="
+<?php if ( current_user_can( 'fb_export_entries' ) ) : // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability. ?>
 	<?php
-	echo esc_url(
-		add_query_arg(
-			array(
-				'action'   => 'fbm_export_entries',
-				'_wpnonce' => wp_create_nonce( 'fbm_db_export' ),
-			),
-			$base_url
-		)
+	$export_base = add_query_arg(
+		array(
+			'action' => 'fbm_export_entries',
+		),
+		$base_url
 	);
+	$export_url  = wp_nonce_url( $export_base, 'fbm_db_export', '_wpnonce' );
 	?>
-							"><?php esc_html_e( 'Export CSV', 'foodbank-manager' ); ?></a></p>
+<p><a class="button" href="<?php echo esc_url( $export_url ); ?>"><?php esc_html_e( 'Export CSV', 'foodbank-manager' ); ?></a></p>
 <?php endif; ?>
 </div>
