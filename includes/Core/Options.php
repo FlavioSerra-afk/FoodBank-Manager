@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace FoodBankManager\Core;
 
+/**
+ * Plugin options utility.
+ */
 class Options {
 	private const KEY = 'fbm_settings';
 
@@ -111,12 +114,13 @@ class Options {
 		return $settings;
 	}
 
-	/**
-	 * Set a value using dot notation and persist.
-	 *
-	 * @param string $path  Path like "emails.from_email".
-	 * @param mixed  $value Value to set.
-	 */
+		/**
+		 * Set a value using dot notation and persist.
+		 *
+		 * @param string $path  Path like "emails.from_email".
+		 * @param mixed  $value Value to set.
+		 * @return bool
+		 */
 	public static function set( string $path, $value ): bool {
 		$settings = self::all();
 		$ref      =& $settings;
@@ -131,24 +135,29 @@ class Options {
 		return update_option( self::KEY, $settings );
 	}
 
-	/**
-	 * Back-compat alias for set().
-	 */
+		/**
+		 * Back-compat alias for set().
+		 *
+		 * @param string $path  Option path.
+		 * @param mixed  $value Value to set.
+		 * @return bool
+		 */
 	public static function update( string $path, $value ): bool {
-		return self::set( $path, $value );
+			return self::set( $path, $value );
 	}
 
-	/**
-	 * Persist an array of settings, merged with defaults.
-	 * Values are sanitized based on known structure.
-	 *
-	 * @param array<string,mixed> $new Settings from request.
-	 */
+		/**
+		 * Persist an array of settings, merged with defaults.
+		 * Values are sanitized based on known structure.
+		 *
+		 * @param array<string,mixed> $new Settings from request.
+		 * @return bool
+		 */
 	public static function saveAll( array $new ): bool {
 		$defaults = self::defaults();
 		$merged   = array_replace_recursive( $defaults, $new );
 
-		// basic sanitization
+			// Basic sanitization.
 		$merged['general']['org_name']    = sanitize_text_field( (string) ( $merged['general']['org_name'] ?? '' ) );
 		$merged['general']['logo_id']     = (int) ( $merged['general']['logo_id'] ?? 0 );
 		$merged['general']['date_format'] = sanitize_text_field( (string) ( $merged['general']['date_format'] ?? '' ) );
@@ -183,17 +192,17 @@ class Options {
 		} else {
 			$types = array_map( 'sanitize_key', $types );
 		}
-		$merged['attendance']['types'] = $types ?: array( 'in_person' );
+			$merged['attendance']['types'] = $types ? $types : array( 'in_person' );
 
-				$merged['privacy']['retention_months'] = max( 0, (int) ( $merged['privacy']['retention_months'] ?? 24 ) );
-				$merged['privacy']['anonymise_files']  = in_array( $merged['privacy']['anonymise_files'], array( 'delete', 'keep', 'move' ), true ) ? $merged['privacy']['anonymise_files'] : 'delete';
+			$merged['privacy']['retention_months'] = max( 0, (int) ( $merged['privacy']['retention_months'] ?? 24 ) );
+			$merged['privacy']['anonymise_files']  = in_array( $merged['privacy']['anonymise_files'], array( 'delete', 'keep', 'move' ), true ) ? $merged['privacy']['anonymise_files'] : 'delete';
 
-				$merged['theme']['frontend'] = self::sanitize_theme( (array) ( $merged['theme']['frontend'] ?? array() ) );
-				$merged['theme']['admin']    = self::sanitize_theme( (array) ( $merged['theme']['admin'] ?? array() ) );
+			$merged['theme']['frontend'] = self::sanitize_theme( (array) ( $merged['theme']['frontend'] ?? array() ) );
+			$merged['theme']['admin']    = self::sanitize_theme( (array) ( $merged['theme']['admin'] ?? array() ) );
 
-				unset( $merged['encryption'] );
+			unset( $merged['encryption'] );
 
-				return update_option( self::KEY, $merged );
+			return update_option( self::KEY, $merged );
 	}
 
 		/**
@@ -236,9 +245,9 @@ class Options {
 				$out['dark_mode'] = $data['dark_mode'];
 		}
 
-               $css = (string) ( $data['custom_css'] ?? '' );
-               $css = substr( $css, 0, 10000 );
-               $out['custom_css'] = function_exists( 'wp_strip_all_tags' ) ? wp_strip_all_tags( $css ) : strip_tags( $css );
+				$css               = (string) ( $data['custom_css'] ?? '' );
+				$css               = substr( $css, 0, 10000 );
+				$out['custom_css'] = function_exists( 'wp_strip_all_tags' ) ? wp_strip_all_tags( $css ) : strip_tags( $css ); // phpcs:ignore WordPress.WP.AlternativeFunctions.strip_tags -- Fallback when WordPress is unavailable.
 
 				$out['load_font'] = ! empty( $data['load_font'] );
 

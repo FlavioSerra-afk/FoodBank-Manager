@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace FoodBankManager\Mail;
 
+/**
+ * Email template renderer.
+ */
 class Templates {
 	private const OPTION_KEY = 'fbm_email_templates';
 
@@ -47,6 +50,7 @@ class Templates {
 	 * Save templates.
 	 *
 	 * @param array<string,array{subject:string,body:string}> $new Templates.
+	 * @return bool
 	 */
 	public static function saveAll( array $new ): bool {
 		$templates = self::getAll();
@@ -88,6 +92,10 @@ class Templates {
 
 	/**
 	 * Token replacement helper.
+	 *
+	 * @param string               $text Raw text.
+	 * @param array<string,string> $vars Tokens.
+	 * @return string
 	 */
 	private static function replace( string $text, array $vars ): string {
 		foreach ( $vars as $k => $v ) {
