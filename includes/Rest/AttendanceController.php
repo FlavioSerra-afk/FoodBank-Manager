@@ -152,7 +152,7 @@ class AttendanceController {
                         );
                 }
 
-                $policy_days = (int) Options::get( 'policy_days' );
+                $policy_days = (int) Options::get( 'attendance.policy_days' );
                 $last        = AttendanceRepo::lastPresent( $application_id );
                 $now         = current_time( 'mysql', true );
                 $override    = $request->get_param( 'override' );
@@ -171,7 +171,7 @@ class AttendanceController {
 
                 $event_id = (int) $request->get_param( 'event_id' );
                 $type     = Helpers::sanitize_text( (string) $request->get_param( 'type' ) );
-                if ( $type === '' || ! in_array( $type, Options::get( 'attendance_types' ), true ) ) {
+                if ( $type === '' || ! in_array( $type, Options::get( 'attendance.types' ), true ) ) {
                         $type = 'in_person';
                 }
                 $method  = Helpers::sanitize_text( (string) $request->get_param( 'method' ) );
