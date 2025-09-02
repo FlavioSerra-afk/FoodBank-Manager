@@ -7,6 +7,8 @@ namespace FoodBankManager\Http;
 
 use FoodBankManager\Security\Helpers;
 use FoodBankManager\Security\Crypto;
+use FoodBankManager\Core\Options;
+use FoodBankManager\Mail\Templates;
 
 class FormSubmitController {
     public static function handle(): void {
@@ -43,6 +45,26 @@ class FormSubmitController {
                 $errors[] = 'consent';
             }
 
+            $provider = Options::get( 'forms.captcha_provider', 'off' );
+            if ( $provider !== 'off' ) {
+                $response_key = $provider === 'turnstile' ? 'cf-turnstile-response' : 'g-recaptcha-response';
+                $response = sanitize_text_field( (string) ( $_POST[ $response_key ] ?? '' ) );
+                $secret   = Options::get( 'forms.captcha_secret' );
+                if ( $secret && $response ) {
+                    $url  = $provider === 'turnstile' ? 'https://challenges.cloudflare.com/turnstile/v0/siteverify' : 'https://www.google.com/recaptcha/api/siteverify';
+                    $verify = wp_remote_post( $url, array( 'body' => array( 'secret' => $secret, 'response' => $response, 'remoteip' => $_SERVER['REMOTE_ADDR'] ?? '' ) ) );
+                    $body = wp_remote_retrieve_body( $verify );
+                    $ok   = false;
+                    if ( $body ) {
+                        $json = json_decode( $body, true );
+                        $ok   = is_array( $json ) && ! empty( $json['success'] );
+                    }
+                    if ( ! $ok ) {
+                        $errors[] = 'captcha';
+                    }
+                }
+            }
+
             if ( $errors ) {
                 $redirect = add_query_arg( array( 'fbm_err' => implode( ',', $errors ) ), $referer );
                 wp_safe_redirect( $redirect );
@@ -52,10 +74,19 @@ class FormSubmitController {
             $file_meta = null;
             if ( isset( $_FILES['upload'] ) && is_array( $_FILES['upload'] ) ) {
                 $file = $_FILES['upload'];
-                // Hardcoded defaults: 5 MB limit and basic MIME whitelist until settings are implemented.
-                if ( UPLOAD_ERR_OK === (int) $file['error'] && (int) $file['size'] <= 5 * 1024 * 1024 ) { // 5MB limit
-                    $allowed = array( 'pdf' => 'application/pdf', 'jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png' );
-                    $type    = wp_check_filetype( $file['name'], $allowed );
+                $max_mb = (int) Options::get( 'files.max_size_mb', 5 );
+                $allowed_exts = Options::get( 'files.allowed_mimes', array() );
+                $allowed_mimes = array();
+                if ( is_array( $allowed_exts ) ) {
+                    $all_mimes = get_allowed_mime_types();
+                    foreach ( $allowed_exts as $ext ) {
+                        if ( isset( $all_mimes[ $ext ] ) ) {
+                            $allowed_mimes[ $ext ] = $all_mimes[ $ext ];
+                        }
+                    }
+                }
+                if ( UPLOAD_ERR_OK === (int) $file['error'] && (int) $file['size'] <= $max_mb * 1024 * 1024 ) {
+                    $type = wp_check_filetype( $file['name'], $allowed_mimes );
                     if ( ! empty( $type['ext'] ) && ! empty( $type['type'] ) ) {
                         $override = array(
                             'test_form' => false,
@@ -141,6 +172,7 @@ class FormSubmitController {
                 'last_name'      => $last,
                 'created_at'     => $now,
                 'summary_table'  => $summary_table,
+                'reference'      => 'FBM-' . $app_id,
             );
 
             if ( class_exists( '\\FoodBankManager\\Attendance\\TokenService' ) ) {
@@ -154,23 +186,37 @@ class FormSubmitController {
                 }
             }
 
-            $subject = sprintf( __( 'We received your application — Ref %d', 'foodbank-manager' ), $app_id );
-            ob_start();
-            extract( $tokens, EXTR_SKIP );
-            include plugin_dir_path( \FBM_FILE ) . 'templates/emails/applicant-confirmation.php';
-            $message = ob_get_clean();
-            wp_mail( $email, $subject, $message, array( 'Content-Type: text/html; charset=UTF-8' ) );
-
-            $admin_subject = sprintf( __( 'New application received (Ref %d)', 'foodbank-manager' ), $app_id );
             $admin_tokens  = $tokens;
-            $admin_tokens['entry_url'] = admin_url( 'admin.php?page=fbm_application&id=' . $app_id );
-            ob_start();
-            extract( $admin_tokens, EXTR_SKIP );
-            include plugin_dir_path( \FBM_FILE ) . 'templates/emails/admin-notification.php';
-            $admin_message = ob_get_clean();
-            wp_mail( (string) get_option( 'admin_email' ), $admin_subject, $admin_message, array( 'Content-Type: text/html; charset=UTF-8' ) );
+            $admin_tokens['application_link'] = admin_url( 'admin.php?page=fbm_application&id=' . $app_id );
 
-            $redirect = add_query_arg( array( 'fbm_success' => 1, 'fbm_ref' => $app_id ), $referer );
+            $headers = array( 'Content-Type: text/html; charset=UTF-8' );
+            $from_email = Options::get( 'emails.from_email' );
+            if ( $from_email ) {
+                $from_name = Options::get( 'emails.from_name' );
+                $headers[] = 'From: ' . ( $from_name ? $from_name : $from_email ) . ' <' . $from_email . '>';
+            }
+            $reply = Options::get( 'emails.reply_to' );
+            if ( $reply ) {
+                $headers[] = 'Reply-To: ' . $reply;
+            }
+
+            $rendered = Templates::render( 'applicant_confirmation', $tokens );
+            wp_mail( $email, $rendered['subject'], $rendered['body_html'], $headers );
+
+            $admin_rendered = Templates::render( 'admin_notification', $admin_tokens );
+            $recipients = Options::get( 'emails.admin_recipients' );
+            $to_admin = $recipients !== '' ? array_map( 'trim', explode( ',', $recipients ) ) : (string) get_option( 'admin_email' );
+            wp_mail( $to_admin, $admin_rendered['subject'], $admin_rendered['body_html'], $headers );
+
+            $redirect = $referer;
+            $success_page = (int) Options::get( 'forms.success_redirect_page_id' );
+            if ( $success_page ) {
+                $page_url = get_permalink( $success_page );
+                if ( $page_url ) {
+                    $redirect = $page_url;
+                }
+            }
+            $redirect = add_query_arg( array( 'fbm_success' => 1, 'fbm_ref' => $app_id ), $redirect );
             wp_safe_redirect( $redirect );
             exit;
         } catch ( \Throwable $e ) {
@@ -183,18 +229,8 @@ class FormSubmitController {
     }
 
     private static function consent_text(): string {
-        $preset_path = plugin_dir_path( \FBM_FILE ) . 'templates/forms/presets/foodbank-intake.json';
-        $default     = __( 'I consent to the processing of my data as described.', 'foodbank-manager' );
-        if ( file_exists( $preset_path ) ) {
-            $json = file_get_contents( $preset_path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
-            $cfg  = json_decode( (string) $json, true );
-            if ( is_array( $cfg ) && isset( $cfg['consent_text'] ) ) {
-                $text = Helpers::sanitize_text( (string) $cfg['consent_text'] );
-                if ( '' !== $text ) {
-                    return $text;
-                }
-            }
-        }
-        return $default;
+        $text = (string) Options::get( 'forms.consent_text', __( 'I consent to the processing of my data as described.', 'foodbank-manager' ) );
+        $text = Helpers::sanitize_text( $text );
+        return $text !== '' ? $text : __( 'I consent to the processing of my data as described.', 'foodbank-manager' );
     }
 }

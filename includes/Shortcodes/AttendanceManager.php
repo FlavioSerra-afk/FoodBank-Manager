@@ -12,7 +12,7 @@ class AttendanceManager {
             return '<div class="fbm-no-permission">' . esc_html__( 'You do not have permission to check in attendees.', 'foodbank-manager' ) . '</div>';
         }
         $nonce = wp_create_nonce( 'wp_rest' );
-        $types = (array) Options::get( 'attendance_types' );
+        $types = (array) Options::get( 'attendance.types' );
         ob_start();
         $nonce_var = $nonce; // local var for template scope
         $type_opts = $types;

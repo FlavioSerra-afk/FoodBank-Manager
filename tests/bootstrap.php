@@ -36,3 +36,48 @@ if (! function_exists('current_time')) {
         return gmdate('Y-m-d H:i:s');
     }
 }
+
+if (! function_exists('get_option')) {
+    function get_option(string $key, $default = false) {
+        global $fbm_test_options;
+        return $fbm_test_options[$key] ?? $default;
+    }
+}
+
+if (! function_exists('update_option')) {
+    function update_option(string $key, $value) {
+        global $fbm_test_options;
+        $fbm_test_options[$key] = $value;
+        return true;
+    }
+}
+
+if (! function_exists('sanitize_text_field')) {
+    function sanitize_text_field($str) {
+        return trim(strip_tags((string) $str));
+    }
+}
+
+if (! function_exists('sanitize_email')) {
+    function sanitize_email($email) {
+        return filter_var($email, FILTER_SANITIZE_EMAIL);
+    }
+}
+
+if (! function_exists('is_email')) {
+    function is_email($email) {
+        return (bool) filter_var($email, FILTER_VALIDATE_EMAIL);
+    }
+}
+
+if (! function_exists('sanitize_key')) {
+    function sanitize_key($key) {
+        return preg_replace('/[^a-z0-9_]/', '', strtolower((string) $key));
+    }
+}
+
+if (! function_exists('wp_kses_post')) {
+    function wp_kses_post($data) {
+        return $data;
+    }
+}

@@ -40,6 +40,8 @@ final class Plugin {
                         add_action('load-foodbank_page_fbm-database', [\FoodBankManager\Admin\DatabasePage::class, 'route']);
                         add_action('load-foodbank_page_fbm-attendance', [\FoodBankManager\Admin\AttendancePage::class, 'route']);
                         add_action('load-foodbank_page_fbm-permissions', [\FoodBankManager\Admin\PermissionsPage::class, 'route']);
+                        add_action('load-foodbank_page_fbm-settings', [\FoodBankManager\Admin\SettingsPage::class, 'route']);
+                        add_action('load-foodbank_page_fbm-emails', [\FoodBankManager\Admin\EmailsPage::class, 'route']);
                 }
 
                 add_action( 'admin_post_nopriv_fbm_submit', array( FormSubmitController::class, 'handle' ) );
@@ -58,6 +60,28 @@ final class Plugin {
                                                         echo '<div class="notice notice-warning"><p>' . esc_html__( 'FoodBank Manager: Encryption key (FBM_KEK_BASE64) not set. Some features are degraded.', 'foodbank-manager' ) . '</p></div>';
                                                 }
                                         );
+                                }
+                                $from = \FoodBankManager\Core\Options::get('emails.from_email');
+                                if ( ! is_email( $from ) ) {
+                                        add_action(
+                                                'admin_notices',
+                                                static function (): void {
+                                                        echo '<div class="notice notice-error"><p>' . esc_html__( 'FoodBank Manager: From email is not configured.', 'foodbank-manager' ) . '</p></div>';
+                                                }
+                                        );
+                                }
+                                $provider = \FoodBankManager\Core\Options::get('forms.captcha_provider');
+                                if ( $provider !== 'off' ) {
+                                        $site = \FoodBankManager\Core\Options::get('forms.captcha_site_key');
+                                        $secret = \FoodBankManager\Core\Options::get('forms.captcha_secret');
+                                        if ( $site === '' || $secret === '' ) {
+                                                add_action(
+                                                        'admin_notices',
+                                                        static function (): void {
+                                                                echo '<div class="notice notice-warning"><p>' . esc_html__( 'FoodBank Manager: CAPTCHA keys are missing.', 'foodbank-manager' ) . '</p></div>';
+                                                        }
+                                                );
+                                        }
                                 }
                         }
                 );

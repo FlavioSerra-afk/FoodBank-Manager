@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FoodBankManager\Attendance;
 
 use wpdb;
+use FoodBankManager\Core\Options;
 
 final class AttendanceRepo {
     /**
@@ -47,7 +48,7 @@ final class AttendanceRepo {
         // required inputs
         $rf = $args['range_from'];
         $rt = $args['range_to'];
-        $policyDays = (int)($args['policy_days'] ?? 7);
+        $policyDays = (int)($args['policy_days'] ?? Options::get( 'attendance.policy_days' ));
 
         $where = ["1=1"];
         $params = [];
