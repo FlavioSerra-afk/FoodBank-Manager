@@ -8,6 +8,18 @@ use wpdb;
 
 final class AttendanceRepo {
     /**
+     * Fetch the last 'present' attendance timestamp for an application.
+     */
+    public static function lastPresent(int $application_id): ?string {
+        global $wpdb;
+        $sql  = $wpdb->prepare(
+            "SELECT attendance_at FROM {$wpdb->prefix}fb_attendance WHERE application_id=%d AND status='present' ORDER BY attendance_at DESC LIMIT 1",
+            $application_id
+        );
+        $last = $wpdb->get_var($sql);
+        return $last ? (string) $last : null;
+    }
+    /**
      * @param array $args {
      *   @type string $range_from  UTC 'Y-m-d H:i:s'
      *   @type string $range_to    UTC 'Y-m-d H:i:s'
