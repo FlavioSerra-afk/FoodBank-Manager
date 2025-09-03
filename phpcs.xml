@@ -48,5 +48,27 @@
   <!-- We’re namespaced, don’t require global prefixes or Yoda -->
   <exclude name="WordPress.PHP.YodaConditions"/>
   <exclude name="WordPress.NamingConventions.PrefixAllGlobals"/>
-  <exclude name="WordPress.Files.FileName"/>
+  <rule ref="WordPress.Files.FileName">
+    <severity>0</severity>
+  </rule>
+
+  <rule ref="WordPress.WP.Capabilities">
+    <properties>
+      <property name="custom_capabilities" type="array">
+        <element value="fb_manage_dashboard"/>
+        <element value="fb_manage_attendance"/>
+        <element value="fb_manage_database"/>
+        <element value="fb_manage_forms"/>
+        <element value="fb_manage_settings"/>
+        <element value="fb_manage_diagnostics"/>
+        <element value="fb_manage_permissions"/>
+        <element value="fb_manage_theme"/>
+        <element value="fb_view_sensitive"/>
+      </property>
+    </properties>
+  </rule>
+
+  <rule ref="WordPress.PHP.DiscouragedPHPFunctions">
+    <exclude name="WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode"/>
+  </rule>
 </ruleset>

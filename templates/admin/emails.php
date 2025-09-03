@@ -16,8 +16,8 @@ $templates = Templates::getAll();
 <div class="wrap">
 	<h1><?php esc_html_e( 'Email Templates', 'foodbank-manager' ); ?></h1>
 	<?php settings_errors( 'fbm-emails' ); ?>
-	<form method="post" action="">
-		<?php wp_nonce_field( 'fbm_emails_save', 'fbm_emails_nonce' ); ?>
+		<form method="post" action="">
+				<?php wp_nonce_field( 'fbm_admin_action', '_fbm_nonce' ); ?>
 		<h2><?php esc_html_e( 'Applicant Confirmation', 'foodbank-manager' ); ?></h2>
 <p><label><?php esc_html_e( 'Subject', 'foodbank-manager' ); ?><br />
 <input type="text" name="templates[applicant_confirmation][subject]"
@@ -31,18 +31,22 @@ wp_editor(
 	)
 );
 ?>
-		<p><a class="button" href="
-		<?php
-		echo esc_url(
-			add_query_arg(
-				array(
-					'preview'  => 1,
-					'template' => 'applicant_confirmation',
-				)
-			)
-		);
-		?>
-		" target="_blank"><?php esc_html_e( 'Preview', 'foodbank-manager' ); ?></a></p>
+				<p><a class="button" href="
+				<?php
+				echo esc_url(
+					wp_nonce_url(
+						add_query_arg(
+							array(
+								'preview'  => 1,
+								'template' => 'applicant_confirmation',
+							)
+						),
+						'fbm_admin_action',
+						'_fbm_nonce'
+					)
+				);
+				?>
+				" target="_blank"><?php esc_html_e( 'Preview', 'foodbank-manager' ); ?></a></p>
 		<hr />
 		<h2><?php esc_html_e( 'Admin Notification', 'foodbank-manager' ); ?></h2>
 <p><label><?php esc_html_e( 'Subject', 'foodbank-manager' ); ?><br />
@@ -57,24 +61,28 @@ wp_editor(
 	)
 );
 ?>
-		<p><a class="button" href="
-		<?php
-		echo esc_url(
-			add_query_arg(
-				array(
-					'preview'  => 1,
-					'template' => 'admin_notification',
-				)
-			)
-		);
-		?>
-		" target="_blank"><?php esc_html_e( 'Preview', 'foodbank-manager' ); ?></a></p>
+				<p><a class="button" href="
+				<?php
+				echo esc_url(
+					wp_nonce_url(
+						add_query_arg(
+							array(
+								'preview'  => 1,
+								'template' => 'admin_notification',
+							)
+						),
+						'fbm_admin_action',
+						'_fbm_nonce'
+					)
+				);
+				?>
+				" target="_blank"><?php esc_html_e( 'Preview', 'foodbank-manager' ); ?></a></p>
 				<?php submit_button( esc_html__( 'Save Templates', 'foodbank-manager' ) ); ?>
 	</form>
 	<hr />
 	<h2><?php esc_html_e( 'Send Test', 'foodbank-manager' ); ?></h2>
-	<form method="post">
-		<?php wp_nonce_field( 'fbm_emails_test', 'fbm_emails_test_nonce' ); ?>
+		<form method="post">
+				<?php wp_nonce_field( 'fbm_admin_action', '_fbm_nonce' ); ?>
 		<input type="hidden" name="fbm_email_action" value="send_test" />
 		<p>
 			<label><?php esc_html_e( 'Template', 'foodbank-manager' ); ?>
