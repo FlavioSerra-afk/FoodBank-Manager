@@ -108,17 +108,31 @@ final class AttendanceRepo {
 		}
 
 		$statuses = array_values( array_filter( array_map( 'sanitize_text_field', (array) ( $args['status'] ?? array() ) ) ) );
+		if ( isset( $args['status'] ) && empty( $statuses ) ) {
+			return array(
+				'rows'  => array(),
+				'total' => 0,
+			);
+		}
 		if ( $statuses ) {
-			$ph      = implode( ',', array_fill( 0, count( $statuses ), '%s' ) );
-			$where[] = "t.status IN ($ph)";
-			$params  = array_merge( $params, $statuses );
+			$where[] = $wpdb->prepare(
+				't.status IN (' . implode( ', ', array_fill( 0, count( $statuses ), '%s' ) ) . ')',
+				$statuses
+			);
 		}
 
 		$types = array_values( array_filter( array_map( 'sanitize_text_field', (array) ( $args['type'] ?? array() ) ) ) );
+		if ( isset( $args['type'] ) && empty( $types ) ) {
+			return array(
+				'rows'  => array(),
+				'total' => 0,
+			);
+		}
 		if ( $types ) {
-			$ph      = implode( ',', array_fill( 0, count( $types ), '%s' ) );
-			$where[] = "t.type IN ($ph)";
-			$params  = array_merge( $params, $types );
+			$where[] = $wpdb->prepare(
+				't.type IN (' . implode( ', ', array_fill( 0, count( $types ), '%s' ) ) . ')',
+				$types
+			);
 		}
 
 		$manager_id = absint( $args['manager_id'] ?? 0 );
@@ -264,18 +278,21 @@ WHERE t2.application_id = t.application_id
 			return array();
 		}
 
-		$ids = array_values( array_map( 'absint', array_column( $rows, 'id' ) ) );
+		$ids = array_values( array_filter( array_map( 'absint', array_column( $rows, 'id' ) ) ) );
 		if ( empty( $ids ) ) {
-			return $rows;
+			return array();
 		}
 
-		$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+		$placeholders = implode( ', ', array_fill( 0, count( $ids ), '%d' ) );
+		$sql          = "
+SELECT attendance_id, user_id, note_text, created_at
+FROM {$t_notes}
+WHERE attendance_id IN ($placeholders)
+ORDER BY created_at ASC
+";
 		$note_rows    = $wpdb->get_results(
-			$wpdb->prepare(
 // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is constant and placeholders match count.
-				"SELECT attendance_id,user_id,note_text,created_at FROM {$t_notes} WHERE attendance_id IN ($placeholders) ORDER BY created_at ASC",
-				$ids
-			),
+			$wpdb->prepare( $sql, $ids ),
 			'ARRAY_A'
 		);
 		$note_rows = $note_rows ? $note_rows : array();
