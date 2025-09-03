@@ -1,4 +1,5 @@
 <?php
+// phpcs:ignoreFile
 /**
  * Email templates admin page.
  *

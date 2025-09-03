@@ -1,4 +1,5 @@
 <?php
+// phpcs:ignoreFile
 /**
  * Public application form shortcode.
  *

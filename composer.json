@@ -45,9 +45,10 @@
     "release:major": "php bin/bump-version.php major && php bin/changelog.php",
     "release:set": "php bin/bump-version.php set",
     "release:tagless": "php bin/bump-version.php patch --no-tag && php bin/changelog.php",
-    "build:zip": "bash -lc 'rm -rf dist && mkdir -p dist/foodbank-manager && rsync -a --exclude=.git --exclude=.github --exclude=node_modules --exclude=dist ./ dist/foodbank-manager/ && cd dist && zip -r foodbank-manager.zip foodbank-manager'",
     "cs:report": "phpcs --standard=phpcs.xml -q --report=full --report-file=./phpcs-report.txt",
-    "cs:fix": "composer phpcbf && composer phpcs || true"
+    "cs:fix": "composer phpcbf && composer phpcs || true",
+    "qa": "composer phpcs && composer phpstan -- --memory-limit=1G && composer test",
+    "build:zip": "php -r \"@mkdir('dist');\"; rm -rf dist/foodbank-manager && mkdir -p dist/foodbank-manager && rsync -a --exclude 'dist' --exclude '.github' --exclude 'Docs' --exclude 'analysis' --exclude 'tests' --exclude 'node_modules' --exclude '.git' --exclude '.gitignore' ./ dist/foodbank-manager/ && cd dist && zip -r9 foodbank-manager.zip foodbank-manager"
   },
   "config": {
     "allow-plugins": {

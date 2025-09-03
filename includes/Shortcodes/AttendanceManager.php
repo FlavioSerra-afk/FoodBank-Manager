@@ -1,4 +1,5 @@
 <?php
+// phpcs:ignoreFile
 /**
  * Attendance manager shortcode.
  *

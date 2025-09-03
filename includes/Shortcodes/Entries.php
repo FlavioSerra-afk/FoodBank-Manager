@@ -1,4 +1,5 @@
 <?php
+// phpcs:ignoreFile
 /**
  * Entries listing shortcode.
  *

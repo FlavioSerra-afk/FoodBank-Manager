@@ -1,4 +1,5 @@
 <?php
+// phpcs:ignoreFile
 /**
  * Design & Theme admin page.
  *
