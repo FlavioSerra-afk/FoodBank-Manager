@@ -36,7 +36,7 @@ final class AttendanceRepo {
 		$t_att = $wpdb->prefix . 'fb_attendance';
 		$last  = $wpdb->get_var(
 			$wpdb->prepare(
-// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- table name is constant and placeholders match.
+	// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- table name is constant and placeholders match.
 				"SELECT attendance_at FROM {$t_att} WHERE application_id = %d AND status = 'present' ORDER BY attendance_at DESC LIMIT 1",
 				$application_id
 			)
@@ -170,7 +170,7 @@ final class AttendanceRepo {
 			$limit_sql             = $wpdb->prepare( ' LIMIT %d OFFSET %d', $limit, $offset );
 
 			$base_sql = "
-SELECT
+	SELECT
   a.id AS application_id,
   MAX(CASE WHEN t.status='present' THEN t.attendance_at END)                                                 AS last_attended,
   SUM(CASE WHEN t.status='present' AND t.attendance_at BETWEEN %s AND %s THEN 1 ELSE 0 END)                  AS visits_range,
@@ -191,18 +191,18 @@ WHERE {$where_sql}
 GROUP BY t.application_id{$having}";
 
 			$rows = $wpdb->get_results(
-// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- placeholders strictly match params length.
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- placeholders strictly match params length.
 				$wpdb->prepare( $base_sql . $order_sql . $limit_sql, array_merge( array( $rf, $rt, $rf, $rt, $rt, $policy_days ), $params ) ),
 				'ARRAY_A'
 			);
 
 		if ( ! empty( $args['policy_only'] ) ) {
 			$count_base   = "
-SELECT COUNT(*) FROM (
+	SELECT COUNT(*) FROM (
   SELECT t.application_id,
 MAX(
   EXISTS(
-SELECT 1 FROM {$t_att} t2
+	SELECT 1 FROM {$t_att} t2
 WHERE t2.application_id = t.application_id
   AND t2.status='present'
   AND t2.attendance_at > DATE_SUB(t.attendance_at, INTERVAL %d DAY)
@@ -222,7 +222,7 @@ WHERE t2.application_id = t.application_id
 		}
 
 		$total = (int) $wpdb->get_var(
-// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- placeholders strictly match params length.
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- placeholders strictly match params length.
 			$wpdb->prepare( $count_base, $count_params )
 		);
 
@@ -309,15 +309,19 @@ WHERE t2.application_id = t.application_id
 		}
 
 		$placeholders = implode( ', ', array_fill( 0, count( $ids ), '%d' ) );
-		$sql          = "
+		$clauses      = array( "attendance_id IN ($placeholders)" );
+		$args         = $ids;
+		$where        = $self->fbm_sql_where( $clauses );
+
+		$sql       = "
 SELECT attendance_id, user_id, note_text, created_at
 FROM {$t_notes}
-WHERE attendance_id IN ($placeholders)
+$where
 ORDER BY created_at ASC
 ";
-		$note_rows    = $wpdb->get_results(
-// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is constant and placeholders match count.
-			$wpdb->prepare( $sql, $ids ),
+		$note_rows = $wpdb->get_results(
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is constant and placeholders match count.
+			$wpdb->prepare( $sql, ...$args ),
 			'ARRAY_A'
 		);
 		$note_rows = $note_rows ? $note_rows : array();
