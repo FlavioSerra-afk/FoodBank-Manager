@@ -1,3 +1,4 @@
+Docs-Revision: 2025-09-03 (Wave CS-Backlog-08)
 # REST API (pcc-fb/v1)
 
 Base namespace: `pcc-fb/v1`. All write endpoints require `X-WP-Nonce` and capabilities.
@@ -22,6 +23,7 @@ Base namespace: `pcc-fb/v1`. All write endpoints require `X-WP-Nonce` and capabi
 - `POST /attendance/note`
   - Body: `{ attendance_id:int, note:string }`
   - Perm: `attendance_admin`
+- All attendance endpoints delegate to `AttendanceRepo`, which uses `$wpdb->prepare()` with strict placeholders and returns masked data unless `fb_view_sensitive` is granted. Unit tests cover policy enforcement and SQL injection boundaries.
 
 ## Forms (MVP via admin-post)
 - Shortcode `[pcc_fb_form]` posts to `admin-post.php?action=fbm_submit`.
