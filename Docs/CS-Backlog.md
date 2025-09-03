@@ -1,19 +1,19 @@
-Docs-Revision: 2025-09-04 (Wave CS-Backlog-06)
+Docs-Revision: 2025-09-03 (Wave CS-Backlog-07)
 Strict (cleaned):
 
 includes/Admin/SettingsPage.php
 includes/Admin/EmailsPage.php
 includes/Admin/ThemePage.php
 includes/Admin/Menu.php
-includes/Attendance/AttendanceRepo.php
 includes/Admin/PermissionsPage.php
-includes/Admin/DatabasePage.php
-includes/Exports/CsvExporter.php
 
 Legacy (temporary ignoreFile to unblock ZIP):
 
 includes/Database/ApplicationsRepo.php
 includes/Admin/AttendancePage.php
+includes/Admin/DatabasePage.php
+includes/Attendance/AttendanceRepo.php
+includes/Exports/CsvExporter.php
 includes/UI/Theme.php
 includes/Mail/Templates.php
 includes/Http/FormSubmitController.php
@@ -34,6 +34,9 @@ Temporary ignores present in:
 
 includes/Database/ApplicationsRepo.php
 includes/Admin/AttendancePage.php
+includes/Admin/DatabasePage.php
+includes/Attendance/AttendanceRepo.php
+includes/Exports/CsvExporter.php
 includes/UI/Theme.php
 includes/Mail/Templates.php
 includes/Core/Plugin.php

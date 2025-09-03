@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.4] - 2025-09-03
+### Security
+- Strict guard cleanup (no suppressions in Strict files)
+### Build
+- PHPStan config modernized (no deprecated options)
+### Docs
+- CS-Backlog.md and PHPCS-Ignores.md revision-stamped for Wave CS-Backlog-07
+
 ## [1.0.3] - 2025-09-04
 ### Security
 - Harden Database admin page and CSV exports with nonces, sanitization and masking; promote to Strict.

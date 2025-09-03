@@ -11,7 +11,7 @@ use FoodBankManager\Http\FormSubmitController;
 
 final class Plugin {
 
-    public const FBM_VERSION = '1.0.3';
+    public const FBM_VERSION = '1.0.4';
 
         private static ?Plugin $instance = null;
 

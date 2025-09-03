@@ -34,7 +34,7 @@ final class CsvExporterTest extends TestCase {
             ),
         );
         ob_start();
-        CsvExporter::streamList( $rows );
+        CsvExporter::stream_list( $rows );
         $output  = ob_get_clean();
         header_remove();
 
@@ -65,7 +65,7 @@ final class CsvExporterTest extends TestCase {
             ),
         );
         ob_start();
-        CsvExporter::streamList( $rows, false );
+        CsvExporter::stream_list( $rows, false );
         $output = ob_get_clean();
         header_remove();
         $output = preg_replace( '/^\xEF\xBB\xBF/', '', $output );

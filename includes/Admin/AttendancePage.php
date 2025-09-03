@@ -169,7 +169,7 @@ final class AttendancePage {
         $req                 = $_REQUEST; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- flag only.
         $mask                = ! ( $can_sensitive && isset( $req['unmask'] ) );
         $rows                = self::decorateRows( $data['rows'], ! $can_sensitive || $mask );
-        CsvExporter::streamAttendancePeople( $rows, $mask, ! empty( $filters['include_voided'] ) );
+        CsvExporter::stream_attendance_people( $rows, $mask, ! empty( $filters['include_voided'] ) );
         exit;
     }
 
