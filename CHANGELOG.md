@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.0.3] - 2025-09-04
+### Security
+- Harden Database admin page and CSV exports with nonces, sanitization and masking; promote to Strict.
+### Docs
+- PRD-foodbank-manager.md: clarify database export capabilities and masking.
+- Architecture.md: note database capabilities and masked exports.
+- CS-Backlog.md: move DatabasePage and CsvExporter to Strict.
+- PHPCS-Ignores.md: regenerate report.
+
 ## [1.0.2] - 2025-09-03
 - Harden Permissions page (sanitization, nonces, safe redirects); moved to Strict; no behavior changes.
 

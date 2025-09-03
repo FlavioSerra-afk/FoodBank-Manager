@@ -1,4 +1,4 @@
-<?php // phpcs:ignoreFile
+<?php
 /**
  * Database listing template.
  *
@@ -10,7 +10,8 @@ use FoodBankManager\Security\Helpers;
 use FoodBankManager\Security\Crypto;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; }
+		exit;
+}
 ?>
 <div class="wrap">
 <h1><?php esc_html_e( 'Database', 'foodbank-manager' ); ?></h1>
@@ -115,25 +116,24 @@ else :
 				"><?php esc_html_e( 'View', 'foodbank-manager' ); ?></a>
 		<?php
 // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
-            if ( current_user_can( 'fb_manage_database' ) ) :
+		if ( current_user_can( 'fb_manage_database' ) ) :
 			?>
-		| <form method="post" style="display:inline">
-				<input type="hidden" name="action" value="fbm_export_single" />
-				<input type="hidden" name="id" value="<?php echo esc_attr( (string) $r['id'] ); ?>" />
-						<?php wp_nonce_field( 'fbm_db_single_export_' . $r['id'], '_wpnonce' ); ?>
+				| <form method="post" style="display:inline">
+								<input type="hidden" name="fbm_action" value="export_single" />
+								<input type="hidden" name="id" value="<?php echo esc_attr( (string) $r['id'] ); ?>" />
+							<?php wp_nonce_field( 'fbm_export_single_' . $r['id'], 'fbm_nonce' ); ?>
 								<button type="submit" class="button-link"><?php esc_html_e( 'CSV', 'foodbank-manager' ); ?></button>
 				</form>
 			<?php
 endif;
 // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
-            if ( current_user_can( 'fb_manage_database' ) ) :
+		if ( current_user_can( 'fb_manage_database' ) ) :
 			?>
-| <form method="post" style="display:inline"
-onsubmit="return confirm('<?php echo esc_js( __( 'Are you sure?', 'foodbank-manager' ) ); ?>');">
-				<input type="hidden" name="action" value="fbm_delete_entry" />
-				<input type="hidden" name="id" value="<?php echo esc_attr( (string) $r['id'] ); ?>" />
-						<?php wp_nonce_field( 'fbm_db_delete_' . $r['id'], '_wpnonce' ); ?>
-				<button type="submit" class="button-link"><?php esc_html_e( 'Delete', 'foodbank-manager' ); ?></button>
+| <form method="post" style="display:inline" onsubmit="return confirm('<?php echo esc_js( __( 'Are you sure?', 'foodbank-manager' ) ); ?>');">
+								<input type="hidden" name="fbm_action" value="delete_entry" />
+								<input type="hidden" name="id" value="<?php echo esc_attr( (string) $r['id'] ); ?>" />
+							<?php wp_nonce_field( 'fbm_delete_entry_' . $r['id'], 'fbm_nonce' ); ?>
+								<button type="submit" class="button-link"><?php esc_html_e( 'Delete', 'foodbank-manager' ); ?></button>
 				</form>
 			<?php
 endif;
@@ -172,15 +172,10 @@ $base_url    = remove_query_arg( 'paged' );
 	</div>
 </div>
 <?php if ( current_user_can( 'fb_manage_database' ) ) : // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability. ?>
-	<?php
-	$export_base = add_query_arg(
-		array(
-			'action' => 'fbm_export_entries',
-		),
-		$base_url
-	);
-	$export_url  = wp_nonce_url( $export_base, 'fbm_db_export', '_wpnonce' );
-	?>
-<p><a class="button" href="<?php echo esc_url( $export_url ); ?>"><?php esc_html_e( 'Export CSV', 'foodbank-manager' ); ?></a></p>
+<form method="post">
+		<input type="hidden" name="fbm_action" value="export_entries" />
+		<?php wp_nonce_field( 'fbm_export_entries', 'fbm_nonce' ); ?>
+		<button class="button" type="submit"><?php esc_html_e( 'Export CSV', 'foodbank-manager' ); ?></button>
+</form>
 <?php endif; ?>
 </div>

@@ -1,5 +1,9 @@
 <?php
-// phpcs:ignoreFile
+/**
+ * CSV export utilities.
+ *
+ * @package FoodBankManager
+ */
 
 declare(strict_types=1);
 
@@ -7,126 +11,163 @@ namespace FoodBankManager\Exports;
 
 use FoodBankManager\Security\Helpers;
 
+/**
+ * CSV export helpers.
+ */
 class CsvExporter {
-    /**
-     * Stream a CSV list export.
-     *
-     * @param array<int,array> $rows normalized rows ready to dump
-     * @param bool             $maskPII default true
-     */
-    public static function streamList( array $rows, bool $maskPII = true, string $filename = 'fbm-entries.csv' ): void {
-        if ( headers_sent() ) {
-            return;
-        }
-        $filename = preg_replace('/[^A-Za-z0-9._-]/', '_', $filename);
-        header( 'Content-Type: text/csv; charset=UTF-8' );
-        header( 'X-Content-Type-Options: nosniff' );
-        header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
-        echo "\xEF\xBB\xBF"; // UTF-8 BOM
+	/**
+	 * Stream a CSV list export.
+	 *
+	 * @param array<int,array> $rows          Rows ready to export.
+	 * @param bool             $mask_sensitive Whether to mask sensitive fields.
+	 * @param string           $filename       Output filename.
+	 */
+	public static function streamList( array $rows, bool $mask_sensitive = true, string $filename = 'fbm-entries.csv' ): void { // phpcs:ignore WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid
+		if ( headers_sent() ) {
+			return;
+		}
+		$filename = sanitize_file_name( $filename );
+		header( 'Content-Type: text/csv; charset=UTF-8' );
+		header( 'X-Content-Type-Options: nosniff' );
+		header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
+		echo "\xEF\xBB\xBF"; // UTF-8 BOM.
 
-        if ( class_exists( '\\League\\Csv\\Writer' ) ) {
-            $csv = \League\Csv\Writer::createFromFileObject( new \SplTempFileObject() );
-            if ( ! empty( $rows ) ) {
-                $csv->insertOne( array_keys( $rows[0] ) );
-                foreach ( $rows as $row ) {
-                    if ( $maskPII ) {
-                        $row['email']    = Helpers::mask_email( (string) ( $row['email'] ?? '' ) );
-                        $row['postcode'] = Helpers::mask_postcode( (string) ( $row['postcode'] ?? '' ) );
-                    }
-                    $csv->insertOne( $row );
-                }
-            }
-            $csv->output( $filename );
-        } else {
-            $out = fopen( 'php://output', 'wb' );
-            if ( ! empty( $rows ) ) {
-                fputcsv( $out, array_keys( $rows[0] ) );
-                foreach ( $rows as $row ) {
-                    if ( $maskPII ) {
-                        $row['email']    = Helpers::mask_email( (string) ( $row['email'] ?? '' ) );
-                        $row['postcode'] = Helpers::mask_postcode( (string) ( $row['postcode'] ?? '' ) );
-                    }
-                    fputcsv( $out, $row );
-                }
-            }
-            fclose( $out );
-        }
-    }
+		$keys    = array( 'id', 'created_at', 'name', 'email', 'postcode', 'status' );
+		$headers = array(
+			__( 'ID', 'foodbank-manager' ),
+			__( 'Created At', 'foodbank-manager' ),
+			__( 'Name', 'foodbank-manager' ),
+			__( 'Email', 'foodbank-manager' ),
+			__( 'Postcode', 'foodbank-manager' ),
+			__( 'Status', 'foodbank-manager' ),
+		);
 
-    /**
-     * Stream attendance people CSV.
-     *
-     * @param array<int,array> $rows
-     * @param bool             $maskPII default true
-     */
-    public static function streamAttendancePeople( array $rows, bool $maskPII = true, bool $includeVoided = false, string $filename = 'fbm-attendance.csv' ): void {
-        if ( headers_sent() ) {
-            return;
-        }
-        $filename = preg_replace('/[^A-Za-z0-9._-]/', '_', $filename);
-        header( 'Content-Type: text/csv; charset=UTF-8' );
-        header( 'X-Content-Type-Options: nosniff' );
-        header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
-        echo "\xEF\xBB\xBF";
+		if ( class_exists( '\\League\\Csv\\Writer' ) ) {
+			$csv = \League\Csv\Writer::createFromFileObject( new \SplTempFileObject() );
+			if ( ! empty( $rows ) ) {
+				$csv->insertOne( $headers );
+				foreach ( $rows as $row ) {
+					if ( $mask_sensitive ) {
+						$row['email']    = Helpers::mask_email( (string) ( $row['email'] ?? '' ) );
+						$row['postcode'] = Helpers::mask_postcode( (string) ( $row['postcode'] ?? '' ) );
+					}
+					$out_row = array();
+					foreach ( $keys as $k ) {
+						$out_row[] = $row[ $k ] ?? '';
+					}
+					$csv->insertOne( $out_row );
+				}
+			}
+			$csv->output( $filename );
+		} else {
+			$out = fopen( 'php://output', 'wb' );
+			if ( ! empty( $rows ) ) {
+				fputcsv( $out, $headers );
+				foreach ( $rows as $row ) {
+					if ( $mask_sensitive ) {
+						$row['email']    = Helpers::mask_email( (string) ( $row['email'] ?? '' ) );
+						$row['postcode'] = Helpers::mask_postcode( (string) ( $row['postcode'] ?? '' ) );
+					}
+					$out_row = array();
+					foreach ( $keys as $k ) {
+						$out_row[] = $row[ $k ] ?? '';
+					}
+					fputcsv( $out, $out_row );
+				}
+			}
+		}
+	}
 
-        $header = array( 'Application ID', 'Name', 'Email', 'Postcode', 'Last Attended', 'Visits (Range)', 'No-shows (Range)', 'Visits (12m)', 'Policy' );
-        if ($includeVoided) {
-            $header[] = 'Voided';
-        }
-        if ( class_exists( '\\League\\Csv\\Writer' ) ) {
-            $csv = \League\Csv\Writer::createFromFileObject( new \SplTempFileObject() );
-            if ( ! empty( $rows ) ) {
-                $csv->insertOne( $header );
-                foreach ( $rows as $row ) {
-                    if ( $maskPII ) {
-                        $row['email']    = Helpers::mask_email( (string) ( $row['email'] ?? '' ) );
-                        $row['postcode'] = Helpers::mask_postcode( (string) ( $row['postcode'] ?? '' ) );
-                    }
-                    $rowOut = array(
-                        $row['application_id'] ?? '',
-                        $row['name'] ?? '',
-                        $row['email'] ?? '',
-                        $row['postcode'] ?? '',
-                        $row['last_attended'] ?? '',
-                        $row['visits_range'] ?? '',
-                        $row['noshows_range'] ?? '',
-                        $row['visits_12m'] ?? '',
-                        $row['policy_badge'] ?? '',
-                    );
-                    if ($includeVoided) {
-                        $rowOut[] = !empty($row['is_void']) ? 'Yes' : 'No';
-                    }
-                    $csv->insertOne($rowOut);
-                }
-            }
-            $csv->output( $filename );
-        } else {
-            $out = fopen( 'php://output', 'wb' );
-            if ( ! empty( $rows ) ) {
-                fputcsv( $out, $header );
-                foreach ( $rows as $row ) {
-                    if ( $maskPII ) {
-                        $row['email']    = Helpers::mask_email( (string) ( $row['email'] ?? '' ) );
-                        $row['postcode'] = Helpers::mask_postcode( (string) ( $row['postcode'] ?? '' ) );
-                    }
-                    $rowOut = array(
-                        $row['application_id'] ?? '',
-                        $row['name'] ?? '',
-                        $row['email'] ?? '',
-                        $row['postcode'] ?? '',
-                        $row['last_attended'] ?? '',
-                        $row['visits_range'] ?? '',
-                        $row['noshows_range'] ?? '',
-                        $row['visits_12m'] ?? '',
-                        $row['policy_badge'] ?? '',
-                    );
-                    if ($includeVoided) {
-                        $rowOut[] = !empty($row['is_void']) ? 'Yes' : 'No';
-                    }
-                    fputcsv($out, $rowOut);
-                }
-            }
-            fclose( $out );
-        }
-    }
+	/**
+	 * Stream attendance people CSV.
+	 *
+	 * @param array<int,array> $rows           Data rows.
+	 * @param bool             $mask_sensitive Whether to mask sensitive fields.
+	 * @param bool             $include_voided Include voided flag column.
+	 * @param string           $filename       Output filename.
+	 */
+	public static function streamAttendancePeople( // phpcs:ignore WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid
+		array $rows,
+		bool $mask_sensitive = true,
+		bool $include_voided = false,
+		string $filename = 'fbm-attendance.csv'
+	): void {
+		if ( headers_sent() ) {
+			return;
+		}
+			$filename = sanitize_file_name( $filename );
+			header( 'Content-Type: text/csv; charset=UTF-8' );
+			header( 'X-Content-Type-Options: nosniff' );
+			header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
+			echo "\xEF\xBB\xBF";
+
+			$header = array(
+				__( 'Application ID', 'foodbank-manager' ),
+				__( 'Name', 'foodbank-manager' ),
+				__( 'Email', 'foodbank-manager' ),
+				__( 'Postcode', 'foodbank-manager' ),
+				__( 'Last Attended', 'foodbank-manager' ),
+				__( 'Visits (Range)', 'foodbank-manager' ),
+				__( 'No-shows (Range)', 'foodbank-manager' ),
+				__( 'Visits (12m)', 'foodbank-manager' ),
+				__( 'Policy', 'foodbank-manager' ),
+			);
+			if ( $include_voided ) {
+				$header[] = __( 'Voided', 'foodbank-manager' );
+			}
+			if ( class_exists( '\\League\\Csv\\Writer' ) ) {
+				$csv = \League\Csv\Writer::createFromFileObject( new \SplTempFileObject() );
+				if ( ! empty( $rows ) ) {
+					$csv->insertOne( $header );
+					foreach ( $rows as $row ) {
+						if ( $mask_sensitive ) {
+							$row['email']    = Helpers::mask_email( (string) ( $row['email'] ?? '' ) );
+							$row['postcode'] = Helpers::mask_postcode( (string) ( $row['postcode'] ?? '' ) );
+						}
+						$row_out = array(
+							$row['application_id'] ?? '',
+							$row['name'] ?? '',
+							$row['email'] ?? '',
+							$row['postcode'] ?? '',
+							$row['last_attended'] ?? '',
+							$row['visits_range'] ?? '',
+							$row['noshows_range'] ?? '',
+							$row['visits_12m'] ?? '',
+							$row['policy_badge'] ?? '',
+						);
+						if ( $include_voided ) {
+							$row_out[] = ! empty( $row['is_void'] ) ? __( 'Yes', 'foodbank-manager' ) : __( 'No', 'foodbank-manager' );
+						}
+						$csv->insertOne( $row_out );
+					}
+				}
+				$csv->output( $filename );
+			} else {
+				$out = fopen( 'php://output', 'wb' );
+				if ( ! empty( $rows ) ) {
+					fputcsv( $out, $header );
+					foreach ( $rows as $row ) {
+						if ( $mask_sensitive ) {
+							$row['email']    = Helpers::mask_email( (string) ( $row['email'] ?? '' ) );
+							$row['postcode'] = Helpers::mask_postcode( (string) ( $row['postcode'] ?? '' ) );
+						}
+						$row_out = array(
+							$row['application_id'] ?? '',
+							$row['name'] ?? '',
+							$row['email'] ?? '',
+							$row['postcode'] ?? '',
+							$row['last_attended'] ?? '',
+							$row['visits_range'] ?? '',
+							$row['noshows_range'] ?? '',
+							$row['visits_12m'] ?? '',
+							$row['policy_badge'] ?? '',
+						);
+						if ( $include_voided ) {
+							$row_out[] = ! empty( $row['is_void'] ) ? __( 'Yes', 'foodbank-manager' ) : __( 'No', 'foodbank-manager' );
+						}
+						fputcsv( $out, $row_out );
+					}
+				}
+			}
+	}
 }
