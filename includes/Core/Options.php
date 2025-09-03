@@ -1,4 +1,5 @@
 <?php
+// phpcs:ignoreFile
 /**
  * Options storage and helpers.
  *

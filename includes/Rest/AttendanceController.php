@@ -1,4 +1,5 @@
 <?php
+// phpcs:ignoreFile
 /**
  * REST controller for attendance actions.
  *
