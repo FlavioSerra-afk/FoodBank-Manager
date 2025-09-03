@@ -1,3 +1,4 @@
+Docs-Revision: 2025-09-03 (Wave CS-Backlog-08)
 # Contributing to PCC FoodBank Manager
 
 Thanks for helping build a secure and accessible tool for the community!  
@@ -92,6 +93,7 @@ npm run lint
 - **Integration**: REST endpoints, DB writes, encryption/decryption.
 - **Manual**: Forms, uploads, emails, dashboard filters, attendance scan/manual.
 - **A11y**: Keyboard nav, labels, color contrast, screen reader checks.
+- **AttendanceRepo**: unit tests cover check-in, no-show, void/unvoid, timeline queries, and SQL injection edges.
 
 Example:
 ```bash
@@ -105,6 +107,7 @@ composer test
 - File uploads: strict MIME/size validation, randomized names, no direct web execution.
 - Rate-limit public endpoints; verify CAPTCHA server-side.
 - Use prepared statements with `$wpdb`.
+- AttendanceRepo must use strict `$wpdb->prepare()` placeholders and return masked data unless `fb_view_sensitive` is granted.
 
 ## i18n & a11y
 - Wrap user-facing strings in `__()`/`_e()` and update the `.pot` (`npm run make-pot` or WP-CLI).
