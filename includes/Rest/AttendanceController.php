@@ -127,7 +127,7 @@ class AttendanceController {
 		 * @return bool
 		 */
 	public function check_write_permissions(): bool {
-			return Permissions::user_can( 'attendance_checkin' );
+                    return Permissions::user_can( 'fb_manage_attendance' );
 	}
 
 		/**
@@ -136,7 +136,7 @@ class AttendanceController {
 		 * @return bool
 		 */
 	public function check_view_permissions(): bool {
-			return Permissions::user_can( 'attendance_view' );
+                    return Permissions::user_can( 'fb_manage_attendance' );
 	}
 
 		/**
@@ -145,7 +145,7 @@ class AttendanceController {
 		 * @return bool
 		 */
 	public function check_admin_permissions(): bool {
-			return Permissions::user_can( 'attendance_admin' );
+                    return Permissions::user_can( 'fb_manage_attendance' );
 	}
 
 		/**

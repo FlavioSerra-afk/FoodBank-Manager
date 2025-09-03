@@ -61,7 +61,7 @@ final class PermissionsPage {
                 $mapping[ $role_key ] = $caps_for_role;
             }
             Options::update( 'permissions_roles', $mapping );
-            Roles::grantCapsToAdmin();
+            Roles::ensure_admin_caps();
             $notice = __( 'Permissions updated.', 'foodbank-manager' );
         } elseif ( $tab === 'users' && ( $_SERVER['REQUEST_METHOD'] ?? '' ) === 'POST' ) {
             Helpers::require_nonce( 'fbm_perm_users' );
@@ -117,7 +117,7 @@ final class PermissionsPage {
                             delete_user_meta( $user_id, 'fbm_user_caps' );
                         }
                     }
-                    Roles::grantCapsToAdmin();
+                    Roles::ensure_admin_caps();
                     $notice = __( 'Permissions imported.', 'foodbank-manager' );
                 } else {
                     $notice = __( 'Invalid JSON file.', 'foodbank-manager' );
@@ -130,7 +130,7 @@ final class PermissionsPage {
             foreach ( $users as $u ) {
                 delete_user_meta( $u->ID, 'fbm_user_caps' );
             }
-            Roles::grantCapsToAdmin();
+            Roles::ensure_admin_caps();
             $notice = __( 'Permissions reset.', 'foodbank-manager' );
         }
 
@@ -159,20 +159,15 @@ final class PermissionsPage {
      */
     private static function capLabels(): array {
         return array(
-            'fb_read_entries'      => __( 'Read entries', 'foodbank-manager' ),
-            'fb_edit_entries'      => __( 'Edit entries', 'foodbank-manager' ),
-            'fb_delete_entries'    => __( 'Delete entries', 'foodbank-manager' ),
-            'fb_export_entries'    => __( 'Export entries', 'foodbank-manager' ),
-            'fb_manage_forms'      => __( 'Manage forms', 'foodbank-manager' ),
-            'fb_manage_settings'   => __( 'Manage settings', 'foodbank-manager' ),
-            'fb_manage_emails'     => __( 'Manage emails', 'foodbank-manager' ),
-            'fb_manage_encryption' => __( 'Manage encryption', 'foodbank-manager' ),
-            'attendance_checkin'   => __( 'Attendance check-in', 'foodbank-manager' ),
-            'attendance_view'      => __( 'View attendance', 'foodbank-manager' ),
-            'attendance_export'    => __( 'Export attendance', 'foodbank-manager' ),
-            'attendance_admin'     => __( 'Administer attendance', 'foodbank-manager' ),
-            'read_sensitive'       => __( 'Read sensitive data', 'foodbank-manager' ),
+            'fb_manage_dashboard'   => __( 'Dashboard', 'foodbank-manager' ),
+            'fb_manage_attendance'  => __( 'Manage attendance', 'foodbank-manager' ),
+            'fb_manage_database'    => __( 'Manage database', 'foodbank-manager' ),
+            'fb_manage_forms'       => __( 'Manage forms', 'foodbank-manager' ),
+            'fb_manage_settings'    => __( 'Manage settings', 'foodbank-manager' ),
+            'fb_manage_diagnostics' => __( 'Diagnostics', 'foodbank-manager' ),
             'fb_manage_permissions' => __( 'Manage permissions', 'foodbank-manager' ),
+            'fb_manage_theme'       => __( 'Manage theme', 'foodbank-manager' ),
+            'fb_view_sensitive'     => __( 'View sensitive data', 'foodbank-manager' ),
         );
     }
 }

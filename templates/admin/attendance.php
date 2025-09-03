@@ -146,7 +146,7 @@ endif;
 	</form>
 	</div>
 </div>
-<?php if ( current_user_can( 'attendance_export' ) ) : ?>
+<?php if ( current_user_can( 'fb_manage_attendance' ) ) : ?>
 <form method="post" class="fbm-export">
 	<input type="hidden" name="action" value="fbm_att_export" />
 	<?php
@@ -170,7 +170,7 @@ endif;
 	const nonce='<?php echo esc_js( wp_create_nonce( 'wp_rest' ) ); ?>';
 	const endpoint='<?php echo esc_url_raw( rest_url( 'pcc-fb/v1/attendance/timeline' ) ); ?>';
 	const includeVoided=<?php echo $include_voided ? 'true' : 'false'; ?>;
-	const canAdmin=<?php echo current_user_can( 'attendance_admin' ) ? 'true' : 'false'; ?>;
+    const canAdmin=<?php echo current_user_can( 'fb_manage_attendance' ) ? 'true' : 'false'; ?>;
 	const voidUrl='<?php echo esc_url_raw( rest_url( 'pcc-fb/v1/attendance/void' ) ); ?>';
 	const unvoidUrl='<?php echo esc_url_raw( rest_url( 'pcc-fb/v1/attendance/unvoid' ) ); ?>';
 	const noteUrl='<?php echo esc_url_raw( rest_url( 'pcc-fb/v1/attendance/note' ) ); ?>';

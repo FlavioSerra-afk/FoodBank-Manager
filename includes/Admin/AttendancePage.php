@@ -16,7 +16,7 @@ final class AttendancePage {
      * Route the attendance admin page.
      */
     public static function route(): void {
-        if ( ! current_user_can('attendance_view') && ! current_user_can('manage_options') ) {
+        if ( ! current_user_can('fb_manage_attendance') && ! current_user_can('manage_options') ) {
             wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ), '', array('response' => 403) );
         }
 
@@ -157,7 +157,7 @@ final class AttendancePage {
      * Handle CSV export.
      */
     private static function handleExport(): void {
-        if ( ! current_user_can( 'attendance_export' ) ) {
+        if ( ! current_user_can( 'fb_manage_attendance' ) ) {
             wp_die( '', '', array( 'response' => 403 ) );
         }
         Helpers::require_nonce( 'fbm_att_export' );
@@ -165,7 +165,7 @@ final class AttendancePage {
         $filters['page']     = 1;
         $filters['per_page'] = 1000;
         $data                = AttendanceRepo::peopleSummary( $filters );
-        $can_sensitive       = current_user_can( 'read_sensitive' );
+        $can_sensitive       = current_user_can( 'fb_view_sensitive' );
         $req                 = $_REQUEST; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- flag only.
         $mask                = ! ( $can_sensitive && isset( $req['unmask'] ) );
         $rows                = self::decorateRows( $data['rows'], ! $can_sensitive || $mask );
@@ -187,7 +187,7 @@ final class AttendancePage {
         $range_from    = $filters['range_from'];
         $range_to      = $filters['range_to'];
         $include_voided = ! empty( $filters['include_voided'] );
-        $can_sensitive = current_user_can( 'read_sensitive' );
+        $can_sensitive = current_user_can( 'fb_view_sensitive' );
         require FBM_PATH . 'templates/admin/attendance.php';
     }
 }
