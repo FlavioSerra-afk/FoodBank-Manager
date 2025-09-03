@@ -25,7 +25,7 @@ class Entries {
 		 * @return string
 		 */
 	public static function render( array $atts = array() ): string { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- Attributes reserved for future use.
-		if ( ! Permissions::user_can( 'fb_read_entries' ) ) {
+                if ( ! Permissions::user_can( 'fb_manage_database' ) ) {
 				return '';
 		}
 			ob_start();

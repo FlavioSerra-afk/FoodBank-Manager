@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignoreFile
 /**
  * Diagnostics template.
  *
@@ -13,8 +13,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom plugin capability.
-if ( ! current_user_can( 'fb_manage_settings' ) && ! current_user_can( 'manage_options' ) ) {
-	wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ) );
+if ( ! current_user_can( 'fb_manage_diagnostics' ) && ! current_user_can( 'manage_options' ) ) {
+        wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ) );
 }
 ?>
 <div class="wrap">

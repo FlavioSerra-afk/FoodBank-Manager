@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignoreFile
 /**
  * Database listing template.
  *
@@ -115,7 +115,7 @@ else :
 				"><?php esc_html_e( 'View', 'foodbank-manager' ); ?></a>
 		<?php
 // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
-		if ( current_user_can( 'fb_export_entries' ) ) :
+            if ( current_user_can( 'fb_manage_database' ) ) :
 			?>
 		| <form method="post" style="display:inline">
 				<input type="hidden" name="action" value="fbm_export_single" />
@@ -126,7 +126,7 @@ else :
 			<?php
 endif;
 // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
-		if ( current_user_can( 'fb_delete_entries' ) ) :
+            if ( current_user_can( 'fb_manage_database' ) ) :
 			?>
 | <form method="post" style="display:inline"
 onsubmit="return confirm('<?php echo esc_js( __( 'Are you sure?', 'foodbank-manager' ) ); ?>');">
@@ -171,7 +171,7 @@ $base_url    = remove_query_arg( 'paged' );
 	</form>
 	</div>
 </div>
-<?php if ( current_user_can( 'fb_export_entries' ) ) : // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability. ?>
+<?php if ( current_user_can( 'fb_manage_database' ) ) : // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability. ?>
 	<?php
 	$export_base = add_query_arg(
 		array(

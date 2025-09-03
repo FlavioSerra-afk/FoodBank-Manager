@@ -79,7 +79,7 @@ if ( ! $can_sensitive ) {
 <a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=fbm-database' ) ); ?>">
 	<?php esc_html_e( 'Back', 'foodbank-manager' ); ?>
 </a>
-<?php if ( current_user_can( 'fb_export_entries' ) ) : // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability. ?>
+<?php if ( current_user_can( 'fb_manage_database' ) ) : // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability. ?>
 <form method="post" style="display:inline">
 		<input type="hidden" name="action" value="fbm_export_single" />
 		<input type="hidden" name="id" value="<?php echo esc_attr( (string) $entry['id'] ); ?>" />
@@ -87,7 +87,7 @@ if ( ! $can_sensitive ) {
 				<button class="button"><?php esc_html_e( 'CSV', 'foodbank-manager' ); ?></button>
 </form>
 <?php endif; ?>
-<?php if ( current_user_can( 'fb_delete_entries' ) ) : // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability. ?>
+<?php if ( current_user_can( 'fb_manage_database' ) ) : // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability. ?>
 <form method="post" style="display:inline" onsubmit="return confirm('<?php echo esc_js( __( 'Are you sure?', 'foodbank-manager' ) ); ?>');">
 		<input type="hidden" name="action" value="fbm_delete_entry" />
 		<input type="hidden" name="id" value="<?php echo esc_attr( (string) $entry['id'] ); ?>" />

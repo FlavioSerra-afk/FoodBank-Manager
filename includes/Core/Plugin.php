@@ -44,6 +44,8 @@ final class Plugin {
                 \FoodBankManager\Auth\CapabilitiesResolver::boot();
 
                 if ( is_admin() ) {
+                        add_action('admin_init', [\FoodBankManager\Auth\Roles::class, 'ensure_admin_caps'], 5);
+                        \FoodBankManager\Admin\Notices::boot();
                         \FoodBankManager\Admin\Menu::register();
                         add_action('load-toplevel_page_fbm-dashboard', [\FoodBankManager\Admin\DatabasePage::class, 'route']);
                         add_action('load-foodbank_page_fbm-database', [\FoodBankManager\Admin\DatabasePage::class, 'route']);
@@ -68,9 +70,6 @@ final class Plugin {
                 add_action(
                         'admin_init',
                         static function (): void {
-                                if ( function_exists( '\\FoodBankManager\\Auth\\Roles::grantCapsToAdmin' ) ) {
-                                        \FoodBankManager\Auth\Roles::grantCapsToAdmin();
-                                }
                                 if ( ! defined( 'FBM_KEK_BASE64' ) || empty( constant( 'FBM_KEK_BASE64' ) ) ) {
                                         add_action(
                                                 'admin_notices',
@@ -108,9 +107,9 @@ final class Plugin {
         }
 
         /** Activate plugin. */
-        public function activate(): void {
+        public static function activate(): void {
                 ( new Migrations() )->maybe_migrate();
-                Roles::activate();
+                Roles::install();
         }
 
         /** Deactivate plugin. */

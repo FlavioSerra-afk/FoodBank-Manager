@@ -13,39 +13,39 @@ namespace FoodBankManager\Tests\Unit {
 			self::$meta = array();
 		}
 
-		public function testAdministratorHasAllCaps(): void {
-			$user        = new \WP_User();
-			$user->ID    = 1;
-			$user->roles = array( 'administrator' );
-			$resolved    = CapabilitiesResolver::applyUserOverrides( array(), array(), array(), $user );
-			foreach ( Capabilities::all() as $cap ) {
-				$this->assertArrayHasKey( $cap, $resolved );
-				$this->assertTrue( $resolved[ $cap ] );
-			}
-		}
+                public function testGrantAdmins(): void {
+                        $user        = new \WP_User();
+                        $user->ID    = 1;
+                        $user->roles = array( 'administrator' );
+                        $resolved    = CapabilitiesResolver::grantAdmins( array(), array(), array(), $user );
+                        foreach ( Capabilities::all() as $cap ) {
+                                $this->assertArrayHasKey( $cap, $resolved );
+                                $this->assertTrue( $resolved[ $cap ] );
+                        }
+                }
 
-		public function testUserOverridesApply(): void {
-			self::$meta[2] = array(
-				'fb_read_entries'   => true,
-				'fb_export_entries' => false,
-			);
-			$user          = new \WP_User();
-			$user->ID      = 2;
-			$user->roles   = array( 'subscriber' );
-			$resolved      = CapabilitiesResolver::applyUserOverrides( array( 'fb_edit_entries' => true ), array(), array(), $user );
-			$this->assertTrue( $resolved['fb_read_entries'] );
-			$this->assertFalse( $resolved['fb_export_entries'] );
-			$this->assertTrue( $resolved['fb_edit_entries'] );
-		}
+                public function testUserOverridesApply(): void {
+                        self::$meta[2] = array(
+                                'fb_manage_dashboard' => true,
+                                'fb_manage_forms'     => false,
+                        );
+                        $user        = new \WP_User();
+                        $user->ID    = 2;
+                        $user->roles = array( 'subscriber' );
+                        $resolved    = CapabilitiesResolver::applyUserOverrides( array( 'fb_manage_database' => true ), array(), array(), $user );
+                        $this->assertTrue( $resolved['fb_manage_dashboard'] );
+                        $this->assertFalse( $resolved['fb_manage_forms'] );
+                        $this->assertTrue( $resolved['fb_manage_database'] );
+                }
 
-		public function testUnknownCapsIgnored(): void {
-			self::$meta[3] = array( 'unknown_cap' => true );
-			$user          = new \WP_User();
-			$user->ID      = 3;
-			$user->roles   = array();
-			$resolved      = CapabilitiesResolver::applyUserOverrides( array(), array(), array(), $user );
-			$this->assertArrayNotHasKey( 'unknown_cap', $resolved );
-		}
+                public function testUnknownCapsIgnored(): void {
+                        self::$meta[3] = array( 'unknown_cap' => true );
+                        $user          = new \WP_User();
+                        $user->ID      = 3;
+                        $user->roles   = array();
+                        $resolved      = CapabilitiesResolver::applyUserOverrides( array(), array(), array(), $user );
+                        $this->assertArrayNotHasKey( 'unknown_cap', $resolved );
+                }
 	}
 }
 

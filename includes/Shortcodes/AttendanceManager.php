@@ -27,7 +27,7 @@ class AttendanceManager {
 	public static function render( array $atts = array() ): string { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- Attributes reserved for future use.
 		Theme::enqueue_front();
 
-		if ( ! current_user_can( 'attendance_checkin' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
+                if ( ! current_user_can( 'fb_manage_attendance' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
 			return '<div class="fbm-no-permission">' . esc_html__( 'You do not have permission to check in attendees.', 'foodbank-manager' ) . '</div>';
 		}
 		$nonce = wp_create_nonce( 'wp_rest' );

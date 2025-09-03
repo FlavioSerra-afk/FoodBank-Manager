@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignoreFile
 /**
  * Plugin Name: FoodBank Manager
  * Description: Secure forms, encrypted storage, dashboards, and attendance tracking for food banks.
@@ -78,17 +78,8 @@ add_action(
 	}
 );
 
-// Activation/Deactivation hooks using instance wrappers.
-if ( ! function_exists( __NAMESPACE__ . '\\pcc_fbm_activate' ) ) {
-		/**
-		 * Wrapper for plugin activation.
-		 */
-	function pcc_fbm_activate(): void {
-			$plugin = new \FoodBankManager\Core\Plugin();
-			$plugin->activate();
-	}
-}
-register_activation_hook( __FILE__, __NAMESPACE__ . '\\pcc_fbm_activate' );
+// Activation/Deactivation hooks.
+register_activation_hook( FBM_FILE, [ \FoodBankManager\Core\Plugin::class, 'activate' ] );
 
 if ( ! function_exists( __NAMESPACE__ . '\\pcc_fbm_deactivate' ) ) {
 		/**
