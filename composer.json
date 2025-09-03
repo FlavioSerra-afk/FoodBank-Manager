@@ -38,8 +38,8 @@
   },
   "scripts": {
     "lint": "find . -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l",
-    "phpcs": "phpcs --standard=phpcs.xml --report=summary --report-width=120",
-    "phpcbf": "phpcbf --standard=phpcs.xml",
+    "phpcs": "php -d memory_limit=512M vendor/bin/phpcs --standard=phpcs.xml --report=summary --report-width=120",
+    "phpcbf": "php -d memory_limit=512M vendor/bin/phpcbf --standard=phpcs.xml",
     "phpstan": "phpstan analyse -c phpstan.neon --no-progress --memory-limit=1G",
     "phpstan:fast": "phpstan analyse -c phpstan.neon --no-progress --level=5 --memory-limit=768M",
     "phpstan:debug": "phpstan analyse -c phpstan.neon --debug --no-progress --memory-limit=1G",
@@ -49,9 +49,10 @@
     "release:major": "php bin/bump-version.php major && php bin/changelog.php",
     "release:set": "php bin/bump-version.php set",
     "release:tagless": "php bin/bump-version.php patch --no-tag && php bin/changelog.php",
-    "cs:report": "phpcs --standard=phpcs.xml -q --report=full --report-file=./phpcs-report.txt",
+    "cs:report": "php -d memory_limit=512M vendor/bin/phpcs --standard=phpcs.xml -q --report=full --report-file=./phpcs-report.txt",
     "cs:fix": "composer phpcbf && composer phpcs || true",
     "qa": "composer phpcs && composer phpstan && composer test",
+    "qa:fast": "composer phpcs && composer phpstan:fast && composer test",
     "build:zip": "php -r \"@mkdir('dist');\"; rm -rf dist/foodbank-manager && mkdir -p dist/foodbank-manager && rsync -a --exclude 'dist' --exclude '.github' --exclude 'Docs' --exclude 'analysis' --exclude 'tests' --exclude 'node_modules' --exclude '.git' --exclude '.gitignore' ./ dist/foodbank-manager/ && cd dist && zip -r9 foodbank-manager.zip foodbank-manager"
   },
   "config": {
