@@ -4,10 +4,10 @@ includes/Admin/SettingsPage.php
 includes/Admin/EmailsPage.php
 includes/Admin/ThemePage.php
 includes/Admin/Menu.php
+includes/Attendance/AttendanceRepo.php
 
 Legacy (temporary ignoreFile to unblock ZIP):
 
-includes/Attendance/AttendanceRepo.php
 includes/Database/ApplicationsRepo.php
 includes/Admin/AttendancePage.php
 includes/Admin/PermissionsPage.php
@@ -31,7 +31,6 @@ templates/admin/permissions.php
 
 Temporary ignores present in:
 
-includes/Attendance/AttendanceRepo.php
 includes/Database/ApplicationsRepo.php
 includes/Admin/AttendancePage.php
 includes/Admin/PermissionsPage.php
@@ -59,5 +58,4 @@ replacing ignoreFile with real fixes (escaping, nonces, prepared SQL, docblocks)
 keeping only surgical one-line // phpcs:ignore … where wp_kses_post() or strict IN (…) placeholders trigger false positives.
 
 Next cleanup targets:
-- includes/Attendance/AttendanceRepo.php
 - includes/Admin/PermissionsPage.php

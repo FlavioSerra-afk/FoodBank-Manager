@@ -1,0 +1,86 @@
+
+FILE: ...orkspace/FoodBank-Manager/includes/Attendance/AttendanceRepo.php
+----------------------------------------------------------------------
+FOUND 17 ERRORS AND 4 WARNINGS AFFECTING 11 LINES
+----------------------------------------------------------------------
+  39 | ERROR   | [x] Line indented incorrectly; expected at least 2
+     |         |     tabs, found 0
+     |         |     (Generic.WhiteSpace.ScopeIndent.Incorrect)
+  39 | ERROR   | [x] Multi-line function call not indented correctly;
+     |         |     expected 12 spaces but found 0
+     |         |     (PEAR.Functions.FunctionCallSignature.Indent)
+  40 | ERROR   | [ ] Use placeholders and $wpdb->prepare(); found
+     |         |     interpolated variable {$t_att} at "SELECT
+     |         |     attendance_at FROM {$t_att} WHERE application_id
+     |         |     = %d AND status = 'present' ORDER BY
+     |         |     attendance_at DESC LIMIT 1"
+     |         |     (WordPress.DB.PreparedSQL.InterpolatedNotPrepared)
+ 178 | ERROR   | [x] Line indented incorrectly; expected at least 2
+     |         |     tabs, found 0
+     |         |     (Generic.WhiteSpace.ScopeIndent.Incorrect)
+ 179 | ERROR   | [ ] Use placeholders and $wpdb->prepare(); found
+     |         |     $base_sql (WordPress.DB.PreparedSQL.NotPrepared)
+ 179 | ERROR   | [ ] Use placeholders and $wpdb->prepare(); found
+     |         |     $order_sql
+     |         |     (WordPress.DB.PreparedSQL.NotPrepared)
+ 179 | ERROR   | [ ] Use placeholders and $wpdb->prepare(); found
+     |         |     $limit_sql
+     |         |     (WordPress.DB.PreparedSQL.NotPrepared)
+ 209 | ERROR   | [x] Line indented incorrectly; expected at least 2
+     |         |     tabs, found 0
+     |         |     (Generic.WhiteSpace.ScopeIndent.Incorrect)
+ 210 | ERROR   | [ ] Use placeholders and $wpdb->prepare(); found
+     |         |     $count_base
+     |         |     (WordPress.DB.PreparedSQL.NotPrepared)
+ 256 | ERROR   | [x] Multi-line function call not indented correctly;
+     |         |     expected 12 spaces but found 4
+     |         |     (PEAR.Functions.FunctionCallSignature.Indent)
+ 256 | ERROR   | [x] Line indented incorrectly; expected at least 2
+     |         |     tabs, found 1
+     |         |     (Generic.WhiteSpace.ScopeIndent.Incorrect)
+ 257 | ERROR   | [ ] Use placeholders and $wpdb->prepare(); found
+     |         |     interpolated variable {$t_att} at "SELECT
+     |         |     t.id,t.status,t.attendance_at,t.event_id,t.type,t.method,t.recorded_by_user_id,t.is_void,t.void_reason,t.void_by_user_id,t.void_at
+     |         |     FROM {$t_att} t WHERE {$where_sql} ORDER BY
+     |         |     t.attendance_at ASC"
+     |         |     (WordPress.DB.PreparedSQL.InterpolatedNotPrepared)
+ 257 | ERROR   | [ ] Use placeholders and $wpdb->prepare(); found
+     |         |     interpolated variable {$where_sql} at "SELECT
+     |         |     t.id,t.status,t.attendance_at,t.event_id,t.type,t.method,t.recorded_by_user_id,t.is_void,t.void_reason,t.void_by_user_id,t.void_at
+     |         |     FROM {$t_att} t WHERE {$where_sql} ORDER BY
+     |         |     t.attendance_at ASC"
+     |         |     (WordPress.DB.PreparedSQL.InterpolatedNotPrepared)
+ 257 | WARNING | [ ] Line exceeds 160 characters; contains 220
+     |         |     characters (Generic.Files.LineLength.TooLong)
+ 257 | WARNING | [ ] Replacement variables found, but no valid
+     |         |     placeholders found in the query.
+     |         |     (WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare)
+ 275 | ERROR   | [x] Line indented incorrectly; expected at least 2
+     |         |     tabs, found 0
+     |         |     (Generic.WhiteSpace.ScopeIndent.Incorrect)
+ 275 | ERROR   | [x] Multi-line function call not indented correctly;
+     |         |     expected 12 spaces but found 0
+     |         |     (PEAR.Functions.FunctionCallSignature.Indent)
+ 276 | ERROR   | [ ] Use placeholders and $wpdb->prepare(); found
+     |         |     interpolated variable {$t_notes} at "SELECT
+     |         |     attendance_id,user_id,note_text,created_at FROM
+     |         |     {$t_notes} WHERE attendance_id IN
+     |         |     ($placeholders) ORDER BY created_at ASC"
+     |         |     (WordPress.DB.PreparedSQL.InterpolatedNotPrepared)
+ 276 | ERROR   | [ ] Use placeholders and $wpdb->prepare(); found
+     |         |     interpolated variable $placeholders at "SELECT
+     |         |     attendance_id,user_id,note_text,created_at FROM
+     |         |     {$t_notes} WHERE attendance_id IN
+     |         |     ($placeholders) ORDER BY created_at ASC"
+     |         |     (WordPress.DB.PreparedSQL.InterpolatedNotPrepared)
+ 276 | WARNING | [ ] Replacement variables found, but no valid
+     |         |     placeholders found in the query.
+     |         |     (WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare)
+ 307 | WARNING | [ ] It is recommended not to use reserved keyword
+     |         |     "void" as function parameter name. Found: $void
+     |         |     (Universal.NamingConventions.NoReservedKeywordParameterNames.voidFound)
+----------------------------------------------------------------------
+PHPCBF CAN FIX THE 8 MARKED SNIFF VIOLATIONS AUTOMATICALLY
+----------------------------------------------------------------------
+
+

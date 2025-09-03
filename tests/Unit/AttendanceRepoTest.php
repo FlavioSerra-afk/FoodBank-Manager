@@ -18,7 +18,7 @@ final class AttendanceRepoTest extends TestCase {
 			public function get_var( $sql ) {
 				return 0; }
 		};
-		AttendanceRepo::peopleSummary(
+            AttendanceRepo::people_summary(
 			array(
 				'range_from' => '2024-01-01 00:00:00',
 				'range_to'   => '2024-01-31 00:00:00',
@@ -26,7 +26,7 @@ final class AttendanceRepoTest extends TestCase {
 		);
 		$this->assertStringContainsString( 't.is_void = 0', $wpdb->prepared[0] );
 		$wpdb->prepared = array();
-		AttendanceRepo::peopleSummary(
+            AttendanceRepo::people_summary(
 			array(
 				'range_from'     => '2024-01-01 00:00:00',
 				'range_to'       => '2024-01-31 00:00:00',

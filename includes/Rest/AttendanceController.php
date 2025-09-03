@@ -187,7 +187,7 @@ class AttendanceController {
 		}
 
 		$policy_days = (int) Options::get( 'attendance.policy_days' );
-		$last        = AttendanceRepo::lastPresent( $application_id );
+                $last        = AttendanceRepo::last_present( $application_id );
 		$now         = current_time( 'mysql', true );
 		$override    = $request->get_param( 'override' );
 		$override_ok = is_array( $override ) && ! empty( $override['allowed'] );
@@ -363,7 +363,7 @@ class AttendanceController {
 		$attendance_id = (int) $request->get_param( 'attendance_id' );
 		$reason        = Helpers::sanitize_text( (string) $request->get_param( 'reason' ) );
 		$now           = current_time( 'mysql', true );
-		$ok            = AttendanceRepo::setVoid( $attendance_id, true, $reason !== '' ? $reason : null, get_current_user_id(), $now );
+            $ok            = AttendanceRepo::set_void( $attendance_id, true, $reason !== '' ? $reason : null, get_current_user_id(), $now );
 		if ( $ok ) {
 				Audit::log( 'attendance_void', 'attendance', $attendance_id, get_current_user_id(), array( 'reason' => $reason ) );
 		}
@@ -399,7 +399,7 @@ class AttendanceController {
 		}
 		$attendance_id = (int) $request->get_param( 'attendance_id' );
 		$now           = current_time( 'mysql', true );
-		$ok            = AttendanceRepo::setVoid( $attendance_id, false, null, get_current_user_id(), $now );
+            $ok            = AttendanceRepo::set_void( $attendance_id, false, null, get_current_user_id(), $now );
 		if ( $ok ) {
 				Audit::log( 'attendance_unvoid', 'attendance', $attendance_id, get_current_user_id(), array() );
 		}
@@ -436,7 +436,7 @@ class AttendanceController {
 		$attendance_id = (int) $request->get_param( 'attendance_id' );
 		$note          = Helpers::sanitize_text( (string) $request->get_param( 'note' ) );
 		$now           = current_time( 'mysql', true );
-		$ok            = AttendanceRepo::addNote( $attendance_id, get_current_user_id(), $note, $now );
+            $ok            = AttendanceRepo::add_note( $attendance_id, get_current_user_id(), $note, $now );
 		if ( $ok ) {
 			Audit::log(
 				'attendance_note',
