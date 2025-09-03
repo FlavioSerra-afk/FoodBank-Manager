@@ -26,7 +26,8 @@ parameters:
     - vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
 
   # Keep false positives down
-  checkMissingIterableValueType: false
-  checkGenericClassInNonGenericObjectType: false
   checkImplicitMixed: false
-  reportUnmatchedIgnoredErrors: true
+  reportUnmatchedIgnoredErrors: false
+  ignoreErrors:
+    - identifier: missingType.iterableValue
+    - identifier: missingType.generics

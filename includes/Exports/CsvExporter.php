@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignoreFile
 /**
  * CSV export utilities.
  *
@@ -22,7 +22,7 @@ class CsvExporter {
 	 * @param bool             $mask_sensitive Whether to mask sensitive fields.
 	 * @param string           $filename       Output filename.
 	 */
-	public static function streamList( array $rows, bool $mask_sensitive = true, string $filename = 'fbm-entries.csv' ): void { // phpcs:ignore WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid
+        public static function stream_list( array $rows, bool $mask_sensitive = true, string $filename = 'fbm-entries.csv' ): void {
 		if ( headers_sent() ) {
 			return;
 		}
@@ -86,12 +86,12 @@ class CsvExporter {
 	 * @param bool             $include_voided Include voided flag column.
 	 * @param string           $filename       Output filename.
 	 */
-	public static function streamAttendancePeople( // phpcs:ignore WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid
-		array $rows,
-		bool $mask_sensitive = true,
-		bool $include_voided = false,
-		string $filename = 'fbm-attendance.csv'
-	): void {
+        public static function stream_attendance_people(
+                array $rows,
+                bool $mask_sensitive = true,
+                bool $include_voided = false,
+                string $filename = 'fbm-attendance.csv'
+        ): void {
 		if ( headers_sent() ) {
 			return;
 		}

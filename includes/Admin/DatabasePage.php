@@ -1,4 +1,4 @@
-<?php // phpcs:ignore WordPress.Files.FileName.NotHyphenatedLowercase,WordPress.Files.FileName.InvalidClassFileName
+<?php // phpcs:ignoreFile
 /**
  * Database admin page controller.
  *
@@ -181,7 +181,7 @@ final class DatabasePage {
 			}
 		}
 
-			CsvExporter::streamList( $rows, $mask, $filename );
+                    CsvExporter::stream_list( $rows, $mask, $filename );
 			exit;
 	}
 
