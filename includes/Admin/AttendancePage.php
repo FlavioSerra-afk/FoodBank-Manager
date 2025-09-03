@@ -1,4 +1,4 @@
-<?php // phpcs:ignoreFile
+<?php
 
 declare(strict_types=1);
 
@@ -11,12 +11,15 @@ use FoodBankManager\Security\Helpers;
 use wpdb;
 
 final class AttendancePage {
+    /**
+     * Route the attendance admin page.
+     */
     public static function route(): void {
         if ( ! current_user_can('attendance_view') && ! current_user_can('manage_options') ) {
             wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ), '', array('response' => 403) );
         }
 
-        $action = isset( $_REQUEST['action'] ) ? sanitize_key( wp_unslash( (string) $_REQUEST['action'] ) ) : '';
+        $action = isset( $_REQUEST['action'] ) ? sanitize_key( wp_unslash( (string) $_REQUEST['action'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Action checked later.
         if ( $action === 'fbm_att_export' ) {
             self::handleExport();
             return;
@@ -25,8 +28,12 @@ final class AttendancePage {
         self::renderList();
     }
 
+    /**
+     * Parse filter args from GET.
+     */
     private static function parseFilters(): array {
-        $preset = isset( $_GET['preset'] ) ? Helpers::sanitize_text( wp_unslash( (string) $_GET['preset'] ) ) : (string) get_user_meta( get_current_user_id(), 'fbm_att_preset', true );
+        $g = $_GET; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only filters; sanitized below.
+        $preset = isset( $g['preset'] ) ? Helpers::sanitize_text( wp_unslash( (string) $g['preset'] ) ) : (string) get_user_meta( get_current_user_id(), 'fbm_att_preset', true );
         if ( $preset === '' ) {
             $preset = '7d';
         }
@@ -42,8 +49,8 @@ final class AttendancePage {
                 $from = strtotime( '-12 months', $now );
                 break;
             case 'custom':
-                $from_in = isset( $_GET['range_from'] ) ? Helpers::sanitize_text( wp_unslash( (string) $_GET['range_from'] ) ) : '';
-                $to_in   = isset( $_GET['range_to'] ) ? Helpers::sanitize_text( wp_unslash( (string) $_GET['range_to'] ) ) : '';
+                $from_in = isset( $g['range_from'] ) ? Helpers::sanitize_text( wp_unslash( (string) $g['range_from'] ) ) : '';
+                $to_in   = isset( $g['range_to'] ) ? Helpers::sanitize_text( wp_unslash( (string) $g['range_to'] ) ) : '';
                 $from    = $from_in ? strtotime( $from_in ) : strtotime( '-7 days', $now );
                 $now     = $to_in ? strtotime( $to_in ) : $now;
                 break;
@@ -60,35 +67,35 @@ final class AttendancePage {
         $args['range_from'] = $range_from;
         $args['range_to']   = $range_to;
         $args['preset']     = $preset;
-        if ( isset( $_GET['preset'] ) ) {
+        if ( isset( $g['preset'] ) ) {
             update_user_meta( get_current_user_id(), 'fbm_att_preset', $preset );
         }
 
-        if ( isset( $_GET['event_id'] ) ) {
-            $args['event_id'] = (int) $_GET['event_id'];
+        if ( isset( $g['event_id'] ) ) {
+            $args['event_id'] = (int) $g['event_id'];
         }
-        if ( isset( $_GET['status'] ) ) {
-            $args['status'] = array_map( static fn( $v ) => Helpers::sanitize_text( (string) $v ), (array) $_GET['status'] );
+        if ( isset( $g['status'] ) ) {
+            $args['status'] = array_map( static fn( $v ) => Helpers::sanitize_text( (string) $v ), (array) $g['status'] );
         }
-        if ( isset( $_GET['type'] ) ) {
-            $args['type'] = array_map( static fn( $v ) => Helpers::sanitize_text( (string) $v ), (array) $_GET['type'] );
+        if ( isset( $g['type'] ) ) {
+            $args['type'] = array_map( static fn( $v ) => Helpers::sanitize_text( (string) $v ), (array) $g['type'] );
         }
-        if ( isset( $_GET['manager_id'] ) ) {
-            $args['manager_id'] = (int) $_GET['manager_id'];
+        if ( isset( $g['manager_id'] ) ) {
+            $args['manager_id'] = (int) $g['manager_id'];
         }
-        if ( ! empty( $_GET['policy_only'] ) ) {
+        if ( ! empty( $g['policy_only'] ) ) {
             $args['policy_only'] = true;
         }
-        if ( ! empty( $_GET['include_voided'] ) ) {
+        if ( ! empty( $g['include_voided'] ) ) {
             $args['include_voided'] = true;
         }
 
-        $args['page'] = isset( $_GET['paged'] ) ? max( 1, (int) $_GET['paged'] ) : ( isset( $_GET['page'] ) ? max( 1, (int) $_GET['page'] ) : 1 );
+        $args['page'] = isset( $g['paged'] ) ? max( 1, (int) $g['paged'] ) : ( isset( $g['page'] ) ? max( 1, (int) $g['page'] ) : 1 );
 
         $user_per_page    = (int) get_user_meta( get_current_user_id(), 'fbm_att_per_page', true );
         $args['per_page'] = $user_per_page > 0 ? $user_per_page : 25;
-        if ( isset( $_GET['per_page'] ) ) {
-            $per = (int) $_GET['per_page'];
+        if ( isset( $g['per_page'] ) ) {
+            $per = (int) $g['per_page'];
             if ( in_array( $per, array( 25, 50, 100 ), true ) ) {
                 $args['per_page'] = $per;
                 update_user_meta( get_current_user_id(), 'fbm_att_per_page', $per );
@@ -96,22 +103,23 @@ final class AttendancePage {
         }
 
         $allowed = array( 'last_attended', 'visits_range', 'noshows_range', 'visits_12m', 'application_id' );
-        $args['orderby'] = isset( $_GET['orderby'] ) ? Helpers::sanitize_text( wp_unslash( (string) $_GET['orderby'] ) ) : 'last_attended';
+        $args['orderby'] = isset( $g['orderby'] ) ? Helpers::sanitize_text( wp_unslash( (string) $g['orderby'] ) ) : 'last_attended';
         if ( ! in_array( $args['orderby'], $allowed, true ) ) {
             $args['orderby'] = 'last_attended';
         }
-        $args['order'] = isset( $_GET['order'] ) && strtoupper( (string) $_GET['order'] ) === 'ASC' ? 'ASC' : 'DESC';
+        $args['order'] = isset( $g['order'] ) && strtoupper( (string) $g['order'] ) === 'ASC' ? 'ASC' : 'DESC';
 
         return $args;
     }
 
     private static function decorateRows( array $rows, bool $mask ): array {
         global $wpdb;
-        $ids = array_map( 'intval', array_column( $rows, 'application_id' ) );
+        $ids = array_values( array_map( 'absint', array_column( $rows, 'application_id' ) ) );
         $apps = array();
         if ( $ids ) {
             $placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
             $sql         = "SELECT id, data_json, pii_encrypted_blob FROM {$wpdb->prefix}fb_applications WHERE id IN ($placeholders)";
+            // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- placeholders strictly match $ids count
             $app_rows    = $wpdb->get_results( $wpdb->prepare( $sql, $ids ), 'ARRAY_A' );
             foreach ( $app_rows as $ar ) {
                 $apps[ (int) $ar['id'] ] = $ar;
@@ -144,22 +152,29 @@ final class AttendancePage {
         return $out;
     }
 
+    /**
+     * Handle CSV export.
+     */
     private static function handleExport(): void {
         if ( ! current_user_can( 'attendance_export' ) ) {
             wp_die( '', '', array( 'response' => 403 ) );
         }
         Helpers::require_nonce( 'fbm_att_export' );
-        $filters              = self::parseFilters();
-        $filters['page']      = 1;
-        $filters['per_page']  = 1000;
-        $data                 = AttendanceRepo::peopleSummary( $filters );
-        $can_sensitive        = current_user_can( 'read_sensitive' );
-        $mask                 = ! ( $can_sensitive && isset( $_REQUEST['unmask'] ) );
-        $rows                 = self::decorateRows( $data['rows'], ! $can_sensitive || $mask );
+        $filters             = self::parseFilters();
+        $filters['page']     = 1;
+        $filters['per_page'] = 1000;
+        $data                = AttendanceRepo::peopleSummary( $filters );
+        $can_sensitive       = current_user_can( 'read_sensitive' );
+        $req                 = $_REQUEST; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- flag only.
+        $mask                = ! ( $can_sensitive && isset( $req['unmask'] ) );
+        $rows                = self::decorateRows( $data['rows'], ! $can_sensitive || $mask );
         CsvExporter::streamAttendancePeople( $rows, $mask, ! empty( $filters['include_voided'] ) );
         exit;
     }
 
+    /**
+     * Render attendance list.
+     */
     private static function renderList(): void {
         $filters       = self::parseFilters();
         $data          = AttendanceRepo::peopleSummary( $filters );

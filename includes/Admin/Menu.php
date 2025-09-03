@@ -1,14 +1,20 @@
-<?php // phpcs:ignoreFile
+<?php
 
 declare(strict_types=1);
 
 namespace FoodBankManager\Admin;
 
 final class Menu {
+    /**
+     * Hook menu registration.
+     */
     public static function register(): void {
         add_action('admin_menu', [__CLASS__, 'addMenu']);
     }
 
+    /**
+     * Add top-level and submenu pages.
+     */
     public static function addMenu(): void {
         $cap = current_user_can('fb_read_entries') ? 'fb_read_entries' : 'manage_options';
 
@@ -46,12 +52,20 @@ final class Menu {
         }
     }
 
+    /** Render dashboard page. */
     public static function renderDashboard(): void  { self::safeInclude('dashboard.php'); }
+    /** Render attendance page. */
     public static function renderAttendance(): void { self::safeInclude('attendance.php'); }
+    /** Render database page. */
     public static function renderDatabase(): void   { \FoodBankManager\Admin\DatabasePage::route(); }
+    /** Render forms page. */
     public static function renderForms(): void      { self::safeInclude('forms.php'); }
+    /** Render email templates page. */
     public static function renderEmails(): void     { self::safeInclude('emails.php'); }
+    /** Render settings page. */
     public static function renderSettings(): void   { self::safeInclude('settings.php'); }
+    /** Render theme page. */
     public static function renderTheme(): void      { self::safeInclude('theme.php'); }
+    /** Render diagnostics page. */
     public static function renderDiagnostics(): void{ self::safeInclude('diagnostics.php'); }
 }

@@ -1,4 +1,4 @@
-<?php // phpcs:ignoreFile
+<?php
 
 declare(strict_types=1);
 
@@ -12,18 +12,26 @@ final class Plugin {
 
     public const FBM_VERSION = '0.1.1';
 
+        private static ?Plugin $instance = null;
 
-	private static ?Plugin $instance = null;
+        /**
+         * Get singleton instance.
+         */
+        public static function get_instance(): self {
+                return self::$instance ??= new self();
+        }
 
-	public static function get_instance(): self {
-		return self::$instance ??= new self();
-	}
-
+        /**
+         * Register hooks and assets.
+         */
         public function init(): void {
                 ( new Hooks() )->register();
                 ( new Assets() )->register();
         }
 
+        /**
+         * Boot the plugin.
+         */
         public function boot(): void {
                 add_action(
                         'init',
@@ -98,12 +106,14 @@ final class Plugin {
                 $this->init();
         }
 
+        /** Activate plugin. */
         public function activate(): void {
                 ( new Migrations() )->maybe_migrate();
                 Roles::activate();
         }
 
-	public function deactivate(): void {
-		// Placeholder for future deactivation routines.
-	}
+        /** Deactivate plugin. */
+        public function deactivate(): void {
+                // Placeholder for future deactivation routines.
+        }
 }

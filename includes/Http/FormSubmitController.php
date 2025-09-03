@@ -1,5 +1,4 @@
 <?php
-// phpcs:ignoreFile
 
 declare(strict_types=1);
 
@@ -11,6 +10,9 @@ use FoodBankManager\Core\Options;
 use FoodBankManager\Mail\Templates;
 
 class FormSubmitController {
+    /**
+     * Handle public form submissions.
+     */
     public static function handle(): void {
         try {
             if ( ! Helpers::verify_nonce( 'fbm_submit_form', '_fbm_nonce' ) ) {
@@ -51,8 +53,9 @@ class FormSubmitController {
                 $response = sanitize_text_field( (string) ( $_POST[ $response_key ] ?? '' ) );
                 $secret   = Options::get( 'forms.captcha_secret' );
                 if ( $secret && $response ) {
-                    $url  = $provider === 'turnstile' ? 'https://challenges.cloudflare.com/turnstile/v0/siteverify' : 'https://www.google.com/recaptcha/api/siteverify';
-                    $verify = wp_remote_post( $url, array( 'body' => array( 'secret' => $secret, 'response' => $response, 'remoteip' => $_SERVER['REMOTE_ADDR'] ?? '' ) ) );
+                    $url       = $provider === 'turnstile' ? 'https://challenges.cloudflare.com/turnstile/v0/siteverify' : 'https://www.google.com/recaptcha/api/siteverify';
+                    $remote_ip = sanitize_text_field( (string) ( $_SERVER['REMOTE_ADDR'] ?? '' ) );
+                    $verify    = wp_remote_post( $url, array( 'body' => array( 'secret' => $secret, 'response' => $response, 'remoteip' => $remote_ip ) ) );
                     $body = wp_remote_retrieve_body( $verify );
                     $ok   = false;
                     if ( $body ) {
@@ -124,7 +127,7 @@ class FormSubmitController {
 
             $consent_text = self::consent_text();
             $consent_hash = hash( 'sha256', $consent_text );
-            $ip           = $_SERVER['REMOTE_ADDR'] ?? '';
+            $ip           = sanitize_text_field( (string) ( $_SERVER['REMOTE_ADDR'] ?? '' ) );
             $ip_bin       = $ip !== '' ? @inet_pton( $ip ) : null; // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
             $now          = current_time( 'mysql', true );
 
@@ -228,6 +231,9 @@ class FormSubmitController {
         }
     }
 
+    /**
+     * Fetch consent text from options.
+     */
     private static function consent_text(): string {
         $text = (string) Options::get( 'forms.consent_text', __( 'I consent to the processing of my data as described.', 'foodbank-manager' ) );
         $text = Helpers::sanitize_text( $text );
