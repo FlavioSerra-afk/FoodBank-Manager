@@ -1,5 +1,4 @@
-<?php
-// phpcs:ignoreFile
+<?php // phpcs:ignore WordPress.Files.FileName.NotHyphenatedLowercase,WordPress.Files.FileName.InvalidClassFileName
 /**
  * Settings admin page.
  *
