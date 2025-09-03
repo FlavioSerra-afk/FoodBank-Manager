@@ -35,7 +35,6 @@ includes/Core/Options.php
 includes/Core/Plugin.php
 includes/Database/ApplicationsRepo.php
 includes/Exports/CsvExporter.php
-includes/Http/FormSubmitController.php
 includes/Mail/Templates.php
 includes/Rest/Api.php
 includes/Rest/AttendanceController.php
@@ -58,7 +57,6 @@ includes/Core/Options.php
 includes/Core/Plugin.php
 includes/Database/ApplicationsRepo.php
 includes/Exports/CsvExporter.php
-includes/Http/FormSubmitController.php
 includes/Mail/Templates.php
 includes/Rest/Api.php
 includes/Rest/AttendanceController.php
