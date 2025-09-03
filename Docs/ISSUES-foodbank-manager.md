@@ -1,3 +1,4 @@
+Docs-Revision: 2025-09-03 (Wave CS-Backlog-08)
 # FoodBank Manager — Issues & Milestones
 
 This file maps **milestones → epics → issues** so you can paste into GitHub.  
@@ -244,6 +245,18 @@ Use alongside the PRD: `PRD-foodbank-manager.md`.
 
 ## M4 — Attendance
 **Goal:** Events (optional), QR issuance, scan/manual check-in, policy rules, reports.
+
+**Issue: Harden AttendanceRepo**
+- **Title:** chore(cs): make AttendanceRepo SQL strict and remove ignoreFile
+- **Body:**
+  - **Tasks:**
+    - [ ] Replace string concatenation with `$wpdb->prepare()` and strict placeholders.
+    - [ ] Ensure attendance queries mask PII by default.
+    - [ ] Add unit tests for check-in, no-show, void/unvoid, timeline queries, and SQL injection attempts.
+  - **Acceptance Criteria:**
+    - No `phpcs:ignoreFile` on `includes/Attendance/AttendanceRepo.php`; tests cover policy edges.
+  - **Labels:** area:attendance, type:chore, security
+  - **PRD Refs:** §6.3, §10
 
 **Issue: Events model & UI **
 - **Title:** feat(attendance): events CRUD & listing

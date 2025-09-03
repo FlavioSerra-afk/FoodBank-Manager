@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave CS-Backlog-06)
+Docs-Revision: 2025-09-03 (Wave CS-Backlog-08)
 # FoodBank Manager — Product Requirements Document (PRD)
 
 **Repo file:** `Docs/PRD-foodbank-manager.md`  
@@ -116,6 +116,7 @@ Roles map to WordPress **capabilities** (granular; see §10 Security).
 - **Settings:** branding, date/time, email defaults, spam protection keys, file policy, retention/anonymisation, encryption controls (see §10).
 - **Diagnostics:** email logs, resend, environment checks (PHP/WP version, cron, transport).
 - **Permissions:** map capabilities to roles and set per-user overrides.
+- **Attendance repository:** all queries use `$wpdb->prepare()` with strict placeholders; results mask PII unless `fb_view_sensitive` is granted; unit tests cover check-in, no-show, void/unvoid, and policy edge cases.
 
 **Permissions tab — Acceptance Criteria**
 - Admins can map caps to roles (except Administrator which is fixed).
