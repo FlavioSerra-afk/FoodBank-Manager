@@ -44,31 +44,41 @@ final class AttendanceRepo {
 		return $last ? $last : null;
 	}
 
-	/**
-	 * Summarize attendance across applications.
-	 *
-	 * @since 0.1.x
-	 *
-	 * @param array<string,mixed> $args Arguments.
-	 * @phpstan-param array{
-	 *   range_from:string,
-	 *   range_to:string,
-	 *   form_id?:int,
-	 *   event_id?:int,
-	 *   status?:array<int,string>,
-	 *   type?:array<int,string>,
-	 *   manager_id?:int,
-	 *   policy_only?:bool,
-	 *   include_voided?:bool,
-	 *   policy_days?:int,
-	 *   page?:int,
-	 *   per_page?:int,
-	 *   orderby?:string,
-	 *   order?:string
-	 * } $args
-	 *
-	 * @return array{rows:list<array<string,scalar|null>>, total:int}
-	 */
+		/**
+		 * Summarize attendance across applications.
+		 *
+		 * @since 0.1.x
+		 *
+		 * @param array<string,mixed> $args Arguments.
+		 * @phpstan-param array{
+		 *   range_from:string,
+		 *   range_to:string,
+		 *   form_id?:int,
+		 *   event_id?:int,
+		 *   status?:array<int,string>,
+		 *   type?:array<int,string>,
+		 *   manager_id?:int,
+		 *   policy_only?:bool,
+		 *   include_voided?:bool,
+		 *   policy_days?:int,
+		 *   page?:int,
+		 *   per_page?:int,
+		 *   orderby?:string,
+		 *   order?:string
+		 * } $args
+		 *
+		 * @return array{
+		 *   rows:list<array{
+		 *     application_id:int,
+		 *     last_attended: string|null,
+		 *     visits_range:int,
+		 *     noshows_range:int,
+		 *     visits_12m:int,
+		 *     policy_breach:int
+		 *   }>,
+		 *   total:int
+		 * }
+		 */
 	public static function people_summary( array $args ): array {
 		global $wpdb;
 		$t_att = $wpdb->prefix . 'fb_attendance';
@@ -139,27 +149,27 @@ final class AttendanceRepo {
 			$params[] = $manager_id;
 		}
 
-				$where_sql = implode( ' AND ', $where );
-				$having    = ! empty( $args['policy_only'] ) ? ' HAVING policy_breach = 1' : '';
+			$where_sql = implode( ' AND ', $where );
+			$having    = ! empty( $args['policy_only'] ) ? ' HAVING policy_breach = 1' : '';
 
-				$order_map = array(
-					'created_at' => 'a.created_at',
-					'status'     => 'a.status',
-					'person_id'  => 'a.person_id',
-					'event_id'   => 't.event_id',
-					'last_seen'  => 'last_attended',
-				);
-				$requested = (string) ( $args['orderby'] ?? '' );
-				$order_by  = $order_map[ $requested ] ?? 'a.created_at';
-				$order     = 'ASC' === strtoupper( $args['order'] ?? '' ) ? 'ASC' : 'DESC';
-				$order_sql = " ORDER BY {$order_by} {$order}";
+			$order_map = array(
+				'created_at' => 'a.created_at',
+				'status'     => 'a.status',
+				'person_id'  => 'a.person_id',
+				'event_id'   => 't.event_id',
+				'last_seen'  => 'last_attended',
+			);
+			$requested = (string) ( $args['orderby'] ?? '' );
+			$order_by  = $order_map[ $requested ] ?? 'a.created_at';
+			$order     = 'ASC' === strtoupper( $args['order'] ?? '' ) ? 'ASC' : 'DESC';
+			$order_sql = " ORDER BY {$order_by} {$order}";
 
-								$limit = min( 500, max( 1, absint( $args['per_page'] ?? 25 ) ) );
-				$page                  = max( 1, absint( $args['page'] ?? 1 ) );
-				$offset                = max( 0, ( $page - 1 ) * $limit );
-				$limit_sql             = $wpdb->prepare( ' LIMIT %d OFFSET %d', $limit, $offset );
+							$limit = min( 500, max( 1, absint( $args['per_page'] ?? 25 ) ) );
+			$page                  = max( 1, absint( $args['page'] ?? 1 ) );
+			$offset                = max( 0, ( $page - 1 ) * $limit );
+			$limit_sql             = $wpdb->prepare( ' LIMIT %d OFFSET %d', $limit, $offset );
 
-				$base_sql = "
+			$base_sql = "
 SELECT
   a.id AS application_id,
   MAX(CASE WHEN t.status='present' THEN t.attendance_at END)                                                 AS last_attended,
@@ -180,11 +190,11 @@ JOIN {$t_app} a ON a.id = t.application_id
 WHERE {$where_sql}
 GROUP BY t.application_id{$having}";
 
-				$rows = $wpdb->get_results(
+			$rows = $wpdb->get_results(
 // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- placeholders strictly match params length.
-					$wpdb->prepare( $base_sql . $order_sql . $limit_sql, array_merge( array( $rf, $rt, $rf, $rt, $rt, $policy_days ), $params ) ),
-					'ARRAY_A'
-				);
+				$wpdb->prepare( $base_sql . $order_sql . $limit_sql, array_merge( array( $rf, $rt, $rf, $rt, $rt, $policy_days ), $params ) ),
+				'ARRAY_A'
+			);
 
 		if ( ! empty( $args['policy_only'] ) ) {
 			$count_base   = "
@@ -216,25 +226,43 @@ WHERE t2.application_id = t.application_id
 			$wpdb->prepare( $count_base, $count_params )
 		);
 
-								$rows = $rows ? array_values( $rows ) : array();
+							$rows = $rows ? array_values( $rows ) : array();
 
-								return array(
-									'rows'  => $rows,
-									'total' => $total,
-								);
+							return array(
+								'rows'  => $rows,
+								'total' => $total,
+							);
 	}
 
-	/**
-	 * Retrieve attendance timeline rows for an application.
-	 *
-	 * @since 0.1.x
-	 *
-	 * @param int    $application_id Application ID.
-	 * @param string $from           Optional UTC start 'Y-m-d'.
-	 * @param string $to             Optional UTC end 'Y-m-d'.
-	 * @param bool   $include_voided Include voided rows.
-	 * @return list<array<string,scalar|null|list<array<string,scalar|null>>>>
-	 */
+		/**
+		 * Retrieve attendance timeline rows for an application.
+		 *
+		 * @since 0.1.x
+		 *
+		 * @param int    $application_id Application ID.
+		 * @param string $from           Optional UTC start 'Y-m-d'.
+		 * @param string $to             Optional UTC end 'Y-m-d'.
+		 * @param bool   $include_voided Include voided rows.
+		 * @return list<array{
+		 *   id:int,
+		 *   status:string,
+		 *   attendance_at:string,
+		 *   event_id:int,
+		 *   type:string|null,
+		 *   method:string|null,
+		 *   recorded_by_user_id:int,
+		 *   is_void:int,
+		 *   void_reason:string|null,
+		 *   void_by_user_id:int|null,
+		 *   void_at:string|null,
+		 *   notes:list<array{
+		 *     attendance_id:int,
+		 *     user_id:int,
+		 *     note_text:string,
+		 *     created_at:string
+		 *   }>
+		 * }>
+		 */
 	public static function timeline( int $application_id, string $from, string $to, bool $include_voided = false ): array {
 		global $wpdb;
 		$application_id = absint( $application_id );
@@ -257,9 +285,9 @@ WHERE t2.application_id = t.application_id
 		if ( ! $include_voided ) {
 			$where[] = 't.is_void = 0';
 		}
-				$where_sql = implode( ' AND ', $where );
+			$where_sql = implode( ' AND ', $where );
 
-				$sql  = "
+			$sql  = "
 SELECT t.id, t.status, t.attendance_at, t.event_id, t.type, t.method,
        t.recorded_by_user_id, t.is_void, t.void_reason,
        t.void_by_user_id, t.void_at
@@ -267,11 +295,11 @@ FROM {$t_att} t
 WHERE {$where_sql}
 ORDER BY t.attendance_at ASC
 ";
-				$rows = $wpdb->get_results(
-                       // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is constant and placeholders match params length.
-					$wpdb->prepare( $sql, $params ),
-					'ARRAY_A'
-				);
+			$rows = $wpdb->get_results(
+				   // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is constant and placeholders match params length.
+				$wpdb->prepare( $sql, $params ),
+				'ARRAY_A'
+			);
 
 		if ( empty( $rows ) ) {
 			return array();
@@ -303,9 +331,9 @@ ORDER BY created_at ASC
 		foreach ( $rows as &$r ) {
 				$r['notes'] = $grouped[ (int) $r['id'] ] ?? array();
 		}
-				unset( $r );
+			unset( $r );
 
-				return array_values( $rows );
+			return array_values( $rows );
 	}
 
 	/**

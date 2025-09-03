@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-03 (Wave CS-Backlog-08)
+Docs-Revision: 2025-09-03 (Wave CS-Backlog-11B.1)
 # Database Schema (summary)
 
 ## fb_applications
@@ -17,7 +17,7 @@ Docs-Revision: 2025-09-03 (Wave CS-Backlog-08)
 - policy override fields (if present)
 - voiding: is_void TINYINT, void_reason, void_by_user_id, void_at
 - Indexes: (application_id, attendance_at), (event_id, attendance_at), (status)
-- Access via `AttendanceRepo` which uses `$wpdb->prepare()` for all queries and masks PII unless `fb_view_sensitive` is granted; unit tests cover timeline and SQL injection attempts.
+- Access via `AttendanceRepo` (declares strict types) which uses `$wpdb->prepare()` for all queries and masks PII unless `fb_view_sensitive` is granted; unit tests cover timeline and SQL injection attempts.
 
 ## fb_attendance_notes
 - id PK, attendance_id FK, user_id, note_text, created_at
