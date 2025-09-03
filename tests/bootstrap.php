@@ -71,9 +71,15 @@ if ( ! function_exists( 'is_email' ) ) {
 }
 
 if ( ! function_exists( 'sanitize_key' ) ) {
-	function sanitize_key( $key ) {
-		return preg_replace( '/[^a-z0-9_]/', '', strtolower( (string) $key ) );
-	}
+        function sanitize_key( $key ) {
+                return preg_replace( '/[^a-z0-9_]/', '', strtolower( (string) $key ) );
+        }
+}
+
+if ( ! function_exists( 'absint' ) ) {
+        function absint( $value ) {
+                return abs( (int) $value );
+        }
 }
 
 if ( ! function_exists( 'wp_kses_post' ) ) {

@@ -18,21 +18,23 @@ final class AttendanceRepoTest extends TestCase {
 			public function get_var( $sql ) {
 				return 0; }
 		};
-            AttendanceRepo::people_summary(
-			array(
-				'range_from' => '2024-01-01 00:00:00',
-				'range_to'   => '2024-01-31 00:00:00',
-			)
-		);
-		$this->assertStringContainsString( 't.is_void = 0', $wpdb->prepared[0] );
-		$wpdb->prepared = array();
-            AttendanceRepo::people_summary(
-			array(
-				'range_from'     => '2024-01-01 00:00:00',
-				'range_to'       => '2024-01-31 00:00:00',
-				'include_voided' => true,
-			)
-		);
-		$this->assertStringNotContainsString( 't.is_void = 0', $wpdb->prepared[0] );
-	}
+                AttendanceRepo::people_summary(
+                        array(
+                                'range_from' => '2024-01-01',
+                                'range_to'   => '2024-01-31',
+                        )
+                );
+                $this->assertNotEmpty( $wpdb->prepared );
+                $this->assertStringContainsString( 't.is_void = 0', end( $wpdb->prepared ) );
+                $wpdb->prepared = array();
+                AttendanceRepo::people_summary(
+                        array(
+                                'range_from'     => '2024-01-01',
+                                'range_to'       => '2024-01-31',
+                                'include_voided' => true,
+                        )
+                );
+                $this->assertNotEmpty( $wpdb->prepared );
+                $this->assertStringNotContainsString( 't.is_void = 0', end( $wpdb->prepared ) );
+        }
 }
