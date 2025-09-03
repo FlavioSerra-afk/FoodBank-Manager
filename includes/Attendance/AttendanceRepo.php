@@ -253,7 +253,7 @@ WHERE t2.application_id = t.application_id
 
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
-	// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is constant.
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, Generic.Files.LineLength.TooLong -- table name is constant.
 				"SELECT t.id,t.status,t.attendance_at,t.event_id,t.type,t.method,t.recorded_by_user_id,t.is_void,t.void_reason,t.void_by_user_id,t.void_at FROM {$t_att} t WHERE {$where_sql} ORDER BY t.attendance_at ASC",
 				$params
 			),
@@ -298,13 +298,13 @@ WHERE t2.application_id = t.application_id
 	 * @since 0.1.x
 	 *
 	 * @param int         $attendance_id Attendance ID.
-	 * @param bool        $void          Whether to void.
+	 * @param bool        $void_flag     Whether to void.
 	 * @param string|null $reason        Optional void reason.
 	 * @param int         $actor_id      Acting user ID.
 	 * @param string      $now_utc       Current UTC datetime 'Y-m-d H:i:s'.
 	 * @return bool True on success, false on failure.
 	 */
-	public static function set_void( int $attendance_id, bool $void, ?string $reason, int $actor_id, string $now_utc ): bool {
+	public static function set_void( int $attendance_id, bool $void_flag, ?string $reason, int $actor_id, string $now_utc ): bool {
 		global $wpdb;
 		$attendance_id = absint( $attendance_id );
 		$actor_id      = absint( $actor_id );
@@ -313,7 +313,7 @@ WHERE t2.application_id = t.application_id
 			$reason = sanitize_text_field( $reason );
 		}
 
-		if ( $void ) {
+		if ( $void_flag ) {
 			$data = array(
 				'is_void'         => 1,
 				'void_reason'     => $reason,
@@ -329,13 +329,13 @@ WHERE t2.application_id = t.application_id
 			);
 		}
 
-		$updated = $wpdb->update(
-			$wpdb->prefix . 'fb_attendance',
-			$data,
-			array( 'id' => $attendance_id ),
-			array( '%d', '%s', '%d', '%s' ),
-			array( '%d' )
-		);
+			$updated = $wpdb->update(
+				$wpdb->prefix . 'fb_attendance',
+				$data,
+				array( 'id' => $attendance_id ),
+				array( '%d', '%s', '%d', '%s' ),
+				array( '%d' )
+			);
 		return false !== $updated;
 	}
 
