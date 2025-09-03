@@ -1,10 +1,9 @@
-<?php // phpcs:ignoreFile
+<?php // phpcs:ignore WordPress.Files.FileName.NotHyphenatedLowercase,WordPress.Files.FileName.InvalidClassFileName
 /**
  * Admin menu registration.
  *
  * @package FoodBankManager
  */
-
 
 declare(strict_types=1);
 
@@ -22,8 +21,8 @@ final class Menu {
 	private const CAP_FORMS       = 'fb_manage_forms';
 	private const CAP_SETTINGS    = 'fb_manage_settings';
 	private const CAP_DIAGNOSTICS = 'fb_manage_diagnostics';
-        private const CAP_PERMISSIONS = 'fb_manage_permissions';
-        private const CAP_THEME       = 'fb_manage_theme';
+	private const CAP_PERMISSIONS = 'fb_manage_permissions';
+	private const CAP_THEME       = 'fb_manage_theme';
 
 	/**
 	 * Captured page hooks.
@@ -143,13 +142,13 @@ final class Menu {
 			array( \FoodBankManager\Admin\PermissionsPage::class, 'route' )
 		);
 
-                self::$hooks[] = self::add_page(
-                        self::CAP_THEME,
-                        'fbm-dashboard',
-                        'fbm-theme',
-                        __( 'Design & Theme', 'foodbank-manager' ),
-                        array( \FoodBankManager\Admin\ThemePage::class, 'route' )
-                );
+				self::$hooks[] = self::add_page(
+					self::CAP_THEME,
+					'fbm-dashboard',
+					'fbm-theme',
+					__( 'Design & Theme', 'foodbank-manager' ),
+					array( \FoodBankManager\Admin\ThemePage::class, 'route' )
+				);
 
 		self::screen_hooks();
 	}

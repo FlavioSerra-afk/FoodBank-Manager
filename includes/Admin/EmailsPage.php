@@ -1,5 +1,4 @@
-<?php
-// phpcs:ignoreFile
+<?php // phpcs:ignore WordPress.Files.FileName.NotHyphenatedLowercase,WordPress.Files.FileName.InvalidClassFileName
 /**
  * Email templates admin page.
  *
@@ -24,7 +23,7 @@ class EmailsPage {
 	 * @since 0.1.1
 	 */
 	public static function route(): void {
-                if ( ! current_user_can( 'fb_manage_settings' ) && ! current_user_can( 'manage_options' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
+		if ( ! current_user_can( 'fb_manage_settings' ) && ! current_user_can( 'manage_options' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
 			wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ), '', array( 'response' => 403 ) );
 		}
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only preview; template sanitized in handler.
@@ -44,7 +43,7 @@ class EmailsPage {
 	 */
 	private static function handle_post(): void {
 		check_admin_referer( 'fbm_admin_action', '_fbm_nonce' );
-                if ( ! current_user_can( 'manage_options' ) && ! current_user_can( 'fb_manage_settings' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
+		if ( ! current_user_can( 'manage_options' ) && ! current_user_can( 'fb_manage_settings' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
 			wp_die( esc_html__( 'You do not have permission to perform this action.', 'foodbank-manager' ) );
 		}
 		$action = sanitize_key( (string) ( $_POST['fbm_email_action'] ?? '' ) );
@@ -86,7 +85,7 @@ class EmailsPage {
 		if ( ! $to || ! is_email( $to ) ) {
 			return;
 		}
-		$rendered = Templates::render( $template, self::sampleVars() );
+		$rendered = Templates::render( $template, self::sample_vars() );
 		wp_mail( $to, $rendered['subject'], $rendered['body_html'], array( 'Content-Type: text/html; charset=UTF-8' ) );
 		add_settings_error( 'fbm-emails', 'fbm_test', esc_html__( 'Test email sent.', 'foodbank-manager' ), 'updated' );
 		$url = wp_get_referer();
@@ -103,7 +102,7 @@ class EmailsPage {
 	private static function handle_preview(): void {
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only preview; template sanitized below.
 		$template = sanitize_key( (string) ( $_GET['template'] ?? '' ) );
-		$rendered = Templates::render( $template, self::sampleVars() );
+		$rendered = Templates::render( $template, self::sample_vars() );
 		header( 'Content-Type: text/html; charset=UTF-8' );
 		echo wp_kses_post( $rendered['body_html'] );
 		exit;
@@ -116,7 +115,7 @@ class EmailsPage {
 	 *
 	 * @return array<string,string>
 	 */
-	private static function sampleVars(): array {
+	private static function sample_vars(): array {
 		$now = current_time( 'mysql' );
 		return array(
 			'application_id'   => 123,

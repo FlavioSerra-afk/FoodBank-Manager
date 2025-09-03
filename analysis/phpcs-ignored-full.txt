@@ -1,390 +1,48 @@
 
-FILE: /workspace/FoodBank-Manager/includes/Security/Helpers.php
+FILE: ...orkspace/FoodBank-Manager/includes/Http/FormSubmitController.php
 ----------------------------------------------------------------------
-FOUND 9 ERRORS AFFECTING 9 LINES
+FOUND 4 ERRORS AND 3 WARNINGS AFFECTING 5 LINES
 ----------------------------------------------------------------------
-  1 | ERROR | Missing file doc comment
-    |       | (Squiz.Commenting.FileComment.Missing)
-  7 | ERROR | Missing doc comment for class Helpers
-    |       | (Squiz.Commenting.ClassComment.Missing)
-  9 | ERROR | Missing doc comment for function verify_nonce()
-    |       | (Squiz.Commenting.FunctionComment.Missing)
- 10 | ERROR | Detected usage of a non-sanitized input variable:
-    |       | $_REQUEST[$name]
-    |       | (WordPress.Security.ValidatedSanitizedInput.InputNotSanitized)
- 14 | ERROR | Missing doc comment for function require_nonce()
-    |       | (Squiz.Commenting.FunctionComment.Missing)
- 20 | ERROR | Missing doc comment for function sanitize_text()
-    |       | (Squiz.Commenting.FunctionComment.Missing)
- 24 | ERROR | Missing doc comment for function esc_html()
-    |       | (Squiz.Commenting.FunctionComment.Missing)
- 28 | ERROR | Missing doc comment for function mask_email()
-    |       | (Squiz.Commenting.FunctionComment.Missing)
- 41 | ERROR | Missing doc comment for function mask_postcode()
-    |       | (Squiz.Commenting.FunctionComment.Missing)
-----------------------------------------------------------------------
-
-
-FILE: /workspace/FoodBank-Manager/includes/Security/Crypto.php
-----------------------------------------------------------------------
-FOUND 10 ERRORS AND 4 WARNINGS AFFECTING 14 LINES
-----------------------------------------------------------------------
-  1 | ERROR   | [ ] Missing file doc comment
-    |         |     (Squiz.Commenting.FileComment.Missing)
-  7 | ERROR   | [ ] Empty IF statement detected
-    |         |     (Generic.CodeAnalysis.EmptyStatement.DetectedIf)
-  8 | ERROR   | [ ] Inline comments must end in full-stops,
-    |         |     exclamation marks, or question marks
-    |         |     (Squiz.Commenting.InlineComment.InvalidEndChar)
- 11 | ERROR   | [ ] Missing doc comment for class Crypto
-    |         |     (Squiz.Commenting.ClassComment.Missing)
- 15 | ERROR   | [ ] Missing doc comment for function get_kek()
-    |         |     (Squiz.Commenting.FunctionComment.Missing)
- 21 | WARNING | [ ] base64_decode() can be used to obfuscate code
-    |         |     which is strongly discouraged. Please verify that
-    |         |     the function is used for benign reasons.
-    |         |     (WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode)
- 29 | ERROR   | [ ] Missing doc comment for function ensure_sodium()
-    |         |     (Squiz.Commenting.FunctionComment.Missing)
- 33 | ERROR   | [x] Multi-line function call not indented correctly;
-    |         |     expected 36 spaces but found 40
-    |         |     (PEAR.Functions.FunctionCallSignature.Indent)
- 34 | ERROR   | [x] Multi-line function call not indented correctly;
-    |         |     expected 36 spaces but found 40
-    |         |     (PEAR.Functions.FunctionCallSignature.Indent)
- 35 | WARNING | [ ] Line exceeds 160 characters; contains 199
-    |         |     characters (Generic.Files.LineLength.TooLong)
- 43 | ERROR   | [ ] Missing doc comment for function
-    |         |     encryptSensitive()
-    |         |     (Squiz.Commenting.FunctionComment.Missing)
- 54 | WARNING | [ ] base64_encode() can be used to obfuscate code
-    |         |     which is strongly discouraged. Please verify that
-    |         |     the function is used for benign reasons.
-    |         |     (WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode)
- 57 | ERROR   | [ ] Missing doc comment for function
-    |         |     decryptSensitive()
-    |         |     (Squiz.Commenting.FunctionComment.Missing)
- 62 | WARNING | [ ] base64_decode() can be used to obfuscate code
-    |         |     which is strongly discouraged. Please verify that
-    |         |     the function is used for benign reasons.
-    |         |     (WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode)
-----------------------------------------------------------------------
-PHPCBF CAN FIX THE 2 MARKED SNIFF VIOLATIONS AUTOMATICALLY
-----------------------------------------------------------------------
-
-
-FILE: ...orkspace/FoodBank-Manager/includes/Database/ApplicationsRepo.php
-----------------------------------------------------------------------
-FOUND 14 ERRORS AFFECTING 14 LINES
-----------------------------------------------------------------------
-   1 | ERROR | [ ] Missing file doc comment
-     |       |     (Squiz.Commenting.FileComment.Missing)
-   9 | ERROR | [ ] Missing doc comment for class ApplicationsRepo
-     |       |     (Squiz.Commenting.ClassComment.Missing)
-  19 | ERROR | [x] Array item not aligned correctly; expected 20
-     |       |     spaces but found 24
-     |       |     (WordPress.Arrays.ArrayIndentation.ItemNotAligned)
-  20 | ERROR | [x] Array item not aligned correctly; expected 20
-     |       |     spaces but found 24
-     |       |     (WordPress.Arrays.ArrayIndentation.ItemNotAligned)
-  21 | ERROR | [x] Array item not aligned correctly; expected 20
-     |       |     spaces but found 24
-     |       |     (WordPress.Arrays.ArrayIndentation.ItemNotAligned)
-  22 | ERROR | [x] Array item not aligned correctly; expected 20
-     |       |     spaces but found 24
-     |       |     (WordPress.Arrays.ArrayIndentation.ItemNotAligned)
-  81 | ERROR | [ ] Use placeholders and $wpdb->prepare(); found $sql
-     |       |     (WordPress.DB.PreparedSQL.NotPrepared)
-  82 | ERROR | [ ] Use placeholders and $wpdb->prepare(); found
-     |       |     $prepared (WordPress.DB.PreparedSQL.NotPrepared)
-  85 | ERROR | [ ] Use placeholders and $wpdb->prepare(); found
-     |       |     $count_sql (WordPress.DB.PreparedSQL.NotPrepared)
-  93 | ERROR | [ ] Doc comment for parameter "$id" missing
-     |       |     (Squiz.Commenting.FunctionComment.MissingParamTag)
- 101 | ERROR | [ ] Use placeholders and $wpdb->prepare(); found $sql
-     |       |     (WordPress.DB.PreparedSQL.NotPrepared)
- 106 | ERROR | [ ] Use placeholders and $wpdb->prepare(); found
-     |       |     $files_sql (WordPress.DB.PreparedSQL.NotPrepared)
- 111 | ERROR | [ ] Doc comment for parameter "$id" missing
-     |       |     (Squiz.Commenting.FunctionComment.MissingParamTag)
- 117 | ERROR | [ ] Use placeholders and $wpdb->prepare(); found $sql
-     |       |     (WordPress.DB.PreparedSQL.NotPrepared)
-----------------------------------------------------------------------
-PHPCBF CAN FIX THE 4 MARKED SNIFF VIOLATIONS AUTOMATICALLY
-----------------------------------------------------------------------
-
-
-FILE: /workspace/FoodBank-Manager/includes/Exports/CsvExporter.php
-----------------------------------------------------------------------
-FOUND 18 ERRORS AND 3 WARNINGS AFFECTING 17 LINES
-----------------------------------------------------------------------
-   1 | ERROR   | [ ] Missing file doc comment
-     |         |     (Squiz.Commenting.FileComment.Missing)
-   9 | ERROR   | [ ] Missing doc comment for class CsvExporter
-     |         |     (Squiz.Commenting.ClassComment.Missing)
-  10 | ERROR   | [ ] Doc comment for parameter "$filename" missing
-     |         |     (Squiz.Commenting.FunctionComment.MissingParamTag)
-  13 | ERROR   | [ ] Parameter comment must end with a full stop
-     |         |     (Squiz.Commenting.FunctionComment.ParamCommentFullStop)
-  14 | ERROR   | [ ] Parameter comment must end with a full stop
-     |         |     (Squiz.Commenting.FunctionComment.ParamCommentFullStop)
-  24 | ERROR   | [ ] Inline comments must end in full-stops,
-     |         |     exclamation marks, or question marks
-     |         |     (Squiz.Commenting.InlineComment.InvalidEndChar)
-  51 | WARNING | [ ] File operations should use WP_Filesystem methods
-     |         |     instead of direct PHP filesystem calls. Found:
-     |         |     fclose().
-     |         |     (WordPress.WP.AlternativeFunctions.file_system_operations_fclose)
-  55 | ERROR   | [ ] Doc comment for parameter "$includeVoided"
-     |         |     missing
-     |         |     (Squiz.Commenting.FunctionComment.MissingParamTag)
-  55 | ERROR   | [ ] Doc comment for parameter "$filename" missing
-     |         |     (Squiz.Commenting.FunctionComment.MissingParamTag)
-  58 | ERROR   | [ ] Missing parameter comment
-     |         |     (Squiz.Commenting.FunctionComment.MissingParamComment)
-  59 | ERROR   | [ ] Parameter comment must end with a full stop
-     |         |     (Squiz.Commenting.FunctionComment.ParamCommentFullStop)
-  61 | WARNING | [ ] Line exceeds 160 characters; contains 164
-     |         |     characters (Generic.Files.LineLength.TooLong)
-  72 | ERROR   | [x] No space after opening parenthesis is prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceAfterOpenParenthesis)
-  72 | ERROR   | [x] No space before closing parenthesis is
-     |         |     prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceBeforeCloseParenthesis)
-  95 | ERROR   | [x] No space after opening parenthesis is prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceAfterOpenParenthesis)
-  95 | ERROR   | [x] No space before closing parenthesis is
-     |         |     prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceBeforeCloseParenthesis)
-  96 | ERROR   | [x] Expected 1 space after "!"; 0 found
-     |         |     (WordPress.WhiteSpace.OperatorSpacing.NoSpaceAfter)
- 122 | ERROR   | [x] No space after opening parenthesis is prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceAfterOpenParenthesis)
- 122 | ERROR   | [x] No space before closing parenthesis is
-     |         |     prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceBeforeCloseParenthesis)
- 123 | ERROR   | [x] Expected 1 space after "!"; 0 found
-     |         |     (WordPress.WhiteSpace.OperatorSpacing.NoSpaceAfter)
- 128 | WARNING | [ ] File operations should use WP_Filesystem methods
-     |         |     instead of direct PHP filesystem calls. Found:
-     |         |     fclose().
-     |         |     (WordPress.WP.AlternativeFunctions.file_system_operations_fclose)
-----------------------------------------------------------------------
-PHPCBF CAN FIX THE 8 MARKED SNIFF VIOLATIONS AUTOMATICALLY
-----------------------------------------------------------------------
-
-
-FILE: /workspace/FoodBank-Manager/includes/Core/Plugin.php
-----------------------------------------------------------------------
-FOUND 30 ERRORS AND 2 WARNINGS AFFECTING 25 LINES
-----------------------------------------------------------------------
-  1 | ERROR   | [ ] Missing file doc comment
-    |         |     (Squiz.Commenting.FileComment.Missing)
- 11 | ERROR   | [ ] Missing doc comment for class Plugin
-    |         |     (Squiz.Commenting.ClassComment.Missing)
- 15 | ERROR   | [ ] Missing member variable doc comment
-    |         |     (Squiz.Commenting.VariableComment.Missing)
- 37 | ERROR   | [x] Multi-line function call not indented correctly;
-    |         |     expected 20 spaces but found 24
-    |         |     (PEAR.Functions.FunctionCallSignature.Indent)
- 38 | ERROR   | [x] Multi-line function call not indented correctly;
-    |         |     expected 20 spaces but found 24
-    |         |     (PEAR.Functions.FunctionCallSignature.Indent)
- 47 | ERROR   | [x] Expected 1 space after the array opener in a
-    |         |     single line array. Found: no spaces
-    |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceAfterArrayOpenerSingleLine)
- 47 | ERROR   | [x] Expected 1 space before the array closer in a
-    |         |     single line array. Found: no spaces
-    |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceBeforeArrayCloserSingleLine)
- 48 | ERROR   | [x] Expected 1 space after the array opener in a
-    |         |     single line array. Found: no spaces
-    |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceAfterArrayOpenerSingleLine)
- 48 | ERROR   | [x] Expected 1 space before the array closer in a
-    |         |     single line array. Found: no spaces
-    |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceBeforeArrayCloserSingleLine)
- 49 | ERROR   | [x] Expected 1 space after the array opener in a
-    |         |     single line array. Found: no spaces
-    |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceAfterArrayOpenerSingleLine)
- 49 | ERROR   | [x] Expected 1 space before the array closer in a
-    |         |     single line array. Found: no spaces
-    |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceBeforeArrayCloserSingleLine)
- 50 | ERROR   | [x] Expected 1 space after the array opener in a
-    |         |     single line array. Found: no spaces
-    |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceAfterArrayOpenerSingleLine)
- 50 | ERROR   | [x] Expected 1 space before the array closer in a
-    |         |     single line array. Found: no spaces
-    |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceBeforeArrayCloserSingleLine)
- 51 | ERROR   | [x] Expected 1 space after the array opener in a
-    |         |     single line array. Found: no spaces
-    |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceAfterArrayOpenerSingleLine)
- 51 | ERROR   | [x] Expected 1 space before the array closer in a
-    |         |     single line array. Found: no spaces
-    |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceBeforeArrayCloserSingleLine)
- 52 | ERROR   | [x] Expected 1 space after the array opener in a
-    |         |     single line array. Found: no spaces
-    |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceAfterArrayOpenerSingleLine)
- 52 | ERROR   | [x] Expected 1 space before the array closer in a
-    |         |     single line array. Found: no spaces
-    |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceBeforeArrayCloserSingleLine)
- 53 | ERROR   | [x] Expected 1 space after the array opener in a
-    |         |     single line array. Found: no spaces
-    |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceAfterArrayOpenerSingleLine)
- 53 | ERROR   | [x] Expected 1 space before the array closer in a
-    |         |     single line array. Found: no spaces
-    |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceBeforeArrayCloserSingleLine)
- 55 | ERROR   | [x] Multi-line function call not indented correctly;
-    |         |     expected 28 spaces but found 32
-    |         |     (PEAR.Functions.FunctionCallSignature.Indent)
- 56 | ERROR   | [x] Multi-line function call not indented correctly;
-    |         |     expected 28 spaces but found 32
-    |         |     (PEAR.Functions.FunctionCallSignature.Indent)
- 68 | ERROR   | [x] Multi-line function call not indented correctly;
-    |         |     expected 20 spaces but found 24
-    |         |     (PEAR.Functions.FunctionCallSignature.Indent)
- 69 | ERROR   | [x] Multi-line function call not indented correctly;
-    |         |     expected 20 spaces but found 24
-    |         |     (PEAR.Functions.FunctionCallSignature.Indent)
- 75 | ERROR   | [x] Multi-line function call not indented correctly;
-    |         |     expected 44 spaces but found 48
-    |         |     (PEAR.Functions.FunctionCallSignature.Indent)
- 76 | ERROR   | [x] Multi-line function call not indented correctly;
-    |         |     expected 44 spaces but found 48
-    |         |     (PEAR.Functions.FunctionCallSignature.Indent)
- 77 | ERROR   | [ ] Line exceeds maximum limit of 240 characters;
-    |         |     contains 242 characters
-    |         |     (Generic.Files.LineLength.MaxExceeded)
- 84 | ERROR   | [x] Multi-line function call not indented correctly;
-    |         |     expected 44 spaces but found 48
-    |         |     (PEAR.Functions.FunctionCallSignature.Indent)
- 85 | ERROR   | [x] Multi-line function call not indented correctly;
-    |         |     expected 44 spaces but found 48
-    |         |     (PEAR.Functions.FunctionCallSignature.Indent)
- 86 | WARNING | [ ] Line exceeds 160 characters; contains 201
-    |         |     characters (Generic.Files.LineLength.TooLong)
- 96 | ERROR   | [x] Multi-line function call not indented correctly;
-    |         |     expected 52 spaces but found 56
-    |         |     (PEAR.Functions.FunctionCallSignature.Indent)
- 97 | ERROR   | [x] Multi-line function call not indented correctly;
-    |         |     expected 52 spaces but found 56
-    |         |     (PEAR.Functions.FunctionCallSignature.Indent)
- 98 | WARNING | [ ] Line exceeds 160 characters; contains 207
-    |         |     characters (Generic.Files.LineLength.TooLong)
-----------------------------------------------------------------------
-PHPCBF CAN FIX THE 26 MARKED SNIFF VIOLATIONS AUTOMATICALLY
-----------------------------------------------------------------------
-
-
-FILE: /workspace/FoodBank-Manager/includes/Core/Hooks.php
-----------------------------------------------------------------------
-FOUND 4 ERRORS AFFECTING 4 LINES
-----------------------------------------------------------------------
-  1 | ERROR | Missing file doc comment
-    |       | (Squiz.Commenting.FileComment.Missing)
- 14 | ERROR | Missing doc comment for class Hooks
-    |       | (Squiz.Commenting.ClassComment.Missing)
- 16 | ERROR | Missing doc comment for function register()
-    |       | (Squiz.Commenting.FunctionComment.Missing)
- 23 | ERROR | Missing doc comment for function register_shortcodes()
-    |       | (Squiz.Commenting.FunctionComment.Missing)
-----------------------------------------------------------------------
-
-
-FILE: /workspace/FoodBank-Manager/includes/Core/Assets.php
-----------------------------------------------------------------------
-FOUND 5 ERRORS AFFECTING 5 LINES
-----------------------------------------------------------------------
-  1 | ERROR | Missing file doc comment
-    |       | (Squiz.Commenting.FileComment.Missing)
-  7 | ERROR | Missing doc comment for class Assets
-    |       | (Squiz.Commenting.ClassComment.Missing)
-  9 | ERROR | Missing doc comment for function register()
-    |       | (Squiz.Commenting.FunctionComment.Missing)
- 14 | ERROR | Missing doc comment for function enqueue_front()
-    |       | (Squiz.Commenting.FunctionComment.Missing)
- 18 | ERROR | Missing doc comment for function enqueue_admin()
-    |       | (Squiz.Commenting.FunctionComment.Missing)
-----------------------------------------------------------------------
-
-
-FILE: /workspace/FoodBank-Manager/includes/Core/Options.php
-----------------------------------------------------------------------
-FOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE
-----------------------------------------------------------------------
- 258 | WARNING | strip_tags() is discouraged. Use the more
-     |         | comprehensive wp_strip_all_tags() instead.
-     |         | (WordPress.WP.AlternativeFunctions.strip_tags_strip_tags)
-----------------------------------------------------------------------
-
-
-FILE: /workspace/FoodBank-Manager/includes/Shortcodes/Form.php
-----------------------------------------------------------------------
-FOUND 1 ERROR AND 13 WARNINGS AFFECTING 12 LINES
-----------------------------------------------------------------------
-  41 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  41 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  42 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  46 | WARNING | Line exceeds 160 characters; contains 186 characters
+   1 | ERROR   | Filenames should be all lowercase with hyphens as
+     |         | word separators. Expected formsubmitcontroller.php,
+     |         | but found FormSubmitController.php.
+     |         | (WordPress.Files.FileName.NotHyphenatedLowercase)
+   1 | ERROR   | Class file names should be based on the class name
+     |         | with "class-" prepended. Expected
+     |         | class-formsubmitcontroller.php, but found
+     |         | FormSubmitController.php.
+     |         | (WordPress.Files.FileName.InvalidClassFileName)
+   1 | ERROR   | Missing file doc comment
+     |         | (Squiz.Commenting.FileComment.Missing)
+  71 | WARNING | Line exceeds 160 characters; contains 173 characters
      |         | (Generic.Files.LineLength.TooLong)
-  50 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  51 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  51 | ERROR   | Detected usage of a non-sanitized input variable:
-     |         | $_GET['fbm_err']
-     |         | (WordPress.Security.ValidatedSanitizedInput.InputNotSanitized)
-  60 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  67 | WARNING | file_get_contents() is discouraged. Use
-     |         | wp_remote_get() for remote URLs instead.
-     |         | (WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents)
-  79 | WARNING | Line exceeds 160 characters; contains 164 characters
-     |         | (Generic.Files.LineLength.TooLong)
- 117 | WARNING | Line exceeds 160 characters; contains 182 characters
-     |         | (Generic.Files.LineLength.TooLong)
- 136 | WARNING | Line exceeds 160 characters; contains 183 characters
-     |         | (Generic.Files.LineLength.TooLong)
- 155 | WARNING | Line exceeds 160 characters; contains 191 characters
-     |         | (Generic.Files.LineLength.TooLong)
- 189 | WARNING | Line exceeds 160 characters; contains 197 characters
-     |         | (Generic.Files.LineLength.TooLong)
+ 129 | WARNING | Silencing errors is strongly discouraged. Use proper
+     |         | error checking instead. Found: @inet_pton( $ip ...
+     |         | (WordPress.PHP.NoSilencedErrors.Discouraged)
+ 191 | WARNING | base64_encode() can be used to obfuscate code which
+     |         | is strongly discouraged. Please verify that the
+     |         | function is used for benign reasons.
+     |         | (WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode)
+ 243 | ERROR   | Processing form data without nonce verification.
+     |         | (WordPress.Security.NonceVerification.Missing)
 ----------------------------------------------------------------------
 
 
-FILE: /workspace/FoodBank-Manager/includes/Shortcodes/Entries.php
+FILE: /workspace/FoodBank-Manager/includes/Admin/DatabasePage.php
 ----------------------------------------------------------------------
-FOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE
+FOUND 3 ERRORS AND 18 WARNINGS AFFECTING 13 LINES
 ----------------------------------------------------------------------
- 26 | WARNING | The method parameter $atts is never used
-    |         | (Generic.CodeAnalysis.UnusedFunctionParameter.Found)
-----------------------------------------------------------------------
-
-
-FILE: ...space/FoodBank-Manager/includes/Shortcodes/AttendanceManager.php
-----------------------------------------------------------------------
-FOUND 0 ERRORS AND 2 WARNINGS AFFECTING 2 LINES
-----------------------------------------------------------------------
- 26 | WARNING | The method parameter $atts is never used
-    |         | (Generic.CodeAnalysis.UnusedFunctionParameter.Found)
- 29 | WARNING | Found unknown capability "attendance_checkin" in
-    |         | function call to current_user_can(). Please check the
-    |         | spelling of the capability. If this is a custom
-    |         | capability, please verify the capability is
-    |         | registered with WordPress via a call to
-    |         | WP_Role(s)->add_cap().
-    |         | Custom capabilities can be made known to this sniff
-    |         | by setting the "custom_capabilities" property in the
-    |         | PHPCS ruleset. (WordPress.WP.Capabilities.Unknown)
-----------------------------------------------------------------------
-
-
-FILE: /workspace/FoodBank-Manager/includes/Admin/EmailsPage.php
-----------------------------------------------------------------------
-FOUND 3 ERRORS AND 5 WARNINGS AFFECTING 7 LINES
-----------------------------------------------------------------------
-  26 | WARNING | Found unknown capability "fb_manage_emails" in
+   1 | ERROR   | Filenames should be all lowercase with hyphens as
+     |         | word separators. Expected databasepage.php, but
+     |         | found DatabasePage.php.
+     |         | (WordPress.Files.FileName.NotHyphenatedLowercase)
+   1 | ERROR   | Class file names should be based on the class name
+     |         | with "class-" prepended. Expected
+     |         | class-databasepage.php, but found DatabasePage.php.
+     |         | (WordPress.Files.FileName.InvalidClassFileName)
+   1 | ERROR   | Missing file doc comment
+     |         | (Squiz.Commenting.FileComment.Missing)
+  30 | WARNING | Found unknown capability "fb_manage_database" in
      |         | function call to current_user_can(). Please check
      |         | the spelling of the capability. If this is a custom
      |         | capability, please verify the capability is
@@ -393,11 +51,31 @@ FOUND 3 ERRORS AND 5 WARNINGS AFFECTING 7 LINES
      |         | Custom capabilities can be made known to this sniff
      |         | by setting the "custom_capabilities" property in the
      |         | PHPCS ruleset. (WordPress.WP.Capabilities.Unknown)
-  30 | WARNING | Processing form data without nonce verification.
+  35 | WARNING | Processing form data without nonce verification.
      |         | (WordPress.Security.NonceVerification.Recommended)
-  30 | WARNING | Processing form data without nonce verification.
+  35 | WARNING | Processing form data without nonce verification.
      |         | (WordPress.Security.NonceVerification.Recommended)
-  46 | WARNING | Found unknown capability "fb_manage_emails" in
+  46 | WARNING | Processing form data without nonce verification.
+     |         | (WordPress.Security.NonceVerification.Recommended)
+  48 | WARNING | Processing form data without nonce verification.
+     |         | (WordPress.Security.NonceVerification.Recommended)
+  48 | WARNING | Processing form data without nonce verification.
+     |         | (WordPress.Security.NonceVerification.Recommended)
+  48 | WARNING | Processing form data without nonce verification.
+     |         | (WordPress.Security.NonceVerification.Recommended)
+  55 | WARNING | Processing form data without nonce verification.
+     |         | (WordPress.Security.NonceVerification.Recommended)
+  55 | WARNING | Processing form data without nonce verification.
+     |         | (WordPress.Security.NonceVerification.Recommended)
+  63 | WARNING | Processing form data without nonce verification.
+     |         | (WordPress.Security.NonceVerification.Recommended)
+  63 | WARNING | Processing form data without nonce verification.
+     |         | (WordPress.Security.NonceVerification.Recommended)
+  65 | WARNING | Processing form data without nonce verification.
+     |         | (WordPress.Security.NonceVerification.Recommended)
+  65 | WARNING | Processing form data without nonce verification.
+     |         | (WordPress.Security.NonceVerification.Recommended)
+  93 | WARNING | Found unknown capability "fb_view_sensitive" in
      |         | function call to current_user_can(). Please check
      |         | the spelling of the capability. If this is a custom
      |         | capability, please verify the capability is
@@ -406,210 +84,59 @@ FOUND 3 ERRORS AND 5 WARNINGS AFFECTING 7 LINES
      |         | Custom capabilities can be made known to this sniff
      |         | by setting the "custom_capabilities" property in the
      |         | PHPCS ruleset. (WordPress.WP.Capabilities.Unknown)
-  60 | ERROR   | Detected usage of a non-sanitized input variable:
-     |         | $_POST['templates']
-     |         | (WordPress.Security.ValidatedSanitizedInput.InputNotSanitized)
-  78 | ERROR   | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Missing)
-  84 | ERROR   | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Missing)
- 104 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-----------------------------------------------------------------------
-
-
-FILE: /workspace/FoodBank-Manager/includes/Admin/PermissionsPage.php
-----------------------------------------------------------------------
-FOUND 20 ERRORS AND 16 WARNINGS AFFECTING 31 LINES
-----------------------------------------------------------------------
-   1 | ERROR   | [ ] Missing file doc comment
-     |         |     (Squiz.Commenting.FileComment.Missing)
-  12 | ERROR   | [ ] Missing doc comment for class PermissionsPage
-     |         |     (Squiz.Commenting.ClassComment.Missing)
-  17 | WARNING | [ ] Found unknown capability "fb_manage_permissions"
-     |         |     in function call to current_user_can(). Please
-     |         |     check the spelling of the capability. If this is
-     |         |     a custom capability, please verify the
-     |         |     capability is registered with WordPress via a
-     |         |     call to WP_Role(s)->add_cap().
-     |         |     Custom capabilities can be made known to this
-     |         |     sniff by setting the "custom_capabilities"
-     |         |     property in the PHPCS ruleset.
-     |         |     (WordPress.WP.Capabilities.Unknown)
-  20 | WARNING | [ ] Processing form data without nonce verification.
-     |         |     (WordPress.Security.NonceVerification.Recommended)
-  21 | ERROR   | [ ] Processing form data without nonce verification.
-     |         |     (WordPress.Security.NonceVerification.Missing)
-  28 | ERROR   | [x] When a multi-item array uses associative keys,
-     |         |     each value should start on a new line.
-     |         |     (WordPress.Arrays.ArrayDeclarationSpacing.AssociativeArrayFound)
-  35 | ERROR   | [x] When a multi-item array uses associative keys,
-     |         |     each value should start on a new line.
-     |         |     (WordPress.Arrays.ArrayDeclarationSpacing.AssociativeArrayFound)
-  38 | ERROR   | [ ] All output should be run through an escaping
-     |         |     function (see the Security sections in the
-     |         |     WordPress Developer Handbooks), found
-     |         |     '(string)'.
-     |         |     (WordPress.Security.EscapeOutput.OutputNotEscaped)
-  40 | ERROR   | [ ] $_SERVER['REQUEST_METHOD'] not unslashed before
-     |         |     sanitization. Use wp_unslash() or similar
-     |         |     (WordPress.Security.ValidatedSanitizedInput.MissingUnslash)
-  40 | ERROR   | [ ] Detected usage of a non-sanitized input
-     |         |     variable: $_SERVER['REQUEST_METHOD']
-     |         |     (WordPress.Security.ValidatedSanitizedInput.InputNotSanitized)
-  65 | ERROR   | [ ] $_SERVER['REQUEST_METHOD'] not unslashed before
-     |         |     sanitization. Use wp_unslash() or similar
-     |         |     (WordPress.Security.ValidatedSanitizedInput.MissingUnslash)
-  65 | ERROR   | [ ] Detected usage of a non-sanitized input
-     |         |     variable: $_SERVER['REQUEST_METHOD']
-     |         |     (WordPress.Security.ValidatedSanitizedInput.InputNotSanitized)
-  86 | ERROR   | [ ] $_SERVER['REQUEST_METHOD'] not unslashed before
-     |         |     sanitization. Use wp_unslash() or similar
-     |         |     (WordPress.Security.ValidatedSanitizedInput.MissingUnslash)
-  86 | ERROR   | [ ] Detected usage of a non-sanitized input
-     |         |     variable: $_SERVER['REQUEST_METHOD']
-     |         |     (WordPress.Security.ValidatedSanitizedInput.InputNotSanitized)
-  88 | ERROR   | [ ] Processing form data without nonce verification.
-     |         |     (WordPress.Security.NonceVerification.Missing)
-  88 | ERROR   | [ ] Processing form data without nonce verification.
-     |         |     (WordPress.Security.NonceVerification.Missing)
-  90 | WARNING | [ ] file_get_contents() is discouraged. Use
-     |         |     wp_remote_get() for remote URLs instead.
-     |         |     (WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents)
- 125 | ERROR   | [ ] $_SERVER['REQUEST_METHOD'] not unslashed before
-     |         |     sanitization. Use wp_unslash() or similar
-     |         |     (WordPress.Security.ValidatedSanitizedInput.MissingUnslash)
- 125 | ERROR   | [ ] Detected usage of a non-sanitized input
-     |         |     variable: $_SERVER['REQUEST_METHOD']
-     |         |     (WordPress.Security.ValidatedSanitizedInput.InputNotSanitized)
- 128 | ERROR   | [x] When a multi-item array uses associative keys,
-     |         |     each value should start on a new line.
-     |         |     (WordPress.Arrays.ArrayDeclarationSpacing.AssociativeArrayFound)
- 144 | ERROR   | [x] Opening parenthesis of a multi-line function
-     |         |     call must be the last content on the line
-     |         |     (PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket)
- 150 | ERROR   | [x] Closing parenthesis of a multi-line function
-     |         |     call must be on a line by itself
-     |         |     (PEAR.Functions.FunctionCallSignature.CloseBracketLine)
- 156 | ERROR   | [ ] Missing short description in doc comment
-     |         |     (Generic.Commenting.DocComment.MissingShort)
- 161 | WARNING | [x] Array double arrow not aligned correctly;
-     |         |     expected 7 space(s) between "'fb_read_entries'"
-     |         |     and double arrow, but found 6.
-     |         |     (WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned)
- 162 | WARNING | [x] Array double arrow not aligned correctly;
-     |         |     expected 7 space(s) between "'fb_edit_entries'"
-     |         |     and double arrow, but found 6.
-     |         |     (WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned)
- 163 | WARNING | [x] Array double arrow not aligned correctly;
-     |         |     expected 5 space(s) between
-     |         |     "'fb_delete_entries'" and double arrow, but
-     |         |     found 4.
-     |         |     (WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned)
- 164 | WARNING | [x] Array double arrow not aligned correctly;
-     |         |     expected 5 space(s) between
-     |         |     "'fb_export_entries'" and double arrow, but
-     |         |     found 4.
-     |         |     (WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned)
- 165 | WARNING | [x] Array double arrow not aligned correctly;
-     |         |     expected 7 space(s) between "'fb_manage_forms'"
-     |         |     and double arrow, but found 6.
-     |         |     (WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned)
- 166 | WARNING | [x] Array double arrow not aligned correctly;
-     |         |     expected 4 space(s) between
-     |         |     "'fb_manage_settings'" and double arrow, but
-     |         |     found 3.
-     |         |     (WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned)
- 167 | WARNING | [x] Array double arrow not aligned correctly;
-     |         |     expected 6 space(s) between "'fb_manage_emails'"
-     |         |     and double arrow, but found 5.
-     |         |     (WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned)
- 168 | WARNING | [x] Array double arrow not aligned correctly;
-     |         |     expected 2 space(s) between
-     |         |     "'fb_manage_encryption'" and double arrow, but
-     |         |     found 1.
-     |         |     (WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned)
- 169 | WARNING | [x] Array double arrow not aligned correctly;
-     |         |     expected 4 space(s) between
-     |         |     "'attendance_checkin'" and double arrow, but
-     |         |     found 3.
-     |         |     (WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned)
- 170 | WARNING | [x] Array double arrow not aligned correctly;
-     |         |     expected 7 space(s) between "'attendance_view'"
-     |         |     and double arrow, but found 6.
-     |         |     (WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned)
- 171 | WARNING | [x] Array double arrow not aligned correctly;
-     |         |     expected 5 space(s) between
-     |         |     "'attendance_export'" and double arrow, but
-     |         |     found 4.
-     |         |     (WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned)
- 172 | WARNING | [x] Array double arrow not aligned correctly;
-     |         |     expected 6 space(s) between "'attendance_admin'"
-     |         |     and double arrow, but found 5.
-     |         |     (WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned)
- 173 | WARNING | [x] Array double arrow not aligned correctly;
-     |         |     expected 8 space(s) between "'read_sensitive'"
-     |         |     and double arrow, but found 7.
-     |         |     (WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned)
-----------------------------------------------------------------------
-PHPCBF CAN FIX THE 18 MARKED SNIFF VIOLATIONS AUTOMATICALLY
-----------------------------------------------------------------------
-
-
-FILE: /workspace/FoodBank-Manager/includes/Admin/ThemePage.php
-----------------------------------------------------------------------
-FOUND 1 ERROR AND 3 WARNINGS AFFECTING 4 LINES
-----------------------------------------------------------------------
- 25 | WARNING | Found unknown capability "fb_manage_settings" in
-    |         | function call to current_user_can(). Please check the
-    |         | spelling of the capability. If this is a custom
-    |         | capability, please verify the capability is
-    |         | registered with WordPress via a call to
-    |         | WP_Role(s)->add_cap().
-    |         | Custom capabilities can be made known to this sniff
-    |         | by setting the "custom_capabilities" property in the
-    |         | PHPCS ruleset. (WordPress.WP.Capabilities.Unknown)
- 40 | WARNING | Found unknown capability "fb_manage_settings" in
-    |         | function call to current_user_can(). Please check the
-    |         | spelling of the capability. If this is a custom
-    |         | capability, please verify the capability is
-    |         | registered with WordPress via a call to
-    |         | WP_Role(s)->add_cap().
-    |         | Custom capabilities can be made known to this sniff
-    |         | by setting the "custom_capabilities" property in the
-    |         | PHPCS ruleset. (WordPress.WP.Capabilities.Unknown)
- 57 | WARNING | file_get_contents() is discouraged. Use
-    |         | wp_remote_get() for remote URLs instead.
-    |         | (WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents)
- 72 | ERROR   | Detected usage of a non-sanitized input variable:
-    |         | $_POST['fbm_theme']
-    |         | (WordPress.Security.ValidatedSanitizedInput.InputNotSanitized)
-----------------------------------------------------------------------
-
-
-FILE: /workspace/FoodBank-Manager/includes/Admin/Notices.php
-----------------------------------------------------------------------
-FOUND 3 ERRORS AND 1 WARNING AFFECTING 4 LINES
-----------------------------------------------------------------------
-  1 | ERROR   | [ ] Missing file doc comment
-    |         |     (Squiz.Commenting.FileComment.Missing)
- 25 | ERROR   | [x] Multi-line function call not indented correctly;
-    |         |     expected 20 spaces but found 24
-    |         |     (PEAR.Functions.FunctionCallSignature.Indent)
- 26 | ERROR   | [x] Multi-line function call not indented correctly;
-    |         |     expected 20 spaces but found 24
-    |         |     (PEAR.Functions.FunctionCallSignature.Indent)
- 27 | WARNING | [ ] Line exceeds 160 characters; contains 181
-    |         |     characters (Generic.Files.LineLength.TooLong)
-----------------------------------------------------------------------
-PHPCBF CAN FIX THE 2 MARKED SNIFF VIOLATIONS AUTOMATICALLY
+ 119 | WARNING | Found unknown capability "fb_view_sensitive" in
+     |         | function call to current_user_can(). Please check
+     |         | the spelling of the capability. If this is a custom
+     |         | capability, please verify the capability is
+     |         | registered with WordPress via a call to
+     |         | WP_Role(s)->add_cap().
+     |         | Custom capabilities can be made known to this sniff
+     |         | by setting the "custom_capabilities" property in the
+     |         | PHPCS ruleset. (WordPress.WP.Capabilities.Unknown)
+ 133 | WARNING | Found unknown capability "fb_manage_database" in
+     |         | function call to current_user_can(). Please check
+     |         | the spelling of the capability. If this is a custom
+     |         | capability, please verify the capability is
+     |         | registered with WordPress via a call to
+     |         | WP_Role(s)->add_cap().
+     |         | Custom capabilities can be made known to this sniff
+     |         | by setting the "custom_capabilities" property in the
+     |         | PHPCS ruleset. (WordPress.WP.Capabilities.Unknown)
+ 159 | WARNING | Found unknown capability "fb_manage_database" in
+     |         | function call to current_user_can(). Please check
+     |         | the spelling of the capability. If this is a custom
+     |         | capability, please verify the capability is
+     |         | registered with WordPress via a call to
+     |         | WP_Role(s)->add_cap().
+     |         | Custom capabilities can be made known to this sniff
+     |         | by setting the "custom_capabilities" property in the
+     |         | PHPCS ruleset. (WordPress.WP.Capabilities.Unknown)
+ 181 | WARNING | Found unknown capability "fb_view_sensitive" in
+     |         | function call to current_user_can(). Please check
+     |         | the spelling of the capability. If this is a custom
+     |         | capability, please verify the capability is
+     |         | registered with WordPress via a call to
+     |         | WP_Role(s)->add_cap().
+     |         | Custom capabilities can be made known to this sniff
+     |         | by setting the "custom_capabilities" property in the
+     |         | PHPCS ruleset. (WordPress.WP.Capabilities.Unknown)
 ----------------------------------------------------------------------
 
 
 FILE: /workspace/FoodBank-Manager/includes/Admin/SettingsPage.php
 ----------------------------------------------------------------------
-FOUND 1 ERROR AND 2 WARNINGS AFFECTING 3 LINES
+FOUND 4 ERRORS AND 2 WARNINGS AFFECTING 4 LINES
 ----------------------------------------------------------------------
+  1 | ERROR   | Filenames should be all lowercase with hyphens as
+    |         | word separators. Expected settingspage.php, but found
+    |         | SettingsPage.php.
+    |         | (WordPress.Files.FileName.NotHyphenatedLowercase)
+  1 | ERROR   | Class file names should be based on the class name
+    |         | with "class-" prepended. Expected
+    |         | class-settingspage.php, but found SettingsPage.php.
+    |         | (WordPress.Files.FileName.InvalidClassFileName)
+  1 | ERROR   | Missing file doc comment
+    |         | (Squiz.Commenting.FileComment.Missing)
  25 | WARNING | Found unknown capability "fb_manage_settings" in
     |         | function call to current_user_can(). Please check the
     |         | spelling of the capability. If this is a custom
@@ -634,226 +161,21 @@ FOUND 1 ERROR AND 2 WARNINGS AFFECTING 3 LINES
 ----------------------------------------------------------------------
 
 
-FILE: /workspace/FoodBank-Manager/includes/Admin/DatabasePage.php
+FILE: /workspace/FoodBank-Manager/includes/Admin/EmailsPage.php
 ----------------------------------------------------------------------
-FOUND 24 ERRORS AND 44 WARNINGS AFFECTING 43 LINES
+FOUND 10 ERRORS AND 5 WARNINGS AFFECTING 12 LINES
 ----------------------------------------------------------------------
-   1 | ERROR   | Missing file doc comment
-     |         | (Squiz.Commenting.FileComment.Missing)
-  12 | ERROR   | Missing doc comment for class DatabasePage
-     |         | (Squiz.Commenting.ClassComment.Missing)
-  13 | ERROR   | Missing doc comment for function route()
-     |         | (Squiz.Commenting.FunctionComment.Missing)
-  14 | WARNING | Found unknown capability "fb_read_entries" in
-     |         | function call to current_user_can(). Please check
-     |         | the spelling of the capability. If this is a custom
-     |         | capability, please verify the capability is
-     |         | registered with WordPress via a call to
-     |         | WP_Role(s)->add_cap().
-     |         | Custom capabilities can be made known to this sniff
-     |         | by setting the "custom_capabilities" property in the
-     |         | PHPCS ruleset. (WordPress.WP.Capabilities.Unknown)
-  18 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  18 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  32 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  39 | ERROR   | Missing doc comment for function parseFilters()
-     |         | (Squiz.Commenting.FunctionComment.Missing)
-  41 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  41 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  41 | ERROR   | Detected usage of a non-sanitized input variable:
-     |         | $_GET['status']
-     |         | (WordPress.Security.ValidatedSanitizedInput.InputNotSanitized)
-  42 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  42 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  42 | ERROR   | Detected usage of a non-sanitized input variable:
-     |         | $_GET['date_from']
-     |         | (WordPress.Security.ValidatedSanitizedInput.InputNotSanitized)
-  43 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  43 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  43 | ERROR   | Detected usage of a non-sanitized input variable:
-     |         | $_GET['date_to']
-     |         | (WordPress.Security.ValidatedSanitizedInput.InputNotSanitized)
-  44 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  44 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  44 | ERROR   | Detected usage of a non-sanitized input variable:
-     |         | $_GET['city']
-     |         | (WordPress.Security.ValidatedSanitizedInput.InputNotSanitized)
-  45 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  45 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  45 | ERROR   | Detected usage of a non-sanitized input variable:
-     |         | $_GET['postcode']
-     |         | (WordPress.Security.ValidatedSanitizedInput.InputNotSanitized)
-  46 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  46 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  46 | ERROR   | Detected usage of a non-sanitized input variable:
-     |         | $_GET['search']
-     |         | (WordPress.Security.ValidatedSanitizedInput.InputNotSanitized)
-  47 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  47 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  48 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  48 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  49 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  49 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  49 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  49 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  52 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  53 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  59 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  59 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  59 | ERROR   | Detected usage of a non-sanitized input variable:
-     |         | $_GET['orderby']
-     |         | (WordPress.Security.ValidatedSanitizedInput.InputNotSanitized)
-  60 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  60 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  60 | ERROR   | Detected usage of a non-sanitized input variable:
-     |         | $_GET['order']
-     |         | (WordPress.Security.ValidatedSanitizedInput.InputNotSanitized)
-  64 | ERROR   | Missing doc comment for function handleExportList()
-     |         | (Squiz.Commenting.FunctionComment.Missing)
-  65 | WARNING | Found unknown capability "fb_export_entries" in
-     |         | function call to current_user_can(). Please check
-     |         | the spelling of the capability. If this is a custom
-     |         | capability, please verify the capability is
-     |         | registered with WordPress via a call to
-     |         | WP_Role(s)->add_cap().
-     |         | Custom capabilities can be made known to this sniff
-     |         | by setting the "custom_capabilities" property in the
-     |         | PHPCS ruleset. (WordPress.WP.Capabilities.Unknown)
-  72 | WARNING | Found unknown capability "read_sensitive" in
-     |         | function call to current_user_can(). Please check
-     |         | the spelling of the capability. If this is a custom
-     |         | capability, please verify the capability is
-     |         | registered with WordPress via a call to
-     |         | WP_Role(s)->add_cap().
-     |         | Custom capabilities can be made known to this sniff
-     |         | by setting the "custom_capabilities" property in the
-     |         | PHPCS ruleset. (WordPress.WP.Capabilities.Unknown)
-  76 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  81 | ERROR   | Missing doc comment for function
-     |         | handleExportSingle()
-     |         | (Squiz.Commenting.FunctionComment.Missing)
-  82 | WARNING | Found unknown capability "fb_export_entries" in
-     |         | function call to current_user_can(). Please check
-     |         | the spelling of the capability. If this is a custom
-     |         | capability, please verify the capability is
-     |         | registered with WordPress via a call to
-     |         | WP_Role(s)->add_cap().
-     |         | Custom capabilities can be made known to this sniff
-     |         | by setting the "custom_capabilities" property in the
-     |         | PHPCS ruleset. (WordPress.WP.Capabilities.Unknown)
-  85 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  85 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  89 | WARNING | Found unknown capability "read_sensitive" in
-     |         | function call to current_user_can(). Please check
-     |         | the spelling of the capability. If this is a custom
-     |         | capability, please verify the capability is
-     |         | registered with WordPress via a call to
-     |         | WP_Role(s)->add_cap().
-     |         | Custom capabilities can be made known to this sniff
-     |         | by setting the "custom_capabilities" property in the
-     |         | PHPCS ruleset. (WordPress.WP.Capabilities.Unknown)
-  91 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
-  97 | ERROR   | Missing doc comment for function handleDelete()
-     |         | (Squiz.Commenting.FunctionComment.Missing)
-  98 | WARNING | Found unknown capability "fb_delete_entries" in
-     |         | function call to current_user_can(). Please check
-     |         | the spelling of the capability. If this is a custom
-     |         | capability, please verify the capability is
-     |         | registered with WordPress via a call to
-     |         | WP_Role(s)->add_cap().
-     |         | Custom capabilities can be made known to this sniff
-     |         | by setting the "custom_capabilities" property in the
-     |         | PHPCS ruleset. (WordPress.WP.Capabilities.Unknown)
- 101 | ERROR   | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Missing)
- 101 | ERROR   | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Missing)
- 108 | ERROR   | Missing doc comment for function renderList()
-     |         | (Squiz.Commenting.FunctionComment.Missing)
- 115 | WARNING | Found unknown capability "read_sensitive" in
-     |         | function call to current_user_can(). Please check
-     |         | the spelling of the capability. If this is a custom
-     |         | capability, please verify the capability is
-     |         | registered with WordPress via a call to
-     |         | WP_Role(s)->add_cap().
-     |         | Custom capabilities can be made known to this sniff
-     |         | by setting the "custom_capabilities" property in the
-     |         | PHPCS ruleset. (WordPress.WP.Capabilities.Unknown)
- 116 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
- 120 | ERROR   | Missing doc comment for function renderSingle()
-     |         | (Squiz.Commenting.FunctionComment.Missing)
- 121 | WARNING | Processing form data without nonce verification.
-     |         | (WordPress.Security.NonceVerification.Recommended)
- 121 | ERROR   | Detected usage of a possibly undefined superglobal
-     |         | array index: $_GET['view']. Use isset() or empty()
-     |         | to check the index exists before using it
-     |         | (WordPress.Security.ValidatedSanitizedInput.InputNotValidated)
- 126 | WARNING | Found unknown capability "read_sensitive" in
-     |         | function call to current_user_can(). Please check
-     |         | the spelling of the capability. If this is a custom
-     |         | capability, please verify the capability is
-     |         | registered with WordPress via a call to
-     |         | WP_Role(s)->add_cap().
-     |         | Custom capabilities can be made known to this sniff
-     |         | by setting the "custom_capabilities" property in the
-     |         | PHPCS ruleset. (WordPress.WP.Capabilities.Unknown)
- 130 | ERROR   | Missing short description in doc comment
-     |         | (Generic.Commenting.DocComment.MissingShort)
- 131 | ERROR   | Parameter comment must end with a full stop
-     |         | (Squiz.Commenting.FunctionComment.ParamCommentFullStop)
- 132 | ERROR   | Parameter comment must end with a full stop
-     |         | (Squiz.Commenting.FunctionComment.ParamCommentFullStop)
- 135 | WARNING | The method parameter $can_sensitive is never used
-     |         | (Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed)
- 136 | ERROR   | Using short ternaries is not allowed as they are
-     |         | rarely used correctly
-     |         | (Universal.Operators.DisallowShortTernary.Found)
-----------------------------------------------------------------------
-
-
-FILE: /workspace/FoodBank-Manager/includes/Admin/AttendancePage.php
-----------------------------------------------------------------------
-FOUND 10 ERRORS AND 9 WARNINGS AFFECTING 16 LINES
-----------------------------------------------------------------------
+   1 | ERROR   | [ ] Filenames should be all lowercase with hyphens
+     |         |     as word separators. Expected emailspage.php, but
+     |         |     found EmailsPage.php.
+     |         |     (WordPress.Files.FileName.NotHyphenatedLowercase)
+   1 | ERROR   | [ ] Class file names should be based on the class
+     |         |     name with "class-" prepended. Expected
+     |         |     class-emailspage.php, but found EmailsPage.php.
+     |         |     (WordPress.Files.FileName.InvalidClassFileName)
    1 | ERROR   | [ ] Missing file doc comment
      |         |     (Squiz.Commenting.FileComment.Missing)
-  13 | ERROR   | [ ] Missing doc comment for class AttendancePage
-     |         |     (Squiz.Commenting.ClassComment.Missing)
-  18 | WARNING | [ ] Found unknown capability "attendance_view" in
+  26 | WARNING | [ ] Found unknown capability "fb_manage_settings" in
      |         |     function call to current_user_can(). Please
      |         |     check the spelling of the capability. If this is
      |         |     a custom capability, please verify the
@@ -863,35 +185,14 @@ FOUND 10 ERRORS AND 9 WARNINGS AFFECTING 16 LINES
      |         |     sniff by setting the "custom_capabilities"
      |         |     property in the PHPCS ruleset.
      |         |     (WordPress.WP.Capabilities.Unknown)
-  19 | ERROR   | [x] Expected 1 space after the array opener in a
-     |         |     single line array. Found: no spaces
-     |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceAfterArrayOpenerSingleLine)
-  19 | ERROR   | [x] Expected 1 space before the array closer in a
-     |         |     single line array. Found: no spaces
-     |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceBeforeArrayCloserSingleLine)
-  22 | WARNING | [ ] Processing form data without nonce verification.
+  29 | ERROR   | [x] Tabs must be used to indent lines; spaces are
+     |         |     not allowed
+     |         |     (Generic.WhiteSpace.DisallowSpaceIndent.SpacesUsed)
+  30 | WARNING | [ ] Processing form data without nonce verification.
      |         |     (WordPress.Security.NonceVerification.Recommended)
-  22 | WARNING | [ ] Processing form data without nonce verification.
+  30 | WARNING | [ ] Processing form data without nonce verification.
      |         |     (WordPress.Security.NonceVerification.Recommended)
-  35 | WARNING | [ ] Processing form data without nonce verification.
-     |         |     (WordPress.Security.NonceVerification.Recommended)
-  36 | WARNING | [ ] Line exceeds 160 characters; contains 178
-     |         |     characters (Generic.Files.LineLength.TooLong)
-  40 | ERROR   | [x] Don't use current_time() for retrieving a Unix
-     |         |     (UTC) timestamp. Use time() instead. Found:
-     |         |     current_time( 'timestamp', true )
-     |         |     (WordPress.DateTime.CurrentTimeTimestamp.RequestedUTC)
-  40 | ERROR   | [ ] Inline comments must end in full-stops,
-     |         |     exclamation marks, or question marks
-     |         |     (Squiz.Commenting.InlineComment.InvalidEndChar)
- 115 | ERROR   | [ ] Missing doc comment for function decorateRows()
-     |         |     (Squiz.Commenting.FunctionComment.Missing)
- 123 | ERROR   | [ ] Use placeholders and $wpdb->prepare(); found
-     |         |     $sql (WordPress.DB.PreparedSQL.NotPrepared)
- 132 | ERROR   | [ ] Using short ternaries is not allowed as they are
-     |         |     rarely used correctly
-     |         |     (Universal.Operators.DisallowShortTernary.Found)
- 159 | WARNING | [ ] Found unknown capability "attendance_export" in
+  46 | WARNING | [ ] Found unknown capability "fb_manage_settings" in
      |         |     function call to current_user_can(). Please
      |         |     check the spelling of the capability. If this is
      |         |     a custom capability, please verify the
@@ -901,1381 +202,83 @@ FOUND 10 ERRORS AND 9 WARNINGS AFFECTING 16 LINES
      |         |     sniff by setting the "custom_capabilities"
      |         |     property in the PHPCS ruleset.
      |         |     (WordPress.WP.Capabilities.Unknown)
- 167 | WARNING | [ ] Found unknown capability "read_sensitive" in
-     |         |     function call to current_user_can(). Please
-     |         |     check the spelling of the capability. If this is
-     |         |     a custom capability, please verify the
-     |         |     capability is registered with WordPress via a
-     |         |     call to WP_Role(s)->add_cap().
-     |         |     Custom capabilities can be made known to this
-     |         |     sniff by setting the "custom_capabilities"
-     |         |     property in the PHPCS ruleset.
-     |         |     (WordPress.WP.Capabilities.Unknown)
- 168 | WARNING | [ ] Processing form data without nonce verification.
+  60 | ERROR   | [ ] Detected usage of a non-sanitized input
+     |         |     variable: $_POST['templates']
+     |         |     (WordPress.Security.ValidatedSanitizedInput.InputNotSanitized)
+  77 | ERROR   | [x] Tabs must be used to indent lines; spaces are
+     |         |     not allowed
+     |         |     (Generic.WhiteSpace.DisallowSpaceIndent.SpacesUsed)
+  78 | ERROR   | [ ] Processing form data without nonce verification.
+     |         |     (WordPress.Security.NonceVerification.Missing)
+  83 | ERROR   | [x] Tabs must be used to indent lines; spaces are
+     |         |     not allowed
+     |         |     (Generic.WhiteSpace.DisallowSpaceIndent.SpacesUsed)
+  84 | ERROR   | [ ] Processing form data without nonce verification.
+     |         |     (WordPress.Security.NonceVerification.Missing)
+ 103 | ERROR   | [x] Tabs must be used to indent lines; spaces are
+     |         |     not allowed
+     |         |     (Generic.WhiteSpace.DisallowSpaceIndent.SpacesUsed)
+ 104 | WARNING | [ ] Processing form data without nonce verification.
      |         |     (WordPress.Security.NonceVerification.Recommended)
- 189 | WARNING | [ ] Found unknown capability "read_sensitive" in
-     |         |     function call to current_user_can(). Please
-     |         |     check the spelling of the capability. If this is
-     |         |     a custom capability, please verify the
-     |         |     capability is registered with WordPress via a
-     |         |     call to WP_Role(s)->add_cap().
-     |         |     Custom capabilities can be made known to this
-     |         |     sniff by setting the "custom_capabilities"
-     |         |     property in the PHPCS ruleset.
-     |         |     (WordPress.WP.Capabilities.Unknown)
- 192 | ERROR   | [x] Expected 1 blank line at end of file; 2 found
-     |         |     (PSR2.Files.EndFileNewline.TooMany)
 ----------------------------------------------------------------------
 PHPCBF CAN FIX THE 4 MARKED SNIFF VIOLATIONS AUTOMATICALLY
+----------------------------------------------------------------------
+
+
+FILE: /workspace/FoodBank-Manager/includes/Admin/ThemePage.php
+----------------------------------------------------------------------
+FOUND 4 ERRORS AND 3 WARNINGS AFFECTING 5 LINES
+----------------------------------------------------------------------
+  1 | ERROR   | Filenames should be all lowercase with hyphens as
+    |         | word separators. Expected themepage.php, but found
+    |         | ThemePage.php.
+    |         | (WordPress.Files.FileName.NotHyphenatedLowercase)
+  1 | ERROR   | Class file names should be based on the class name
+    |         | with "class-" prepended. Expected
+    |         | class-themepage.php, but found ThemePage.php.
+    |         | (WordPress.Files.FileName.InvalidClassFileName)
+  1 | ERROR   | Missing file doc comment
+    |         | (Squiz.Commenting.FileComment.Missing)
+ 25 | WARNING | Found unknown capability "fb_manage_theme" in
+    |         | function call to current_user_can(). Please check the
+    |         | spelling of the capability. If this is a custom
+    |         | capability, please verify the capability is
+    |         | registered with WordPress via a call to
+    |         | WP_Role(s)->add_cap().
+    |         | Custom capabilities can be made known to this sniff
+    |         | by setting the "custom_capabilities" property in the
+    |         | PHPCS ruleset. (WordPress.WP.Capabilities.Unknown)
+ 40 | WARNING | Found unknown capability "fb_manage_theme" in
+    |         | function call to current_user_can(). Please check the
+    |         | spelling of the capability. If this is a custom
+    |         | capability, please verify the capability is
+    |         | registered with WordPress via a call to
+    |         | WP_Role(s)->add_cap().
+    |         | Custom capabilities can be made known to this sniff
+    |         | by setting the "custom_capabilities" property in the
+    |         | PHPCS ruleset. (WordPress.WP.Capabilities.Unknown)
+ 57 | WARNING | file_get_contents() is discouraged. Use
+    |         | wp_remote_get() for remote URLs instead.
+    |         | (WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents)
+ 72 | ERROR   | Detected usage of a non-sanitized input variable:
+    |         | $_POST['fbm_theme']
+    |         | (WordPress.Security.ValidatedSanitizedInput.InputNotSanitized)
 ----------------------------------------------------------------------
 
 
 FILE: /workspace/FoodBank-Manager/includes/Admin/Menu.php
 ----------------------------------------------------------------------
-FOUND 57 ERRORS AND 5 WARNINGS AFFECTING 25 LINES
+FOUND 3 ERRORS AFFECTING 1 LINE
 ----------------------------------------------------------------------
-  1 | ERROR   | [ ] Missing file doc comment
-    |         |     (Squiz.Commenting.FileComment.Missing)
-  7 | ERROR   | [ ] Missing doc comment for class Menu
-    |         |     (Squiz.Commenting.ClassComment.Missing)
- 12 | ERROR   | [x] Expected 1 space after the array opener in a
-    |         |     single line array. Found: no spaces
-    |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceAfterArrayOpenerSingleLine)
- 12 | ERROR   | [x] Expected 1 space before the array closer in a
-    |         |     single line array. Found: no spaces
-    |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceBeforeArrayCloserSingleLine)
- 19 | WARNING | [ ] Found unknown capability "fb_read_entries" in
-    |         |     function call to current_user_can(). Please check
-    |         |     the spelling of the capability. If this is a
-    |         |     custom capability, please verify the capability
-    |         |     is registered with WordPress via a call to
-    |         |     WP_Role(s)->add_cap().
-    |         |     Custom capabilities can be made known to this
-    |         |     sniff by setting the "custom_capabilities"
-    |         |     property in the PHPCS ruleset.
-    |         |     (WordPress.WP.Capabilities.Unknown)
- 26 | ERROR   | [x] Expected 1 space after the array opener in a
-    |         |     single line array. Found: no spaces
-    |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceAfterArrayOpenerSingleLine)
- 26 | ERROR   | [x] Expected 1 space before the array closer in a
-    |         |     single line array. Found: no spaces
-    |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceBeforeArrayCloserSingleLine)
- 31 | ERROR   | [x] Expected 1 space after comma in argument list; 3
-    |         |     found
-    |         |     (Generic.Functions.FunctionCallArgumentSpacing.TooMuchSpaceAfterComma)
- 31 | ERROR   | [x] Expected 1 space after comma in argument list; 3
-    |         |     found
-    |         |     (Generic.Functions.FunctionCallArgumentSpacing.TooMuchSpaceAfterComma)
- 31 | ERROR   | [x] Expected 1 space after the array opener in a
-    |         |     single line array. Found: no spaces
-    |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceAfterArrayOpenerSingleLine)
- 31 | ERROR   | [x] Expected 1 space before the array closer in a
-    |         |     single line array. Found: no spaces
-    |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceBeforeArrayCloserSingleLine)
- 31 | WARNING | [ ] Line exceeds 160 characters; contains 162
-    |         |     characters (Generic.Files.LineLength.TooLong)
- 32 | ERROR   | [x] Expected 1 space after comma in argument list; 5
-    |         |     found
-    |         |     (Generic.Functions.FunctionCallArgumentSpacing.TooMuchSpaceAfterComma)
- 32 | ERROR   | [x] Expected 1 space after comma in argument list; 5
-    |         |     found
-    |         |     (Generic.Functions.FunctionCallArgumentSpacing.TooMuchSpaceAfterComma)
- 32 | ERROR   | [x] Expected 1 space after the array opener in a
-    |         |     single line array. Found: no spaces
-    |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceAfterArrayOpenerSingleLine)
- 32 | ERROR   | [x] Expected 1 space before the array closer in a
-    |         |     single line array. Found: no spaces
-    |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceBeforeArrayCloserSingleLine)
- 33 | ERROR   | [x] Expected 1 space after comma in argument list; 8
-    |         |     found
-    |         |     (Generic.Functions.FunctionCallArgumentSpacing.TooMuchSpaceAfterComma)
- 33 | ERROR   | [x] Expected 1 space after comma in argument list; 8
-    |         |     found
-    |         |     (Generic.Functions.FunctionCallArgumentSpacing.TooMuchSpaceAfterComma)
- 33 | ERROR   | [x] Expected 1 space after the array opener in a
-    |         |     single line array. Found: no spaces
-    |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceAfterArrayOpenerSingleLine)
- 33 | ERROR   | [x] Expected 1 space before the array closer in a
-    |         |     single line array. Found: no spaces
-    |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceBeforeArrayCloserSingleLine)
- 34 | ERROR   | [x] Expected 1 space after comma in argument list; 7
-    |         |     found
-    |         |     (Generic.Functions.FunctionCallArgumentSpacing.TooMuchSpaceAfterComma)
- 34 | ERROR   | [x] Expected 1 space after the array opener in a
-    |         |     single line array. Found: no spaces
-    |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceAfterArrayOpenerSingleLine)
- 34 | ERROR   | [x] Expected 1 space before the array closer in a
-    |         |     single line array. Found: no spaces
-    |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceBeforeArrayCloserSingleLine)
- 35 | ERROR   | [x] Expected 1 space after comma in argument list; 5
-    |         |     found
-    |         |     (Generic.Functions.FunctionCallArgumentSpacing.TooMuchSpaceAfterComma)
- 35 | ERROR   | [x] Expected 1 space after comma in argument list; 5
-    |         |     found
-    |         |     (Generic.Functions.FunctionCallArgumentSpacing.TooMuchSpaceAfterComma)
- 35 | ERROR   | [x] Expected 1 space after the array opener in a
-    |         |     single line array. Found: no spaces
-    |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceAfterArrayOpenerSingleLine)
- 35 | ERROR   | [x] Expected 1 space before the array closer in a
-    |         |     single line array. Found: no spaces
-    |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceBeforeArrayCloserSingleLine)
- 36 | ERROR   | [x] Expected 1 space after comma in argument list; 8
-    |         |     found
-    |         |     (Generic.Functions.FunctionCallArgumentSpacing.TooMuchSpaceAfterComma)
- 36 | ERROR   | [x] Expected 1 space after the array opener in a
-    |         |     single line array. Found: no spaces
-    |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceAfterArrayOpenerSingleLine)
- 36 | ERROR   | [x] Expected 1 space before the array closer in a
-    |         |     single line array. Found: no spaces
-    |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceBeforeArrayCloserSingleLine)
- 37 | ERROR   | [x] Expected 1 space after the array opener in a
-    |         |     single line array. Found: no spaces
-    |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceAfterArrayOpenerSingleLine)
- 37 | ERROR   | [x] Expected 1 space before the array closer in a
-    |         |     single line array. Found: no spaces
-    |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceBeforeArrayCloserSingleLine)
- 37 | WARNING | [ ] Line exceeds 160 characters; contains 180
-    |         |     characters (Generic.Files.LineLength.TooLong)
- 38 | ERROR   | [x] Expected 1 space after comma in argument list; 2
-    |         |     found
-    |         |     (Generic.Functions.FunctionCallArgumentSpacing.TooMuchSpaceAfterComma)
- 38 | ERROR   | [x] Expected 1 space after comma in argument list; 2
-    |         |     found
-    |         |     (Generic.Functions.FunctionCallArgumentSpacing.TooMuchSpaceAfterComma)
- 38 | ERROR   | [x] Expected 1 space after the array opener in a
-    |         |     single line array. Found: no spaces
-    |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceAfterArrayOpenerSingleLine)
- 38 | ERROR   | [x] Expected 1 space before the array closer in a
-    |         |     single line array. Found: no spaces
-    |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceBeforeArrayCloserSingleLine)
- 41 | ERROR   | [ ] Missing doc comment for function submenu()
-    |         |     (Squiz.Commenting.FunctionComment.Missing)
- 41 | ERROR   | [x] Expected 1 spaces after opening parenthesis; 0
-    |         |     found
-    |         |     (Squiz.Functions.FunctionDeclarationArgumentSpacing.SpacingAfterOpen)
- 41 | WARNING | [ ] It is recommended not to use reserved keyword
-    |         |     "parent" as function parameter name. Found:
-    |         |     $parent
-    |         |     (Universal.NamingConventions.NoReservedKeywordParameterNames.parentFound)
- 41 | ERROR   | [x] Expected 1 spaces before closing parenthesis; 0
-    |         |     found
-    |         |     (Squiz.Functions.FunctionDeclarationArgumentSpacing.SpacingBeforeClose)
- 45 | ERROR   | [ ] Missing doc comment for function safeInclude()
-    |         |     (Squiz.Commenting.FunctionComment.Missing)
- 45 | ERROR   | [x] Expected 1 spaces after opening parenthesis; 0
-    |         |     found
-    |         |     (Squiz.Functions.FunctionDeclarationArgumentSpacing.SpacingAfterOpen)
- 45 | ERROR   | [x] Expected 1 spaces before closing parenthesis; 0
-    |         |     found
-    |         |     (Squiz.Functions.FunctionDeclarationArgumentSpacing.SpacingBeforeClose)
- 47 | ERROR   | [x] No space after opening parenthesis is prohibited
-    |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceAfterOpenParenthesis)
- 47 | ERROR   | [x] No space before closing parenthesis is prohibited
-    |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceBeforeCloseParenthesis)
- 51 | WARNING | [x] Found precision alignment of 3 spaces.
-    |         |     (Universal.WhiteSpace.PrecisionAlignment.Found)
- 56 | ERROR   | [x] Expected 1 space before opening brace; found 2
-    |         |     (Generic.Functions.OpeningFunctionBraceKernighanRitchie.SpaceBeforeBrace)
- 56 | ERROR   | [x] Opening brace must be the last content on the
-    |         |     line
-    |         |     (Squiz.Functions.MultiLineFunctionDeclaration.ContentAfterBrace)
- 58 | ERROR   | [x] Opening brace must be the last content on the
-    |         |     line
-    |         |     (Squiz.Functions.MultiLineFunctionDeclaration.ContentAfterBrace)
- 60 | ERROR   | [x] Expected 1 space before opening brace; found 3
-    |         |     (Generic.Functions.OpeningFunctionBraceKernighanRitchie.SpaceBeforeBrace)
- 60 | ERROR   | [x] Opening brace must be the last content on the
-    |         |     line
-    |         |     (Squiz.Functions.MultiLineFunctionDeclaration.ContentAfterBrace)
- 62 | ERROR   | [x] Expected 1 space before opening brace; found 6
-    |         |     (Generic.Functions.OpeningFunctionBraceKernighanRitchie.SpaceBeforeBrace)
- 62 | ERROR   | [x] Opening brace must be the last content on the
-    |         |     line
-    |         |     (Squiz.Functions.MultiLineFunctionDeclaration.ContentAfterBrace)
- 64 | ERROR   | [x] Expected 1 space before opening brace; found 5
-    |         |     (Generic.Functions.OpeningFunctionBraceKernighanRitchie.SpaceBeforeBrace)
- 64 | ERROR   | [x] Opening brace must be the last content on the
-    |         |     line
-    |         |     (Squiz.Functions.MultiLineFunctionDeclaration.ContentAfterBrace)
- 66 | ERROR   | [x] Expected 1 space before opening brace; found 3
-    |         |     (Generic.Functions.OpeningFunctionBraceKernighanRitchie.SpaceBeforeBrace)
- 66 | ERROR   | [x] Opening brace must be the last content on the
-    |         |     line
-    |         |     (Squiz.Functions.MultiLineFunctionDeclaration.ContentAfterBrace)
- 68 | ERROR   | [x] Expected 1 space before opening brace; found 6
-    |         |     (Generic.Functions.OpeningFunctionBraceKernighanRitchie.SpaceBeforeBrace)
- 68 | ERROR   | [x] Opening brace must be the last content on the
-    |         |     line
-    |         |     (Squiz.Functions.MultiLineFunctionDeclaration.ContentAfterBrace)
- 70 | ERROR   | [x] Expected 1 space before opening brace; found 0
-    |         |     (Generic.Functions.OpeningFunctionBraceKernighanRitchie.SpaceBeforeBrace)
- 70 | ERROR   | [x] Opening brace must be the last content on the
-    |         |     line
-    |         |     (Squiz.Functions.MultiLineFunctionDeclaration.ContentAfterBrace)
-----------------------------------------------------------------------
-PHPCBF CAN FIX THE 54 MARKED SNIFF VIOLATIONS AUTOMATICALLY
-----------------------------------------------------------------------
-
-
-FILE: /workspace/FoodBank-Manager/includes/Db/Migrations.php
-----------------------------------------------------------------------
-FOUND 3 ERRORS AFFECTING 3 LINES
-----------------------------------------------------------------------
-  1 | ERROR | Missing file doc comment
-    |       | (Squiz.Commenting.FileComment.Missing)
-  7 | ERROR | Missing doc comment for class Migrations
-    |       | (Squiz.Commenting.ClassComment.Missing)
- 12 | ERROR | Missing doc comment for function maybe_migrate()
-    |       | (Squiz.Commenting.FunctionComment.Missing)
-----------------------------------------------------------------------
-
-
-FILE: /workspace/FoodBank-Manager/includes/Attendance/TokenService.php
-----------------------------------------------------------------------
-FOUND 3 ERRORS AND 2 WARNINGS AFFECTING 5 LINES
-----------------------------------------------------------------------
-  1 | ERROR   | Missing file doc comment
-    |         | (Squiz.Commenting.FileComment.Missing)
-  7 | ERROR   | Missing doc comment for class TokenService
-    |         | (Squiz.Commenting.ClassComment.Missing)
- 22 | WARNING | base64_encode() can be used to obfuscate code which
-    |         | is strongly discouraged. Please verify that the
-    |         | function is used for benign reasons.
-    |         | (WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode)
- 25 | ERROR   | Doc comment for parameter "$max_age" missing
-    |         | (Squiz.Commenting.FunctionComment.MissingParamTag)
- 36 | WARNING | base64_decode() can be used to obfuscate code which
-    |         | is strongly discouraged. Please verify that the
-    |         | function is used for benign reasons.
-    |         | (WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode)
-----------------------------------------------------------------------
-
-
-FILE: ...orkspace/FoodBank-Manager/includes/Attendance/AttendanceRepo.php
-----------------------------------------------------------------------
-FOUND 157 ERRORS AND 10 WARNINGS AFFECTING 70 LINES
-----------------------------------------------------------------------
-   1 | ERROR   | [ ] Missing file doc comment
-     |         |     (Squiz.Commenting.FileComment.Missing)
-  10 | ERROR   | [ ] Missing doc comment for class AttendanceRepo
-     |         |     (Squiz.Commenting.ClassComment.Missing)
-  11 | ERROR   | [ ] Doc comment for parameter "$application_id"
-     |         |     missing
-     |         |     (Squiz.Commenting.FunctionComment.MissingParamTag)
-  14 | ERROR   | [x] Expected 1 spaces after opening parenthesis; 0
-     |         |     found
-     |         |     (Squiz.Functions.FunctionDeclarationArgumentSpacing.SpacingAfterOpen)
-  14 | ERROR   | [x] Expected 1 spaces before closing parenthesis; 0
-     |         |     found
-     |         |     (Squiz.Functions.FunctionDeclarationArgumentSpacing.SpacingBeforeClose)
-  20 | ERROR   | [ ] Use placeholders and $wpdb->prepare(); found
-     |         |     $sql (WordPress.DB.PreparedSQL.NotPrepared)
-  23 | ERROR   | [ ] Missing short description in doc comment
-     |         |     (Generic.Commenting.DocComment.MissingShort)
-  24 | ERROR   | [ ] Parameter comment must end with a full stop
-     |         |     (Squiz.Commenting.FunctionComment.ParamCommentFullStop)
-  43 | ERROR   | [x] Expected 1 spaces after opening parenthesis; 0
-     |         |     found
-     |         |     (Squiz.Functions.FunctionDeclarationArgumentSpacing.SpacingAfterOpen)
-  43 | ERROR   | [x] Expected 1 spaces before closing parenthesis; 0
-     |         |     found
-     |         |     (Squiz.Functions.FunctionDeclarationArgumentSpacing.SpacingBeforeClose)
-  48 | ERROR   | [ ] Inline comments must end in full-stops,
-     |         |     exclamation marks, or question marks
-     |         |     (Squiz.Commenting.InlineComment.InvalidEndChar)
-  51 | ERROR   | [x] Expected 1 space after cast statement; 0 found
-     |         |     (Generic.Formatting.SpaceAfterCast.NoSpace)
-  51 | ERROR   | [x] Expected 1 space after open parenthesis; 0 found
-     |         |     (Generic.WhiteSpace.ArbitraryParenthesesSpacing.SpaceAfterOpen)
-  51 | ERROR   | [x] Expected 1 space before close parenthesis; 0
-     |         |     found
-     |         |     (Generic.WhiteSpace.ArbitraryParenthesesSpacing.SpaceBeforeClose)
-  53 | ERROR   | [x] Expected 1 space after the array opener in a
-     |         |     single line array. Found: no spaces
-     |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceAfterArrayOpenerSingleLine)
-  53 | ERROR   | [x] String "1=1" does not require double quotes; use
-     |         |     single quotes instead
-     |         |     (Squiz.Strings.DoubleQuoteUsage.NotRequired)
-  53 | ERROR   | [x] Expected 1 space before the array closer in a
-     |         |     single line array. Found: no spaces
-     |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceBeforeArrayCloserSingleLine)
-  55 | ERROR   | [x] No space after opening parenthesis is prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceAfterOpenParenthesis)
-  55 | ERROR   | [x] No space before closing parenthesis is
-     |         |     prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceBeforeCloseParenthesis)
-  59 | ERROR   | [ ] Inline comments must end in full-stops,
-     |         |     exclamation marks, or question marks
-     |         |     (Squiz.Commenting.InlineComment.InvalidEndChar)
-  60 | ERROR   | [x] No space after opening parenthesis is prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceAfterOpenParenthesis)
-  60 | ERROR   | [x] Expected exactly one space between closing
-     |         |     parenthesis and opening control structure; "  "
-     |         |     found.
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.ExtraSpaceAfterCloseParenthesis)
-  60 | ERROR   | [x] Expected 1 space before "!"; 0 found
-     |         |     (WordPress.WhiteSpace.OperatorSpacing.NoSpaceBefore)
-  60 | ERROR   | [x] Expected 1 space after "!"; 0 found
-     |         |     (WordPress.WhiteSpace.OperatorSpacing.NoSpaceAfter)
-  60 | ERROR   | [x] No space before closing parenthesis is
-     |         |     prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceBeforeCloseParenthesis)
-  60 | ERROR   | [x] Expected 1 space after closing parenthesis;
-     |         |     found 2
-     |         |     (Squiz.ControlStructures.ControlSignature.SpaceAfterCloseParenthesis)
-  60 | ERROR   | [x] Newline required after opening brace
-     |         |     (Squiz.ControlStructures.ControlSignature.NewlineAfterOpenBrace)
-  60 | ERROR   | [x] String "a.form_id = %d" does not require double
-     |         |     quotes; use single quotes instead
-     |         |     (Squiz.Strings.DoubleQuoteUsage.NotRequired)
-  60 | ERROR   | [x] Expected 1 space after cast statement; 0 found
-     |         |     (Generic.Formatting.SpaceAfterCast.NoSpace)
-  60 | ERROR   | [x] Each PHP statement must be on a line by itself
-     |         |     (Generic.Formatting.DisallowMultipleStatements.SameLine)
-  61 | ERROR   | [x] No space after opening parenthesis is prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceAfterOpenParenthesis)
-  61 | ERROR   | [x] Expected 1 space before "!"; 0 found
-     |         |     (WordPress.WhiteSpace.OperatorSpacing.NoSpaceBefore)
-  61 | ERROR   | [x] Expected 1 space after "!"; 0 found
-     |         |     (WordPress.WhiteSpace.OperatorSpacing.NoSpaceAfter)
-  61 | ERROR   | [x] No space before closing parenthesis is
-     |         |     prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceBeforeCloseParenthesis)
-  61 | ERROR   | [x] Newline required after opening brace
-     |         |     (Squiz.ControlStructures.ControlSignature.NewlineAfterOpenBrace)
-  61 | ERROR   | [x] String "t.event_id = %d" does not require double
-     |         |     quotes; use single quotes instead
-     |         |     (Squiz.Strings.DoubleQuoteUsage.NotRequired)
-  61 | ERROR   | [x] Expected 1 space after cast statement; 0 found
-     |         |     (Generic.Formatting.SpaceAfterCast.NoSpace)
-  61 | ERROR   | [x] Each PHP statement must be on a line by itself
-     |         |     (Generic.Formatting.DisallowMultipleStatements.SameLine)
-  62 | ERROR   | [x] No space after opening parenthesis is prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceAfterOpenParenthesis)
-  62 | ERROR   | [x] Expected 1 space before "!"; 0 found
-     |         |     (WordPress.WhiteSpace.OperatorSpacing.NoSpaceBefore)
-  62 | ERROR   | [x] Expected 1 space after "!"; 0 found
-     |         |     (WordPress.WhiteSpace.OperatorSpacing.NoSpaceAfter)
-  62 | ERROR   | [x] No space before closing parenthesis is
-     |         |     prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceBeforeCloseParenthesis)
-  67 | ERROR   | [x] No space after opening parenthesis is prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceAfterOpenParenthesis)
-  67 | ERROR   | [x] Expected 1 space before "!"; 0 found
-     |         |     (WordPress.WhiteSpace.OperatorSpacing.NoSpaceBefore)
-  67 | ERROR   | [x] Expected 1 space after "!"; 0 found
-     |         |     (WordPress.WhiteSpace.OperatorSpacing.NoSpaceAfter)
-  67 | ERROR   | [x] No space before closing parenthesis is
-     |         |     prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceBeforeCloseParenthesis)
-  72 | ERROR   | [x] No space after opening parenthesis is prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceAfterOpenParenthesis)
-  72 | ERROR   | [x] Expected 1 space before "!"; 0 found
-     |         |     (WordPress.WhiteSpace.OperatorSpacing.NoSpaceBefore)
-  72 | ERROR   | [x] Expected 1 space after "!"; 0 found
-     |         |     (WordPress.WhiteSpace.OperatorSpacing.NoSpaceAfter)
-  72 | ERROR   | [x] No space before closing parenthesis is
-     |         |     prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceBeforeCloseParenthesis)
-  72 | ERROR   | [x] Newline required after opening brace
-     |         |     (Squiz.ControlStructures.ControlSignature.NewlineAfterOpenBrace)
-  72 | ERROR   | [x] String "t.recorded_by_user_id = %d" does not
-     |         |     require double quotes; use single quotes instead
-     |         |     (Squiz.Strings.DoubleQuoteUsage.NotRequired)
-  72 | ERROR   | [x] Expected 1 space after cast statement; 0 found
-     |         |     (Generic.Formatting.SpaceAfterCast.NoSpace)
-  72 | ERROR   | [x] Each PHP statement must be on a line by itself
-     |         |     (Generic.Formatting.DisallowMultipleStatements.SameLine)
-  78 | ERROR   | [x] Expected 1 space after "!"; 0 found
-     |         |     (WordPress.WhiteSpace.OperatorSpacing.NoSpaceAfter)
-  80 | ERROR   | [ ] Inline comments must end in full-stops,
-     |         |     exclamation marks, or question marks
-     |         |     (Squiz.Commenting.InlineComment.InvalidEndChar)
-  85 | ERROR   | [x] Expected 1 space after cast statement; 0 found
-     |         |     (Generic.Formatting.SpaceAfterCast.NoSpace)
-  85 | ERROR   | [x] Expected 1 space after open parenthesis; 0 found
-     |         |     (Generic.WhiteSpace.ArbitraryParenthesesSpacing.SpaceAfterOpen)
-  85 | ERROR   | [x] Expected 1 space before close parenthesis; 0
-     |         |     found
-     |         |     (Generic.WhiteSpace.ArbitraryParenthesesSpacing.SpaceBeforeClose)
-  86 | ERROR   | [x] Expected 1 space after cast statement; 0 found
-     |         |     (Generic.Formatting.SpaceAfterCast.NoSpace)
-  86 | ERROR   | [x] Expected 1 space after open parenthesis; 0 found
-     |         |     (Generic.WhiteSpace.ArbitraryParenthesesSpacing.SpaceAfterOpen)
-  86 | ERROR   | [x] Expected 1 space before close parenthesis; 0
-     |         |     found
-     |         |     (Generic.WhiteSpace.ArbitraryParenthesesSpacing.SpaceBeforeClose)
-  87 | ERROR   | [x] Expected 1 space after open parenthesis; 0 found
-     |         |     (Generic.WhiteSpace.ArbitraryParenthesesSpacing.SpaceAfterOpen)
-  87 | ERROR   | [x] Expected 1 space before close parenthesis; 0
-     |         |     found
-     |         |     (Generic.WhiteSpace.ArbitraryParenthesesSpacing.SpaceBeforeClose)
-  89 | ERROR   | [ ] Inline comments must end in full-stops,
-     |         |     exclamation marks, or question marks
-     |         |     (Squiz.Commenting.InlineComment.InvalidEndChar)
- 116 | ERROR   | [ ] Inline comments must end in full-stops,
-     |         |     exclamation marks, or question marks
-     |         |     (Squiz.Commenting.InlineComment.InvalidEndChar)
- 117 | ERROR   | [x] No space after opening parenthesis is prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceAfterOpenParenthesis)
- 117 | ERROR   | [x] Expected 1 space before "!"; 0 found
-     |         |     (WordPress.WhiteSpace.OperatorSpacing.NoSpaceBefore)
- 117 | ERROR   | [x] Expected 1 space after "!"; 0 found
-     |         |     (WordPress.WhiteSpace.OperatorSpacing.NoSpaceAfter)
- 117 | ERROR   | [x] No space before closing parenthesis is
-     |         |     prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceBeforeCloseParenthesis)
- 137 | ERROR   | [x] Expected 1 space after the array opener in a
-     |         |     single line array. Found: no spaces
-     |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceAfterArrayOpenerSingleLine)
- 137 | ERROR   | [x] Expected 1 space before the array closer in a
-     |         |     single line array. Found: no spaces
-     |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceBeforeArrayCloserSingleLine)
- 149 | ERROR   | [x] Each item in a multi-line array must be on a new
-     |         |     line. Found: 1 space
-     |         |     (WordPress.Arrays.ArrayDeclarationSpacing.ArrayItemNoNewLine)
- 149 | ERROR   | [ ] Inline comments must end in full-stops,
-     |         |     exclamation marks, or question marks
-     |         |     (Squiz.Commenting.InlineComment.InvalidEndChar)
- 150 | ERROR   | [x] Each item in a multi-line array must be on a new
-     |         |     line. Found: 1 space
-     |         |     (WordPress.Arrays.ArrayDeclarationSpacing.ArrayItemNoNewLine)
- 150 | ERROR   | [ ] Inline comments must end in full-stops,
-     |         |     exclamation marks, or question marks
-     |         |     (Squiz.Commenting.InlineComment.InvalidEndChar)
- 151 | ERROR   | [ ] Inline comments must end in full-stops,
-     |         |     exclamation marks, or question marks
-     |         |     (Squiz.Commenting.InlineComment.InvalidEndChar)
- 155 | ERROR   | [ ] Inline comments must end in full-stops,
-     |         |     exclamation marks, or question marks
-     |         |     (Squiz.Commenting.InlineComment.InvalidEndChar)
- 156 | ERROR   | [x] Expected 1 space after the array opener in a
-     |         |     single line array. Found: no spaces
-     |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceAfterArrayOpenerSingleLine)
- 156 | ERROR   | [x] Expected 1 space before the array closer in a
-     |         |     single line array. Found: no spaces
-     |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceBeforeArrayCloserSingleLine)
- 159 | ERROR   | [ ] Use placeholders and $wpdb->prepare(); found
-     |         |     $sql (WordPress.DB.PreparedSQL.NotPrepared)
- 160 | ERROR   | [ ] Use placeholders and $wpdb->prepare(); found
-     |         |     $prepared (WordPress.DB.PreparedSQL.NotPrepared)
- 160 | ERROR   | [ ] Using short ternaries is not allowed as they are
-     |         |     rarely used correctly
-     |         |     (Universal.Operators.DisallowShortTernary.Found)
- 162 | ERROR   | [ ] Use placeholders and $wpdb->prepare(); found
-     |         |     $countSql (WordPress.DB.PreparedSQL.NotPrepared)
- 163 | ERROR   | [x] Expected 1 space after cast statement; 0 found
-     |         |     (Generic.Formatting.SpaceAfterCast.NoSpace)
- 163 | ERROR   | [ ] Use placeholders and $wpdb->prepare(); found
-     |         |     $preparedCount
-     |         |     (WordPress.DB.PreparedSQL.NotPrepared)
- 165 | ERROR   | [x] Expected 1 space after the array opener in a
-     |         |     single line array. Found: no spaces
-     |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceAfterArrayOpenerSingleLine)
- 165 | ERROR   | [x] When a multi-item array uses associative keys,
-     |         |     each value should start on a new line.
-     |         |     (WordPress.Arrays.ArrayDeclarationSpacing.AssociativeArrayFound)
- 165 | ERROR   | [x] Expected 1 space before the array closer in a
-     |         |     single line array. Found: no spaces
-     |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceBeforeArrayCloserSingleLine)
- 178 | ERROR   | [x] Expected 1 spaces after opening parenthesis; 0
-     |         |     found
-     |         |     (Squiz.Functions.FunctionDeclarationArgumentSpacing.SpacingAfterOpen)
- 178 | ERROR   | [x] Incorrect spacing between argument
-     |         |     "$includeVoided" and equals sign; expected 1 but
-     |         |     found 0
-     |         |     (Squiz.Functions.FunctionDeclarationArgumentSpacing.SpaceBeforeEquals)
- 178 | ERROR   | [x] Incorrect spacing between default value and
-     |         |     equals sign for argument "$includeVoided";
-     |         |     expected 1 but found 0
-     |         |     (Squiz.Functions.FunctionDeclarationArgumentSpacing.SpaceAfterEquals)
- 178 | ERROR   | [x] Expected 1 spaces before closing parenthesis; 0
-     |         |     found
-     |         |     (Squiz.Functions.FunctionDeclarationArgumentSpacing.SpacingBeforeClose)
- 182 | ERROR   | [x] Expected 1 space after the array opener in a
-     |         |     single line array. Found: no spaces
-     |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceAfterArrayOpenerSingleLine)
- 182 | ERROR   | [x] Expected 1 space before the array closer in a
-     |         |     single line array. Found: no spaces
-     |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceBeforeArrayCloserSingleLine)
- 183 | ERROR   | [x] Expected 1 space after the array opener in a
-     |         |     single line array. Found: no spaces
-     |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceAfterArrayOpenerSingleLine)
- 183 | ERROR   | [x] Expected 1 space before the array closer in a
-     |         |     single line array. Found: no spaces
-     |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceBeforeArrayCloserSingleLine)
- 184 | ERROR   | [x] No space after opening parenthesis is prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceAfterOpenParenthesis)
- 184 | ERROR   | [x] No space before closing parenthesis is
-     |         |     prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceBeforeCloseParenthesis)
- 184 | ERROR   | [x] Newline required after opening brace
-     |         |     (Squiz.ControlStructures.ControlSignature.NewlineAfterOpenBrace)
- 184 | ERROR   | [x] Each PHP statement must be on a line by itself
-     |         |     (Generic.Formatting.DisallowMultipleStatements.SameLine)
- 185 | ERROR   | [x] No space after opening parenthesis is prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceAfterOpenParenthesis)
- 185 | ERROR   | [x] Expected 1 space before "!=="; 3 found
-     |         |     (WordPress.WhiteSpace.OperatorSpacing.SpacingBefore)
- 185 | ERROR   | [x] No space before closing parenthesis is
-     |         |     prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceBeforeCloseParenthesis)
- 185 | ERROR   | [x] Newline required after opening brace
-     |         |     (Squiz.ControlStructures.ControlSignature.NewlineAfterOpenBrace)
- 185 | ERROR   | [x] Each PHP statement must be on a line by itself
-     |         |     (Generic.Formatting.DisallowMultipleStatements.SameLine)
- 186 | ERROR   | [x] No space after opening parenthesis is prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceAfterOpenParenthesis)
- 186 | ERROR   | [x] Expected 1 space before "!"; 0 found
-     |         |     (WordPress.WhiteSpace.OperatorSpacing.NoSpaceBefore)
- 186 | ERROR   | [x] Expected 1 space after "!"; 0 found
-     |         |     (WordPress.WhiteSpace.OperatorSpacing.NoSpaceAfter)
- 186 | ERROR   | [x] No space before closing parenthesis is
-     |         |     prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceBeforeCloseParenthesis)
- 186 | ERROR   | [x] Newline required after opening brace
-     |         |     (Squiz.ControlStructures.ControlSignature.NewlineAfterOpenBrace)
- 188 | WARNING | [ ] Line exceeds 160 characters; contains 216
-     |         |     characters (Generic.Files.LineLength.TooLong)
- 189 | ERROR   | [ ] Use placeholders and $wpdb->prepare(); found
-     |         |     $sql (WordPress.DB.PreparedSQL.NotPrepared)
- 189 | ERROR   | [ ] Using short ternaries is not allowed as they are
-     |         |     rarely used correctly
-     |         |     (Universal.Operators.DisallowShortTernary.Found)
- 190 | ERROR   | [x] No space after opening parenthesis is prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceAfterOpenParenthesis)
- 190 | ERROR   | [x] No space before closing parenthesis is
-     |         |     prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceBeforeCloseParenthesis)
- 190 | ERROR   | [x] Newline required after opening brace
-     |         |     (Squiz.ControlStructures.ControlSignature.NewlineAfterOpenBrace)
- 192 | ERROR   | [x] No space after opening parenthesis is prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceAfterOpenParenthesis)
- 192 | ERROR   | [x] No space before closing parenthesis is
-     |         |     prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceBeforeCloseParenthesis)
- 192 | ERROR   | [x] Newline required after opening brace
-     |         |     (Squiz.ControlStructures.ControlSignature.NewlineAfterOpenBrace)
- 196 | ERROR   | [ ] Use placeholders and $wpdb->prepare(); found
-     |         |     $noteSql (WordPress.DB.PreparedSQL.NotPrepared)
- 196 | ERROR   | [ ] Using short ternaries is not allowed as they are
-     |         |     rarely used correctly
-     |         |     (Universal.Operators.DisallowShortTernary.Found)
- 198 | ERROR   | [x] No space after opening parenthesis is prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceAfterOpenParenthesis)
- 198 | ERROR   | [x] No space before closing parenthesis is
-     |         |     prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceBeforeCloseParenthesis)
- 199 | ERROR   | [x] Array keys must be surrounded by spaces unless
-     |         |     they contain a string or an integer.
-     |         |     (WordPress.Arrays.ArrayKeySpacingRestrictions.NoSpacesAroundArrayKeys)
- 199 | ERROR   | [x] Expected 1 space after cast statement; 0 found
-     |         |     (Generic.Formatting.SpaceAfterCast.NoSpace)
- 199 | ERROR   | [x] Expected a space before the type cast open
-     |         |     parenthesis; none found
-     |         |     (WordPress.WhiteSpace.CastStructureSpacing.NoSpaceBeforeOpenParenthesis)
- 201 | ERROR   | [x] No space after opening parenthesis is prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceAfterOpenParenthesis)
- 201 | ERROR   | [x] No space before closing parenthesis is
-     |         |     prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceBeforeCloseParenthesis)
- 202 | ERROR   | [x] Array keys must be surrounded by spaces unless
-     |         |     they contain a string or an integer.
-     |         |     (WordPress.Arrays.ArrayKeySpacingRestrictions.NoSpacesAroundArrayKeys)
- 202 | ERROR   | [x] Expected 1 space after cast statement; 0 found
-     |         |     (Generic.Formatting.SpaceAfterCast.NoSpace)
- 202 | ERROR   | [x] Expected a space before the type cast open
-     |         |     parenthesis; none found
-     |         |     (WordPress.WhiteSpace.CastStructureSpacing.NoSpaceBeforeOpenParenthesis)
- 207 | ERROR   | [ ] Doc comment for parameter "$attendanceId"
-     |         |     missing
-     |         |     (Squiz.Commenting.FunctionComment.MissingParamTag)
- 207 | ERROR   | [ ] Doc comment for parameter "$void" missing
-     |         |     (Squiz.Commenting.FunctionComment.MissingParamTag)
- 207 | ERROR   | [ ] Doc comment for parameter "$reason" missing
-     |         |     (Squiz.Commenting.FunctionComment.MissingParamTag)
- 207 | ERROR   | [ ] Doc comment for parameter "$actorId" missing
-     |         |     (Squiz.Commenting.FunctionComment.MissingParamTag)
- 207 | ERROR   | [ ] Doc comment for parameter "$nowUtc" missing
-     |         |     (Squiz.Commenting.FunctionComment.MissingParamTag)
- 210 | ERROR   | [x] Expected 1 spaces after opening parenthesis; 0
-     |         |     found
-     |         |     (Squiz.Functions.FunctionDeclarationArgumentSpacing.SpacingAfterOpen)
- 210 | WARNING | [ ] It is recommended not to use reserved keyword
-     |         |     "void" as function parameter name. Found: $void
-     |         |     (Universal.NamingConventions.NoReservedKeywordParameterNames.voidFound)
- 210 | ERROR   | [x] Expected 1 spaces before closing parenthesis; 0
-     |         |     found
-     |         |     (Squiz.Functions.FunctionDeclarationArgumentSpacing.SpacingBeforeClose)
- 212 | ERROR   | [x] No space after opening parenthesis is prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceAfterOpenParenthesis)
- 212 | ERROR   | [x] No space before closing parenthesis is
-     |         |     prohibited
-     |         |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceBeforeCloseParenthesis)
- 214 | WARNING | [x] Array double arrow not aligned correctly;
-     |         |     expected 9 space(s) between "'is_void'" and
-     |         |     double arrow, but found 8.
-     |         |     (WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned)
- 215 | WARNING | [x] Array double arrow not aligned correctly;
-     |         |     expected 5 space(s) between "'void_reason'" and
-     |         |     double arrow, but found 4.
-     |         |     (WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned)
- 216 | WARNING | [x] Array double arrow not aligned correctly;
-     |         |     expected 1 space(s) between "'void_by_user_id'"
-     |         |     and double arrow, but found 0.
-     |         |     (WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned)
- 216 | ERROR   | [x] Expected 1 space before "=>"; 0 found
-     |         |     (WordPress.WhiteSpace.OperatorSpacing.NoSpaceBefore)
- 217 | WARNING | [x] Array double arrow not aligned correctly;
-     |         |     expected 9 space(s) between "'void_at'" and
-     |         |     double arrow, but found 8.
-     |         |     (WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned)
- 221 | WARNING | [x] Array double arrow not aligned correctly;
-     |         |     expected 9 space(s) between "'is_void'" and
-     |         |     double arrow, but found 8.
-     |         |     (WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned)
- 222 | WARNING | [x] Array double arrow not aligned correctly;
-     |         |     expected 5 space(s) between "'void_reason'" and
-     |         |     double arrow, but found 4.
-     |         |     (WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned)
- 223 | WARNING | [x] Array double arrow not aligned correctly;
-     |         |     expected 1 space(s) between "'void_by_user_id'"
-     |         |     and double arrow, but found 0.
-     |         |     (WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned)
- 223 | ERROR   | [x] Expected 1 space before "=>"; 0 found
-     |         |     (WordPress.WhiteSpace.OperatorSpacing.NoSpaceBefore)
- 224 | WARNING | [x] Array double arrow not aligned correctly;
-     |         |     expected 9 space(s) between "'void_at'" and
-     |         |     double arrow, but found 8.
-     |         |     (WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned)
- 230 | ERROR   | [x] Expected 1 space after the array opener in a
-     |         |     single line array. Found: no spaces
-     |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceAfterArrayOpenerSingleLine)
- 230 | ERROR   | [x] Expected 1 space before the array closer in a
-     |         |     single line array. Found: no spaces
-     |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceBeforeArrayCloserSingleLine)
- 231 | ERROR   | [x] Expected 1 space after the array opener in a
-     |         |     single line array. Found: no spaces
-     |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceAfterArrayOpenerSingleLine)
- 231 | ERROR   | [x] Expected 1 space before the array closer in a
-     |         |     single line array. Found: no spaces
-     |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceBeforeArrayCloserSingleLine)
- 232 | ERROR   | [x] Expected 1 space after the array opener in a
-     |         |     single line array. Found: no spaces
-     |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceAfterArrayOpenerSingleLine)
- 232 | ERROR   | [x] Expected 1 space before the array closer in a
-     |         |     single line array. Found: no spaces
-     |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceBeforeArrayCloserSingleLine)
- 237 | ERROR   | [ ] Doc comment for parameter "$attendanceId"
-     |         |     missing
-     |         |     (Squiz.Commenting.FunctionComment.MissingParamTag)
- 237 | ERROR   | [ ] Doc comment for parameter "$userId" missing
-     |         |     (Squiz.Commenting.FunctionComment.MissingParamTag)
- 237 | ERROR   | [ ] Doc comment for parameter "$note" missing
-     |         |     (Squiz.Commenting.FunctionComment.MissingParamTag)
- 237 | ERROR   | [ ] Doc comment for parameter "$nowUtc" missing
-     |         |     (Squiz.Commenting.FunctionComment.MissingParamTag)
- 240 | ERROR   | [x] Expected 1 spaces after opening parenthesis; 0
-     |         |     found
-     |         |     (Squiz.Functions.FunctionDeclarationArgumentSpacing.SpacingAfterOpen)
- 240 | ERROR   | [x] Expected 1 spaces before closing parenthesis; 0
-     |         |     found
-     |         |     (Squiz.Functions.FunctionDeclarationArgumentSpacing.SpacingBeforeClose)
- 250 | ERROR   | [x] Expected 1 space after the array opener in a
-     |         |     single line array. Found: no spaces
-     |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceAfterArrayOpenerSingleLine)
- 250 | ERROR   | [x] Expected 1 space before the array closer in a
-     |         |     single line array. Found: no spaces
-     |         |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceBeforeArrayCloserSingleLine)
- 254 | ERROR   | [x] Expected 1 blank line at end of file; 2 found
-     |         |     (PSR2.Files.EndFileNewline.TooMany)
-----------------------------------------------------------------------
-PHPCBF CAN FIX THE 132 MARKED SNIFF VIOLATIONS AUTOMATICALLY
-----------------------------------------------------------------------
-
-
-FILE: /workspace/FoodBank-Manager/includes/Attendance/Policy.php
-----------------------------------------------------------------------
-FOUND 8 ERRORS AFFECTING 5 LINES
-----------------------------------------------------------------------
-  1 | ERROR | [ ] Missing file doc comment
-    |       |     (Squiz.Commenting.FileComment.Missing)
-  7 | ERROR | [ ] Missing doc comment for class Policy
-    |       |     (Squiz.Commenting.ClassComment.Missing)
- 15 | ERROR | [x] Expected 1 spaces after opening parenthesis; 0
-    |       |     found
-    |       |     (Squiz.Functions.FunctionDeclarationArgumentSpacing.SpacingAfterOpen)
- 15 | ERROR | [x] Expected 1 spaces before closing parenthesis; 0
-    |       |     found
-    |       |     (Squiz.Functions.FunctionDeclarationArgumentSpacing.SpacingBeforeClose)
- 16 | ERROR | [x] No space after opening parenthesis is prohibited
-    |       |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceAfterOpenParenthesis)
- 16 | ERROR | [x] No space before closing parenthesis is prohibited
-    |       |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceBeforeCloseParenthesis)
- 21 | ERROR | [x] No space after opening parenthesis is prohibited
-    |       |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceAfterOpenParenthesis)
- 21 | ERROR | [x] No space before closing parenthesis is prohibited
-    |       |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceBeforeCloseParenthesis)
-----------------------------------------------------------------------
-PHPCBF CAN FIX THE 6 MARKED SNIFF VIOLATIONS AUTOMATICALLY
-----------------------------------------------------------------------
-
-
-FILE: /workspace/FoodBank-Manager/includes/Logging/Audit.php
-----------------------------------------------------------------------
-FOUND 7 ERRORS AFFECTING 4 LINES
-----------------------------------------------------------------------
-  1 | ERROR | [ ] Missing file doc comment
-    |       |     (Squiz.Commenting.FileComment.Missing)
-  7 | ERROR | [ ] Missing doc comment for class Audit
-    |       |     (Squiz.Commenting.ClassComment.Missing)
-  8 | ERROR | [ ] Missing doc comment for function log()
-    |       |     (Squiz.Commenting.FunctionComment.Missing)
-  8 | ERROR | [x] Expected 1 spaces after opening parenthesis; 0
-    |       |     found
-    |       |     (Squiz.Functions.FunctionDeclarationArgumentSpacing.SpacingAfterOpen)
-  8 | ERROR | [x] Expected 1 spaces before closing parenthesis; 0
-    |       |     found
-    |       |     (Squiz.Functions.FunctionDeclarationArgumentSpacing.SpacingBeforeClose)
- 21 | ERROR | [x] Expected 1 space after the array opener in a single
-    |       |     line array. Found: no spaces
-    |       |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceAfterArrayOpenerSingleLine)
- 21 | ERROR | [x] Expected 1 space before the array closer in a
-    |       |     single line array. Found: no spaces
-    |       |     (NormalizedArrays.Arrays.ArrayBraceSpacing.SpaceBeforeArrayCloserSingleLine)
-----------------------------------------------------------------------
-PHPCBF CAN FIX THE 4 MARKED SNIFF VIOLATIONS AUTOMATICALLY
-----------------------------------------------------------------------
-
-
-FILE: ...orkspace/FoodBank-Manager/includes/Http/FormSubmitController.php
-----------------------------------------------------------------------
-FOUND 38 ERRORS AND 6 WARNINGS AFFECTING 26 LINES
-----------------------------------------------------------------------
-   1 | ERROR   | [ ] Missing file doc comment
-     |         |     (Squiz.Commenting.FileComment.Missing)
-  12 | ERROR   | [ ] Missing doc comment for class
-     |         |     FormSubmitController
-     |         |     (Squiz.Commenting.ClassComment.Missing)
-  22 | ERROR   | [ ] Using short ternaries is not allowed as they are
-     |         |     rarely used correctly
-     |         |     (Universal.Operators.DisallowShortTernary.Found)
-  24 | ERROR   | [ ] Processing form data without nonce verification.
-     |         |     (WordPress.Security.NonceVerification.Missing)
-  24 | ERROR   | [ ] $_POST['first_name'] not unslashed before
-     |         |     sanitization. Use wp_unslash() or similar
-     |         |     (WordPress.Security.ValidatedSanitizedInput.MissingUnslash)
-  24 | ERROR   | [ ] Detected usage of a non-sanitized input
-     |         |     variable: $_POST['first_name']
-     |         |     (WordPress.Security.ValidatedSanitizedInput.InputNotSanitized)
-  25 | ERROR   | [ ] Processing form data without nonce verification.
-     |         |     (WordPress.Security.NonceVerification.Missing)
-  25 | ERROR   | [ ] $_POST['last_name'] not unslashed before
-     |         |     sanitization. Use wp_unslash() or similar
-     |         |     (WordPress.Security.ValidatedSanitizedInput.MissingUnslash)
-  25 | ERROR   | [ ] Detected usage of a non-sanitized input
-     |         |     variable: $_POST['last_name']
-     |         |     (WordPress.Security.ValidatedSanitizedInput.InputNotSanitized)
-  26 | ERROR   | [ ] Processing form data without nonce verification.
-     |         |     (WordPress.Security.NonceVerification.Missing)
-  26 | ERROR   | [ ] $_POST['email'] not unslashed before
-     |         |     sanitization. Use wp_unslash() or similar
-     |         |     (WordPress.Security.ValidatedSanitizedInput.MissingUnslash)
-  27 | ERROR   | [ ] Processing form data without nonce verification.
-     |         |     (WordPress.Security.NonceVerification.Missing)
-  27 | ERROR   | [ ] $_POST['phone'] not unslashed before
-     |         |     sanitization. Use wp_unslash() or similar
-     |         |     (WordPress.Security.ValidatedSanitizedInput.MissingUnslash)
-  27 | ERROR   | [ ] Detected usage of a non-sanitized input
-     |         |     variable: $_POST['phone']
-     |         |     (WordPress.Security.ValidatedSanitizedInput.InputNotSanitized)
-  28 | ERROR   | [ ] Processing form data without nonce verification.
-     |         |     (WordPress.Security.NonceVerification.Missing)
-  28 | ERROR   | [ ] $_POST['postcode'] not unslashed before
-     |         |     sanitization. Use wp_unslash() or similar
-     |         |     (WordPress.Security.ValidatedSanitizedInput.MissingUnslash)
-  28 | ERROR   | [ ] Detected usage of a non-sanitized input
-     |         |     variable: $_POST['postcode']
-     |         |     (WordPress.Security.ValidatedSanitizedInput.InputNotSanitized)
-  29 | ERROR   | [ ] Processing form data without nonce verification.
-     |         |     (WordPress.Security.NonceVerification.Missing)
-  29 | ERROR   | [ ] Processing form data without nonce verification.
-     |         |     (WordPress.Security.NonceVerification.Missing)
-  29 | ERROR   | [ ] $_POST['notes'] not unslashed before
-     |         |     sanitization. Use wp_unslash() or similar
-     |         |     (WordPress.Security.ValidatedSanitizedInput.MissingUnslash)
-  30 | ERROR   | [ ] Processing form data without nonce verification.
-     |         |     (WordPress.Security.NonceVerification.Missing)
-  30 | ERROR   | [ ] $_POST['consent'] not unslashed before
-     |         |     sanitization. Use wp_unslash() or similar
-     |         |     (WordPress.Security.ValidatedSanitizedInput.MissingUnslash)
-  30 | ERROR   | [ ] Detected usage of a non-sanitized input
-     |         |     variable: $_POST['consent']
-     |         |     (WordPress.Security.ValidatedSanitizedInput.InputNotSanitized)
-  31 | ERROR   | [ ] Processing form data without nonce verification.
-     |         |     (WordPress.Security.NonceVerification.Missing)
-  31 | ERROR   | [ ] $_POST['form_id'] not unslashed before
-     |         |     sanitization. Use wp_unslash() or similar
-     |         |     (WordPress.Security.ValidatedSanitizedInput.MissingUnslash)
-  31 | ERROR   | [ ] Detected usage of a non-sanitized input
-     |         |     variable: $_POST['form_id']
-     |         |     (WordPress.Security.ValidatedSanitizedInput.InputNotSanitized)
-  53 | ERROR   | [ ] Processing form data without nonce verification.
-     |         |     (WordPress.Security.NonceVerification.Missing)
-  53 | ERROR   | [ ] $_POST[$response_key] not unslashed before
-     |         |     sanitization. Use wp_unslash() or similar
-     |         |     (WordPress.Security.ValidatedSanitizedInput.MissingUnslash)
-  56 | WARNING | [ ] Line exceeds 160 characters; contains 173
-     |         |     characters (Generic.Files.LineLength.TooLong)
-  57 | ERROR   | [ ] $_SERVER['REMOTE_ADDR'] not unslashed before
-     |         |     sanitization. Use wp_unslash() or similar
-     |         |     (WordPress.Security.ValidatedSanitizedInput.MissingUnslash)
-  58 | ERROR   | [x] When a multi-item array uses associative keys,
-     |         |     each value should start on a new line.
-     |         |     (WordPress.Arrays.ArrayDeclarationSpacing.AssociativeArrayFound)
-  78 | ERROR   | [ ] Processing form data without nonce verification.
-     |         |     (WordPress.Security.NonceVerification.Missing)
-  78 | ERROR   | [ ] Processing form data without nonce verification.
-     |         |     (WordPress.Security.NonceVerification.Missing)
-  79 | ERROR   | [ ] Processing form data without nonce verification.
-     |         |     (WordPress.Security.NonceVerification.Missing)
-  79 | ERROR   | [ ] Detected usage of a non-sanitized input
-     |         |     variable: $_FILES['upload']
-     |         |     (WordPress.Security.ValidatedSanitizedInput.InputNotSanitized)
-  95 | WARNING | [x] Array double arrow not aligned correctly;
-     |         |     expected 16 space(s) between "'test_form'" and
-     |         |     double arrow, but found 1.
-     |         |     (WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned)
- 130 | ERROR   | [ ] $_SERVER['REMOTE_ADDR'] not unslashed before
-     |         |     sanitization. Use wp_unslash() or similar
-     |         |     (WordPress.Security.ValidatedSanitizedInput.MissingUnslash)
- 131 | WARNING | [ ] Silencing errors is strongly discouraged. Use
-     |         |     proper error checking instead. Found:
-     |         |     @inet_pton( $ip ...
-     |         |     (WordPress.PHP.NoSilencedErrors.Discouraged)
- 137 | WARNING | [ ] Line exceeds 160 characters; contains 232
-     |         |     characters (Generic.Files.LineLength.TooLong)
- 154 | WARNING | [ ] Line exceeds 160 characters; contains 181
-     |         |     characters (Generic.Files.LineLength.TooLong)
- 167 | ERROR   | [x] When a multi-item array uses associative keys,
-     |         |     each value should start on a new line.
-     |         |     (WordPress.Arrays.ArrayDeclarationSpacing.AssociativeArrayFound)
- 186 | WARNING | [ ] base64_encode() can be used to obfuscate code
-     |         |     which is strongly discouraged. Please verify
-     |         |     that the function is used for benign reasons.
-     |         |     (WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode)
- 222 | ERROR   | [x] When a multi-item array uses associative keys,
-     |         |     each value should start on a new line.
-     |         |     (WordPress.Arrays.ArrayDeclarationSpacing.AssociativeArrayFound)
- 228 | ERROR   | [ ] Using short ternaries is not allowed as they are
-     |         |     rarely used correctly
-     |         |     (Universal.Operators.DisallowShortTernary.Found)
-----------------------------------------------------------------------
-PHPCBF CAN FIX THE 4 MARKED SNIFF VIOLATIONS AUTOMATICALLY
-----------------------------------------------------------------------
-
-
-FILE: /workspace/FoodBank-Manager/includes/Mail/Logger.php
-----------------------------------------------------------------------
-FOUND 6 ERRORS AFFECTING 6 LINES
-----------------------------------------------------------------------
-  1 | ERROR | Missing file doc comment
-    |       | (Squiz.Commenting.FileComment.Missing)
-  7 | ERROR | Missing doc comment for class Logger
-    |       | (Squiz.Commenting.ClassComment.Missing)
-  9 | ERROR | Missing doc comment for function init()
-    |       | (Squiz.Commenting.FunctionComment.Missing)
- 14 | ERROR | Missing doc comment for function log_succeeded()
-    |       | (Squiz.Commenting.FunctionComment.Missing)
- 18 | ERROR | Missing doc comment for function log_failed()
-    |       | (Squiz.Commenting.FunctionComment.Missing)
- 22 | ERROR | Missing doc comment for function insert_log()
-    |       | (Squiz.Commenting.FunctionComment.Missing)
-----------------------------------------------------------------------
-
-
-FILE: /workspace/FoodBank-Manager/includes/Rest/Api.php
-----------------------------------------------------------------------
-FOUND 0 ERRORS AND 6 WARNINGS AFFECTING 3 LINES
-----------------------------------------------------------------------
- 203 | WARNING | The method parameter $first_name is never used
-     |         | (Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed)
- 212 | WARNING | base64_encode() can be used to obfuscate code which
-     |         | is strongly discouraged. Please verify that the
-     |         | function is used for benign reasons.
-     |         | (WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode)
- 235 | WARNING | The method parameter $first is never used
-     |         | (Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed)
- 235 | WARNING | The method parameter $last is never used
-     |         | (Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed)
- 235 | WARNING | The method parameter $email is never used
-     |         | (Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed)
- 235 | WARNING | The method parameter $postcode is never used
-     |         | (Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed)
-----------------------------------------------------------------------
-
-
-FILE: /workspace/FoodBank-Manager/includes/Auth/Capabilities.php
-----------------------------------------------------------------------
-FOUND 2 ERRORS AFFECTING 2 LINES
-----------------------------------------------------------------------
+ 1 | ERROR | Filenames should be all lowercase with hyphens as word
+   |       | separators. Expected menu.php, but found Menu.php.
+   |       | (WordPress.Files.FileName.NotHyphenatedLowercase)
+ 1 | ERROR | Class file names should be based on the class name with
+   |       | "class-" prepended. Expected class-menu.php, but found
+   |       | Menu.php.
+   |       | (WordPress.Files.FileName.InvalidClassFileName)
  1 | ERROR | Missing file doc comment
    |       | (Squiz.Commenting.FileComment.Missing)
- 7 | ERROR | Missing doc comment for class Capabilities
-   |       | (Squiz.Commenting.ClassComment.Missing)
-----------------------------------------------------------------------
-
-
-FILE: /workspace/FoodBank-Manager/includes/Auth/Permissions.php
-----------------------------------------------------------------------
-FOUND 3 ERRORS AFFECTING 3 LINES
-----------------------------------------------------------------------
- 1 | ERROR | Missing file doc comment
-   |       | (Squiz.Commenting.FileComment.Missing)
- 7 | ERROR | Missing doc comment for class Permissions
-   |       | (Squiz.Commenting.ClassComment.Missing)
- 9 | ERROR | Missing doc comment for function user_can()
-   |       | (Squiz.Commenting.FunctionComment.Missing)
-----------------------------------------------------------------------
-
-
-FILE: /workspace/FoodBank-Manager/includes/Auth/Roles.php
-----------------------------------------------------------------------
-FOUND 10 ERRORS AFFECTING 5 LINES
-----------------------------------------------------------------------
-  1 | ERROR | [ ] Missing file doc comment
-    |       |     (Squiz.Commenting.FileComment.Missing)
-  7 | ERROR | [ ] Missing doc comment for class Roles
-    |       |     (Squiz.Commenting.ClassComment.Missing)
- 60 | ERROR | [x] No space after opening parenthesis is prohibited
-    |       |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceAfterOpenParenthesis)
- 60 | ERROR | [x] Expected 1 space before "!"; 0 found
-    |       |     (WordPress.WhiteSpace.OperatorSpacing.NoSpaceBefore)
- 60 | ERROR | [x] No space before closing parenthesis is prohibited
-    |       |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceBeforeCloseParenthesis)
- 63 | ERROR | [x] No space after opening parenthesis is prohibited
-    |       |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceAfterOpenParenthesis)
- 63 | ERROR | [x] No space before closing parenthesis is prohibited
-    |       |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceBeforeCloseParenthesis)
- 64 | ERROR | [x] No space after opening parenthesis is prohibited
-    |       |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceAfterOpenParenthesis)
- 64 | ERROR | [x] Expected 1 space before "!"; 0 found
-    |       |     (WordPress.WhiteSpace.OperatorSpacing.NoSpaceBefore)
- 64 | ERROR | [x] No space before closing parenthesis is prohibited
-    |       |     (WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceBeforeCloseParenthesis)
-----------------------------------------------------------------------
-PHPCBF CAN FIX THE 8 MARKED SNIFF VIOLATIONS AUTOMATICALLY
-----------------------------------------------------------------------
-
-
-FILE: ...orkspace/FoodBank-Manager/includes/Auth/CapabilitiesResolver.php
-----------------------------------------------------------------------
-FOUND 5 ERRORS AFFECTING 5 LINES
-----------------------------------------------------------------------
-  1 | ERROR | Missing file doc comment
-    |       | (Squiz.Commenting.FileComment.Missing)
-  7 | ERROR | Missing doc comment for class CapabilitiesResolver
-    |       | (Squiz.Commenting.ClassComment.Missing)
-  8 | ERROR | Missing doc comment for function boot()
-    |       | (Squiz.Commenting.FunctionComment.Missing)
- 12 | ERROR | Missing short description in doc comment
-    |       | (Generic.Commenting.DocComment.MissingShort)
- 15 | ERROR | Parameter comment must end with a full stop
-    |       | (Squiz.Commenting.FunctionComment.ParamCommentFullStop)
-----------------------------------------------------------------------
-
-
-FILE: ...rkspace/FoodBank-Manager/templates/public/attendance-manager.php
-----------------------------------------------------------------------
-FOUND 4 ERRORS AND 9 WARNINGS AFFECTING 11 LINES
-----------------------------------------------------------------------
-  1 | ERROR   | Missing file doc comment
-    |         | (Squiz.Commenting.FileComment.Missing)
- 16 | WARNING | Line exceeds 160 characters; contains 162 characters
-    |         | (Generic.Files.LineLength.TooLong)
- 26 | WARNING | Use of the "translate()" function is reserved for
-    |         | low-level API usage.
-    |         | (WordPress.WP.I18n.LowLevelTranslationFunction)
- 26 | ERROR   | The $text parameter must be a single text string
-    |         | literal. Found: ucfirst( str_replace( '_', ' ', $t )
-    |         | ) (WordPress.WP.I18n.NonSingularStringLiteralText)
- 26 | WARNING | Line exceeds 160 characters; contains 177 characters
-    |         | (Generic.Files.LineLength.TooLong)
- 31 | WARNING | Line exceeds 160 characters; contains 167 characters
-    |         | (Generic.Files.LineLength.TooLong)
- 37 | WARNING | Line exceeds 160 characters; contains 170 characters
-    |         | (Generic.Files.LineLength.TooLong)
- 64 | WARNING | Line exceeds 160 characters; contains 183 characters
-    |         | (Generic.Files.LineLength.TooLong)
- 66 | ERROR   | Line exceeds maximum limit of 240 characters;
-    |         | contains 353 characters
-    |         | (Generic.Files.LineLength.MaxExceeded)
- 76 | WARNING | Line exceeds 160 characters; contains 198 characters
-    |         | (Generic.Files.LineLength.TooLong)
- 79 | ERROR   | Line exceeds maximum limit of 240 characters;
-    |         | contains 289 characters
-    |         | (Generic.Files.LineLength.MaxExceeded)
- 83 | WARNING | Line exceeds 160 characters; contains 216 characters
-    |         | (Generic.Files.LineLength.TooLong)
- 86 | WARNING | Line exceeds 160 characters; contains 219 characters
-    |         | (Generic.Files.LineLength.TooLong)
-----------------------------------------------------------------------
-
-
-FILE: /workspace/FoodBank-Manager/templates/admin/attendance.php
-----------------------------------------------------------------------
-FOUND 3 ERRORS AND 12 WARNINGS AFFECTING 15 LINES
-----------------------------------------------------------------------
-   1 | ERROR   | Missing file doc comment
-     |         | (Squiz.Commenting.FileComment.Missing)
-  23 | WARNING | Line exceeds 160 characters; contains 173 characters
-     |         | (Generic.Files.LineLength.TooLong)
-  24 | WARNING | Line exceeds 160 characters; contains 167 characters
-     |         | (Generic.Files.LineLength.TooLong)
-  25 | WARNING | Line exceeds 160 characters; contains 212 characters
-     |         | (Generic.Files.LineLength.TooLong)
-  58 | WARNING | Line exceeds 160 characters; contains 223 characters
-     |         | (Generic.Files.LineLength.TooLong)
-  59 | WARNING | Line exceeds 160 characters; contains 187 characters
-     |         | (Generic.Files.LineLength.TooLong)
-  60 | WARNING | Line exceeds 160 characters; contains 174 characters
-     |         | (Generic.Files.LineLength.TooLong)
-  80 | ERROR   | Overriding WordPress globals is prohibited. Found
-     |         | assignment to $order
-     |         | (WordPress.WP.GlobalVariablesOverride.Prohibited)
-  90 | ERROR   | All output should be run through an escaping
-     |         | function (see the Security sections in the WordPress
-     |         | Developer Handbooks), found '$url'.
-     |         | (WordPress.Security.EscapeOutput.OutputNotEscaped)
- 109 | WARNING | Line exceeds 160 characters; contains 166 characters
-     |         | (Generic.Files.LineLength.TooLong)
- 110 | WARNING | Line exceeds 160 characters; contains 202 characters
-     |         | (Generic.Files.LineLength.TooLong)
- 149 | WARNING | Found unknown capability "attendance_export" in
-     |         | function call to current_user_can(). Please check
-     |         | the spelling of the capability. If this is a custom
-     |         | capability, please verify the capability is
-     |         | registered with WordPress via a call to
-     |         | WP_Role(s)->add_cap().
-     |         | Custom capabilities can be made known to this sniff
-     |         | by setting the "custom_capabilities" property in the
-     |         | PHPCS ruleset. (WordPress.WP.Capabilities.Unknown)
- 164 | WARNING | Line exceeds 160 characters; contains 186 characters
-     |         | (Generic.Files.LineLength.TooLong)
- 173 | WARNING | Found unknown capability "attendance_admin" in
-     |         | function call to current_user_can(). Please check
-     |         | the spelling of the capability. If this is a custom
-     |         | capability, please verify the capability is
-     |         | registered with WordPress via a call to
-     |         | WP_Role(s)->add_cap().
-     |         | Custom capabilities can be made known to this sniff
-     |         | by setting the "custom_capabilities" property in the
-     |         | PHPCS ruleset. (WordPress.WP.Capabilities.Unknown)
- 205 | WARNING | Line exceeds 160 characters; contains 164 characters
-     |         | (Generic.Files.LineLength.TooLong)
-----------------------------------------------------------------------
-
-
-FILE: /workspace/FoodBank-Manager/templates/admin/forms.php
-----------------------------------------------------------------------
-FOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE
-----------------------------------------------------------------------
- 17 | WARNING | Found unknown capability "fb_manage_forms" in
-    |         | function call to current_user_can(). Please check the
-    |         | spelling of the capability. If this is a custom
-    |         | capability, please verify the capability is
-    |         | registered with WordPress via a call to
-    |         | WP_Role(s)->add_cap().
-    |         | Custom capabilities can be made known to this sniff
-    |         | by setting the "custom_capabilities" property in the
-    |         | PHPCS ruleset. (WordPress.WP.Capabilities.Unknown)
-----------------------------------------------------------------------
-
-
-FILE: /workspace/FoodBank-Manager/templates/admin/dashboard.php
-----------------------------------------------------------------------
-FOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE
-----------------------------------------------------------------------
- 17 | WARNING | Found unknown capability "fb_read_entries" in
-    |         | function call to current_user_can(). Please check the
-    |         | spelling of the capability. If this is a custom
-    |         | capability, please verify the capability is
-    |         | registered with WordPress via a call to
-    |         | WP_Role(s)->add_cap().
-    |         | Custom capabilities can be made known to this sniff
-    |         | by setting the "custom_capabilities" property in the
-    |         | PHPCS ruleset. (WordPress.WP.Capabilities.Unknown)
-----------------------------------------------------------------------
-
-
-FILE: /workspace/FoodBank-Manager/templates/admin/database.php
-----------------------------------------------------------------------
-FOUND 0 ERRORS AND 3 WARNINGS AFFECTING 3 LINES
-----------------------------------------------------------------------
- 118 | WARNING | Found unknown capability "fb_export_entries" in
-     |         | function call to current_user_can(). Please check
-     |         | the spelling of the capability. If this is a custom
-     |         | capability, please verify the capability is
-     |         | registered with WordPress via a call to
-     |         | WP_Role(s)->add_cap().
-     |         | Custom capabilities can be made known to this sniff
-     |         | by setting the "custom_capabilities" property in the
-     |         | PHPCS ruleset. (WordPress.WP.Capabilities.Unknown)
- 129 | WARNING | Found unknown capability "fb_delete_entries" in
-     |         | function call to current_user_can(). Please check
-     |         | the spelling of the capability. If this is a custom
-     |         | capability, please verify the capability is
-     |         | registered with WordPress via a call to
-     |         | WP_Role(s)->add_cap().
-     |         | Custom capabilities can be made known to this sniff
-     |         | by setting the "custom_capabilities" property in the
-     |         | PHPCS ruleset. (WordPress.WP.Capabilities.Unknown)
- 174 | WARNING | Found unknown capability "fb_export_entries" in
-     |         | function call to current_user_can(). Please check
-     |         | the spelling of the capability. If this is a custom
-     |         | capability, please verify the capability is
-     |         | registered with WordPress via a call to
-     |         | WP_Role(s)->add_cap().
-     |         | Custom capabilities can be made known to this sniff
-     |         | by setting the "custom_capabilities" property in the
-     |         | PHPCS ruleset. (WordPress.WP.Capabilities.Unknown)
-----------------------------------------------------------------------
-
-
-FILE: /workspace/FoodBank-Manager/templates/admin/diagnostics.php
-----------------------------------------------------------------------
-FOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE
-----------------------------------------------------------------------
- 16 | WARNING | Found unknown capability "fb_manage_settings" in
-    |         | function call to current_user_can(). Please check the
-    |         | spelling of the capability. If this is a custom
-    |         | capability, please verify the capability is
-    |         | registered with WordPress via a call to
-    |         | WP_Role(s)->add_cap().
-    |         | Custom capabilities can be made known to this sniff
-    |         | by setting the "custom_capabilities" property in the
-    |         | PHPCS ruleset. (WordPress.WP.Capabilities.Unknown)
-----------------------------------------------------------------------
-
-
-FILE: /workspace/FoodBank-Manager/templates/admin/settings.php
-----------------------------------------------------------------------
-FOUND 13 ERRORS AND 17 WARNINGS AFFECTING 30 LINES
-----------------------------------------------------------------------
-   1 | ERROR   | [ ] Missing file doc comment
-     |         |     (Squiz.Commenting.FileComment.Missing)
-  35 | WARNING | [ ] Line exceeds 160 characters; contains 192
-     |         |     characters (Generic.Files.LineLength.TooLong)
-  39 | WARNING | [ ] Line exceeds 160 characters; contains 201
-     |         |     characters (Generic.Files.LineLength.TooLong)
-  50 | ERROR   | [x] Array item not aligned correctly; expected 52
-     |         |     spaces but found 56
-     |         |     (WordPress.Arrays.ArrayIndentation.ItemNotAligned)
-  51 | ERROR   | [x] Array item not aligned correctly; expected 52
-     |         |     spaces but found 56
-     |         |     (WordPress.Arrays.ArrayIndentation.ItemNotAligned)
-  52 | ERROR   | [x] Array item not aligned correctly; expected 52
-     |         |     spaces but found 56
-     |         |     (WordPress.Arrays.ArrayIndentation.ItemNotAligned)
-  57 | WARNING | [ ] Line exceeds 160 characters; contains 217
-     |         |     characters (Generic.Files.LineLength.TooLong)
-  64 | WARNING | [ ] Line exceeds 160 characters; contains 212
-     |         |     characters (Generic.Files.LineLength.TooLong)
-  68 | WARNING | [ ] Line exceeds 160 characters; contains 206
-     |         |     characters (Generic.Files.LineLength.TooLong)
-  72 | WARNING | [ ] Line exceeds 160 characters; contains 167
-     |         |     characters (Generic.Files.LineLength.TooLong)
-  76 | WARNING | [ ] Line exceeds 160 characters; contains 215
-     |         |     characters (Generic.Files.LineLength.TooLong)
-  80 | WARNING | [ ] Line exceeds 160 characters; contains 202
-     |         |     characters (Generic.Files.LineLength.TooLong)
- 102 | WARNING | [ ] Line exceeds 160 characters; contains 197
-     |         |     characters (Generic.Files.LineLength.TooLong)
- 106 | WARNING | [ ] Line exceeds 160 characters; contains 219
-     |         |     characters (Generic.Files.LineLength.TooLong)
- 112 | WARNING | [ ] Line exceeds 160 characters; contains 205
-     |         |     characters (Generic.Files.LineLength.TooLong)
- 113 | WARNING | [ ] Line exceeds 160 characters; contains 199
-     |         |     characters (Generic.Files.LineLength.TooLong)
- 115 | WARNING | [ ] Line exceeds 160 characters; contains 204
-     |         |     characters (Generic.Files.LineLength.TooLong)
- 122 | ERROR   | [ ] Line exceeds maximum limit of 240 characters;
-     |         |     contains 293 characters
-     |         |     (Generic.Files.LineLength.MaxExceeded)
- 123 | ERROR   | [ ] Line exceeds maximum limit of 240 characters;
-     |         |     contains 299 characters
-     |         |     (Generic.Files.LineLength.MaxExceeded)
- 124 | ERROR   | [ ] Line exceeds maximum limit of 240 characters;
-     |         |     contains 289 characters
-     |         |     (Generic.Files.LineLength.MaxExceeded)
- 125 | ERROR   | [ ] Line exceeds maximum limit of 240 characters;
-     |         |     contains 328 characters
-     |         |     (Generic.Files.LineLength.MaxExceeded)
- 130 | ERROR   | [ ] Line exceeds maximum limit of 240 characters;
-     |         |     contains 311 characters
-     |         |     (Generic.Files.LineLength.MaxExceeded)
- 131 | ERROR   | [ ] Line exceeds maximum limit of 240 characters;
-     |         |     contains 326 characters
-     |         |     (Generic.Files.LineLength.MaxExceeded)
- 136 | ERROR   | [ ] Line exceeds maximum limit of 240 characters;
-     |         |     contains 330 characters
-     |         |     (Generic.Files.LineLength.MaxExceeded)
- 139 | WARNING | [ ] Line exceeds 160 characters; contains 204
-     |         |     characters (Generic.Files.LineLength.TooLong)
- 140 | WARNING | [ ] Line exceeds 160 characters; contains 198
-     |         |     characters (Generic.Files.LineLength.TooLong)
- 141 | WARNING | [ ] Line exceeds 160 characters; contains 198
-     |         |     characters (Generic.Files.LineLength.TooLong)
- 148 | WARNING | [ ] Line exceeds 160 characters; contains 189
-     |         |     characters (Generic.Files.LineLength.TooLong)
- 149 | ERROR   | [ ] Line exceeds maximum limit of 240 characters;
-     |         |     contains 339 characters
-     |         |     (Generic.Files.LineLength.MaxExceeded)
- 158 | ERROR   | [ ] Line exceeds maximum limit of 240 characters;
-     |         |     contains 328 characters
-     |         |     (Generic.Files.LineLength.MaxExceeded)
-----------------------------------------------------------------------
-PHPCBF CAN FIX THE 3 MARKED SNIFF VIOLATIONS AUTOMATICALLY
-----------------------------------------------------------------------
-
-
-FILE: /workspace/FoodBank-Manager/templates/admin/theme.php
-----------------------------------------------------------------------
-FOUND 21 ERRORS AND 11 WARNINGS AFFECTING 32 LINES
-----------------------------------------------------------------------
-   1 | ERROR   | [ ] Missing file doc comment
-     |         |     (Squiz.Commenting.FileComment.Missing)
-  21 | ERROR   | [x] Array item not aligned correctly; expected 4
-     |         |     spaces but found 8
-     |         |     (WordPress.Arrays.ArrayIndentation.ItemNotAligned)
-  22 | ERROR   | [x] Array item not aligned correctly; expected 4
-     |         |     spaces but found 8
-     |         |     (WordPress.Arrays.ArrayIndentation.ItemNotAligned)
-  23 | ERROR   | [x] Array item not aligned correctly; expected 4
-     |         |     spaces but found 8
-     |         |     (WordPress.Arrays.ArrayIndentation.ItemNotAligned)
-  24 | ERROR   | [x] Array item not aligned correctly; expected 4
-     |         |     spaces but found 8
-     |         |     (WordPress.Arrays.ArrayIndentation.ItemNotAligned)
-  25 | ERROR   | [x] Array item not aligned correctly; expected 4
-     |         |     spaces but found 8
-     |         |     (WordPress.Arrays.ArrayIndentation.ItemNotAligned)
-  28 | ERROR   | [x] Array item not aligned correctly; expected 4
-     |         |     spaces but found 8
-     |         |     (WordPress.Arrays.ArrayIndentation.ItemNotAligned)
-  29 | ERROR   | [x] Array item not aligned correctly; expected 4
-     |         |     spaces but found 8
-     |         |     (WordPress.Arrays.ArrayIndentation.ItemNotAligned)
-  30 | ERROR   | [x] Array item not aligned correctly; expected 4
-     |         |     spaces but found 8
-     |         |     (WordPress.Arrays.ArrayIndentation.ItemNotAligned)
-  31 | ERROR   | [x] Array item not aligned correctly; expected 4
-     |         |     spaces but found 8
-     |         |     (WordPress.Arrays.ArrayIndentation.ItemNotAligned)
-  34 | ERROR   | [x] Array item not aligned correctly; expected 4
-     |         |     spaces but found 8
-     |         |     (WordPress.Arrays.ArrayIndentation.ItemNotAligned)
-  35 | ERROR   | [x] Array item not aligned correctly; expected 4
-     |         |     spaces but found 8
-     |         |     (WordPress.Arrays.ArrayIndentation.ItemNotAligned)
-  36 | ERROR   | [x] Array item not aligned correctly; expected 4
-     |         |     spaces but found 8
-     |         |     (WordPress.Arrays.ArrayIndentation.ItemNotAligned)
-  37 | ERROR   | [x] Array item not aligned correctly; expected 4
-     |         |     spaces but found 8
-     |         |     (WordPress.Arrays.ArrayIndentation.ItemNotAligned)
-  40 | ERROR   | [x] Array item not aligned correctly; expected 4
-     |         |     spaces but found 8
-     |         |     (WordPress.Arrays.ArrayIndentation.ItemNotAligned)
-  41 | ERROR   | [x] Array item not aligned correctly; expected 4
-     |         |     spaces but found 8
-     |         |     (WordPress.Arrays.ArrayIndentation.ItemNotAligned)
-  42 | ERROR   | [x] Array item not aligned correctly; expected 4
-     |         |     spaces but found 8
-     |         |     (WordPress.Arrays.ArrayIndentation.ItemNotAligned)
-  45 | ERROR   | [x] Array item not aligned correctly; expected 4
-     |         |     spaces but found 8
-     |         |     (WordPress.Arrays.ArrayIndentation.ItemNotAligned)
-  46 | ERROR   | [x] Array item not aligned correctly; expected 4
-     |         |     spaces but found 8
-     |         |     (WordPress.Arrays.ArrayIndentation.ItemNotAligned)
-  47 | ERROR   | [x] Array item not aligned correctly; expected 4
-     |         |     spaces but found 8
-     |         |     (WordPress.Arrays.ArrayIndentation.ItemNotAligned)
-  66 | WARNING | [ ] Line exceeds 160 characters; contains 202
-     |         |     characters (Generic.Files.LineLength.TooLong)
-  67 | WARNING | [ ] Line exceeds 160 characters; contains 233
-     |         |     characters (Generic.Files.LineLength.TooLong)
-  70 | WARNING | [ ] Line exceeds 160 characters; contains 189
-     |         |     characters (Generic.Files.LineLength.TooLong)
-  77 | WARNING | [ ] Line exceeds 160 characters; contains 225
-     |         |     characters (Generic.Files.LineLength.TooLong)
-  88 | WARNING | [ ] Line exceeds 160 characters; contains 230
-     |         |     characters (Generic.Files.LineLength.TooLong)
-  98 | WARNING | [ ] Line exceeds 160 characters; contains 199
-     |         |     characters (Generic.Files.LineLength.TooLong)
-  99 | WARNING | [ ] Line exceeds 160 characters; contains 230
-     |         |     characters (Generic.Files.LineLength.TooLong)
- 102 | WARNING | [ ] Line exceeds 160 characters; contains 189
-     |         |     characters (Generic.Files.LineLength.TooLong)
- 109 | WARNING | [ ] Line exceeds 160 characters; contains 222
-     |         |     characters (Generic.Files.LineLength.TooLong)
- 120 | WARNING | [ ] Line exceeds 160 characters; contains 227
-     |         |     characters (Generic.Files.LineLength.TooLong)
- 132 | WARNING | [ ] Line exceeds 160 characters; contains 205
-     |         |     characters (Generic.Files.LineLength.TooLong)
- 138 | ERROR   | [ ] Line exceeds maximum limit of 240 characters;
-     |         |     contains 328 characters
-     |         |     (Generic.Files.LineLength.MaxExceeded)
-----------------------------------------------------------------------
-PHPCBF CAN FIX THE 19 MARKED SNIFF VIOLATIONS AUTOMATICALLY
-----------------------------------------------------------------------
-
-
-FILE: /workspace/FoodBank-Manager/templates/admin/database-view.php
-----------------------------------------------------------------------
-FOUND 0 ERRORS AND 2 WARNINGS AFFECTING 2 LINES
-----------------------------------------------------------------------
- 82 | WARNING | Found unknown capability "fb_export_entries" in
-    |         | function call to current_user_can(). Please check the
-    |         | spelling of the capability. If this is a custom
-    |         | capability, please verify the capability is
-    |         | registered with WordPress via a call to
-    |         | WP_Role(s)->add_cap().
-    |         | Custom capabilities can be made known to this sniff
-    |         | by setting the "custom_capabilities" property in the
-    |         | PHPCS ruleset. (WordPress.WP.Capabilities.Unknown)
- 90 | WARNING | Found unknown capability "fb_delete_entries" in
-    |         | function call to current_user_can(). Please check the
-    |         | spelling of the capability. If this is a custom
-    |         | capability, please verify the capability is
-    |         | registered with WordPress via a call to
-    |         | WP_Role(s)->add_cap().
-    |         | Custom capabilities can be made known to this sniff
-    |         | by setting the "custom_capabilities" property in the
-    |         | PHPCS ruleset. (WordPress.WP.Capabilities.Unknown)
-----------------------------------------------------------------------
-
-
-FILE: ...rkspace/FoodBank-Manager/templates/emails/admin-notification.php
-----------------------------------------------------------------------
-FOUND 1 ERROR AFFECTING 1 LINE
-----------------------------------------------------------------------
- 25 | ERROR | All output should be run through an escaping function
-    |       | (see the Security sections in the WordPress Developer
-    |       | Handbooks), found '$safe_summary'.
-    |       | (WordPress.Security.EscapeOutput.OutputNotEscaped)
-----------------------------------------------------------------------
-
-
-FILE: ...ace/FoodBank-Manager/templates/emails/applicant-confirmation.php
-----------------------------------------------------------------------
-FOUND 1 ERROR AFFECTING 1 LINE
-----------------------------------------------------------------------
- 38 | ERROR | All output should be run through an escaping function
-    |       | (see the Security sections in the WordPress Developer
-    |       | Handbooks), found '$safe_summary'.
-    |       | (WordPress.Security.EscapeOutput.OutputNotEscaped)
 ----------------------------------------------------------------------
 
 

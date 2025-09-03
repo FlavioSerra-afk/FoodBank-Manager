@@ -1,5 +1,4 @@
-<?php
-// phpcs:ignoreFile
+<?php // phpcs:ignore WordPress.Files.FileName.NotHyphenatedLowercase,WordPress.Files.FileName.InvalidClassFileName
 /**
  * Design & Theme admin page.
  *
@@ -23,7 +22,7 @@ class ThemePage {
 	 * @since 0.1.1
 	 */
 	public static function route(): void {
-                if ( ! current_user_can( 'fb_manage_theme' ) && ! current_user_can( 'manage_options' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
+		if ( ! current_user_can( 'fb_manage_theme' ) && ! current_user_can( 'manage_options' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
 			wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ), '', array( 'response' => 403 ) );
 		}
 		if ( isset( $_SERVER['REQUEST_METHOD'] ) && 'POST' === $_SERVER['REQUEST_METHOD'] ) {
@@ -38,8 +37,8 @@ class ThemePage {
 	 */
 	private static function handle_post(): void {
 		check_admin_referer( 'fbm_admin_action', '_fbm_nonce' );
-                if ( ! current_user_can( 'manage_options' ) && ! current_user_can( 'fb_manage_theme' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
-				wp_die( esc_html__( 'You do not have permission to perform this action.', 'foodbank-manager' ) );
+		if ( ! current_user_can( 'manage_options' ) && ! current_user_can( 'fb_manage_theme' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
+			wp_die( esc_html__( 'You do not have permission to perform this action.', 'foodbank-manager' ) );
 		}
 		if ( isset( $_POST['fbm_theme_export'] ) ) {
 				$theme = Options::get( 'theme', array() );
