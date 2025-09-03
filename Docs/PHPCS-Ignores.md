@@ -1,23 +1,31 @@
 # PHPCS Ignores & Suppressed Issues Dashboard
 
-_Generated: 2025-09-03 11:23:41Z
+_Generated: 2025-09-03 13:46:42Z
 
 This report shows which issues are currently suppressed via `phpcs:ignore` and what would fail if annotations were disabled.
 
 ## Snapshot
 
-- Suppressed issues (from `--ignore-annotations` run): **0**
+- Suppressed issues (from `--ignore-annotations` run): **21**
 - Ignore annotations present: **63** lines
 
 ## Top sniffs by count
 
 | Sniff | Count | Recipe |
 |---|---:|---|
+| `Generic.WhiteSpace.ScopeIndent.Incorrect` | 5 | - **Fix:** Apply appropriate sanitization/escaping or add targeted justification. |
+| `WordPress.DB.PreparedSQL.InterpolatedNotPrepared` | 5 | - **Fix:** Apply appropriate sanitization/escaping or add targeted justification. |
+| `WordPress.DB.PreparedSQL.NotPrepared` | 4 | - **Fix:** Apply appropriate sanitization/escaping or add targeted justification. |
+| `PEAR.Functions.FunctionCallSignature.Indent` | 3 | - **Fix:** Apply appropriate sanitization/escaping or add targeted justification. |
+| `WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare` | 2 | - **Fix:** Build strict placeholders for `IN (...)` (e.g., `implode(',', array_fill(0, count($ids), '%d'))`), guard for empty arrays, and prepare values. Keep a one-line ignore only if PHPCS remains noisy. |
+| `Generic.Files.LineLength.TooLong` | 1 | - **Fix:** Apply appropriate sanitization/escaping or add targeted justification. |
+| `Universal.NamingConventions.NoReservedKeywordParameterNames.voidFound` | 1 | - **Fix:** Apply appropriate sanitization/escaping or add targeted justification. |
 
 ## Top files by suppressed issues
 
 | File | Count |
 |---|---:|
+| /workspace/FoodBank-Manager/includes/Attendance/AttendanceRepo.php | 21 |
 
 ## All ignores (locations)
 
@@ -90,3 +98,24 @@ templates/admin/attendance.php:2:// phpcs:ignoreFile```
 
 | File | Line | Sniff | Message |
 |---|---:|---|---|
+| /workspace/FoodBank-Manager/includes/Attendance/AttendanceRepo.php | 39 | `Generic.WhiteSpace.ScopeIndent.Incorrect` | Line indented incorrectly; expected at least 2 tabs, found 0 |
+| /workspace/FoodBank-Manager/includes/Attendance/AttendanceRepo.php | 39 | `PEAR.Functions.FunctionCallSignature.Indent` | Multi-line function call not indented correctly; expected 12 spaces but found 0 |
+| /workspace/FoodBank-Manager/includes/Attendance/AttendanceRepo.php | 40 | `WordPress.DB.PreparedSQL.InterpolatedNotPrepared` | Use placeholders and $wpdb->prepare(); found interpolated variable {$t_att} at "SELECT attendance_at FROM {$t_att} WHERE application_id = %d AND status = 'present' ORDER BY attendance_at DESC LIMIT 1" |
+| /workspace/FoodBank-Manager/includes/Attendance/AttendanceRepo.php | 178 | `Generic.WhiteSpace.ScopeIndent.Incorrect` | Line indented incorrectly; expected at least 2 tabs, found 0 |
+| /workspace/FoodBank-Manager/includes/Attendance/AttendanceRepo.php | 179 | `WordPress.DB.PreparedSQL.NotPrepared` | Use placeholders and $wpdb->prepare(); found $base_sql |
+| /workspace/FoodBank-Manager/includes/Attendance/AttendanceRepo.php | 179 | `WordPress.DB.PreparedSQL.NotPrepared` | Use placeholders and $wpdb->prepare(); found $order_sql |
+| /workspace/FoodBank-Manager/includes/Attendance/AttendanceRepo.php | 179 | `WordPress.DB.PreparedSQL.NotPrepared` | Use placeholders and $wpdb->prepare(); found $limit_sql |
+| /workspace/FoodBank-Manager/includes/Attendance/AttendanceRepo.php | 209 | `Generic.WhiteSpace.ScopeIndent.Incorrect` | Line indented incorrectly; expected at least 2 tabs, found 0 |
+| /workspace/FoodBank-Manager/includes/Attendance/AttendanceRepo.php | 210 | `WordPress.DB.PreparedSQL.NotPrepared` | Use placeholders and $wpdb->prepare(); found $count_base |
+| /workspace/FoodBank-Manager/includes/Attendance/AttendanceRepo.php | 256 | `PEAR.Functions.FunctionCallSignature.Indent` | Multi-line function call not indented correctly; expected 12 spaces but found 4 |
+| /workspace/FoodBank-Manager/includes/Attendance/AttendanceRepo.php | 256 | `Generic.WhiteSpace.ScopeIndent.Incorrect` | Line indented incorrectly; expected at least 2 tabs, found 1 |
+| /workspace/FoodBank-Manager/includes/Attendance/AttendanceRepo.php | 257 | `WordPress.DB.PreparedSQL.InterpolatedNotPrepared` | Use placeholders and $wpdb->prepare(); found interpolated variable {$t_att} at "SELECT t.id,t.status,t.attendance_at,t.event_id,t.type,t.method,t.recorded_by_user_id,t.is_void,t.void_reason,t.void_by_user_id,t.void_at FROM {$t_att} t WHERE {$where_sql} ORDER BY t.attendance_at ASC" |
+| /workspace/FoodBank-Manager/includes/Attendance/AttendanceRepo.php | 257 | `WordPress.DB.PreparedSQL.InterpolatedNotPrepared` | Use placeholders and $wpdb->prepare(); found interpolated variable {$where_sql} at "SELECT t.id,t.status,t.attendance_at,t.event_id,t.type,t.method,t.recorded_by_user_id,t.is_void,t.void_reason,t.void_by_user_id,t.void_at FROM {$t_att} t WHERE {$where_sql} ORDER BY t.attendance_at ASC" |
+| /workspace/FoodBank-Manager/includes/Attendance/AttendanceRepo.php | 257 | `Generic.Files.LineLength.TooLong` | Line exceeds 160 characters; contains 220 characters |
+| /workspace/FoodBank-Manager/includes/Attendance/AttendanceRepo.php | 257 | `WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare` | Replacement variables found, but no valid placeholders found in the query. |
+| /workspace/FoodBank-Manager/includes/Attendance/AttendanceRepo.php | 275 | `Generic.WhiteSpace.ScopeIndent.Incorrect` | Line indented incorrectly; expected at least 2 tabs, found 0 |
+| /workspace/FoodBank-Manager/includes/Attendance/AttendanceRepo.php | 275 | `PEAR.Functions.FunctionCallSignature.Indent` | Multi-line function call not indented correctly; expected 12 spaces but found 0 |
+| /workspace/FoodBank-Manager/includes/Attendance/AttendanceRepo.php | 276 | `WordPress.DB.PreparedSQL.InterpolatedNotPrepared` | Use placeholders and $wpdb->prepare(); found interpolated variable {$t_notes} at "SELECT attendance_id,user_id,note_text,created_at FROM {$t_notes} WHERE attendance_id IN ($placeholders) ORDER BY created_at ASC" |
+| /workspace/FoodBank-Manager/includes/Attendance/AttendanceRepo.php | 276 | `WordPress.DB.PreparedSQL.InterpolatedNotPrepared` | Use placeholders and $wpdb->prepare(); found interpolated variable $placeholders at "SELECT attendance_id,user_id,note_text,created_at FROM {$t_notes} WHERE attendance_id IN ($placeholders) ORDER BY created_at ASC" |
+| /workspace/FoodBank-Manager/includes/Attendance/AttendanceRepo.php | 276 | `WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare` | Replacement variables found, but no valid placeholders found in the query. |
+| /workspace/FoodBank-Manager/includes/Attendance/AttendanceRepo.php | 307 | `Universal.NamingConventions.NoReservedKeywordParameterNames.voidFound` | It is recommended not to use reserved keyword "void" as function parameter name. Found: $void |

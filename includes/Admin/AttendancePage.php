@@ -164,7 +164,7 @@ final class AttendancePage {
         $filters             = self::parseFilters();
         $filters['page']     = 1;
         $filters['per_page'] = 1000;
-        $data                = AttendanceRepo::peopleSummary( $filters );
+        $data                = AttendanceRepo::people_summary( $filters );
         $can_sensitive       = current_user_can( 'fb_view_sensitive' );
         $req                 = $_REQUEST; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- flag only.
         $mask                = ! ( $can_sensitive && isset( $req['unmask'] ) );
@@ -178,7 +178,7 @@ final class AttendancePage {
      */
     private static function renderList(): void {
         $filters       = self::parseFilters();
-        $data          = AttendanceRepo::peopleSummary( $filters );
+        $data          = AttendanceRepo::people_summary( $filters );
         $rows          = self::decorateRows( $data['rows'], true );
         $total         = $data['total'];
         $page          = $filters['page'];
