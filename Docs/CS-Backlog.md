@@ -74,3 +74,4 @@ we’ll remove one file per wave by:
 replacing ignoreFile with real fixes (escaping, nonces, prepared SQL, docblocks),
 
 keeping only surgical one-line // phpcs:ignore … where wp_kses_post() or strict IN (…) placeholders trigger false positives.
+
