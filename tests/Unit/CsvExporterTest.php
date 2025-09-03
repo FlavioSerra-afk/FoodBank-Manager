@@ -74,4 +74,12 @@ final class CsvExporterTest extends TestCase {
         $this->assertStringContainsString( 'john@example.com', $lines[1] );
         $this->assertStringContainsString( 'jane@example.com', $lines[2] );
     }
+
+    public function testStreamListEmptyRowsOutputsOnlyBom(): void {
+        ob_start();
+        CsvExporter::stream_list( array() );
+        $output = ob_get_clean();
+        header_remove();
+        $this->assertSame( "\xEF\xBB\xBF", $output );
+    }
 }

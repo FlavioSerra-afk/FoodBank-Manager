@@ -9,6 +9,23 @@ if ( ! function_exists( 'wp_unslash' ) ) {
         return is_array( $value ) ? array_map( 'wp_unslash', $value ) : stripslashes( (string) $value );
     }
 }
+if ( ! function_exists( 'current_user_can' ) ) {
+    function current_user_can( string $cap ): bool {
+        return true;
+    }
+}
+if ( ! function_exists( 'check_admin_referer' ) ) {
+    function check_admin_referer( string $action, string $name = '_wpnonce' ): void {
+        if ( empty( $_POST[ $name ] ) ) {
+            throw new RuntimeException( 'missing nonce' );
+        }
+    }
+}
+if ( ! function_exists( 'wp_die' ) ) {
+    function wp_die( $message = '' ) {
+        throw new RuntimeException( (string) $message );
+    }
+}
 
 final class DatabasePageTest extends TestCase {
     private function getFilters(): array {
@@ -18,18 +35,27 @@ final class DatabasePageTest extends TestCase {
         return $method->invoke( null );
     }
 
+    protected function tearDown(): void {
+        parent::tearDown();
+        $_GET    = array();
+        $_POST   = array();
+        $_SERVER = array();
+    }
+
     public function testFilterSanitizationAndWhitelist(): void {
-        $_GET = array(
-            'search'    => '<b>hello</b>',
-            'status'    => 'invalid',
-            'has_file'  => '1',
-            'consent'   => '1',
-            'date_from' => '2025-09-01',
-            'date_to'   => 'bad-date',
-            'paged'     => '2',
-            'per_page'  => '999',
-            'orderby'   => 'bad',
-            'order'     => 'drop',
+        $_SERVER['QUERY_STRING'] = http_build_query(
+            array(
+                'search'    => '<b>hello</b>',
+                'status'    => 'invalid',
+                'has_file'  => '1',
+                'consent'   => '1',
+                'date_from' => '2025-09-01',
+                'date_to'   => 'bad-date',
+                'paged'     => '2',
+                'per_page'  => '999',
+                'orderby'   => 'bad',
+                'order'     => 'drop',
+            )
         );
         $filters = $this->getFilters();
         $this->assertSame( 'hello', $filters['search'] );
@@ -39,18 +65,42 @@ final class DatabasePageTest extends TestCase {
         $this->assertSame( '2025-09-01', $filters['date_from'] );
         $this->assertSame( '', $filters['date_to'] );
         $this->assertSame( 2, $filters['page'] );
-        $this->assertSame( 100, $filters['per_page'] );
+        $this->assertSame( 500, $filters['per_page'] );
         $this->assertSame( 'created_at', $filters['orderby'] );
         $this->assertSame( 'DESC', $filters['order'] );
     }
 
     public function testValidOrderbyMapping(): void {
-        $_GET = array(
-            'orderby' => 'status',
-            'order'   => 'asc',
+        $_SERVER['QUERY_STRING'] = http_build_query(
+            array(
+                'orderby' => 'status',
+                'order'   => 'asc',
+            )
         );
         $filters = $this->getFilters();
         $this->assertSame( 'status', $filters['orderby'] );
         $this->assertSame( 'ASC', $filters['order'] );
+    }
+
+    public function testDefaultFilters(): void {
+        $_SERVER['QUERY_STRING'] = '';
+        $filters = $this->getFilters();
+        $this->assertSame( '', $filters['search'] );
+        $this->assertSame( '', $filters['status'] );
+        $this->assertNull( $filters['has_file'] );
+        $this->assertNull( $filters['consent'] );
+        $this->assertSame( '', $filters['date_from'] );
+        $this->assertSame( '', $filters['date_to'] );
+        $this->assertSame( 1, $filters['page'] );
+        $this->assertSame( 20, $filters['per_page'] );
+        $this->assertSame( 'created_at', $filters['orderby'] );
+        $this->assertSame( 'DESC', $filters['order'] );
+    }
+
+    public function testExportRequiresNonce(): void {
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST   = array( 'fbm_action' => 'export_entries' );
+        $this->expectException( RuntimeException::class );
+        DatabasePage::route();
     }
 }

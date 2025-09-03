@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.6] - 2025-09-03
+### Security/Quality
+- Harden Database admin page and CSV exports; sanitize filters, whitelist ordering, and mask PII by default. Promoted to Strict.
+### Docs
+- Architecture.md, README.md, PRD-foodbank-manager.md, and CS-Backlog.md revision-stamped for Wave CS-Backlog-10.
+
 ## [1.0.5] - 2025-09-03
 ### Quality/Security
 - Admin Menu hardened; moved to Strict.

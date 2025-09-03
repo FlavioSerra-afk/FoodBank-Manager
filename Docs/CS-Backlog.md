@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-03 (Wave CS-Backlog-09)
+Docs-Revision: 2025-09-03 (Wave CS-Backlog-10)
 Strict (cleaned):
 
 includes/Admin/SettingsPage.php
@@ -6,6 +6,8 @@ includes/Admin/EmailsPage.php
 includes/Admin/ThemePage.php
 includes/Admin/Menu.php
 includes/Admin/PermissionsPage.php
+includes/Admin/DatabasePage.php
+includes/Exports/CsvExporter.php
 
 Wave focus:
 - Convert `includes/Attendance/AttendanceRepo.php` to strict `$wpdb->prepare()` queries, ensure masking defaults, and backfill unit tests.
@@ -14,9 +16,7 @@ Legacy (temporary ignoreFile to unblock ZIP):
 
 includes/Database/ApplicationsRepo.php
 includes/Admin/AttendancePage.php
-includes/Admin/DatabasePage.php
 includes/Attendance/AttendanceRepo.php
-includes/Exports/CsvExporter.php
 includes/UI/Theme.php
 includes/Mail/Templates.php
 includes/Http/FormSubmitController.php
@@ -37,9 +37,7 @@ Temporary ignores present in:
 
 includes/Database/ApplicationsRepo.php
 includes/Admin/AttendancePage.php
-includes/Admin/DatabasePage.php
 includes/Attendance/AttendanceRepo.php
-includes/Exports/CsvExporter.php
 includes/UI/Theme.php
 includes/Mail/Templates.php
 includes/Core/Plugin.php

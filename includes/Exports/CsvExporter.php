@@ -1,4 +1,4 @@
-<?php // phpcs:ignoreFile
+<?php
 /**
  * CSV export utilities.
  *
@@ -22,7 +22,7 @@ class CsvExporter {
 	 * @param bool             $mask_sensitive Whether to mask sensitive fields.
 	 * @param string           $filename       Output filename.
 	 */
-        public static function stream_list( array $rows, bool $mask_sensitive = true, string $filename = 'fbm-entries.csv' ): void {
+	public static function stream_list( array $rows, bool $mask_sensitive = true, string $filename = 'fbm-entries.csv' ): void {
 		if ( headers_sent() ) {
 			return;
 		}
@@ -86,88 +86,88 @@ class CsvExporter {
 	 * @param bool             $include_voided Include voided flag column.
 	 * @param string           $filename       Output filename.
 	 */
-        public static function stream_attendance_people(
-                array $rows,
-                bool $mask_sensitive = true,
-                bool $include_voided = false,
-                string $filename = 'fbm-attendance.csv'
-        ): void {
+	public static function stream_attendance_people(
+		array $rows,
+		bool $mask_sensitive = true,
+		bool $include_voided = false,
+		string $filename = 'fbm-attendance.csv'
+	): void {
 		if ( headers_sent() ) {
 			return;
 		}
-			$filename = sanitize_file_name( $filename );
-			header( 'Content-Type: text/csv; charset=UTF-8' );
-			header( 'X-Content-Type-Options: nosniff' );
-			header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
-			echo "\xEF\xBB\xBF";
+		$filename = sanitize_file_name( $filename );
+		header( 'Content-Type: text/csv; charset=UTF-8' );
+		header( 'X-Content-Type-Options: nosniff' );
+		header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
+		echo "\xEF\xBB\xBF";
 
-			$header = array(
-				__( 'Application ID', 'foodbank-manager' ),
-				__( 'Name', 'foodbank-manager' ),
-				__( 'Email', 'foodbank-manager' ),
-				__( 'Postcode', 'foodbank-manager' ),
-				__( 'Last Attended', 'foodbank-manager' ),
-				__( 'Visits (Range)', 'foodbank-manager' ),
-				__( 'No-shows (Range)', 'foodbank-manager' ),
-				__( 'Visits (12m)', 'foodbank-manager' ),
-				__( 'Policy', 'foodbank-manager' ),
-			);
-			if ( $include_voided ) {
-				$header[] = __( 'Voided', 'foodbank-manager' );
-			}
-			if ( class_exists( '\\League\\Csv\\Writer' ) ) {
-				$csv = \League\Csv\Writer::createFromFileObject( new \SplTempFileObject() );
-				if ( ! empty( $rows ) ) {
-					$csv->insertOne( $header );
-					foreach ( $rows as $row ) {
-						if ( $mask_sensitive ) {
-							$row['email']    = Helpers::mask_email( (string) ( $row['email'] ?? '' ) );
-							$row['postcode'] = Helpers::mask_postcode( (string) ( $row['postcode'] ?? '' ) );
-						}
-						$row_out = array(
-							$row['application_id'] ?? '',
-							$row['name'] ?? '',
-							$row['email'] ?? '',
-							$row['postcode'] ?? '',
-							$row['last_attended'] ?? '',
-							$row['visits_range'] ?? '',
-							$row['noshows_range'] ?? '',
-							$row['visits_12m'] ?? '',
-							$row['policy_badge'] ?? '',
-						);
-						if ( $include_voided ) {
-							$row_out[] = ! empty( $row['is_void'] ) ? __( 'Yes', 'foodbank-manager' ) : __( 'No', 'foodbank-manager' );
-						}
-						$csv->insertOne( $row_out );
+		$header = array(
+			__( 'Application ID', 'foodbank-manager' ),
+			__( 'Name', 'foodbank-manager' ),
+			__( 'Email', 'foodbank-manager' ),
+			__( 'Postcode', 'foodbank-manager' ),
+			__( 'Last Attended', 'foodbank-manager' ),
+			__( 'Visits (Range)', 'foodbank-manager' ),
+			__( 'No-shows (Range)', 'foodbank-manager' ),
+			__( 'Visits (12m)', 'foodbank-manager' ),
+			__( 'Policy', 'foodbank-manager' ),
+		);
+		if ( $include_voided ) {
+			$header[] = __( 'Voided', 'foodbank-manager' );
+		}
+		if ( class_exists( '\\League\\Csv\\Writer' ) ) {
+			$csv = \League\Csv\Writer::createFromFileObject( new \SplTempFileObject() );
+			if ( ! empty( $rows ) ) {
+				$csv->insertOne( $header );
+				foreach ( $rows as $row ) {
+					if ( $mask_sensitive ) {
+						$row['email']    = Helpers::mask_email( (string) ( $row['email'] ?? '' ) );
+						$row['postcode'] = Helpers::mask_postcode( (string) ( $row['postcode'] ?? '' ) );
 					}
-				}
-				$csv->output( $filename );
-			} else {
-				$out = fopen( 'php://output', 'wb' );
-				if ( ! empty( $rows ) ) {
-					fputcsv( $out, $header );
-					foreach ( $rows as $row ) {
-						if ( $mask_sensitive ) {
-							$row['email']    = Helpers::mask_email( (string) ( $row['email'] ?? '' ) );
-							$row['postcode'] = Helpers::mask_postcode( (string) ( $row['postcode'] ?? '' ) );
-						}
-						$row_out = array(
-							$row['application_id'] ?? '',
-							$row['name'] ?? '',
-							$row['email'] ?? '',
-							$row['postcode'] ?? '',
-							$row['last_attended'] ?? '',
-							$row['visits_range'] ?? '',
-							$row['noshows_range'] ?? '',
-							$row['visits_12m'] ?? '',
-							$row['policy_badge'] ?? '',
-						);
-						if ( $include_voided ) {
-							$row_out[] = ! empty( $row['is_void'] ) ? __( 'Yes', 'foodbank-manager' ) : __( 'No', 'foodbank-manager' );
-						}
-						fputcsv( $out, $row_out );
+					$row_out = array(
+						$row['application_id'] ?? '',
+						$row['name'] ?? '',
+						$row['email'] ?? '',
+						$row['postcode'] ?? '',
+						$row['last_attended'] ?? '',
+						$row['visits_range'] ?? '',
+						$row['noshows_range'] ?? '',
+						$row['visits_12m'] ?? '',
+						$row['policy_badge'] ?? '',
+					);
+					if ( $include_voided ) {
+						$row_out[] = ! empty( $row['is_void'] ) ? __( 'Yes', 'foodbank-manager' ) : __( 'No', 'foodbank-manager' );
 					}
+					$csv->insertOne( $row_out );
 				}
 			}
+			$csv->output( $filename );
+		} else {
+			$out = fopen( 'php://output', 'wb' );
+			if ( ! empty( $rows ) ) {
+				fputcsv( $out, $header );
+				foreach ( $rows as $row ) {
+					if ( $mask_sensitive ) {
+						$row['email']    = Helpers::mask_email( (string) ( $row['email'] ?? '' ) );
+						$row['postcode'] = Helpers::mask_postcode( (string) ( $row['postcode'] ?? '' ) );
+					}
+					$row_out = array(
+						$row['application_id'] ?? '',
+						$row['name'] ?? '',
+						$row['email'] ?? '',
+						$row['postcode'] ?? '',
+						$row['last_attended'] ?? '',
+						$row['visits_range'] ?? '',
+						$row['noshows_range'] ?? '',
+						$row['visits_12m'] ?? '',
+						$row['policy_badge'] ?? '',
+					);
+					if ( $include_voided ) {
+						$row_out[] = ! empty( $row['is_void'] ) ? __( 'Yes', 'foodbank-manager' ) : __( 'No', 'foodbank-manager' );
+					}
+					fputcsv( $out, $row_out );
+				}
+			}
+		}
 	}
 }

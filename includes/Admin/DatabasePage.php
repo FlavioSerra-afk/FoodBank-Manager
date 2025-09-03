@@ -1,4 +1,4 @@
-<?php // phpcs:ignoreFile
+<?php
 /**
  * Database admin page controller.
  *
@@ -27,56 +27,60 @@ final class DatabasePage {
 	 * @return void
 	 */
 	public static function route(): void {
-		if ( ! current_user_can( 'fb_manage_database' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
-			wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ), '', array( 'response' => 403 ) );
+		if ( ! current_user_can( 'fb_manage_database' ) ) {
+			wp_die(
+				esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ),
+				'',
+				array(
+					'response' => 403,
+				)
+			);
 		}
 
-				$method = isset( $_SERVER['REQUEST_METHOD'] ) ? sanitize_text_field( wp_unslash( (string) $_SERVER['REQUEST_METHOD'] ) ) : '';
+		$method = isset( $_SERVER['REQUEST_METHOD'] ) ? sanitize_text_field( wp_unslash( (string) $_SERVER['REQUEST_METHOD'] ) ) : '';
 		if ( 'POST' === strtoupper( $method ) ) {
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Sanitized and checked below.
 			$action = isset( $_POST['fbm_action'] ) ? sanitize_key( wp_unslash( $_POST['fbm_action'] ) ) : '';
 			switch ( $action ) {
 				case 'export_entries':
 					check_admin_referer( 'fbm_export_entries', 'fbm_nonce' );
 					$filters = self::get_filters();
-					// phpcs:ignore WordPress.Security.NonceVerification.Missing -- IDs sanitized below.
-					if ( isset( $_POST['id'] ) ) {
-								$filters['id'] = absint( wp_unslash( $_POST['id'] ) );
+					$id      = isset( $_POST['id'] ) ? absint( wp_unslash( $_POST['id'] ) ) : 0;
+					if ( $id ) {
+						$filters['id'] = $id;
 					}
-					$mask = ! current_user_can( 'fb_view_sensitive' ); // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
+					$mask = ! current_user_can( 'fb_view_sensitive' );
 					self::do_export( $filters, $mask );
 					return;
 				case 'delete_entry':
-					// phpcs:ignore WordPress.Security.NonceVerification.Missing -- IDs sanitized below.
 					$id = isset( $_POST['id'] ) ? absint( wp_unslash( $_POST['id'] ) ) : 0;
 					check_admin_referer( 'fbm_delete_entry_' . $id, 'fbm_nonce' );
 					self::do_delete( $id );
 					return;
 				case 'export_single':
-						// Legacy single export support.
-						// phpcs:ignore WordPress.Security.NonceVerification.Missing -- IDs sanitized below.
-						$id = isset( $_POST['id'] ) ? absint( wp_unslash( $_POST['id'] ) ) : 0;
-						check_admin_referer( 'fbm_export_single_' . $id, 'fbm_nonce' );
-						$filters = self::get_filters();
+					// Legacy single export support.
+					$id = isset( $_POST['id'] ) ? absint( wp_unslash( $_POST['id'] ) ) : 0;
+					check_admin_referer( 'fbm_export_single_' . $id, 'fbm_nonce' );
+					$filters = self::get_filters();
 					if ( $id ) {
-							$filters['id'] = $id;
+						$filters['id'] = $id;
 					}
-						$mask = ! current_user_can( 'fb_view_sensitive' ); // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
-						self::do_export( $filters, $mask );
+					$mask = ! current_user_can( 'fb_view_sensitive' );
+					self::do_export( $filters, $mask );
 					return;
 			}
 		}
 
-				// Support legacy `view` query param.
-                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only ID parameter.
-				$view_id = isset( $_GET['view'] ) ? absint( $_GET['view'] ) : 0;
+		// Support legacy `view` query param.
+		$query_string = isset( $_SERVER['QUERY_STRING'] ) ? sanitize_text_field( wp_unslash( (string) $_SERVER['QUERY_STRING'] ) ) : '';
+		parse_str( $query_string, $query_vars );
+		$view_id = isset( $query_vars['view'] ) ? absint( $query_vars['view'] ) : 0;
 		if ( $view_id ) {
-				self::render_view( $view_id );
-				return;
+			self::render_view( $view_id );
+			return;
 		}
 
-				$filters = self::get_filters();
-				self::render_list( $filters );
+		$filters = self::get_filters( $query_vars );
+		self::render_list( $filters );
 	}
 
 	/**
@@ -95,12 +99,12 @@ final class DatabasePage {
 		$page     = $filters['page'];
 		$per_page = $filters['per_page'];
 
-		$can_sensitive = current_user_can( 'fb_view_sensitive' ); // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
+		$can_sensitive = current_user_can( 'fb_view_sensitive' );
 		$unmask        = false;
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce validated below.
-		if ( $can_sensitive && isset( $_GET['unmask'] ) ) {
-			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only nonce param; sanitized here.
-			$nonce  = isset( $_GET['_wpnonce'] ) ? sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ) : '';
+		$query_string  = isset( $_SERVER['QUERY_STRING'] ) ? sanitize_text_field( wp_unslash( (string) $_SERVER['QUERY_STRING'] ) ) : '';
+		parse_str( $query_string, $query_vars );
+		if ( $can_sensitive && isset( $query_vars['unmask'] ) ) {
+			$nonce  = isset( $query_vars['_wpnonce'] ) ? sanitize_text_field( $query_vars['_wpnonce'] ) : '';
 			$unmask = $nonce && wp_verify_nonce( $nonce, 'fbm_db_unmask' );
 		}
 
@@ -121,7 +125,7 @@ final class DatabasePage {
 		if ( ! $entry ) {
 			wp_die( esc_html__( 'Entry not found.', 'foodbank-manager' ) );
 		}
-		$can_sensitive = current_user_can( 'fb_view_sensitive' ); // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
+		$can_sensitive = current_user_can( 'fb_view_sensitive' );
 		require FBM_PATH . 'templates/admin/database-view.php';
 	}
 
@@ -135,11 +139,11 @@ final class DatabasePage {
 	 * @return void
 	 */
 	private static function do_delete( int $id ): void {
-		if ( ! current_user_can( 'fb_manage_database' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
+		if ( ! current_user_can( 'fb_manage_database' ) ) {
 			wp_die( esc_html__( 'You do not have permission to perform this action.', 'foodbank-manager' ) );
 		}
 
-				check_admin_referer( 'fbm_delete_entry_' . $id, 'fbm_nonce' );
+		check_admin_referer( 'fbm_delete_entry_' . $id, 'fbm_nonce' );
 		ApplicationsRepo::softDelete( $id );
 
 		$url = add_query_arg(
@@ -161,28 +165,28 @@ final class DatabasePage {
 	 * @return void
 	 */
 	private static function do_export( array $filters, bool $mask ): void {
-		if ( ! current_user_can( 'fb_manage_database' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
+		if ( ! current_user_can( 'fb_manage_database' ) ) {
 			wp_die( esc_html__( 'You do not have permission to perform this action.', 'foodbank-manager' ), '', array( 'response' => 403 ) );
 		}
 
-			$rows     = array();
-			$filename = 'fbm-entries.csv';
+		$rows     = array();
+		$filename = 'fbm-entries.csv';
 
 		if ( isset( $filters['id'] ) ) {
-				$entry = ApplicationsRepo::get( (int) $filters['id'] );
+			$entry = ApplicationsRepo::get( (int) $filters['id'] );
 			if ( $entry ) {
 				$rows[]   = self::normalize_export_row( $entry );
 				$filename = 'fbm-entry-' . (int) $filters['id'] . '.csv';
 			}
 		} else {
-				$data = ApplicationsRepo::list( $filters );
+			$data = ApplicationsRepo::list( $filters );
 			foreach ( $data['rows'] as $row ) {
-					$rows[] = self::normalize_export_row( $row );
+				$rows[] = self::normalize_export_row( $row );
 			}
 		}
 
-                    CsvExporter::stream_list( $rows, $mask, $filename );
-			exit;
+		CsvExporter::stream_list( $rows, $mask, $filename );
+		exit;
 	}
 
 	/**
@@ -220,64 +224,66 @@ final class DatabasePage {
 	 *
 	 * @return array<string, mixed>
 	 */
-	private static function get_filters(): array {
-			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only filters; sanitized immediately.
-			$search = isset( $_GET['search'] ) ? sanitize_text_field( wp_unslash( $_GET['search'] ) ) : '';
-
-			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only filters; sanitized immediately.
-			$status         = isset( $_GET['status'] ) ? sanitize_key( wp_unslash( $_GET['status'] ) ) : '';
-			$allowed_status = array( 'new', 'approved', 'archived' );
-		if ( ! in_array( $status, $allowed_status, true ) ) {
-				$status = '';
+	/**
+	 * Parse filters from the request.
+	 *
+	 * @param array<string, mixed>|null $query_vars Optional parsed query variables.
+	 *
+	 * @since 0.1.x
+	 *
+	 * @return array<string, mixed>
+	 */
+	private static function get_filters( ?array $query_vars = null ): array {
+		$query_vars = $query_vars ?? array();
+		if ( empty( $query_vars ) && isset( $_SERVER['QUERY_STRING'] ) ) {
+			parse_str( sanitize_text_field( wp_unslash( (string) $_SERVER['QUERY_STRING'] ) ), $query_vars );
 		}
 
-				$has_file = isset( $_GET['has_file'] ) ? true : null; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only filter.
-				$consent  = isset( $_GET['consent'] ) ? true : null; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only filter.
+		$search = isset( $query_vars['search'] ) ? sanitize_text_field( $query_vars['search'] ) : '';
 
-				$date_from = isset( $_GET['date_from'] ) ? self::sanitize_date( wp_unslash( $_GET['date_from'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized by sanitize_date().
-				$date_to   = isset( $_GET['date_to'] ) ? self::sanitize_date( wp_unslash( $_GET['date_to'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized by sanitize_date().
+		$status_raw     = isset( $query_vars['status'] ) ? sanitize_key( $query_vars['status'] ) : '';
+		$allowed_status = array( 'new', 'approved', 'archived' );
+		$status         = in_array( $status_raw, $allowed_status, true ) ? $status_raw : '';
 
-			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only filters; sanitized immediately.
-			$page = isset( $_GET['paged'] ) ? max( 1, absint( $_GET['paged'] ) ) : 1;
-			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only filters; sanitized immediately.
-			$per_page = isset( $_GET['per_page'] ) ? min( 100, max( 10, absint( $_GET['per_page'] ) ) ) : 20;
+		$has_file = isset( $query_vars['has_file'] ) ? true : null;
+		$consent  = isset( $query_vars['consent'] ) ? true : null;
 
-			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only filters; sanitized immediately.
-			$orderby         = isset( $_GET['orderby'] ) ? sanitize_key( wp_unslash( $_GET['orderby'] ) ) : 'created_at';
-			$allowed_orderby = array( 'created_at', 'status', 'id' );
-		if ( ! in_array( $orderby, $allowed_orderby, true ) ) {
-				$orderby = 'created_at';
-		}
+		$date_from = isset( $query_vars['date_from'] ) ? self::sanitize_date( sanitize_text_field( $query_vars['date_from'] ) ) : '';
+		$date_to   = isset( $query_vars['date_to'] ) ? self::sanitize_date( sanitize_text_field( $query_vars['date_to'] ) ) : '';
 
-			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only filters; sanitized immediately.
-			$order = isset( $_GET['order'] ) ? strtoupper( sanitize_key( wp_unslash( $_GET['order'] ) ) ) : 'DESC';
-		if ( ! in_array( $order, array( 'ASC', 'DESC' ), true ) ) {
-				$order = 'DESC';
-		}
+		$page     = isset( $query_vars['paged'] ) ? max( 1, absint( $query_vars['paged'] ) ) : 1;
+		$per_page = isset( $query_vars['per_page'] ) ? min( 500, max( 1, absint( $query_vars['per_page'] ) ) ) : 20;
 
-			return array(
-				'search'    => $search,
-				'status'    => $status,
-				'has_file'  => is_null( $has_file ) ? null : (bool) $has_file,
-				'consent'   => is_null( $consent ) ? null : (bool) $consent,
-				'date_from' => $date_from,
-				'date_to'   => $date_to,
-				'page'      => $page,
-				'per_page'  => $per_page,
-				'orderby'   => $orderby,
-				'order'     => $order,
-			);
+		$orderby_key     = isset( $query_vars['orderby'] ) ? sanitize_key( $query_vars['orderby'] ) : '';
+		$allowed_orderby = array( 'created_at', 'status', 'form_id', 'id' );
+		$orderby         = in_array( $orderby_key, $allowed_orderby, true ) ? $orderby_key : 'created_at';
+
+		$order_key = isset( $query_vars['order'] ) ? strtoupper( sanitize_key( $query_vars['order'] ) ) : '';
+		$order     = in_array( $order_key, array( 'ASC', 'DESC' ), true ) ? $order_key : 'DESC';
+
+		return array(
+			'search'    => $search,
+			'status'    => $status,
+			'has_file'  => is_null( $has_file ) ? null : (bool) $has_file,
+			'consent'   => is_null( $consent ) ? null : (bool) $consent,
+			'date_from' => $date_from,
+			'date_to'   => $date_to,
+			'page'      => $page,
+			'per_page'  => $per_page,
+			'orderby'   => $orderby,
+			'order'     => $order,
+		);
 	}
 
-		/**
-		 * Validate and sanitize an ISO date (Y-m-d).
-		 *
-		 * @param string $raw Raw date string.
-		 *
-		 * @return string
-		 */
+	/**
+	 * Validate and sanitize an ISO date (Y-m-d).
+	 *
+	 * @param string $raw Raw date string.
+	 *
+	 * @return string
+	 */
 	private static function sanitize_date( string $raw ): string {
-			$raw = sanitize_text_field( $raw );
-			return preg_match( '/^\d{4}-\d{2}-\d{2}$/', $raw ) ? $raw : '';
+		$raw = sanitize_text_field( $raw );
+		return preg_match( '/^\d{4}-\d{2}-\d{2}$/', $raw ) ? $raw : '';
 	}
 }
