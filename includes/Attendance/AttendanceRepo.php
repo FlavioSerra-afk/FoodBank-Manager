@@ -289,8 +289,8 @@ WHERE t2.application_id = t.application_id
 
 			$sql  = "
 SELECT t.id, t.status, t.attendance_at, t.event_id, t.type, t.method,
-       t.recorded_by_user_id, t.is_void, t.void_reason,
-       t.void_by_user_id, t.void_at
+	   t.recorded_by_user_id, t.is_void, t.void_reason,
+	   t.void_by_user_id, t.void_at
 FROM {$t_att} t
 WHERE {$where_sql}
 ORDER BY t.attendance_at ASC
@@ -412,5 +412,46 @@ ORDER BY created_at ASC
 			array( '%d', '%d', '%s', '%s' )
 		);
 		return false !== $inserted;
+	}
+	/**
+	 * Build a prepared IN(...) clause.
+	 *
+	 * @param array  $values Values.
+	 * @param string $type   Placeholder type.
+	 * @return array{0:string,1:array} [sql, args]
+	 */
+	private function fbm_sql_in( array $values, string $type = '%s' ): array {
+		$values = '%d' === $type
+			? array_values( array_filter( array_map( 'intval', $values ), static fn( $v ) => 0 !== $v ) )
+			: array_values( array_map( 'strval', $values ) );
+		if ( ! $values ) {
+			return array( '(NULL)', array() ); // Yields no matches.
+		}
+		$ph = implode( ',', array_fill( 0, count( $values ), $type ) );
+		return array( "($ph)", $values );
+	}
+
+	/**
+	 * Whitelist ORDER BY.
+	 *
+	 * @param string $key Column key.
+	 * @param string $dir Direction.
+	 * @param array  $map Map of columns.
+	 * @return string ORDER BY clause.
+	 */
+	private function fbm_sql_order( string $key, string $dir, array $map ): string {
+		$col = $map[ $key ] ?? ( $map['created_at'] ?? 'created_at' );
+		$dir = 'ASC' === strtoupper( $dir ) ? 'ASC' : 'DESC';
+		return "ORDER BY {$col} {$dir}";
+	}
+
+	/**
+	 * Join WHERE clauses.
+	 *
+	 * @param array $clauses Clauses.
+	 * @return string WHERE clause.
+	 */
+	private function fbm_sql_where( array $clauses ): string {
+		return $clauses ? 'WHERE ' . implode( ' AND ', $clauses ) : '';
 	}
 }
