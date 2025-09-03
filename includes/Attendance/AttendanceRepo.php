@@ -156,10 +156,10 @@ final class AttendanceRepo {
 				$order     = 'ASC' === strtoupper( $args['order'] ?? '' ) ? 'ASC' : 'DESC';
 				$order_sql = " ORDER BY {$order_by} {$order}";
 
-				$limit     = min( 100, max( 1, absint( $args['per_page'] ?? 25 ) ) );
-				$page      = max( 1, absint( $args['page'] ?? 1 ) );
-				$offset    = max( 0, ( $page - 1 ) * $limit );
-				$limit_sql = $wpdb->prepare( ' LIMIT %d OFFSET %d', $limit, $offset );
+								$limit = min( 500, max( 1, absint( $args['per_page'] ?? 25 ) ) );
+				$page                  = max( 1, absint( $args['page'] ?? 1 ) );
+				$offset                = max( 0, ( $page - 1 ) * $limit );
+				$limit_sql             = $wpdb->prepare( ' LIMIT %d OFFSET %d', $limit, $offset );
 
 				$base_sql = "
 SELECT
@@ -218,10 +218,12 @@ WHERE t2.application_id = t.application_id
 			$wpdb->prepare( $count_base, $count_params )
 		);
 
-		return array(
-			'rows'  => $rows ? $rows : array(),
-			'total' => $total,
-		);
+								$rows = $rows ? array_values( $rows ) : array();
+
+								return array(
+									'rows'  => $rows,
+									'total' => $total,
+								);
 	}
 
 	/**
@@ -296,11 +298,11 @@ ORDER BY created_at ASC
 			$grouped[ (int) $n['attendance_id'] ][] = $n;
 		}
 		foreach ( $rows as &$r ) {
-			$r['notes'] = $grouped[ (int) $r['id'] ] ?? array();
+				$r['notes'] = $grouped[ (int) $r['id'] ] ?? array();
 		}
-		unset( $r );
+				unset( $r );
 
-		return $rows;
+				return array_values( $rows );
 	}
 
 	/**
@@ -309,13 +311,13 @@ ORDER BY created_at ASC
 	 * @since 0.1.x
 	 *
 	 * @param int         $attendance_id Attendance ID.
-	 * @param bool        $void_flag     Whether to void.
+	 * @param bool        $voided        Whether to void.
 	 * @param string|null $reason        Optional void reason.
 	 * @param int         $actor_id      Acting user ID.
 	 * @param string      $now_utc       Current UTC datetime 'Y-m-d H:i:s'.
 	 * @return bool True on success, false on failure.
 	 */
-	public static function set_void( int $attendance_id, bool $void_flag, ?string $reason, int $actor_id, string $now_utc ): bool {
+	public static function set_void( int $attendance_id, bool $voided, ?string $reason, int $actor_id, string $now_utc ): bool {
 		global $wpdb;
 		$attendance_id = absint( $attendance_id );
 		$actor_id      = absint( $actor_id );
@@ -324,7 +326,7 @@ ORDER BY created_at ASC
 			$reason = sanitize_text_field( $reason );
 		}
 
-		if ( $void_flag ) {
+		if ( $voided ) {
 			$data = array(
 				'is_void'         => 1,
 				'void_reason'     => $reason,
