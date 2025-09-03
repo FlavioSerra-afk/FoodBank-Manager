@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-03 (Wave CS-Backlog-08)
+Docs-Revision: 2025-09-03 (Wave CS-Backlog-10)
 # FoodBank Manager (WordPress Plugin)
 
 A secure, mobile‑first WordPress plugin for Food Bank applications, encrypted data storage, operational dashboards, and **attendance tracking** with QR codes.
@@ -25,7 +25,7 @@ composer phpcs && composer phpstan -- --memory-limit=1G && composer test
 - **Exact Food Bank form preset** matching the live site.
 - **Email confirmations & admin notifications** (HTML), with **logging** and resend.
 - **Custom database** with **field‑level encryption** (libsodium AEAD, envelope keys).
-- **Front‑end dashboard** (Viewer/Manager) with filters, exports (CSV/XLSX/PDF).
+- **Front‑end dashboard** (Viewer/Manager) with sanitized filters and CSV/XLSX/PDF exports that sanitize filenames, include a UTF‑8 BOM with translated headers, and mask sensitive fields unless the user has `fb_view_sensitive`.
 - **Attendance module**: events (optional), QR issuance, scan/manual check‑in, policy rules, reports. Attendance repository queries use `$wpdb->prepare()` with strict placeholders, mask PII by default, and are covered by unit tests.
 - **GDPR helpers**: consent logs, SAR export, retention/anonymisation.
 - **Diagnostics**: mail failures, environment checks, test email.
