@@ -9,6 +9,7 @@ includes/Admin/PermissionsPage.php
 includes/Admin/SettingsPage.php
 includes/Admin/EmailsPage.php
 includes/Admin/ThemePage.php
+includes/Admin/Menu.php
 includes/Exports/CsvExporter.php
 includes/UI/Theme.php
 includes/Mail/Templates.php
@@ -25,7 +26,6 @@ Legacy (temporary ignoreFile to unblock ZIP):
 
 includes/Admin/AttendancePage.php
 includes/Admin/EmailsPage.php
-includes/Admin/Menu.php
 includes/Admin/PermissionsPage.php
 includes/Admin/SettingsPage.php
 includes/Admin/ThemePage.php
@@ -49,7 +49,6 @@ Temporary ignores present in:
 
 includes/Admin/AttendancePage.php
 includes/Admin/EmailsPage.php
-includes/Admin/Menu.php
 includes/Admin/PermissionsPage.php
 includes/Admin/SettingsPage.php
 includes/Admin/ThemePage.php
