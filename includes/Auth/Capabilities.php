@@ -12,6 +12,7 @@ final class Capabilities {
             'fb_manage_attendance',
             'fb_manage_database',
             'fb_manage_forms',
+            'fb_manage_emails',
             'fb_manage_settings',
             'fb_manage_diagnostics',
             'fb_manage_permissions',

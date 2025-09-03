@@ -1,63 +1,104 @@
-includes/Auth/CapabilitiesResolver.php:1:<?php // phpcs:ignoreFile
-includes/Auth/Roles.php:1:<?php // phpcs:ignoreFile
-includes/Auth/Capabilities.php:1:<?php // phpcs:ignoreFile
-includes/Auth/Permissions.php:1:<?php // phpcs:ignoreFile
-includes/Logging/Audit.php:1:<?php // phpcs:ignoreFile
-includes/Http/FormSubmitController.php:2:// phpcs:ignoreFile
-includes/Http/FormSubmitController.php:128:            $ip_bin       = $ip !== '' ? @inet_pton( $ip ) : null; // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-includes/Exports/CsvExporter.php:1:<?php // phpcs:ignoreFile
-includes/Shortcodes/AttendanceManager.php:26:	public static function render( array $atts = array() ): string { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- Attributes reserved for future use.
-includes/Shortcodes/AttendanceManager.php:29:		if ( ! current_user_can( 'attendance_checkin' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
-includes/Shortcodes/Entries.php:26:	public static function render( array $atts = array() ): string { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- Attributes reserved for future use.
-includes/Shortcodes/Form.php:51:			$raw_param = (string) wp_unslash( $_GET['fbm_err'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized via sanitize_key.
-includes/Shortcodes/Form.php:60:		if ( isset( $_GET['fbm_error'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only error flag.
-includes/Shortcodes/Form.php:67:			$json = file_get_contents( $preset_path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Local preset file.
-includes/Core/Options.php:258:				$out['custom_css'] = function_exists( 'wp_strip_all_tags' ) ? wp_strip_all_tags( $css ) : strip_tags( $css ); // phpcs:ignore WordPress.WP.AlternativeFunctions.strip_tags_strip_tags -- Fallback when WordPress is unavailable.
-includes/Core/Plugin.php:1:<?php // phpcs:ignoreFile
-includes/Core/Hooks.php:1:<?php // phpcs:ignoreFile
-includes/Core/Assets.php:1:<?php // phpcs:ignoreFile
-includes/Mail/Logger.php:1:<?php // phpcs:ignoreFile
-includes/Database/ApplicationsRepo.php:1:<?php // phpcs:ignoreFile
-includes/Security/Helpers.php:1:<?php // phpcs:ignoreFile
-includes/Security/Crypto.php:1:<?php // phpcs:ignoreFile
-includes/Rest/Api.php:203:	private static function send_applicant_email( string $to, int $app_id, string $first_name ): void { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Used in included template.
-includes/Rest/Api.php:212:				$qr_code_url = 'data:image/png;base64,' . base64_encode( $writer->write( $qr )->getString() ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- Embedding QR code.
-includes/Rest/Api.php:235:	private static function send_admin_email( int $app_id, string $first, string $last, string $email, string $postcode ): void { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Used in included template.
-includes/Attendance/AttendanceRepo.php:1:<?php // phpcs:ignoreFile
-includes/Attendance/TokenService.php:1:<?php // phpcs:ignoreFile
-includes/Attendance/Policy.php:1:<?php // phpcs:ignoreFile
-includes/Admin/Menu.php:1:<?php // phpcs:ignoreFile
-includes/Admin/AttendancePage.php:1:<?php // phpcs:ignoreFile
-includes/Admin/SettingsPage.php:25:		if ( ! current_user_can( 'fb_manage_settings' ) && ! current_user_can( 'manage_options' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
-includes/Admin/SettingsPage.php:40:		if ( ! current_user_can( 'manage_options' ) && ! current_user_can( 'fb_manage_settings' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
-includes/Admin/SettingsPage.php:45:						? (array) wp_unslash( $_POST['fbm_settings'] ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized in Options::saveAll.
-includes/Admin/Notices.php:1:<?php // phpcs:ignoreFile
-includes/Admin/ThemePage.php:25:		if ( ! current_user_can( 'fb_manage_settings' ) && ! current_user_can( 'manage_options' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
-includes/Admin/ThemePage.php:40:		if ( ! current_user_can( 'manage_options' ) && ! current_user_can( 'fb_manage_settings' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
-includes/Admin/ThemePage.php:56:						// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- reading uploaded JSON.
-includes/Admin/ThemePage.php:72:						? (array) wp_unslash( $_POST['fbm_theme'] ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized in Options::saveAll.
+Docs/CS-Backlog.md:63:keeping only surgical one-line // phpcs:ignore … where wp_kses_post() or strict IN (…) placeholders trigger false positives.
+Docs/ISSUES-foodbank-manager.md:257:    - No `phpcs:ignoreFile` on `includes/Attendance/AttendanceRepo.php`; tests cover policy edges.
+bin/build-phpcs-ignore-report.php:78:$md .= "This report shows which issues are currently suppressed via `phpcs:ignore` and what would fail if annotations were disabled.\n\n";
+bin/build-phpcs-ignore-report.php:7: *  - analysis/phpcs-ignores.txt  (grep of phpcs:ignore etc.)
+foodbank-manager.php:1:<?php // phpcs:ignoreFile
+includes/Admin/AttendancePage.php:123:            // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- placeholders strictly match $ids count
+includes/Admin/AttendancePage.php:169:        $req                 = $_REQUEST; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- flag only.
+includes/Admin/AttendancePage.php:23:        $action = isset( $_REQUEST['action'] ) ? sanitize_key( wp_unslash( (string) $_REQUEST['action'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Action checked later.
+includes/Admin/AttendancePage.php:2:// phpcs:ignoreFile
+includes/Admin/AttendancePage.php:36:        $g = $_GET; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only filters; sanitized below.
+includes/Admin/DatabasePage.php:100:		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce validated below.
+includes/Admin/DatabasePage.php:102:			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only nonce param; sanitized here.
+includes/Admin/DatabasePage.php:124:		$can_sensitive = current_user_can( 'fb_view_sensitive' ); // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
+includes/Admin/DatabasePage.php:138:		if ( ! current_user_can( 'fb_manage_database' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
+includes/Admin/DatabasePage.php:164:		if ( ! current_user_can( 'fb_manage_database' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
 includes/Admin/DatabasePage.php:1:<?php // phpcs:ignoreFile
-includes/Admin/PermissionsPage.php:1:<?php // phpcs:ignoreFile
-includes/Admin/EmailsPage.php:26:		if ( ! current_user_can( 'fb_manage_emails' ) && ! current_user_can( 'manage_options' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
-includes/Admin/EmailsPage.php:29:        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only preview; template sanitized in handler.
-includes/Admin/EmailsPage.php:46:		if ( ! current_user_can( 'manage_options' ) && ! current_user_can( 'fb_manage_emails' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
-includes/Admin/EmailsPage.php:60:				(array) wp_unslash( $_POST['templates'] ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized in array_map.
-includes/Admin/EmailsPage.php:77:        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified in handle_post().
-includes/Admin/EmailsPage.php:83:        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified in handle_post().
-includes/Admin/EmailsPage.php:103:        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only preview; template sanitized below.
+includes/Admin/DatabasePage.php:224:			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only filters; sanitized immediately.
+includes/Admin/DatabasePage.php:227:			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only filters; sanitized immediately.
+includes/Admin/DatabasePage.php:234:				$has_file = isset( $_GET['has_file'] ) ? true : null; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only filter.
+includes/Admin/DatabasePage.php:235:				$consent  = isset( $_GET['consent'] ) ? true : null; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only filter.
+includes/Admin/DatabasePage.php:237:				$date_from = isset( $_GET['date_from'] ) ? self::sanitize_date( wp_unslash( $_GET['date_from'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized by sanitize_date().
+includes/Admin/DatabasePage.php:238:				$date_to   = isset( $_GET['date_to'] ) ? self::sanitize_date( wp_unslash( $_GET['date_to'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized by sanitize_date().
+includes/Admin/DatabasePage.php:240:			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only filters; sanitized immediately.
+includes/Admin/DatabasePage.php:242:			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only filters; sanitized immediately.
+includes/Admin/DatabasePage.php:245:			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only filters; sanitized immediately.
+includes/Admin/DatabasePage.php:252:			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only filters; sanitized immediately.
+includes/Admin/DatabasePage.php:30:		if ( ! current_user_can( 'fb_manage_database' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
+includes/Admin/DatabasePage.php:36:		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Sanitized and checked below.
+includes/Admin/DatabasePage.php:42:					// phpcs:ignore WordPress.Security.NonceVerification.Missing -- IDs sanitized below.
+includes/Admin/DatabasePage.php:46:					$mask = ! current_user_can( 'fb_view_sensitive' ); // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
+includes/Admin/DatabasePage.php:50:					// phpcs:ignore WordPress.Security.NonceVerification.Missing -- IDs sanitized below.
+includes/Admin/DatabasePage.php:57:						// phpcs:ignore WordPress.Security.NonceVerification.Missing -- IDs sanitized below.
+includes/Admin/DatabasePage.php:64:						$mask = ! current_user_can( 'fb_view_sensitive' ); // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
+includes/Admin/DatabasePage.php:71:                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only ID parameter.
+includes/Admin/DatabasePage.php:98:		$can_sensitive = current_user_can( 'fb_view_sensitive' ); // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
+includes/Admin/Notices.php:1:<?php // phpcs:ignoreFile
+includes/Admin/Notices.php:31:        if (!isset($_GET['fbm_repair_caps'])) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- verified below
+includes/Attendance/AttendanceRepo.php:186:// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- placeholders strictly match params length.
+includes/Attendance/AttendanceRepo.php:217:// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- placeholders strictly match params length.
+includes/Attendance/AttendanceRepo.php:266:        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, Generic.Files.LineLength.TooLong -- table name is constant.
+includes/Attendance/AttendanceRepo.php:290:// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is constant and placeholders match count.
+includes/Attendance/AttendanceRepo.php:39:// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- table name is constant and placeholders match.
+includes/Attendance/Policy.php:1:<?php // phpcs:ignoreFile
+includes/Attendance/TokenService.php:1:<?php // phpcs:ignoreFile
+includes/Auth/Capabilities.php:1:<?php // phpcs:ignoreFile
+includes/Auth/CapabilitiesResolver.php:1:<?php // phpcs:ignoreFile
+includes/Auth/Permissions.php:1:<?php // phpcs:ignoreFile
+includes/Auth/Roles.php:1:<?php // phpcs:ignoreFile
+includes/Core/Assets.php:1:<?php // phpcs:ignoreFile
+includes/Core/Hooks.php:1:<?php // phpcs:ignoreFile
+includes/Core/Options.php:259:				$out['custom_css'] = function_exists( 'wp_strip_all_tags' ) ? wp_strip_all_tags( $css ) : strip_tags( $css ); // phpcs:ignore WordPress.WP.AlternativeFunctions.strip_tags_strip_tags -- Fallback when WordPress is unavailable.
+includes/Core/Options.php:2:// phpcs:ignoreFile
+includes/Core/Plugin.php:2:// phpcs:ignoreFile
+includes/Database/ApplicationsRepo.php:2:// phpcs:ignoreFile
 includes/Db/Migrations.php:1:<?php // phpcs:ignoreFile
+includes/Exports/CsvExporter.php:1:<?php // phpcs:ignoreFile
+includes/Http/FormSubmitController.php:112:			$uploads = self::process_uploads( $_FILES, $policy ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified above
+includes/Http/FormSubmitController.php:129:			$ip_bin       = '' !== $ip ? @inet_pton( $ip ) : null; // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+includes/Http/FormSubmitController.php:191:					$tokens['qr_code_url'] = 'data:image/png;base64,' . base64_encode( $writer->write( $qr )->getString() ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- output data URI
+includes/Http/FormSubmitController.php:1:<?php // phpcs:ignore WordPress.Files.FileName.NotHyphenatedLowercase,WordPress.Files.FileName.InvalidClassFileName
+includes/Http/FormSubmitController.php:243:		$raw = $_POST; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce checked in handle()
+includes/Http/FormSubmitController.php:68:				$token     = sanitize_text_field( wp_unslash( $_POST[ $token_key ] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified above
+includes/Http/FormSubmitController.php:71:					$endpoint = 'turnstile' === $provider ? 'https://challenges.cloudflare.com/turnstile/v0/siteverify' : 'https://www.google.com/recaptcha/api/siteverify'; // phpcs:ignore Generic.Files.LineLength.TooLong
+includes/Logging/Audit.php:1:<?php // phpcs:ignoreFile
+includes/Mail/Logger.php:1:<?php // phpcs:ignoreFile
+includes/Mail/Templates.php:2:// phpcs:ignoreFile
+includes/Rest/Api.php:204:	private static function send_applicant_email( string $to, int $app_id, string $first_name ): void { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Used in included template.
+includes/Rest/Api.php:213:				$qr_code_url = 'data:image/png;base64,' . base64_encode( $writer->write( $qr )->getString() ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- Embedding QR code.
+includes/Rest/Api.php:236:	private static function send_admin_email( int $app_id, string $first, string $last, string $email, string $postcode ): void { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Used in included template.
+includes/Rest/Api.php:2:// phpcs:ignoreFile
+includes/Rest/AttendanceController.php:2:// phpcs:ignoreFile
+includes/Security/Crypto.php:1:<?php // phpcs:ignoreFile
+includes/Security/Helpers.php:1:<?php // phpcs:ignoreFile
+includes/Shortcodes/AttendanceManager.php:27:	public static function render( array $atts = array() ): string { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- Attributes reserved for future use.
+includes/Shortcodes/AttendanceManager.php:2:// phpcs:ignoreFile
+includes/Shortcodes/AttendanceManager.php:30:                if ( ! current_user_can( 'fb_manage_attendance' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
+includes/Shortcodes/Entries.php:27:	public static function render( array $atts = array() ): string { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- Attributes reserved for future use.
+includes/Shortcodes/Entries.php:2:// phpcs:ignoreFile
+includes/Shortcodes/Form.php:2:// phpcs:ignoreFile
+includes/Shortcodes/Form.php:52:			$raw_param = (string) wp_unslash( $_GET['fbm_err'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized via sanitize_key.
+includes/Shortcodes/Form.php:61:		if ( isset( $_GET['fbm_error'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only error flag.
+includes/Shortcodes/Form.php:68:			$json = file_get_contents( $preset_path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Local preset file.
+includes/UI/Theme.php:2:// phpcs:ignoreFile
+templates/admin/attendance.php:2:// phpcs:ignoreFile
+templates/admin/dashboard.php:16:// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom plugin capability.
+templates/admin/dashboard.php:1:<?php // phpcs:ignoreFile
+templates/admin/database-view.php:82:<?php if ( current_user_can( 'fb_manage_database' ) ) : // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability. ?>
+templates/admin/database-view.php:90:<?php if ( current_user_can( 'fb_manage_database' ) ) : // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability. ?>
+templates/admin/database.php:118:// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
+templates/admin/database.php:129:// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
+templates/admin/database.php:174:<?php if ( current_user_can( 'fb_manage_database' ) ) : // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability. ?>
+templates/admin/diagnostics.php:15:// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom plugin capability.
+templates/admin/diagnostics.php:1:<?php // phpcs:ignoreFile
+templates/admin/forms.php:16:// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom plugin capability.
+templates/admin/permissions.php:2:// phpcs:ignoreFile
+templates/admin/settings.php:2:// phpcs:ignoreFile
+templates/admin/theme.php:2:// phpcs:ignoreFile
 templates/emails/admin-notification.php:24:// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $safe_summary is sanitized via wp_kses_post().
 templates/emails/applicant-confirmation.php:37:// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $safe_summary is sanitized via wp_kses_post().
 templates/public/attendance-manager.php:2:// phpcs:ignoreFile
-templates/admin/database.php:117:// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
-templates/admin/database.php:128:// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
-templates/admin/database.php:174:<?php if ( current_user_can( 'fb_export_entries' ) ) : // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability. ?>
-templates/admin/diagnostics.php:15:// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom plugin capability.
-templates/admin/dashboard.php:16:// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom plugin capability.
-templates/admin/settings.php:2:// phpcs:ignoreFile
-templates/admin/theme.php:2:// phpcs:ignoreFile
-templates/admin/theme.php:10:// phpcs:disable Generic.Files.LineLength.TooLong
-templates/admin/database-view.php:82:<?php if ( current_user_can( 'fb_export_entries' ) ) : // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability. ?>
-templates/admin/database-view.php:90:<?php if ( current_user_can( 'fb_delete_entries' ) ) : // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability. ?>
-templates/admin/forms.php:16:// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom plugin capability.
-templates/admin/attendance.php:2:// phpcs:ignoreFile
+uninstall.php:27:        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- uninstall-time schema cleanup.
+uninstall.php:40:    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- targeted uninstall cleanup.
+uninstall.php:45:        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- targeted uninstall cleanup.
+uninstall.php:54:} catch ( \Throwable $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement -- Silent by design.

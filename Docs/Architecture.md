@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-03 (Wave CS-Backlog-08)
+Docs-Revision: 2025-09-03 (Wave CS-Backlog-09)
 # FoodBank Manager — Architecture
 
 ## Overview
@@ -32,7 +32,7 @@ A secure, privacy-first WordPress plugin for managing Food Bank applicant intake
 - Admin notices display when the vendor autoloader is missing or the KEK is not defined.
 
 ## Components
- - **Admin Pages:** Dashboard, Attendance, Database, Forms, Email Templates, Settings, Diagnostics, Permissions, Design & Theme.
+ - **Admin Pages:** Dashboard (`fb_manage_dashboard`), Attendance (`fb_manage_attendance`), Database (`fb_manage_database`), Forms (`fb_manage_forms`), Email Templates (`fb_manage_emails`), Settings (`fb_manage_settings`), Diagnostics (`fb_manage_diagnostics`), Permissions (`fb_manage_permissions`), Design & Theme (`fb_manage_theme`).
    - Database page requires `fb_manage_database`; exports respect filters and mask PII unless user has `fb_view_sensitive`.
 - **Shortcodes:** `[pcc_fb_form]`, `[fb_attendance_manager]`.
 - **REST:** namespace `pcc-fb/v1`; endpoints for attendance check-in, no-show, timeline, void/unvoid/note.

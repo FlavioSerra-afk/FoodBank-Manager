@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.5] - 2025-09-03
+### Quality/Security
+- Admin Menu hardened; moved to Strict.
+### Docs
+- Architecture.md, CS-Backlog.md, PHPCS-Ignores.md revision-stamped for Wave CS-Backlog-09.
+
 ## [1.0.4] - 2025-09-03
 ### Security
 - Strict guard cleanup (no suppressions in Strict files)
