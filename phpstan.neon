@@ -1,7 +1,32 @@
 parameters:
-  level: 5
+  level: 6
+  tmpDir: build/phpstan
+  parallel:
+    maximumNumberOfProcesses: 8
+
+  # Only analyze our source (exclude dist/vendor/assets/docs/tests)
   paths:
+    - foodbank-manager.php
     - includes
+
+  excludePaths:
+    - */vendor/*
+    - */dist/*
+    - */assets/*
+    - */Docs/*
+    - */analysis/*
+    - */tests/*
+    - */templates/*   # templates are view-only; optional to include later
+
   bootstrapFiles:
-    - vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
     - phpstan-bootstrap.php
+
+  # WordPress environment assumptions
+  stubFiles:
+    - vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
+
+  # Keep false positives down
+  checkMissingIterableValueType: false
+  checkGenericClassInNonGenericObjectType: false
+  checkImplicitMixed: false
+  reportUnmatchedIgnoredErrors: true
