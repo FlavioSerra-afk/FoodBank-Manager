@@ -1,4 +1,4 @@
-<?php // phpcs:ignoreFile
+<?php
 
 declare(strict_types=1);
 
@@ -7,23 +7,21 @@ namespace FoodBankManager\Database;
 use wpdb;
 
 class ApplicationsRepo {
-	/**
-	 * @param array{
-	 *  form_id?:int,status?:string,date_from?:string,date_to?:string,city?:string,postcode?:string,
-	 *  has_file?:?bool,consent?:?bool,search?:string,page?:int,per_page?:int,
-	 *  orderby?:string,order?:string
-	 * } $args
-	 * @return array{rows: array<int,array>, total:int}
-	 */
-	public static function list( array $args ): array {
-		global $wpdb;
-		$defaults = array(
-			'page'     => 1,
-			'per_page' => 25,
-			'orderby'  => 'created_at',
-			'order'    => 'DESC',
-		);
-		$args     = array_merge( $defaults, $args );
+        /**
+         * List applications with optional filters.
+         *
+         * @param array{form_id?:int,status?:string,date_from?:string,date_to?:string,city?:string,postcode?:string,has_file?:?bool,consent?:?bool,search?:string,page?:int,per_page?:int,orderby?:string,order?:string} $args Arguments.
+         * @return array{rows: array<int,array>, total:int}
+         */
+        public static function list( array $args ): array {
+                global $wpdb;
+                $defaults = array(
+                        'page'     => 1,
+                        'per_page' => 25,
+                        'orderby'  => 'created_at',
+                        'order'    => 'DESC',
+                );
+                $args     = array_merge( $defaults, $args );
 		$where    = 'WHERE 1=1';
 		$params   = array();
 
@@ -67,9 +65,9 @@ class ApplicationsRepo {
 			$params[] = $like;
 		}
 
-		$allowed_orderby = array( 'created_at', 'status', 'id' );
-		$orderby         = in_array( $args['orderby'], $allowed_orderby, true ) ? $args['orderby'] : 'created_at';
-		$order           = strtoupper( $args['order'] ) === 'ASC' ? 'ASC' : 'DESC';
+                $allowed = array( 'created_at', 'status', 'id' );
+                $orderby = in_array( $args['orderby'], $allowed, true ) ? $args['orderby'] : 'created_at';
+                $order   = 'ASC' === strtoupper( (string) $args['order'] ) ? 'ASC' : 'DESC';
 
 		$offset = ( (int) $args['page'] - 1 ) * (int) $args['per_page'];
 		$limit  = (int) $args['per_page'];
@@ -92,10 +90,12 @@ class ApplicationsRepo {
 		);
 	}
 
-	/**
-	 * @return array|null
-	 */
-	public static function get( int $id ): ?array {
+        /**
+         * Retrieve an application by ID.
+         *
+         * @return array|null
+         */
+        public static function get( int $id ): ?array {
 		global $wpdb;
 		$sql = "SELECT * FROM {$wpdb->prefix}fb_applications WHERE id = %d";
                 $app = $wpdb->get_row( $wpdb->prepare( $sql, $id ), 'ARRAY_A' );
@@ -108,7 +108,10 @@ class ApplicationsRepo {
 		return $app;
 	}
 
-	public static function softDelete( int $id ): bool {
+        /**
+         * Soft-delete an application.
+         */
+        public static function softDelete( int $id ): bool {
 		global $wpdb;
 		$sql = "UPDATE {$wpdb->prefix}fb_applications SET status = 'archived' WHERE id = %d";
 		$res = $wpdb->query( $wpdb->prepare( $sql, $id ) );

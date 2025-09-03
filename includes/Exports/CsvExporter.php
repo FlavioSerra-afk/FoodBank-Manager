@@ -1,4 +1,4 @@
-<?php // phpcs:ignoreFile
+<?php
 
 declare(strict_types=1);
 
@@ -8,6 +8,8 @@ use FoodBankManager\Security\Helpers;
 
 class CsvExporter {
     /**
+     * Stream a CSV list export.
+     *
      * @param array<int,array> $rows normalized rows ready to dump
      * @param bool             $maskPII default true
      */
@@ -15,8 +17,10 @@ class CsvExporter {
         if ( headers_sent() ) {
             return;
         }
-        header( 'Content-Type: text/csv; charset=utf-8' );
-        header( 'Content-Disposition: attachment; filename=' . $filename );
+        $filename = preg_replace('/[^A-Za-z0-9._-]/', '_', $filename);
+        header( 'Content-Type: text/csv; charset=UTF-8' );
+        header( 'X-Content-Type-Options: nosniff' );
+        header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
         echo "\xEF\xBB\xBF"; // UTF-8 BOM
 
         if ( class_exists( '\\League\\Csv\\Writer' ) ) {
@@ -49,6 +53,8 @@ class CsvExporter {
     }
 
     /**
+     * Stream attendance people CSV.
+     *
      * @param array<int,array> $rows
      * @param bool             $maskPII default true
      */
@@ -56,8 +62,10 @@ class CsvExporter {
         if ( headers_sent() ) {
             return;
         }
-        header( 'Content-Type: text/csv; charset=utf-8' );
-        header( 'Content-Disposition: attachment; filename=' . $filename );
+        $filename = preg_replace('/[^A-Za-z0-9._-]/', '_', $filename);
+        header( 'Content-Type: text/csv; charset=UTF-8' );
+        header( 'X-Content-Type-Options: nosniff' );
+        header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
         echo "\xEF\xBB\xBF";
 
         $header = array( 'Application ID', 'Name', 'Email', 'Postcode', 'Last Attended', 'Visits (Range)', 'No-shows (Range)', 'Visits (12m)', 'Policy' );

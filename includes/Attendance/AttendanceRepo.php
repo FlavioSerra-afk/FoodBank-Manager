@@ -1,4 +1,4 @@
-<?php // phpcs:ignoreFile
+<?php
 
 declare(strict_types=1);
 
@@ -78,9 +78,9 @@ final class AttendanceRepo {
         $having   = !empty($args['policy_only']) ? 'HAVING policy_breach = 1' : '';
 
         // Sorting
-        $orderby = in_array($args['orderby'] ?? '', ['last_attended','visits_range','noshows_range','visits_12m','application_id'], true)
-            ? $args['orderby'] : 'last_attended';
-        $order   = strtoupper($args['order'] ?? 'DESC') === 'ASC' ? 'ASC' : 'DESC';
+        $allowed = array( 'last_attended', 'visits_range', 'noshows_range', 'visits_12m', 'application_id' );
+        $orderby = in_array( $args['orderby'] ?? '', $allowed, true ) ? $args['orderby'] : 'last_attended';
+        $order   = 'ASC' === strtoupper( (string) ( $args['order'] ?? '' ) ) ? 'ASC' : 'DESC';
 
         $limit  = max(1, (int)($args['per_page'] ?? 25));
         $page   = max(1, (int)($args['page'] ?? 1));
@@ -165,6 +165,16 @@ final class AttendanceRepo {
         return ['rows' => $rows, 'total' => $total];
     }
 
+    /**
+     * Retrieve attendance timeline rows for an application.
+     *
+     * @param int    $applicationId Application ID.
+     * @param string $from          Optional UTC start.
+     * @param string $to            Optional UTC end.
+     * @param bool   $includeVoided Include voided rows.
+     *
+     * @return array<int,array>
+     */
     public static function timeline(int $applicationId, string $from, string $to, bool $includeVoided=false): array {
         global $wpdb;
         $att   = $wpdb->prefix . 'fb_attendance';
@@ -178,9 +188,11 @@ final class AttendanceRepo {
         $sql = "SELECT t.id,t.status,t.attendance_at,t.event_id,t.type,t.method,t.recorded_by_user_id,t.is_void,t.void_reason,t.void_by_user_id,t.void_at FROM {$att} t WHERE {$whereSql} ORDER BY t.attendance_at ASC";
         $rows = $wpdb->get_results($wpdb->prepare($sql, $params), 'ARRAY_A') ?: [];
         if (empty($rows)) { return []; }
-        $ids = array_map('intval', array_column($rows, 'id'));
-        $in  = implode(',', array_fill(0, count($ids), '%d'));
-        $noteSql = "SELECT attendance_id,user_id,note_text,created_at FROM {$notes} WHERE attendance_id IN ($in) ORDER BY created_at ASC";
+        $ids = array_values( array_map('absint', array_column($rows, 'id')) );
+        if (empty($ids)) { return $rows; }
+        $placeholders = implode(',', array_fill(0, count($ids), '%d'));
+        $noteSql = "SELECT attendance_id,user_id,note_text,created_at FROM {$notes} WHERE attendance_id IN ($placeholders) ORDER BY created_at ASC";
+        // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- placeholders strictly match $ids count
         $noteRows = $wpdb->get_results($wpdb->prepare($noteSql, $ids), 'ARRAY_A') ?: [];
         $grouped = [];
         foreach ($noteRows as $n) {
@@ -192,6 +204,9 @@ final class AttendanceRepo {
         return $rows;
     }
 
+    /**
+     * Toggle the void flag for an attendance entry.
+     */
     public static function setVoid(int $attendanceId, bool $void, ?string $reason, int $actorId, string $nowUtc): bool {
         global $wpdb;
         if ($void) {
@@ -219,6 +234,9 @@ final class AttendanceRepo {
         return $updated !== false;
     }
 
+    /**
+     * Add a note to an attendance entry.
+     */
     public static function addNote(int $attendanceId, int $userId, string $note, string $nowUtc): bool {
         global $wpdb;
         $inserted = $wpdb->insert(

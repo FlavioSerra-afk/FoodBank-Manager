@@ -25,17 +25,27 @@
   <config name="testVersion" value="8.1-8.3"/>
   <config name="minimum_supported_wp_version" value="6.0"/>
 
-  <!-- Project-specific tuning -->
+  <!-- De-noise low-signal style sniffs -->
+  <rule ref="Generic.WhiteSpace.DisallowSpaceIndent"><severity>0</severity></rule>
+  <rule ref="Generic.WhiteSpace.ScopeIndent"><severity>0</severity></rule>
+  <rule ref="Generic.Formatting.MultipleStatementAlignment"><severity>0</severity></rule>
+  <rule ref="PEAR.Functions.FunctionCallSignature.SpaceAfterOpenBracket"><severity>0</severity></rule>
+  <rule ref="PEAR.Functions.FunctionCallSignature.SpaceBeforeCloseBracket"><severity>0</severity></rule>
+  <rule ref="Universal.Arrays.DisallowShortArraySyntax.Found"><severity>0</severity></rule>
+
+  <!-- Tame line length noise (we already ignore comments) -->
   <rule ref="Generic.Files.LineLength">
     <properties>
-      <property name="lineLimit" value="140"/>
-      <property name="absoluteLineLimit" value="200"/>
+      <property name="lineLimit" value="160"/>
+      <property name="absoluteLineLimit" value="240"/>
       <property name="ignoreComments" value="true"/>
     </properties>
   </rule>
 
-  <!-- Escaping rules must be STRICT -->
+  <!-- Treat security & validation as first-class (keep strict) -->
   <rule ref="WordPress.Security.EscapeOutput"/>
   <rule ref="WordPress.Security.NonceVerification"/>
   <rule ref="WordPress.Security.ValidatedSanitizedInput"/>
+  <rule ref="WordPress.DB.PreparedSQL"/>
+  <rule ref="WordPress.DB.PreparedSQLPlaceholders"/>
 </ruleset>

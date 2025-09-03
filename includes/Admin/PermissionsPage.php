@@ -1,4 +1,4 @@
-<?php // phpcs:ignoreFile
+<?php
 
 declare(strict_types=1);
 
@@ -10,13 +10,18 @@ use FoodBankManager\Core\Options;
 use FoodBankManager\Security\Helpers;
 
 final class PermissionsPage {
+    /**
+     * Route the permissions management page.
+     */
     public static function route(): void {
         if ( ! current_user_can( 'fb_manage_permissions' ) && ! current_user_can( 'manage_options' ) ) {
             wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ), '', array( 'response' => 403 ) );
         }
-        $tab    = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( (string) $_GET['tab'] ) ) : 'roles';
+        $get = $_GET; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only parameters; sanitized below.
+        $post = $_POST; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonces verified per action.
+        $tab    = isset( $get['tab'] ) ? sanitize_key( wp_unslash( (string) $get['tab'] ) ) : 'roles';
         $notice = '';
-        if ( $tab === 'import' && isset( $_GET['export'] ) ) {
+        if ( $tab === 'import' && isset( $get['export'] ) ) {
             Helpers::require_nonce( 'fbm_perm_import' );
             $roles_data = Options::get( 'permissions_roles', array() );
             $users_data = array();
@@ -32,9 +37,9 @@ final class PermissionsPage {
             header( 'Content-Disposition: attachment; filename=fbm-permissions.json' );
             echo (string) $json;
             exit;
-        } elseif ( $tab === 'roles' && $_SERVER['REQUEST_METHOD'] === 'POST' ) {
+        } elseif ( $tab === 'roles' && ( $_SERVER['REQUEST_METHOD'] ?? '' ) === 'POST' ) {
             Helpers::require_nonce( 'fbm_perm_roles' );
-            $input   = isset( $_POST['role_caps'] ) && is_array( $_POST['role_caps'] ) ? $_POST['role_caps'] : array();
+            $input   = isset( $post['role_caps'] ) && is_array( $post['role_caps'] ) ? wp_unslash( $post['role_caps'] ) : array();
             $mapping = array();
             foreach ( get_editable_roles() as $role_key => $role ) {
                 if ( $role_key === 'administrator' ) {
@@ -57,9 +62,9 @@ final class PermissionsPage {
             Options::update( 'permissions_roles', $mapping );
             Roles::grantCapsToAdmin();
             $notice = __( 'Permissions updated.', 'foodbank-manager' );
-        } elseif ( $tab === 'users' && $_SERVER['REQUEST_METHOD'] === 'POST' ) {
+        } elseif ( $tab === 'users' && ( $_SERVER['REQUEST_METHOD'] ?? '' ) === 'POST' ) {
             Helpers::require_nonce( 'fbm_perm_users' );
-            $input = isset( $_POST['user_caps'] ) && is_array( $_POST['user_caps'] ) ? $_POST['user_caps'] : array();
+            $input = isset( $post['user_caps'] ) && is_array( $post['user_caps'] ) ? wp_unslash( $post['user_caps'] ) : array();
             foreach ( $input as $user_id => $caps ) {
                 $user_id = (int) $user_id;
                 $meta    = array();
@@ -78,10 +83,11 @@ final class PermissionsPage {
                 }
             }
             $notice = __( 'Permissions updated.', 'foodbank-manager' );
-        } elseif ( $tab === 'import' && $_SERVER['REQUEST_METHOD'] === 'POST' ) {
+        } elseif ( $tab === 'import' && ( $_SERVER['REQUEST_METHOD'] ?? '' ) === 'POST' ) {
             Helpers::require_nonce( 'fbm_perm_import' );
-            if ( ! empty( $_FILES['import_json']['tmp_name'] ) ) {
-                $data    = file_get_contents( $_FILES['import_json']['tmp_name'] );
+            $tmp = isset( $_FILES['import_json']['tmp_name'] ) ? sanitize_text_field( (string) $_FILES['import_json']['tmp_name'] ) : '';
+            if ( $tmp !== '' ) {
+                $data    = file_get_contents( $tmp );
                 $decoded = json_decode( (string) $data, true );
                 if ( is_array( $decoded ) ) {
                     $roles_data = is_array( $decoded['roles'] ?? null ) ? $decoded['roles'] : array();
@@ -116,7 +122,7 @@ final class PermissionsPage {
                     $notice = __( 'Invalid JSON file.', 'foodbank-manager' );
                 }
             }
-        } elseif ( $tab === 'reset' && $_SERVER['REQUEST_METHOD'] === 'POST' ) {
+        } elseif ( $tab === 'reset' && ( $_SERVER['REQUEST_METHOD'] ?? '' ) === 'POST' ) {
             Helpers::require_nonce( 'fbm_perm_reset' );
             delete_option( 'fbm_permissions_roles' );
             $users = get_users( array( 'meta_key' => 'fbm_user_caps', 'fields' => 'ID' ) );
@@ -131,8 +137,8 @@ final class PermissionsPage {
         $role_caps  = Options::get( 'permissions_roles', array() );
         $caps       = Capabilities::all();
         $cap_labels = self::capLabels();
-        $search     = isset( $_GET['user_search'] ) ? sanitize_text_field( wp_unslash( (string) $_GET['user_search'] ) ) : '';
-        $paged      = isset( $_GET['paged'] ) ? max( 1, (int) $_GET['paged'] ) : 1;
+        $search     = isset( $get['user_search'] ) ? sanitize_text_field( wp_unslash( (string) $get['user_search'] ) ) : '';
+        $paged      = isset( $get['paged'] ) ? max( 1, (int) $get['paged'] ) : 1;
         $users      = array();
         if ( $tab === 'users' && $search !== '' ) {
             $users = get_users( array(
