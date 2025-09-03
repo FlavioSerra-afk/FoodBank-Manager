@@ -81,18 +81,18 @@ if ( ! $can_sensitive ) {
 </a>
 <?php if ( current_user_can( 'fb_manage_database' ) ) : // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability. ?>
 <form method="post" style="display:inline">
-		<input type="hidden" name="action" value="fbm_export_single" />
-		<input type="hidden" name="id" value="<?php echo esc_attr( (string) $entry['id'] ); ?>" />
-		<?php wp_nonce_field( 'fbm_db_single_export_' . $entry['id'], '_wpnonce' ); ?>
+				<input type="hidden" name="fbm_action" value="export_single" />
+				<input type="hidden" name="id" value="<?php echo esc_attr( (string) $entry['id'] ); ?>" />
+				<?php wp_nonce_field( 'fbm_export_single_' . $entry['id'], 'fbm_nonce' ); ?>
 				<button class="button"><?php esc_html_e( 'CSV', 'foodbank-manager' ); ?></button>
 </form>
 <?php endif; ?>
 <?php if ( current_user_can( 'fb_manage_database' ) ) : // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability. ?>
 <form method="post" style="display:inline" onsubmit="return confirm('<?php echo esc_js( __( 'Are you sure?', 'foodbank-manager' ) ); ?>');">
-		<input type="hidden" name="action" value="fbm_delete_entry" />
-		<input type="hidden" name="id" value="<?php echo esc_attr( (string) $entry['id'] ); ?>" />
-		<?php wp_nonce_field( 'fbm_db_delete_' . $entry['id'], '_wpnonce' ); ?>
-		<button class="button"><?php esc_html_e( 'Delete', 'foodbank-manager' ); ?></button>
+				<input type="hidden" name="fbm_action" value="delete_entry" />
+				<input type="hidden" name="id" value="<?php echo esc_attr( (string) $entry['id'] ); ?>" />
+				<?php wp_nonce_field( 'fbm_delete_entry_' . $entry['id'], 'fbm_nonce' ); ?>
+				<button class="button"><?php esc_html_e( 'Delete', 'foodbank-manager' ); ?></button>
 </form>
 <?php endif; ?>
 </p>

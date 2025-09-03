@@ -1,3 +1,4 @@
+Docs-Revision: 2025-09-04 (Wave CS-Backlog-06)
 # FoodBank Manager — Product Requirements Document (PRD)
 
 **Repo file:** `Docs/PRD-foodbank-manager.md`  
@@ -108,6 +109,8 @@ Roles map to WordPress **capabilities** (granular; see §10 Security).
 ### 5.5 Admin (wp-admin) Interface
 - **Menu:** FoodBank → **Dashboard**, **Attendance**, **Database**, **Forms**, **Email Templates**, **Settings**, **Permissions**, **Diagnostics**.
 - **Database list:** filters (date, status, city, postcode, has file, consent), column chooser, pagination.
+  - **Capabilities:** viewing and exporting require `fb_manage_database`; sensitive fields unmasked only with `fb_view_sensitive`.
+  - **Exports:** CSV export respects current filters and masks sensitive fields by default.
 - **Entry view:** all fields, internal notes, status (new/review/approved/declined/archived), actions: Edit, PDF, CSV, Delete (with confirm).
 - **Email Templates:** WYSIWYG editor, variables list, preview, send test.
 - **Settings:** branding, date/time, email defaults, spam protection keys, file policy, retention/anonymisation, encryption controls (see §10).
