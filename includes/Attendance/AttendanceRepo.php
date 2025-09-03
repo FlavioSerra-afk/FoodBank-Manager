@@ -115,10 +115,9 @@ final class AttendanceRepo {
 			);
 		}
 		if ( $statuses ) {
-			$where[] = $wpdb->prepare(
-				't.status IN (' . implode( ', ', array_fill( 0, count( $statuses ), '%s' ) ) . ')',
-				$statuses
-			);
+				$placeholders = implode( ', ', array_fill( 0, count( $statuses ), '%s' ) );
+				$where[]      = "t.status IN ($placeholders)";
+				$params       = array_merge( $params, $statuses );
 		}
 
 		$types = array_values( array_filter( array_map( 'sanitize_text_field', (array) ( $args['type'] ?? array() ) ) ) );
@@ -129,10 +128,9 @@ final class AttendanceRepo {
 			);
 		}
 		if ( $types ) {
-			$where[] = $wpdb->prepare(
-				't.type IN (' . implode( ', ', array_fill( 0, count( $types ), '%s' ) ) . ')',
-				$types
-			);
+				$placeholders = implode( ', ', array_fill( 0, count( $types ), '%s' ) );
+				$where[]      = "t.type IN ($placeholders)";
+				$params       = array_merge( $params, $types );
 		}
 
 		$manager_id = absint( $args['manager_id'] ?? 0 );
@@ -259,16 +257,21 @@ WHERE t2.application_id = t.application_id
 		if ( ! $include_voided ) {
 			$where[] = 't.is_void = 0';
 		}
-		$where_sql = implode( ' AND ', $where );
+				$where_sql = implode( ' AND ', $where );
 
-		$rows = $wpdb->get_results(
-			$wpdb->prepare(
-        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, Generic.Files.LineLength.TooLong -- table name is constant.
-				"SELECT t.id,t.status,t.attendance_at,t.event_id,t.type,t.method,t.recorded_by_user_id,t.is_void,t.void_reason,t.void_by_user_id,t.void_at FROM {$t_att} t WHERE {$where_sql} ORDER BY t.attendance_at ASC",
-				$params
-			),
-			'ARRAY_A'
-		);
+				$sql  = "
+SELECT t.id, t.status, t.attendance_at, t.event_id, t.type, t.method,
+       t.recorded_by_user_id, t.is_void, t.void_reason,
+       t.void_by_user_id, t.void_at
+FROM {$t_att} t
+WHERE {$where_sql}
+ORDER BY t.attendance_at ASC
+";
+				$rows = $wpdb->get_results(
+                       // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is constant and placeholders match params length.
+					$wpdb->prepare( $sql, $params ),
+					'ARRAY_A'
+				);
 
 		if ( empty( $rows ) ) {
 			return array();
