@@ -108,17 +108,31 @@ final class AttendanceRepo {
 		}
 
 		$statuses = array_values( array_filter( array_map( 'sanitize_text_field', (array) ( $args['status'] ?? array() ) ) ) );
+		if ( isset( $args['status'] ) && empty( $statuses ) ) {
+			return array(
+				'rows'  => array(),
+				'total' => 0,
+			);
+		}
 		if ( $statuses ) {
-			$ph      = implode( ',', array_fill( 0, count( $statuses ), '%s' ) );
-			$where[] = "t.status IN ($ph)";
-			$params  = array_merge( $params, $statuses );
+			$where[] = $wpdb->prepare(
+				't.status IN (' . implode( ', ', array_fill( 0, count( $statuses ), '%s' ) ) . ')',
+				$statuses
+			);
 		}
 
 		$types = array_values( array_filter( array_map( 'sanitize_text_field', (array) ( $args['type'] ?? array() ) ) ) );
+		if ( isset( $args['type'] ) && empty( $types ) ) {
+			return array(
+				'rows'  => array(),
+				'total' => 0,
+			);
+		}
 		if ( $types ) {
-			$ph      = implode( ',', array_fill( 0, count( $types ), '%s' ) );
-			$where[] = "t.type IN ($ph)";
-			$params  = array_merge( $params, $types );
+			$where[] = $wpdb->prepare(
+				't.type IN (' . implode( ', ', array_fill( 0, count( $types ), '%s' ) ) . ')',
+				$types
+			);
 		}
 
 		$manager_id = absint( $args['manager_id'] ?? 0 );
@@ -127,33 +141,27 @@ final class AttendanceRepo {
 			$params[] = $manager_id;
 		}
 
-		$where_sql = implode( ' AND ', $where );
-		$having    = ! empty( $args['policy_only'] ) ? ' HAVING policy_breach = 1' : '';
+				$where_sql = implode( ' AND ', $where );
+				$having    = ! empty( $args['policy_only'] ) ? ' HAVING policy_breach = 1' : '';
 
-		$allowed = array( 'created_at', 'last_attended', 'visits_range', 'noshows_range', 'visits_12m', 'id', 'status', 'application_id' );
-		$orderby = in_array( $args['orderby'] ?? '', $allowed, true ) ? (string) $args['orderby'] : 'created_at';
-		$order   = 'ASC' === strtoupper( $args['order'] ?? '' ) ? 'ASC' : 'DESC';
+				$order_map = array(
+					'created_at' => 'a.created_at',
+					'status'     => 'a.status',
+					'person_id'  => 'a.person_id',
+					'event_id'   => 't.event_id',
+					'last_seen'  => 'last_attended',
+				);
+				$requested = (string) ( $args['orderby'] ?? '' );
+				$order_by  = $order_map[ $requested ] ?? 'a.created_at';
+				$order     = 'ASC' === strtoupper( $args['order'] ?? '' ) ? 'ASC' : 'DESC';
+				$order_sql = " ORDER BY {$order_by} {$order}";
 
-		switch ( $orderby ) {
-			case 'created_at':
-			case 'id':
-			case 'status':
-				$order_by_expr = 'a.' . $orderby;
-				break;
-			case 'application_id':
-				$order_by_expr = 'application_id';
-				break;
-			default:
-				$order_by_expr = $orderby;
-		}
-		$order_sql = " ORDER BY {$order_by_expr} {$order}";
+				$limit     = min( 500, max( 1, absint( $args['per_page'] ?? 25 ) ) );
+				$page      = max( 1, absint( $args['page'] ?? 1 ) );
+				$offset    = max( 0, ( $page - 1 ) * $limit );
+				$limit_sql = $wpdb->prepare( ' LIMIT %d OFFSET %d', $limit, $offset );
 
-		$limit     = min( 100, max( 1, absint( $args['per_page'] ?? 25 ) ) );
-		$page      = max( 1, absint( $args['page'] ?? 1 ) );
-		$offset    = max( 0, ( $page - 1 ) * $limit );
-		$limit_sql = $wpdb->prepare( ' LIMIT %d OFFSET %d', $limit, $offset );
-
-		$base_sql = "
+				$base_sql = "
 SELECT
   a.id AS application_id,
   MAX(CASE WHEN t.status='present' THEN t.attendance_at END)                                                 AS last_attended,
@@ -174,11 +182,11 @@ JOIN {$t_app} a ON a.id = t.application_id
 WHERE {$where_sql}
 GROUP BY t.application_id{$having}";
 
-		$rows = $wpdb->get_results(
+				$rows = $wpdb->get_results(
 // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- placeholders strictly match params length.
-			$wpdb->prepare( $base_sql . $order_sql . $limit_sql, array_merge( array( $rf, $rt, $rf, $rt, $rt, $policy_days ), $params ) ),
-			'ARRAY_A'
-		);
+					$wpdb->prepare( $base_sql . $order_sql . $limit_sql, array_merge( array( $rf, $rt, $rf, $rt, $rt, $policy_days ), $params ) ),
+					'ARRAY_A'
+				);
 
 		if ( ! empty( $args['policy_only'] ) ) {
 			$count_base   = "
@@ -264,18 +272,21 @@ WHERE t2.application_id = t.application_id
 			return array();
 		}
 
-		$ids = array_values( array_map( 'absint', array_column( $rows, 'id' ) ) );
+		$ids = array_values( array_filter( array_map( 'absint', array_column( $rows, 'id' ) ) ) );
 		if ( empty( $ids ) ) {
-			return $rows;
+			return array();
 		}
 
-		$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+		$placeholders = implode( ', ', array_fill( 0, count( $ids ), '%d' ) );
+		$sql          = "
+SELECT attendance_id, user_id, note_text, created_at
+FROM {$t_notes}
+WHERE attendance_id IN ($placeholders)
+ORDER BY created_at ASC
+";
 		$note_rows    = $wpdb->get_results(
-			$wpdb->prepare(
 // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is constant and placeholders match count.
-				"SELECT attendance_id,user_id,note_text,created_at FROM {$t_notes} WHERE attendance_id IN ($placeholders) ORDER BY created_at ASC",
-				$ids
-			),
+			$wpdb->prepare( $sql, $ids ),
 			'ARRAY_A'
 		);
 		$note_rows = $note_rows ? $note_rows : array();

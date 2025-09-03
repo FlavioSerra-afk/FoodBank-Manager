@@ -1,9 +1,11 @@
-Docs-Revision: 2025-09-03 (Wave CS-Backlog-07)
+Docs-Revision: 2025-09-03 (Wave CS-Backlog-08)
 # PHPCS Ignores & Suppressed Issues Dashboard
 
 _Generated: 2025-09-03 17:11:41Z
 
 This report shows which issues are currently suppressed via `phpcs:ignore` and what would fail if annotations were disabled.
+
+Wave note: `includes/Attendance/AttendanceRepo.php` holds most suppressions; CS-Backlog-08 will drop the ignoreFile, enforce `$wpdb->prepare()` with strict placeholders, and backfill tests.
 
 ## Snapshot
 

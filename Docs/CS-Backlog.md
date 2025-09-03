@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-03 (Wave CS-Backlog-07)
+Docs-Revision: 2025-09-03 (Wave CS-Backlog-08)
 Strict (cleaned):
 
 includes/Admin/SettingsPage.php
@@ -6,6 +6,9 @@ includes/Admin/EmailsPage.php
 includes/Admin/ThemePage.php
 includes/Admin/Menu.php
 includes/Admin/PermissionsPage.php
+
+Wave focus:
+- Convert `includes/Attendance/AttendanceRepo.php` to strict `$wpdb->prepare()` queries, ensure masking defaults, and backfill unit tests.
 
 Legacy (temporary ignoreFile to unblock ZIP):
 
@@ -60,4 +63,5 @@ replacing ignoreFile with real fixes (escaping, nonces, prepared SQL, docblocks)
 keeping only surgical one-line // phpcs:ignore … where wp_kses_post() or strict IN (…) placeholders trigger false positives.
 
 Next cleanup targets:
+- includes/Attendance/AttendanceRepo.php
 - includes/Admin/PermissionsPage.php

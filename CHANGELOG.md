@@ -7,6 +7,7 @@
 - PHPStan config modernized (no deprecated options)
 ### Docs
 - CS-Backlog.md and PHPCS-Ignores.md revision-stamped for Wave CS-Backlog-07
+- Clarified AttendanceRepo SQL safety, masking defaults, and test coverage across PRD, Architecture, DB_SCHEMA, API, README, CONTRIBUTING, CS-Backlog, PHPCS-Ignores, and ISSUES docs.
 
 ## [1.0.3] - 2025-09-04
 ### Security
