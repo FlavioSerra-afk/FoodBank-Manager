@@ -1,4 +1,4 @@
-<?php // phpcs:ignore WordPress.Files.FileName.NotHyphenatedLowercase,WordPress.Files.FileName.InvalidClassFileName
+<?php
 /**
  * Email templates admin page.
  *
@@ -23,16 +23,18 @@ class EmailsPage {
 	 * @since 0.1.1
 	 */
 	public static function route(): void {
-		if ( ! current_user_can( 'fb_manage_settings' ) && ! current_user_can( 'manage_options' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
-			wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ), '', array( 'response' => 403 ) );
+		if ( ! current_user_can( 'fb_manage_settings' ) && ! current_user_can( 'manage_options' ) ) {
+				wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ), '', array( 'response' => 403 ) );
 		}
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only preview; template sanitized in handler.
-		if ( isset( $_GET['preview'], $_GET['template'] ) ) {
-			self::handle_preview();
-			return;
+		if ( isset( $_GET['preview'], $_GET['template'], $_GET['_fbm_nonce'] ) ) {
+				check_admin_referer( 'fbm_admin_action', '_fbm_nonce' );
+				$template = sanitize_key( (string) wp_unslash( $_GET['template'] ) );
+				self::handle_preview( $template );
+				return;
 		}
-		if ( isset( $_SERVER['REQUEST_METHOD'] ) && 'POST' === $_SERVER['REQUEST_METHOD'] ) {
-			self::handle_post();
+			$method = strtoupper( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ?? '' ) ) );
+		if ( 'POST' === $method ) {
+				self::handle_post();
 		}
 	}
 
@@ -42,54 +44,65 @@ class EmailsPage {
 	 * @since 0.1.1
 	 */
 	private static function handle_post(): void {
-		check_admin_referer( 'fbm_admin_action', '_fbm_nonce' );
-		if ( ! current_user_can( 'manage_options' ) && ! current_user_can( 'fb_manage_settings' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
-			wp_die( esc_html__( 'You do not have permission to perform this action.', 'foodbank-manager' ) );
+			check_admin_referer( 'fbm_admin_action', '_fbm_nonce' );
+		if ( ! current_user_can( 'manage_options' ) && ! current_user_can( 'fb_manage_settings' ) ) {
+				wp_die( esc_html__( 'You do not have permission to perform this action.', 'foodbank-manager' ) );
 		}
-		$action = sanitize_key( (string) ( $_POST['fbm_email_action'] ?? '' ) );
+			$action = sanitize_key( (string) ( $_POST['fbm_email_action'] ?? '' ) );
 		if ( 'send_test' === $action ) {
-			self::send_test();
-			return;
+				$template = sanitize_key( (string) ( $_POST['test_template'] ?? 'applicant_confirmation' ) );
+				$to       = sanitize_email( wp_unslash( (string) ( $_POST['test_email'] ?? '' ) ) );
+				self::send_test( $template, $to );
+				return;
 		}
-		$data = isset( $_POST['templates'] ) && is_array( $_POST['templates'] )
-			? array_map(
-				fn( $tpl ) => array(
+		$data      = array();
+		$templates = filter_input( INPUT_POST, 'templates', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
+		if ( is_array( $templates ) ) {
+			/**
+			 * Raw templates data.
+			 *
+			 * @var array<string,array<string,string>> $raw
+			 */
+			$raw = wp_unslash( $templates );
+			foreach ( $raw as $key => $tpl ) {
+				$data[ sanitize_key( $key ) ] = array(
 					'subject' => sanitize_text_field( $tpl['subject'] ?? '' ),
 					'body'    => wp_kses_post( $tpl['body'] ?? '' ),
-				),
-				(array) wp_unslash( $_POST['templates'] ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized in array_map.
-			)
-			: array();
+				);
+			}
+		}
 		Templates::saveAll( $data );
-		add_settings_error( 'fbm-emails', 'fbm_saved', esc_html__( 'Templates saved.', 'foodbank-manager' ), 'updated' );
-		$url = wp_get_referer();
-		$url = $url ? $url : admin_url();
-		wp_safe_redirect( esc_url_raw( $url ) );
-		exit;
+			add_settings_error( 'fbm-emails', 'fbm_saved', esc_html__( 'Templates saved.', 'foodbank-manager' ), 'updated' );
+			$url = add_query_arg( 'updated', 1, menu_page_url( 'fbm-emails', false ) );
+			wp_safe_redirect( esc_url_raw( $url ) );
+			exit;
 	}
 
-	/**
-	 * Send a test email.
-	 *
-	 * @since 0.1.1
-	 */
-	private static function send_test(): void {
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified in handle_post().
-		$template = sanitize_key( (string) ( $_POST['test_template'] ?? 'applicant_confirmation' ) );
-		$user     = wp_get_current_user();
+		/**
+		 * Send a test email.
+		 *
+		 * @since 0.1.1
+		 *
+		 * @param string $template Template key.
+		 * @param string $to       Destination email.
+		 *
+		 * @return void
+		 */
+	private static function send_test( string $template, string $to ): void {
+		$user = wp_get_current_user();
 		if ( ! $user instanceof WP_User ) {
-			return;
+				return;
 		}
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified in handle_post().
-		$to = sanitize_email( (string) wp_unslash( $_POST['test_email'] ?? $user->user_email ) );
 		if ( ! $to || ! is_email( $to ) ) {
-			return;
+				return;
 		}
-		$rendered = Templates::render( $template, self::sample_vars() );
-		wp_mail( $to, $rendered['subject'], $rendered['body_html'], array( 'Content-Type: text/html; charset=UTF-8' ) );
-		add_settings_error( 'fbm-emails', 'fbm_test', esc_html__( 'Test email sent.', 'foodbank-manager' ), 'updated' );
-		$url = wp_get_referer();
-		$url = $url ? $url : admin_url();
+			$rendered = Templates::render( $template, self::sample_vars() );
+			wp_mail( $to, $rendered['subject'], $rendered['body_html'], array( 'Content-Type: text/html; charset=UTF-8' ) );
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				\call_user_func( 'error_log', 'fbm_test_email ' . $rendered['subject'] . ' ' . md5( $rendered['body_html'] ) );
+		}
+			add_settings_error( 'fbm-emails', 'fbm_test', esc_html__( 'Test email sent.', 'foodbank-manager' ), 'updated' );
+		$url = add_query_arg( 'updated', 1, menu_page_url( 'fbm-emails', false ) );
 		wp_safe_redirect( esc_url_raw( $url ) );
 		exit;
 	}
@@ -99,13 +112,20 @@ class EmailsPage {
 	 *
 	 * @since 0.1.1
 	 */
-	private static function handle_preview(): void {
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only preview; template sanitized below.
-		$template = sanitize_key( (string) ( $_GET['template'] ?? '' ) );
-		$rendered = Templates::render( $template, self::sample_vars() );
-		header( 'Content-Type: text/html; charset=UTF-8' );
-		echo wp_kses_post( $rendered['body_html'] );
-		exit;
+		/**
+		 * Preview an email template.
+		 *
+		 * @since 0.1.1
+		 *
+		 * @param string $template Template key.
+		 *
+		 * @return void
+		 */
+	private static function handle_preview( string $template ): void {
+			$rendered = Templates::render( $template, self::sample_vars() );
+			header( 'Content-Type: text/html; charset=UTF-8' );
+			echo wp_kses_post( $rendered['body_html'] );
+			exit;
 	}
 
 	/**

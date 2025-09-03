@@ -1,7 +1,5 @@
 Strict (cleaned):
 
-includes/Http/FormSubmitController.php
-includes/Admin/DatabasePage.php
 includes/Admin/SettingsPage.php
 includes/Admin/EmailsPage.php
 includes/Admin/ThemePage.php
@@ -16,6 +14,8 @@ includes/Admin/PermissionsPage.php
 includes/Exports/CsvExporter.php
 includes/UI/Theme.php
 includes/Mail/Templates.php
+includes/Http/FormSubmitController.php
+includes/Admin/DatabasePage.php
 includes/Core/Plugin.php
 includes/Core/Hooks.php
 includes/Core/Options.php
