@@ -55,7 +55,7 @@ final class AssetsTest extends TestCase {
                 $current_screen       = null;
         }
 
-        public function testInlineStyleContainsVariables(): void {
+        public function testThemeCssContainsVariables(): void {
                 Options::update(
                         array(
                                 'theme' => array(
@@ -67,10 +67,10 @@ final class AssetsTest extends TestCase {
                                 ),
                         )
                 );
-                global $fbm_inline_styles;
-                $assets = new Assets();
-                $assets->enqueue_front();
-                $css = $fbm_inline_styles['fbm-theme-frontend'] ?? '';
+                $ref    = new \ReflectionClass( Assets::class );
+                $method = $ref->getMethod( 'theme_css' );
+                $method->setAccessible( true );
+                $css = (string) $method->invoke( null );
                 $this->assertStringContainsString( '--fbm-primary:#010203', $css );
                 $this->assertStringContainsString( '--fbm-density:compact', $css );
                 $this->assertStringContainsString( '--fbm-font:"Inter"', $css );
@@ -82,12 +82,17 @@ final class AssetsTest extends TestCase {
                 global $fbm_enqueued_styles, $current_screen;
                 $assets = new Assets();
 
-                $current_screen = (object) array( 'id' => 'dashboard' );
+                $current_screen       = (object) array( 'id' => 'dashboard' );
                 $fbm_enqueued_styles = array();
                 $assets->enqueue_admin();
                 $this->assertNotContains( 'fbm-admin', $fbm_enqueued_styles );
 
-                $current_screen = (object) array( 'id' => 'foodbank_page_fbm_settings' );
+                $current_screen       = (object) array( 'id' => 'toplevel_page_fbm' );
+                $fbm_enqueued_styles = array();
+                $assets->enqueue_admin();
+                $this->assertContains( 'fbm-admin', $fbm_enqueued_styles );
+
+                $current_screen       = (object) array( 'id' => 'foodbank_page_fbm_settings' );
                 $fbm_enqueued_styles = array();
                 $assets->enqueue_admin();
                 $this->assertContains( 'fbm-admin', $fbm_enqueued_styles );

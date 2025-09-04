@@ -13,7 +13,7 @@
 ### Build
 - `phpstan:fast` memory limit increased to 1G.
 ### Docs
-- Docs revised for Admin Menu De-dup + Canonical Screen IDs (Wave v1.2.3).
+- Docs revised for Admin Menu canonicalization, screen gating, and template wrappers (Wave v1.2.3-fix).
 ### QA
 - Remove `AttendanceRepo` PHPCS suppression and document query filters.
 

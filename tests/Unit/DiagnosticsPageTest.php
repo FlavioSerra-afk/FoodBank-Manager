@@ -106,6 +106,11 @@ if ( ! function_exists( 'is_email' ) ) {
         return (bool) filter_var( $email, FILTER_VALIDATE_EMAIL );
     }
 }
+if ( ! function_exists( 'get_current_screen' ) ) {
+    function get_current_screen() {
+        return (object) array( 'id' => 'foodbank_page_fbm_diagnostics' );
+    }
+}
 if ( ! function_exists( 'add_filter' ) ) {
     function add_filter( $tag, $function_to_add ) {}
 }

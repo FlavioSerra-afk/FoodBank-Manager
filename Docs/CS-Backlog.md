@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-05 (Wave v1.2.4 – Strict Guard Green)
+Docs-Revision: 2025-09-04 (Wave v1.2.3-fix)
 Strict (cleaned):
 
 includes/Admin/EmailsPage.php

@@ -73,13 +73,10 @@ if ( ! class_exists( \FoodBankManager\Core\Plugin::class ) ) {
 
 // Boot plugin after all plugins load.
 add_action(
-	'plugins_loaded',
-	static function (): void {
-		$plugin = new \FoodBankManager\Core\Plugin();
-		if ( method_exists( $plugin, 'boot' ) ) {
-			$plugin->boot();
-		}
-	}
+        'plugins_loaded',
+        static function (): void {
+                \FoodBankManager\Core\Plugin::boot();
+        }
 );
 
 // Activation/Deactivation hooks.

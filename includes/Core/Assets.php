@@ -28,10 +28,10 @@ class Assets {
         }
 
         public function enqueue_admin(): void {
-                $screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-                if ( ! $screen || ( strpos( $screen->id, 'toplevel_page_fbm' ) !== 0 && strpos( $screen->id, 'foodbank_page_fbm_' ) !== 0 ) ) {
+                if ( ! self::is_fbm_screen() ) {
                         return;
                 }
+                $screen = get_current_screen();
                 wp_register_style( 'fbm-admin', FBM_URL . 'assets/css/admin.css', array(), Plugin::FBM_VERSION );
                 wp_add_inline_style( 'fbm-admin', self::theme_css() );
                 wp_enqueue_style( 'fbm-admin' );
@@ -64,5 +64,19 @@ class Assets {
                         $css .= "\n" . $custom;
                 }
                 return $css;
+        }
+
+        /**
+         * Check if current screen belongs to FBM.
+         */
+        private static function is_fbm_screen(): bool {
+                if ( ! function_exists( 'get_current_screen' ) ) {
+                        return false;
+                }
+                $s = get_current_screen();
+                if ( ! $s || empty( $s->id ) ) {
+                        return false;
+                }
+                return str_starts_with( $s->id, 'toplevel_page_fbm' ) || str_starts_with( $s->id, 'foodbank_page_fbm_' );
         }
 }

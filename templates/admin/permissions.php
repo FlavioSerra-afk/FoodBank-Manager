@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 $perms_base = menu_page_url( 'fbm_permissions', false );
 ?>
-<div class="wrap fbm-admin">
+<div class="fbm-admin"><div class="wrap">
         <h1><?php \esc_html_e( 'Permissions', 'foodbank-manager' ); ?></h1>
 <h2 class="nav-tab-wrapper">
 <a href="<?php echo esc_url( $perms_base ); ?>"
@@ -166,4 +166,4 @@ value="1" <?php checked( isset( $role_caps[ $role_key ][ $cap ] ) ? (bool) $role
                                                 <?php submit_button( esc_html__( 'Reset to defaults', 'foodbank-manager' ), 'delete' ); ?>
                 </form>
         <?php endif; ?>
-</div>
+</div></div>

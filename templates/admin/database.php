@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		exit;
 }
 ?>
-<div class="wrap fbm-admin">
+<div class="fbm-admin"><div class="wrap">
 <h1><?php esc_html_e( 'Database', 'foodbank-manager' ); ?></h1>
 <div class="fbm-preset-bar">
 <form method="post" style="display:inline">
@@ -256,4 +256,4 @@ document.querySelectorAll('.fbm-column-toggle input[type="checkbox"]').forEach(f
 		});
 });
 </script>
-</div>
+</div></div>

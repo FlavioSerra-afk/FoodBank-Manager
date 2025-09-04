@@ -20,16 +20,21 @@ $kek_defined    = defined( 'FBM_KEK_BASE64' ) && FBM_KEK_BASE64 !== '';
 $mail_available = function_exists( 'wp_mail' );
 $cron_cleanup   = wp_next_scheduled( 'fbm_cron_cleanup' );
 $cron_retry     = wp_next_scheduled( 'fbm_cron_email_retry' );
-$notice         = isset( $_GET['notice'] ) ? sanitize_key( wp_unslash( $_GET['notice'] ) ) : '';
-$missing_slugs  = array();
+$notice        = isset( $_GET['notice'] ) ? sanitize_key( wp_unslash( $_GET['notice'] ) ) : '';
+$missing_slugs = array();
+$found_slugs   = array();
 foreach ( \FoodBankManager\Admin\Menu::slugs() as $slug ) {
     if ( menu_page_url( $slug, false ) === false ) {
         $missing_slugs[] = $slug;
+    } else {
+        $found_slugs[] = $slug;
     }
 }
-$slugs_ok = empty( $missing_slugs );
+$slugs_ok   = empty( $missing_slugs );
+$screen     = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+$gating_ok  = $screen && ( str_starts_with( $screen->id, 'toplevel_page_fbm' ) || str_starts_with( $screen->id, 'foodbank_page_fbm_' ) );
 ?>
-<div class="wrap fbm-admin">
+<div class="fbm-admin"><div class="wrap">
     <h1><?php esc_html_e( 'Diagnostics', 'foodbank-manager' ); ?></h1>
     <?php if ( 'sent' === $notice ) : ?>
         <div class="notice notice-success"><p><?php esc_html_e( 'Test email sent.', 'foodbank-manager' ); ?></p></div>
@@ -75,12 +80,23 @@ $slugs_ok = empty( $missing_slugs );
                 <td><?php echo esc_html( $cron_retry ? gmdate( 'Y-m-d H:i:s', $cron_retry ) : __( 'not scheduled', 'foodbank-manager' ) ); ?></td>
             </tr>
             <tr>
-                <td><?php esc_html_e( 'Admin menu slugs', 'foodbank-manager' ); ?></td>
+                <td><?php esc_html_e( 'Canonical menu slugs registered', 'foodbank-manager' ); ?></td>
                 <td><?php
                 if ( $slugs_ok ) {
-                    echo '<span class="dashicons dashicons-yes-alt" style="color:green"></span>';
+                    echo '<span class="dashicons dashicons-yes-alt" style="color:green"></span> ' . esc_html( implode( ', ', $found_slugs ) );
                 } else {
-                    echo esc_html( implode( ', ', $missing_slugs ) );
+                    echo '\u26A0\uFE0F ' . esc_html( implode( ', ', $missing_slugs ) );
+                }
+                ?></td>
+            </tr>
+            <tr>
+                <td><?php esc_html_e( 'FBM Asset Gating active (screen id prefix check)', 'foodbank-manager' ); ?></td>
+                <td><?php
+                if ( $gating_ok ) {
+                    echo '<span class="dashicons dashicons-yes-alt" style="color:green"></span> ' . esc_html( $screen->id );
+                } else {
+                    $id = $screen && isset( $screen->id ) ? $screen->id : '';
+                    echo '\u26A0\uFE0F ' . esc_html( $id === '' ? 'missing' : $id );
                 }
                 ?></td>
             </tr>
@@ -97,4 +113,4 @@ $slugs_ok = empty( $missing_slugs );
         <input type="hidden" name="fbm_action" value="repair_caps" />
         <p><button type="submit" class="button"><?php esc_html_e( 'Repair Capabilities', 'foodbank-manager' ); ?></button></p>
     </form>
-</div>
+</div></div>

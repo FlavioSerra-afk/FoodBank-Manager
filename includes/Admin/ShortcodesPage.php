@@ -15,23 +15,9 @@ use FoodBankManager\Shortcodes\Metadata;
  * Shortcodes admin page.
  */
 final class ShortcodesPage {
-		/**
-		 * Register menu item.
-		 */
-	public static function register_menu(): void {
-						add_submenu_page(
-							'fbm',
-							esc_html__( 'Shortcodes', 'foodbank-manager' ),
-							esc_html__( 'Shortcodes', 'foodbank-manager' ),
-							'fb_manage_forms',
-							'fbm_shortcodes',
-							array( self::class, 'route' )
-						);
-	}
-
-		/**
-		 * Render the page.
-		 */
+				/**
+				 * Render the page.
+				 */
 	public static function route(): void {
 		if ( ! current_user_can( 'fb_manage_forms' ) ) {
 						wp_die(

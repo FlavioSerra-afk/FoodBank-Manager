@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.2.3 – Admin Menu De-dup + Canonical Screen IDs)
+Docs-Revision: 2025-09-04 (Wave v1.2.3-fix)
 # FoodBank Manager — Product Requirements Document (PRD)
 
 **Repo file:** `Docs/PRD-foodbank-manager.md`  
