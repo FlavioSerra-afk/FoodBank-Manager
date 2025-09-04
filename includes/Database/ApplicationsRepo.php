@@ -166,4 +166,42 @@ class ApplicationsRepo {
                         'files'      => $files,
                 );
         }
+
+       /**
+        * Find applications by email address.
+        *
+        * @param string $email Email address.
+        * @return array<int,array>
+        */
+       public static function find_by_email( string $email ): array {
+               global $wpdb;
+               $like   = '%' . $wpdb->esc_like( substr( $email, 0, 128 ) ) . '%';
+               $sql    = "SELECT * FROM {$wpdb->prefix}fb_applications WHERE data_json LIKE %s";
+               $query  = $wpdb->prepare( $sql, $like );
+               $rows   = $wpdb->get_results( $query, 'ARRAY_A' );
+               return $rows ? $rows : array();
+       }
+
+       /**
+        * Get files for a given application ID.
+        *
+        * @param int $id Application ID.
+        * @return array<int,array>
+        */
+       public static function get_files_for_application( int $id ): array {
+               global $wpdb;
+               $sql     = "SELECT id, stored_path, original_name, mime FROM {$wpdb->prefix}fb_files WHERE application_id = %d";
+               $query   = $wpdb->prepare( $sql, $id );
+               $rows    = $wpdb->get_results( $query, 'ARRAY_A' );
+               $sanitized = array();
+               foreach ( $rows ?: array() as $row ) {
+                       $sanitized[] = array(
+                               'id'           => (int) ( $row['id'] ?? 0 ),
+                               'stored_path'  => sanitize_text_field( (string) ( $row['stored_path'] ?? '' ) ),
+                               'original_name'=> sanitize_file_name( (string) ( $row['original_name'] ?? '' ) ),
+                               'mime'         => sanitize_text_field( (string) ( $row['mime'] ?? '' ) ),
+                       );
+               }
+               return $sanitized;
+       }
 }

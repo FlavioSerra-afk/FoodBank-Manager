@@ -15,11 +15,10 @@ if ( ! current_user_can( 'fb_manage_diagnostics' ) ) {
 
 $php_version    = PHP_VERSION;
 $wp_version     = get_bloginfo( 'version' );
+$fbm_version    = defined( 'FBM_VERSION' ) ? FBM_VERSION : 'dev';
 $sodium         = extension_loaded( 'sodium' ) ? 'native' : ( class_exists( '\\ParagonIE_Sodium_Compat' ) ? 'polyfill' : 'missing' );
 $kek_defined    = defined( 'FBM_KEK_BASE64' ) && FBM_KEK_BASE64 !== '';
-$mail_available = function_exists( 'wp_mail' );
-$cron_cleanup   = wp_next_scheduled( 'fbm_cron_cleanup' );
-$cron_retry     = wp_next_scheduled( 'fbm_cron_email_retry' );
+$transport      = function_exists( 'wp_mail' ) ? 'wp_mail' : 'none';
 $notice        = isset( $_GET['notice'] ) ? sanitize_key( wp_unslash( $_GET['notice'] ) ) : '';
 $missing_slugs = array();
 $found_slugs   = array();
@@ -43,71 +42,25 @@ $gating_ok  = \FoodBankManager\Core\Screen::is_fbm_screen();
     <?php elseif ( 'error' === $notice ) : ?>
         <div class="notice notice-error"><p><?php esc_html_e( 'Action failed.', 'foodbank-manager' ); ?></p></div>
     <?php endif; ?>
-    <table class="widefat fixed">
-        <thead>
-            <tr>
-                <th><?php esc_html_e( 'Check', 'foodbank-manager' ); ?></th>
-                <th><?php esc_html_e( 'Result', 'foodbank-manager' ); ?></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><?php esc_html_e( 'PHP version', 'foodbank-manager' ); ?></td>
-                <td><?php echo esc_html( $php_version ); ?></td>
-            </tr>
-            <tr>
-                <td><?php esc_html_e( 'WordPress version', 'foodbank-manager' ); ?></td>
-                <td><?php echo esc_html( $wp_version ); ?></td>
-            </tr>
-            <tr>
-                <td><?php esc_html_e( 'Sodium', 'foodbank-manager' ); ?></td>
-                <td><?php echo esc_html( $sodium ); ?></td>
-            </tr>
-            <tr>
-                <td><?php esc_html_e( 'Encryption key', 'foodbank-manager' ); ?></td>
-                <td><?php echo esc_html( $kek_defined ? __( 'present', 'foodbank-manager' ) : __( 'missing', 'foodbank-manager' ) ); ?></td>
-            </tr>
-            <tr>
-                <td><?php esc_html_e( 'Mail transport', 'foodbank-manager' ); ?></td>
-                <td><?php echo esc_html( $mail_available ? __( 'available', 'foodbank-manager' ) : __( 'missing', 'foodbank-manager' ) ); ?></td>
-            </tr>
-            <tr>
-                <td><?php esc_html_e( 'Next fbm_cron_cleanup', 'foodbank-manager' ); ?></td>
-                <td><?php echo esc_html( $cron_cleanup ? gmdate( 'Y-m-d H:i:s', $cron_cleanup ) : __( 'not scheduled', 'foodbank-manager' ) ); ?></td>
-            </tr>
-            <tr>
-                <td><?php esc_html_e( 'Next fbm_cron_email_retry', 'foodbank-manager' ); ?></td>
-                <td><?php echo esc_html( $cron_retry ? gmdate( 'Y-m-d H:i:s', $cron_retry ) : __( 'not scheduled', 'foodbank-manager' ) ); ?></td>
-            </tr>
-            <tr>
-                <td><?php esc_html_e( 'Canonical menu slugs registered', 'foodbank-manager' ); ?></td>
-                <td><?php
-                if ( $slugs_ok ) {
-                    echo '<span class="dashicons dashicons-yes-alt" style="color:green"></span> ' . esc_html( implode( ', ', $found_slugs ) );
-                } else {
-                    echo '\u26A0\uFE0F ' . esc_html( implode( ', ', $missing_slugs ) );
-                }
-                ?></td>
-            </tr>
-            <tr>
-                <td><?php esc_html_e( 'FBM Asset Gating active (screen id prefix check)', 'foodbank-manager' ); ?></td>
-                <td><?php
-                if ( $gating_ok ) {
-                    echo '<span class="dashicons dashicons-yes-alt" style="color:green"></span> ' . esc_html( $screen->id );
-                } else {
-                    $id = $screen && isset( $screen->id ) ? $screen->id : '';
-                    echo '\u26A0\uFE0F ' . esc_html( $id === '' ? 'missing' : $id );
-                }
-                ?></td>
-            </tr>
-        </tbody>
-    </table>
-    <h2><?php esc_html_e( 'Actions', 'foodbank-manager' ); ?></h2>
+    <h2><?php esc_html_e( 'Crypto', 'foodbank-manager' ); ?></h2>
+    <ul>
+        <li><?php echo esc_html( $kek_defined ? '✅ key' : '⚠️ key' ); ?></li>
+        <li><?php echo esc_html( 'sodium: ' . $sodium ); ?></li>
+    </ul>
+    <h2><?php esc_html_e( 'SMTP', 'foodbank-manager' ); ?></h2>
+    <p><?php echo esc_html( sprintf( __( 'Transport: %s', 'foodbank-manager' ), $transport ) ); ?></p>
     <form method="post" action="">
-        <?php wp_nonce_field( 'fbm_diagnostics_send_test_email', '_fbm_nonce' ); ?>
-        <input type="hidden" name="fbm_action" value="send_test_email" />
-        <p><button type="submit" class="button"><?php esc_html_e( 'Send Test Email', 'foodbank-manager' ); ?></button></p>
+        <?php wp_nonce_field( 'fbm_diag_mail_test', '_fbm_nonce' ); ?>
+        <input type="hidden" name="fbm_action" value="mail_test" />
+        <p><button type="submit" class="button"><?php esc_html_e( 'Send test email', 'foodbank-manager' ); ?></button></p>
     </form>
+    <h2><?php esc_html_e( 'Environment', 'foodbank-manager' ); ?></h2>
+    <ul>
+        <li><?php echo esc_html( 'PHP ' . $php_version ); ?></li>
+        <li><?php echo esc_html( 'WP ' . $wp_version ); ?></li>
+        <li><?php echo esc_html( 'FBM ' . $fbm_version ); ?></li>
+    </ul>
+    <h2><?php esc_html_e( 'Actions', 'foodbank-manager' ); ?></h2>
     <form method="post" action="">
         <?php wp_nonce_field( 'fbm_diagnostics_repair_caps', '_fbm_nonce' ); ?>
         <input type="hidden" name="fbm_action" value="repair_caps" />
