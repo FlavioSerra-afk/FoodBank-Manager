@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.1] - 2025-09-04
+### Features
+- Diagnostics Phase 1: environment checks with test email and Repair Caps.
+### Docs
+- Docs revised for Diagnostics Phase 1 (Wave v1.1.1).
+
 ## [1.1.0] - 2025-09-04
 ### Features
 - Settings Phase 1: validated options schema and admin save flow for Branding and Email defaults.

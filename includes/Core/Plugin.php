@@ -12,7 +12,7 @@ use FoodBankManager\Core\Options;
 
 final class Plugin {
 
-    public const FBM_VERSION = '1.1.0';
+    public const FBM_VERSION = '1.1.1';
 
         private static ?Plugin $instance = null;
 
@@ -56,6 +56,7 @@ final class Plugin {
                         add_action('load-foodbank_page_fbm-settings', [\FoodBankManager\Admin\SettingsPage::class, 'route']);
                         add_action('load-foodbank_page_fbm-theme', [\FoodBankManager\Admin\ThemePage::class, 'route']);
                         add_action('load-foodbank_page_fbm-emails', [\FoodBankManager\Admin\EmailsPage::class, 'route']);
+                        add_action('load-foodbank_page_fbm-diagnostics', [\FoodBankManager\Admin\DiagnosticsPage::class, 'route']);
                         add_action(
                                 'admin_enqueue_scripts',
                                 static function ( string $hook ): void {

@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.0 – Settings Phase 1)
+Docs-Revision: 2025-09-04 (Wave v1.1.1 – Diagnostics P1)
 # Local Development
 
 This project supports two easy setups.
@@ -36,6 +36,8 @@ if ( getenv('FBM_KEK_BASE64') ) {
 ```
 
 Never commit real keys. See `.env.example`.
+
+Use wp-admin → FoodBank → Diagnostics to verify environment checks, send a test email, or repair capabilities.
 
 ### QA one-liners
 

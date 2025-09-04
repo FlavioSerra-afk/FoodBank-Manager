@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.0 – Settings Phase 1)
+Docs-Revision: 2025-09-04 (Wave v1.1.1 – Diagnostics P1)
 # FoodBank Manager — Product Requirements Document (PRD)
 
 **Repo file:** `Docs/PRD-foodbank-manager.md`  
@@ -63,7 +63,7 @@ Roles map to WordPress **capabilities** (granular; see §10 Security).
 - Data storage in custom tables with **field-level encryption**.
 - Back-end Database tab (list, view, edit, delete, export).
 - Front-end dashboard (authenticated) for **Viewer/Manager** with filters and exports; **Manager** can mark attendance.
-- Diagnostics tab: email logs, resend, test email, system health.
+- Diagnostics tab: email logs, resend, test email, repair caps, environment checks.
 - Exports: CSV/XLSX, single & bulk PDF.
 - GDPR: consent logs, SAR export, retention/anonymisation.
 
@@ -115,7 +115,7 @@ Roles map to WordPress **capabilities** (granular; see §10 Security).
 - **Entry view:** all fields, internal notes, status (new/review/approved/declined/archived), actions: Edit, PDF, CSV, Delete (with confirm).
 - **Email Templates:** WYSIWYG editor, variables list, preview, send test.
 - **Settings:** branding, date/time, email defaults, spam protection keys, file policy, retention/anonymisation, encryption controls (see §10).
-- **Diagnostics:** email logs, resend, environment checks (PHP/WP version, cron, transport).
+- **Diagnostics:** email logs, resend, test email, repair capabilities, environment checks (PHP/WP version, cron, KEK, mail transport).
 - **Permissions:** map capabilities to roles and set per-user overrides.
 - **Attendance repository:** all queries use `$wpdb->prepare()` with strict placeholders; results mask PII unless `fb_view_sensitive` is granted; unit tests cover check-in, no-show, void/unvoid, and policy edge cases.
 
@@ -480,7 +480,7 @@ PDF templates, theming presets, PT translations, docs.
 
 - Email log (sent/failed), resend, provider messages.
 - Cron/queue status; pending jobs; last run times.
-- Environment checks (PHP/WP versions, HTTPS, uploads writable, KEK present).
+- Environment checks (PHP/WP versions, KEK presence, mail transport, cron schedules).
 - Self-check warnings if encryption/CAPTCHA/SMTP not configured.
 
 ---
