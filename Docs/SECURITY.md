@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.5 – Forms Presets P1)
+Docs-Revision: 2025-09-04 (Wave v1.1.6 – Attendance P1)
 # Security Policy — PCC FoodBank Manager
 
 We take security seriously. Please follow the guidelines below for reporting vulnerabilities.
@@ -21,6 +21,7 @@ We aim to acknowledge reports **within 2 working days**.
 - Exposed endpoints under the plugin’s REST namespace (`pcc-fb/v1`)
 - Front‑end submission and dashboard flows
 - Database migrations and encryption code
+- Admin QR check-in URLs include only IDs + REST nonces and require `fb_manage_attendance`.
 - Admin shortcode previews enforce capability checks, nonces, attribute whitelists with `mask_sensitive=true`, and `wp_kses_post` filtering.
 - Forms presets are sanitized server-side; unknown preset IDs fall back to a minimal safe form without exposing errors to regular users.
 

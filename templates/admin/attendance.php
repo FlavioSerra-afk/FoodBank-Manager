@@ -2,12 +2,16 @@
 // phpcs:ignoreFile
 
 use FoodBankManager\Security\Helpers;
+use FoodBankManager\Admin\AttendancePage;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; }
 ?>
 <div class="wrap">
 <h1><?php esc_html_e( 'Attendance', 'foodbank-manager' ); ?></h1>
+<?php if ( isset( $_GET['fbm_override'] ) ) : ?>
+<div class="notice notice-success"><p><?php esc_html_e( 'Override check-in recorded.', 'foodbank-manager' ); ?></p></div>
+<?php endif; ?>
 <form method="get" class="fbm-filters">
 	<input type="hidden" name="page" value="fbm-attendance" />
 	<div class="fbm-filter-row">
@@ -73,9 +77,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 			'visits_range'  => __( 'Visits (Range)', 'foodbank-manager' ),
 			'noshows_range' => __( 'No-shows (Range)', 'foodbank-manager' ),
 			'visits_12m'    => __( 'Visits (12m)', 'foodbank-manager' ),
-			'policy_badge'  => __( 'Policy', 'foodbank-manager' ),
-			'timeline'      => __( 'Timeline', 'foodbank-manager' ),
-		);
+                        'policy_badge'  => __( 'Policy', 'foodbank-manager' ),
+                        'actions'       => __( 'Actions', 'foodbank-manager' ),
+                );
 		foreach ( $cols as $key => $label ) {
 			$order = ( $filters['orderby'] === $key && $filters['order'] === 'ASC' ) ? 'DESC' : 'ASC';
 			$url   = esc_url(
@@ -93,7 +97,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</tr></thead>
 	<tbody>
 	<?php if ( empty( $rows ) ) : ?>
-	<tr><td colspan="8"><?php esc_html_e( 'No attendance records.', 'foodbank-manager' ); ?></td></tr>
+        <tr><td colspan="9"><?php esc_html_e( 'No attendance records.', 'foodbank-manager' ); ?></td></tr>
 		<?php
 	else :
 		foreach ( $rows as $r ) :
@@ -107,7 +111,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<td><?php echo esc_html( (string) $r['noshows_range'] ); ?></td>
 		<td><?php echo esc_html( (string) $r['visits_12m'] ); ?></td>
 		<td><?php echo $r['policy_badge'] === 'warning' ? '<span class="badge badge-warning">' . esc_html__( 'Warning', 'foodbank-manager' ) . '</span>' : ''; ?></td>
-		<td><button type="button" class="button fbm-timeline-btn" data-app="<?php echo esc_attr( (string) $r['application_id'] ); ?>"><?php esc_html_e( 'Timeline', 'foodbank-manager' ); ?></button></td>
+                <td>
+                        <button type="button" class="button fbm-timeline-btn" data-app="<?php echo esc_attr( (string) $r['application_id'] ); ?>"><?php esc_html_e( 'Timeline', 'foodbank-manager' ); ?></button>
+                        <?php if ( current_user_can( 'fb_manage_attendance' ) ) : ?>
+                        <button type="button" class="button fbm-showqr-btn" data-url="<?php echo esc_url( AttendancePage::build_checkin_url( (int) $r['application_id'] ) ); ?>"><?php esc_html_e( 'Show QR', 'foodbank-manager' ); ?></button>
+                        <button type="button" class="button fbm-override-btn" data-app="<?php echo esc_attr( (string) $r['application_id'] ); ?>"><?php esc_html_e( 'Override & Check-in', 'foodbank-manager' ); ?></button>
+                        <?php endif; ?>
+                </td>
 	</tr>
 			<?php
 	endforeach;
@@ -162,18 +172,34 @@ endif;
 <?php endif; ?>
 </div>
 <div id="fbm-timeline-modal" style="display:none;position:fixed;top:10%;left:10%;right:10%;background:#fff;border:1px solid #ccc;padding:10px;max-height:70%;overflow:auto;z-index:1000;">
-	<button type="button" id="fbm-timeline-close" style="float:right;">&times;</button>
-	<ul id="fbm-timeline-list"></ul>
+        <button type="button" id="fbm-timeline-close" style="float:right;">&times;</button>
+        <ul id="fbm-timeline-list"></ul>
+</div>
+<div id="fbm-qr-modal" style="display:none;position:fixed;top:10%;left:10%;right:10%;background:#fff;border:1px solid #ccc;padding:10px;z-index:1000;">
+        <button type="button" id="fbm-qr-close" style="float:right;">&times;</button>
+        <div id="fbm-qr-canvas"></div>
+        <p><code id="fbm-qr-url"></code> <button type="button" id="fbm-qr-copy" class="button"><?php esc_html_e( 'Copy', 'foodbank-manager' ); ?></button></p>
+        <p><?php esc_html_e( 'Admin-only — requires login', 'foodbank-manager' ); ?></p>
+        <p><?php esc_html_e( 'Expires with session/nonce', 'foodbank-manager' ); ?></p>
+</div>
+<div id="fbm-override-modal" style="display:none;position:fixed;top:20%;left:30%;right:30%;background:#fff;border:1px solid #ccc;padding:10px;z-index:1000;">
+        <button type="button" id="fbm-override-close" style="float:right;">&times;</button>
+        <form id="fbm-override-form">
+                <label><?php esc_html_e( 'Reason', 'foodbank-manager' ); ?><br />
+                <textarea id="fbm-override-reason" required minlength="5" maxlength="500" style="width:100%;"></textarea></label>
+                <p><button type="submit" class="button button-primary"><?php esc_html_e( 'Override & Check-in', 'foodbank-manager' ); ?></button></p>
+        </form>
 </div>
 <script>
 (function(){
-	const nonce='<?php echo esc_js( wp_create_nonce( 'wp_rest' ) ); ?>';
-	const endpoint='<?php echo esc_url_raw( rest_url( 'pcc-fb/v1/attendance/timeline' ) ); ?>';
-	const includeVoided=<?php echo $include_voided ? 'true' : 'false'; ?>;
+        const nonce='<?php echo esc_js( wp_create_nonce( 'wp_rest' ) ); ?>';
+        const endpoint='<?php echo esc_url_raw( rest_url( 'pcc-fb/v1/attendance/timeline' ) ); ?>';
+        const includeVoided=<?php echo $include_voided ? 'true' : 'false'; ?>;
     const canAdmin=<?php echo current_user_can( 'fb_manage_attendance' ) ? 'true' : 'false'; ?>;
-	const voidUrl='<?php echo esc_url_raw( rest_url( 'pcc-fb/v1/attendance/void' ) ); ?>';
-	const unvoidUrl='<?php echo esc_url_raw( rest_url( 'pcc-fb/v1/attendance/unvoid' ) ); ?>';
-	const noteUrl='<?php echo esc_url_raw( rest_url( 'pcc-fb/v1/attendance/note' ) ); ?>';
+        const voidUrl='<?php echo esc_url_raw( rest_url( 'pcc-fb/v1/attendance/void' ) ); ?>';
+        const unvoidUrl='<?php echo esc_url_raw( rest_url( 'pcc-fb/v1/attendance/unvoid' ) ); ?>';
+        const noteUrl='<?php echo esc_url_raw( rest_url( 'pcc-fb/v1/attendance/note' ) ); ?>';
+        const checkinUrl='<?php echo esc_url_raw( rest_url( 'pcc-fb/v1/attendance/checkin' ) ); ?>';
 	document.querySelectorAll('.fbm-timeline-btn').forEach(btn=>{
 	btn.addEventListener('click',async()=>{
 		const app=btn.dataset.app;
@@ -221,8 +247,43 @@ endif;
 		document.getElementById('fbm-timeline-modal').style.display='block';
 	});
 	});
-	document.getElementById('fbm-timeline-close').addEventListener('click',()=>{
-	document.getElementById('fbm-timeline-modal').style.display='none';
-	});
+        document.getElementById('fbm-timeline-close').addEventListener('click',()=>{
+        document.getElementById('fbm-timeline-modal').style.display='none';
+        });
+        document.querySelectorAll('.fbm-showqr-btn').forEach(btn=>{
+        btn.addEventListener('click',()=>{
+                const url=btn.dataset.url;
+                const modal=document.getElementById('fbm-qr-modal');
+                const canvas=document.getElementById('fbm-qr-canvas');
+                canvas.innerHTML='';
+                // eslint-disable-next-line no-undef
+                new QRCode(canvas,url);
+                document.getElementById('fbm-qr-url').textContent=url;
+                modal.style.display='block';
+        });
+        });
+        document.getElementById('fbm-qr-close').addEventListener('click',()=>{
+        document.getElementById('fbm-qr-modal').style.display='none';
+        });
+        document.getElementById('fbm-qr-copy').addEventListener('click',()=>{
+        navigator.clipboard.writeText(document.getElementById('fbm-qr-url').textContent);
+        });
+        let overrideApp=0;
+        document.querySelectorAll('.fbm-override-btn').forEach(btn=>{
+        btn.addEventListener('click',()=>{
+                overrideApp=btn.dataset.app;
+                document.getElementById('fbm-override-modal').style.display='block';
+        });
+        });
+        document.getElementById('fbm-override-close').addEventListener('click',()=>{
+        document.getElementById('fbm-override-modal').style.display='none';
+        });
+        document.getElementById('fbm-override-form').addEventListener('submit',async e=>{
+        e.preventDefault();
+        const reason=document.getElementById('fbm-override-reason').value;
+        if(reason.length<5){return;}
+        const res=await fetch(checkinUrl,{method:'POST',headers:{'Content-Type':'application/json','X-WP-Nonce':nonce},body:JSON.stringify({application_id:overrideApp,override:{allowed:true,note:reason}})});
+        if(res.ok){window.location=window.location.href+(window.location.href.includes('?')?'&':'?')+'fbm_override=1';}
+        });
 })();
 </script>

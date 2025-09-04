@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.5 – Forms Presets P1)
+Docs-Revision: 2025-09-04 (Wave v1.1.6 – Attendance P1)
 # REST API (pcc-fb/v1)
 
 Base namespace: `pcc-fb/v1`. All write endpoints require `X-WP-Nonce` and capabilities.
@@ -9,6 +9,7 @@ Shortcode previews are handled via `admin-post.php` (`fbm_action=shortcode_previ
   - Body: `{ token|string OR application_id:int, event_id?:int, type?:string, method?:'qr'|'manual', override?:{ allowed:bool, note?:string } }`
   - Perm: `attendance_checkin`
   - 409 on policy conflict; include `{ policy_warning: { rule_days, last_attended_at } }`
+  - Admin QR helper: `GET` link with `_wpnonce` and `application_id` (no PII) for logged-in staff.
 - `POST /attendance/noshow`
   - Body: `{ application_id:int, event_id?:int, type?:string, reason?:string }`
   - Perm: `attendance_checkin`

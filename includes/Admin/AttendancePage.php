@@ -30,6 +30,23 @@ final class AttendancePage {
     }
 
     /**
+     * Build a REST check-in URL for an application.
+     */
+    public static function build_checkin_url( int $application_id, int $event_id = 0 ): string {
+        if ( ! current_user_can( 'fb_manage_attendance' ) ) {
+            return '';
+        }
+        $args = array(
+            'application_id' => $application_id,
+            '_wpnonce'       => wp_create_nonce( 'wp_rest' ),
+        );
+        if ( $event_id > 0 ) {
+            $args['event_id'] = $event_id;
+        }
+        return add_query_arg( $args, rest_url( 'pcc-fb/v1/attendance/checkin' ) );
+    }
+
+    /**
      * Parse filter args from GET.
      */
     private static function parseFilters(): array {
