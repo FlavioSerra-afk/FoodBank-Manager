@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.2.0 – Frontend Dashboard P1)
+Docs-Revision: 2025-09-04 (Wave v1.2.1 – Frontend Dashboard P2)
 # FoodBank Manager — Architecture
 
 ## Overview
@@ -37,7 +37,7 @@ A secure, privacy-first WordPress plugin for managing Food Bank applicant intake
 ## Components
  - **Admin Pages:** Dashboard (`fb_manage_dashboard`), Attendance (`fb_manage_attendance`), Database (`fb_manage_database`), Forms (`fb_manage_forms`) with a read-only presets library, Shortcodes builder with preview (`fb_manage_forms`), Email Templates (`fb_manage_emails`), Settings (`fb_manage_settings`), Diagnostics (`fb_manage_diagnostics` – environment checks, test email, repair caps), Permissions (`fb_manage_permissions`), Design & Theme (`fb_manage_theme`).
   - Database page requires `fb_manage_database`; filters are sanitized and whitelisted. It supports per-user column preferences (`fbm_db_columns`) and saved filter presets stored in options (`db_filter_presets`). Exports respect filters, sanitize filenames, include a UTF-8 BOM with translated headers, and mask PII unless the user has `fb_view_sensitive`.
-- **Shortcodes:** `[fbm_form]`, `[fb_attendance_manager]`, `[fbm_dashboard]` (manager-only card stats, no PII).
+- **Shortcodes:** `[fbm_form]`, `[fb_attendance_manager]`, `[fbm_dashboard]` (manager-only card stats with trend deltas and sparkline; no PII).
 - **REST:** namespace `pcc-fb/v1`; endpoints for attendance check-in, no-show, timeline, void/unvoid/note.
  - Admin Attendance page generates REST-nonce QR check-in URLs (no PII) and an override reason form.
 - **Security:** libsodium/XChaCha20-Poly1305 envelope encryption (`FBM_KEK_BASE64`), `sodium_compat` fallback; masking helpers; no PII in logs.

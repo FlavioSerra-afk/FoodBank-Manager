@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.1] - 2025-09-04
+### Features
+- Dashboard shortcode now shows trend deltas and daily check-ins sparkline.
+### Docs
+- Docs revised for Frontend Dashboard P2 (Wave v1.2.1).
+### QA
+- phpstan:fast memory limit increased to 768M.
+
 ## [1.2.0] - 2025-09-04
 ### Features
 - Manager dashboard shortcode with aggregated non-PII cards.

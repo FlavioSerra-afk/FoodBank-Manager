@@ -9,9 +9,11 @@ declare(strict_types=1);
 
 namespace FoodBankManager\Attendance;
 
+use DateTimeImmutable;
 use FoodBankManager\Core\Options;
 use wpdb;
 use function absint;
+use function sanitize_key;
 use function sanitize_text_field;
 use function sanitize_textarea_field;
 
@@ -541,6 +543,80 @@ ORDER BY created_at ASC
 			array( "SELECT COUNT(*) FROM {$t_att} WHERE is_void = 1 AND attendance_at >= %s", $since )
 		);
 		return (int) call_user_func( array( $wpdb, 'get_var' ), $prepared );
+	}
+
+		/**
+		 * Get daily present counts since a date.
+		 *
+		 * @param DateTimeImmutable $since Start date/time (UTC).
+		 * @return array<int,int> One value per day (or hour for today).
+		 */
+	public static function daily_present_counts( DateTimeImmutable $since ): array {
+			global $wpdb;
+			$t_att     = $wpdb->prefix . 'fb_attendance';
+			$since_str = sanitize_text_field( $since->format( 'Y-m-d H:i:s' ) );
+			$today     = gmdate( 'Y-m-d' );
+
+		if ( $since->format( 'Y-m-d' ) === $today ) {
+				$prepared = call_user_func_array(
+					array( $wpdb, 'prepare' ),
+					array(
+						"SELECT DATE_FORMAT(attendance_at,'%H') h, COUNT(*) c FROM {$t_att} WHERE status = 'present' AND attendance_at >= %s GROUP BY h",
+						$since_str,
+					)
+				);
+				$rows     = call_user_func( array( $wpdb, 'get_results' ), $prepared );
+				$out      = array_fill( 0, 24, 0 );
+			if ( is_array( $rows ) ) {
+				foreach ( $rows as $row ) {
+						$h = (int) $row->h;
+					if ( $h >= 0 && $h < 24 ) {
+						$out[ $h ] = (int) $row->c;
+					}
+				}
+			}
+				return $out;
+		}
+
+			$prepared  = call_user_func_array(
+				array( $wpdb, 'prepare' ),
+				array( "SELECT DATE(attendance_at) d, COUNT(*) c FROM {$t_att} WHERE status = 'present' AND attendance_at >= %s GROUP BY d", $since_str )
+			);
+			$rows      = call_user_func( array( $wpdb, 'get_results' ), $prepared );
+			$now       = new DateTimeImmutable( 'today', new \DateTimeZone( 'UTC' ) );
+			$days      = $now->diff( $since )->days;
+			$len       = $days + 1;
+			$out       = array_fill( 0, (int) $len, 0 );
+			$since_day = strtotime( $since->format( 'Y-m-d' ) );
+		if ( is_array( $rows ) ) {
+			foreach ( $rows as $row ) {
+				$d   = sanitize_text_field( (string) $row->d );
+				$idx = (int) floor( ( strtotime( $d ) - $since_day ) / 86400 );
+				if ( $idx >= 0 && $idx < $len ) {
+						$out[ $idx ] = (int) $row->c;
+				}
+			}
+		}
+			return $out;
+	}
+
+		/**
+		 * Get totals for the period since a date.
+		 *
+		 * @param DateTimeImmutable $since Start date/time (UTC).
+		 * @return array{present:int,households:int,no_shows:int,in_person:int,delivery:int,voided:int}
+		 */
+	public static function period_totals( DateTimeImmutable $since ): array {
+			$since_str = sanitize_text_field( $since->format( 'Y-m-d H:i:s' ) );
+				$types = self::count_by_type( $since_str );
+				return array(
+					'present'    => self::count_present( $since_str ),
+					'households' => self::count_unique_households( $since_str ),
+					'no_shows'   => self::count_no_shows( $since_str ),
+					'in_person'  => (int) $types['in_person'],
+					'delivery'   => (int) $types['delivery'],
+					'voided'     => self::count_voided( $since_str ),
+				);
 	}
 
 	/**
