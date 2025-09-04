@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.6 – Attendance P1)
+Docs-Revision: 2025-09-04 (Wave v1.1.7 – Database UX P1)
 Strict (cleaned):
 
 includes/Admin/EmailsPage.php
@@ -13,6 +13,7 @@ Wave focus:
 - Promote `includes/Admin/PermissionsPage.php` to Strict.
 - Phase 2: add visual form builder, uploads, and CAPTCHA options.
 - Attendance P1: admin QR check-in helper and override reason UI.
+- Database UX P1: filter presets and column toggles.
 
 Legacy (temporary ignoreFile to unblock ZIP):
 

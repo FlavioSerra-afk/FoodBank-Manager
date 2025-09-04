@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.7] - 2025-09-04
+### Features
+- Saved Database filter presets and per-user column toggles.
+### Docs
+- Docs revised for Database UX P1 (Wave v1.1.7).
+
 ## [1.1.6] - 2025-09-04
 ### Features
 - Admin-only QR check-in links and override reason prompt for Attendance.
