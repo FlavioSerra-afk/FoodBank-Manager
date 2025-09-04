@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.0] - 2025-09-04
+### Features
+- Settings Phase 1: validated options schema and admin save flow for Branding and Email defaults.
+### Docs
+- Docs revised for Settings Phase 1 (Wave v1.1.0).
+
 ## [1.0.7] - 2025-09-03
 ### Security/Quality
 - Remove PHPCS suppressions from AttendanceRepo; promote to Strict.

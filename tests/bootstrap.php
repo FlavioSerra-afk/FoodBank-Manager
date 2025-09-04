@@ -65,6 +65,12 @@ if ( ! function_exists( 'sanitize_email' ) ) {
 	}
 }
 
+if ( ! function_exists( 'esc_url_raw' ) ) {
+        function esc_url_raw( $url ) {
+                return filter_var( $url, FILTER_SANITIZE_URL );
+        }
+}
+
 if ( ! function_exists( 'is_email' ) ) {
 	function is_email( $email ) {
 		return (bool) filter_var( $email, FILTER_VALIDATE_EMAIL );

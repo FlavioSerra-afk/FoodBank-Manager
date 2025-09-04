@@ -1,7 +1,6 @@
-Docs-Revision: 2025-09-03 (Wave CS-Backlog-11B.2)
+Docs-Revision: 2025-09-04 (Wave v1.1.0 – Settings Phase 1)
 Strict (cleaned):
 
-includes/Admin/SettingsPage.php
 includes/Admin/EmailsPage.php
 includes/Admin/ThemePage.php
 includes/Admin/Menu.php

@@ -14,7 +14,51 @@ namespace FoodBankManager\Core;
  * Plugin options utility.
  */
 class Options {
-	private const KEY = 'fbm_settings';
+        private const KEY = 'fbm_settings';
+
+       /**
+        * Validation schema for typed settings.
+        *
+        * @var array<string,array<string,array<string,mixed>>>
+        */
+       private const SCHEMA = array(
+               'branding' => array(
+                       'site_name' => array(
+                               'type'    => 'string',
+                               'default' => '',
+                       ),
+                       'logo_url'  => array(
+                               'type'    => 'url',
+                               'default' => '',
+                       ),
+                       'color'     => array(
+                               'type'    => 'enum',
+                               'enum'    => array( 'default', 'blue', 'green', 'red', 'orange', 'purple' ),
+                               'default' => 'default',
+                       ),
+               ),
+               'emails'   => array(
+                       'from_name'  => array(
+                               'type'    => 'string',
+                               'default' => '',
+                       ),
+                       'from_email' => array(
+                               'type'    => 'email',
+                               'default' => '',
+                       ),
+                       'reply_to'   => array(
+                               'type'    => 'email',
+                               'default' => '',
+                       ),
+               ),
+       );
+
+       /**
+        * Ensure options are loaded early.
+        */
+       public static function boot(): void {
+               self::all();
+       }
 
 	/**
 	 * Default settings structure.
@@ -22,12 +66,17 @@ class Options {
 	 * @return array<string,mixed>
 	 */
 	private static function defaults(): array {
-		return array(
-			'general'    => array(
-				'org_name'    => '',
-				'logo_id'     => 0,
-				'date_format' => '',
-			),
+               return array(
+                       'branding'   => array(
+                               'site_name' => '',
+                               'logo_url'  => '',
+                               'color'     => 'default',
+                       ),
+                       'general'    => array(
+                                'org_name'    => '',
+                                'logo_id'     => 0,
+                                'date_format' => '',
+                        ),
 			'forms'      => array(
 				'captcha_provider'         => 'off',
 				'captcha_site_key'         => '',
@@ -136,16 +185,104 @@ class Options {
 		return update_option( self::KEY, $settings );
 	}
 
-		/**
-		 * Back-compat alias for set().
-		 *
-		 * @param string $path  Option path.
-		 * @param mixed  $value Value to set.
-		 * @return bool
-		 */
-	public static function update( string $path, $value ): bool {
-			return self::set( $path, $value );
-	}
+       /**
+        * Update options using schema validation.
+        *
+        * When called with a string path, acts as a back-compat wrapper for set().
+        * When passed an array, validates and saves known groups/fields.
+        *
+        * @param string|array<string,mixed> $path  Option path or data array.
+        * @param mixed                      $value Value to set when using path mode.
+        * @return bool
+        */
+       public static function update( $path, $value = null ): bool {
+               if ( is_array( $path ) && null === $value ) {
+                       return self::update_many( $path );
+               }
+
+               return self::set( (string) $path, $value );
+       }
+
+       /**
+        * Validate and persist multiple settings.
+        *
+        * @param array<string,mixed> $new_settings Incoming settings grouped by section.
+        * @return bool
+        */
+       private static function update_many( array $new_settings ): bool {
+               $saved = get_option( self::KEY, array() );
+               if ( ! is_array( $saved ) ) {
+                       $saved = array();
+               }
+
+               foreach ( self::SCHEMA as $group => $fields ) {
+                       if ( ! isset( $new_settings[ $group ] ) || ! is_array( $new_settings[ $group ] ) ) {
+                               continue;
+                       }
+
+                       $group_data = $saved[ $group ] ?? array();
+                       foreach ( $fields as $key => $rules ) {
+                               if ( ! array_key_exists( $key, $new_settings[ $group ] ) ) {
+                                       continue;
+                               }
+
+                               $sanitized = self::sanitize_field( $new_settings[ $group ][ $key ], $rules );
+                               if ( null === $sanitized ) {
+                                       continue;
+                               }
+
+                               $group_data[ $key ] = $sanitized;
+                       }
+
+                       // Drop unknown keys.
+                       $saved[ $group ] = array_intersect_key( $group_data, $fields );
+               }
+
+               return update_option( self::KEY, $saved );
+       }
+
+       /**
+        * Sanitize a field based on schema rules.
+        *
+        * @param mixed                       $value Raw value.
+        * @param array<string,mixed>         $rules Schema rules.
+        * @return mixed|null Sanitized value or null if invalid/empty.
+        */
+       private static function sanitize_field( $value, array $rules ) {
+               if ( is_string( $value ) && strlen( $value ) > 1024 ) {
+                       return null; // oversize
+               }
+
+               switch ( $rules['type'] ) {
+                       case 'string':
+                               $value = sanitize_text_field( (string) $value );
+                               break;
+                       case 'url':
+                               $value = esc_url_raw( (string) $value );
+                               break;
+                       case 'email':
+                               $value = sanitize_email( (string) $value );
+                               if ( $value === '' || ! is_email( $value ) ) {
+                                       return null;
+                               }
+                               break;
+                       case 'enum':
+                               $value   = sanitize_text_field( (string) $value );
+                               $allowed = $rules['enum'] ?? array();
+                               if ( ! in_array( $value, $allowed, true ) ) {
+                                       $value = $rules['default'] ?? '';
+                               }
+                               break;
+                       default:
+                               return null;
+               }
+
+               if ( is_string( $value ) && strlen( $value ) > 1024 ) {
+                       return null;
+               }
+
+               return $value;
+       }
 
 		/**
 		 * Persist an array of settings, merged with defaults.
@@ -158,10 +295,19 @@ class Options {
 			$defaults = self::defaults();
 			$merged   = array_replace_recursive( $defaults, $new_settings );
 
-		// Basic sanitization.
-		$merged['general']['org_name']    = sanitize_text_field( (string) ( $merged['general']['org_name'] ?? '' ) );
-		$merged['general']['logo_id']     = (int) ( $merged['general']['logo_id'] ?? 0 );
-		$merged['general']['date_format'] = sanitize_text_field( (string) ( $merged['general']['date_format'] ?? '' ) );
+       // Basic sanitization.
+       $merged['branding']['site_name'] = sanitize_text_field( (string) ( $merged['branding']['site_name'] ?? '' ) );
+       $merged['branding']['logo_url']  = esc_url_raw( (string) ( $merged['branding']['logo_url'] ?? '' ) );
+       $colors                           = array( 'default', 'blue', 'green', 'red', 'orange', 'purple' );
+       $merged['branding']['color']     = in_array( $merged['branding']['color'] ?? 'default', $colors, true ) ? $merged['branding']['color'] : 'default';
+       $merged['branding']              = array_intersect_key(
+               $merged['branding'],
+               array( 'site_name' => true, 'logo_url' => true, 'color' => true )
+       );
+
+       $merged['general']['org_name']    = sanitize_text_field( (string) ( $merged['general']['org_name'] ?? '' ) );
+       $merged['general']['logo_id']     = (int) ( $merged['general']['logo_id'] ?? 0 );
+       $merged['general']['date_format'] = sanitize_text_field( (string) ( $merged['general']['date_format'] ?? '' ) );
 
 			$merged['forms']['captcha_provider']     = in_array(
 				$merged['forms']['captcha_provider'],
