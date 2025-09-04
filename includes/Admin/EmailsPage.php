@@ -52,6 +52,8 @@ final class EmailsPage {
                                self::handle_save( $templates );
                        } elseif ( 'emails_preview' === $action ) {
                                $preview = self::handle_preview( $templates );
+                       } elseif ( 'emails_reset' === $action ) {
+                               self::handle_reset( $templates );
                        }
                }
 
@@ -91,6 +93,36 @@ final class EmailsPage {
                $url = add_query_arg(
                        array(
                                'notice' => 'saved',
+                               'tpl'    => $tpl,
+                       ),
+                       menu_page_url( 'fbm-emails', false )
+               );
+               wp_safe_redirect( esc_url_raw( $url ), 303 );
+               exit;
+       }
+
+       /**
+        * Handle template reset.
+        *
+        * @param array<string,array<string,string>> $templates Templates.
+        * @return void
+        */
+       private static function handle_reset( array $templates ): void {
+               check_admin_referer( 'fbm_emails_reset', '_fbm_nonce' );
+               if ( ! current_user_can( 'fb_manage_emails' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown
+                       wp_die( esc_html__( 'You do not have permission to perform this action.', 'foodbank-manager' ) );
+               }
+
+               $tpl = sanitize_key( wp_unslash( $_POST['tpl'] ?? '' ) );
+               if ( ! isset( $templates[ $tpl ] ) ) {
+                       wp_die( esc_html__( 'Invalid template.', 'foodbank-manager' ) );
+               }
+
+               Options::reset_template( $tpl );
+
+               $url = add_query_arg(
+                       array(
+                               'notice' => 'reset',
                                'tpl'    => $tpl,
                        ),
                        menu_page_url( 'fbm-emails', false )
