@@ -1,8 +1,10 @@
-Docs-Revision: 2025-09-04 (Wave v1.2.3 – Admin Menu De-dup + Canonical Screen IDs)
+Docs-Revision: 2025-09-04 (Wave v1.2.3 UI Fix)
 # FoodBank Manager — Issues & Milestones
 
 This file maps **milestones → epics → issues** so you can paste into GitHub.  
 Use alongside the PRD: `PRD-foodbank-manager.md`.
+
+_Post-release notes (2025-09-04): Reinstalled v1.2.3 ZIP on staging with quick click-through — no follow-ups identified._
 
 ---
 

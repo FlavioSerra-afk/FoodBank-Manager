@@ -18,14 +18,13 @@
 
 ## [1.2.3] - 2025-09-04
 ### Fixes
-- Consolidated admin menu under single `FoodBank` parent with canonical screen IDs.
-- Hardened admin asset and notice loading to FoodBank Manager screens only.
-### Build
-- `phpstan:fast` memory limit increased to 1G.
-### Docs
-- Docs revised for Admin Menu canonicalization, screen gating, and template wrappers (Wave v1.2.3-fix).
+- fix(admin): de-dup menus under canonical slugs
+- fix(core): screen-gated assets/notices via helper
+- fix(ui): ensure all admin templates use .fbm-admin wrapper
 ### QA
-- Remove `AttendanceRepo` PHPCS suppression and document query filters.
+- test: deterministic WP stubs; remove anonymous classes
+### Docs
+- docs: stamp Docs-Revision (Wave v1.2.3)
 
 ## [1.2.2] - 2025-09-04
 ### Features
