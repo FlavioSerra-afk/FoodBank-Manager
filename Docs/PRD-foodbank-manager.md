@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.2 – Shortcodes List)
+Docs-Revision: 2025-09-04 (Wave v1.1.3 – Shortcodes Builder+Preview)
 # FoodBank Manager — Product Requirements Document (PRD)
 
 **Repo file:** `Docs/PRD-foodbank-manager.md`  
@@ -217,6 +217,7 @@ Row actions: **View attendee list**, **Export roster (CSV/PDF)**, **Print-friend
 | `[fbm_form]` | `id` (string, default "1") |
 | `[fbm_entries]` | _None_ |
 | `[fbm_attendance_manager]` | _None_ |
+The Shortcodes admin page includes a builder that outputs masked shortcode strings with a nonce-protected, server-side preview.
 - Consent logging (timestamp, IP, user agent, consent text hash).
 - SAR export by email lookup (entries, files, attendance).
 - Retention policies per form (auto-anonymise after X months).

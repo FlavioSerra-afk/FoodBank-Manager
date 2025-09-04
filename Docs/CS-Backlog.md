@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.0 – Settings Phase 1)
+Docs-Revision: 2025-09-04 (Wave v1.1.3 – Shortcodes Builder+Preview)
 Strict (cleaned):
 
 includes/Admin/EmailsPage.php

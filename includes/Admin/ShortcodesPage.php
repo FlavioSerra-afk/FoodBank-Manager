@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace FoodBankManager\Admin;
 
+use FoodBankManager\Shortcodes\Metadata;
+
 /**
  * Shortcodes admin page.
  */
@@ -32,60 +34,95 @@ final class ShortcodesPage {
 		 */
 	public static function route(): void {
 		if ( ! current_user_can( 'fb_manage_forms' ) ) {
-				wp_die(
-					esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ),
-					'',
-					array( 'response' => 403 )
-				);
+						wp_die(
+							esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ),
+							'',
+							array( 'response' => 403 )
+						);
 		}
-		$shortcodes = self::discover();
-		/* @psalm-suppress UnresolvableInclude */
-		require FBM_PATH . 'templates/admin/shortcodes.php';
+			$shortcodes = self::discover();
+			$map        = array();
+		foreach ( $shortcodes as $sc ) {
+					$map[ $sc['tag'] ] = $sc['atts'];
+		}
+			$current_tag  = '';
+			$current_atts = array();
+		$preview_html     = '';
+		if ( isset( $_POST['fbm_action'] ) && 'shortcode_preview' === $_POST['fbm_action'] ) {
+			check_admin_referer( 'fbm_shortcodes_preview' );
+			$tag = sanitize_key( (string) ( $_POST['tag'] ?? '' ) );
+			if ( isset( $map[ $tag ] ) ) {
+				$raw_atts               = isset( $_POST['atts'] ) && is_array( $_POST['atts'] ) ? wp_unslash( $_POST['atts'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized in sanitize_atts
+				$atts                   = self::sanitize_atts( $map[ $tag ], $raw_atts );
+				$atts['mask_sensitive'] = 'true';
+				$current_tag            = $tag;
+				$current_atts           = $atts;
+				$shortcode              = self::build_shortcode( $tag, $atts );
+				$preview_html           = wp_kses_post( do_shortcode( $shortcode ) );
+			} else {
+				$preview_html = '<div class="notice notice-error"><p>' . esc_html__( 'Invalid shortcode.', 'foodbank-manager' ) . '</p></div>';
+			}
+		}
+				/* @psalm-suppress UnresolvableInclude */
+				require FBM_PATH . 'templates/admin/shortcodes.php';
 	}
 
 		/**
-		 * Discover shortcodes and their attributes.
+		 * Discover shortcode metadata.
 		 *
-		 * @return array<int,array{tag:string,atts:array<string,mixed>}> Shortcodes.
+		 * @return array<int,array{tag:string,atts:array<string,array{type:string,default:string,options?:array<int,string>}>}>
 		 */
 	public static function discover(): array {
-			$dir = FBM_PATH . 'includes/Shortcodes';
-		$files   = glob( $dir . '/*.php' );
-		if ( false === $files ) {
-				return array();
-		}
+			return Metadata::discover();
+	}
+
+		/**
+		 * Sanitize attributes based on metadata.
+		 *
+		 * @param array<string,array{type:string,default:string,options?:array<int,string>}> $meta Metadata.
+		 * @param array<string,mixed>                                                        $raw Raw input.
+		 * @return array<string,string>
+		 */
+	private static function sanitize_atts( array $meta, array $raw ): array {
 			$out = array();
-		foreach ( $files as $file ) {
-				$class = basename( $file, '.php' );
-				$snake = strtolower( preg_replace( '/(?<!^)[A-Z]/', '_$0', $class ) );
-				$tag   = 'fbm_' . $snake;
-				$atts  = self::extract_atts( $file );
-				$out[] = array(
-					'tag'  => $tag,
-					'atts' => $atts,
-				);
+		foreach ( $meta as $name => $info ) {
+				$val  = $raw[ $name ] ?? $info['default'];
+				$type = $info['type'];
+			switch ( $type ) {
+				case 'bool':
+						$val = filter_var( $val, FILTER_VALIDATE_BOOLEAN ) ? 'true' : 'false';
+					break;
+				case 'int':
+									$val = (string) (int) $val;
+					break;
+				case 'enum':
+									$val = sanitize_text_field( (string) $val );
+					if ( empty( $info['options'] ) || ! in_array( $val, $info['options'], true ) ) {
+							continue 2;
+					}
+					break;
+				default:
+					$val = sanitize_text_field( (string) $val );
+			}
+			if ( strlen( $val ) > 256 ) {
+						$val = substr( $val, 0, 256 );
+			}
+					$out[ $name ] = $val;
 		}
 			return $out;
 	}
 
 		/**
-		 * Extract default attributes from a shortcode handler file.
+		 * Build shortcode string.
 		 *
-		 * @param string $file File path.
-		 * @return array<string,mixed>
+		 * @param string               $tag  Shortcode tag.
+		 * @param array<string,string> $atts Attributes.
 		 */
-	private static function extract_atts( string $file ): array {
-		$src = file_get_contents( $file ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Local file.
-		if ( false === $src ) {
-				return array();
+	private static function build_shortcode( string $tag, array $atts ): string {
+			$parts = array();
+		foreach ( $atts as $k => $v ) {
+				$parts[] = $k . '="' . $v . '"';
 		}
-		if ( preg_match( '/shortcode_atts\s*\(\s*array\((.*?)\)\s*,/s', $src, $m ) === 1 ) {
-				$code     = 'return array(' . $m[1] . ');';
-				$defaults = eval( $code ); // phpcs:ignore Squiz.PHP.Eval.Discouraged -- Introspecting own code.
-			if ( is_array( $defaults ) ) {
-					return $defaults;
-			}
-		}
-			return array();
+			return '[' . $tag . ( $parts ? ' ' . implode( ' ', $parts ) : '' ) . ']';
 	}
 }
