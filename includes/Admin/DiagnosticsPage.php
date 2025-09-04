@@ -11,6 +11,7 @@ namespace FoodBankManager\Admin;
 
 use FoodBankManager\Auth\Roles;
 use FoodBankManager\Core\Options;
+use FoodBankManager\Admin\Menu;
 
 /**
  * Diagnostics admin page.
@@ -76,8 +77,8 @@ class DiagnosticsPage {
 			remove_filter( 'wp_mail_from_name', $name_filter );
 		}
 
-		$notice = $sent ? 'sent' : 'error';
-		$url    = add_query_arg( array( 'notice' => $notice ), menu_page_url( 'fbm-diagnostics', false ) );
+		$notice      = $sent ? 'sent' : 'error';
+				$url = add_query_arg( array( 'notice' => $notice ), menu_page_url( 'fbm_diagnostics', false ) );
 		wp_safe_redirect( esc_url_raw( $url ), 303 );
 		exit;
 	}
@@ -86,11 +87,14 @@ class DiagnosticsPage {
 	 * Repair roles and capabilities.
 	 */
 	private static function repair_caps(): void {
-		Roles::install();
-		Roles::ensure_admin_caps();
+				Roles::install();
+				Roles::ensure_admin_caps();
+		if ( function_exists( 'add_menu_page' ) ) {
+				Menu::register();
+		}
 
-		$url = add_query_arg( array( 'notice' => 'repaired' ), menu_page_url( 'fbm-diagnostics', false ) );
-		wp_safe_redirect( esc_url_raw( $url ), 303 );
-		exit;
+				$url = add_query_arg( array( 'notice' => 'repaired' ), menu_page_url( 'fbm_diagnostics', false ) );
+				wp_safe_redirect( esc_url_raw( $url ), 303 );
+				exit;
 	}
 }

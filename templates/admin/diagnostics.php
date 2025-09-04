@@ -21,6 +21,13 @@ $mail_available = function_exists( 'wp_mail' );
 $cron_cleanup   = wp_next_scheduled( 'fbm_cron_cleanup' );
 $cron_retry     = wp_next_scheduled( 'fbm_cron_email_retry' );
 $notice         = isset( $_GET['notice'] ) ? sanitize_key( wp_unslash( $_GET['notice'] ) ) : '';
+$missing_slugs  = array();
+foreach ( \FoodBankManager\Admin\Menu::slugs() as $slug ) {
+    if ( menu_page_url( $slug, false ) === false ) {
+        $missing_slugs[] = $slug;
+    }
+}
+$slugs_ok = empty( $missing_slugs );
 ?>
 <div class="wrap fbm-admin">
     <h1><?php esc_html_e( 'Diagnostics', 'foodbank-manager' ); ?></h1>
@@ -66,6 +73,16 @@ $notice         = isset( $_GET['notice'] ) ? sanitize_key( wp_unslash( $_GET['no
             <tr>
                 <td><?php esc_html_e( 'Next fbm_cron_email_retry', 'foodbank-manager' ); ?></td>
                 <td><?php echo esc_html( $cron_retry ? gmdate( 'Y-m-d H:i:s', $cron_retry ) : __( 'not scheduled', 'foodbank-manager' ) ); ?></td>
+            </tr>
+            <tr>
+                <td><?php esc_html_e( 'Admin menu slugs', 'foodbank-manager' ); ?></td>
+                <td><?php
+                if ( $slugs_ok ) {
+                    echo '<span class="dashicons dashicons-yes-alt" style="color:green"></span>';
+                } else {
+                    echo esc_html( implode( ', ', $missing_slugs ) );
+                }
+                ?></td>
             </tr>
         </tbody>
     </table>

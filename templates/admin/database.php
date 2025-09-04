@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<button class="button" type="submit"><?php esc_html_e( 'Save Preset', 'foodbank-manager' ); ?></button>
 </form>
 <form method="get" style="display:inline;margin-left:10px;">
-		<input type="hidden" name="page" value="fbm-database" />
+			<input type="hidden" name="page" value="fbm_database" />
 		<select name="preset">
 				<option value=""><?php esc_html_e( 'Select preset', 'foodbank-manager' ); ?></option>
 				<?php foreach ( $presets as $p ) : ?>
@@ -51,7 +51,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 </form>
 </div>
 <form method="get">
-		<input type="hidden" name="page" value="fbm-database" />
+			<input type="hidden" name="page" value="fbm_database" />
 		<div class="fbm-filters">
 		<label>
 				<?php esc_html_e( 'From', 'foodbank-manager' ); ?>
@@ -174,7 +174,7 @@ else :
 		echo esc_url(
 			add_query_arg(
 				array(
-					'page' => 'fbm-database',
+					'page' => 'fbm_database',
 					'view' => $r['id'],
 				)
 			)
@@ -229,7 +229,7 @@ $base_url    = remove_query_arg( 'paged' );
 	</div>
 	<div class="alignleft actions">
 	<form method="get" id="fbm-perpage-form">
-		<input type="hidden" name="page" value="fbm-database" />
+			<input type="hidden" name="page" value="fbm_database" />
 		<select name="per_page" onchange="document.getElementById('fbm-perpage-form').submit();">
 		<option value="25" <?php selected( $per_page, 25 ); ?>>25</option>
 		<option value="50" <?php selected( $per_page, 50 ); ?>>50</option>

@@ -46,7 +46,7 @@ final class NoticesTest extends TestCase {
     protected function setUp(): void {
         global $wp_filter, $current_screen;
         $wp_filter = array();
-        $current_screen = (object) array('id' => 'foodbank_page_fbm-diagnostics');
+        $current_screen = (object) array('id' => 'foodbank_page_fbm_diagnostics');
     }
 
     public function testMissingKekBailsOnNonFbmScreen(): void {

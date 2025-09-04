@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.2.3] - 2025-09-04
+### Fixes
+- Consolidated admin menu under single `FoodBank` parent with canonical screen IDs.
+- Hardened admin asset and notice loading to FoodBank Manager screens only.
+### Build
+- `phpstan:fast` memory limit increased to 1G.
+### Docs
+- Docs revised for Admin Menu De-dup + Canonical Screen IDs (Wave v1.2.3).
+
 ## [1.2.2] - 2025-09-04
 ### Features
 - Dashboard shortcode now accepts type/event/policy filters and provides a capability-gated summary CSV export.

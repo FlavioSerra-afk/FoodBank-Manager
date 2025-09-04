@@ -41,7 +41,7 @@
     "phpcs": "php -d memory_limit=512M vendor/bin/phpcs --standard=phpcs.xml --report=summary --report-width=120",
     "phpcbf": "php -d memory_limit=512M vendor/bin/phpcbf --standard=phpcs.xml",
     "phpstan": "phpstan analyse -c phpstan.neon --no-progress --memory-limit=1G",
-    "phpstan:fast": "phpstan analyse -c phpstan.neon --no-progress --level=5 --memory-limit=768M",
+    "phpstan:fast": "phpstan analyse -c phpstan.neon --no-progress --level=5 --memory-limit=1G",
     "phpstan:debug": "phpstan analyse -c phpstan.neon --debug --no-progress --memory-limit=1G",
     "test": "phpunit",
     "release:patch": "php bin/bump-version.php patch && php bin/changelog.php",
@@ -62,5 +62,5 @@
     },
     "sort-packages": true
   },
-    "version": "1.2.2"
+    "version": "1.2.3"
 }

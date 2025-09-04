@@ -87,7 +87,7 @@ final class AssetsTest extends TestCase {
                 $assets->enqueue_admin();
                 $this->assertNotContains( 'fbm-admin', $fbm_enqueued_styles );
 
-                $current_screen = (object) array( 'id' => 'foodbank_page_fbm-settings' );
+                $current_screen = (object) array( 'id' => 'foodbank_page_fbm_settings' );
                 $fbm_enqueued_styles = array();
                 $assets->enqueue_admin();
                 $this->assertContains( 'fbm-admin', $fbm_enqueued_styles );

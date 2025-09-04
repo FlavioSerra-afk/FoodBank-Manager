@@ -1,3 +1,13 @@
 /vendor/*
 !/vendor/.gitkeep
 .phpunit.result.cache
+
+# Ignore common binaries
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.pdf
+*.zip
+*.exe
+.DS_Store

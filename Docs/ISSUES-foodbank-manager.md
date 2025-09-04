@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-03 (Wave CS-Backlog-08)
+Docs-Revision: 2025-09-04 (Wave v1.2.3 – Admin Menu De-dup + Canonical Screen IDs)
 # FoodBank Manager — Issues & Milestones
 
 This file maps **milestones → epics → issues** so you can paste into GitHub.  

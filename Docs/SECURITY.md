@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.2.2 – Frontend Dashboard P3)
+Docs-Revision: 2025-09-04 (Wave v1.2.3 – Admin Menu De-dup + Canonical Screen IDs)
 # Security Policy — PCC FoodBank Manager
 
 We take security seriously. Please follow the guidelines below for reporting vulnerabilities.

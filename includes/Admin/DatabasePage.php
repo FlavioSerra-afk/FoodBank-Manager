@@ -258,7 +258,7 @@ final class DatabasePage {
 		 * @return void
 		 */
 	private static function redirect_list( array $args = array() ): void {
-			$url = add_query_arg( $args, menu_page_url( 'fbm-database', false ) );
+					$url = add_query_arg( $args, menu_page_url( 'fbm_database', false ) );
 			wp_safe_redirect( esc_url_raw( $url ) );
 			exit;
 	}
@@ -282,7 +282,7 @@ final class DatabasePage {
 
 		$url = add_query_arg(
 			array( 'deleted' => 1 ),
-			menu_page_url( 'fbm-database', false )
+			menu_page_url( 'fbm_database', false )
 		);
 		wp_safe_redirect( esc_url_raw( $url ) );
 		exit;
