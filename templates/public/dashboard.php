@@ -7,11 +7,33 @@
  * @var array<string,int|null>    $deltas_attr
  * @var string                    $updated
  * @var string                    $period_attr
+ * @var array{event:string,type:string,policy_only:bool} $filters_attr
+ * @var string                    $csv_url_attr
  *
  * @package FoodBankManager
  */
 ?>
 <div class="fbm-dashboard">
+<form class="fbm-filter-row" method="get">
+    <label>
+        <?php esc_html_e( 'Type', 'foodbank-manager' ); ?>
+        <select name="fbm_type">
+            <option value="all"<?php selected( $filters_attr['type'], 'all' ); ?>><?php esc_html_e( 'All', 'foodbank-manager' ); ?></option>
+            <option value="in_person"<?php selected( $filters_attr['type'], 'in_person' ); ?>><?php esc_html_e( 'In person', 'foodbank-manager' ); ?></option>
+            <option value="delivery"<?php selected( $filters_attr['type'], 'delivery' ); ?>><?php esc_html_e( 'Delivery', 'foodbank-manager' ); ?></option>
+        </select>
+    </label>
+    <label>
+        <?php esc_html_e( 'Event', 'foodbank-manager' ); ?>
+        <input type="text" name="fbm_event" value="<?php echo esc_attr( $filters_attr['event'] ); ?>" />
+    </label>
+    <label>
+        <input type="checkbox" name="fbm_policy_only" value="1" <?php checked( $filters_attr['policy_only'] ); ?> />
+        <?php esc_html_e( 'Policy only', 'foodbank-manager' ); ?>
+    </label>
+    <button type="submit"><?php esc_html_e( 'Apply', 'foodbank-manager' ); ?></button>
+    <a class="fbm-download" href="<?php echo esc_url( $csv_url_attr ); ?>"><?php esc_html_e( 'Download CSV', 'foodbank-manager' ); ?></a>
+</form>
 <div class="fbm-dashboard-grid">
 <div class="fbm-card">
 <div class="fbm-card-value"><?php echo esc_html( number_format_i18n( (int) $counts['present'] ) ); ?></div>

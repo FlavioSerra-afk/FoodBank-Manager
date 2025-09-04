@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.2.1 – Frontend Dashboard P2)
+Docs-Revision: 2025-09-04 (Wave v1.2.2 – Frontend Dashboard P3)
 # Security Policy — PCC FoodBank Manager
 
 We take security seriously. Please follow the guidelines below for reporting vulnerabilities.
@@ -21,7 +21,7 @@ We aim to acknowledge reports **within 2 working days**.
 ## 🔒 Scope
 - Plugin code in this repository
 - Exposed endpoints under the plugin’s REST namespace (`pcc-fb/v1`)
-- Front‑end submission and dashboard flows (card dashboard shows aggregated, non‑PII counts with optional trend deltas and sparkline and requires `fb_manage_dashboard`)
+- Front‑end submission and dashboard flows (card dashboard shows aggregated, non‑PII counts with optional trend deltas, filters, and nonce-protected CSV export; requires `fb_manage_dashboard`)
 - Database migrations and encryption code
 - Admin QR check-in URLs include only IDs + REST nonces and require `fb_manage_attendance`.
 - Admin shortcode previews enforce capability checks, nonces, attribute whitelists with `mask_sensitive=true`, and `wp_kses_post` filtering.

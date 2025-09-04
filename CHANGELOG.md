@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.2.2] - 2025-09-04
+### Features
+- Dashboard shortcode now accepts type/event/policy filters and provides a capability-gated summary CSV export.
+### Docs
+- Docs revised for Frontend Dashboard P3 (Wave v1.2.2).
+
 ## [1.2.1] - 2025-09-04
 ### Features
 - Dashboard shortcode now shows trend deltas and daily check-ins sparkline.

@@ -29,3 +29,13 @@ margin-top: .25rem;
 margin-top: 1rem;
 font-size: .875rem;
 }
+.fbm-dashboard .fbm-filter-row {
+display:flex;
+gap:.5rem;
+margin-bottom:1rem;
+align-items:center;
+flex-wrap:wrap;
+}
+.fbm-dashboard .fbm-filter-row .fbm-download {
+margin-left:auto;
+}

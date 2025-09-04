@@ -8,12 +8,13 @@ namespace FoodBankManager\Core;
 use FoodBankManager\Db\Migrations;
 use FoodBankManager\Auth\Roles;
 use FoodBankManager\Http\FormSubmitController;
+use FoodBankManager\Http\DashboardExportController;
 use FoodBankManager\Core\Options;
 use FoodBankManager\Admin\ShortcodesPage;
 
 final class Plugin {
 
-    public const FBM_VERSION = '1.2.1';
+    public const FBM_VERSION = '1.2.2';
 
         private static ?Plugin $instance = null;
         private static bool $booted = false;
@@ -70,6 +71,7 @@ final class Plugin {
 
                 add_action( 'admin_post_nopriv_fbm_submit', array( FormSubmitController::class, 'handle' ) );
                 add_action( 'admin_post_fbm_submit', array( FormSubmitController::class, 'handle' ) );
+                add_action( 'admin_post_fbm_dash_export', array( DashboardExportController::class, 'handle' ) );
 
                 add_action(
                         'admin_init',

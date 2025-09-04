@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.2.1 – Frontend Dashboard P2)
+Docs-Revision: 2025-09-04 (Wave v1.2.2 – Frontend Dashboard P3)
 # FoodBank Manager — Product Requirements Document (PRD)
 
 **Repo file:** `Docs/PRD-foodbank-manager.md`  
@@ -66,7 +66,7 @@ Roles map to WordPress **capabilities** (granular; see §10 Security).
 - Email confirmations (applicant) and notifications (admin); HTML templates.
 - Data storage in custom tables with **field-level encryption**.
 - Back-end Database tab (list, view, edit, delete, export).
-- Front-end dashboard (authenticated) for **Viewer/Manager** with filters and exports; **Manager** can mark attendance.
+- Front-end dashboard (authenticated) for **Viewer/Manager** with optional filters (event, type, policy-only) and an aggregated CSV export; **Manager** can mark attendance.
 - Diagnostics tab: email logs, resend, test email, repair caps, environment checks.
 - Exports: CSV/XLSX, single & bulk PDF.
 - GDPR: consent logs, SAR export, retention/anonymisation.
