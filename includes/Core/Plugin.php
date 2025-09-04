@@ -13,7 +13,7 @@ use FoodBankManager\Admin\ShortcodesPage;
 
 final class Plugin {
 
-    public const FBM_VERSION = '1.1.3';
+    public const FBM_VERSION = '1.1.4';
 
         private static ?Plugin $instance = null;
 
