@@ -53,7 +53,9 @@
     "cs:fix": "composer phpcbf && composer phpcs || true",
     "qa": "composer phpcs && composer phpstan && composer test",
     "qa:fast": "composer phpcs && composer phpstan:fast && composer test",
-    "build:zip": "php -r \"@mkdir('dist');\"; rm -rf dist/foodbank-manager && mkdir -p dist/foodbank-manager && rsync -a --exclude 'dist' --exclude '.github' --exclude 'Docs' --exclude 'analysis' --exclude 'tests' --exclude 'node_modules' --exclude '.git' --exclude '.gitignore' ./ dist/foodbank-manager/ && cd dist && zip -r9 foodbank-manager.zip foodbank-manager"
+    "build:zip": [
+      "bash bin/package.sh"
+    ]
   },
   "config": {
     "allow-plugins": {
