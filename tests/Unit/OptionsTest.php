@@ -4,6 +4,12 @@ declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 use FoodBankManager\Core\Options;
 
+if ( ! function_exists( 'wp_strip_all_tags' ) ) {
+        function wp_strip_all_tags( string $text ): string {
+                return strip_tags( $text );
+        }
+}
+
 final class OptionsTest extends TestCase {
 	public function setUp(): void {
 		global $fbm_test_options;
@@ -62,5 +68,35 @@ final class OptionsTest extends TestCase {
                $this->assertSame( 'Ok', Options::get( 'emails.from_name' ) );
                Options::update( array( 'emails' => array( 'from_name' => str_repeat( 'a', 2001 ) ) ) );
                $this->assertSame( 'Ok', Options::get( 'emails.from_name' ) );
+       }
+
+       public function testTemplateRoundTrip(): void {
+               $id = 'applicant_confirmation';
+               $ok  = Options::set_template(
+                       $id,
+                       array(
+                               'subject'   => '<b>Hello</b>',
+                               'body_html' => '<p>Hi</p>',
+                       )
+               );
+               $this->assertTrue( $ok );
+
+               $data = Options::get_template( $id );
+               $this->assertSame( 'Hello', $data['subject'] );
+               $this->assertSame( '<p>Hi</p>', $data['body_html'] );
+               $this->assertNotSame( '', $data['updated_at'] );
+
+               Options::reset_template( $id );
+               $reset = Options::get_template( $id );
+               $this->assertSame( '', $reset['subject'] );
+               $this->assertSame( '', $reset['body_html'] );
+       }
+
+       public function testRejectsUnknownTemplateId(): void {
+               $this->assertFalse( Options::set_template( 'unknown', array() ) );
+               $this->assertFalse( Options::reset_template( 'unknown' ) );
+               $unknown = Options::get_template( 'unknown' );
+               $this->assertSame( '', $unknown['subject'] );
+               $this->assertSame( '', $unknown['body_html'] );
        }
 }

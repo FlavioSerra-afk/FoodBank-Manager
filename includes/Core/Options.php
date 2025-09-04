@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace FoodBankManager\Core;
 
+use FoodBankManager\Mail\Templates as MailTemplates;
+
 /**
  * Plugin options utility.
  */
@@ -92,16 +94,17 @@ class Options {
 				'storage'       => 'uploads',
 				'local_path'    => '',
 			),
-			'emails'     => array(
-				'from_name'        => '',
-				'from_email'       => '',
-				'reply_to'         => '',
-				'admin_recipients' => '',
-			),
-			'attendance' => array(
-				'policy_days' => 7,
-				'types'       => array( 'in_person', 'delivery', 'other' ),
-			),
+                        'emails'     => array(
+                                'from_name'        => '',
+                                'from_email'       => '',
+                                'reply_to'         => '',
+                                'admin_recipients' => '',
+                        ),
+                        'email_templates' => array(),
+                        'attendance' => array(
+                                'policy_days' => 7,
+                                'types'       => array( 'in_person', 'delivery', 'other' ),
+                        ),
 			'privacy'    => array(
 				'retention_months' => 24,
 				'anonymise_files'  => 'delete',
@@ -404,8 +407,99 @@ class Options {
 				$css               = substr( $css, 0, 10000 );
 				$out['custom_css'] = function_exists( 'wp_strip_all_tags' ) ? wp_strip_all_tags( $css ) : strip_tags( $css ); // phpcs:ignore WordPress.WP.AlternativeFunctions.strip_tags_strip_tags -- Fallback when WordPress is unavailable.
 
-				$out['load_font'] = ! empty( $data['load_font'] );
+                               $out['load_font'] = ! empty( $data['load_font'] );
 
-				return $out;
-	}
+                               return $out;
+       }
+
+       /**
+        * Retrieve an email template override.
+        *
+        * @param string $id Template ID.
+        * @return array{subject:string,body_html:string,updated_at:string}
+        */
+       public static function get_template( string $id ): array {
+               if ( ! self::is_valid_template_id( $id ) ) {
+                       return array(
+                               'subject'   => '',
+                               'body_html' => '',
+                               'updated_at' => '',
+                       );
+               }
+
+               $all = self::get( 'email_templates', array() );
+               if ( ! is_array( $all ) ) {
+                       $all = array();
+               }
+               $tpl = $all[ $id ] ?? array();
+
+               return array(
+                       'subject'   => (string) ( $tpl['subject'] ?? '' ),
+                       'body_html' => (string) ( $tpl['body_html'] ?? '' ),
+                       'updated_at' => (string) ( $tpl['updated_at'] ?? '' ),
+               );
+       }
+
+       /**
+        * Save an email template override.
+        *
+        * @param string               $id   Template ID.
+        * @param array<string,string> $data Template data.
+        * @return bool
+        */
+       public static function set_template( string $id, array $data ): bool {
+               if ( ! self::is_valid_template_id( $id ) ) {
+                       return false;
+               }
+
+               $subject = (string) ( $data['subject'] ?? '' );
+               $subject = function_exists( 'wp_strip_all_tags' ) ? wp_strip_all_tags( $subject ) : strip_tags( $subject ); // phpcs:ignore WordPress.WP.AlternativeFunctions.strip_tags_strip_tags -- Fallback when WordPress is unavailable.
+               $subject = substr( $subject, 0, 255 );
+
+               $body = (string) ( $data['body_html'] ?? '' );
+               $body = function_exists( 'wp_kses_post' ) ? wp_kses_post( $body ) : $body;
+               if ( strlen( $body ) > 32768 ) {
+                       $body = substr( $body, 0, 32768 );
+               }
+
+               return self::set(
+                       'email_templates.' . $id,
+                       array(
+                               'subject'    => $subject,
+                               'body_html'  => $body,
+                               'updated_at' => function_exists( 'current_time' ) ? current_time( 'mysql' ) : gmdate( 'Y-m-d H:i:s' ),
+                       )
+               );
+       }
+
+       /**
+        * Reset an email template override.
+        *
+        * @param string $id Template ID.
+        * @return bool
+        */
+       public static function reset_template( string $id ): bool {
+               if ( ! self::is_valid_template_id( $id ) ) {
+                       return false;
+               }
+
+               $settings = self::all();
+               if ( isset( $settings['email_templates'][ $id ] ) ) {
+                       unset( $settings['email_templates'][ $id ] );
+                       return update_option( self::KEY, $settings );
+               }
+
+               return true;
+       }
+
+       /**
+        * Determine whether a template ID is valid.
+        *
+        * @param string $id Template ID.
+        * @return bool
+        */
+       private static function is_valid_template_id( string $id ): bool {
+               $ids = array_keys( MailTemplates::defaults() );
+               return in_array( $id, $ids, true );
+       }
 }
