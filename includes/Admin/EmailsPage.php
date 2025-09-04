@@ -105,7 +105,7 @@ final class EmailsPage {
 					'notice' => 'saved',
 					'tpl'    => $tpl,
 				),
-				menu_page_url( 'fbm-emails', false )
+				menu_page_url( 'fbm_emails', false )
 			);
 			wp_safe_redirect( esc_url_raw( $url ), 303 );
 			exit;
@@ -135,7 +135,7 @@ final class EmailsPage {
 					'notice' => 'reset',
 					'tpl'    => $tpl,
 				),
-				menu_page_url( 'fbm-emails', false )
+				menu_page_url( 'fbm_emails', false )
 			);
 			wp_safe_redirect( esc_url_raw( $url ), 303 );
 			exit;

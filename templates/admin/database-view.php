@@ -27,7 +27,7 @@ if ( ! $can_sensitive ) {
 	<?php esc_html_e( 'Entry', 'foodbank-manager' ); ?> #<?php echo esc_html( (string) $entry['id'] ); ?>
 </h1>
 <p>
-	<a href="<?php echo esc_url( admin_url( 'admin.php?page=fbm-database' ) ); ?>">
+		<a href="<?php echo esc_url( admin_url( 'admin.php?page=fbm_database' ) ); ?>">
 		&larr; <?php esc_html_e( 'Back to list', 'foodbank-manager' ); ?>
 	</a>
 </p>
@@ -76,7 +76,7 @@ if ( ! $can_sensitive ) {
 </ul>
 <?php endif; ?>
 <p>
-<a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=fbm-database' ) ); ?>">
+<a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=fbm_database' ) ); ?>">
 	<?php esc_html_e( 'Back', 'foodbank-manager' ); ?>
 </a>
 <?php if ( current_user_can( 'fb_manage_database' ) ) : // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability. ?>

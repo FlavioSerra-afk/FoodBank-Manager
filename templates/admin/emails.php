@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<?php foreach ( $templates as $key => $tpl ) : ?>
 			<li>
 				<?php echo esc_html( ucwords( str_replace( '_', ' ', $key ) ) ); ?>
-				<a href="<?php echo esc_url( add_query_arg( array( 'tpl' => $key ), menu_page_url( 'fbm-emails', false ) ) ); ?>">
+								<a href="<?php echo esc_url( add_query_arg( array( 'tpl' => $key ), menu_page_url( 'fbm_emails', false ) ) ); ?>">
 					<?php esc_html_e( 'Edit', 'foodbank-manager' ); ?>
 				</a>
 			</li>

@@ -12,7 +12,7 @@ namespace FoodBankManager\Admin;
 if ( ! defined( 'ABSPATH' ) ) {
 		exit;
 }
-$perms_base = menu_page_url( 'fbm-permissions', false );
+$perms_base = menu_page_url( 'fbm_permissions', false );
 ?>
 <div class="wrap fbm-admin">
         <h1><?php \esc_html_e( 'Permissions', 'foodbank-manager' ); ?></h1>
@@ -108,7 +108,7 @@ value="1" <?php checked( isset( $role_caps[ $role_key ][ $cap ] ) ? (bool) $role
 
                 <h3><?php \esc_html_e( 'Search Users', 'foodbank-manager' ); ?></h3>
                 <form method="get">
-                        <input type="hidden" name="page" value="fbm-permissions" />
+                        <input type="hidden" name="page" value="fbm_permissions" />
                         <input type="hidden" name="tab" value="users" />
                         <p><input type="search" name="user_search" value="<?php echo esc_attr( $search ); ?>" />
                                 <?php submit_button( esc_html__( 'Search', 'foodbank-manager' ), 'secondary', '', false ); ?></p>

@@ -19,14 +19,14 @@ final class ShortcodesPage {
 		 * Register menu item.
 		 */
 	public static function register_menu(): void {
-			add_submenu_page(
-				'fbm-dashboard',
-				esc_html__( 'Shortcodes', 'foodbank-manager' ),
-				esc_html__( 'Shortcodes', 'foodbank-manager' ),
-				'fb_manage_forms',
-				'fbm-shortcodes',
-				array( self::class, 'route' )
-			);
+						add_submenu_page(
+							'fbm',
+							esc_html__( 'Shortcodes', 'foodbank-manager' ),
+							esc_html__( 'Shortcodes', 'foodbank-manager' ),
+							'fb_manage_forms',
+							'fbm_shortcodes',
+							array( self::class, 'route' )
+						);
 	}
 
 		/**

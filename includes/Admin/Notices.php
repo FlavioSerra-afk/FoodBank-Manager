@@ -12,7 +12,7 @@ final class Notices {
 
     public static function maybeShowCapsRepair(): void {
         $s = function_exists('get_current_screen') ? get_current_screen() : null;
-        if (!$s || strpos($s->id, 'foodbank_page_') !== 0 && $s->id !== 'toplevel_page_fbm-dashboard') {
+        if (!$s || (strpos($s->id, 'toplevel_page_fbm') !== 0 && strpos($s->id, 'foodbank_page_fbm_') !== 0)) {
             return;
         }
         if (! current_user_can('administrator')) {
@@ -20,7 +20,7 @@ final class Notices {
         }
         if (! current_user_can('fb_manage_dashboard')) {
             $url = wp_nonce_url(
-                add_query_arg('fbm_repair_caps', '1', admin_url('admin.php?page=fbm-diagnostics')),
+                add_query_arg('fbm_repair_caps', '1', admin_url('admin.php?page=fbm_diagnostics')),
                 'fbm_repair_caps'
             );
             echo '<div class="notice notice-warning"><p>' .
@@ -57,7 +57,7 @@ final class Notices {
             'admin_notices',
             function (): void {
                 $s = function_exists('get_current_screen') ? get_current_screen() : null;
-                if (!$s || (strpos($s->id, 'foodbank_page_') !== 0 && $s->id !== 'toplevel_page_fbm-dashboard')) {
+                if (!$s || (strpos($s->id, 'toplevel_page_fbm') !== 0 && strpos($s->id, 'foodbank_page_fbm_') !== 0)) {
                     return;
                 }
                 echo '<div class="notice notice-error"><p>' . \esc_html__('FoodBank Manager encryption key is not configured.', 'foodbank-manager') . '</p></div>';

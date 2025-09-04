@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div class="notice notice-success"><p><?php esc_html_e( 'Override check-in recorded.', 'foodbank-manager' ); ?></p></div>
 <?php endif; ?>
 <form method="get" class="fbm-filters">
-	<input type="hidden" name="page" value="fbm-attendance" />
+        <input type="hidden" name="page" value="fbm_attendance" />
 	<div class="fbm-filter-row">
 	<label><?php esc_html_e( 'Preset', 'foodbank-manager' ); ?>
 		<select name="preset">
@@ -140,7 +140,7 @@ endif;
 	</div>
 	<div class="alignleft actions">
 	<form method="get" id="fbm-perpage-form">
-		<input type="hidden" name="page" value="fbm-attendance" />
+                <input type="hidden" name="page" value="fbm_attendance" />
 		<input type="hidden" name="preset" value="<?php echo esc_attr( $preset ); ?>" />
 		<input type="hidden" name="range_from" value="<?php echo esc_attr( $range_from ); ?>" />
 		<input type="hidden" name="range_to" value="<?php echo esc_attr( $range_to ); ?>" />

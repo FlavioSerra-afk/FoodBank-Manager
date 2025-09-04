@@ -14,7 +14,7 @@ use FoodBankManager\Admin\ShortcodesPage;
 
 final class Plugin {
 
-    public const FBM_VERSION = '1.2.2';
+    public const FBM_VERSION = '1.2.3';
 
         private static ?Plugin $instance = null;
         private static bool $booted = false;
@@ -53,19 +53,18 @@ final class Plugin {
                 \FoodBankManager\Auth\CapabilitiesResolver::boot();
 
                 if ( is_admin() ) {
-                        add_action('admin_init', [\FoodBankManager\Auth\Roles::class, 'ensure_admin_caps'], 5);
+                        add_action( 'admin_init', [\FoodBankManager\Auth\Roles::class, 'ensure_admin_caps'], 5 );
                         \FoodBankManager\Admin\Notices::boot();
                         \FoodBankManager\Admin\Menu::register();
-                        add_action('load-toplevel_page_fbm-dashboard', [\FoodBankManager\Admin\DatabasePage::class, 'route']);
-                        add_action('load-foodbank_page_fbm-database', [\FoodBankManager\Admin\DatabasePage::class, 'route']);
-                        add_action('load-foodbank_page_fbm-attendance', [\FoodBankManager\Admin\AttendancePage::class, 'route']);
-                        add_action('load-foodbank_page_fbm-permissions', [\FoodBankManager\Admin\PermissionsPage::class, 'route']);
-                        add_action('load-foodbank_page_fbm-settings', [\FoodBankManager\Admin\SettingsPage::class, 'route']);
-                        add_action('load-foodbank_page_fbm-theme', [\FoodBankManager\Admin\ThemePage::class, 'route']);
-                        add_action('load-foodbank_page_fbm-emails', [\FoodBankManager\Admin\EmailsPage::class, 'route']);
-                        add_action('load-foodbank_page_fbm-diagnostics', [\FoodBankManager\Admin\DiagnosticsPage::class, 'route']);
-                        add_action('admin_menu', [ShortcodesPage::class, 'register_menu']);
-                        add_action('load-foodbank_page_fbm-shortcodes', [ShortcodesPage::class, 'route']);
+                        add_action( 'load-foodbank_page_fbm_database', [\FoodBankManager\Admin\DatabasePage::class, 'route'] );
+                        add_action( 'load-foodbank_page_fbm_attendance', [\FoodBankManager\Admin\AttendancePage::class, 'route'] );
+                        add_action( 'load-foodbank_page_fbm_permissions', [\FoodBankManager\Admin\PermissionsPage::class, 'route'] );
+                        add_action( 'load-foodbank_page_fbm_settings', [\FoodBankManager\Admin\SettingsPage::class, 'route'] );
+                        add_action( 'load-foodbank_page_fbm_theme', [\FoodBankManager\Admin\ThemePage::class, 'route'] );
+                        add_action( 'load-foodbank_page_fbm_emails', [\FoodBankManager\Admin\EmailsPage::class, 'route'] );
+                        add_action( 'load-foodbank_page_fbm_diagnostics', [\FoodBankManager\Admin\DiagnosticsPage::class, 'route'] );
+                        add_action( 'admin_menu', [ShortcodesPage::class, 'register_menu'] );
+                        add_action( 'load-foodbank_page_fbm_shortcodes', [ShortcodesPage::class, 'route'] );
                         // Theme CSS enqueued via Core\Assets.
                 }
 
@@ -81,7 +80,7 @@ final class Plugin {
                                                 'admin_notices',
                                                 static function (): void {
                                                         $s = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-                                                        if ( ! $s || ( strpos( $s->id, 'foodbank_page_' ) !== 0 && $s->id !== 'toplevel_page_fbm-dashboard' ) ) {
+                                                        if ( ! $s || ( strpos( $s->id, 'toplevel_page_fbm' ) !== 0 && strpos( $s->id, 'foodbank_page_fbm_' ) !== 0 ) ) {
                                                                 return;
                                                         }
                                                         echo '<div class="notice notice-warning"><p>' . esc_html__( 'FoodBank Manager: Encryption key (FBM_KEK_BASE64) not set. Some features are degraded.', 'foodbank-manager' ) . '</p></div>';
@@ -94,7 +93,7 @@ final class Plugin {
                                                 'admin_notices',
                                                 static function (): void {
                                                         $s = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-                                                        if ( ! $s || ( strpos( $s->id, 'foodbank_page_' ) !== 0 && $s->id !== 'toplevel_page_fbm-dashboard' ) ) {
+                                                        if ( ! $s || ( strpos( $s->id, 'toplevel_page_fbm' ) !== 0 && strpos( $s->id, 'foodbank_page_fbm_' ) !== 0 ) ) {
                                                                 return;
                                                         }
                                                         echo '<div class="notice notice-error"><p>' . esc_html__( 'FoodBank Manager: From email is not configured.', 'foodbank-manager' ) . '</p></div>';
@@ -110,7 +109,7 @@ final class Plugin {
                                                         'admin_notices',
                                                         static function (): void {
                                                                 $s = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-                                                                if ( ! $s || ( strpos( $s->id, 'foodbank_page_' ) !== 0 && $s->id !== 'toplevel_page_fbm-dashboard' ) ) {
+                                                                if ( ! $s || ( strpos( $s->id, 'toplevel_page_fbm' ) !== 0 && strpos( $s->id, 'foodbank_page_fbm_' ) !== 0 ) ) {
                                                                         return;
                                                                 }
                                                                 echo '<div class="notice notice-warning"><p>' . esc_html__( 'FoodBank Manager: CAPTCHA keys are missing.', 'foodbank-manager' ) . '</p></div>';

@@ -55,7 +55,7 @@ class SettingsPage {
 					'notice' => 'saved',
 					'tab'    => 'branding',
 				),
-				menu_page_url( 'fbm-settings', false )
+				menu_page_url( 'fbm_settings', false )
 			);
 			wp_safe_redirect( esc_url_raw( $url ), 303 );
 			exit;
@@ -80,7 +80,7 @@ class SettingsPage {
 					'notice' => 'saved',
 					'tab'    => 'email',
 				),
-				menu_page_url( 'fbm-settings', false )
+				menu_page_url( 'fbm_settings', false )
 			);
 			wp_safe_redirect( esc_url_raw( $url ), 303 );
 			exit;

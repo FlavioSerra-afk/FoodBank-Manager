@@ -1,6 +1,7 @@
+Docs-Revision: 2025-09-04 (Wave v1.2.3 – Admin Menu De-dup + Canonical Screen IDs)
 # PHPCS Ignores & Suppressed Issues Dashboard
 
-_Generated: 2025-09-04 15:17:22Z
+_Generated: 2025-09-04 15:59:41Z
 
 This report shows which issues are currently suppressed via `phpcs:ignore` and what would fail if annotations were disabled.
 

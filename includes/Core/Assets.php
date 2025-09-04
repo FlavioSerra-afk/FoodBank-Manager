@@ -29,14 +29,15 @@ class Assets {
 
         public function enqueue_admin(): void {
                 $screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-                if ( $screen && ( strpos( $screen->id, 'foodbank_page_' ) === 0 || $screen->id === 'toplevel_page_fbm-dashboard' ) ) {
-                        wp_register_style( 'fbm-admin', FBM_URL . 'assets/css/admin.css', array(), Plugin::FBM_VERSION );
-                        wp_add_inline_style( 'fbm-admin', self::theme_css() );
-                        wp_enqueue_style( 'fbm-admin' );
+                if ( ! $screen || ( strpos( $screen->id, 'toplevel_page_fbm' ) !== 0 && strpos( $screen->id, 'foodbank_page_fbm_' ) !== 0 ) ) {
+                        return;
+                }
+                wp_register_style( 'fbm-admin', FBM_URL . 'assets/css/admin.css', array(), Plugin::FBM_VERSION );
+                wp_add_inline_style( 'fbm-admin', self::theme_css() );
+                wp_enqueue_style( 'fbm-admin' );
 
-                        if ( $screen->id === 'foodbank_page_fbm-attendance' && current_user_can( 'fb_manage_attendance' ) ) {
-                                wp_enqueue_script( 'fbm-qrcode', FBM_URL . 'assets/js/qrcode.min.js', array(), Plugin::FBM_VERSION, true );
-                        }
+                if ( $screen->id === 'foodbank_page_fbm_attendance' && current_user_can( 'fb_manage_attendance' ) ) {
+                        wp_enqueue_script( 'fbm-qrcode', FBM_URL . 'assets/js/qrcode.min.js', array(), Plugin::FBM_VERSION, true );
                 }
         }
 

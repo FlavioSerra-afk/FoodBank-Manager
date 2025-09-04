@@ -402,8 +402,8 @@ final class PermissionsPage {
 	 * @return void
 	 */
 	private function redirect_with_notice( string $code, string $type = 'success', array $args = array() ): void {
-		$base = menu_page_url( 'fbm-permissions', false );
-		$args = array_merge(
+			$base = menu_page_url( 'fbm_permissions', false );
+		$args     = array_merge(
 			array(
 				'notice' => $code,
 				'type'   => $type,

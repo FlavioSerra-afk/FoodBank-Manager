@@ -43,7 +43,7 @@ class ThemePage {
                         $data = map_deep( wp_unslash( $_POST['fbm_theme'] ), 'sanitize_text_field' );
                 }
                 Options::update( array( 'theme' => $data ) );
-                $url = add_query_arg( 'notice', 'saved', menu_page_url( 'fbm-theme', false ) );
+                $url = add_query_arg( 'notice', 'saved', menu_page_url( 'fbm_theme', false ) );
                 wp_safe_redirect( esc_url_raw( $url ) );
                 exit;
         }
