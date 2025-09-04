@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.2.1 – Frontend Dashboard P2)
+Docs-Revision: 2025-09-04 (Wave v1.2.2 – Frontend Dashboard P3)
 # FoodBank Manager (WordPress Plugin)
 
 A secure, mobile‑first WordPress plugin for Food Bank applications, encrypted data storage, operational dashboards, and **attendance tracking** with QR codes. Administrators can configure branding and default email senders via a validated settings page. The Shortcodes page includes a builder with masked, nonce‑protected previews.
@@ -29,7 +29,7 @@ composer phpcs && composer phpstan -- --memory-limit=1G && composer test
 - **Email confirmations & admin notifications** (HTML), with **logging** and resend.
 - **Email templates admin page** (list with edit skeleton).
 - **Custom database** with **field‑level encryption** (libsodium AEAD, envelope keys).
-- **Front‑end dashboard** (Viewer/Manager) with sanitized filters and CSV/XLSX/PDF exports that sanitize filenames, include a UTF‑8 BOM with translated headers, and mask sensitive fields unless the user has `fb_view_sensitive`. Manager dashboard cards via `[fbm_dashboard]` show aggregated, non‑PII stats with optional % change vs previous period and a daily check-ins sparkline. Default period is 7 days.
+- **Front‑end dashboard** (Viewer/Manager) with sanitized filters and CSV/XLSX/PDF exports that sanitize filenames, include a UTF‑8 BOM with translated headers, and mask sensitive fields unless the user has `fb_view_sensitive`. Manager dashboard cards via `[fbm_dashboard]` show aggregated, non‑PII stats with optional % change vs previous period and a daily check-ins sparkline. It supports optional filters (event, type, policy-only) and a summary CSV download. Default period is 7 days.
 - **Database filter presets and per-user column toggles** on the admin Database page.
 - **Attendance module**: events (optional), admin‑only QR check‑in links (REST nonce, no PII), override reasons, scan/manual check‑in, policy rules, reports. Attendance repository queries use `$wpdb->prepare()` with strict placeholders, mask PII by default, and are covered by unit tests.
 - **GDPR helpers**: consent logs, SAR export, retention/anonymisation.

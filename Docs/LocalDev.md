@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.10 – Admin Layout Guard)
+Docs-Revision: 2025-09-04 (Wave v1.2.2 – Frontend Dashboard P3)
 # Local Development
 
 This project supports two easy setups.

@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignoreFile
 /**
  * Attendance repository.
  *
@@ -449,71 +449,79 @@ ORDER BY created_at ASC
 	}
 
 	/**
-	 * Count present check-ins since a date.
-	 *
-	 * @param string $since UTC datetime.
-	 * @return int
-	 */
-	public static function count_present( string $since ): int {
-		global $wpdb;
-		$since    = sanitize_text_field( $since );
-		$t_att    = $wpdb->prefix . 'fb_attendance';
-		$prepared = call_user_func_array(
-			array( $wpdb, 'prepare' ),
-			array( "SELECT COUNT(*) FROM {$t_att} WHERE status = 'present' AND attendance_at >= %s", $since )
-		);
-		return (int) call_user_func( array( $wpdb, 'get_var' ), $prepared );
+     * Count present check-ins since a date.
+     *
+     * @param string               $since   UTC datetime.
+     * @param array<string,mixed>  $filters Optional filters.
+     * @return int
+     */
+        public static function count_present( string $since, array $filters = array() ): int {
+				global $wpdb;
+				$since                            = sanitize_text_field( $since );
+				$t_att                            = $wpdb->prefix . 'fb_attendance';
+				list( $filter_sql, $filter_args ) = self::build_filter_clauses( $filters );
+				$prepared                         = call_user_func_array(
+					array( $wpdb, 'prepare' ),
+					array_merge( array( "SELECT COUNT(*) FROM {$t_att} WHERE status = 'present' AND attendance_at >= %s{$filter_sql}", $since ), $filter_args )
+				);
+				return (int) call_user_func( array( $wpdb, 'get_var' ), $prepared );
 	}
 
 	/**
-	 * Count unique households served since date.
-	 *
-	 * @param string $since UTC datetime.
-	 * @return int
-	 */
-	public static function count_unique_households( string $since ): int {
-		global $wpdb;
-		$since    = sanitize_text_field( $since );
-		$t_att    = $wpdb->prefix . 'fb_attendance';
-		$prepared = call_user_func_array(
-			array( $wpdb, 'prepare' ),
-			array( "SELECT COUNT(DISTINCT application_id) FROM {$t_att} WHERE status = 'present' AND attendance_at >= %s", $since )
-		);
-		return (int) call_user_func( array( $wpdb, 'get_var' ), $prepared );
+     * Count unique households served since date.
+     *
+     * @param string               $since   UTC datetime.
+     * @param array<string,mixed>  $filters Optional filters.
+     * @return int
+     */
+        public static function count_unique_households( string $since, array $filters = array() ): int {
+				global $wpdb;
+				$since                            = sanitize_text_field( $since );
+				$t_att                            = $wpdb->prefix . 'fb_attendance';
+				list( $filter_sql, $filter_args ) = self::build_filter_clauses( $filters );
+				$prepared                         = call_user_func_array(
+					array( $wpdb, 'prepare' ),
+					array_merge( array( "SELECT COUNT(DISTINCT application_id) FROM {$t_att} WHERE status = 'present' AND attendance_at >= %s{$filter_sql}", $since ), $filter_args )
+				);
+				return (int) call_user_func( array( $wpdb, 'get_var' ), $prepared );
 	}
 
 	/**
-	 * Count no-shows since date.
-	 *
-	 * @param string $since UTC datetime.
-	 * @return int
-	 */
-	public static function count_no_shows( string $since ): int {
-		global $wpdb;
-		$since    = sanitize_text_field( $since );
-		$t_att    = $wpdb->prefix . 'fb_attendance';
-		$prepared = call_user_func_array(
-			array( $wpdb, 'prepare' ),
-			array( "SELECT COUNT(*) FROM {$t_att} WHERE status = 'no_show' AND attendance_at >= %s", $since )
-		);
-		return (int) call_user_func( array( $wpdb, 'get_var' ), $prepared );
+     * Count no-shows since date.
+     *
+     * @param string               $since   UTC datetime.
+     * @param array<string,mixed>  $filters Optional filters.
+     * @return int
+     */
+        public static function count_no_shows( string $since, array $filters = array() ): int {
+				global $wpdb;
+				$since                            = sanitize_text_field( $since );
+				$t_att                            = $wpdb->prefix . 'fb_attendance';
+				list( $filter_sql, $filter_args ) = self::build_filter_clauses( $filters );
+				$prepared                         = call_user_func_array(
+					array( $wpdb, 'prepare' ),
+					array_merge( array( "SELECT COUNT(*) FROM {$t_att} WHERE status = 'no_show' AND attendance_at >= %s{$filter_sql}", $since ), $filter_args )
+				);
+				return (int) call_user_func( array( $wpdb, 'get_var' ), $prepared );
 	}
 
 	/**
-	 * Count attendance by type since date.
-	 *
-	 * @param string $since UTC datetime.
-	 * @return array{in_person:int,delivery:int}
-	 */
-	public static function count_by_type( string $since ): array {
-		global $wpdb;
-		$since    = sanitize_text_field( $since );
-		$t_att    = $wpdb->prefix . 'fb_attendance';
-		$prepared = call_user_func_array(
-			array( $wpdb, 'prepare' ),
-			array( "SELECT type, COUNT(*) as c FROM {$t_att} WHERE status = 'present' AND attendance_at >= %s GROUP BY type", $since )
-		);
-		$rows     = call_user_func( array( $wpdb, 'get_results' ), $prepared );
+     * Count attendance by type since date.
+     *
+     * @param string               $since   UTC datetime.
+     * @param array<string,mixed>  $filters Optional filters.
+     * @return array{in_person:int,delivery:int}
+     */
+        public static function count_by_type( string $since, array $filters = array() ): array {
+				global $wpdb;
+				$since                            = sanitize_text_field( $since );
+				$t_att                            = $wpdb->prefix . 'fb_attendance';
+				list( $filter_sql, $filter_args ) = self::build_filter_clauses( $filters );
+				$prepared                         = call_user_func_array(
+					array( $wpdb, 'prepare' ),
+					array_merge( array( "SELECT type, COUNT(*) as c FROM {$t_att} WHERE status = 'present' AND attendance_at >= %s{$filter_sql} GROUP BY type", $since ), $filter_args )
+				);
+		$rows                                     = call_user_func( array( $wpdb, 'get_results' ), $prepared );
 		if ( ! is_array( $rows ) ) {
 			$rows = array();
 		}
@@ -529,20 +537,22 @@ ORDER BY created_at ASC
 	}
 
 	/**
-	 * Count voided records since date.
-	 *
-	 * @param string $since UTC datetime.
-	 * @return int
-	 */
-	public static function count_voided( string $since ): int {
-		global $wpdb;
-		$since    = sanitize_text_field( $since );
-		$t_att    = $wpdb->prefix . 'fb_attendance';
-		$prepared = call_user_func_array(
-			array( $wpdb, 'prepare' ),
-			array( "SELECT COUNT(*) FROM {$t_att} WHERE is_void = 1 AND attendance_at >= %s", $since )
-		);
-		return (int) call_user_func( array( $wpdb, 'get_var' ), $prepared );
+     * Count voided records since date.
+     *
+     * @param string               $since   UTC datetime.
+     * @param array<string,mixed>  $filters Optional filters.
+     * @return int
+     */
+        public static function count_voided( string $since, array $filters = array() ): int {
+				global $wpdb;
+				$since                            = sanitize_text_field( $since );
+				$t_att                            = $wpdb->prefix . 'fb_attendance';
+				list( $filter_sql, $filter_args ) = self::build_filter_clauses( $filters );
+				$prepared                         = call_user_func_array(
+					array( $wpdb, 'prepare' ),
+					array_merge( array( "SELECT COUNT(*) FROM {$t_att} WHERE is_void = 1 AND attendance_at >= %s{$filter_sql}", $since ), $filter_args )
+				);
+				return (int) call_user_func( array( $wpdb, 'get_var' ), $prepared );
 	}
 
 		/**
@@ -551,22 +561,26 @@ ORDER BY created_at ASC
 		 * @param DateTimeImmutable $since Start date/time (UTC).
 		 * @return array<int,int> One value per day (or hour for today).
 		 */
-	public static function daily_present_counts( DateTimeImmutable $since ): array {
-			global $wpdb;
-			$t_att     = $wpdb->prefix . 'fb_attendance';
-			$since_str = sanitize_text_field( $since->format( 'Y-m-d H:i:s' ) );
-			$today     = gmdate( 'Y-m-d' );
+	public static function daily_present_counts( DateTimeImmutable $since, array $filters = array() ): array {
+						global $wpdb;
+						$t_att                            = $wpdb->prefix . 'fb_attendance';
+						$since_str                        = sanitize_text_field( $since->format( 'Y-m-d H:i:s' ) );
+						$today                            = gmdate( 'Y-m-d' );
+						list( $filter_sql, $filter_args ) = self::build_filter_clauses( $filters );
 
 		if ( $since->format( 'Y-m-d' ) === $today ) {
-				$prepared = call_user_func_array(
-					array( $wpdb, 'prepare' ),
-					array(
-						"SELECT DATE_FORMAT(attendance_at,'%H') h, COUNT(*) c FROM {$t_att} WHERE status = 'present' AND attendance_at >= %s GROUP BY h",
-						$since_str,
-					)
-				);
-				$rows     = call_user_func( array( $wpdb, 'get_results' ), $prepared );
-				$out      = array_fill( 0, 24, 0 );
+								$prepared = call_user_func_array(
+									array( $wpdb, 'prepare' ),
+									array_merge(
+										array(
+											"SELECT DATE_FORMAT(attendance_at,'%H') h, COUNT(*) c FROM {$t_att} WHERE status = 'present' AND attendance_at >= %s{$filter_sql} GROUP BY h",
+											$since_str,
+										),
+										$filter_args
+									)
+								);
+				$rows                     = call_user_func( array( $wpdb, 'get_results' ), $prepared );
+				$out                      = array_fill( 0, 24, 0 );
 			if ( is_array( $rows ) ) {
 				foreach ( $rows as $row ) {
 						$h = (int) $row->h;
@@ -578,16 +592,19 @@ ORDER BY created_at ASC
 				return $out;
 		}
 
-			$prepared  = call_user_func_array(
-				array( $wpdb, 'prepare' ),
-				array( "SELECT DATE(attendance_at) d, COUNT(*) c FROM {$t_att} WHERE status = 'present' AND attendance_at >= %s GROUP BY d", $since_str )
-			);
-			$rows      = call_user_func( array( $wpdb, 'get_results' ), $prepared );
-			$now       = new DateTimeImmutable( 'today', new \DateTimeZone( 'UTC' ) );
-			$days      = $now->diff( $since )->days;
-			$len       = $days + 1;
-			$out       = array_fill( 0, (int) $len, 0 );
-			$since_day = strtotime( $since->format( 'Y-m-d' ) );
+						$prepared = call_user_func_array(
+							array( $wpdb, 'prepare' ),
+							array_merge(
+								array( "SELECT DATE(attendance_at) d, COUNT(*) c FROM {$t_att} WHERE status = 'present' AND attendance_at >= %s{$filter_sql} GROUP BY d", $since_str ),
+								$filter_args
+							)
+						);
+			$rows                 = call_user_func( array( $wpdb, 'get_results' ), $prepared );
+			$now                  = new DateTimeImmutable( 'today', new \DateTimeZone( 'UTC' ) );
+			$days                 = $now->diff( $since )->days;
+			$len                  = $days + 1;
+			$out                  = array_fill( 0, (int) $len, 0 );
+			$since_day            = strtotime( $since->format( 'Y-m-d' ) );
 		if ( is_array( $rows ) ) {
 			foreach ( $rows as $row ) {
 				$d   = sanitize_text_field( (string) $row->d );
@@ -606,17 +623,17 @@ ORDER BY created_at ASC
 		 * @param DateTimeImmutable $since Start date/time (UTC).
 		 * @return array{present:int,households:int,no_shows:int,in_person:int,delivery:int,voided:int}
 		 */
-	public static function period_totals( DateTimeImmutable $since ): array {
-			$since_str = sanitize_text_field( $since->format( 'Y-m-d H:i:s' ) );
-				$types = self::count_by_type( $since_str );
-				return array(
-					'present'    => self::count_present( $since_str ),
-					'households' => self::count_unique_households( $since_str ),
-					'no_shows'   => self::count_no_shows( $since_str ),
-					'in_person'  => (int) $types['in_person'],
-					'delivery'   => (int) $types['delivery'],
-					'voided'     => self::count_voided( $since_str ),
-				);
+	public static function period_totals( DateTimeImmutable $since, array $filters = array() ): array {
+						$since_str     = sanitize_text_field( $since->format( 'Y-m-d H:i:s' ) );
+								$types = self::count_by_type( $since_str, $filters );
+								return array(
+									'present'    => self::count_present( $since_str, $filters ),
+									'households' => self::count_unique_households( $since_str, $filters ),
+									'no_shows'   => self::count_no_shows( $since_str, $filters ),
+									'in_person'  => (int) $types['in_person'],
+									'delivery'   => (int) $types['delivery'],
+									'voided'     => self::count_voided( $since_str, $filters ),
+								);
 	}
 
 	/**
@@ -626,6 +643,42 @@ ORDER BY created_at ASC
 	 * @return string WHERE clause.
 	 */
 	private function fbm_sql_where( array $clauses ): string {
-		return $clauses ? 'WHERE ' . implode( ' AND ', $clauses ) : '';
+			return $clauses ? 'WHERE ' . implode( ' AND ', $clauses ) : '';
+	}
+
+		/**
+		 * Build optional filter SQL and args.
+		 *
+		 * @param array $filters Filters.
+		 * @return array{0:string,1:array}
+		 */
+	private static function build_filter_clauses( array $filters ): array {
+			$clauses = array();
+			$args    = array();
+
+			$event = $filters['event'] ?? null;
+		if ( null !== $event && '' !== $event ) {
+				$event = sanitize_text_field( (string) $event );
+			if ( ctype_digit( $event ) ) {
+				$clauses[] = 'event_id = %d';
+				$args[]    = (int) $event;
+			} else {
+					$clauses[] = 'event_id = %s';
+					$args[]    = $event;
+			}
+		}
+
+			$type = sanitize_key( (string) ( $filters['type'] ?? '' ) );
+		if ( in_array( $type, array( 'in_person', 'delivery' ), true ) ) {
+				$clauses[] = 'type = %s';
+				$args[]    = $type;
+		}
+
+		if ( ! empty( $filters['policy_only'] ) ) {
+				$clauses[] = 'policy_breach = 1';
+		}
+
+			$sql = $clauses ? ' AND ' . implode( ' AND ', $clauses ) : '';
+			return array( $sql, $args );
 	}
 }

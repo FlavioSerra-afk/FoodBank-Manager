@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.2.1 – Frontend Dashboard P2)
+Docs-Revision: 2025-09-04 (Wave v1.2.2 – Frontend Dashboard P3)
 Strict (cleaned):
 
 includes/Admin/EmailsPage.php
@@ -13,6 +13,7 @@ Wave focus:
 - Attendance P1: admin QR check-in helper and override reason UI.
 - Database UX P1: filter presets and column toggles.
 - Admin Layout Guard: wrap admin templates in `.fbm-admin`, gate assets/notices to plugin screens.
+- Frontend Dashboard P3: filters (event/type/policy) and summary CSV export.
 
 Legacy (temporary ignoreFile to unblock ZIP):
 

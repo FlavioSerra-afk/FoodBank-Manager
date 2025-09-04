@@ -11,6 +11,14 @@ final class DashboardShortcodeTest extends TestCase {
         $this->assertSame( '7d', \FoodBankManager\Shortcodes\Dashboard::sanitize_period( 'bad' ) );
     }
 
+    public function testSanitizeTypeAndEvent(): void {
+        require_once __DIR__ . '/../../includes/Shortcodes/Dashboard.php';
+        $this->assertSame( 'all', \FoodBankManager\Shortcodes\Dashboard::sanitize_type( 'bogus' ) );
+        $this->assertSame( 'delivery', \FoodBankManager\Shortcodes\Dashboard::sanitize_type( 'delivery' ) );
+        $this->assertNull( \FoodBankManager\Shortcodes\Dashboard::sanitize_event( '' ) );
+        $this->assertSame( 'abc', \FoodBankManager\Shortcodes\Dashboard::sanitize_event( 'abc' ) );
+    }
+
     /** @runInSeparateProcess */
     public function testUnauthorizedGated(): void {
         $GLOBALS['fbm_can_dashboard'] = false;
@@ -40,6 +48,12 @@ final class DashboardShortcodeTest extends TestCase {
         if ( ! function_exists( 'esc_url' ) ) {
             function esc_url( $u ) { return $u; }
         }
+        if ( ! function_exists( 'selected' ) ) {
+            function selected( $a, $b ) {}
+        }
+        if ( ! function_exists( 'checked' ) ) {
+            function checked( $a, $b = true ) {}
+        }
         if ( ! function_exists( 'sanitize_key' ) ) {
             function sanitize_key( $k ) { return $k; }
         }
@@ -60,6 +74,12 @@ final class DashboardShortcodeTest extends TestCase {
         }
         if ( ! function_exists( 'wp_enqueue_style' ) ) {
             function wp_enqueue_style( $h ) {}
+        }
+        if ( ! function_exists( 'wp_nonce_url' ) ) {
+            function wp_nonce_url( $u ) { return $u; }
+        }
+        if ( ! function_exists( 'admin_url' ) ) {
+            function admin_url( $u ) { return $u; }
         }
         if ( ! function_exists( 'add_query_arg' ) ) {
             function add_query_arg( $a ) { return ''; }

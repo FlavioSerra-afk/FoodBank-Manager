@@ -1,8 +1,9 @@
-Docs-Revision: 2025-09-04 (Wave v1.2.1 – Frontend Dashboard P2)
+Docs-Revision: 2025-09-04 (Wave v1.2.2 – Frontend Dashboard P3)
 # REST API (pcc-fb/v1)
 
 Base namespace: `pcc-fb/v1`. All write endpoints require `X-WP-Nonce` and capabilities.
 Shortcode previews are handled via `admin-post.php` (`fbm_action=shortcode_preview`) and are not exposed via REST.
+Dashboard summary CSV downloads use `admin-post.php?action=fbm_dash_export` with a nonce and `fb_manage_dashboard` capability.
 Design & Theme options are configuration-only; no REST endpoints expose or modify them.
 Admin screens are wrapped in `.fbm-admin` with assets/notices loaded only on FoodBank Manager pages.
 
@@ -39,7 +40,7 @@ Admin screens are wrapped in `.fbm-admin` with assets/notices loaded only on Foo
 | `[fbm_form]` | `id` (string, default "1"), `preset` (string, default "basic_intake") |
 | `[fbm_entries]` | _None_ |
 | `[fbm_attendance_manager]` | _None_ |
-| `[fbm_dashboard]` | `period` ("today"\|"7d"\|"30d"), `compare` ("1"\|"0"), `sparkline` ("1"\|"0") |
+| `[fbm_dashboard]` | `period` ("today"|"7d"|"30d"), `compare` ("1"|"0"), `sparkline` ("1"|"0"), `event`, `type` ("in_person"|"delivery"|"all"), `policy_only` ("1"|"0") |
 - Validates nonce, required fields, file policy.
 - Stores encrypted PII; triggers applicant/admin emails.
 
