@@ -3,21 +3,12 @@ declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 use FoodBankManager\Attendance\AttendanceRepo;
+use FBM\Tests\Support\WPDBStub;
 
 final class AttendanceRepoFilterTest extends TestCase {
     public function setUp(): void {
         global $wpdb;
-        $wpdb = new class() {
-            public $prefix = 'wp_';
-            public $last_sql;
-            public $last_args = array();
-            public function prepare( $sql, ...$args ) {
-                $this->last_sql  = $sql;
-                $this->last_args = $args;
-                return $sql;
-            }
-            public function get_var( $sql ) { return 0; }
-        };
+        $wpdb = new WPDBStub();
     }
 
     public function testFiltersPrepared(): void {

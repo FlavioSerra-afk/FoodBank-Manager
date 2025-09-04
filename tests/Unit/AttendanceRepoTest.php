@@ -3,21 +3,12 @@ declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 use FoodBankManager\Attendance\AttendanceRepo;
+use FBM\Tests\Support\WPDBStub;
 
 final class AttendanceRepoTest extends TestCase {
 	public function testPeopleSummaryExcludesVoidedByDefault(): void {
 		global $wpdb;
-		$wpdb = new class() {
-			public $prefix   = 'wp_';
-			public $prepared = array();
-			public function prepare( $sql, $args ) {
-				$this->prepared[] = $sql;
-				return $sql; }
-			public function get_results( $sql, $output ) {
-				return array(); }
-			public function get_var( $sql ) {
-				return 0; }
-		};
+                $wpdb = new WPDBStub();
                 AttendanceRepo::people_summary(
                         array(
                                 'range_from' => '2024-01-01',

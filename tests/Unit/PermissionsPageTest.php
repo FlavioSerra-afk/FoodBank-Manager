@@ -203,6 +203,7 @@ namespace {
 
         public function test_user_override_add_and_remove(): void {
             $_POST['_fbm_nonce'] = '1';
+            $_POST['_wpnonce']   = '1';
             $_POST['user_id']    = 1;
             $_POST['caps']       = array( 'fb_manage_dashboard' );
             $add = new \ReflectionMethod( \FoodBankManager\Admin\PermissionsPage::class, 'handle_user_override_add' );
@@ -215,6 +216,7 @@ namespace {
             $this->assertArrayHasKey( 'fbm_user_caps', $fbm_test_user_meta[1] );
 
             $_POST['_fbm_nonce'] = '1';
+            $_POST['_wpnonce']   = '1';
             $_POST['user_id']    = 1;
             $rm = new \ReflectionMethod( \FoodBankManager\Admin\PermissionsPage::class, 'handle_user_override_remove' );
             $rm->setAccessible( true );
