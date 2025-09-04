@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.9 – Permissions UX)
+Docs-Revision: 2025-09-04 (Wave v1.1.10 – Admin Layout Guard)
 # FoodBank Manager — Architecture
 
 ## Overview
@@ -9,6 +9,7 @@ A secure, privacy-first WordPress plugin for managing Food Bank applicant intake
 - No fatals: the plugin should never crash a site.
 - Graceful optional dependencies: features should degrade cleanly if dependencies are missing.
 - Least privilege: grant only the capabilities required.
+- Isolated admin layout: `.fbm-admin` wrapper and screen-gated assets/notices ensure no overflow into wp-admin.
 
 ## Directory layout (key paths)
 - `foodbank-manager.php` – bootstrap, constants: `FBM_FILE`, `FBM_PATH`, `FBM_URL`, `FBM_VERSION`.

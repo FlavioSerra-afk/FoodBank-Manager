@@ -7,7 +7,7 @@ use FoodBankManager\Admin\AttendancePage;
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; }
 ?>
-<div class="wrap">
+<div class="wrap fbm-admin">
 <h1><?php esc_html_e( 'Attendance', 'foodbank-manager' ); ?></h1>
 <?php if ( isset( $_GET['fbm_override'] ) ) : ?>
 <div class="notice notice-success"><p><?php esc_html_e( 'Override check-in recorded.', 'foodbank-manager' ); ?></p></div>
@@ -170,7 +170,6 @@ endif;
 	<button type="submit" class="button"><?php esc_html_e( 'Export CSV', 'foodbank-manager' ); ?></button>
 </form>
 <?php endif; ?>
-</div>
 <div id="fbm-timeline-modal" style="display:none;position:fixed;top:10%;left:10%;right:10%;background:#fff;border:1px solid #ccc;padding:10px;max-height:70%;overflow:auto;z-index:1000;">
         <button type="button" id="fbm-timeline-close" style="float:right;">&times;</button>
         <ul id="fbm-timeline-list"></ul>
@@ -287,3 +286,4 @@ endif;
         });
 })();
 </script>
+</div>

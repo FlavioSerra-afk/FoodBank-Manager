@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.1 – Diagnostics P1)
+Docs-Revision: 2025-09-04 (Wave v1.1.10 – Admin Layout Guard)
 # Local Development
 
 This project supports two easy setups.
@@ -24,6 +24,8 @@ npx @wordpress/env destroy && npx @wordpress/env start
 Use `wordpress:6.8-php8.1` and `mysql:8` containers, mount `./foodbank-manager` into `/var/www/html/wp-content/plugins/`.
 
 Run `wp core install`, then `wp plugin activate foodbank-manager`.
+
+Admin pages render inside `.fbm-admin`; when tweaking CSS, enqueue only `assets/css/admin.css` on FoodBank Manager screens.
 
 ### Secrets / Keys
 

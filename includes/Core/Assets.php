@@ -9,7 +9,7 @@ use FoodBankManager\Core\Options;
 class Assets {
         public function register(): void {
                 add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_front' ) );
-                add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin' ) );
+                add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin' ), 10, 0 );
         }
 
         public function enqueue_front(): void {
@@ -18,13 +18,16 @@ class Assets {
                 wp_enqueue_style( 'fbm-theme-frontend' );
         }
 
-        public function enqueue_admin( string $hook ): void {
-                wp_register_style( 'fbm-theme-admin', FBM_URL . 'assets/css/theme-admin.css', array(), Plugin::FBM_VERSION );
-                wp_add_inline_style( 'fbm-theme-admin', self::theme_css() );
-                wp_enqueue_style( 'fbm-theme-admin' );
+        public function enqueue_admin(): void {
+                $screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+                if ( $screen && ( strpos( $screen->id, 'foodbank_page_' ) === 0 || $screen->id === 'toplevel_page_fbm-dashboard' ) ) {
+                        wp_register_style( 'fbm-admin', FBM_URL . 'assets/css/admin.css', array(), Plugin::FBM_VERSION );
+                        wp_add_inline_style( 'fbm-admin', self::theme_css() );
+                        wp_enqueue_style( 'fbm-admin' );
 
-                if ( $hook === 'foodbank-manager_page_fbm-attendance' && current_user_can( 'fb_manage_attendance' ) ) {
-                        wp_enqueue_script( 'fbm-qrcode', FBM_URL . 'assets/js/qrcode.min.js', array(), Plugin::FBM_VERSION, true );
+                        if ( $screen->id === 'foodbank_page_fbm-attendance' && current_user_can( 'fb_manage_attendance' ) ) {
+                                wp_enqueue_script( 'fbm-qrcode', FBM_URL . 'assets/js/qrcode.min.js', array(), Plugin::FBM_VERSION, true );
+                        }
                 }
         }
 

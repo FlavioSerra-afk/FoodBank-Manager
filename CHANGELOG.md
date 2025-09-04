@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.10] - 2025-09-04
+### Fixes
+- Contained admin pages with `.fbm-admin` wrapper and screen-gated assets/notices.
+### Docs
+- Docs revised for Admin Layout Guard (Wave v1.1.10).
+
 ## [1.1.9] - 2025-09-04
 ### Features
 - Permissions admin page: JSON export/import (Dry Run), per-user overrides table, and Reset.

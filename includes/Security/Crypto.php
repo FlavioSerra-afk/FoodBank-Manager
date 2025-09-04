@@ -32,6 +32,10 @@ class Crypto {
                                 \add_action(
                                         'admin_notices',
                                         static function () {
+                                                $s = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+                                                if ( ! $s || ( strpos( $s->id, 'foodbank_page_' ) !== 0 && $s->id !== 'toplevel_page_fbm-dashboard' ) ) {
+                                                        return;
+                                                }
                                                 echo '<div class="notice notice-error"><p>' . \esc_html__( 'Sodium extension not available; encryption disabled.', 'foodbank-manager' ) . '</p></div>';
                                         }
                                 );

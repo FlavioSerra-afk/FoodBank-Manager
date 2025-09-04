@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.9 – Permissions UX)
+Docs-Revision: 2025-09-04 (Wave v1.1.10 – Admin Layout Guard)
 Strict (cleaned):
 
 includes/Admin/EmailsPage.php
@@ -12,6 +12,7 @@ Wave focus:
 - Phase 2: add visual form builder, uploads, and CAPTCHA options.
 - Attendance P1: admin QR check-in helper and override reason UI.
 - Database UX P1: filter presets and column toggles.
+- Admin Layout Guard: wrap admin templates in `.fbm-admin`, gate assets/notices to plugin screens.
 
 Legacy (temporary ignoreFile to unblock ZIP):
 

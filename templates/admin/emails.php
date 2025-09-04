@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 ?>
-<div class="wrap">
+<div class="wrap fbm-admin">
 	<h1><?php esc_html_e( 'Email Templates', 'foodbank-manager' ); ?></h1>
 	<ul>
 		<?php foreach ( $templates as $key => $tpl ) : ?>

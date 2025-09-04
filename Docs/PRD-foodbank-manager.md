@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.9 – Permissions UX)
+Docs-Revision: 2025-09-04 (Wave v1.1.10 – Admin Layout Guard)
 # FoodBank Manager — Product Requirements Document (PRD)
 
 **Repo file:** `Docs/PRD-foodbank-manager.md`  
@@ -20,6 +20,7 @@ FoodBank Manager is a secure, mobile-first WordPress plugin to:
 - Provide admin and front-end dashboards to search, filter, export, and (for Managers) **track attendance** at distribution sessions.
 - Allow administrators to configure branding and default email senders via a validated settings page.
 - Offer a Design & Theme settings page for primary colour, density, font, default dark mode and optional custom CSS (sanitised) applied across admin and front-end.
+- Admin pages are wrapped in a namespaced `.fbm-admin` container with plugin CSS and notices loaded only on FoodBank Manager screens.
 - Ensure compliance with UK GDPR and follow best-practice WordPress security.
 
 The plugin must reproduce the current Food Bank form at `https://pcclondon.uk/food-bank/` exactly as a starter preset, and allow building additional custom forms with full control over fields, layout, logic, and data handling.
