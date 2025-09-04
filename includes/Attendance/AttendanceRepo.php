@@ -58,6 +58,8 @@ final class AttendanceRepo {
 		 *   status?:array<int,string>,
 		 *   type?:array<int,string>,
 		 *   manager_id?:int,
+		 *   application_ids?:list<int>,
+		 *   person_ids?:list<int>,
 		 *   policy_only?:bool,
 		 *   include_voided?:bool,
 		 *   policy_days?:int,
@@ -80,76 +82,103 @@ final class AttendanceRepo {
 		 * }
 		 */
 	public static function people_summary( array $args ): array {
-		global $wpdb;
-		$t_att = $wpdb->prefix . 'fb_attendance';
-		$t_app = $wpdb->prefix . 'fb_applications';
+			global $wpdb;
+			$self  = new self();
+			$t_att = $wpdb->prefix . 'fb_attendance';
+			$t_app = $wpdb->prefix . 'fb_applications';
 
-		$range_from = sanitize_text_field( $args['range_from'] );
-		$range_to   = sanitize_text_field( $args['range_to'] );
+			$range_from = sanitize_text_field( $args['range_from'] );
+			$range_to   = sanitize_text_field( $args['range_to'] );
 		if ( 1 !== preg_match( '/^\d{4}-\d{2}-\d{2}$/', $range_from ) || 1 !== preg_match( '/^\d{4}-\d{2}-\d{2}$/', $range_to ) ) {
-			return array(
-				'rows'  => array(),
-				'total' => 0,
-			);
+				return array(
+					'rows'  => array(),
+					'total' => 0,
+				);
 		}
-		$rf = $range_from . ' 00:00:00';
-		$rt = $range_to . ' 23:59:59';
+			$rf = $range_from . ' 00:00:00';
+			$rt = $range_to . ' 23:59:59';
 
-		$policy_days    = absint( $args['policy_days'] ?? Options::get( 'attendance.policy_days' ) );
-		$include_voided = ! empty( $args['include_voided'] );
+			$policy_days    = absint( $args['policy_days'] ?? Options::get( 'attendance.policy_days' ) );
+			$include_voided = ! empty( $args['include_voided'] );
 
-		$where  = array( '1=1' );
-		$params = array();
+			$clauses    = array( 't.attendance_at BETWEEN %s AND %s' );
+			$where_args = array( $rf, $rt );
 
 		if ( ! $include_voided ) {
-			$where[] = 't.is_void = 0';
+				$clauses[] = 't.is_void = 0';
 		}
 
-		$form_id = absint( $args['form_id'] ?? 0 );
+			$form_id = absint( $args['form_id'] ?? 0 );
 		if ( $form_id ) {
-			$where[]  = 'a.form_id = %d';
-			$params[] = $form_id;
+				$clauses[]    = 'a.form_id = %d';
+				$where_args[] = $form_id;
 		}
 
-		$event_id = absint( $args['event_id'] ?? 0 );
+			$event_id = absint( $args['event_id'] ?? 0 );
 		if ( $event_id ) {
-			$where[]  = 't.event_id = %d';
-			$params[] = $event_id;
+				$clauses[]    = 't.event_id = %d';
+				$where_args[] = $event_id;
 		}
 
-		$statuses = array_values( array_filter( array_map( 'sanitize_text_field', (array) ( $args['status'] ?? array() ) ) ) );
+			$statuses = array_values( array_filter( array_map( 'sanitize_text_field', (array) ( $args['status'] ?? array() ) ) ) );
 		if ( isset( $args['status'] ) && empty( $statuses ) ) {
-			return array(
-				'rows'  => array(),
-				'total' => 0,
-			);
+				return array(
+					'rows'  => array(),
+					'total' => 0,
+				);
 		}
 		if ( $statuses ) {
 				$placeholders = implode( ', ', array_fill( 0, count( $statuses ), '%s' ) );
-				$where[]      = "t.status IN ($placeholders)";
-				$params       = array_merge( $params, $statuses );
+				$clauses[]    = "t.status IN ($placeholders)";
+				$where_args   = array_merge( $where_args, $statuses );
 		}
 
-		$types = array_values( array_filter( array_map( 'sanitize_text_field', (array) ( $args['type'] ?? array() ) ) ) );
+			$types = array_values( array_filter( array_map( 'sanitize_text_field', (array) ( $args['type'] ?? array() ) ) ) );
 		if ( isset( $args['type'] ) && empty( $types ) ) {
-			return array(
-				'rows'  => array(),
-				'total' => 0,
-			);
+				return array(
+					'rows'  => array(),
+					'total' => 0,
+				);
 		}
 		if ( $types ) {
 				$placeholders = implode( ', ', array_fill( 0, count( $types ), '%s' ) );
-				$where[]      = "t.type IN ($placeholders)";
-				$params       = array_merge( $params, $types );
+				$clauses[]    = "t.type IN ($placeholders)";
+				$where_args   = array_merge( $where_args, $types );
 		}
 
-		$manager_id = absint( $args['manager_id'] ?? 0 );
+			$manager_id = absint( $args['manager_id'] ?? 0 );
 		if ( $manager_id ) {
-			$where[]  = 't.recorded_by_user_id = %d';
-			$params[] = $manager_id;
+				$clauses[]    = 't.recorded_by_user_id = %d';
+				$where_args[] = $manager_id;
 		}
 
-			$where_sql = implode( ' AND ', $where );
+			$app_ids = array_values( array_filter( array_map( 'absint', (array) ( $args['application_ids'] ?? array() ) ) ) );
+		if ( isset( $args['application_ids'] ) && empty( $app_ids ) ) {
+				return array(
+					'rows'  => array(),
+					'total' => 0,
+				);
+		}
+		if ( $app_ids ) {
+				$placeholders = implode( ', ', array_fill( 0, count( $app_ids ), '%d' ) );
+				$clauses[]    = "t.application_id IN ($placeholders)";
+				$where_args   = array_merge( $where_args, $app_ids );
+		}
+
+			$person_ids = array_values( array_filter( array_map( 'absint', (array) ( $args['person_ids'] ?? array() ) ) ) );
+		if ( isset( $args['person_ids'] ) && empty( $person_ids ) ) {
+				return array(
+					'rows'  => array(),
+					'total' => 0,
+				);
+		}
+		if ( $person_ids ) {
+				$placeholders = implode( ', ', array_fill( 0, count( $person_ids ), '%d' ) );
+				$clauses[]    = "a.person_id IN ($placeholders)";
+				$where_args   = array_merge( $where_args, $person_ids );
+		}
+
+			$where_sql = $self->fbm_sql_where( $clauses );
 			$having    = ! empty( $args['policy_only'] ) ? ' HAVING policy_breach = 1' : '';
 
 			$order_map = array(
@@ -164,74 +193,76 @@ final class AttendanceRepo {
 			$order     = 'ASC' === strtoupper( $args['order'] ?? '' ) ? 'ASC' : 'DESC';
 			$order_sql = " ORDER BY {$order_by} {$order}";
 
-							$limit = min( 500, max( 1, absint( $args['per_page'] ?? 25 ) ) );
-			$page                  = max( 1, absint( $args['page'] ?? 1 ) );
-			$offset                = max( 0, ( $page - 1 ) * $limit );
-			$limit_sql             = $wpdb->prepare( ' LIMIT %d OFFSET %d', $limit, $offset );
+			$limit     = min( 500, max( 1, absint( $args['per_page'] ?? 25 ) ) );
+			$page      = max( 1, absint( $args['page'] ?? 1 ) );
+			$offset    = max( 0, ( $page - 1 ) * $limit );
+			$limit_sql = $wpdb->prepare( ' LIMIT %d OFFSET %d', $limit, $offset );
 
 			$base_sql = "
-	SELECT
+SELECT
   a.id AS application_id,
   MAX(CASE WHEN t.status='present' THEN t.attendance_at END)                                                 AS last_attended,
   SUM(CASE WHEN t.status='present' AND t.attendance_at BETWEEN %s AND %s THEN 1 ELSE 0 END)                  AS visits_range,
   SUM(CASE WHEN t.status='no_show'  AND t.attendance_at BETWEEN %s AND %s THEN 1 ELSE 0 END)                 AS noshows_range,
   SUM(CASE WHEN t.status='present' AND t.attendance_at >= DATE_SUB(%s, INTERVAL 12 MONTH) THEN 1 ELSE 0 END) AS visits_12m,
   MAX(
-EXISTS(
-  SELECT 1 FROM {$t_att} t2
-  WHERE t2.application_id = t.application_id
-AND t2.status='present'
-AND t2.attendance_at > DATE_SUB(t.attendance_at, INTERVAL %d DAY)
-AND t2.attendance_at <  t.attendance_at
-)
+    EXISTS(
+      SELECT 1 FROM {$t_att} t2
+      WHERE t2.application_id = t.application_id
+        AND t2.status='present'
+        AND t2.attendance_at > DATE_SUB(t.attendance_at, INTERVAL %d DAY)
+        AND t2.attendance_at <  t.attendance_at
+    )
   ) AS policy_breach
 FROM {$t_att} t
 JOIN {$t_app} a ON a.id = t.application_id
-WHERE {$where_sql}
+$where_sql
 GROUP BY t.application_id{$having}";
 
-			$rows = $wpdb->get_results(
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- placeholders strictly match params length.
-				$wpdb->prepare( $base_sql . $order_sql . $limit_sql, array_merge( array( $rf, $rt, $rf, $rt, $rt, $policy_days ), $params ) ),
+			$select_args = array( $rf, $rt, $rf, $rt, $rt, $policy_days );
+			$query_args  = array_merge( $select_args, $where_args );
+			$rows        = $wpdb->get_results(
+			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- placeholders strictly match params length.
+				$wpdb->prepare( $base_sql . $order_sql . $limit_sql, $query_args ),
 				'ARRAY_A'
 			);
 
 		if ( ! empty( $args['policy_only'] ) ) {
-			$count_base   = "
-	SELECT COUNT(*) FROM (
+				$count_base = "
+SELECT COUNT(*) FROM (
   SELECT t.application_id,
-MAX(
-  EXISTS(
-	SELECT 1 FROM {$t_att} t2
-WHERE t2.application_id = t.application_id
-  AND t2.status='present'
-  AND t2.attendance_at > DATE_SUB(t.attendance_at, INTERVAL %d DAY)
-  AND t2.attendance_at <  t.attendance_at
-  )
-) AS policy_breach
+         MAX(
+           EXISTS(
+             SELECT 1 FROM {$t_att} t2
+             WHERE t2.application_id = t.application_id
+               AND t2.status='present'
+               AND t2.attendance_at > DATE_SUB(t.attendance_at, INTERVAL %d DAY)
+               AND t2.attendance_at <  t.attendance_at
+           )
+         ) AS policy_breach
   FROM {$t_att} t
   JOIN {$t_app} a ON a.id = t.application_id
-  WHERE {$where_sql}
+  $where_sql
   GROUP BY t.application_id
   HAVING policy_breach = 1
 ) c";
-			$count_params = array_merge( array( $policy_days ), $params );
+				$count_args = array_merge( array( $policy_days ), $where_args );
 		} else {
-			$count_base   = "SELECT COUNT(DISTINCT t.application_id) FROM {$t_att} t JOIN {$t_app} a ON a.id = t.application_id WHERE {$where_sql}";
-			$count_params = $params;
+				$count_base = "SELECT COUNT(DISTINCT t.application_id) FROM {$t_att} t JOIN {$t_app} a ON a.id = t.application_id $where_sql";
+				$count_args = $where_args;
 		}
 
-		$total = (int) $wpdb->get_var(
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- placeholders strictly match params length.
-			$wpdb->prepare( $count_base, $count_params )
-		);
+			$total = (int) $wpdb->get_var(
+			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- placeholders strictly match params length.
+				$wpdb->prepare( $count_base, $count_args )
+			);
 
-							$rows = $rows ? array_values( $rows ) : array();
+			$rows = $rows ? array_values( $rows ) : array();
 
-							return array(
-								'rows'  => $rows,
-								'total' => $total,
-							);
+			return array(
+				'rows'  => $rows,
+				'total' => $total,
+			);
 	}
 
 		/**
