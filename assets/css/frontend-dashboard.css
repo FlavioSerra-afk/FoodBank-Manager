@@ -18,6 +18,13 @@ font-size: 1.5rem;
 font-weight: 600;
 color: var(--fbm-accent);
 }
+.fbm-dashboard .fbm-card-delta {
+font-size: .75rem;
+margin-top: .25rem;
+}
+.fbm-dashboard .fbm-card-delta.fbm-up { color: #0a0; }
+.fbm-dashboard .fbm-card-delta.fbm-down { color: #a00; }
+.fbm-dashboard .fbm-sparkline svg { width: 100%; height: 30px; }
 .fbm-dashboard .fbm-dashboard-meta {
 margin-top: 1rem;
 font-size: .875rem;

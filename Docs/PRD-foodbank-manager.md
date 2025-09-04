@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.2.0 – Frontend Dashboard P1)
+Docs-Revision: 2025-09-04 (Wave v1.2.1 – Frontend Dashboard P2)
 # FoodBank Manager — Product Requirements Document (PRD)
 
 **Repo file:** `Docs/PRD-foodbank-manager.md`  
@@ -208,7 +208,7 @@ Row actions: **View attendee list**, **Export roster (CSV/PDF)**, **Print-friend
 ### 5.6 Front-End Dashboard (Viewer/Manager)
 - Shortcodes:
   - `[foodbank_entries roles="foodbank_viewer,foodbank_manager" columns="id,created_at,name,postcode,status" filters="date,postcode,status,benefits" export="csv|xlsx|pdf"]`
-  - `[fbm_dashboard period="7d|30d|today"]` — Manager-only card grid (Totals, Unique Households, No-shows, Deliveries vs In-person %, Voided) with 7‑day default.
+  - `[fbm_dashboard period="today|7d|30d" compare="1|0" sparkline="1|0"]` — Manager-only card grid (Totals, Unique Households, No-shows, Deliveries vs In-person %, Voided) with optional % change vs previous period and daily check-ins sparkline. 7‑day period by default; compare and sparkline enabled by default.
 - Server-side filtering, search, sorting, pagination.
 - Viewer: read-only; Manager: edit, status update, PDF.
 - **Attendance tab** (Manager): **Scan** and **Manual** modes (see §6).

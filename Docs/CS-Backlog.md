@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.10 – Admin Layout Guard)
+Docs-Revision: 2025-09-04 (Wave v1.2.1 – Frontend Dashboard P2)
 Strict (cleaned):
 
 includes/Admin/EmailsPage.php
