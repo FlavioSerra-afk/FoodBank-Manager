@@ -121,5 +121,49 @@ class ApplicationsRepo {
                $prepared = $wpdb->prepare( $sql, $id );
                $res      = $wpdb->query( $prepared );
                return (bool) $res;
-	}
+        }
+
+        /**
+         * Get a sanitized entry with decrypted PII and files.
+         *
+         * @param int $id Entry ID.
+         * @return array|null
+         */
+        public static function get_entry( int $id ): ?array {
+                $row = self::get( $id );
+                if ( ! $row ) {
+                        return null;
+                }
+                $data = json_decode( (string) ( $row['data_json'] ?? '' ), true );
+                if ( ! is_array( $data ) ) {
+                        $data = array();
+                }
+                $data = array_map( 'sanitize_text_field', $data );
+
+                $pii = \FoodBankManager\Security\Crypto::decryptSensitive( (string) ( $row['pii_encrypted_blob'] ?? '' ) );
+                if ( ! is_array( $pii ) ) {
+                        $pii = array();
+                }
+                $pii = array_map( 'sanitize_text_field', $pii );
+
+                $files = array();
+                foreach ( $row['files'] ?? array() as $f ) {
+                        $files[] = array(
+                                'id'           => (int) ( $f['id'] ?? 0 ),
+                                'original_name'=> sanitize_file_name( (string) ( $f['original_name'] ?? '' ) ),
+                                'mime'        => sanitize_text_field( (string) ( $f['mime'] ?? '' ) ),
+                                'size_bytes'  => (int) ( $f['size_bytes'] ?? 0 ),
+                                'created_at'  => sanitize_text_field( (string) ( $f['created_at'] ?? '' ) ),
+                        );
+                }
+
+                return array(
+                        'id'         => (int) $row['id'],
+                        'status'     => sanitize_key( (string) ( $row['status'] ?? '' ) ),
+                        'created_at' => sanitize_text_field( (string) ( $row['created_at'] ?? '' ) ),
+                        'data'       => $data,
+                        'pii'        => $pii,
+                        'files'      => $files,
+                );
+        }
 }
