@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.2.3 – Admin Menu De-dup + Canonical Screen IDs)
+Docs-Revision: 2025-09-05 (Wave v1.2.4 – Strict Guard Green)
 Strict (cleaned):
 
 includes/Admin/EmailsPage.php
@@ -6,9 +6,9 @@ includes/Admin/Menu.php
 includes/Admin/DatabasePage.php
 includes/Exports/CsvExporter.php
 includes/Attendance/AttendanceRepo.php
+includes/Admin/PermissionsPage.php
 
 Wave focus:
-- Promote `includes/Admin/PermissionsPage.php` to Strict.
 - Phase 2: add visual form builder, uploads, and CAPTCHA options.
 - Attendance P1: admin QR check-in helper and override reason UI.
 - Database UX P1: filter presets and column toggles.
@@ -62,4 +62,4 @@ replacing ignoreFile with real fixes (escaping, nonces, prepared SQL, docblocks)
 keeping only surgical one-line // phpcs:ignore … where wp_kses_post() or strict IN (…) placeholders trigger false positives.
 
 Next cleanup targets:
-- includes/Admin/PermissionsPage.php
+- includes/Admin/AttendancePage.php

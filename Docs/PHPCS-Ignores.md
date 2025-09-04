@@ -1,6 +1,6 @@
 # PHPCS Ignores & Suppressed Issues Dashboard
 
-_Generated: 2025-09-04 17:03:04Z
+_Generated: 2025-09-04 17:19:28Z
 
 This report shows which issues are currently suppressed via `phpcs:ignore` and what would fail if annotations were disabled.
 

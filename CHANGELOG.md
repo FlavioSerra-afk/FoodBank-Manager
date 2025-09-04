@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.2.4] - 2025-09-05
+### Docs
+- Docs revised for Strict Guard Green (Wave v1.2.4).
+### QA
+- Promoted PermissionsPage to Strict with nonce checks and sanitized inputs.
+
 ## [1.2.3] - 2025-09-04
 ### Fixes
 - Consolidated admin menu under single `FoodBank` parent with canonical screen IDs.
