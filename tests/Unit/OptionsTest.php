@@ -99,4 +99,28 @@ final class OptionsTest extends TestCase {
                $this->assertSame( '', $unknown['subject'] );
                $this->assertSame( '', $unknown['body_html'] );
        }
+
+       public function testThemeValidation(): void {
+               Options::update(
+                       array(
+                               'theme' => array(
+                                       'primary_color'    => '#112233',
+                                       'density'          => 'compact',
+                                       'font_family'      => 'roboto',
+                                       'dark_mode_default' => '1',
+                                       'custom_css'       => '.x{color:red!important;}@import url(x);',
+                               ),
+                       )
+               );
+               $this->assertSame( '#112233', Options::get( 'theme.primary_color' ) );
+               $this->assertSame( 'compact', Options::get( 'theme.density' ) );
+               $this->assertSame( 'roboto', Options::get( 'theme.font_family' ) );
+               $this->assertTrue( Options::get( 'theme.dark_mode_default' ) );
+               $this->assertSame( '.x{color:red;}', Options::get( 'theme.custom_css' ) );
+
+               Options::update( array( 'theme' => array( 'primary_color' => 'bad', 'density' => 'wide', 'font_family' => 'foo' ) ) );
+               $this->assertSame( '#3b82f6', Options::get( 'theme.primary_color' ) );
+               $this->assertSame( 'comfortable', Options::get( 'theme.density' ) );
+               $this->assertSame( 'system', Options::get( 'theme.font_family' ) );
+       }
 }

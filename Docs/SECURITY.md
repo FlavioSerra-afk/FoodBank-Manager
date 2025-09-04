@@ -1,7 +1,9 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.7 – Database UX P1)
+Docs-Revision: 2025-09-04 (Wave v1.1.8 – Design & Theme)
 # Security Policy — PCC FoodBank Manager
 
 We take security seriously. Please follow the guidelines below for reporting vulnerabilities.
+
+Custom CSS supplied via the Design & Theme page is strictly sanitised: `@import`, `@font-face`, `@keyframes`, `url()`, `expression()` and angle brackets are removed, only a small set of style properties is allowed, and `!important` is stripped.
 
 ## 📬 Reporting
 - **Do not** open a public GitHub Issue for security findings.

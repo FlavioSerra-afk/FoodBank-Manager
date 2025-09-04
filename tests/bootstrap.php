@@ -32,6 +32,15 @@ if ( ! function_exists( 'wp_json_encode' ) ) {
 	}
 }
 
+if ( ! function_exists( 'add_query_arg' ) ) {
+        function add_query_arg( $key, $value, string $url = '' ) {
+                if ( is_array( $key ) ) {
+                        return $url . '?' . http_build_query( $key );
+                }
+                return $url . '?' . urlencode( (string) $key ) . '=' . urlencode( (string) $value );
+        }
+}
+
 if ( ! function_exists( 'current_time' ) ) {
 	function current_time( string $type, bool $gmt = false ) {
 		return gmdate( 'Y-m-d H:i:s' );

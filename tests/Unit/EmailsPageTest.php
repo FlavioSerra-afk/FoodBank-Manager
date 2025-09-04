@@ -19,6 +19,9 @@ namespace FoodBankManager\Admin {
         if ( class_exists( '\\SettingsPageTest', false ) ) {
             \SettingsPageTest::$redirect = $url;
         }
+        if ( class_exists( '\\ThemePageTest', false ) ) {
+            \ThemePageTest::$redirect = $url;
+        }
         throw new \RuntimeException( 'redirect' );
     }
 }

@@ -1,8 +1,9 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.7 – Database UX P1)
+Docs-Revision: 2025-09-04 (Wave v1.1.8 – Design & Theme)
 # REST API (pcc-fb/v1)
 
 Base namespace: `pcc-fb/v1`. All write endpoints require `X-WP-Nonce` and capabilities.
 Shortcode previews are handled via `admin-post.php` (`fbm_action=shortcode_preview`) and are not exposed via REST.
+Design & Theme options are configuration-only; no REST endpoints expose or modify them.
 
 ## Attendance
 - `POST /attendance/checkin`
