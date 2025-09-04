@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace {
     use PHPUnit\Framework\TestCase;
-    use FoodBankManager\Admin\GDPRPage;
 
     if ( ! function_exists( 'wp_unslash' ) ) {
         function wp_unslash( $value ) { return is_array( $value ) ? array_map( 'wp_unslash', $value ) : stripslashes( (string) $value ); }
@@ -77,25 +76,13 @@ namespace FoodBankManager\Exports {
         }
     }
 }
-namespace FoodBankManager\Database {
-    class ApplicationsRepo {
-        public static function get( int $id ) { return array( 'id' => $id ); }
-        public static function get_files_for_application( int $id ): array { return array(); }
-        public static function find_by_email( string $email ): array { return array( array( 'id' => 1 ) ); }
-    }
-}
-namespace FoodBankManager\Attendance {
-    class AttendanceRepo { public static function find_by_application_id( int $id ): array { return array(); } }
-}
-namespace FoodBankManager\Mail {
-    class LogRepo { public static function find_by_application_id( int $id ): array { return array(); } }
-}
 
 namespace {
     use PHPUnit\Framework\TestCase;
+    use FoodBankManager\Admin\GDPRPage;
 
     /**
-     * @runInSeparateProcess
+     * @runTestsInSeparateProcesses
      */
     final class GDPRPageTest extends TestCase {
         public static bool $can_manage = true;
@@ -107,6 +94,15 @@ namespace {
             self::$can_sensitive = false;
             self::$redirect      = '';
             $_GET = $_POST = $_SERVER = array();
+            if (!class_exists('FoodBankManager\\Database\\ApplicationsRepo', false)) {
+                require_once __DIR__ . '/../../Support/ApplicationsRepoStub.php';
+            }
+            if (!class_exists('FoodBankManager\\Attendance\\AttendanceRepo', false)) {
+                require_once __DIR__ . '/../../Support/AttendanceRepoStub.php';
+            }
+            if (!class_exists('FoodBankManager\\Mail\\LogRepo', false)) {
+                require_once __DIR__ . '/../../Support/LogRepoStub.php';
+            }
         }
 
         public function testSearchPreview(): void {

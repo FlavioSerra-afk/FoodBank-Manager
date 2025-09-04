@@ -52,6 +52,10 @@ if ( ! function_exists( 'wp_json_encode' ) ) {
 
 if ( ! function_exists( 'current_user_can' ) ) {
         function current_user_can( string $cap ): bool {
+                $map = $GLOBALS['fbm_caps'] ?? [];
+                if ( array_key_exists( $cap, $map ) ) {
+                        return (bool) $map[ $cap ];
+                }
                 if ( $cap === 'fb_manage_dashboard' ) {
                         return (bool) ( $GLOBALS['fbm_can_dashboard'] ?? true );
                 }

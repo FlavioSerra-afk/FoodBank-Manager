@@ -39,3 +39,9 @@ namespace FoodBankManager\Core {
         return $o;
     }
 }
+
+namespace {
+    function nocache_headers(): void {
+        // no-op in tests
+    }
+}
