@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.0 – Settings Phase 1)
+Docs-Revision: 2025-09-04 (Wave v1.1.1 – Diagnostics P1)
 # Security Policy — PCC FoodBank Manager
 
 We take security seriously. Please follow the guidelines below for reporting vulnerabilities.
@@ -35,5 +35,6 @@ We aim to acknowledge reports **within 2 working days**.
 - Enforce **HTTPS** and strong admin passwords, enable **2FA**
 - Configure **SMTP** and monitor **Diagnostics → Email**
 - Set **FBM_KEK_BASE64** in `wp-config.php` (don’t commit secrets) If you previously set `PCC_FBM_KEK_BASE64` in `wp-config.php`, rename it to `FBM_KEK_BASE64`.
+- Use **Diagnostics → Repair Capabilities** after role or plugin updates.
 - Enable CAPTCHA and server‑side verification
 - Keep your WordPress, themes, plugins, and this plugin **up to date**
