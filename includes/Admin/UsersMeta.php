@@ -14,6 +14,7 @@ namespace FoodBankManager\Admin;
  */
 final class UsersMeta {
 	private const KEY_DB_COLUMNS = 'fbm_db_columns';
+	private const KEY_USER_CAPS  = 'fbm_user_caps';
 
 		/**
 		 * Allowed DB column IDs.
@@ -74,8 +75,8 @@ final class UsersMeta {
 		 * @return bool
 		 */
 	public static function set_db_columns( int $user_id, array $columns ): bool {
-			$allowed = self::allowed_db_columns();
-			$clean   = array();
+		$allowed = self::allowed_db_columns();
+		$clean   = array();
 		foreach ( $columns as $col ) {
 				$col = sanitize_key( (string) $col );
 			if ( in_array( $col, $allowed, true ) ) {
@@ -86,5 +87,38 @@ final class UsersMeta {
 				$clean = $allowed;
 		}
 			return update_user_meta( $user_id, self::KEY_DB_COLUMNS, $clean );
+	}
+
+		/**
+		 * Get per-user capability overrides.
+		 *
+		 * @param int $user_id User ID.
+		 * @return array<string,bool>
+		 */
+	public static function get_user_caps( int $user_id ): array {
+			$raw = get_user_meta( $user_id, self::KEY_USER_CAPS, true );
+			return is_array( $raw ) ? $raw : array();
+	}
+
+		/**
+		 * Persist per-user capability overrides.
+		 *
+		 * @param int               $user_id User ID.
+		 * @param array<int,string> $caps    Capabilities to grant.
+		 * @return bool
+		 */
+	public static function set_user_caps( int $user_id, array $caps ): bool {
+			$known = \FoodBankManager\Auth\Capabilities::all();
+			$clean = array();
+		foreach ( $caps as $cap ) {
+				$cap = sanitize_key( (string) $cap );
+			if ( in_array( $cap, $known, true ) ) {
+				$clean[ $cap ] = true;
+			}
+		}
+		if ( empty( $clean ) ) {
+				return delete_user_meta( $user_id, self::KEY_USER_CAPS );
+		}
+			return update_user_meta( $user_id, self::KEY_USER_CAPS, $clean );
 	}
 }
