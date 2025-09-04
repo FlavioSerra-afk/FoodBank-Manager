@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FoodBankManager\Core;
 
-use FoodBankManager\Shortcodes\Form;
+use FoodBankManager\Shortcodes\FormShortcode;
 use FoodBankManager\Shortcodes\Entries;
 use FoodBankManager\Shortcodes\AttendanceManager;
 use FoodBankManager\Shortcodes\Dashboard;
@@ -22,8 +22,8 @@ class Hooks {
 	}
 
 	public function register_shortcodes(): void {
-               add_shortcode( 'fbm_form', array( Form::class, 'render' ) );
-               add_shortcode( 'pcc_fb_form', array( Form::class, 'render' ) );
+               add_shortcode( 'fbm_form', array( FormShortcode::class, 'render' ) );
+               add_shortcode( 'pcc_fb_form', array( FormShortcode::class, 'render' ) );
                add_shortcode( 'foodbank_entries', array( Entries::class, 'render' ) );
                add_shortcode( 'fb_attendance_manager', array( AttendanceManager::class, 'render' ) );
                add_shortcode( 'fbm_dashboard', array( Dashboard::class, 'render' ) );
