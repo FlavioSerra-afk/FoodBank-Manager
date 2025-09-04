@@ -23,8 +23,9 @@ $settings    = Options::all();
 		<h2 class="nav-tab-wrapper">
                 <a href="<?php echo esc_url( add_query_arg( 'tab', 'branding' ) ); ?>" class="nav-tab <?php echo 'branding' === $current_tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Branding', 'foodbank-manager' ); ?></a> <?php // phpcs:ignore Generic.Files.LineLength ?>
                 <a href="<?php echo esc_url( add_query_arg( 'tab', 'email' ) ); ?>" class="nav-tab <?php echo 'email' === $current_tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Email', 'foodbank-manager' ); ?></a> <?php // phpcs:ignore Generic.Files.LineLength ?>
-		</h2>
-		<?php if ( 'email' === $current_tab ) : ?>
+                <a href="<?php echo esc_url( add_query_arg( 'tab', 'privacy' ) ); ?>" class="nav-tab <?php echo 'privacy' === $current_tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Privacy', 'foodbank-manager' ); ?></a> <?php // phpcs:ignore Generic.Files.LineLength ?>
+                </h2>
+                <?php if ( 'email' === $current_tab ) : ?>
 		<form method="post" action="">
 				<?php wp_nonce_field( 'fbm_email_save', '_fbm_nonce' ); ?>
 				<input type="hidden" name="fbm_action" value="email_save" />
@@ -44,10 +45,49 @@ $settings    = Options::all();
 				</table>
 				<?php submit_button(); ?>
 		</form>
-		<?php else : ?>
-		<form method="post" action="">
-				<?php wp_nonce_field( 'fbm_branding_save', '_fbm_nonce' ); ?>
-				<input type="hidden" name="fbm_action" value="branding_save" />
+                <?php elseif ( 'privacy' === $current_tab ) : ?>
+                <form method="post" action="">
+                                <?php wp_nonce_field( 'fbm_retention_save', '_fbm_nonce' ); ?>
+                                <input type="hidden" name="fbm_action" value="retention_save" />
+                                <table class="form-table">
+                                                <?php
+                                                $cats = array(
+                                                        'applications' => __( 'Applications', 'foodbank-manager' ),
+                                                        'attendance'   => __( 'Attendance', 'foodbank-manager' ),
+                                                        'mail_log'     => __( 'Email Log', 'foodbank-manager' ),
+                                                );
+                                                $ret = $settings['privacy']['retention'] ?? array();
+                                                foreach ( $cats as $key => $label ) :
+                                                        $val = $ret[ $key ] ?? array( 'days' => 0, 'policy' => 'delete' );
+                                                ?>
+                                                <tr>
+                                                                <th><label for="ret_<?php echo esc_attr( $key ); ?>_days"><?php echo esc_html( $label ); ?></label></th>
+                                                                <td>
+                                                                        <input type="number" min="0" id="ret_<?php echo esc_attr( $key ); ?>_days" name="retention[<?php echo esc_attr( $key ); ?>][days]" value="<?php echo esc_attr( (string) ( $val['days'] ?? 0 ) ); ?>" />
+                                                                        <select name="retention[<?php echo esc_attr( $key ); ?>][policy]">
+                                                                                <option value="delete" <?php selected( $val['policy'] ?? '', 'delete' ); ?>><?php esc_html_e( 'Delete', 'foodbank-manager' ); ?></option>
+                                                                                <option value="anonymise" <?php selected( $val['policy'] ?? '', 'anonymise' ); ?>><?php esc_html_e( 'Anonymise', 'foodbank-manager' ); ?></option>
+                                                                        </select>
+                                                                </td>
+                                                </tr>
+                                                <?php endforeach; ?>
+                                </table>
+                                <?php submit_button(); ?>
+                </form>
+                <form method="post" action="" style="margin-top:1em;">
+                                <?php wp_nonce_field( 'fbm_retention_dryrun', '_fbm_nonce' ); ?>
+                                <input type="hidden" name="fbm_action" value="retention_dryrun" />
+                                <p><button type="submit" class="button"><?php esc_html_e( 'Dry-run now', 'foodbank-manager' ); ?></button></p>
+                </form>
+                <form method="post" action="">
+                                <?php wp_nonce_field( 'fbm_retention_run', '_fbm_nonce' ); ?>
+                                <input type="hidden" name="fbm_action" value="retention_run" />
+                                <p><button type="submit" class="button button-primary"><?php esc_html_e( 'Run now', 'foodbank-manager' ); ?></button></p>
+                </form>
+                <?php else : ?>
+                <form method="post" action="">
+                                <?php wp_nonce_field( 'fbm_branding_save', '_fbm_nonce' ); ?>
+                                <input type="hidden" name="fbm_action" value="branding_save" />
 				<table class="form-table">
 						<tr>
 								<th><label for="site_name"><?php esc_html_e( 'Site name', 'foodbank-manager' ); ?></label></th>

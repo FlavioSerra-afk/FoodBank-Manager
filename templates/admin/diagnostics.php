@@ -66,4 +66,28 @@ $gating_ok  = \FoodBankManager\Core\Screen::is_fbm_screen();
         <input type="hidden" name="fbm_action" value="repair_caps" />
         <p><button type="submit" class="button"><?php esc_html_e( 'Repair Capabilities', 'foodbank-manager' ); ?></button></p>
     </form>
+    <h2><?php esc_html_e( 'Cron', 'foodbank-manager' ); ?></h2>
+    <?php $cron = \FoodBankManager\Admin\DiagnosticsPage::cron_status(); ?>
+    <table class="widefat">
+        <thead>
+            <tr>
+                <th><?php esc_html_e( 'Event', 'foodbank-manager' ); ?></th>
+                <th><?php esc_html_e( 'Schedule', 'foodbank-manager' ); ?></th>
+                <th><?php esc_html_e( 'Last run', 'foodbank-manager' ); ?></th>
+                <th><?php esc_html_e( 'Next run', 'foodbank-manager' ); ?></th>
+                <th><?php esc_html_e( 'Status', 'foodbank-manager' ); ?></th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ( $cron as $row ) : ?>
+            <tr>
+                <td><?php echo esc_html( $row['hook'] ); ?></td>
+                <td><?php echo esc_html( $row['schedule'] ); ?></td>
+                <td><?php echo $row['last_run'] ? esc_html( gmdate( 'Y-m-d H:i', $row['last_run'] ) ) : '&mdash;'; ?></td>
+                <td><?php echo $row['next_run'] ? esc_html( gmdate( 'Y-m-d H:i', $row['next_run'] ) ) : '&mdash;'; ?></td>
+                <td><?php echo $row['overdue'] ? '⚠️' : '✅'; ?></td>
+            </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
 </div>

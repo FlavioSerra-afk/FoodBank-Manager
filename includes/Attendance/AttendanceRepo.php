@@ -53,7 +53,7 @@ final class AttendanceRepo {
 		 * @param int $application_id Application ID.
 		 * @return array<int,array>
 		 */
-	public static function find_by_application_id( int $application_id ): array {
+        public static function find_by_application_id( int $application_id ): array {
 			global $wpdb;
 			$application_id = absint( $application_id );
 				$t_att      = $wpdb->prefix . 'fb_attendance';
@@ -70,9 +70,28 @@ final class AttendanceRepo {
 				'type'          => sanitize_text_field( (string) ( $row['type'] ?? '' ) ),
 				'method'        => sanitize_text_field( (string) ( $row['method'] ?? '' ) ),
 			);
-		}
-			return $out;
-	}
+        }
+
+                        return $out;
+        }
+
+       /**
+        * Anonymise attendance rows.
+        *
+        * @param array<int> $ids IDs to anonymise.
+        * @return int Rows affected.
+        */
+       public static function anonymise_batch( array $ids ): int {
+               global $wpdb;
+               $ids = array_values( array_filter( array_map( 'absint', $ids ) ) );
+               if ( empty( $ids ) ) {
+                       return 0;
+               }
+               $placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+               $sql = "UPDATE {$wpdb->prefix}fb_attendance SET notes=NULL,source_ip=NULL,token_hash=NULL WHERE id IN ($placeholders)";
+               $prepared = $wpdb->prepare( $sql, $ids );
+               return (int) $wpdb->query( $prepared );
+       }
 
 		/**
 		 * Summarize attendance across applications.

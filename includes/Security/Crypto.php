@@ -58,7 +58,7 @@ class Crypto {
                 return base64_encode( $nonce . $wrapped . $cipher );
         }
 
-	public static function decryptSensitive( string $blob ): array {
+        public static function decryptSensitive( string $blob ): array {
 		$kek = self::get_kek();
 		if ( ! $kek || $blob === '' ) {
 			return array();
@@ -83,5 +83,19 @@ class Crypto {
 		}
 		$decoded_map = json_decode( $plain, true );
 		return is_array( $decoded_map ) ? $decoded_map : array();
-	}
+        }
+
+        /**
+         * Generate an irreversible keyed hash.
+         *
+         * @param string $value Value to hash.
+         * @return string Hex encoded hash.
+         */
+        public static function hmac( string $value ): string {
+                $kek = self::get_kek();
+                if ( ! $kek ) {
+                        return hash( 'sha256', $value );
+                }
+                return hash_hmac( 'sha256', $value, $kek );
+        }
 }
