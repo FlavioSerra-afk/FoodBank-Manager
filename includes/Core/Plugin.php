@@ -10,6 +10,7 @@ use FoodBankManager\Auth\Roles;
 use FoodBankManager\Http\FormSubmitController;
 use FoodBankManager\Http\DashboardExportController;
 use FoodBankManager\Core\Options;
+use FoodBankManager\Core\Retention;
 use FoodBankManager\Admin\ShortcodesPage;
 use FoodBankManager\Core\Screen;
 
@@ -44,6 +45,7 @@ final class Plugin {
                 }
                 self::$booted = true;
                 Options::boot();
+                Retention::init();
                 add_action(
                         'init',
                         static function (): void {
@@ -123,6 +125,7 @@ final class Plugin {
         public static function activate(): void {
                 ( new Migrations() )->maybe_migrate();
                 Roles::install();
+                Retention::schedule();
         }
 
         /** Deactivate plugin. */

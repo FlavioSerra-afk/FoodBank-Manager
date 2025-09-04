@@ -136,10 +136,11 @@ class Options {
                                 'policy_days' => 7,
                                 'types'       => array( 'in_person', 'delivery', 'other' ),
                         ),
-			'privacy'    => array(
-				'retention_months' => 24,
-				'anonymise_files'  => 'delete',
-			),
+                        'privacy'    => array(
+                                'retention_months' => 24,
+                                'anonymise_files'  => 'delete',
+                                'retention'        => array(),
+                        ),
                        'theme'      => self::theme_defaults(),
                        'encryption' => array(),
                        'form_presets_custom' => array(),

@@ -188,7 +188,7 @@ class ApplicationsRepo {
         * @param int $id Application ID.
         * @return array<int,array>
         */
-       public static function get_files_for_application( int $id ): array {
+        public static function get_files_for_application( int $id ): array {
                global $wpdb;
                $sql     = "SELECT id, stored_path, original_name, mime FROM {$wpdb->prefix}fb_files WHERE application_id = %d";
                $query   = $wpdb->prepare( $sql, $id );
@@ -203,5 +203,23 @@ class ApplicationsRepo {
                        );
                }
                return $sanitized;
+        }
+
+       /**
+        * Anonymise a batch of applications.
+        *
+        * @param array<int> $ids IDs to anonymise.
+        * @return int Rows affected.
+        */
+       public static function anonymise_batch( array $ids ): int {
+               global $wpdb;
+               $ids = array_values( array_filter( array_map( 'absint', $ids ) ) );
+               if ( empty( $ids ) ) {
+                       return 0;
+               }
+               $placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+               $sql = "UPDATE {$wpdb->prefix}fb_applications SET data_json='{}',pii_encrypted_blob=NULL WHERE id IN ($placeholders)";
+               $prepared = $wpdb->prepare( $sql, $ids );
+               return (int) $wpdb->query( $prepared );
        }
 }

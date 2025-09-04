@@ -5,6 +5,10 @@ namespace {
     use PHPUnit\Framework\TestCase;
     use FoodBankManager\Admin\DiagnosticsPage;
 
+    if ( ! defined( 'DAY_IN_SECONDS' ) ) {
+        define( 'DAY_IN_SECONDS', 86400 );
+    }
+
     if ( ! function_exists( 'wp_unslash' ) ) {
         function wp_unslash( $value ) {
             return is_array( $value ) ? array_map( 'wp_unslash', $value ) : stripslashes( (string) $value );
@@ -85,6 +89,21 @@ namespace {
             return $fbm_test_options[ $key ] ?? $default;
         }
     }
+    if ( ! function_exists( 'wp_next_scheduled' ) ) {
+        function wp_next_scheduled( string $hook ) {
+            return DiagnosticsPageTest::$cron_next[ $hook ] ?? false;
+        }
+    }
+    if ( ! function_exists( 'wp_get_schedule' ) ) {
+        function wp_get_schedule( string $hook ) {
+            return 'daily';
+        }
+    }
+    if ( ! function_exists( 'wp_get_schedules' ) ) {
+        function wp_get_schedules() {
+            return array( 'daily' => array( 'interval' => DAY_IN_SECONDS ) );
+        }
+    }
     if ( ! function_exists( 'sanitize_key' ) ) {
         function sanitize_key( $key ) { return preg_replace( '/[^a-z0-9_]/', '', strtolower( (string) $key ) ); }
     }
@@ -113,6 +132,8 @@ namespace {
         public static bool $can = true;
         public static string $redirect = '';
         public static bool $mail_result = true;
+        /** @var array<string,int> */
+        public static array $cron_next = array();
 
         protected function setUp(): void {
             self::$can        = true;
@@ -170,6 +191,31 @@ namespace {
             $this->assertStringContainsString( 'Crypto', $html );
             $this->assertStringContainsString( 'Environment', $html );
             $this->assertStringNotContainsString( 'from@example.com', $html );
+        }
+
+        public function testCronTableShowsOverdue(): void {
+            if ( ! defined( 'DAY_IN_SECONDS' ) ) {
+                define( 'DAY_IN_SECONDS', 86400 );
+            }
+            self::$cron_next = array(
+                'fbm_retention_tick' => time() - 10,
+                'fbm_cron_cleanup'   => time() + 100,
+                'fbm_cron_email_retry' => time() + 100,
+            );
+            global $fbm_test_options;
+            $fbm_test_options['fbm_retention_tick_last_run'] = 123;
+            if ( ! defined( 'ABSPATH' ) ) {
+                define( 'ABSPATH', __DIR__ );
+            }
+            if ( ! defined( 'FBM_PATH' ) ) {
+                define( 'FBM_PATH', dirname( __DIR__, 2 ) . '/' );
+            }
+            ob_start();
+            include FBM_PATH . 'templates/admin/diagnostics.php';
+            $html = ob_get_clean();
+            $this->assertStringContainsString( 'fbm_retention_tick', $html );
+            $this->assertStringContainsString( '⚠️', $html );
+            $this->assertStringContainsString( gmdate( 'Y-m-d', 123 ), $html );
         }
     }
 }

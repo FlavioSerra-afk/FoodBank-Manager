@@ -15,6 +15,9 @@ use function sanitize_text_field;
 use function sanitize_key;
 use function wp_unslash;
 use function get_option;
+use function wp_next_scheduled;
+use function wp_get_schedule;
+use function wp_get_schedules;
 
 /**
  * Diagnostics admin page.
@@ -46,13 +49,39 @@ class DiagnosticsPage {
 		/**
 		 * Render diagnostics template.
 		 */
-	public static function render(): void {
+        public static function render(): void {
 		if ( ! current_user_can( 'fb_manage_diagnostics' ) ) {
 				wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ), '', array( 'response' => 403 ) );
 		}
 			/* @psalm-suppress UnresolvableInclude */
-			require FBM_PATH . 'templates/admin/diagnostics.php';
-	}
+                        require FBM_PATH . 'templates/admin/diagnostics.php';
+        }
+
+       /**
+        * Get cron event diagnostics.
+        *
+        * @return array<int,array{hook:string,schedule:string,next_run:int,last_run:int,overdue:bool}>
+        */
+       public static function cron_status(): array {
+               $hooks     = array( 'fbm_cron_cleanup', 'fbm_cron_email_retry', 'fbm_retention_tick' );
+               $schedules = wp_get_schedules();
+               $now       = time();
+               $out       = array();
+               foreach ( $hooks as $hook ) {
+                       $next     = (int) wp_next_scheduled( $hook );
+                       $schedule = (string) wp_get_schedule( $hook );
+                       $interval = isset( $schedules[ $schedule ]['interval'] ) ? $schedules[ $schedule ]['interval'] : 0;
+                       $last     = (int) get_option( $hook . '_last_run', 0 );
+                       $out[]    = array(
+                               'hook'     => $hook,
+                               'schedule' => $schedule,
+                               'next_run' => $next,
+                               'last_run' => $last,
+                               'overdue'  => $next > 0 && $next < $now,
+                       );
+               }
+               return $out;
+       }
 
 	/**
 	 * Send a test email to the current user.
