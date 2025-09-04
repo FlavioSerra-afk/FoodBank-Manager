@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.4 – E1)
+Docs-Revision: 2025-09-04 (Wave v1.1.4 – E3)
 # FoodBank Manager — Product Requirements Document (PRD)
 
 **Repo file:** `Docs/PRD-foodbank-manager.md`  

@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.4] - 2025-09-04
+### Features
+- Emails admin page skeleton listing default templates with edit links.
+### Docs
+- Docs revised for Emails skeleton (Wave v1.1.4).
+
 ## [1.1.3] - 2025-09-04
 ### Features
 - Shortcodes builder with masked shortcode generation and nonce-protected live preview.
