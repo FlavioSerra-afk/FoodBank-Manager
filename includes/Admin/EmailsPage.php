@@ -40,11 +40,18 @@ final class EmailsPage {
                }
                unset( $tpl );
 
+               $preview = array(
+                       'subject'   => '',
+                       'body_html' => '',
+               );
+
                $method = strtoupper( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ?? '' ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
                if ( 'POST' === $method ) {
                        $action = sanitize_key( wp_unslash( $_POST['fbm_action'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- validated in handler
                        if ( 'emails_save' === $action ) {
                                self::handle_save( $templates );
+                       } elseif ( 'emails_preview' === $action ) {
+                               $preview = self::handle_preview( $templates );
                        }
                }
 
@@ -90,5 +97,36 @@ final class EmailsPage {
                );
                wp_safe_redirect( esc_url_raw( $url ), 303 );
                exit;
+       }
+
+       /**
+        * Handle preview request.
+        *
+        * @param array<string,array<string,string>> $templates Templates.
+        * @return array{subject:string,body_html:string}
+        */
+       private static function handle_preview( array $templates ): array {
+               check_admin_referer( 'fbm_emails_preview', '_fbm_nonce' );
+               if ( ! current_user_can( 'fb_manage_emails' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown
+                       wp_die( esc_html__( 'You do not have permission to perform this action.', 'foodbank-manager' ) );
+               }
+
+               $tpl = sanitize_key( wp_unslash( $_POST['tpl'] ?? '' ) );
+               if ( ! isset( $templates[ $tpl ] ) ) {
+                       wp_die( esc_html__( 'Invalid template.', 'foodbank-manager' ) );
+               }
+
+               $vars = array(
+                       'first_name'       => '***',
+                       'last_name'        => '***',
+                       'application_id'   => '***',
+                       'site_name'        => get_bloginfo( 'name' ),
+                       'appointment_time' => '***',
+               );
+
+               return array(
+                       'subject'   => Templates::render_subject( $tpl, $vars ),
+                       'body_html' => wp_kses_post( Templates::render_body( $tpl, $vars ) ),
+               );
        }
 }

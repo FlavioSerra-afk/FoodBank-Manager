@@ -51,6 +51,11 @@ if ( ! function_exists( 'esc_textarea' ) ) {
         return htmlspecialchars( (string) $text, ENT_QUOTES );
     }
 }
+if ( ! function_exists( 'get_bloginfo' ) ) {
+    function get_bloginfo( $show = '', $filter = 'raw' ) {
+        return 'Test Site';
+    }
+}
 
 final class EmailsPageTest extends TestCase {
     public static string $redirect = '';
@@ -133,6 +138,44 @@ final class EmailsPageTest extends TestCase {
         $this->assertSame( 32768, strlen( $data['body_html'] ) );
         $this->assertStringContainsString( 'notice=saved', self::$redirect );
         $this->assertStringContainsString( 'tpl=applicant_confirmation', self::$redirect );
+    }
+
+    public function testPreviewMissingNonceBlocked(): void {
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST = array(
+            'fbm_action' => 'emails_preview',
+            'tpl'        => 'applicant_confirmation',
+        );
+        $this->expectException( RuntimeException::class );
+        EmailsPage::route();
+    }
+
+    public function testPreviewRequiresCapability(): void {
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST = array(
+            'fbm_action' => 'emails_preview',
+            '_fbm_nonce' => 'nonce',
+            'tpl'        => 'applicant_confirmation',
+        );
+        \ShortcodesPageTest::$can = false;
+        $this->expectException( RuntimeException::class );
+        EmailsPage::route();
+    }
+
+    public function testPreviewRendersAndFilters(): void {
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST = array(
+            'fbm_action' => 'emails_preview',
+            '_fbm_nonce' => 'nonce',
+            'tpl'        => 'applicant_confirmation',
+        );
+        $_GET['tpl'] = 'applicant_confirmation';
+        ob_start();
+        EmailsPage::route();
+        $html = (string) ob_get_clean();
+        $this->assertStringContainsString( 'Preview', $html );
+        $this->assertStringContainsString( '***', $html );
+        $this->assertStringNotContainsString( '<script', $html );
     }
 }
 }
