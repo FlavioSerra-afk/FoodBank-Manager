@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.4 – Final)
+Docs-Revision: 2025-09-04 (Wave v1.1.5 – Forms Presets P1)
 # FoodBank Manager — Product Requirements Document (PRD)
 
 **Repo file:** `Docs/PRD-foodbank-manager.md`  
@@ -22,6 +22,8 @@ FoodBank Manager is a secure, mobile-first WordPress plugin to:
 - Ensure compliance with UK GDPR and follow best-practice WordPress security.
 
 The plugin must reproduce the current Food Bank form at `https://pcclondon.uk/food-bank/` exactly as a starter preset, and allow building additional custom forms with full control over fields, layout, logic, and data handling.
+
+- Phase 1 introduces a read-only **Presets Library** listing built-in and custom presets. Administrators can copy a `[fbm_form preset="…"]` shortcode for each preset. Future waves will add a visual builder and advanced field types.
 
 ---
 

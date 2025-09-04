@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.4 – Emails Page skeleton)
+Docs-Revision: 2025-09-04 (Wave v1.1.5 – Forms Presets P1)
 # FoodBank Manager (WordPress Plugin)
 
 A secure, mobile‑first WordPress plugin for Food Bank applications, encrypted data storage, operational dashboards, and **attendance tracking** with QR codes. Administrators can configure branding and default email senders via a validated settings page. The Shortcodes page includes a builder with masked, nonce‑protected previews.
@@ -23,6 +23,7 @@ composer phpcs && composer phpstan -- --memory-limit=1G && composer test
 ## ✨ Features
 - **Multi‑form builder** (visual): fields, steps, conditional logic, theming (light/dark/high‑contrast).
 - **Exact Food Bank form preset** matching the live site.
+- **Read-only Presets Library** with copyable `[fbm_form preset="…"]` shortcodes.
 - **Email confirmations & admin notifications** (HTML), with **logging** and resend.
 - **Email templates admin page** (list with edit skeleton).
 - **Custom database** with **field‑level encryption** (libsodium AEAD, envelope keys).
