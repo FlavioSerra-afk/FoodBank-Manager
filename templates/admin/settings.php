@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $current_tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'branding'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only
 $settings    = Options::all();
 ?>
-<div class="wrap fbm-admin">
+<div class="fbm-admin"><div class="wrap">
 		<h1><?php esc_html_e( 'Settings', 'foodbank-manager' ); ?></h1>
         <?php if ( isset( $_GET['notice'] ) && 'saved' === $_GET['notice'] ) : // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- admin screen ?>
                 <div class="notice notice-success"><p><?php esc_html_e( 'Settings saved.', 'foodbank-manager' ); ?></p></div> <?php // phpcs:ignore Generic.Files.LineLength ?>
@@ -73,5 +73,5 @@ $settings    = Options::all();
 				</table>
 				<?php submit_button(); ?>
 		</form>
-		<?php endif; ?>
-</div>
+                <?php endif; ?>
+</div></div>

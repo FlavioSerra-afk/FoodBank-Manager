@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 ?>
-<div class="wrap fbm-admin">
+<div class="fbm-admin"><div class="wrap">
 	<h1><?php esc_html_e( 'Email Templates', 'foodbank-manager' ); ?></h1>
 	<ul>
 		<?php foreach ( $templates as $key => $tpl ) : ?>
@@ -74,5 +74,5 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<p><strong><?php esc_html_e( 'Subject', 'foodbank-manager' ); ?>:</strong> <?php echo esc_html( $preview['subject'] ); ?></p>
 						<div class="fbm-preview"><?php echo $preview['body_html']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
 				<?php endif; ?>
-		<?php endif; ?>
-</div>
+				<?php endif; ?>
+</div></div>

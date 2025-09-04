@@ -25,6 +25,8 @@ class SettingsPage {
 
 				$method = strtoupper( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ?? '' ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only server var
 		if ( 'POST' !== $method ) {
+				/* @psalm-suppress UnresolvableInclude */
+				require FBM_PATH . 'templates/admin/settings.php';
 				return;
 		}
 

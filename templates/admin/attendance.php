@@ -7,7 +7,7 @@ use FoodBankManager\Admin\AttendancePage;
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; }
 ?>
-<div class="wrap fbm-admin">
+<div class="fbm-admin"><div class="wrap">
 <h1><?php esc_html_e( 'Attendance', 'foodbank-manager' ); ?></h1>
 <?php if ( isset( $_GET['fbm_override'] ) ) : ?>
 <div class="notice notice-success"><p><?php esc_html_e( 'Override check-in recorded.', 'foodbank-manager' ); ?></p></div>
@@ -286,4 +286,4 @@ endif;
         });
 })();
 </script>
-</div>
+</div></div>

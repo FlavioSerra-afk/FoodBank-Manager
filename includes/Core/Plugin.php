@@ -17,7 +17,6 @@ final class Plugin {
     public const FBM_VERSION = '1.2.3';
 
         private static ?Plugin $instance = null;
-        private static bool $booted = false;
 
         /**
          * Get singleton instance.
@@ -37,11 +36,12 @@ final class Plugin {
         /**
          * Boot the plugin.
          */
-        public function boot(): void {
-                if ( self::$booted ) {
+        public static function boot(): void {
+                static $booted = false;
+                if ( $booted ) {
                         return;
                 }
-                self::$booted = true;
+                $booted = true;
                 Options::boot();
                 add_action(
                         'init',
@@ -59,11 +59,9 @@ final class Plugin {
                         add_action( 'load-foodbank_page_fbm_database', [\FoodBankManager\Admin\DatabasePage::class, 'route'] );
                         add_action( 'load-foodbank_page_fbm_attendance', [\FoodBankManager\Admin\AttendancePage::class, 'route'] );
                         add_action( 'load-foodbank_page_fbm_permissions', [\FoodBankManager\Admin\PermissionsPage::class, 'route'] );
-                        add_action( 'load-foodbank_page_fbm_settings', [\FoodBankManager\Admin\SettingsPage::class, 'route'] );
                         add_action( 'load-foodbank_page_fbm_theme', [\FoodBankManager\Admin\ThemePage::class, 'route'] );
                         add_action( 'load-foodbank_page_fbm_emails', [\FoodBankManager\Admin\EmailsPage::class, 'route'] );
                         add_action( 'load-foodbank_page_fbm_diagnostics', [\FoodBankManager\Admin\DiagnosticsPage::class, 'route'] );
-                        add_action( 'admin_menu', [ShortcodesPage::class, 'register_menu'] );
                         add_action( 'load-foodbank_page_fbm_shortcodes', [ShortcodesPage::class, 'route'] );
                         // Theme CSS enqueued via Core\Assets.
                 }
@@ -120,7 +118,7 @@ final class Plugin {
                         }
                 );
 
-                $this->init();
+                self::get_instance()->init();
         }
 
         /** Activate plugin. */

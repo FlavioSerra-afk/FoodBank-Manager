@@ -11,8 +11,7 @@ final class Notices {
     }
 
     public static function maybeShowCapsRepair(): void {
-        $s = function_exists('get_current_screen') ? get_current_screen() : null;
-        if (!$s || (strpos($s->id, 'toplevel_page_fbm') !== 0 && strpos($s->id, 'foodbank_page_fbm_') !== 0)) {
+        if ( ! self::is_fbm_screen() ) {
             return;
         }
         if (! current_user_can('administrator')) {
@@ -56,12 +55,25 @@ final class Notices {
         add_action(
             'admin_notices',
             function (): void {
-                $s = function_exists('get_current_screen') ? get_current_screen() : null;
-                if (!$s || (strpos($s->id, 'toplevel_page_fbm') !== 0 && strpos($s->id, 'foodbank_page_fbm_') !== 0)) {
+                if ( ! self::is_fbm_screen() ) {
                     return;
                 }
                 echo '<div class="notice notice-error"><p>' . \esc_html__('FoodBank Manager encryption key is not configured.', 'foodbank-manager') . '</p></div>';
             }
         );
+    }
+
+    /**
+     * Determine if current admin screen is part of FBM.
+     */
+    private static function is_fbm_screen(): bool {
+        if (! function_exists('get_current_screen')) {
+            return false;
+        }
+        $s = get_current_screen();
+        if (! $s || empty($s->id)) {
+            return false;
+        }
+        return str_starts_with($s->id, 'toplevel_page_fbm') || str_starts_with($s->id, 'foodbank_page_fbm_');
     }
 }
