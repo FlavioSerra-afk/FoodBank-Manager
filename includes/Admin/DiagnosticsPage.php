@@ -11,6 +11,10 @@ namespace FoodBankManager\Admin;
 
 use FoodBankManager\Auth\Roles;
 use FoodBankManager\Core\Options;
+use function sanitize_text_field;
+use function sanitize_key;
+use function wp_unslash;
+use function get_option;
 
 /**
  * Diagnostics admin page.
@@ -26,16 +30,16 @@ class DiagnosticsPage {
 
 		$method = strtoupper( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ?? '' ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only
 		if ( 'POST' !== $method ) {
-			return;
+				return;
 		}
 
-		$action = sanitize_key( wp_unslash( $_POST['fbm_action'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- validated in handlers
-		if ( 'send_test_email' === $action ) {
-			check_admin_referer( 'fbm_diagnostics_send_test_email', '_fbm_nonce' );
-			self::send_test_email();
+				$action = sanitize_key( wp_unslash( $_POST['fbm_action'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- validated in handlers
+		if ( 'mail_test' === $action ) {
+				check_admin_referer( 'fbm_diag_mail_test', '_fbm_nonce' );
+				self::send_test_email();
 		} elseif ( 'repair_caps' === $action ) {
-			check_admin_referer( 'fbm_diagnostics_repair_caps', '_fbm_nonce' );
-			self::repair_caps();
+				check_admin_referer( 'fbm_diagnostics_repair_caps', '_fbm_nonce' );
+				self::repair_caps();
 		}
 	}
 
@@ -54,18 +58,16 @@ class DiagnosticsPage {
 	 * Send a test email to the current user.
 	 */
 	private static function send_test_email(): void {
-				$user = wp_get_current_user();
-				$to   = (string) $user->user_email;
+			$to         = (string) get_option( 'admin_email' );
+			$from_name  = (string) Options::get( 'emails.from_name' );
+			$from_email = (string) Options::get( 'emails.from_email' );
 
-		$from_name  = (string) Options::get( 'emails.from_name' );
-		$from_email = (string) Options::get( 'emails.from_email' );
-
-		$from_filter = static function () use ( $from_email ): string {
+		$from_filter     = static function () use ( $from_email ): string {
 			return $from_email;
 		};
-		$name_filter = static function () use ( $from_name ): string {
-			return $from_name;
-		};
+			$name_filter = static function () use ( $from_name ): string {
+				return $from_name;
+			};
 
 		if ( is_email( $from_email ) ) {
 			add_filter( 'wp_mail_from', $from_filter );
@@ -74,11 +76,11 @@ class DiagnosticsPage {
 			add_filter( 'wp_mail_from_name', $name_filter );
 		}
 
-				$sent = wp_mail(
-					$to,
-					__( 'FoodBank Manager test email', 'foodbank-manager' ),
-					__( 'This is a test email from FoodBank Manager.', 'foodbank-manager' )
-				);
+			$sent = wp_mail(
+				$to,
+				__( 'FoodBank Manager test email', 'foodbank-manager' ),
+				__( 'This is a test email from FoodBank Manager.', 'foodbank-manager' )
+			);
 
 		if ( is_email( $from_email ) ) {
 			remove_filter( 'wp_mail_from', $from_filter );
@@ -87,10 +89,10 @@ class DiagnosticsPage {
 			remove_filter( 'wp_mail_from_name', $name_filter );
 		}
 
-		$notice      = $sent ? 'sent' : 'error';
-				$url = add_query_arg( array( 'notice' => $notice ), menu_page_url( 'fbm_diagnostics', false ) );
-		wp_safe_redirect( esc_url_raw( $url ), 303 );
-		exit;
+		$notice                  = $sent ? 'sent' : 'error';
+							$url = add_query_arg( array( 'notice' => $notice ), menu_page_url( 'fbm_diagnostics', false ) );
+			wp_safe_redirect( esc_url_raw( $url ), 303 );
+			exit;
 	}
 
 	/**

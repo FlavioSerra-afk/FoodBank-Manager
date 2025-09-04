@@ -32,8 +32,8 @@ final class AttendanceRepo {
 	 * @return string|null UTC datetime or null when none.
 	 */
 	public static function last_present( int $application_id ): ?string {
-		global $wpdb;
-		$application_id = absint( $application_id );
+			global $wpdb;
+			$application_id = absint( $application_id );
 
 		$t_att    = $wpdb->prefix . 'fb_attendance';
 		$prepared = call_user_func_array(
@@ -44,7 +44,34 @@ final class AttendanceRepo {
 			)
 		);
 		$last     = call_user_func( array( $wpdb, 'get_var' ), $prepared );
-		return $last ? $last : null;
+			return $last ? $last : null;
+	}
+
+		/**
+		 * Find attendance rows for an application.
+		 *
+		 * @param int $application_id Application ID.
+		 * @return array<int,array>
+		 */
+	public static function find_by_application_id( int $application_id ): array {
+			global $wpdb;
+			$application_id = absint( $application_id );
+				$t_att      = $wpdb->prefix . 'fb_attendance';
+				$sql        = "SELECT id,status,attendance_at,event_id,type,method FROM {$t_att} WHERE application_id = %d";
+				$query      = call_user_func_array( array( $wpdb, 'prepare' ), array( $sql, $application_id ) );
+				$rows       = call_user_func( array( $wpdb, 'get_results' ), $query, 'ARRAY_A' );
+				$out        = array();
+		foreach ( $rows ? $rows : array() as $row ) {
+			$out[] = array(
+				'id'            => (int) ( $row['id'] ?? 0 ),
+				'status'        => sanitize_key( (string) ( $row['status'] ?? '' ) ),
+				'attendance_at' => sanitize_text_field( (string) ( $row['attendance_at'] ?? '' ) ),
+				'event_id'      => (int) ( $row['event_id'] ?? 0 ),
+				'type'          => sanitize_text_field( (string) ( $row['type'] ?? '' ) ),
+				'method'        => sanitize_text_field( (string) ( $row['method'] ?? '' ) ),
+			);
+		}
+			return $out;
 	}
 
 		/**
