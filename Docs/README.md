@@ -1,7 +1,7 @@
-Docs-Revision: 2025-09-03 (Wave CS-Backlog-10)
+Docs-Revision: 2025-09-04 (Wave v1.1.0 – Settings Phase 1)
 # FoodBank Manager (WordPress Plugin)
 
-A secure, mobile‑first WordPress plugin for Food Bank applications, encrypted data storage, operational dashboards, and **attendance tracking** with QR codes.
+A secure, mobile‑first WordPress plugin for Food Bank applications, encrypted data storage, operational dashboards, and **attendance tracking** with QR codes. Administrators can configure branding and default email senders via a validated settings page.
 
 > Full PRD: [`Docs/PRD-foodbank-manager.md`](Docs/PRD-foodbank-manager.md)
 > Companion issues list: [`ISSUES-foodbank-manager.md`](ISSUES-foodbank-manager.md)

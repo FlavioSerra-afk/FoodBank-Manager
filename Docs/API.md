@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-03 (Wave CS-Backlog-08)
+Docs-Revision: 2025-09-04 (Wave v1.1.0 – Settings Phase 1)
 # REST API (pcc-fb/v1)
 
 Base namespace: `pcc-fb/v1`. All write endpoints require `X-WP-Nonce` and capabilities.

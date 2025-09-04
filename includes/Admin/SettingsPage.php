@@ -15,41 +15,74 @@ use FoodBankManager\Core\Options;
  * Settings admin page.
  */
 class SettingsPage {
-
-	/**
-	 * Route the settings page.
-	 *
-	 * @since 0.1.1
-	 */
+		/**
+		 * Route the settings page.
+		 */
 	public static function route(): void {
-		if ( ! current_user_can( 'fb_manage_settings' ) && ! current_user_can( 'manage_options' ) ) {
+		if ( ! current_user_can( 'fb_manage_settings' ) ) {
 				wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ), '', array( 'response' => 403 ) );
 		}
-			$method = strtoupper( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ?? '' ) ) );
-		if ( 'POST' === $method ) {
-				self::handle_post();
+
+				$method = strtoupper( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ?? '' ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only server var
+		if ( 'POST' !== $method ) {
+				return;
+		}
+
+				$action = sanitize_key( wp_unslash( $_POST['fbm_action'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- validated in handler
+		if ( 'branding_save' === $action ) {
+				self::handle_branding();
+		} elseif ( 'email_save' === $action ) {
+				self::handle_email();
 		}
 	}
 
-	/**
-	 * Handle saving settings.
-	 *
-	 * @since 0.1.1
-	 */
-	private static function handle_post(): void {
-			check_admin_referer( 'fbm_admin_action', '_fbm_nonce' );
-		if ( ! current_user_can( 'manage_options' ) && ! current_user_can( 'fb_manage_settings' ) ) {
+		/**
+		 * Handle branding settings save.
+		 */
+	private static function handle_branding(): void {
+			check_admin_referer( 'fbm_branding_save', '_fbm_nonce' );
+		if ( ! current_user_can( 'fb_manage_settings' ) ) {
 				wp_die( esc_html__( 'You do not have permission to perform this action.', 'foodbank-manager' ) );
 		}
 
-				$data = isset( $_POST['fbm_settings'] ) && is_array( $_POST['fbm_settings'] )
-						? map_deep( wp_unslash( $_POST['fbm_settings'] ), 'sanitize_text_field' )
+				$data = isset( $_POST['branding'] ) && is_array( $_POST['branding'] )
+						? wp_unslash( $_POST['branding'] ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 						: array();
-			Options::saveAll( $data );
-			add_settings_error( 'fbm-settings', 'fbm_saved', esc_html__( 'Settings saved.', 'foodbank-manager' ), 'updated' );
+			Options::update( array( 'branding' => $data ) );
 
-			$url = add_query_arg( 'updated', 1, menu_page_url( 'fbm-settings', false ) );
-			wp_safe_redirect( esc_url_raw( $url ) );
+			$url = add_query_arg(
+				array(
+					'notice' => 'saved',
+					'tab'    => 'branding',
+				),
+				menu_page_url( 'fbm-settings', false )
+			);
+			wp_safe_redirect( esc_url_raw( $url ), 303 );
+			exit;
+	}
+
+		/**
+		 * Handle email settings save.
+		 */
+	private static function handle_email(): void {
+			check_admin_referer( 'fbm_email_save', '_fbm_nonce' );
+		if ( ! current_user_can( 'fb_manage_settings' ) ) {
+				wp_die( esc_html__( 'You do not have permission to perform this action.', 'foodbank-manager' ) );
+		}
+
+				$data = isset( $_POST['emails'] ) && is_array( $_POST['emails'] )
+						? wp_unslash( $_POST['emails'] ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+						: array();
+			Options::update( array( 'emails' => $data ) );
+
+			$url = add_query_arg(
+				array(
+					'notice' => 'saved',
+					'tab'    => 'email',
+				),
+				menu_page_url( 'fbm-settings', false )
+			);
+			wp_safe_redirect( esc_url_raw( $url ), 303 );
 			exit;
 	}
 }

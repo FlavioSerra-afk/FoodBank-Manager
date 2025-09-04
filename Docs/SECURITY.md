@@ -1,3 +1,4 @@
+Docs-Revision: 2025-09-04 (Wave v1.1.0 – Settings Phase 1)
 # Security Policy — PCC FoodBank Manager
 
 We take security seriously. Please follow the guidelines below for reporting vulnerabilities.

@@ -8,10 +8,11 @@ namespace FoodBankManager\Core;
 use FoodBankManager\Db\Migrations;
 use FoodBankManager\Auth\Roles;
 use FoodBankManager\Http\FormSubmitController;
+use FoodBankManager\Core\Options;
 
 final class Plugin {
 
-    public const FBM_VERSION = '1.0.7';
+    public const FBM_VERSION = '1.1.0';
 
         private static ?Plugin $instance = null;
 
@@ -34,6 +35,7 @@ final class Plugin {
          * Boot the plugin.
          */
         public function boot(): void {
+                Options::boot();
                 add_action(
                         'init',
                         static function (): void {
