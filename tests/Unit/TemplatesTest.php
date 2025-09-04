@@ -4,25 +4,45 @@ declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 use FoodBankManager\Mail\Templates;
 
-final class TemplatesTest extends TestCase {
-	public function setUp(): void {
-		global $fbm_test_options;
-		$fbm_test_options = array();
-	}
-
-	public function testRenderReplacesTokens(): void {
-		$vars     = array(
-			'application_id'   => 42,
-			'first_name'       => 'Alice',
-			'last_name'        => 'Smith',
-			'created_at'       => '2024-01-01 00:00:00',
-			'summary_table'    => '<p>Summary</p>',
-			'qr_code_url'      => 'https://example.com/qr.png',
-			'reference'        => 'FBM-42',
-			'application_link' => 'https://example.com',
-		);
-		$rendered = Templates::render( 'applicant_confirmation', $vars );
-		$this->assertStringContainsString( 'FBM-42', $rendered['subject'] );
-		$this->assertStringContainsString( 'Alice', $rendered['body_html'] );
-	}
+if ( ! function_exists( 'esc_html' ) ) {
+    function esc_html( $text ) {
+        return htmlspecialchars( (string) $text, ENT_QUOTES, 'UTF-8' );
+    }
 }
+
+if ( ! function_exists( 'wp_strip_all_tags' ) ) {
+    function wp_strip_all_tags( string $text ): string {
+        return strip_tags( $text );
+    }
+}
+
+final class TemplatesTest extends TestCase {
+    public function testDefaultsContainTemplates(): void {
+        $defaults = Templates::defaults();
+        $this->assertArrayHasKey( 'applicant_confirmation', $defaults );
+        $this->assertArrayHasKey( 'admin_notification', $defaults );
+    }
+
+    public function testRenderReplacesWhitelistedTokensOnly(): void {
+        $vars = array(
+            'first_name'       => 'Alice',
+            'last_name'        => 'Smith',
+            'application_id'   => '42',
+            'site_name'        => 'Food Bank',
+            'appointment_time' => '10:00',
+            'extra'            => 'ignored',
+        );
+        $subject = Templates::render_subject( 'applicant_confirmation', $vars );
+        $this->assertSame( 'We received your application — Ref 42', $subject );
+
+        $body = Templates::render_body( 'admin_notification', $vars );
+        $this->assertStringContainsString( 'Alice Smith', $body );
+        $this->assertStringNotContainsString( 'ignored', $body );
+    }
+
+    public function testUnknownTokensLeftAsIs(): void {
+        $body = Templates::render_body( 'admin_notification', array() );
+        $this->assertStringContainsString( '{last_name}', $body );
+    }
+}
+

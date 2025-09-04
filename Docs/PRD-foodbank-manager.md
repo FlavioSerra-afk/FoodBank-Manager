@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.3 – Shortcodes Builder+Preview)
+Docs-Revision: 2025-09-04 (Wave v1.1.4 – E1)
 # FoodBank Manager — Product Requirements Document (PRD)
 
 **Repo file:** `Docs/PRD-foodbank-manager.md`  
@@ -101,7 +101,8 @@ Roles map to WordPress **capabilities** (granular; see §10 Security).
 
 ### 5.4 Email
 - Per-form **applicant** and **admin** templates (HTML + text).
-- Token variables: `{{application_id}}`, `{{first_name}}`, `{{created_at}}`, etc.
+- Default templates: `applicant_confirmation`, `admin_notification`.
+- Token variables (whitelisted): `{first_name}`, `{last_name}`, `{application_id}`, `{site_name}`, `{appointment_time}`.
 - Conditional recipients (e.g., by postcode).
 - Logging: to, subject, headers, body hash, status, provider message.
 - Test send + preview with sample data.
