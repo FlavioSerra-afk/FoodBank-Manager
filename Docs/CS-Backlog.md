@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.3 – Shortcodes Builder+Preview)
+Docs-Revision: 2025-09-04 (Wave v1.1.5 – Forms Presets P1)
 Strict (cleaned):
 
 includes/Admin/EmailsPage.php
@@ -11,6 +11,7 @@ includes/Attendance/AttendanceRepo.php
 
 Wave focus:
 - Promote `includes/Admin/PermissionsPage.php` to Strict.
+- Phase 2: add visual form builder, uploads, and CAPTCHA options.
 
 Legacy (temporary ignoreFile to unblock ZIP):
 

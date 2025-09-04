@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace FoodBankManager\Core;
 
 use FoodBankManager\Mail\Templates as MailTemplates;
+use FoodBankManager\Forms\Presets as FormPresets;
 
 /**
  * Plugin options utility.
@@ -109,13 +110,14 @@ class Options {
 				'retention_months' => 24,
 				'anonymise_files'  => 'delete',
 			),
-			'theme'      => array(
-				'frontend' => self::theme_defaults(),
-				'admin'    => self::theme_defaults(),
-			),
-			'encryption' => array(),
-		);
-	}
+                        'theme'      => array(
+                                'frontend' => self::theme_defaults(),
+                                'admin'    => self::theme_defaults(),
+                        ),
+                        'encryption' => array(),
+                       'form_presets_custom' => array(),
+                );
+        }
 
 		/**
 		 * Default theme values.
@@ -413,12 +415,36 @@ class Options {
        }
 
        /**
+        * Retrieve custom form presets.
+        *
+        * @return array<string,array<int,array<string,mixed>>>
+        */
+       public static function get_form_presets_custom(): array {
+               $raw = self::get( 'form_presets_custom', array() );
+               if ( ! is_array( $raw ) ) {
+                       return array();
+               }
+               return FormPresets::sanitize_all( $raw );
+       }
+
+       /**
+        * Save custom form presets.
+        *
+        * @param array<string,mixed> $presets Presets.
+        * @return bool
+        */
+       public static function set_form_presets_custom( array $presets ): bool {
+               $clean = FormPresets::sanitize_all( $presets );
+               return self::set( 'form_presets_custom', $clean );
+       }
+
+       /**
         * Retrieve an email template override.
         *
         * @param string $id Template ID.
         * @return array{subject:string,body_html:string,updated_at:string}
         */
-       public static function get_template( string $id ): array {
+    public static function get_template( string $id ): array {
                if ( ! self::is_valid_template_id( $id ) ) {
                        return array(
                                'subject'   => '',

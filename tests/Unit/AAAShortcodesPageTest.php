@@ -193,7 +193,7 @@ final class ShortcodesPageTest extends TestCase {
         $html = (string) ob_get_clean();
         $this->assertStringContainsString( '<div class="fbm-preview"><div>ok</div>alert(1)</div>', $html );
         $this->assertStringNotContainsString( '<script>alert', $html );
-        $this->assertSame( '[fbm_form id="1" mask_sensitive="true"]', self::$last_shortcode );
+        $this->assertSame( '[fbm_form id="1" preset="basic_intake" mask_sensitive="true"]', self::$last_shortcode );
     }
 }
 }

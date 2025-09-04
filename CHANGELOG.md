@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.5] - 2025-09-04
+### Features
+- Read-only Forms Presets Library with shortcode preset support.
+### Docs
+- Docs revised for Forms Presets P1 (Wave v1.1.5).
+
 ## [1.1.4] - 2025-09-04
 ### Features
 - Emails admin page skeleton listing default templates with edit links.

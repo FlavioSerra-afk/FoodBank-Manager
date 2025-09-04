@@ -86,9 +86,7 @@ final class Menu {
 			'fbm-dashboard',
 			'fbm-forms',
 			esc_html__( 'Forms', 'foodbank-manager' ),
-			static function (): void {
-								self::include_template( 'forms.php' );
-			}
+			array( \FoodBankManager\Admin\FormsPage::class, 'route' )
 		);
 
 				self::$hooks[] = self::add_page(

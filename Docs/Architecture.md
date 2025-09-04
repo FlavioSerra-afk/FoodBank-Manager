@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.3 – Shortcodes Builder+Preview)
+Docs-Revision: 2025-09-04 (Wave v1.1.5 – Forms Presets P1)
 # FoodBank Manager — Architecture
 
 ## Overview
@@ -14,6 +14,7 @@ A secure, privacy-first WordPress plugin for managing Food Bank applicant intake
 - `foodbank-manager.php` – bootstrap, constants: `FBM_FILE`, `FBM_PATH`, `FBM_URL`, `FBM_VERSION`.
 - `includes/Core/Plugin.php` (boot), `includes/Db/Migrations.php`.
 - `includes/Core/Options.php` – typed options stored in `fbm_settings`, validated against a schema (unknown keys ignored, fields limited to 1KB).
+- `includes/Forms/Presets.php` – built-in and custom form presets with strict validation.
 - `includes/Admin/*Page.php`, `templates/admin/*`.
 - `includes/Shortcodes/{Form,AttendanceManager}.php`, `templates/public/*`.
 - `includes/Rest/{Api,AttendanceController}.php`.
@@ -33,9 +34,9 @@ A secure, privacy-first WordPress plugin for managing Food Bank applicant intake
 - Admin notices display when the vendor autoloader is missing or the KEK is not defined.
 
 ## Components
-- **Admin Pages:** Dashboard (`fb_manage_dashboard`), Attendance (`fb_manage_attendance`), Database (`fb_manage_database`), Forms (`fb_manage_forms`), Shortcodes builder with preview (`fb_manage_forms`), Email Templates (`fb_manage_emails`), Settings (`fb_manage_settings`), Diagnostics (`fb_manage_diagnostics` – environment checks, test email, repair caps), Permissions (`fb_manage_permissions`), Design & Theme (`fb_manage_theme`).
+ - **Admin Pages:** Dashboard (`fb_manage_dashboard`), Attendance (`fb_manage_attendance`), Database (`fb_manage_database`), Forms (`fb_manage_forms`) with a read-only presets library, Shortcodes builder with preview (`fb_manage_forms`), Email Templates (`fb_manage_emails`), Settings (`fb_manage_settings`), Diagnostics (`fb_manage_diagnostics` – environment checks, test email, repair caps), Permissions (`fb_manage_permissions`), Design & Theme (`fb_manage_theme`).
   - Database page requires `fb_manage_database`; filters are sanitized and whitelisted. Exports respect filters, sanitize filenames, include a UTF-8 BOM with translated headers, and mask PII unless the user has `fb_view_sensitive`.
-- **Shortcodes:** `[pcc_fb_form]`, `[fb_attendance_manager]`.
+- **Shortcodes:** `[fbm_form]`, `[fb_attendance_manager]`.
 - **REST:** namespace `pcc-fb/v1`; endpoints for attendance check-in, no-show, timeline, void/unvoid/note.
 - **Security:** libsodium/XChaCha20-Poly1305 envelope encryption (`FBM_KEK_BASE64`), `sodium_compat` fallback; masking helpers; no PII in logs.
 - **Permissions:** central caps list, Administrator guarantee, role mapping and per-user overrides via `user_has_cap` filter (`fbm_user_caps`).
