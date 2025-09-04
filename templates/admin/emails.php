@@ -22,19 +22,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<?php endforeach; ?>
 	</ul>
 
-	<?php if ( $current && isset( $templates[ $current ] ) ) : ?>
-		<h2><?php esc_html_e( 'Edit Template', 'foodbank-manager' ); ?></h2>
-		<form method="post">
-			<p>
-				<label><?php esc_html_e( 'Subject', 'foodbank-manager' ); ?><br />
-					<input type="text" class="regular-text" value="<?php echo esc_attr( $templates[ $current ]['subject'] ); ?>" disabled />
-				</label>
-			</p>
-			<p>
-				<label><?php esc_html_e( 'Body', 'foodbank-manager' ); ?><br />
-					<textarea class="large-text" rows="10" disabled><?php echo esc_html( $templates[ $current ]['body'] ); ?></textarea>
-				</label>
-			</p>
-		</form>
-	<?php endif; ?>
+       <?php if ( $current && isset( $templates[ $current ] ) ) : ?>
+               <h2><?php esc_html_e( 'Edit Template', 'foodbank-manager' ); ?></h2>
+               <form method="post">
+                       <?php wp_nonce_field( 'fbm_emails_save', '_fbm_nonce' ); ?>
+                       <input type="hidden" name="fbm_action" value="emails_save" />
+                       <input type="hidden" name="tpl" value="<?php echo esc_attr( $current ); ?>" />
+                       <p>
+                               <label><?php esc_html_e( 'Subject', 'foodbank-manager' ); ?><br />
+                                       <input type="text" class="regular-text" name="subject" value="<?php echo esc_attr( $templates[ $current ]['subject'] ); ?>" />
+                               </label>
+                       </p>
+                       <p>
+                               <label><?php esc_html_e( 'Body', 'foodbank-manager' ); ?><br />
+                                       <textarea class="large-text" rows="10" name="body_html"><?php echo esc_textarea( $templates[ $current ]['body_html'] ); ?></textarea>
+                               </label>
+                       </p>
+                       <p>
+                               <button type="submit" class="button button-primary"><?php esc_html_e( 'Save', 'foodbank-manager' ); ?></button>
+                       </p>
+               </form>
+       <?php endif; ?>
 </div>
