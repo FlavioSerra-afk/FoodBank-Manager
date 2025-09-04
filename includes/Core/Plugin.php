@@ -13,7 +13,7 @@ use FoodBankManager\Admin\ShortcodesPage;
 
 final class Plugin {
 
-    public const FBM_VERSION = '1.1.7';
+    public const FBM_VERSION = '1.1.8';
 
         private static ?Plugin $instance = null;
 
@@ -60,14 +60,7 @@ final class Plugin {
                         add_action('load-foodbank_page_fbm-diagnostics', [\FoodBankManager\Admin\DiagnosticsPage::class, 'route']);
                         add_action('admin_menu', [ShortcodesPage::class, 'register_menu']);
                         add_action('load-foodbank_page_fbm-shortcodes', [ShortcodesPage::class, 'route']);
-                        add_action(
-                                'admin_enqueue_scripts',
-                                static function ( string $hook ): void {
-                                        if ( strpos( $hook, 'fbm' ) !== false ) {
-                                                \FoodBankManager\UI\Theme::enqueue_admin();
-                                        }
-                                }
-                        );
+                        // Theme CSS enqueued via Core\Assets.
                 }
 
                 add_action( 'admin_post_nopriv_fbm_submit', array( FormSubmitController::class, 'handle' ) );

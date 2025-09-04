@@ -1,8 +1,7 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.7 – Database UX P1)
+Docs-Revision: 2025-09-04 (Wave v1.1.8 – Design & Theme)
 Strict (cleaned):
 
 includes/Admin/EmailsPage.php
-includes/Admin/ThemePage.php
 includes/Admin/Menu.php
 includes/Admin/PermissionsPage.php
 includes/Admin/DatabasePage.php

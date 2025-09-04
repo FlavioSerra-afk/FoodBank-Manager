@@ -12,6 +12,7 @@ namespace FoodBankManager\Core;
 
 use FoodBankManager\Mail\Templates as MailTemplates;
 use FoodBankManager\Forms\Presets as FormPresets;
+use FoodBankManager\Security\CssSanitizer;
 
 /**
  * Plugin options utility.
@@ -52,6 +53,35 @@ class Options {
                        'reply_to'   => array(
                                'type'    => 'email',
                                'default' => '',
+                       ),
+               ),
+               'theme'    => array(
+                       'primary_color'    => array(
+                               'type'    => 'string',
+                               'regex'   => '/^#([0-9a-fA-F]{6})$/',
+                               'default' => '#3b82f6',
+                               'max'     => 7,
+                       ),
+                       'density'          => array(
+                               'type'    => 'enum',
+                               'enum'    => array( 'compact', 'comfortable' ),
+                               'default' => 'comfortable',
+                       ),
+                       'font_family'      => array(
+                               'type'    => 'enum',
+                               'enum'    => array( 'system', 'inter', 'roboto', 'open-sans' ),
+                               'default' => 'system',
+                       ),
+                       'dark_mode_default' => array(
+                               'type'    => 'bool',
+                               'default' => false,
+                       ),
+                       'custom_css'       => array(
+                               'type'              => 'raw',
+                               'sanitize_callback' => array( CssSanitizer::class, 'sanitize' ),
+                               'default'           => '',
+                               'max'               => 8192,
+                               'truncate'          => true,
                        ),
                ),
        );
@@ -110,10 +140,7 @@ class Options {
 				'retention_months' => 24,
 				'anonymise_files'  => 'delete',
 			),
-                        'theme'      => array(
-                                'frontend' => self::theme_defaults(),
-                                'admin'    => self::theme_defaults(),
-                        ),
+                       'theme'      => self::theme_defaults(),
                        'encryption' => array(),
                        'form_presets_custom' => array(),
                        'db_filter_presets'   => array(),
@@ -125,19 +152,15 @@ class Options {
 		 *
 		 * @return array<string,mixed>
 		 */
-	private static function theme_defaults(): array {
-			return array(
-				'preset'      => 'clean',
-				'accent'      => '#3b82f6',
-				'radius'      => 12,
-				'shadow'      => 'md',
-				'font_family' => 'system',
-				'density'     => 'comfortable',
-				'dark_mode'   => 'auto',
-				'custom_css'  => '',
-				'load_font'   => false,
-			);
-	}
+       private static function theme_defaults(): array {
+               return array(
+                       'primary_color'    => '#3b82f6',
+                       'density'          => 'comfortable',
+                       'font_family'      => 'system',
+                       'dark_mode_default' => false,
+                       'custom_css'       => '',
+               );
+       }
 
 	/**
 	 * Get all settings merged with defaults.
@@ -255,13 +278,23 @@ class Options {
         * @return mixed|null Sanitized value or null if invalid/empty.
         */
        private static function sanitize_field( $value, array $rules ) {
-               if ( is_string( $value ) && strlen( $value ) > 1024 ) {
-                       return null; // oversize
+               $max = isset( $rules['max'] ) ? (int) $rules['max'] : 1024;
+               if ( is_string( $value ) && strlen( $value ) > $max ) {
+                       if ( empty( $rules['truncate'] ) ) {
+                               return null;
+                       }
+                       $value = substr( $value, 0, $max );
                }
 
                switch ( $rules['type'] ) {
                        case 'string':
                                $value = sanitize_text_field( (string) $value );
+                               if ( isset( $rules['regex'] ) && ! preg_match( $rules['regex'], $value ) ) {
+                                       $value = $rules['default'] ?? '';
+                               }
+                               break;
+                       case 'raw':
+                               $value = (string) $value;
                                break;
                        case 'url':
                                $value = esc_url_raw( (string) $value );
@@ -279,12 +312,22 @@ class Options {
                                        $value = $rules['default'] ?? '';
                                }
                                break;
+                       case 'bool':
+                               $value = ! empty( $value );
+                               break;
                        default:
                                return null;
                }
 
-               if ( is_string( $value ) && strlen( $value ) > 1024 ) {
-                       return null;
+               if ( isset( $rules['sanitize_callback'] ) && is_callable( $rules['sanitize_callback'] ) ) {
+                       $value = call_user_func( $rules['sanitize_callback'], $value );
+               }
+
+               if ( is_string( $value ) && strlen( $value ) > $max ) {
+                       if ( empty( $rules['truncate'] ) ) {
+                               return null;
+                       }
+                       $value = substr( $value, 0, $max );
                }
 
                return $value;
@@ -358,8 +401,7 @@ class Options {
 				true
 			) ? $merged['privacy']['anonymise_files'] : 'delete';
 
-			$merged['theme']['frontend'] = self::sanitize_theme( (array) ( $merged['theme']['frontend'] ?? array() ) );
-			$merged['theme']['admin']    = self::sanitize_theme( (array) ( $merged['theme']['admin'] ?? array() ) );
+                       $merged['theme'] = self::sanitize_theme( (array) ( $merged['theme'] ?? array() ) );
 
 			unset( $merged['encryption'] );
 
@@ -372,47 +414,30 @@ class Options {
 		 * @param array<string,mixed> $data Raw theme settings.
 		 * @return array<string,mixed>
 		 */
-	private static function sanitize_theme( array $data ): array {
-			$out     = self::theme_defaults();
-			$presets = array( 'clean', 'classic', 'contrast', 'compact', 'large' );
-		if ( isset( $data['preset'] ) && in_array( $data['preset'], $presets, true ) ) {
-				$out['preset'] = $data['preset'];
-		}
-
-			$accent = (string) ( $data['accent'] ?? '' );
-		if ( preg_match( '/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/', $accent ) ) {
-					$out['accent'] = $accent;
-		}
-
-			$out['radius'] = max( 0, min( 20, (int) ( $data['radius'] ?? 12 ) ) );
-
-			$shadows = array( 'none', 'sm', 'md', 'lg' );
-		if ( isset( $data['shadow'] ) && in_array( $data['shadow'], $shadows, true ) ) {
-					$out['shadow'] = $data['shadow'];
-		}
-
-				$fonts = array( 'system', 'inter', 'roboto', 'georgia' );
-		if ( isset( $data['font_family'] ) && in_array( $data['font_family'], $fonts, true ) ) {
-				$out['font_family'] = $data['font_family'];
-		}
-
-				$densities = array( 'compact', 'comfortable', 'spacious' );
-		if ( isset( $data['density'] ) && in_array( $data['density'], $densities, true ) ) {
-				$out['density'] = $data['density'];
-		}
-
-				$dark = array( 'off', 'on', 'auto' );
-		if ( isset( $data['dark_mode'] ) && in_array( $data['dark_mode'], $dark, true ) ) {
-				$out['dark_mode'] = $data['dark_mode'];
-		}
-
-				$css               = (string) ( $data['custom_css'] ?? '' );
-				$css               = substr( $css, 0, 10000 );
-				$out['custom_css'] = function_exists( 'wp_strip_all_tags' ) ? wp_strip_all_tags( $css ) : strip_tags( $css ); // phpcs:ignore WordPress.WP.AlternativeFunctions.strip_tags_strip_tags -- Fallback when WordPress is unavailable.
-
-                               $out['load_font'] = ! empty( $data['load_font'] );
-
-                               return $out;
+       public static function sanitize_theme( array $data ): array {
+               $out   = self::theme_defaults();
+               $color = (string) ( $data['primary_color'] ?? '' );
+               if ( preg_match( '/^#([0-9a-fA-F]{6})$/', $color ) ) {
+                       $out['primary_color'] = strtolower( $color );
+               }
+               $densities = array( 'compact', 'comfortable' );
+               if ( isset( $data['density'] ) && in_array( $data['density'], $densities, true ) ) {
+                       $out['density'] = $data['density'];
+               }
+               $fonts = array( 'system', 'inter', 'roboto', 'open-sans' );
+               if ( isset( $data['font_family'] ) && in_array( $data['font_family'], $fonts, true ) ) {
+                       $out['font_family'] = $data['font_family'];
+               }
+               $out['dark_mode_default'] = ! empty( $data['dark_mode_default'] );
+               $css = (string) ( $data['custom_css'] ?? '' );
+               if ( strlen( $css ) > 8192 ) {
+                       $css = substr( $css, 0, 8192 );
+               }
+               $css = CssSanitizer::sanitize( $css );
+               if ( $css !== '' ) {
+                       $out['custom_css'] = $css;
+               }
+               return $out;
        }
 
        /**

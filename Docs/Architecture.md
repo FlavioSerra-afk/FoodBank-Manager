@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.7 – Database UX P1)
+Docs-Revision: 2025-09-04 (Wave v1.1.8 – Design & Theme)
 # FoodBank Manager — Architecture
 
 ## Overview
@@ -24,7 +24,7 @@ A secure, privacy-first WordPress plugin for managing Food Bank applicant intake
 - `includes/Database/ApplicationsRepo.php`.
 - `includes/Exports/CsvExporter.php`.
 - `includes/Mail/{Logger,Templates}.php`.
-- `includes/UI/Theme.php`, `assets/css/theme-*.css`.
+- `includes/UI/Theme.php`, `assets/css/theme-*.css`, `includes/Security/CssSanitizer.php`.
 - `includes/Logging/Audit.php`.
 - QA/CI: `.github/workflows/release.yml`, `phpcs.xml`, `phpstan.neon`, `phpstan-bootstrap.php`, `composer.json` scripts.
 
@@ -42,7 +42,7 @@ A secure, privacy-first WordPress plugin for managing Food Bank applicant intake
 - **Security:** libsodium/XChaCha20-Poly1305 envelope encryption (`FBM_KEK_BASE64`), `sodium_compat` fallback; masking helpers; no PII in logs.
 - **Permissions:** central caps list, Administrator guarantee, role mapping and per-user overrides via `user_has_cap` filter (`fbm_user_caps`).
 - **AttendanceRepo:** database access layer for attendance; all queries use `$wpdb->prepare()` with strict placeholders, mask PII by default, and have unit tests covering check-in, no-show, void/unvoid, and timeline SQL injection edges.
-- **Theme system:** scoped `.fbm-scope` CSS variables for front-end and admin UIs; presets; dark mode.
+- **Theme system:** global CSS variables for primary colour, density, font, dark mode default and optional custom CSS (sanitised) applied across admin and front-end.
 
 ## Data model (tables)
 - `wp_fbm_applications`: `id`, `form_id`, `status`, `data_json`, `pii_encrypted_blob`, consent fields, timestamps.

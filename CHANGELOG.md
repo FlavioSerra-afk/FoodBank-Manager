@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.8] - 2025-09-04
+### Features
+- Design & Theme settings with primary colour, density, font, dark mode default and optional custom CSS applied via CSS variables.
+### Docs
+- Docs revised for Design & Theme (Wave v1.1.8).
+
 ## [1.1.7] - 2025-09-04
 ### Features
 - Saved Database filter presets and per-user column toggles.
