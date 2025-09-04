@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.5 – Forms Presets P1)
+Docs-Revision: 2025-09-04 (Wave v1.1.6 – Attendance P1)
 # FoodBank Manager — Product Requirements Document (PRD)
 
 **Repo file:** `Docs/PRD-foodbank-manager.md`  
@@ -161,7 +161,7 @@ Columns (toggleable):
 - **Policy status** (OK / Warning / Violation)  
 - **Notes** (icon shows recent notes)
 
-Row actions: **View Profile**, **Open Attendance Timeline**, **Export (CSV/PDF)**.
+Row actions: **View Profile**, **Open Attendance Timeline**, **Show QR** (REST‑nonce, admin‑only), **Override & Check-in** (reason required), **Export (CSV/PDF)**.
 
 **Sessions View (grouped by Event)**  
 Columns: Event, Date/Time, Location, Capacity, **Attended**, **No-shows**, % used.  

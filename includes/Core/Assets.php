@@ -15,7 +15,19 @@ class Assets {
 		// Placeholder for front-end assets.
 	}
 
-	public function enqueue_admin(): void {
-		// Placeholder for admin assets.
-	}
+        public function enqueue_admin( string $hook ): void {
+                if ( $hook !== 'foodbank-manager_page_fbm-attendance' ) {
+                        return;
+                }
+                if ( ! current_user_can( 'fb_manage_attendance' ) ) {
+                        return;
+                }
+                wp_enqueue_script(
+                        'fbm-qrcode',
+                        FBM_URL . 'assets/js/qrcode.min.js',
+                        array(),
+                        Plugin::FBM_VERSION,
+                        true
+                );
+        }
 }

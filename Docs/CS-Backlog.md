@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.5 – Forms Presets P1)
+Docs-Revision: 2025-09-04 (Wave v1.1.6 – Attendance P1)
 Strict (cleaned):
 
 includes/Admin/EmailsPage.php
@@ -12,6 +12,7 @@ includes/Attendance/AttendanceRepo.php
 Wave focus:
 - Promote `includes/Admin/PermissionsPage.php` to Strict.
 - Phase 2: add visual form builder, uploads, and CAPTCHA options.
+- Attendance P1: admin QR check-in helper and override reason UI.
 
 Legacy (temporary ignoreFile to unblock ZIP):
 

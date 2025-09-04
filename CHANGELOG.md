@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.6] - 2025-09-04
+### Features
+- Admin-only QR check-in links and override reason prompt for Attendance.
+### Docs
+- Docs revised for Attendance P1 (Wave v1.1.6).
+
 ## [1.1.5] - 2025-09-04
 ### Features
 - Read-only Forms Presets Library with shortcode preset support.
