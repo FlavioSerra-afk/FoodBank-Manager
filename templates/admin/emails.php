@@ -42,5 +42,18 @@ if ( ! defined( 'ABSPATH' ) ) {
                                <button type="submit" class="button button-primary"><?php esc_html_e( 'Save', 'foodbank-manager' ); ?></button>
                        </p>
                </form>
+               <form method="post" style="margin-top:1em;">
+                       <?php wp_nonce_field( 'fbm_emails_preview', '_fbm_nonce' ); ?>
+                       <input type="hidden" name="fbm_action" value="emails_preview" />
+                       <input type="hidden" name="tpl" value="<?php echo esc_attr( $current ); ?>" />
+                       <p>
+                               <button type="submit" class="button"><?php esc_html_e( 'Preview', 'foodbank-manager' ); ?></button>
+                       </p>
+               </form>
+               <?php if ( $preview['subject'] || $preview['body_html'] ) : ?>
+                       <h3><?php esc_html_e( 'Preview', 'foodbank-manager' ); ?></h3>
+                       <p><strong><?php esc_html_e( 'Subject', 'foodbank-manager' ); ?>:</strong> <?php echo esc_html( $preview['subject'] ); ?></p>
+                       <div class="fbm-preview"><?php echo $preview['body_html']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
+               <?php endif; ?>
        <?php endif; ?>
 </div>
