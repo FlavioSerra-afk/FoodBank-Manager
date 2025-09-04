@@ -82,8 +82,9 @@ class ApplicationsRepo {
 		$prepared               = $wpdb->prepare( $sql, $params_with_pagination );
                 $rows                   = $wpdb->get_results( $prepared, 'ARRAY_A' );
 
-		$count_sql = "SELECT COUNT(*) FROM {$wpdb->prefix}fb_applications a $where";
-		$total     = (int) $wpdb->get_var( $wpdb->prepare( $count_sql, $params ) );
+               $count_sql   = "SELECT COUNT(*) FROM {$wpdb->prefix}fb_applications a $where";
+               $count_query = $wpdb->prepare( $count_sql, $params );
+               $total       = (int) $wpdb->get_var( $count_query );
 
 		return array(
 			'rows'  => $rows,
@@ -98,13 +99,15 @@ class ApplicationsRepo {
          */
         public static function get( int $id ): ?array {
 		global $wpdb;
-		$sql = "SELECT * FROM {$wpdb->prefix}fb_applications WHERE id = %d";
-                $app = $wpdb->get_row( $wpdb->prepare( $sql, $id ), 'ARRAY_A' );
+               $sql      = "SELECT * FROM {$wpdb->prefix}fb_applications WHERE id = %d";
+               $prepared = $wpdb->prepare( $sql, $id );
+               $app      = $wpdb->get_row( $prepared, 'ARRAY_A' );
 		if ( ! $app ) {
 			return null;
 		}
-		$files_sql    = "SELECT id, original_name, mime, size_bytes, created_at FROM {$wpdb->prefix}fb_files WHERE application_id = %d";
-                $files        = $wpdb->get_results( $wpdb->prepare( $files_sql, $id ), 'ARRAY_A' );
+               $files_sql    = "SELECT id, original_name, mime, size_bytes, created_at FROM {$wpdb->prefix}fb_files WHERE application_id = %d";
+               $files_query  = $wpdb->prepare( $files_sql, $id );
+               $files        = $wpdb->get_results( $files_query, 'ARRAY_A' );
 		$app['files'] = $files;
 		return $app;
 	}
@@ -114,8 +117,9 @@ class ApplicationsRepo {
          */
         public static function softDelete( int $id ): bool {
 		global $wpdb;
-		$sql = "UPDATE {$wpdb->prefix}fb_applications SET status = 'archived' WHERE id = %d";
-		$res = $wpdb->query( $wpdb->prepare( $sql, $id ) );
-		return (bool) $res;
+               $sql      = "UPDATE {$wpdb->prefix}fb_applications SET status = 'archived' WHERE id = %d";
+               $prepared = $wpdb->prepare( $sql, $id );
+               $res      = $wpdb->query( $prepared );
+               return (bool) $res;
 	}
 }
