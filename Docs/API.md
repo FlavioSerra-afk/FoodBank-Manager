@@ -1,9 +1,10 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.8 – Design & Theme)
+Docs-Revision: 2025-09-04 (Wave v1.1.10 – Admin Layout Guard)
 # REST API (pcc-fb/v1)
 
 Base namespace: `pcc-fb/v1`. All write endpoints require `X-WP-Nonce` and capabilities.
 Shortcode previews are handled via `admin-post.php` (`fbm_action=shortcode_preview`) and are not exposed via REST.
 Design & Theme options are configuration-only; no REST endpoints expose or modify them.
+Admin screens are wrapped in `.fbm-admin` with assets/notices loaded only on FoodBank Manager pages.
 
 ## Attendance
 - `POST /attendance/checkin`

@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		exit;
 }
 ?>
-<div class="wrap">
+<div class="wrap fbm-admin">
 <h1><?php esc_html_e( 'Database', 'foodbank-manager' ); ?></h1>
 <div class="fbm-preset-bar">
 <form method="post" style="display:inline">

@@ -22,7 +22,7 @@ $cron_cleanup   = wp_next_scheduled( 'fbm_cron_cleanup' );
 $cron_retry     = wp_next_scheduled( 'fbm_cron_email_retry' );
 $notice         = isset( $_GET['notice'] ) ? sanitize_key( wp_unslash( $_GET['notice'] ) ) : '';
 ?>
-<div class="wrap">
+<div class="wrap fbm-admin">
     <h1><?php esc_html_e( 'Diagnostics', 'foodbank-manager' ); ?></h1>
     <?php if ( 'sent' === $notice ) : ?>
         <div class="notice notice-success"><p><?php esc_html_e( 'Test email sent.', 'foodbank-manager' ); ?></p></div>

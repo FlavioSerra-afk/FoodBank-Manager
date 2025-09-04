@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.8 – Design & Theme)
+Docs-Revision: 2025-09-04 (Wave v1.1.10 – Admin Layout Guard)
 # Security Policy — PCC FoodBank Manager
 
 We take security seriously. Please follow the guidelines below for reporting vulnerabilities.
@@ -27,6 +27,7 @@ We aim to acknowledge reports **within 2 working days**.
 - Admin shortcode previews enforce capability checks, nonces, attribute whitelists with `mask_sensitive=true`, and `wp_kses_post` filtering.
 - Forms presets are sanitized server-side; unknown preset IDs fall back to a minimal safe form without exposing errors to regular users.
 - Database filter presets and per-user column selections require `fb_manage_database`, use nonces, and whitelist allowed query/column keys.
+- Admin UI is wrapped in `.fbm-admin` with screen-gated CSS/notices to prevent cross-plugin CSS or markup bleed.
 
 ## 🔁 Coordinated Disclosure
 - We will validate, develop a fix, and prepare a security release.

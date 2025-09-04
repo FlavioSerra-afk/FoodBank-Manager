@@ -1,8 +1,9 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.8 – Design & Theme)
+Docs-Revision: 2025-09-04 (Wave v1.1.10 – Admin Layout Guard)
 # FoodBank Manager (WordPress Plugin)
 
 A secure, mobile‑first WordPress plugin for Food Bank applications, encrypted data storage, operational dashboards, and **attendance tracking** with QR codes. Administrators can configure branding and default email senders via a validated settings page. The Shortcodes page includes a builder with masked, nonce‑protected previews.
 Design & Theme settings allow adjusting primary colour, density, font, dark mode default, and safe Custom CSS applied across the site.
+Admin screens are wrapped in a `.fbm-admin` container; plugin CSS and notices load only on FoodBank Manager pages to avoid wp-admin bleed.
 
 > Full PRD: [`Docs/PRD-foodbank-manager.md`](Docs/PRD-foodbank-manager.md)
 > Companion issues list: [`ISSUES-foodbank-manager.md`](ISSUES-foodbank-manager.md)

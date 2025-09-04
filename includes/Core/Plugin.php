@@ -13,9 +13,10 @@ use FoodBankManager\Admin\ShortcodesPage;
 
 final class Plugin {
 
-    public const FBM_VERSION = '1.1.9';
+    public const FBM_VERSION = '1.1.10';
 
         private static ?Plugin $instance = null;
+        private static bool $booted = false;
 
         /**
          * Get singleton instance.
@@ -36,6 +37,10 @@ final class Plugin {
          * Boot the plugin.
          */
         public function boot(): void {
+                if ( self::$booted ) {
+                        return;
+                }
+                self::$booted = true;
                 Options::boot();
                 add_action(
                         'init',
@@ -73,6 +78,10 @@ final class Plugin {
                                         add_action(
                                                 'admin_notices',
                                                 static function (): void {
+                                                        $s = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+                                                        if ( ! $s || ( strpos( $s->id, 'foodbank_page_' ) !== 0 && $s->id !== 'toplevel_page_fbm-dashboard' ) ) {
+                                                                return;
+                                                        }
                                                         echo '<div class="notice notice-warning"><p>' . esc_html__( 'FoodBank Manager: Encryption key (FBM_KEK_BASE64) not set. Some features are degraded.', 'foodbank-manager' ) . '</p></div>';
                                                 }
                                         );
@@ -82,18 +91,26 @@ final class Plugin {
                                         add_action(
                                                 'admin_notices',
                                                 static function (): void {
+                                                        $s = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+                                                        if ( ! $s || ( strpos( $s->id, 'foodbank_page_' ) !== 0 && $s->id !== 'toplevel_page_fbm-dashboard' ) ) {
+                                                                return;
+                                                        }
                                                         echo '<div class="notice notice-error"><p>' . esc_html__( 'FoodBank Manager: From email is not configured.', 'foodbank-manager' ) . '</p></div>';
                                                 }
                                         );
                                 }
                                 $provider = \FoodBankManager\Core\Options::get('forms.captcha_provider');
                                 if ( $provider !== 'off' ) {
-                                        $site = \FoodBankManager\Core\Options::get('forms.captcha_site_key');
+                                        $site   = \FoodBankManager\Core\Options::get('forms.captcha_site_key');
                                         $secret = \FoodBankManager\Core\Options::get('forms.captcha_secret');
                                         if ( $site === '' || $secret === '' ) {
                                                 add_action(
                                                         'admin_notices',
                                                         static function (): void {
+                                                                $s = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+                                                                if ( ! $s || ( strpos( $s->id, 'foodbank_page_' ) !== 0 && $s->id !== 'toplevel_page_fbm-dashboard' ) ) {
+                                                                        return;
+                                                                }
                                                                 echo '<div class="notice notice-warning"><p>' . esc_html__( 'FoodBank Manager: CAPTCHA keys are missing.', 'foodbank-manager' ) . '</p></div>';
                                                         }
                                                 );

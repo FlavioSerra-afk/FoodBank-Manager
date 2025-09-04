@@ -1,0 +1,9 @@
+/* phpcs:ignoreFile */
+/* FBM admin only */
+.fbm-admin { max-width: 100%; }
+.fbm-admin .fbm-toolbar { display:flex; flex-wrap:wrap; gap:.5rem; align-items:center; }
+.fbm-admin .fbm-table-wrap { overflow-x:auto; }
+/* Prevent full-viewport layouts inside wp-admin */
+.fbm-admin [style*="width:100vw"], 
+.fbm-admin .fbm-fullbleed { width:auto !important; margin:0 !important; }
+

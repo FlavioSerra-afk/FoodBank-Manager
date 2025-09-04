@@ -20,7 +20,7 @@ $densities = array(
         'comfortable' => __( 'Comfortable', 'foodbank-manager' ),
 );
 ?>
-<div class="wrap">
+<div class="wrap fbm-admin">
         <h1><?php esc_html_e( 'Design & Theme', 'foodbank-manager' ); ?></h1>
         <?php if ( isset( $_GET['notice'] ) && 'saved' === $_GET['notice'] ) : ?>
                 <div class="notice notice-success"><p><?php esc_html_e( 'Settings saved.', 'foodbank-manager' ); ?></p></div>
@@ -69,7 +69,6 @@ $densities = array(
                 </table>
                 <?php submit_button(); ?>
         </form>
-</div>
 <script>
 ( function() {
         var field = document.getElementById( 'fbm_primary_color' );
@@ -80,3 +79,4 @@ $densities = array(
         }
 } )();
 </script>
+</div>

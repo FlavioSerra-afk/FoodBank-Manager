@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 ?>
-<div class="wrap">
+<div class="wrap fbm-admin">
 <h1><?php esc_html_e( 'Shortcodes', 'foodbank-manager' ); ?></h1>
 <form method="post" id="fbm-shortcodes-form">
 	<?php wp_nonce_field( 'fbm_shortcodes_preview', '_wpnonce' ); ?>
@@ -37,7 +37,6 @@ declare(strict_types=1);
 		<h2><?php esc_html_e( 'Preview', 'foodbank-manager' ); ?></h2>
 		<div class="fbm-preview"><?php echo $preview_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- safe HTML ?></div>
 <?php endif; ?>
-</div>
 <script>
 const FBM_SHORTCODES = <?php echo wp_json_encode( $shortcodes ); ?>;
 const FBM_CURRENT = {
@@ -112,3 +111,4 @@ if(FBM_CURRENT.tag){
 	buildAttrs(FBM_CURRENT.tag);
 }
 </script>
+</div>

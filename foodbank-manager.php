@@ -2,7 +2,7 @@
 /**
  * Plugin Name: FoodBank Manager
  * Description: Secure forms, encrypted storage, dashboards, and attendance tracking for food banks.
- * Version: 1.1.9
+ * Version: 1.1.10
  * Requires at least: 6.0
  * Requires PHP: 8.1
  * Author: Portuguese Community Centre London
@@ -49,19 +49,23 @@ if ( file_exists( $autoload ) ) {
 
 // If our core class still isn't available, show a safe admin notice and bail (no fatals).
 add_action(
-	'admin_notices',
-	static function () {
-		if ( ! class_exists( \FoodBankManager\Core\Plugin::class ) ) {
-						$notice = esc_html__( 'Autoloader not found.', 'foodbank-manager' ) . ' '
-								. esc_html__( 'Please install using the Release ZIP from GitHub.', 'foodbank-manager' ) . ' '
-								. esc_html__( 'The ZIP includes the vendor/ folder.', 'foodbank-manager' ) . ' '
-								. esc_html__( 'Alternatively, run composer install before activation.', 'foodbank-manager' );
-				printf(
-					'<div class="notice notice-error"><p><strong>FoodBank Manager:</strong> %s</p></div>',
-					esc_html( $notice )
-				);
-		}
-	}
+        'admin_notices',
+        static function () {
+                if ( ! class_exists( \FoodBankManager\Core\Plugin::class ) ) {
+                        $s = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+                        if ( ! $s || ( strpos( $s->id, 'foodbank_page_' ) !== 0 && $s->id !== 'toplevel_page_fbm-dashboard' ) ) {
+                                return;
+                        }
+                        $notice = esc_html__( 'Autoloader not found.', 'foodbank-manager' ) . ' '
+                                . esc_html__( 'Please install using the Release ZIP from GitHub.', 'foodbank-manager' ) . ' '
+                                . esc_html__( 'The ZIP includes the vendor/ folder.', 'foodbank-manager' ) . ' '
+                                . esc_html__( 'Alternatively, run composer install before activation.', 'foodbank-manager' );
+                        printf(
+                                '<div class="notice notice-error"><p><strong>FoodBank Manager:</strong> %s</p></div>',
+                                esc_html( $notice )
+                        );
+                }
+        }
 );
 if ( ! class_exists( \FoodBankManager\Core\Plugin::class ) ) {
 	return;
