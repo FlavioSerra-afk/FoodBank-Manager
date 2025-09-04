@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.0 – Settings Phase 1)
+Docs-Revision: 2025-09-04 (Wave v1.1.2 – Shortcodes List)
 # REST API (pcc-fb/v1)
 
 Base namespace: `pcc-fb/v1`. All write endpoints require `X-WP-Nonce` and capabilities.
@@ -26,7 +26,15 @@ Base namespace: `pcc-fb/v1`. All write endpoints require `X-WP-Nonce` and capabi
 - All attendance endpoints delegate to `AttendanceRepo`, which uses `$wpdb->prepare()` with strict placeholders and returns masked data unless `fb_view_sensitive` is granted. Unit tests cover policy enforcement and SQL injection boundaries.
 
 ## Forms (MVP via admin-post)
-- Shortcode `[pcc_fb_form]` posts to `admin-post.php?action=fbm_submit`.
+- Shortcode `[fbm_form]` posts to `admin-post.php?action=fbm_submit`.
+
+## Shortcodes
+
+| Shortcode | Attributes (default) |
+| --- | --- |
+| `[fbm_form]` | `id` (string, default "1") |
+| `[fbm_entries]` | _None_ |
+| `[fbm_attendance_manager]` | _None_ |
 - Validates nonce, required fields, file policy.
 - Stores encrypted PII; triggers applicant/admin emails.
 

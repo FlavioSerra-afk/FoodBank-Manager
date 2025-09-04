@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.2] - 2025-09-04
+### Features
+- Shortcodes admin page listing available shortcodes, attributes, and examples.
+### Docs
+- Docs revised for Shortcodes List (Wave v1.1.2).
+
 ## [1.1.1] - 2025-09-04
 ### Features
 - Diagnostics Phase 1: environment checks with test email and Repair Caps.

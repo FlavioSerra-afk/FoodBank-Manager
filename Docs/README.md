@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.1 – Diagnostics P1)
+Docs-Revision: 2025-09-04 (Wave v1.1.2 – Shortcodes List)
 # FoodBank Manager (WordPress Plugin)
 
 A secure, mobile‑first WordPress plugin for Food Bank applications, encrypted data storage, operational dashboards, and **attendance tracking** with QR codes. Administrators can configure branding and default email senders via a validated settings page.
@@ -69,14 +69,22 @@ Alternatively build locally with `composer build:zip` and upload that ZIP.
 1. **Create a Form** (FoodBank → Forms) or use the **“Food Bank Intake”** preset.
 2. Drop the shortcode on a page:
    ```
-   [fb_form id="123"]
+   [fbm_form id="123"]
    ```
 3. Submit a test entry → verify applicant & admin emails appear under **Diagnostics**.
 4. Add the front‑end dashboard for team members:
    ```
-   [foodbank_entries roles="foodbank_viewer,foodbank_manager"]
+   [fbm_entries]
    ```
 5. Try **Attendance → Scan** (QR embedded in confirmation email).
+
+## Shortcodes
+
+| Shortcode | Attributes (default) |
+| --- | --- |
+| `[fbm_form]` | `id` (string, default "1") |
+| `[fbm_entries]` | _None_ |
+| `[fbm_attendance_manager]` | _None_ |
 
 ## 📚 Docs
 - **PRD:** [`Docs/PRD-foodbank-manager.md`](Docs/PRD-foodbank-manager.md)

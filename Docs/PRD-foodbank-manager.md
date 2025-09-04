@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.1 – Diagnostics P1)
+Docs-Revision: 2025-09-04 (Wave v1.1.2 – Shortcodes List)
 # FoodBank Manager — Product Requirements Document (PRD)
 
 **Repo file:** `Docs/PRD-foodbank-manager.md`  
@@ -87,7 +87,7 @@ Roles map to WordPress **capabilities** (granular; see §10 Security).
 - **Consent:** explicit (unchecked) checkbox for data processing; optional newsletter opt-in (unchecked).
 
 ### 5.2 Form Rendering
-- Shortcode: `[pcc_fb_form id="123" captcha="turnstile|recaptcha|off" success_redirect="" show_title="true|false"]`
+- Shortcode: `[fbm_form id="123"]`
 - Gutenberg block with same props.
 - Mobile-first, accessible (labels, aria, keyboard support).
 
@@ -209,6 +209,14 @@ Row actions: **View attendee list**, **Export roster (CSV/PDF)**, **Print-friend
 - Background jobs for large export batches.
 
 ### 5.8 GDPR & Privacy
+
+### 5.9 Shortcodes
+
+| Shortcode | Attributes (default) |
+| --- | --- |
+| `[fbm_form]` | `id` (string, default "1") |
+| `[fbm_entries]` | _None_ |
+| `[fbm_attendance_manager]` | _None_ |
 - Consent logging (timestamp, IP, user agent, consent text hash).
 - SAR export by email lookup (entries, files, attendance).
 - Retention policies per form (auto-anonymise after X months).

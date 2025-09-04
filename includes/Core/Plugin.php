@@ -9,10 +9,11 @@ use FoodBankManager\Db\Migrations;
 use FoodBankManager\Auth\Roles;
 use FoodBankManager\Http\FormSubmitController;
 use FoodBankManager\Core\Options;
+use FoodBankManager\Admin\ShortcodesPage;
 
 final class Plugin {
 
-    public const FBM_VERSION = '1.1.1';
+    public const FBM_VERSION = '1.1.2';
 
         private static ?Plugin $instance = null;
 
@@ -57,6 +58,8 @@ final class Plugin {
                         add_action('load-foodbank_page_fbm-theme', [\FoodBankManager\Admin\ThemePage::class, 'route']);
                         add_action('load-foodbank_page_fbm-emails', [\FoodBankManager\Admin\EmailsPage::class, 'route']);
                         add_action('load-foodbank_page_fbm-diagnostics', [\FoodBankManager\Admin\DiagnosticsPage::class, 'route']);
+                        add_action('admin_menu', [ShortcodesPage::class, 'register_menu']);
+                        add_action('load-foodbank_page_fbm-shortcodes', [ShortcodesPage::class, 'route']);
                         add_action(
                                 'admin_enqueue_scripts',
                                 static function ( string $hook ): void {
