@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.3] - 2025-09-04
+### Features
+- Shortcodes builder with masked shortcode generation and nonce-protected live preview.
+### Docs
+- Docs revised for Shortcodes Builder+Preview (Wave v1.1.3).
+
 ## [1.1.2] - 2025-09-04
 ### Features
 - Shortcodes admin page listing available shortcodes, attributes, and examples.

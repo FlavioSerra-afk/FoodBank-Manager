@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.1 – Diagnostics P1)
+Docs-Revision: 2025-09-04 (Wave v1.1.3 – Shortcodes Builder+Preview)
 # Security Policy — PCC FoodBank Manager
 
 We take security seriously. Please follow the guidelines below for reporting vulnerabilities.
@@ -21,6 +21,7 @@ We aim to acknowledge reports **within 2 working days**.
 - Exposed endpoints under the plugin’s REST namespace (`pcc-fb/v1`)
 - Front‑end submission and dashboard flows
 - Database migrations and encryption code
+- Admin shortcode previews enforce capability checks, nonces, attribute whitelists with `mask_sensitive=true`, and `wp_kses_post` filtering.
 
 ## 🔁 Coordinated Disclosure
 - We will validate, develop a fix, and prepare a security release.

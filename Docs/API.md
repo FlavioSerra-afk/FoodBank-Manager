@@ -1,7 +1,8 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.2 – Shortcodes List)
+Docs-Revision: 2025-09-04 (Wave v1.1.3 – Shortcodes Builder+Preview)
 # REST API (pcc-fb/v1)
 
 Base namespace: `pcc-fb/v1`. All write endpoints require `X-WP-Nonce` and capabilities.
+Shortcode previews are handled via `admin-post.php` (`fbm_action=shortcode_preview`) and are not exposed via REST.
 
 ## Attendance
 - `POST /attendance/checkin`
