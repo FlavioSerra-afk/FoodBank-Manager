@@ -23,12 +23,6 @@ if (!function_exists('do_action')) {
 if (!function_exists('current_user_can')) {
     function current_user_can(string $cap): bool { return true; }
 }
-if (!function_exists('get_current_screen')) {
-    function get_current_screen() {
-        global $current_screen;
-        return $current_screen;
-    }
-}
 if (!function_exists('esc_html__')) {
     function esc_html__(string $text, string $domain = ''): string { return $text; }
 }
@@ -44,14 +38,13 @@ if (!function_exists('wp_nonce_url')) {
 
 final class NoticesTest extends TestCase {
     protected function setUp(): void {
-        global $wp_filter, $current_screen;
+        global $wp_filter;
         $wp_filter = array();
-        $current_screen = (object) array('id' => 'foodbank_page_fbm_diagnostics');
+        $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_diagnostics';
     }
 
     public function testMissingKekBailsOnNonFbmScreen(): void {
-        global $current_screen;
-        $current_screen = (object) array('id' => 'dashboard');
+        $GLOBALS['fbm_test_screen_id'] = 'dashboard';
         ob_start();
         Notices::missing_kek();
         do_action('admin_notices');
@@ -60,6 +53,7 @@ final class NoticesTest extends TestCase {
     }
 
     public function testMissingKekShowsOnFbmScreen(): void {
+        $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_diagnostics';
         ob_start();
         Notices::missing_kek();
         do_action('admin_notices');

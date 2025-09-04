@@ -22,12 +22,10 @@ final class DashboardShortcodeTest extends TestCase {
     /** @runInSeparateProcess */
     public function testUnauthorizedGated(): void {
         $GLOBALS['fbm_can_dashboard'] = false;
-        if ( ! function_exists( 'current_user_can' ) ) {
-            function current_user_can() { return $GLOBALS['fbm_can_dashboard']; }
-        }
         if ( ! function_exists( 'esc_html__' ) ) {
             function esc_html__( $t, $d = null ) { return $t; }
         }
+        $GLOBALS['fbm_test_current_user_id'] = 0;
         require_once __DIR__ . '/../../includes/Shortcodes/Dashboard.php';
         $out = \FoodBankManager\Shortcodes\Dashboard::render();
         $this->assertStringContainsString( 'You do not have permission', $out );
@@ -36,9 +34,6 @@ final class DashboardShortcodeTest extends TestCase {
     /** @runInSeparateProcess */
     public function testSafeHtmlOutput(): void {
         $GLOBALS['fbm_can_dashboard'] = true;
-        if ( ! function_exists( 'current_user_can' ) ) {
-            function current_user_can() { return $GLOBALS['fbm_can_dashboard']; }
-        }
         if ( ! function_exists( 'esc_html__' ) ) {
             function esc_html__( $t, $d = null ) { return $t; }
         }
@@ -60,15 +55,7 @@ final class DashboardShortcodeTest extends TestCase {
         if ( ! function_exists( 'shortcode_atts' ) ) {
             function shortcode_atts( $pairs, $atts, $shortcode = '' ) { return array_merge( $pairs, $atts ); }
         }
-        if ( ! function_exists( 'get_current_user_id' ) ) {
-            function get_current_user_id() { return 1; }
-        }
-        if ( ! function_exists( 'get_transient' ) ) {
-            function get_transient( $k ) { return false; }
-        }
-        if ( ! function_exists( 'set_transient' ) ) {
-            function set_transient( $k, $v, $e ) {}
-        }
+        $GLOBALS['fbm_test_current_user_id'] = 1;
         if ( ! function_exists( 'current_time' ) ) {
             function current_time( $t, $g = false ) { return '2025-09-04 00:00:00'; }
         }
@@ -88,8 +75,12 @@ final class DashboardShortcodeTest extends TestCase {
             function number_format_i18n( $n ) { return (string) $n; }
         }
         // Stub Theme and AttendanceRepo
-        eval('namespace FoodBankManager\\UI; class Theme { public static function enqueue_front(): void {} }');
-        eval('namespace FoodBankManager\\Attendance; class AttendanceRepo { public static function daily_present_counts($s){ return array(1,2,3); } public static function period_totals($s){ return array("present"=>3,"households"=>2,"no_shows"=>1,"in_person"=>1,"delivery"=>2,"voided"=>0); } }');
+        if (! class_exists('FoodBankManager\\UI\\Theme')) {
+            eval('namespace FoodBankManager\\UI; class Theme { public static function enqueue_front(): void {} }');
+        }
+        if (! class_exists('FoodBankManager\\Attendance\\AttendanceRepo')) {
+            eval('namespace FoodBankManager\\Attendance; class AttendanceRepo { public static function daily_present_counts($s){ return array(1,2,3); } public static function period_totals($s){ return array("present"=>3,"households"=>2,"no_shows"=>1,"in_person"=>1,"delivery"=>2,"voided"=>0); } }');
+        }
         require_once __DIR__ . '/../../includes/Shortcodes/Dashboard.php';
         $out = \FoodBankManager\Shortcodes\Dashboard::render( array( 'period'=>'today', 'compare'=>'1', 'sparkline'=>'1' ) );
         $this->assertStringContainsString( '<svg', $out );

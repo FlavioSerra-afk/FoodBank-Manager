@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.2.6] - 2025-09-05
+### QA
+- test: replace anonymous test doubles with named stubs; add deterministic WP function shims for unit tests.
+
 ## [1.2.5] - 2025-09-05
 ### Fixes
 - Deduplicated admin menu registration with canonical slugs and Settings page rendering.

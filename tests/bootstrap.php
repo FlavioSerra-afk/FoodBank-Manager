@@ -1,11 +1,29 @@
 <?php
 declare(strict_types=1);
+
+// Composer + project autoload
+require_once __DIR__ . '/../vendor/autoload.php';
+
+// Load deterministic function shims & stubs
+require_once __DIR__ . '/Support/WPStubs.php';
+require_once __DIR__ . '/Support/ScreenStub.php';
+require_once __DIR__ . '/Support/WPDBStub.php';
+
+// Reset globals before each test run
+$GLOBALS['fbm_test_calls'] = [
+    'add_menu_page'    => [],
+    'add_submenu_page' => [],
+];
+$GLOBALS['fbm_test_screen_id'] = null;
+$GLOBALS['fbm_test_transients'] = [];
+$GLOBALS['fbm_test_current_user_id'] = 0;
+
+// Remove any stale cache file just in case
+$cache = __DIR__ . '/../.phpunit.result.cache';
+if (file_exists($cache)) { @unlink($cache); }
+
 // Minimal bootstrap for pure unit tests (no WordPress).
 ob_start();
-$vendor = __DIR__ . '/../vendor/autoload.php';
-if ( file_exists( $vendor ) ) {
-	require $vendor;
-}
 
 if ( ! defined( 'FBM_KEK_BASE64' ) ) {
 	if ( ! defined( 'SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_KEYBYTES' ) ) {
@@ -27,14 +45,24 @@ if ( ! function_exists( 'wp_salt' ) ) {
 }
 
 if ( ! function_exists( 'wp_json_encode' ) ) {
-	function wp_json_encode( $data ) {
-		return json_encode( $data );
-	}
+        function wp_json_encode( $data ) {
+                return json_encode( $data );
+        }
+}
+
+if ( ! function_exists( 'current_user_can' ) ) {
+        function current_user_can( string $cap ): bool {
+                if ( $cap === 'fb_manage_dashboard' ) {
+                        return (bool) ( $GLOBALS['fbm_can_dashboard'] ?? true );
+                }
+                return true;
+        }
 }
 
 if ( ! function_exists( 'add_query_arg' ) ) {
-        function add_query_arg( $key, $value, string $url = '' ) {
+        function add_query_arg( $key, $value = null, string $url = '' ) {
                 if ( is_array( $key ) ) {
+                        $url = is_string( $value ) ? $value : '';
                         return $url . '?' . http_build_query( $key );
                 }
                 return $url . '?' . urlencode( (string) $key ) . '=' . urlencode( (string) $value );
@@ -99,7 +127,46 @@ if ( ! function_exists( 'absint' ) ) {
 }
 
 if ( ! function_exists( 'wp_kses_post' ) ) {
-	function wp_kses_post( $data ) {
-		return $data;
-	}
+        function wp_kses_post( $data ) {
+                return $data;
+        }
+}
+
+if ( ! function_exists( 'get_transient' ) ) {
+        function get_transient( $key ) {
+                return $GLOBALS['fbm_test_transients'][ $key ] ?? false;
+        }
+}
+if ( ! function_exists( 'set_transient' ) ) {
+        function set_transient( $key, $value, $expiration = 0 ) {
+                $GLOBALS['fbm_test_transients'][ $key ] = $value;
+                return true;
+        }
+}
+
+if ( ! function_exists( 'checked' ) ) {
+        function checked( $a, $b = true ) {
+                return $a === $b ? ' checked="checked"' : '';
+        }
+}
+if ( ! function_exists( 'selected' ) ) {
+        function selected( $a, $b ) {
+                return $a === $b ? ' selected="selected"' : '';
+        }
+}
+if ( ! function_exists( 'number_format_i18n' ) ) {
+        function number_format_i18n( $n ) {
+                return (string) $n;
+        }
+}
+if ( ! function_exists( 'esc_attr__' ) ) {
+        function esc_attr__( string $text, string $domain = 'default' ): string {
+                return $text;
+        }
+}
+
+if ( ! function_exists( 'get_current_user_id' ) ) {
+        function get_current_user_id(): int {
+                return (int) ( $GLOBALS['fbm_test_current_user_id'] ?? 0 );
+        }
 }

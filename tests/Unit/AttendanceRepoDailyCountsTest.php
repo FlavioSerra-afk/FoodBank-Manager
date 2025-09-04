@@ -3,15 +3,12 @@ declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 use FoodBankManager\Attendance\AttendanceRepo;
+use FBM\Tests\Support\WPDBStub;
 
 final class AttendanceRepoDailyCountsTest extends TestCase {
     public function setUp(): void {
         global $wpdb;
-        $wpdb = new class() {
-            public $prefix = 'wp_';
-            public function prepare( $sql, $arg ) { return $sql; }
-            public function get_results( $sql ) { return array(); }
-        };
+        $wpdb = new WPDBStub();
     }
 
     public function testCountsLength(): void {

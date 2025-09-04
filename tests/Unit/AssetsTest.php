@@ -35,24 +35,18 @@ if ( ! function_exists( 'current_user_can' ) ) {
                 return true;
         }
 }
-if ( ! function_exists( 'get_current_screen' ) ) {
-        function get_current_screen() {
-                global $current_screen;
-                return $current_screen;
-        }
-}
 if ( ! defined( 'FBM_URL' ) ) {
         define( 'FBM_URL', '' );
 }
 
 final class AssetsTest extends TestCase {
         protected function setUp(): void {
-                global $fbm_inline_styles, $fbm_test_options, $fbm_enqueued_styles, $fbm_registered_styles, $current_screen;
+                global $fbm_inline_styles, $fbm_test_options, $fbm_enqueued_styles, $fbm_registered_styles;
                 $fbm_inline_styles    = array();
                 $fbm_test_options     = array();
                 $fbm_enqueued_styles  = array();
                 $fbm_registered_styles = array();
-                $current_screen       = null;
+                $GLOBALS['fbm_test_screen_id'] = null;
         }
 
         public function testThemeCssContainsVariables(): void {
@@ -79,20 +73,20 @@ final class AssetsTest extends TestCase {
         }
 
         public function testAdminCssOnlyEnqueuedOnFbmScreens(): void {
-                global $fbm_enqueued_styles, $current_screen;
+                global $fbm_enqueued_styles;
                 $assets = new Assets();
 
-                $current_screen       = (object) array( 'id' => 'dashboard' );
+                $GLOBALS['fbm_test_screen_id'] = 'dashboard';
                 $fbm_enqueued_styles = array();
                 $assets->enqueue_admin();
                 $this->assertNotContains( 'fbm-admin', $fbm_enqueued_styles );
 
-                $current_screen       = (object) array( 'id' => 'toplevel_page_fbm' );
+                $GLOBALS['fbm_test_screen_id'] = 'toplevel_page_fbm';
                 $fbm_enqueued_styles = array();
                 $assets->enqueue_admin();
                 $this->assertContains( 'fbm-admin', $fbm_enqueued_styles );
 
-                $current_screen       = (object) array( 'id' => 'foodbank_page_fbm_database' );
+                $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_database';
                 $fbm_enqueued_styles = array();
                 $assets->enqueue_admin();
                 $this->assertContains( 'fbm-admin', $fbm_enqueued_styles );
