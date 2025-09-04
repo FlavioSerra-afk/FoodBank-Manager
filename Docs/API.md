@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.6 – Attendance P1)
+Docs-Revision: 2025-09-04 (Wave v1.1.7 – Database UX P1)
 # REST API (pcc-fb/v1)
 
 Base namespace: `pcc-fb/v1`. All write endpoints require `X-WP-Nonce` and capabilities.
@@ -48,3 +48,7 @@ Shortcode previews are handled via `admin-post.php` (`fbm_action=shortcode_previ
 
 - Default templates: `applicant_confirmation`, `admin_notification`.
 - Token variables (whitelisted): `{first_name}`, `{last_name}`, `{application_id}`, `{site_name}`, `{appointment_time}`.
+
+## Database Presets & Columns
+
+- Saved filter presets and column preferences on the Database page use nonce-protected admin forms and are not exposed via REST.

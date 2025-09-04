@@ -8,6 +8,7 @@
 
 use FoodBankManager\Security\Helpers;
 use FoodBankManager\Security\Crypto;
+use FoodBankManager\Admin\UsersMeta;
 
 if ( ! defined( 'ABSPATH' ) ) {
 		exit;
@@ -15,9 +16,43 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 <div class="wrap">
 <h1><?php esc_html_e( 'Database', 'foodbank-manager' ); ?></h1>
+<div class="fbm-preset-bar">
+<form method="post" style="display:inline">
+		<input type="hidden" name="fbm_action" value="db_presets_save" />
+		<?php wp_nonce_field( 'fbm_database_db_presets_save' ); ?>
+		<input type="text" name="preset_name" placeholder="<?php esc_attr_e( 'Preset name', 'foodbank-manager' ); ?>" maxlength="50" />
+		<button class="button" type="submit"><?php esc_html_e( 'Save Preset', 'foodbank-manager' ); ?></button>
+</form>
+<form method="get" style="display:inline;margin-left:10px;">
+		<input type="hidden" name="page" value="fbm-database" />
+		<select name="preset">
+				<option value=""><?php esc_html_e( 'Select preset', 'foodbank-manager' ); ?></option>
+				<?php foreach ( $presets as $p ) : ?>
+												<option value="<?php echo esc_attr( $p['name'] ); ?>"
+														<?php selected( $current_preset, $p['name'] ); ?>>
+														<?php echo esc_html( $p['name'] ); ?>
+												</option>
+				<?php endforeach; ?>
+		</select>
+		<button class="button" type="submit"><?php esc_html_e( 'Apply', 'foodbank-manager' ); ?></button>
+</form>
+<form method="post" style="display:inline;margin-left:10px;">
+		<input type="hidden" name="fbm_action" value="db_presets_delete" />
+		<?php wp_nonce_field( 'fbm_database_db_presets_delete' ); ?>
+		<select name="preset_name">
+				<?php foreach ( $presets as $p ) : ?>
+						<option value="<?php echo esc_attr( $p['name'] ); ?>"><?php echo esc_html( $p['name'] ); ?></option>
+				<?php endforeach; ?>
+		</select>
+				<button class="button" type="submit"
+						onclick="return confirm('<?php echo esc_js( __( 'Delete preset?', 'foodbank-manager' ) ); ?>');">
+						<?php esc_html_e( 'Delete', 'foodbank-manager' ); ?>
+				</button>
+</form>
+</div>
 <form method="get">
-	<input type="hidden" name="page" value="fbm-database" />
-	<div class="fbm-filters">
+		<input type="hidden" name="page" value="fbm-database" />
+		<div class="fbm-filters">
 		<label>
 				<?php esc_html_e( 'From', 'foodbank-manager' ); ?>
 				<input type="date" name="date_from" value="<?php echo esc_attr( $filters['date_from'] ?? '' ); ?>" />
@@ -59,18 +94,46 @@ if ( ! defined( 'ABSPATH' ) ) {
 				</label>
 				<?php wp_nonce_field( 'fbm_db_unmask', '_wpnonce' ); ?>
 	<?php endif; ?>
-	<button class="button"><?php esc_html_e( 'Filter', 'foodbank-manager' ); ?></button>
-	</div>
+		<button class="button"><?php esc_html_e( 'Filter', 'foodbank-manager' ); ?></button>
+		</div>
 </form>
+<form method="post" class="fbm-columns" style="margin:10px 0;">
+		<input type="hidden" name="fbm_action" value="db_columns_save" />
+		<?php wp_nonce_field( 'fbm_database_db_columns_save' ); ?>
+		<?php foreach ( UsersMeta::db_column_labels() as $col_id => $label ) : ?>
+				<label class="fbm-column-toggle">
+												<input type="checkbox"
+														name="columns[]"
+														value="<?php echo esc_attr( $col_id ); ?>"
+														<?php checked( in_array( $col_id, $columns, true ) ); ?>
+												/>
+						<?php echo esc_html( $label ); ?>
+				</label>
+		<?php endforeach; ?>
+		<button class="button" type="submit"><?php esc_html_e( 'Save Columns', 'foodbank-manager' ); ?></button>
+</form>
+<?php $col_vis = array_flip( $columns ); ?>
 <table class="wp-list-table widefat fixed striped">
 <thead><tr>
-<th><?php esc_html_e( 'ID', 'foodbank-manager' ); ?></th>
-<th><?php esc_html_e( 'Created', 'foodbank-manager' ); ?></th>
-<th><?php esc_html_e( 'Name', 'foodbank-manager' ); ?></th>
-<th><?php esc_html_e( 'Email', 'foodbank-manager' ); ?></th>
-<th><?php esc_html_e( 'Postcode', 'foodbank-manager' ); ?></th>
-<th><?php esc_html_e( 'Status', 'foodbank-manager' ); ?></th>
-<th><?php esc_html_e( 'Has Files', 'foodbank-manager' ); ?></th>
+<th class="column-id"<?php echo isset( $col_vis['id'] ) ? '' : ' style="display:none"'; ?>><?php esc_html_e( 'ID', 'foodbank-manager' ); ?></th>
+<th class="column-created_at"<?php echo isset( $col_vis['created_at'] ) ? '' : ' style="display:none"'; ?>>
+		<?php esc_html_e( 'Created', 'foodbank-manager' ); ?>
+</th>
+<th class="column-name"<?php echo isset( $col_vis['name'] ) ? '' : ' style="display:none"'; ?>>
+		<?php esc_html_e( 'Name', 'foodbank-manager' ); ?>
+</th>
+<th class="column-email"<?php echo isset( $col_vis['email'] ) ? '' : ' style="display:none"'; ?>>
+		<?php esc_html_e( 'Email', 'foodbank-manager' ); ?>
+</th>
+<th class="column-postcode"<?php echo isset( $col_vis['postcode'] ) ? '' : ' style="display:none"'; ?>>
+		<?php esc_html_e( 'Postcode', 'foodbank-manager' ); ?>
+</th>
+<th class="column-status"<?php echo isset( $col_vis['status'] ) ? '' : ' style="display:none"'; ?>>
+		<?php esc_html_e( 'Status', 'foodbank-manager' ); ?>
+</th>
+<th class="column-has_files"<?php echo isset( $col_vis['has_files'] ) ? '' : ' style="display:none"'; ?>>
+		<?php esc_html_e( 'Has Files', 'foodbank-manager' ); ?>
+</th>
 <th><?php esc_html_e( 'Actions', 'foodbank-manager' ); ?></th>
 </tr></thead>
 <tbody>
@@ -94,13 +157,17 @@ else :
 		$created = get_date_from_gmt( (string) $r['created_at'] );
 		?>
 <tr>
-<td><?php echo esc_html( (string) $r['id'] ); ?></td>
-<td><?php echo esc_html( $created ); ?></td>
-<td><?php echo esc_html( $name ); ?></td>
-<td><?php echo esc_html( $email ); ?></td>
-<td><?php echo esc_html( $postcode ); ?></td>
-<td><?php echo esc_html( (string) $r['status'] ); ?></td>
-<td><?php echo $r['has_files'] ? esc_html__( 'Yes', 'foodbank-manager' ) : esc_html__( 'No', 'foodbank-manager' ); ?></td>
+<td class="column-id"<?php echo isset( $col_vis['id'] ) ? '' : ' style="display:none"'; ?>><?php echo esc_html( (string) $r['id'] ); ?></td>
+<td class="column-created_at"<?php echo isset( $col_vis['created_at'] ) ? '' : ' style="display:none"'; ?>><?php echo esc_html( $created ); ?></td>
+<td class="column-name"<?php echo isset( $col_vis['name'] ) ? '' : ' style="display:none"'; ?>><?php echo esc_html( $name ); ?></td>
+<td class="column-email"<?php echo isset( $col_vis['email'] ) ? '' : ' style="display:none"'; ?>><?php echo esc_html( $email ); ?></td>
+<td class="column-postcode"<?php echo isset( $col_vis['postcode'] ) ? '' : ' style="display:none"'; ?>><?php echo esc_html( $postcode ); ?></td>
+<td class="column-status"<?php echo isset( $col_vis['status'] ) ? '' : ' style="display:none"'; ?>><?php echo esc_html( (string) $r['status'] ); ?></td>
+<td class="column-has_files"<?php echo isset( $col_vis['has_files'] ) ? '' : ' style="display:none"'; ?>>
+		<?php
+		echo $r['has_files'] ? esc_html__( 'Yes', 'foodbank-manager' ) : esc_html__( 'No', 'foodbank-manager' );
+		?>
+</td>
 <td>
 	<a href="
 		<?php
@@ -178,4 +245,15 @@ $base_url    = remove_query_arg( 'paged' );
 		<button class="button" type="submit"><?php esc_html_e( 'Export CSV', 'foodbank-manager' ); ?></button>
 </form>
 <?php endif; ?>
+<script>
+document.querySelectorAll('.fbm-column-toggle input[type="checkbox"]').forEach(function(cb){
+		cb.addEventListener('change', function(){
+				var col = this.value;
+				var display = this.checked ? '' : 'none';
+				document.querySelectorAll('.column-' + col).forEach(function(el){
+						el.style.display = display;
+				});
+		});
+});
+</script>
 </div>

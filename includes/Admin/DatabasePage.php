@@ -12,6 +12,8 @@ namespace FoodBankManager\Admin;
 use FoodBankManager\Database\ApplicationsRepo;
 use FoodBankManager\Exports\CsvExporter;
 use FoodBankManager\Security\Crypto;
+use FoodBankManager\Core\Options;
+use FoodBankManager\Admin\UsersMeta;
 
 /**
  * Database admin page.
@@ -39,14 +41,14 @@ final class DatabasePage {
 
 		$method = isset( $_SERVER['REQUEST_METHOD'] ) ? sanitize_text_field( wp_unslash( (string) $_SERVER['REQUEST_METHOD'] ) ) : '';
 		if ( 'POST' === strtoupper( $method ) ) {
-			$action = isset( $_POST['fbm_action'] ) ? sanitize_key( wp_unslash( $_POST['fbm_action'] ) ) : '';
+				$action = isset( $_POST['fbm_action'] ) ? sanitize_key( wp_unslash( $_POST['fbm_action'] ) ) : '';
 			switch ( $action ) {
 				case 'export_entries':
 					check_admin_referer( 'fbm_export_entries', 'fbm_nonce' );
 					$filters = self::get_filters();
 					$id      = isset( $_POST['id'] ) ? absint( wp_unslash( $_POST['id'] ) ) : 0;
 					if ( $id ) {
-						$filters['id'] = $id;
+								$filters['id'] = $id;
 					}
 					$mask = ! current_user_can( 'fb_view_sensitive' );
 					self::do_export( $filters, $mask );
@@ -57,30 +59,54 @@ final class DatabasePage {
 					self::do_delete( $id );
 					return;
 				case 'export_single':
-					// Legacy single export support.
-					$id = isset( $_POST['id'] ) ? absint( wp_unslash( $_POST['id'] ) ) : 0;
-					check_admin_referer( 'fbm_export_single_' . $id, 'fbm_nonce' );
-					$filters = self::get_filters();
+						// Legacy single export support.
+						$id = isset( $_POST['id'] ) ? absint( wp_unslash( $_POST['id'] ) ) : 0;
+						check_admin_referer( 'fbm_export_single_' . $id, 'fbm_nonce' );
+						$filters = self::get_filters();
 					if ( $id ) {
-						$filters['id'] = $id;
+							$filters['id'] = $id;
 					}
-					$mask = ! current_user_can( 'fb_view_sensitive' );
-					self::do_export( $filters, $mask );
+						$mask = ! current_user_can( 'fb_view_sensitive' );
+						self::do_export( $filters, $mask );
+					return;
+				case 'db_presets_save':
+								check_admin_referer( 'fbm_database_db_presets_save' );
+								$name = isset( $_POST['preset_name'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['preset_name'] ) ) : '';
+								self::handle_preset_save( $name );
+					return;
+				case 'db_presets_delete':
+								check_admin_referer( 'fbm_database_db_presets_delete' );
+								$name = isset( $_POST['preset_name'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['preset_name'] ) ) : '';
+								self::handle_preset_delete( $name );
+					return;
+				case 'db_columns_save':
+								check_admin_referer( 'fbm_database_db_columns_save' );
+								$cols = isset( $_POST['columns'] ) ? array_map( 'sanitize_key', (array) wp_unslash( $_POST['columns'] ) ) : array();
+								self::handle_columns_save( $cols );
 					return;
 			}
 		}
 
-		// Support legacy `view` query param.
-		$query_string = isset( $_SERVER['QUERY_STRING'] ) ? sanitize_text_field( wp_unslash( (string) $_SERVER['QUERY_STRING'] ) ) : '';
-		parse_str( $query_string, $query_vars );
+				// Support legacy `view` query param.
+				$query_string = isset( $_SERVER['QUERY_STRING'] ) ? sanitize_text_field( wp_unslash( (string) $_SERVER['QUERY_STRING'] ) ) : '';
+				parse_str( $query_string, $query_vars );
 		$view_id = isset( $query_vars['view'] ) ? absint( $query_vars['view'] ) : 0;
 		if ( $view_id ) {
 			self::render_view( $view_id );
 			return;
 		}
 
-		$filters = self::get_filters( $query_vars );
-		self::render_list( $filters );
+				$preset_name = isset( $query_vars['preset'] ) ? sanitize_text_field( $query_vars['preset'] ) : '';
+		if ( $preset_name ) {
+				$preset_query = self::get_preset_query( $preset_name );
+			if ( $preset_query ) {
+						$query_vars = array_merge( $preset_query, $query_vars );
+			}
+		}
+				$filters = self::get_filters( $query_vars );
+				$presets = Options::get_db_filter_presets();
+				$columns = UsersMeta::get_db_columns( get_current_user_id() );
+				self::render_list( $filters, $presets, $preset_name, $columns );
 	}
 
 	/**
@@ -92,12 +118,22 @@ final class DatabasePage {
 	 *
 	 * @return void
 	 */
-	private static function render_list( array $filters ): void {
-		$data     = ApplicationsRepo::list( $filters );
-		$rows     = $data['rows'];
-		$total    = $data['total'];
-		$page     = $filters['page'];
-		$per_page = $filters['per_page'];
+		/**
+		 * Render list view.
+		 *
+		 * @param array<string,mixed>                                      $filters      Filters.
+		 * @param array<int,array{name:string,query:array<string,string>}> $presets Presets.
+		 * @param string                                                   $preset_name  Current preset name.
+		 * @param array<int,string>                                        $columns      Visible columns.
+		 *
+		 * @return void
+		 */
+	private static function render_list( array $filters, array $presets, string $preset_name, array $columns ): void {
+			$data     = ApplicationsRepo::list( $filters );
+			$rows     = $data['rows'];
+			$total    = $data['total'];
+			$page     = $filters['page'];
+			$per_page = $filters['per_page'];
 
 		$can_sensitive = current_user_can( 'fb_view_sensitive' );
 		$unmask        = false;
@@ -108,7 +144,9 @@ final class DatabasePage {
 			$unmask = $nonce && wp_verify_nonce( $nonce, 'fbm_db_unmask' );
 		}
 
-		require FBM_PATH . 'templates/admin/database.php';
+				$current_preset = $preset_name;
+				$columns        = $columns;
+				require FBM_PATH . 'templates/admin/database.php';
 	}
 
 	/**
@@ -121,12 +159,108 @@ final class DatabasePage {
 	 * @return void
 	 */
 	private static function render_view( int $id ): void {
-		$entry = ApplicationsRepo::get( $id );
+			$entry = ApplicationsRepo::get( $id );
 		if ( ! $entry ) {
-			wp_die( esc_html__( 'Entry not found.', 'foodbank-manager' ) );
+				wp_die( esc_html__( 'Entry not found.', 'foodbank-manager' ) );
 		}
-		$can_sensitive = current_user_can( 'fb_view_sensitive' );
-		require FBM_PATH . 'templates/admin/database-view.php';
+			$can_sensitive = current_user_can( 'fb_view_sensitive' );
+			require FBM_PATH . 'templates/admin/database-view.php';
+	}
+
+		/**
+		 * Save a filter preset.
+		 *
+		 * @param string $name Preset name.
+		 *
+		 * @return void
+		 */
+	private static function handle_preset_save( string $name ): void {
+		$name = trim( $name );
+		if ( '' === $name || strlen( $name ) > 50 ) {
+					self::redirect_list( array( 'preset_error' => 1 ) );
+		}
+		$presets = Options::get_db_filter_presets();
+		foreach ( $presets as $p ) {
+			if ( strtolower( $p['name'] ) === strtolower( $name ) ) {
+				self::redirect_list( array( 'preset_error' => 1 ) );
+			}
+		}
+		$filters    = self::get_filters();
+		$allowed    = Options::db_filter_allowed_keys();
+		$query_save = array();
+		foreach ( $allowed as $k ) {
+			if ( isset( $filters[ $k ] ) && '' !== $filters[ $k ] && null !== $filters[ $k ] ) {
+					$query_save[ $k ] = $filters[ $k ];
+			}
+		}
+		$presets[] = array(
+			'name'  => $name,
+			'query' => $query_save,
+		);
+		if ( count( $presets ) > 20 ) {
+				$presets = array_slice( $presets, -20 );
+		}
+		Options::set_db_filter_presets( $presets );
+		self::redirect_list( array( 'preset_saved' => 1 ) );
+	}
+
+		/**
+		 * Delete a filter preset.
+		 *
+		 * @param string $name Preset name.
+		 *
+		 * @return void
+		 */
+	private static function handle_preset_delete( string $name ): void {
+		$presets = Options::get_db_filter_presets();
+		$presets = array_filter(
+			$presets,
+			static function ( $p ) use ( $name ) {
+					return strtolower( $p['name'] ) !== strtolower( $name );
+			}
+		);
+		Options::set_db_filter_presets( array_values( $presets ) );
+		self::redirect_list( array( 'preset_deleted' => 1 ) );
+	}
+
+		/**
+		 * Save column preferences.
+		 *
+		 * @param array<int,string> $cols Column IDs.
+		 *
+		 * @return void
+		 */
+	private static function handle_columns_save( array $cols ): void {
+		UsersMeta::set_db_columns( get_current_user_id(), $cols );
+		self::redirect_list( array( 'columns_saved' => 1 ) );
+	}
+
+		/**
+		 * Retrieve preset query by name.
+		 *
+		 * @param string $name Preset name.
+		 * @return array<string,string>
+		 */
+	private static function get_preset_query( string $name ): array {
+			$presets = Options::get_db_filter_presets();
+		foreach ( $presets as $p ) {
+			if ( strtolower( $p['name'] ) === strtolower( $name ) ) {
+					return $p['query'];
+			}
+		}
+			return array();
+	}
+
+		/**
+		 * Redirect back to list view.
+		 *
+		 * @param array<string,mixed> $args Args.
+		 * @return void
+		 */
+	private static function redirect_list( array $args = array() ): void {
+			$url = add_query_arg( $args, menu_page_url( 'fbm-database', false ) );
+			wp_safe_redirect( esc_url_raw( $url ) );
+			exit;
 	}
 
 	/**

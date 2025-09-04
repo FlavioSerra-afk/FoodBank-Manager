@@ -114,10 +114,11 @@ class Options {
                                 'frontend' => self::theme_defaults(),
                                 'admin'    => self::theme_defaults(),
                         ),
-                        'encryption' => array(),
+                       'encryption' => array(),
                        'form_presets_custom' => array(),
-                );
-        }
+                       'db_filter_presets'   => array(),
+               );
+       }
 
 		/**
 		 * Default theme values.
@@ -436,6 +437,108 @@ class Options {
        public static function set_form_presets_custom( array $presets ): bool {
                $clean = FormPresets::sanitize_all( $presets );
                return self::set( 'form_presets_custom', $clean );
+       }
+
+       /**
+        * Allowed query keys for DB presets.
+        *
+        * @return array<int,string>
+        */
+       public static function db_filter_allowed_keys(): array {
+               return array(
+                       'status',
+                       'form_id',
+                       'date_from',
+                       'date_to',
+                       'search',
+                       'orderby',
+                       'order',
+                       'per_page',
+                       'page',
+                       'has_file',
+                       'consent',
+               );
+       }
+
+       /**
+        * Get saved DB filter presets.
+        *
+        * @return array<int,array{name:string,query:array<string,string>}> Presets.
+        */
+       public static function get_db_filter_presets(): array {
+               $raw = self::get( 'db_filter_presets', array() );
+               if ( ! is_array( $raw ) ) {
+                       return array();
+               }
+               $allowed = self::db_filter_allowed_keys();
+               $out     = array();
+               foreach ( $raw as $preset ) {
+                       if ( ! is_array( $preset ) ) {
+                               continue;
+                       }
+                       $name  = sanitize_text_field( (string) ( $preset['name'] ?? '' ) );
+                       $query = array();
+                       if ( isset( $preset['query'] ) && is_array( $preset['query'] ) ) {
+                               foreach ( $preset['query'] as $k => $v ) {
+                                       $k = sanitize_key( (string) $k );
+                                       if ( ! in_array( $k, $allowed, true ) ) {
+                                               continue;
+                                       }
+                                       $query[ $k ] = sanitize_text_field( (string) $v );
+                               }
+                       }
+                       if ( '' !== $name && ! empty( $query ) ) {
+                               $out[] = array(
+                                       'name'  => $name,
+                                       'query' => $query,
+                               );
+                       }
+               }
+               return $out;
+       }
+
+       /**
+        * Save DB filter presets.
+        *
+        * @param array<int,array<string,mixed>> $presets Presets.
+        * @return bool
+        */
+       public static function set_db_filter_presets( array $presets ): bool {
+               $allowed = self::db_filter_allowed_keys();
+               $clean   = array();
+               $names   = array();
+               foreach ( $presets as $preset ) {
+                       if ( ! is_array( $preset ) ) {
+                               continue;
+                       }
+                       $name = trim( sanitize_text_field( (string) ( $preset['name'] ?? '' ) ) );
+                       if ( '' === $name || strlen( $name ) > 50 ) {
+                               continue;
+                       }
+                       $name_lc = strtolower( $name );
+                       if ( in_array( $name_lc, $names, true ) ) {
+                               continue;
+                       }
+                       $query = array();
+                       if ( isset( $preset['query'] ) && is_array( $preset['query'] ) ) {
+                               foreach ( $preset['query'] as $k => $v ) {
+                                       $k = sanitize_key( (string) $k );
+                                       if ( ! in_array( $k, $allowed, true ) ) {
+                                               continue;
+                                       }
+                                       $query[ $k ] = sanitize_text_field( (string) $v );
+                               }
+                       }
+                       $clean[] = array(
+                               'name'  => $name,
+                               'query' => $query,
+                       );
+                       $names[] = $name_lc;
+                       if ( count( $clean ) >= 20 ) {
+                               break;
+                       }
+               }
+               return self::set( 'db_filter_presets', $clean );
        }
 
        /**

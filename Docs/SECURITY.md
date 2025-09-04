@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.6 – Attendance P1)
+Docs-Revision: 2025-09-04 (Wave v1.1.7 – Database UX P1)
 # Security Policy — PCC FoodBank Manager
 
 We take security seriously. Please follow the guidelines below for reporting vulnerabilities.
@@ -24,6 +24,7 @@ We aim to acknowledge reports **within 2 working days**.
 - Admin QR check-in URLs include only IDs + REST nonces and require `fb_manage_attendance`.
 - Admin shortcode previews enforce capability checks, nonces, attribute whitelists with `mask_sensitive=true`, and `wp_kses_post` filtering.
 - Forms presets are sanitized server-side; unknown preset IDs fall back to a minimal safe form without exposing errors to regular users.
+- Database filter presets and per-user column selections require `fb_manage_database`, use nonces, and whitelist allowed query/column keys.
 
 ## 🔁 Coordinated Disclosure
 - We will validate, develop a fix, and prepare a security release.
