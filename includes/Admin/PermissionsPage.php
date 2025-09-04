@@ -215,34 +215,42 @@ final class PermissionsPage {
 	 * Handle permissions import.
 	 */
 	private function handle_import(): void {
+			check_admin_referer( 'fbm_permissions_perm_import' );
 			$json = '';
-		if ( ! empty( $_FILES['import_file']['tmp_name'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
-						$json = (string) file_get_contents( (string) $_FILES['import_file']['tmp_name'] ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.NonceVerification.Missing
+		if ( ! empty( $_FILES['import_file']['tmp_name'] ) ) {
+				$tmp = sanitize_text_field( wp_unslash( $_FILES['import_file']['tmp_name'] ) );
+			if ( '' !== $tmp && is_readable( $tmp ) ) {
+				require_once ABSPATH . 'wp-admin/includes/file.php';
+				\WP_Filesystem();
+				global $wp_filesystem;
+				$json = (string) $wp_filesystem->get_contents( $tmp );
+			}
 		} else {
-				$json = (string) filter_input( INPUT_POST, 'json', FILTER_UNSAFE_RAW ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				$json = (string) filter_input( INPUT_POST, 'json', FILTER_UNSAFE_RAW );
+				$json = sanitize_text_field( $json );
 		}
 			$data = json_decode( $json, true );
 		if ( ! is_array( $data ) ) {
 				$this->redirect_with_notice( 'invalid_payload', 'error' );
 		}
 
-			$known                     = $this->known_caps();
-			$roles                     = is_array( $data['roles'] ?? null ) ? $data['roles'] : array();
-						$overrides_raw = is_array( $data['overrides'] ?? null ) ? $data['overrides'] : array();
-						$dry_run       = isset( $_POST['dry_run'] ) && (bool) $_POST['dry_run']; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$known         = $this->known_caps();
+			$roles         = is_array( $data['roles'] ?? null ) ? $data['roles'] : array();
+			$overrides_raw = is_array( $data['overrides'] ?? null ) ? $data['overrides'] : array();
+			$dry_run       = (bool) filter_input( INPUT_POST, 'dry_run', FILTER_VALIDATE_BOOLEAN );
 
 			$roles_option = array();
 		foreach ( $roles as $role => $caps_list ) {
-				$role     = sanitize_key( (string) $role );
-				$role_obj = get_role( $role );
+			$role     = sanitize_key( (string) $role );
+			$role_obj = get_role( $role );
 			if ( ! $role_obj || ! is_array( $caps_list ) ) {
-					continue;
+				continue;
 			}
-				$clean = array();
+			$clean = array();
 			foreach ( $caps_list as $cap ) {
-					$cap = sanitize_key( (string) $cap );
+				$cap = sanitize_key( (string) $cap );
 				if ( in_array( $cap, $known, true ) ) {
-						$clean[ $cap ] = true;
+					$clean[ $cap ] = true;
 				}
 			}
 			if ( ! $dry_run ) {
@@ -250,49 +258,49 @@ final class PermissionsPage {
 					if ( isset( $clean[ $cap ] ) ) {
 						$role_obj->add_cap( $cap );
 					} else {
-							$role_obj->remove_cap( $cap );
+						$role_obj->remove_cap( $cap );
 					}
 				}
 			}
-				$roles_option[ $role ] = array_keys( $clean );
+			$roles_option[ $role ] = array_keys( $clean );
 		}
 
 			$override_count = 0;
 		foreach ( $overrides_raw as $user_key => $caps_list ) {
 			if ( is_numeric( $user_key ) ) {
-					$user_id = absint( $user_key );
-					$user    = get_user_by( 'id', $user_id );
+				$user_id = absint( $user_key );
+				$user    = get_user_by( 'id', $user_id );
 			} else {
-					$user    = get_user_by( 'email', sanitize_email( (string) $user_key ) );
-					$user_id = $user ? $user->ID : 0;
+				$user    = get_user_by( 'email', sanitize_email( (string) $user_key ) );
+				$user_id = $user ? $user->ID : 0;
 			}
 			if ( ! $user || ! is_array( $caps_list ) ) {
-					continue;
+				continue;
 			}
-				$clean = array();
+			$clean = array();
 			foreach ( $caps_list as $cap ) {
-					$cap = sanitize_key( (string) $cap );
+				$cap = sanitize_key( (string) $cap );
 				if ( in_array( $cap, $known, true ) ) {
-						$clean[] = $cap;
+					$clean[] = $cap;
 				}
 			}
 			if ( ! $dry_run ) {
-					UsersMeta::set_user_caps( $user_id, $clean );
+				UsersMeta::set_user_caps( $user_id, $clean );
 			}
-				++$override_count;
+			++$override_count;
 		}
 
 		if ( ! $dry_run ) {
-				Options::update( 'permissions_roles', $roles_option );
-				Roles::ensure_admin_caps();
-				$this->redirect_with_notice(
-					'imported',
-					'success',
-					array(
-						'roles' => (string) count( $roles_option ),
-						'users' => (string) $override_count,
-					)
-				);
+			Options::update( 'permissions_roles', $roles_option );
+			Roles::ensure_admin_caps();
+			$this->redirect_with_notice(
+				'imported',
+				'success',
+				array(
+					'roles' => (string) count( $roles_option ),
+					'users' => (string) $override_count,
+				)
+			);
 		}
 			$this->redirect_with_notice(
 				'dry_run',
@@ -328,15 +336,16 @@ final class PermissionsPage {
 		 * Add or update a per-user override.
 		 */
 	private function handle_user_override_add(): void {
-				$user_id = absint( $_POST['user_id'] ?? 0 ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-				$caps    = isset( $_POST['caps'] ) && is_array( $_POST['caps'] ) ? (array) wp_unslash( $_POST['caps'] ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+				check_admin_referer( 'fbm_permissions_perm_user_override_add' );
+				$user_id  = isset( $_POST['user_id'] ) ? absint( $_POST['user_id'] ) : 0;
+				$caps_raw = filter_input( INPUT_POST, 'caps', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY ) ?? array();
 		if ( $user_id <= 0 ) {
 				$this->redirect_with_notice( 'invalid_payload', 'error' );
 		}
+			$caps  = array_map( 'sanitize_key', $caps_raw );
 			$clean = array();
 			$known = $this->known_caps();
 		foreach ( $caps as $cap ) {
-				$cap = sanitize_key( (string) $cap );
 			if ( in_array( $cap, $known, true ) ) {
 					$clean[] = $cap;
 			}
@@ -349,7 +358,8 @@ final class PermissionsPage {
 		 * Remove per-user override.
 		 */
 	private function handle_user_override_remove(): void {
-				$user_id = absint( $_POST['user_id'] ?? 0 ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			check_admin_referer( 'fbm_permissions_perm_user_override_remove' );
+			$user_id = isset( $_POST['user_id'] ) ? absint( $_POST['user_id'] ) : 0;
 		if ( $user_id <= 0 ) {
 				$this->redirect_with_notice( 'invalid_payload', 'error' );
 		}
