@@ -26,6 +26,15 @@ class Templates {
 		'appointment_time',
 	);
 
+		/**
+		 * Get allowed token placeholders.
+		 *
+		 * @return string[]
+		 */
+	public static function tokens(): array {
+			return self::TOKEN_WHITELIST;
+	}
+
 	/**
 	 * Default templates.
 	 *
