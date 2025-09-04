@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.8 – Design & Theme)
+Docs-Revision: 2025-09-04 (Wave v1.1.9 – Permissions UX)
 # FoodBank Manager — Architecture
 
 ## Overview
@@ -40,7 +40,7 @@ A secure, privacy-first WordPress plugin for managing Food Bank applicant intake
 - **REST:** namespace `pcc-fb/v1`; endpoints for attendance check-in, no-show, timeline, void/unvoid/note.
  - Admin Attendance page generates REST-nonce QR check-in URLs (no PII) and an override reason form.
 - **Security:** libsodium/XChaCha20-Poly1305 envelope encryption (`FBM_KEK_BASE64`), `sodium_compat` fallback; masking helpers; no PII in logs.
-- **Permissions:** central caps list, Administrator guarantee, role mapping and per-user overrides via `user_has_cap` filter (`fbm_user_caps`).
+- **Permissions:** central caps list, Administrator guarantee, role mapping and per-user overrides (`fbm_user_caps`) with JSON export/import (Dry Run) and reset tooling.
 - **AttendanceRepo:** database access layer for attendance; all queries use `$wpdb->prepare()` with strict placeholders, mask PII by default, and have unit tests covering check-in, no-show, void/unvoid, and timeline SQL injection edges.
 - **Theme system:** global CSS variables for primary colour, density, font, dark mode default and optional custom CSS (sanitised) applied across admin and front-end.
 

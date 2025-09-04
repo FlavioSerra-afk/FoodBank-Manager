@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.8 – Design & Theme)
+Docs-Revision: 2025-09-04 (Wave v1.1.9 – Permissions UX)
 # FoodBank Manager — Product Requirements Document (PRD)
 
 **Repo file:** `Docs/PRD-foodbank-manager.md`  
@@ -125,8 +125,11 @@ Roles map to WordPress **capabilities** (granular; see §10 Security).
 
 **Permissions tab — Acceptance Criteria**
 - Admins can map caps to roles (except Administrator which is fixed).
-- Admins can set per-user overrides.
-- Import/Export and Reset actions exist with nonces and warnings.
+- Admins can manage per-user overrides via a searchable table with add/remove rows.
+- Export downloads a JSON of role mappings and per-user overrides.
+- Import accepts JSON (file or paste) with optional Dry Run preview; caps validated against `Capabilities::all()`.
+- Reset restores default roles and clears per-user overrides.
+- All actions use nonces and safe redirects.
 - **Attendance** — see detailed spec below.
 
 #### Attendance (Admin Tab)

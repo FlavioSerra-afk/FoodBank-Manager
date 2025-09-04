@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.9] - 2025-09-04
+### Features
+- Permissions admin page: JSON export/import (Dry Run), per-user overrides table, and Reset.
+### Docs
+- Docs revised for Permissions UX (Wave v1.1.9).
+
 ## [1.1.8] - 2025-09-04
 ### Features
 - Design & Theme settings with primary colour, density, font, dark mode default and optional custom CSS applied via CSS variables.

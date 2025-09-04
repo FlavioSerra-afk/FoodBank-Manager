@@ -5,7 +5,11 @@ declare(strict_types=1);
 namespace FoodBankManager\Auth;
 
 final class Capabilities {
-    /** @return string[] */
+    /**
+     * List of plugin capabilities.
+     *
+     * @return string[]
+     */
     public static function all(): array {
         return [
             'fb_manage_dashboard',

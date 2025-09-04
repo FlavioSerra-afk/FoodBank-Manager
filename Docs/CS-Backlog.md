@@ -1,9 +1,8 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.8 – Design & Theme)
+Docs-Revision: 2025-09-04 (Wave v1.1.9 – Permissions UX)
 Strict (cleaned):
 
 includes/Admin/EmailsPage.php
 includes/Admin/Menu.php
-includes/Admin/PermissionsPage.php
 includes/Admin/DatabasePage.php
 includes/Exports/CsvExporter.php
 includes/Attendance/AttendanceRepo.php
