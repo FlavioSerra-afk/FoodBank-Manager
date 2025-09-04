@@ -1,8 +1,6 @@
 # PHPCS Ignores & Suppressed Issues Dashboard
 
-Docs-Revision: 2025-09-04 (Wave v1.2.3-fix)
-
-_Generated: 2025-09-04 17:55:48Z
+_Generated: 2025-09-04 18:29:54Z
 
 This report shows which issues are currently suppressed via `phpcs:ignore` and what would fail if annotations were disabled.
 

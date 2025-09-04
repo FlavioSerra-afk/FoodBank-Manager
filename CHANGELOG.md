@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.2.5] - 2025-09-05
+### Fixes
+- Deduplicated admin menu registration with canonical slugs and Settings page rendering.
+- Screen-gated assets and notices with unified `.fbm-admin` wrappers.
+- Diagnostics now checks menu slugs and asset gating.
+
 ## [1.2.4] - 2025-09-05
 ### Docs
 - Docs revised for Strict Guard Green (Wave v1.2.4).

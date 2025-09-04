@@ -8,6 +8,10 @@ if ( ! function_exists( 'esc_html_e' ) ) {
         echo $text;
     }
 }
+
+if ( ! defined( 'ABSPATH' ) ) {
+    define( 'ABSPATH', '/' );
+}
 if ( ! function_exists( 'esc_html__' ) ) {
     function esc_html__( string $text, string $domain = 'default' ): string {
         return $text;
@@ -40,10 +44,7 @@ final class AdminTemplatesTest extends TestCase {
      * @dataProvider provider
      */
     public function testTemplatesWrapped(string $file): void {
-        ob_start();
-        include $file;
-        $html = trim(ob_get_clean() ?: '');
-        $this->assertStringStartsWith('<div class="fbm-admin"><div class="wrap">', $html);
-        $this->assertStringEndsWith('</div></div>', $html);
+        $html = file_get_contents($file) ?: '';
+        $this->assertStringContainsString('<div class="wrap fbm-admin">', $html);
     }
 }

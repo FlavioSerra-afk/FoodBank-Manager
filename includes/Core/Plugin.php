@@ -11,12 +11,14 @@ use FoodBankManager\Http\FormSubmitController;
 use FoodBankManager\Http\DashboardExportController;
 use FoodBankManager\Core\Options;
 use FoodBankManager\Admin\ShortcodesPage;
+use FoodBankManager\Core\Screen;
 
 final class Plugin {
 
     public const FBM_VERSION = '1.2.3';
 
         private static ?Plugin $instance = null;
+        private static bool $booted = false;
 
         /**
          * Get singleton instance.
@@ -37,11 +39,10 @@ final class Plugin {
          * Boot the plugin.
          */
         public static function boot(): void {
-                static $booted = false;
-                if ( $booted ) {
+                if ( self::$booted ) {
                         return;
                 }
-                $booted = true;
+                self::$booted = true;
                 Options::boot();
                 add_action(
                         'init',
@@ -55,7 +56,7 @@ final class Plugin {
                 if ( is_admin() ) {
                         add_action( 'admin_init', [\FoodBankManager\Auth\Roles::class, 'ensure_admin_caps'], 5 );
                         \FoodBankManager\Admin\Notices::boot();
-                        \FoodBankManager\Admin\Menu::register();
+                        add_action( 'admin_menu', [\FoodBankManager\Admin\Menu::class, 'register'], 9 );
                         add_action( 'load-foodbank_page_fbm_database', [\FoodBankManager\Admin\DatabasePage::class, 'route'] );
                         add_action( 'load-foodbank_page_fbm_attendance', [\FoodBankManager\Admin\AttendancePage::class, 'route'] );
                         add_action( 'load-foodbank_page_fbm_permissions', [\FoodBankManager\Admin\PermissionsPage::class, 'route'] );
@@ -77,8 +78,7 @@ final class Plugin {
                                         add_action(
                                                 'admin_notices',
                                                 static function (): void {
-                                                        $s = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-                                                        if ( ! $s || ( strpos( $s->id, 'toplevel_page_fbm' ) !== 0 && strpos( $s->id, 'foodbank_page_fbm_' ) !== 0 ) ) {
+                                                        if ( ! Screen::is_fbm_screen() ) {
                                                                 return;
                                                         }
                                                         echo '<div class="notice notice-warning"><p>' . esc_html__( 'FoodBank Manager: Encryption key (FBM_KEK_BASE64) not set. Some features are degraded.', 'foodbank-manager' ) . '</p></div>';
@@ -90,8 +90,7 @@ final class Plugin {
                                         add_action(
                                                 'admin_notices',
                                                 static function (): void {
-                                                        $s = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-                                                        if ( ! $s || ( strpos( $s->id, 'toplevel_page_fbm' ) !== 0 && strpos( $s->id, 'foodbank_page_fbm_' ) !== 0 ) ) {
+                                                        if ( ! Screen::is_fbm_screen() ) {
                                                                 return;
                                                         }
                                                         echo '<div class="notice notice-error"><p>' . esc_html__( 'FoodBank Manager: From email is not configured.', 'foodbank-manager' ) . '</p></div>';
@@ -106,8 +105,7 @@ final class Plugin {
                                                 add_action(
                                                         'admin_notices',
                                                         static function (): void {
-                                                                $s = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-                                                                if ( ! $s || ( strpos( $s->id, 'toplevel_page_fbm' ) !== 0 && strpos( $s->id, 'foodbank_page_fbm_' ) !== 0 ) ) {
+                                                                if ( ! Screen::is_fbm_screen() ) {
                                                                         return;
                                                                 }
                                                                 echo '<div class="notice notice-warning"><p>' . esc_html__( 'FoodBank Manager: CAPTCHA keys are missing.', 'foodbank-manager' ) . '</p></div>';

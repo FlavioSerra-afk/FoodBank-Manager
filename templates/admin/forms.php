@@ -9,14 +9,14 @@
 namespace FoodBankManager\Admin;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit;
+		exit;
 }
 // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom plugin capability.
 if ( ! current_user_can( 'fb_manage_forms' ) ) {
-		wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ), '', array( 'response' => 403 ) );
+				wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ), '', array( 'response' => 403 ) );
 }
 ?>
-<div class="fbm-admin"><div class="wrap">
+<div class="wrap fbm-admin">
 		<h1><?php \esc_html_e( 'Forms', 'foodbank-manager' ); ?></h1>
 		<table class="wp-list-table widefat fixed striped">
 				<thead>
@@ -65,4 +65,4 @@ btn.textContent = '<?php echo esc_js( __( 'Copied', 'foodbank-manager' ) ); ?>';
 });
 });
 </script>
-</div></div>
+</div>

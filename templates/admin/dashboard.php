@@ -18,7 +18,7 @@ if ( ! current_user_can( 'fb_manage_dashboard' ) && ! current_user_can( 'manage_
         wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ) );
 }
 ?>
-<div class="fbm-admin"><div class="wrap">
+<div class="wrap fbm-admin">
                 <h1><?php \esc_html_e( 'Dashboard', 'foodbank-manager' ); ?></h1>
                 <p><?php \esc_html_e( 'Coming soon.', 'foodbank-manager' ); ?></p>
-</div></div>
+</div>
