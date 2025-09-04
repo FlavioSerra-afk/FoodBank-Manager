@@ -11,7 +11,6 @@ namespace FoodBankManager\Admin;
 
 use FoodBankManager\Auth\Roles;
 use FoodBankManager\Core\Options;
-use FoodBankManager\Admin\Menu;
 
 /**
  * Diagnostics admin page.
@@ -99,13 +98,10 @@ class DiagnosticsPage {
 	 */
 	private static function repair_caps(): void {
 				Roles::install();
-				Roles::ensure_admin_caps();
-		if ( function_exists( 'add_menu_page' ) ) {
-				Menu::register();
-		}
+								Roles::ensure_admin_caps();
 
-				$url = add_query_arg( array( 'notice' => 'repaired' ), menu_page_url( 'fbm_diagnostics', false ) );
-				wp_safe_redirect( esc_url_raw( $url ), 303 );
-				exit;
+								$url = add_query_arg( array( 'notice' => 'repaired' ), menu_page_url( 'fbm_diagnostics', false ) );
+								wp_safe_redirect( esc_url_raw( $url ), 303 );
+								exit;
 	}
 }

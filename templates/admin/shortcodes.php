@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 ?>
-<div class="fbm-admin"><div class="wrap">
+<div class="wrap fbm-admin">
 <h1><?php esc_html_e( 'Shortcodes', 'foodbank-manager' ); ?></h1>
 <form method="post" id="fbm-shortcodes-form">
 	<?php wp_nonce_field( 'fbm_shortcodes_preview', '_wpnonce' ); ?>
@@ -111,4 +111,4 @@ if(FBM_CURRENT.tag){
 	buildAttrs(FBM_CURRENT.tag);
 }
 </script>
-</div></div>
+</div>

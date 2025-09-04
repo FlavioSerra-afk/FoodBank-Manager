@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FoodBankManager\Core;
 
 use FoodBankManager\Core\Options;
+use FoodBankManager\Core\Screen;
 use function get_post;
 use function has_shortcode;
 use function is_singular;
@@ -28,15 +29,15 @@ class Assets {
         }
 
         public function enqueue_admin(): void {
-                if ( ! self::is_fbm_screen() ) {
+                if ( ! Screen::is_fbm_screen() ) {
                         return;
                 }
-                $screen = get_current_screen();
+                $screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
                 wp_register_style( 'fbm-admin', FBM_URL . 'assets/css/admin.css', array(), Plugin::FBM_VERSION );
                 wp_add_inline_style( 'fbm-admin', self::theme_css() );
                 wp_enqueue_style( 'fbm-admin' );
 
-                if ( $screen->id === 'foodbank_page_fbm_attendance' && current_user_can( 'fb_manage_attendance' ) ) {
+                if ( $screen && $screen->id === 'foodbank_page_fbm_attendance' && current_user_can( 'fb_manage_attendance' ) ) {
                         wp_enqueue_script( 'fbm-qrcode', FBM_URL . 'assets/js/qrcode.min.js', array(), Plugin::FBM_VERSION, true );
                 }
         }
@@ -66,17 +67,4 @@ class Assets {
                 return $css;
         }
 
-        /**
-         * Check if current screen belongs to FBM.
-         */
-        private static function is_fbm_screen(): bool {
-                if ( ! function_exists( 'get_current_screen' ) ) {
-                        return false;
-                }
-                $s = get_current_screen();
-                if ( ! $s || empty( $s->id ) ) {
-                        return false;
-                }
-                return str_starts_with( $s->id, 'toplevel_page_fbm' ) || str_starts_with( $s->id, 'foodbank_page_fbm_' );
-        }
 }

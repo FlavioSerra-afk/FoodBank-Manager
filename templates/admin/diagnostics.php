@@ -32,9 +32,9 @@ foreach ( \FoodBankManager\Admin\Menu::slugs() as $slug ) {
 }
 $slugs_ok   = empty( $missing_slugs );
 $screen     = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-$gating_ok  = $screen && ( str_starts_with( $screen->id, 'toplevel_page_fbm' ) || str_starts_with( $screen->id, 'foodbank_page_fbm_' ) );
+$gating_ok  = \FoodBankManager\Core\Screen::is_fbm_screen();
 ?>
-<div class="fbm-admin"><div class="wrap">
+<div class="wrap fbm-admin">
     <h1><?php esc_html_e( 'Diagnostics', 'foodbank-manager' ); ?></h1>
     <?php if ( 'sent' === $notice ) : ?>
         <div class="notice notice-success"><p><?php esc_html_e( 'Test email sent.', 'foodbank-manager' ); ?></p></div>
@@ -113,4 +113,4 @@ $gating_ok  = $screen && ( str_starts_with( $screen->id, 'toplevel_page_fbm' ) |
         <input type="hidden" name="fbm_action" value="repair_caps" />
         <p><button type="submit" class="button"><?php esc_html_e( 'Repair Capabilities', 'foodbank-manager' ); ?></button></p>
     </form>
-</div></div>
+</div>

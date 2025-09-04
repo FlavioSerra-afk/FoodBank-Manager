@@ -46,23 +46,25 @@ final class Menu {
 	}
 
 		/**
-		 * Register admin menus.
+		 * Whether menus have been registered.
 		 *
-		 * @since 0.1.x
-		 *
-		 * @return void
+		 * @var bool
 		 */
+	private static bool $registered = false;
+
+				/**
+				 * Register admin menus.
+				 *
+				 * @since 0.1.x
+				 *
+				 * @return void
+				 */
 	public static function register(): void {
-			static $registered = false;
-		if ( $registered ) {
+		if ( self::$registered ) {
 				return;
 		}
-		if ( current_action() !== 'admin_menu' ) {
-				add_action( 'admin_menu', array( self::class, __FUNCTION__ ) );
-				return;
-		}
-			$registered  = true;
-			$parent_slug = 'fbm';
+			self::$registered = true;
+			$parent_slug      = 'fbm';
 
 			add_menu_page(
 				esc_html__( 'FoodBank', 'foodbank-manager' ),
@@ -74,95 +76,95 @@ final class Menu {
 				58
 			);
 
-			add_submenu_page(
-				$parent_slug,
-				esc_html__( 'Dashboard', 'foodbank-manager' ),
-				esc_html__( 'Dashboard', 'foodbank-manager' ),
-				self::CAP_DASHBOARD,
-				$parent_slug,
-				array( self::class, 'dashboard' )
-			);
+		add_submenu_page(
+			$parent_slug,
+			esc_html__( 'Dashboard', 'foodbank-manager' ),
+			esc_html__( 'Dashboard', 'foodbank-manager' ),
+			self::CAP_DASHBOARD,
+			$parent_slug,
+			array( self::class, 'dashboard' )
+		);
 
-			add_submenu_page(
-				$parent_slug,
-				esc_html__( 'Attendance', 'foodbank-manager' ),
-				esc_html__( 'Attendance', 'foodbank-manager' ),
-				self::CAP_ATTENDANCE,
-				'fbm_attendance',
-				array( \FoodBankManager\Admin\AttendancePage::class, 'route' )
-			);
+		add_submenu_page(
+			$parent_slug,
+			esc_html__( 'Attendance', 'foodbank-manager' ),
+			esc_html__( 'Attendance', 'foodbank-manager' ),
+			self::CAP_ATTENDANCE,
+			'fbm_attendance',
+			array( \FoodBankManager\Admin\AttendancePage::class, 'route' )
+		);
 
-			add_submenu_page(
-				$parent_slug,
-				esc_html__( 'Database', 'foodbank-manager' ),
-				esc_html__( 'Database', 'foodbank-manager' ),
-				self::CAP_DATABASE,
-				'fbm_database',
-				array( \FoodBankManager\Admin\DatabasePage::class, 'route' )
-			);
+		add_submenu_page(
+			$parent_slug,
+			esc_html__( 'Database', 'foodbank-manager' ),
+			esc_html__( 'Database', 'foodbank-manager' ),
+			self::CAP_DATABASE,
+			'fbm_database',
+			array( \FoodBankManager\Admin\DatabasePage::class, 'route' )
+		);
 
-			add_submenu_page(
-				$parent_slug,
-				esc_html__( 'Forms', 'foodbank-manager' ),
-				esc_html__( 'Forms', 'foodbank-manager' ),
-				self::CAP_FORMS,
-				'fbm_forms',
-				array( \FoodBankManager\Admin\FormsPage::class, 'route' )
-			);
+		add_submenu_page(
+			$parent_slug,
+			esc_html__( 'Forms', 'foodbank-manager' ),
+			esc_html__( 'Forms', 'foodbank-manager' ),
+			self::CAP_FORMS,
+			'fbm_forms',
+			array( \FoodBankManager\Admin\FormsPage::class, 'route' )
+		);
 
-			add_submenu_page(
-				$parent_slug,
-				esc_html__( 'Email Templates', 'foodbank-manager' ),
-				esc_html__( 'Email Templates', 'foodbank-manager' ),
-				self::CAP_EMAILS,
-				'fbm_emails',
-				array( \FoodBankManager\Admin\EmailsPage::class, 'route' )
-			);
+		add_submenu_page(
+			$parent_slug,
+			esc_html__( 'Email Templates', 'foodbank-manager' ),
+			esc_html__( 'Email Templates', 'foodbank-manager' ),
+			self::CAP_EMAILS,
+			'fbm_emails',
+			array( \FoodBankManager\Admin\EmailsPage::class, 'route' )
+		);
 
-			add_submenu_page(
-				$parent_slug,
-				esc_html__( 'Settings', 'foodbank-manager' ),
-				esc_html__( 'Settings', 'foodbank-manager' ),
-				self::CAP_SETTINGS,
-				'fbm_settings',
-				array( \FoodBankManager\Admin\SettingsPage::class, 'route' )
-			);
+		add_submenu_page(
+			$parent_slug,
+			esc_html__( 'Settings', 'foodbank-manager' ),
+			esc_html__( 'Settings', 'foodbank-manager' ),
+			self::CAP_SETTINGS,
+			'fbm_settings',
+			array( \FoodBankManager\Admin\SettingsPage::class, 'route' )
+		);
 
-			add_submenu_page(
-				$parent_slug,
-				esc_html__( 'Permissions', 'foodbank-manager' ),
-				esc_html__( 'Permissions', 'foodbank-manager' ),
-				self::CAP_PERMISSIONS,
-				'fbm_permissions',
-				array( \FoodBankManager\Admin\PermissionsPage::class, 'route' )
-			);
+		add_submenu_page(
+			$parent_slug,
+			esc_html__( 'Permissions', 'foodbank-manager' ),
+			esc_html__( 'Permissions', 'foodbank-manager' ),
+			self::CAP_PERMISSIONS,
+			'fbm_permissions',
+			array( \FoodBankManager\Admin\PermissionsPage::class, 'route' )
+		);
 
-			add_submenu_page(
-				$parent_slug,
-				esc_html__( 'Diagnostics', 'foodbank-manager' ),
-				esc_html__( 'Diagnostics', 'foodbank-manager' ),
-				self::CAP_DIAGNOSTICS,
-				'fbm_diagnostics',
-				array( \FoodBankManager\Admin\DiagnosticsPage::class, 'render' )
-			);
+		add_submenu_page(
+			$parent_slug,
+			esc_html__( 'Diagnostics', 'foodbank-manager' ),
+			esc_html__( 'Diagnostics', 'foodbank-manager' ),
+			self::CAP_DIAGNOSTICS,
+			'fbm_diagnostics',
+			array( \FoodBankManager\Admin\DiagnosticsPage::class, 'render' )
+		);
 
-			add_submenu_page(
-				$parent_slug,
-				esc_html__( 'Design & Theme', 'foodbank-manager' ),
-				esc_html__( 'Design & Theme', 'foodbank-manager' ),
-				self::CAP_THEME,
-				'fbm_theme',
-				array( \FoodBankManager\Admin\ThemePage::class, 'route' )
-			);
+		add_submenu_page(
+			$parent_slug,
+			esc_html__( 'Design & Theme', 'foodbank-manager' ),
+			esc_html__( 'Design & Theme', 'foodbank-manager' ),
+			self::CAP_THEME,
+			'fbm_theme',
+			array( \FoodBankManager\Admin\ThemePage::class, 'route' )
+		);
 
-			add_submenu_page(
-				$parent_slug,
-				esc_html__( 'Shortcodes', 'foodbank-manager' ),
-				esc_html__( 'Shortcodes', 'foodbank-manager' ),
-				self::CAP_FORMS,
-				'fbm_shortcodes',
-				array( \FoodBankManager\Admin\ShortcodesPage::class, 'route' )
-			);
+		add_submenu_page(
+			$parent_slug,
+			esc_html__( 'Shortcodes', 'foodbank-manager' ),
+			esc_html__( 'Shortcodes', 'foodbank-manager' ),
+			self::CAP_FORMS,
+			'fbm_shortcodes',
+			array( \FoodBankManager\Admin\ShortcodesPage::class, 'route' )
+		);
 	}
 
 				/**

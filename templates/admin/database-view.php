@@ -22,7 +22,7 @@ if ( ! $can_sensitive ) {
 	$data['postcode'] = Helpers::mask_postcode( $data['postcode'] ?? '' );
 }
 ?>
-<div class="fbm-admin"><div class="wrap">
+<div class="wrap fbm-admin">
 <h1>
 	<?php esc_html_e( 'Entry', 'foodbank-manager' ); ?> #<?php echo esc_html( (string) $entry['id'] ); ?>
 </h1>
@@ -96,4 +96,4 @@ if ( ! $can_sensitive ) {
 </form>
 <?php endif; ?>
 </p>
-</div></div>
+</div>
