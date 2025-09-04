@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.2.0] - 2025-09-04
+### Features
+- Manager dashboard shortcode with aggregated non-PII cards.
+### Docs
+- Docs revised for Frontend Dashboard P1 (Wave v1.2.0).
+
 ## [1.1.10] - 2025-09-04
 ### Fixes
 - Contained admin pages with `.fbm-admin` wrapper and screen-gated assets/notices.

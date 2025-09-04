@@ -447,6 +447,103 @@ ORDER BY created_at ASC
 	}
 
 	/**
+	 * Count present check-ins since a date.
+	 *
+	 * @param string $since UTC datetime.
+	 * @return int
+	 */
+	public static function count_present( string $since ): int {
+		global $wpdb;
+		$since    = sanitize_text_field( $since );
+		$t_att    = $wpdb->prefix . 'fb_attendance';
+		$prepared = call_user_func_array(
+			array( $wpdb, 'prepare' ),
+			array( "SELECT COUNT(*) FROM {$t_att} WHERE status = 'present' AND attendance_at >= %s", $since )
+		);
+		return (int) call_user_func( array( $wpdb, 'get_var' ), $prepared );
+	}
+
+	/**
+	 * Count unique households served since date.
+	 *
+	 * @param string $since UTC datetime.
+	 * @return int
+	 */
+	public static function count_unique_households( string $since ): int {
+		global $wpdb;
+		$since    = sanitize_text_field( $since );
+		$t_att    = $wpdb->prefix . 'fb_attendance';
+		$prepared = call_user_func_array(
+			array( $wpdb, 'prepare' ),
+			array( "SELECT COUNT(DISTINCT application_id) FROM {$t_att} WHERE status = 'present' AND attendance_at >= %s", $since )
+		);
+		return (int) call_user_func( array( $wpdb, 'get_var' ), $prepared );
+	}
+
+	/**
+	 * Count no-shows since date.
+	 *
+	 * @param string $since UTC datetime.
+	 * @return int
+	 */
+	public static function count_no_shows( string $since ): int {
+		global $wpdb;
+		$since    = sanitize_text_field( $since );
+		$t_att    = $wpdb->prefix . 'fb_attendance';
+		$prepared = call_user_func_array(
+			array( $wpdb, 'prepare' ),
+			array( "SELECT COUNT(*) FROM {$t_att} WHERE status = 'no_show' AND attendance_at >= %s", $since )
+		);
+		return (int) call_user_func( array( $wpdb, 'get_var' ), $prepared );
+	}
+
+	/**
+	 * Count attendance by type since date.
+	 *
+	 * @param string $since UTC datetime.
+	 * @return array{in_person:int,delivery:int}
+	 */
+	public static function count_by_type( string $since ): array {
+		global $wpdb;
+		$since    = sanitize_text_field( $since );
+		$t_att    = $wpdb->prefix . 'fb_attendance';
+		$prepared = call_user_func_array(
+			array( $wpdb, 'prepare' ),
+			array( "SELECT type, COUNT(*) as c FROM {$t_att} WHERE status = 'present' AND attendance_at >= %s GROUP BY type", $since )
+		);
+		$rows     = call_user_func( array( $wpdb, 'get_results' ), $prepared );
+		if ( ! is_array( $rows ) ) {
+			$rows = array();
+		}
+		$out = array(
+			'in_person' => 0,
+			'delivery'  => 0,
+		);
+		foreach ( $rows as $row ) {
+			$type         = sanitize_key( (string) $row->type );
+			$out[ $type ] = (int) $row->c;
+		}
+		return $out;
+	}
+
+	/**
+	 * Count voided records since date.
+	 *
+	 * @param string $since UTC datetime.
+	 * @return int
+	 */
+	public static function count_voided( string $since ): int {
+		global $wpdb;
+		$since    = sanitize_text_field( $since );
+		$t_att    = $wpdb->prefix . 'fb_attendance';
+		$prepared = call_user_func_array(
+			array( $wpdb, 'prepare' ),
+			array( "SELECT COUNT(*) FROM {$t_att} WHERE is_void = 1 AND attendance_at >= %s", $since )
+		);
+		return (int) call_user_func( array( $wpdb, 'get_var' ), $prepared );
+	}
+
+	/**
 	 * Join WHERE clauses.
 	 *
 	 * @param array $clauses Clauses.

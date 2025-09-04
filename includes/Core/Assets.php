@@ -5,6 +5,11 @@ declare(strict_types=1);
 namespace FoodBankManager\Core;
 
 use FoodBankManager\Core\Options;
+use function get_post;
+use function has_shortcode;
+use function is_singular;
+use function wp_enqueue_style;
+use function wp_register_style;
 
 class Assets {
         public function register(): void {
@@ -13,9 +18,13 @@ class Assets {
         }
 
         public function enqueue_front(): void {
-                wp_register_style( 'fbm-theme-frontend', FBM_URL . 'assets/css/theme-frontend.css', array(), Plugin::FBM_VERSION );
-                wp_add_inline_style( 'fbm-theme-frontend', self::theme_css() );
-                wp_enqueue_style( 'fbm-theme-frontend' );
+                if ( function_exists( 'has_shortcode' ) && is_singular() ) {
+                        $post = get_post();
+                        if ( $post && has_shortcode( (string) $post->post_content, 'fbm_dashboard' ) ) {
+                                wp_register_style( 'fbm-frontend-dashboard', FBM_URL . 'assets/css/frontend-dashboard.css', array(), Plugin::FBM_VERSION );
+                                wp_enqueue_style( 'fbm-frontend-dashboard' );
+                        }
+                }
         }
 
         public function enqueue_admin(): void {

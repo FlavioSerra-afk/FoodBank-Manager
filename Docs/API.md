@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.10 – Admin Layout Guard)
+Docs-Revision: 2025-09-04 (Wave v1.2.0 – Frontend Dashboard P1)
 # REST API (pcc-fb/v1)
 
 Base namespace: `pcc-fb/v1`. All write endpoints require `X-WP-Nonce` and capabilities.
@@ -39,6 +39,7 @@ Admin screens are wrapped in `.fbm-admin` with assets/notices loaded only on Foo
 | `[fbm_form]` | `id` (string, default "1"), `preset` (string, default "basic_intake") |
 | `[fbm_entries]` | _None_ |
 | `[fbm_attendance_manager]` | _None_ |
+| `[fbm_dashboard]` | `period` ("7d"\|"30d"\|"today") |
 - Validates nonce, required fields, file policy.
 - Stores encrypted PII; triggers applicant/admin emails.
 
