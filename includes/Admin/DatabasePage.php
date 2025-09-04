@@ -87,25 +87,24 @@ final class DatabasePage {
 			}
 		}
 
-				// Support legacy `view` query param.
-				$query_string = isset( $_SERVER['QUERY_STRING'] ) ? sanitize_text_field( wp_unslash( (string) $_SERVER['QUERY_STRING'] ) ) : '';
-				parse_str( $query_string, $query_vars );
-		$view_id = isset( $query_vars['view'] ) ? absint( $query_vars['view'] ) : 0;
-		if ( $view_id ) {
-			self::render_view( $view_id );
-			return;
+								$query_string = isset( $_SERVER['QUERY_STRING'] ) ? sanitize_text_field( wp_unslash( (string) $_SERVER['QUERY_STRING'] ) ) : '';
+								parse_str( $query_string, $query_vars );
+
+				$fbm_action = isset( $query_vars['fbm_action'] ) ? sanitize_key( $query_vars['fbm_action'] ) : '';
+		if ( 'view_entry' === $fbm_action ) {
+				return;
 		}
 
-				$preset_name = isset( $query_vars['preset'] ) ? sanitize_text_field( $query_vars['preset'] ) : '';
+								$preset_name = isset( $query_vars['preset'] ) ? sanitize_text_field( $query_vars['preset'] ) : '';
 		if ( $preset_name ) {
-				$preset_query = self::get_preset_query( $preset_name );
+						$preset_query = self::get_preset_query( $preset_name );
 			if ( $preset_query ) {
-						$query_vars = array_merge( $preset_query, $query_vars );
+										$query_vars = array_merge( $preset_query, $query_vars );
 			}
 		}
-				$filters = self::get_filters( $query_vars );
-				$presets = Options::get_db_filter_presets();
-				$columns = UsersMeta::get_db_columns( get_current_user_id() );
+								$filters = self::get_filters( $query_vars );
+				$presets                 = Options::get_db_filter_presets();
+				$columns                 = UsersMeta::get_db_columns( get_current_user_id() );
 				self::render_list( $filters, $presets, $preset_name, $columns );
 	}
 
@@ -147,24 +146,6 @@ final class DatabasePage {
 				$current_preset = $preset_name;
 				$columns        = $columns;
 				require FBM_PATH . 'templates/admin/database.php';
-	}
-
-	/**
-	 * Render a single application.
-	 *
-	 * @since 0.1.x
-	 *
-	 * @param int $id Application ID.
-	 *
-	 * @return void
-	 */
-	private static function render_view( int $id ): void {
-			$entry = ApplicationsRepo::get( $id );
-		if ( ! $entry ) {
-				wp_die( esc_html__( 'Entry not found.', 'foodbank-manager' ) );
-		}
-			$can_sensitive = current_user_can( 'fb_view_sensitive' );
-			require FBM_PATH . 'templates/admin/database-view.php';
 	}
 
 		/**

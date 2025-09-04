@@ -169,18 +169,13 @@ else :
 		?>
 </td>
 <td>
-	<a href="
 		<?php
-		echo esc_url(
-			add_query_arg(
-				array(
-					'page' => 'fbm_database',
-					'view' => $r['id'],
-				)
-			)
+		$view_url = wp_nonce_url(
+			admin_url( 'admin.php?page=fbm_database&fbm_action=view_entry&entry_id=' . $r['id'] ),
+			'fbm_entry_view'
 		);
 		?>
-				"><?php esc_html_e( 'View', 'foodbank-manager' ); ?></a>
+		<a href="<?php echo esc_url( $view_url ); ?>"><?php esc_html_e( 'View', 'foodbank-manager' ); ?></a>
 		<?php
 // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
 		if ( current_user_can( 'fb_manage_database' ) ) :
