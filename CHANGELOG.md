@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.7] - 2025-09-03
+### Security/Quality
+- Remove PHPCS suppressions from AttendanceRepo; promote to Strict.
+### Docs
+- CS-Backlog.md revision-stamped for Wave CS-Backlog-11B.2.
+
 ## [1.0.6] - 2025-09-03
 ### Security/Quality
 - Harden Database admin page and CSV exports; sanitize filters, whitelist ordering, and mask PII by default. Promoted to Strict.

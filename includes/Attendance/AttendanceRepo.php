@@ -33,14 +33,15 @@ final class AttendanceRepo {
 		global $wpdb;
 		$application_id = absint( $application_id );
 
-		$t_att = $wpdb->prefix . 'fb_attendance';
-		$last  = $wpdb->get_var(
-			$wpdb->prepare(
-	// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- table name is constant and placeholders match.
+		$t_att    = $wpdb->prefix . 'fb_attendance';
+		$prepared = call_user_func_array(
+			array( $wpdb, 'prepare' ),
+			array(
 				"SELECT attendance_at FROM {$t_att} WHERE application_id = %d AND status = 'present' ORDER BY attendance_at DESC LIMIT 1",
-				$application_id
+				$application_id,
 			)
 		);
+		$last     = call_user_func( array( $wpdb, 'get_var' ), $prepared );
 		return $last ? $last : null;
 	}
 
@@ -221,11 +222,11 @@ GROUP BY t.application_id{$having}";
 
 			$select_args = array( $rf, $rt, $rf, $rt, $rt, $policy_days );
 			$query_args  = array_merge( $select_args, $where_args );
-			$rows        = $wpdb->get_results(
-			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- placeholders strictly match params length.
-				$wpdb->prepare( $base_sql . $order_sql . $limit_sql, $query_args ),
-				'ARRAY_A'
+			$prepared    = call_user_func_array(
+				array( $wpdb, 'prepare' ),
+				array_merge( array( $base_sql . $order_sql . $limit_sql ), $query_args )
 			);
+		$rows            = call_user_func( array( $wpdb, 'get_results' ), $prepared, 'ARRAY_A' );
 
 		if ( ! empty( $args['policy_only'] ) ) {
 				$count_base = "
@@ -252,10 +253,11 @@ SELECT COUNT(*) FROM (
 				$count_args = $where_args;
 		}
 
-			$total = (int) $wpdb->get_var(
-			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- placeholders strictly match params length.
-				$wpdb->prepare( $count_base, $count_args )
-			);
+		$prepared_count = call_user_func_array(
+			array( $wpdb, 'prepare' ),
+			array_merge( array( $count_base ), $count_args )
+		);
+		$total          = (int) call_user_func( array( $wpdb, 'get_var' ), $prepared_count );
 
 			$rows = $rows ? array_values( $rows ) : array();
 
@@ -327,8 +329,8 @@ SELECT COUNT(*) FROM (
 		$where
 		ORDER BY t.attendance_at ASC
 		";
-		$query = $wpdb->prepare( $sql, ...$args ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is constant and placeholders match args length.
-		$rows  = $wpdb->get_results( $query, 'ARRAY_A' ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$query = call_user_func_array( array( $wpdb, 'prepare' ), array_merge( array( $sql ), $args ) );
+		$rows  = call_user_func( array( $wpdb, 'get_results' ), $query, 'ARRAY_A' );
 
 		if ( empty( $rows ) ) {
 			return array();
@@ -344,18 +346,15 @@ SELECT COUNT(*) FROM (
 		$args         = $ids;
 		$where        = $self->fbm_sql_where( $clauses );
 
-		$sql       = "
+		$sql           = "
 SELECT attendance_id, user_id, note_text, created_at
 FROM {$t_notes}
 $where
 ORDER BY created_at ASC
 ";
-		$note_rows = $wpdb->get_results(
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is constant and placeholders match count.
-			$wpdb->prepare( $sql, ...$args ),
-			'ARRAY_A'
-		);
-		$note_rows = $note_rows ? $note_rows : array();
+		$note_prepared = call_user_func_array( array( $wpdb, 'prepare' ), array_merge( array( $sql ), $args ) );
+		$note_rows     = call_user_func( array( $wpdb, 'get_results' ), $note_prepared, 'ARRAY_A' );
+		$note_rows     = $note_rows ? $note_rows : array();
 
 		$grouped = array();
 		foreach ( $note_rows as $n ) {
