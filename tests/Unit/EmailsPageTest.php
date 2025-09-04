@@ -177,6 +177,54 @@ final class EmailsPageTest extends TestCase {
         $this->assertStringContainsString( '***', $html );
         $this->assertStringNotContainsString( '<script', $html );
     }
+
+    public function testResetMissingNonceBlocked(): void {
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST = array(
+            'fbm_action' => 'emails_reset',
+            'tpl'        => 'applicant_confirmation',
+        );
+        $this->expectException( RuntimeException::class );
+        EmailsPage::route();
+    }
+
+    public function testResetRequiresCapability(): void {
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST = array(
+            'fbm_action' => 'emails_reset',
+            '_fbm_nonce' => 'nonce',
+            'tpl'        => 'applicant_confirmation',
+        );
+        \ShortcodesPageTest::$can = false;
+        $this->expectException( RuntimeException::class );
+        EmailsPage::route();
+    }
+
+    public function testResetRestoresDefaults(): void {
+        Options::set_template(
+            'applicant_confirmation',
+            array(
+                'subject'   => 'Hi',
+                'body_html' => '<p>Hello</p>',
+            )
+        );
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST = array(
+            'fbm_action' => 'emails_reset',
+            '_fbm_nonce' => 'nonce',
+            'tpl'        => 'applicant_confirmation',
+        );
+        try {
+            EmailsPage::route();
+        } catch ( RuntimeException $e ) {
+            $this->assertSame( 'redirect', $e->getMessage() );
+        }
+        $data = Options::get_template( 'applicant_confirmation' );
+        $this->assertSame( '', $data['subject'] );
+        $this->assertSame( '', $data['body_html'] );
+        $this->assertStringContainsString( 'notice=reset', self::$redirect );
+        $this->assertStringContainsString( 'tpl=applicant_confirmation', self::$redirect );
+    }
 }
 }
 
