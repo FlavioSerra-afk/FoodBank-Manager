@@ -17,12 +17,14 @@ final class Notices {
     }
 
     public static function register(): void {
-        static $registered = false;
-        if ($registered) {
+        static $reg = false;
+        if ($reg) {
             return;
         }
-        $registered = true;
+        $reg = true;
+
         add_action('admin_notices', [self::class, 'render'], 10);
+        add_action('admin_notices', [self::class, 'render_caps_fix_notice'], 5);
     }
 
     public static function render(): void {
@@ -41,8 +43,6 @@ final class Notices {
 
         self::$renderCount++;
         $printed = true;
-
-        self::maybeShowCapsRepair();
 
         if (self::$missingSodium) {
             echo '<div class="notice notice-error"><p>' . esc_html__('Sodium extension not available; encryption disabled.', 'foodbank-manager') . '</p></div>';
@@ -71,21 +71,56 @@ final class Notices {
         }
     }
 
-    private static function maybeShowCapsRepair(): void {
-        if (! current_user_can('administrator')) {
+    public static function render_caps_fix_notice(): void {
+        static $printed = false;
+        if ($printed) {
             return;
         }
-        if (! current_user_can('fb_manage_dashboard')) {
-            $url = wp_nonce_url(
-                add_query_arg('fbm_repair_caps', '1', admin_url('admin.php?page=fbm_diagnostics')),
-                'fbm_repair_caps'
-            );
-            echo '<div class="notice notice-warning"><p>' .
-                esc_html__('FoodBank Manager detected missing capabilities on your Administrator role.', 'foodbank-manager') . ' ' .
-                '<a class="button button-primary" href="' . esc_url($url) . '">' .
-                esc_html__('Repair capabilities', 'foodbank-manager') .
-                '</a></p></div>';
+        if (!current_user_can('manage_options')) {
+            return;
         }
+
+        foreach (\FBM\Auth\Capabilities::all() as $cap) {
+            if (current_user_can($cap)) {
+                return;
+            }
+        }
+
+        if (get_transient('fbm_caps_notice_dismissed')) {
+            return;
+        }
+
+        $action      = 'fbm_caps_notice_dismiss';
+        $dismiss_url = add_query_arg(
+            [
+                'fbm_action' => $action,
+                '_wpnonce'   => wp_create_nonce($action),
+            ],
+            admin_url()
+        );
+
+        $repair_url = admin_url('admin.php?page=fbm_diagnostics');
+
+        echo '<div class="notice notice-warning"><p>' .
+            esc_html__('FoodBank Manager is installed, but custom capabilities are missing for Administrators.', 'foodbank-manager') . ' <a href="' . esc_url($repair_url) . '">' . esc_html__('Open Diagnostics → Repair caps', 'foodbank-manager') . '</a> · <a href="' . esc_url($dismiss_url) . '">' . esc_html__('Dismiss', 'foodbank-manager') . '</a>' .
+            '</p></div>';
+
+        $printed = true;
+    }
+
+    public static function maybe_handle_caps_notice_dismiss(): void {
+        if (empty($_GET['fbm_action'])) {
+            return;
+        }
+        $action = sanitize_key((string) $_GET['fbm_action']);
+        if ($action !== 'fbm_caps_notice_dismiss') {
+            return;
+        }
+        check_admin_referer($action);
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+        set_transient('fbm_caps_notice_dismissed', 1, DAY_IN_SECONDS);
     }
 
     public static function handleCapsRepair(): void {

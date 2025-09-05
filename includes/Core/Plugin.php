@@ -45,8 +45,11 @@ final class Plugin {
                 }
                self::$booted = true;
 
-               if ( is_admin() && class_exists( \FBM\Auth\Capabilities::class ) ) {
-                       \FBM\Auth\Capabilities::ensure_for_admin();
+               if ( is_admin() ) {
+                       \FoodBankManager\Admin\Notices::maybe_handle_caps_notice_dismiss();
+                       if ( class_exists( \FBM\Auth\Capabilities::class ) ) {
+                               \FBM\Auth\Capabilities::ensure_for_admin();
+                       }
                }
 
                \FBM\Shortcodes\Shortcodes::register();

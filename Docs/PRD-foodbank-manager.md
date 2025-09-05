@@ -113,7 +113,7 @@ Roles map to WordPress **capabilities** (granular; see §10 Security).
 - Compatible with SMTP/transactional providers via site’s chosen plugin.
 
 ### 5.5 Admin (wp-admin) Interface
-- **Menu:** FoodBank → **Dashboard**, **Attendance**, **Database**, **Forms**, **Email Templates**, **Settings**, **Permissions**, **Diagnostics**.
+- **Menu:** FoodBank → **Dashboard**, **Attendance**, **Database**, **Forms**, **Email Templates**, **Settings**, **Permissions**, **Diagnostics**. The parent menu always falls back to `manage_options` so Administrators can reach it even if custom FBM caps are missing. Subpages remain gated by their FBM capabilities. When caps are absent, a one-time, text-only admin notice (no global CSS/JS) links to Diagnostics → Repair caps and can be dismissed for a day.
 - **Database list:** filters (date, status, city, postcode, has file, consent), saveable filter presets, per-user column toggles, pagination.
   - **Capabilities:** viewing and exporting require `fb_manage_database`; sensitive fields unmasked only with `fb_view_sensitive`.
   - **Exports:** CSV export respects current filters, sanitizes filenames, starts with a UTF-8 BOM and translated headers, and masks sensitive fields by default.
