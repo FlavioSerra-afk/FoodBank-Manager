@@ -138,4 +138,91 @@ namespace {
     if (!function_exists('wp_salt')) {
         function wp_salt($scheme = 'auth') { return 'testsalt'; }
     }
+    if (!function_exists('get_current_user_id')) {
+        function get_current_user_id() { return 1; }
+    }
+    if (!function_exists('absint')) {
+        function absint($maybeint) {
+            return abs((int) $maybeint);
+        }
+    }
+    if (!function_exists('wp_unslash')) {
+        function wp_unslash($value) {
+            if (is_array($value)) {
+                return array_map('wp_unslash', $value);
+            }
+            return str_replace('\\', '', (string) $value);
+        }
+    }
+    if (!function_exists('shortcode_atts')) {
+        function shortcode_atts($pairs, $atts, $shortcode = '') {
+            $atts = (array) $atts;
+            return array_merge($pairs, array_intersect_key($atts, $pairs));
+        }
+    }
+    if (!function_exists('wp_parse_args')) {
+        function wp_parse_args($args, $defaults = array()) {
+            if (is_object($args)) {
+                $args = get_object_vars($args);
+            } elseif (is_string($args)) {
+                parse_str($args, $args);
+            }
+            if (!is_array($args)) {
+                $args = array();
+            }
+            return array_merge($defaults, $args);
+        }
+    }
+    if (!function_exists('add_query_arg')) {
+        function add_query_arg(...$args) {
+            if (isset($args[0]) && is_array($args[0])) {
+                $params = $args[0];
+                $url    = $args[1] ?? '';
+            } else {
+                $params = array($args[0] => $args[1] ?? null);
+                $url    = $args[2] ?? '';
+            }
+            $parts = parse_url((string) $url);
+            $query = array();
+            if (!empty($parts['query'])) {
+                parse_str($parts['query'], $query);
+            }
+            foreach ($params as $k => $v) {
+                $query[$k] = $v;
+            }
+            $parts['query'] = http_build_query($query);
+            $scheme = isset($parts['scheme']) ? $parts['scheme'] . '://' : '';
+            $host   = $parts['host'] ?? '';
+            $port   = isset($parts['port']) ? ':' . $parts['port'] : '';
+            $path   = $parts['path'] ?? '';
+            $query_str = $parts['query'] ? '?' . $parts['query'] : '';
+            return $scheme . $host . $port . $path . $query_str;
+        }
+    }
+    if (!function_exists('is_email')) {
+        function is_email($email) {
+            return (bool) filter_var($email, FILTER_VALIDATE_EMAIL);
+        }
+    }
+    if (!function_exists('wp_json_encode')) {
+        function wp_json_encode($data, $options = 0, $depth = 512) {
+            return json_encode($data, $options | JSON_UNESCAPED_UNICODE, $depth);
+        }
+    }
+}
+
+namespace FBM\Admin {
+    function absint($maybeint) { return \absint($maybeint); }
+    function add_query_arg(...$args) { return \add_query_arg(...$args); }
+}
+
+namespace FoodBankManager\Admin {
+    function absint($maybeint) { return \absint($maybeint); }
+    function add_query_arg(...$args) { return \add_query_arg(...$args); }
+    function add_menu_page(...$args) { return \FBM\Admin\add_menu_page(...$args); }
+    function add_submenu_page(...$args) { return \FBM\Admin\add_submenu_page(...$args); }
+}
+
+namespace FoodBankManager\Attendance {
+    function wp_salt($scheme = 'auth') { return \wp_salt($scheme); }
 }

@@ -11,6 +11,7 @@ namespace FoodBankManager\Admin;
 
 use FoodBankManager\Core\Options;
 use FBM\Core\Retention;
+use FBM\Core\RetentionConfig;
 
 /**
  * Settings admin page.
@@ -105,21 +106,9 @@ class SettingsPage {
 		}
 
 				$raw_data = filter_input( INPUT_POST, 'retention', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY ) ?? array();
-				$data     = is_array( $raw_data ) ? array_map( 'wp_unslash', $raw_data ) : array();
-				$out      = array();
-			$categories   = array( 'applications', 'attendance', 'mail_log' );
-		foreach ( $categories as $cat ) {
-					$days   = isset( $data[ $cat ]['days'] ) ? absint( $data[ $cat ]['days'] ) : 0;
-					$policy = isset( $data[ $cat ]['policy'] ) ? sanitize_key( $data[ $cat ]['policy'] ) : 'delete';
-			if ( ! in_array( $policy, array( 'delete', 'anonymise' ), true ) ) {
-				$policy = 'delete';
-			}
-					$out[ $cat ] = array(
-						'days'   => $days,
-						'policy' => $policy,
-					);
-		}
-			Options::set( 'privacy.retention', $out );
+				$raw_data = is_array( $raw_data ) ? array_map( 'wp_unslash', $raw_data ) : array();
+				$out      = RetentionConfig::normalize( $raw_data );
+						Options::set( 'privacy.retention', $out );
 			$url = add_query_arg(
 				array(
 					'notice' => 'saved',

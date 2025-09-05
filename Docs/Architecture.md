@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-05 (Notices de-dup verify)
+Docs-Revision: 2025-09-05 (QA Lockdown PQR)
 # FoodBank Manager — Architecture
 
 ## Overview
@@ -29,12 +29,14 @@ A secure, privacy-first WordPress plugin for managing Food Bank applicant intake
 - `includes/UI/Theme.php`, `assets/css/{theme-*.css,frontend-dashboard.css}`, `includes/Security/CssSanitizer.php`.
 - `includes/Logging/Audit.php`.
 - QA/CI: `.github/workflows/release.yml`, `phpcs.xml`, `phpstan.neon`, `phpstan-bootstrap.php`, `composer.json` scripts.
+- Tests use deterministic WP stubs (`tests/Support/WPStubs.php`) providing fallbacks for core helpers.
 
 ## Boot & lifecycle
 - `foodbank-manager.php` attempts `vendor/autoload.php` and registers a lightweight PSR-4 fallback mapping `FBM\` classes in `includes/` and aliasing `FoodBankManager\` during migration.
 - Activation/deactivation: reflection-based call to instance/static `activate()`/`deactivate()` methods.
 - During `plugins_loaded`, `Core\Plugin::boot()` registers admin menus, REST routes, shortcodes, assets, and repairs roles/capabilities.
 - Admin notices display when the vendor autoloader is missing or the KEK is not defined.
+- Diagnostics surfaces notices render count via `Notices::getRenderCount()`.
 
 ## Screen gating
 Notices and assets check `$screen->id` and run only on `toplevel_page_fbm` or `foodbank_page_fbm_*`. Each notice uses a printed flag to render once per page.

@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace FBM\Core;
 
+use FBM\Core\RetentionConfig;
 use FoodBankManager\Core\Options;
 use FoodBankManager\Logging\Audit;
 use wpdb;
@@ -70,30 +71,26 @@ final class Retention {
 				'deleted'    => 0,
 				'anonymised' => 0,
 			),
-			'mail_log'     => array(
+			'mail'         => array(
 				'deleted'    => 0,
 				'anonymised' => 0,
 			),
 		);
 
-				/**
-				 * Retention configuration.
-				 *
-				 * @var array<string,array<string,mixed>> $cfg
-				 */
-				$cfg = (array) Options::get( 'privacy.retention', array() );
+								$raw = Options::get( 'privacy.retention' );
+								$cfg = RetentionConfig::normalize( $raw );
 
-		$day = defined( 'DAY_IN_SECONDS' ) ? DAY_IN_SECONDS : 86400;
+				$day = defined( 'DAY_IN_SECONDS' ) ? DAY_IN_SECONDS : 86400;
 
-				$categories = array( 'applications', 'attendance', 'mail_log' );
+								$categories = array( 'applications', 'attendance', 'mail' );
 
 		foreach ( $categories as $key ) {
-				$days   = absint( $cfg[ $key ]['days'] ?? 0 );
-				$policy = (string) ( $cfg[ $key ]['policy'] ?? 'delete' );
+						$days   = $cfg[ $key ]['days'];
+						$policy = $cfg[ $key ]['policy'];
 			if ( $days <= 0 ) {
-						continue;
+										continue;
 			}
-				$cutoff = gmdate( 'Y-m-d H:i:s', time() - $days * $day );
+						$cutoff = gmdate( 'Y-m-d H:i:s', time() - $days * $day );
 
 			switch ( $key ) {
 				case 'applications':
@@ -107,28 +104,28 @@ final class Retention {
 						$repo = '\\FoodBankManager\\Database\\ApplicationsRepo';
 					break;
 				case 'attendance':
-						$ids  = $wpdb->get_col(
-							$wpdb->prepare(
-								'SELECT id FROM ' . $wpdb->prefix . 'fb_attendance WHERE attendance_at <= %s LIMIT %d',
-								$cutoff,
-								self::BATCH
-							)
-						);
+					$ids      = $wpdb->get_col(
+						$wpdb->prepare(
+							'SELECT id FROM ' . $wpdb->prefix . 'fb_attendance WHERE attendance_at <= %s LIMIT %d',
+							$cutoff,
+							self::BATCH
+						)
+					);
 						$repo = '\\FoodBankManager\\Attendance\\AttendanceRepo';
 					break;
-				case 'mail_log':
-						$ids  = $wpdb->get_col(
-							$wpdb->prepare(
-								'SELECT id FROM ' . $wpdb->prefix . 'fb_mail_log WHERE timestamp <= %s LIMIT %d',
-								$cutoff,
-								self::BATCH
-							)
-						);
-						$repo = '\\FBM\\Mail\\LogRepo';
+				case 'mail':
+								$ids  = $wpdb->get_col(
+									$wpdb->prepare(
+										'SELECT id FROM ' . $wpdb->prefix . 'fb_mail_log WHERE timestamp <= %s LIMIT %d',
+										$cutoff,
+										self::BATCH
+									)
+								);
+								$repo = '\\FBM\\Mail\\LogRepo';
 					break;
 				default:
-						$ids  = array();
-						$repo = '';
+					$ids  = array();
+					$repo = '';
 			}
 
 			if ( empty( $ids ) ) {
@@ -155,18 +152,18 @@ final class Retention {
 								)
 							);
 							break;
-						case 'mail_log':
-							$wpdb->query(
-								$wpdb->prepare(
-									'DELETE FROM ' . $wpdb->prefix . 'fb_mail_log WHERE id IN ('
-									. implode( ',', array_fill( 0, count( $ids ), '%d' ) ) . ')',
-									$ids
-								)
-							);
+						case 'mail':
+									$wpdb->query(
+										$wpdb->prepare(
+											'DELETE FROM ' . $wpdb->prefix . 'fb_mail_log WHERE id IN ('
+													. implode( ',', array_fill( 0, count( $ids ), '%d' ) ) . ')',
+											$ids
+										)
+									);
 							break;
 					}
 				}
-								$summary[ $key ]['deleted'] += count( $ids );
+				$summary[ $key ]['deleted'] += count( $ids );
 			} else {
 				if ( ! $dry_run && method_exists( $repo, 'anonymise_batch' ) ) {
 								$repo::anonymise_batch( $ids );

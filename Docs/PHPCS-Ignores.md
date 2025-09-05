@@ -1,9 +1,6 @@
-Docs-Revision: 2025-09-05 (Hotfix J/K)
 # PHPCS Ignores & Suppressed Issues Dashboard
 
-_Generated: 2025-09-04 22:11:20Z
-
-`phpcs.xml` excludes `dist/*` and `vendor/*`. We still fix strict types, escaping, and docblocks; remaining ignores are tracked below.
+_Generated: 2025-09-05 15:14:21Z
 
 This report shows which issues are currently suppressed via `phpcs:ignore` and what would fail if annotations were disabled.
 
