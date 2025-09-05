@@ -2,12 +2,6 @@
 declare(strict_types=1);
 
 namespace FoodBankManager\Admin {
-    function current_user_can( string $cap ): bool {
-        if ($cap === 'fb_manage_shortcodes') {
-            return \ShortcodesPageTest::$can;
-        }
-        return \current_user_can($cap);
-    }
     function wp_die( $message = '' ) {
         throw new \RuntimeException( (string) $message );
     }
@@ -104,13 +98,12 @@ use PHPUnit\Framework\TestCase;
 use FoodBankManager\Admin\ShortcodesPage;
 
 final class ShortcodesPageTest extends TestCase {
-    public static bool $can = true;
     public static string $last_shortcode = '';
 
     protected function setUp(): void {
-        self::$can         = true;
+        fbm_test_reset_globals();
+        fbm_grant_for_page('fbm_shortcodes');
         self::$last_shortcode = '';
-        fbm_grant_caps(['fb_manage_forms']);
         if ( ! defined( 'FBM_PATH' ) ) {
             define( 'FBM_PATH', dirname( __DIR__, 2 ) . '/' );
         }
@@ -135,8 +128,7 @@ final class ShortcodesPageTest extends TestCase {
     }
 
     public function testCapabilityRequired(): void {
-        self::$can = false;
-        fbm_clear_caps();
+        fbm_test_reset_globals();
         $this->expectException( \RuntimeException::class );
         ShortcodesPage::route();
     }

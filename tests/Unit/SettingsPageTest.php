@@ -46,7 +46,7 @@ final class SettingsPageTest extends TestCase {
     protected function setUp(): void {
         parent::setUp();
         fbm_test_reset_globals();
-        fbm_grant_caps(['fb_manage_settings']);
+        fbm_grant_for_page('fbm_settings');
         self::$redirect = '';
         $_POST         = array();
         $_SERVER       = array();
@@ -62,10 +62,10 @@ final class SettingsPageTest extends TestCase {
     }
 
     public function testUserWithoutCapBlocked(): void {
+        fbm_test_reset_globals();
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_POST['fbm_action']       = 'branding_save';
         $_POST['_fbm_nonce']       = 'nonce';
-        fbm_clear_caps();
         $this->expectException( RuntimeException::class );
         SettingsPage::route();
     }

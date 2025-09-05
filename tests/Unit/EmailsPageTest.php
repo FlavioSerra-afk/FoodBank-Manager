@@ -64,6 +64,8 @@ final class EmailsPageTest extends TestCase {
     public static string $redirect = '';
 
     protected function setUp(): void {
+        fbm_test_reset_globals();
+        fbm_grant_for_page('fbm_emails');
         if ( ! defined( 'FBM_PATH' ) ) {
             define( 'FBM_PATH', dirname( __DIR__, 1 ) . '/../' );
         }
@@ -73,14 +75,13 @@ final class EmailsPageTest extends TestCase {
         $_GET = array();
         $_POST = array();
         $_SERVER = array();
-        \ShortcodesPageTest::$can = true;
         self::$redirect = '';
         global $fbm_test_options;
         $fbm_test_options = array();
     }
 
     public function testCapabilityRequired(): void {
-        \ShortcodesPageTest::$can = false;
+        fbm_test_reset_globals();
         $this->expectException( RuntimeException::class );
         EmailsPage::route();
     }
@@ -114,7 +115,7 @@ final class EmailsPageTest extends TestCase {
             'subject'    => 'Hi',
             'body_html'  => '<p>Hello</p>',
         );
-        \ShortcodesPageTest::$can = false;
+        fbm_test_reset_globals();
         $this->expectException( RuntimeException::class );
         EmailsPage::route();
     }
@@ -160,7 +161,7 @@ final class EmailsPageTest extends TestCase {
             '_fbm_nonce' => 'nonce',
             'tpl'        => 'applicant_confirmation',
         );
-        \ShortcodesPageTest::$can = false;
+        fbm_test_reset_globals();
         $this->expectException( RuntimeException::class );
         EmailsPage::route();
     }
@@ -198,7 +199,7 @@ final class EmailsPageTest extends TestCase {
             '_fbm_nonce' => 'nonce',
             'tpl'        => 'applicant_confirmation',
         );
-        \ShortcodesPageTest::$can = false;
+        fbm_test_reset_globals();
         $this->expectException( RuntimeException::class );
         EmailsPage::route();
     }
