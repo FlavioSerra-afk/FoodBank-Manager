@@ -28,7 +28,10 @@ namespace FBM\Admin {
     }
     function wp_verify_nonce($nonce, $action = -1) { return true; }
     function wp_nonce_field($action = -1, $name = '_wpnonce', $referer = true, $echo = true) { return ''; }
-    function current_user_can($cap) { return true; }
+    function current_user_can($cap) {
+        $map = $GLOBALS['fbm_current_user_caps'] ?? [];
+        return $map[$cap] ?? true;
+    }
     function wp_safe_redirect($url, $status = 302) { $GLOBALS['fbm_redirect_to'] = (string)$url; return true; }
     function wp_die($message = '') { throw new \RuntimeException((string)$message ?: 'wp_die'); }
 }
@@ -109,6 +112,9 @@ namespace {
     }
     if (!function_exists('wp_kses_post')) {
         function wp_kses_post($html) { return (string)$html; }
+    }
+    if (!function_exists('settings_errors')) {
+        function settings_errors($setting = '', $sanitize = false, $type = '') { return ''; }
     }
     if (!function_exists('__')) { function __($text, $domain = 'default') { return (string)$text; } }
     if (!function_exists('_e')) { function _e($text, $domain = 'default') { echo (string)$text; } }

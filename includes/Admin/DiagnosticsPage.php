@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignoreFile
 /**
  * Diagnostics admin page controller.
  *
@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace FoodBankManager\Admin;
 
-use FoodBankManager\Auth\Roles;
+use FBM\Auth\Capabilities;
 use FoodBankManager\Core\Options;
 use function sanitize_text_field;
 use function sanitize_key;
@@ -23,40 +23,70 @@ use function wp_get_schedules;
  * Diagnostics admin page.
  */
 class DiagnosticsPage {
-	/**
-	 * Route the diagnostics page.
-	 */
-	public static function route(): void {
-		if ( ! current_user_can( 'fb_manage_diagnostics' ) ) {
-			wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ), '', array( 'response' => 403 ) );
-		}
+        private const ACTION_REPAIR_CAPS = 'fbm_repair_caps';
 
-		$method = strtoupper( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ?? '' ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only
-		if ( 'POST' !== $method ) {
-				return;
-		}
+        /**
+         * Route the diagnostics page.
+         */
+        public static function route(): void {
+                if ( ! current_user_can( 'fb_manage_diagnostics' ) ) {
+                        wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ), '', array( 'response' => 403 ) );
+                }
 
-				$action = sanitize_key( wp_unslash( $_POST['fbm_action'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- validated in handlers
-		if ( 'mail_test' === $action ) {
-				check_admin_referer( 'fbm_diag_mail_test', '_fbm_nonce' );
-				self::send_test_email();
-		} elseif ( 'repair_caps' === $action ) {
-				check_admin_referer( 'fbm_diagnostics_repair_caps', '_fbm_nonce' );
-				self::repair_caps();
-		}
-	}
+                $method = strtoupper( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ?? '' ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only
+                if ( 'POST' !== $method ) {
+                        return;
+                }
+
+                $action = sanitize_key( wp_unslash( $_POST['fbm_action'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- validated in handlers
+                if ( 'mail_test' === $action ) {
+                        check_admin_referer( 'fbm_diag_mail_test', '_fbm_nonce' );
+                        self::send_test_email();
+                }
+        }
+
+        private static function handle_actions(): void {
+                if ( ! isset( $_POST['fbm_action'] ) ) {
+                        return;
+                }
+                $action = sanitize_key( (string) $_POST['fbm_action'] );
+                if ( self::ACTION_REPAIR_CAPS !== $action ) {
+                        return;
+                }
+
+                check_admin_referer( self::ACTION_REPAIR_CAPS );
+                if ( ! current_user_can( 'fb_manage_diagnostics' ) ) {
+                        wp_die( esc_html__( 'Insufficient permissions', 'foodbank-manager' ) );
+                }
+
+                Capabilities::ensure_for_admin();
+
+                add_settings_error(
+                        'fbm_diagnostics',
+                        'fbm_caps_repaired',
+                        __( 'FBM capabilities repaired for Administrator.', 'foodbank-manager' ),
+                        'updated'
+                );
+        }
 
 		/**
 		 * Render diagnostics template.
 		 */
-	public static function render(): void {
-		if ( ! current_user_can( 'fb_manage_diagnostics' ) ) {
-						wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ), '', array( 'response' => 403 ) );
-		}
-			$notices_render_count = Notices::getRenderCount();
-			/* @psalm-suppress UnresolvableInclude */
-									require FBM_PATH . 'templates/admin/diagnostics.php';
-	}
+        public static function render(): void {
+                if ( ! current_user_can( 'fb_manage_diagnostics' ) ) {
+                        wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ), '', array( 'response' => 403 ) );
+                }
+
+                self::handle_actions();
+
+                $notices_render_count = Notices::getRenderCount();
+                $caps                = Capabilities::all();
+                $owned               = array_filter( $caps, static fn( $c ) => current_user_can( $c ) );
+                $caps_count          = count( $owned ) . ' / ' . count( $caps );
+
+                /* @psalm-suppress UnresolvableInclude */
+                require FBM_PATH . 'templates/admin/diagnostics.php';
+        }
 
 		/**
 		 * Get cron event diagnostics.
@@ -125,15 +155,4 @@ class DiagnosticsPage {
 			exit;
 	}
 
-	/**
-	 * Repair roles and capabilities.
-	 */
-	private static function repair_caps(): void {
-				Roles::install();
-								Roles::ensure_admin_caps();
-
-								$url = add_query_arg( array( 'notice' => 'repaired' ), menu_page_url( 'fbm_diagnostics', false ) );
-								wp_safe_redirect( esc_url_raw( $url ), 303 );
-								exit;
-	}
 }

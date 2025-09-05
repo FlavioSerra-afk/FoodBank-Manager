@@ -44,6 +44,11 @@ final class Plugin {
                         return;
                 }
                self::$booted = true;
+
+               if ( is_admin() && class_exists( \FBM\Auth\Capabilities::class ) ) {
+                       \FBM\Auth\Capabilities::ensure_for_admin();
+               }
+
                \FBM\Shortcodes\Shortcodes::register();
                Options::boot();
                Retention::init();
@@ -57,7 +62,6 @@ final class Plugin {
                 \FoodBankManager\Auth\CapabilitiesResolver::boot();
 
                 if ( is_admin() ) {
-                        add_action( 'admin_init', [\FoodBankManager\Auth\Roles::class, 'ensure_admin_caps'], 5 );
                         \FoodBankManager\Admin\Notices::boot();
                         add_action( 'admin_menu', [\FoodBankManager\Admin\Menu::class, 'register'], 9 );
                         add_action( 'load-foodbank_page_fbm_database', [\FoodBankManager\Admin\DatabasePage::class, 'route'] );

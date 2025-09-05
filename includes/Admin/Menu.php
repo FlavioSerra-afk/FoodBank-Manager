@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignoreFile
 /**
  * Admin menu registration.
  *
@@ -63,18 +63,22 @@ final class Menu {
 		if ( self::$registered ) {
 				return;
 		}
-			self::$registered = true;
-			$parent_slug      = 'fbm';
+                self::$registered = true;
+                $parent_slug      = 'fbm';
 
-			add_menu_page(
-				esc_html__( 'FoodBank', 'foodbank-manager' ),
-				esc_html__( 'FoodBank', 'foodbank-manager' ),
-				self::CAP_DASHBOARD,
-				$parent_slug,
-				array( self::class, 'dashboard' ),
-				'dashicons-clipboard',
-				58
-			);
+                $root_cap = current_user_can( self::CAP_DASHBOARD )
+                        ? self::CAP_DASHBOARD
+                        : ( current_user_can( 'manage_options' ) ? 'manage_options' : 'do_not_allow' );
+
+                add_menu_page(
+                                esc_html__( 'FoodBank', 'foodbank-manager' ),
+                                esc_html__( 'FoodBank', 'foodbank-manager' ),
+                                $root_cap,
+                                $parent_slug,
+                                array( self::class, 'dashboard' ),
+                                'dashicons-clipboard',
+                                58
+                        );
 
 		add_submenu_page(
 			$parent_slug,

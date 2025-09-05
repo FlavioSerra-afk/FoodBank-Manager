@@ -1,8 +1,7 @@
 <?php // phpcs:ignoreFile
-
 declare(strict_types=1);
 
-namespace FoodBankManager\Auth;
+namespace FBM\Auth;
 
 final class Capabilities {
     /**
@@ -25,15 +24,29 @@ final class Capabilities {
         ];
     }
 
+    /**
+     * Ensure the Administrator role has all FBM caps (idempotent).
+     */
+    public static function ensure_for_admin(): void {
+        if (!function_exists('get_role')) {
+            return;
+        }
+        $role = get_role('administrator');
+        if (!$role) {
+            return;
+        }
+        foreach (self::all() as $cap) {
+            $role->add_cap($cap);
+        }
+    }
+
     /** @return string[] */
     public static function managerRoleCaps(): array {
-        // full manager access
         return self::all();
     }
 
     /** @return string[] */
     public static function viewerRoleCaps(): array {
-        // basic read-only (adjust if you have a viewer role)
         return [
             'fb_manage_dashboard',
             'fb_manage_attendance',
@@ -41,3 +54,5 @@ final class Capabilities {
         ];
     }
 }
+
+\class_alias(__NAMESPACE__ . '\\Capabilities', 'FoodBankManager\\Auth\\Capabilities');

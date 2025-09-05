@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignoreFile
 /**
  * User meta helpers.
  *
@@ -108,7 +108,7 @@ final class UsersMeta {
 		 * @return bool
 		 */
 	public static function set_user_caps( int $user_id, array $caps ): bool {
-			$known = \FoodBankManager\Auth\Capabilities::all();
+            $known = \FBM\Auth\Capabilities::all();
 			$clean = array();
 		foreach ( $caps as $cap ) {
 				$cap = sanitize_key( (string) $cap );

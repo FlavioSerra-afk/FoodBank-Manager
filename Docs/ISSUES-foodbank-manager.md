@@ -6,6 +6,9 @@ Docs-Revision: 2025-09-05 (v1.2.8 release bump)
 - [P1] Admin notices duplicates → Fixed; Diagnostics shows render count
 - [P2] PHPCS flood from dist/ → Fixed (Prompt R); remaining items are docblocks/escaping
 
+## Resolved Issues
+- Menu not visible on fresh install → Administrators now self-heal capabilities; Diagnostics includes a Repair caps control.
+
 # FoodBank Manager — Issues & Milestones
 
 This file maps **milestones → epics → issues** so you can paste into GitHub.
