@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.2.7 UI Fix)
+Docs-Revision: 2025-09-05 (Hotfix J/K)
 # FoodBank Manager — Architecture
 
 ## Overview
@@ -31,9 +31,13 @@ A secure, privacy-first WordPress plugin for managing Food Bank applicant intake
 - QA/CI: `.github/workflows/release.yml`, `phpcs.xml`, `phpstan.neon`, `phpstan-bootstrap.php`, `composer.json` scripts.
 
 ## Boot & lifecycle
+- `foodbank-manager.php` attempts `vendor/autoload.php` and registers a lightweight PSR-4 fallback mapping `FBM\` classes in `includes/` and aliasing `FoodBankManager\` during migration.
 - Activation/deactivation: reflection-based call to instance/static `activate()`/`deactivate()` methods.
 - During `plugins_loaded`, `Core\Plugin::boot()` registers admin menus, REST routes, shortcodes, assets, and repairs roles/capabilities.
 - Admin notices display when the vendor autoloader is missing or the KEK is not defined.
+
+## Screen gating
+Notices and assets check `$screen->id` and run only on `toplevel_page_fbm` or `foodbank_page_fbm_*`. Each notice uses a printed flag to render once per page.
 
 ## Components
  - **Admin Pages:** Dashboard (`fb_manage_dashboard`), Attendance (`fb_manage_attendance`), Database (`fb_manage_database`), Forms (`fb_manage_forms`) with a read-only presets library, Shortcodes builder with preview (`fb_manage_forms`), Email Templates (`fb_manage_emails`), Settings (`fb_manage_settings`), Diagnostics (`fb_manage_diagnostics` – environment checks, test email, repair caps), Permissions (`fb_manage_permissions`), Design & Theme (`fb_manage_theme`).

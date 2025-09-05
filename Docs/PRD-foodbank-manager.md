@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.2.7 UI Fix)
+Docs-Revision: 2025-09-05 (Hotfix J/K)
 # FoodBank Manager — Product Requirements Document (PRD)
 
 **Repo file:** `Docs/PRD-foodbank-manager.md`  
@@ -291,6 +291,11 @@ The Shortcodes admin page includes a builder that outputs masked shortcode strin
 - **Accessibility:** WCAG-friendly labels, error summaries, keyboard navigation.
 - **Internationalization:** `.pot` provided; EN/PT included.
 - **Responsive:** mobile-first layout; touch-friendly controls.
+
+### Admin & Infrastructure
+- **Canonical Namespace:** `FBM\` is primary; `FoodBankManager\` is temporarily bridged via `class_alias` during transition.
+- **Bootstrap:** plugin must attempt `vendor/autoload.php`, then fallback PSR-4 (`FBM/` `FBManager`) with `includes/` mapping.
+- **Notices:** exactly one render per page; hook `admin_notices` only; gate by canonical screen IDs.
 
 ---
 
