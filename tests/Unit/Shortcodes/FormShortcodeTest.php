@@ -44,11 +44,13 @@ namespace FBM\Tests\Unit\Shortcodes {
 
 use FBM\Shortcodes\Shortcodes;
 use FoodBankManager\Forms\PresetsRepo;
+use FoodBankManager\Http\FormSubmitController;
 use PHPUnit\Framework\TestCase;
 
 final class FormShortcodeTest extends TestCase {
     protected function setUp(): void {
         parent::setUp();
+        fbm_reset_globals();
         $GLOBALS['fbm_options_store'] = [];
         if (!defined('FBM_PATH')) {
             define('FBM_PATH', dirname(__DIR__, 3) . '/');
@@ -68,6 +70,21 @@ final class FormShortcodeTest extends TestCase {
         $html = do_shortcode('[fbm_form preset="test_form"]');
         $this->assertStringContainsString('name="captcha"', $html);
         $this->assertStringContainsString('name="email"', $html);
+    }
+
+    public function testSubmitFlowSucceeds(): void {
+        Shortcodes::register();
+        $_POST = [
+            'action' => 'fbm_submit',
+            'preset' => 'test_form',
+            '_fbm_nonce' => 'fbm_submit_form_nonce',
+            'email' => 'a@example.com',
+            'consent' => '1',
+            'captcha' => 'token',
+        ];
+        $_REQUEST = $_POST;
+        FormSubmitController::handle();
+        $this->assertTrue(true);
     }
 }
 

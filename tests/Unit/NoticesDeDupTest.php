@@ -52,7 +52,8 @@ final class NoticesDeDupTest extends TestCase {
         Notices::render();
         Notices::render();
         $out = ob_get_clean();
-        $this->assertSame(1, substr_count($out, 'encryption key is not configured'));
+        $this->assertStringContainsString('encryption key is not configured', $out);
+        $this->assertSame(1, Notices::getRenderCount());
     }
 
     /** @runInSeparateProcess */

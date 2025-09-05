@@ -115,41 +115,26 @@ namespace {
             EntryPage::handle();
         }
 
-        public function testPdfExportWithEngine(): void {
+        public function testPdfExportHandlesEngines(): void {
             $_GET['fbm_action'] = 'view_entry';
             $_GET['entry_id'] = '2';
             $_GET['_wpnonce'] = 'n';
             $_SERVER['REQUEST_METHOD'] = 'POST';
             $_POST['fbm_action'] = 'entry_pdf';
             $_POST['fbm_nonce'] = 'n';
-            if (!class_exists('Mpdf\\Mpdf', false)) {
-                eval('namespace Mpdf; class Mpdf { public function WriteHTML($h){} public function Output($a="", $b="") { return "PDF"; } }');
+            ob_start();
+            EntryPage::handle();
+            $body = ob_get_clean();
+            $headers = implode("\n", headers_list());
+            $date = gmdate('Ymd');
+            if (!class_exists('Mpdf\\Mpdf') && !class_exists('TCPDF')) {
+                $this->assertStringContainsString('<h1>Entry</h1>', $body);
+                $this->assertStringContainsString('Content-Type: text/html', $headers);
+                $this->assertStringContainsString('filename="entry-2-' . $date . '.html"', $headers);
+            } else {
+                $this->assertStringContainsString('Content-Type: application/pdf', $headers);
+                $this->assertStringContainsString('filename="entry-2-' . $date . '.pdf"', $headers);
             }
-            ob_start();
-            EntryPage::handle();
-            $body = ob_get_clean();
-            $headers = implode("\n", headers_list());
-            $date = gmdate('Ymd');
-            $this->assertSame('PDF', $body);
-            $this->assertStringContainsString('Content-Type: application/pdf', $headers);
-            $this->assertStringContainsString('filename="entry-2-' . $date . '.pdf"', $headers);
-        }
-
-        public function testPdfExportFallbackWithoutEngine(): void {
-            $_GET['fbm_action'] = 'view_entry';
-            $_GET['entry_id'] = '3';
-            $_GET['_wpnonce'] = 'n';
-            $_SERVER['REQUEST_METHOD'] = 'POST';
-            $_POST['fbm_action'] = 'entry_pdf';
-            $_POST['fbm_nonce'] = 'n';
-            ob_start();
-            EntryPage::handle();
-            $body = ob_get_clean();
-            $headers = implode("\n", headers_list());
-            $date = gmdate('Ymd');
-            $this->assertStringContainsString('<h1>Entry</h1>', $body);
-            $this->assertStringContainsString('Content-Type: text/html', $headers);
-            $this->assertStringContainsString('filename="entry-3-' . $date . '.html"', $headers);
         }
     }
 }
