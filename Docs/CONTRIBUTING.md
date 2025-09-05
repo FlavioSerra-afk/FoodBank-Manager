@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.2.3 – Admin Menu De-dup + Canonical Screen IDs)
+Docs-Revision: 2025-09-04 (Wave v1.2.7 – Admin Menu De-dup + Canonical Screen IDs)
 # Contributing to PCC FoodBank Manager
 
 Thanks for helping build a secure and accessible tool for the community!  

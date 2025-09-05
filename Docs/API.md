@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.2.3 – Admin Menu De-dup + Canonical Screen IDs)
+Docs-Revision: 2025-09-04 (Wave v1.2.7 – Admin Menu De-dup + Canonical Screen IDs)
 # REST API (pcc-fb/v1)
 
 Base namespace: `pcc-fb/v1`. All write endpoints require `X-WP-Nonce` and capabilities.
