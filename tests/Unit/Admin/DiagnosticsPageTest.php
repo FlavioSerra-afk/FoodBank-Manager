@@ -14,11 +14,7 @@ namespace {
             return is_array( $value ) ? array_map( 'wp_unslash', $value ) : stripslashes( (string) $value );
         }
     }
-    if ( ! function_exists( 'current_user_can' ) ) {
-        function current_user_can( string $cap ): bool {
-            return DiagnosticsPageTest::$can;
-        }
-    }
+    // capability handled via $GLOBALS['fbm_user_caps']
     if ( ! function_exists( 'check_admin_referer' ) ) {
         function check_admin_referer( string $action, string $name = '_fbm_nonce' ): void {
             if ( empty( $_POST[ $name ] ) ) {
@@ -129,14 +125,14 @@ namespace {
      * @runInSeparateProcess
      */
     final class DiagnosticsPageTest extends TestCase {
-        public static bool $can = true;
         public static string $redirect = '';
         public static bool $mail_result = true;
         /** @var array<string,int> */
         public static array $cron_next = array();
 
         protected function setUp(): void {
-            self::$can        = true;
+            fbm_reset_globals();
+            $GLOBALS['fbm_user_caps'] = ['fb_manage_diagnostics' => true];
             self::$redirect   = '';
             self::$mail_result = true;
             \FoodBankManager\Auth\Roles::$installed = false;
@@ -185,6 +181,8 @@ namespace {
             if ( ! defined( 'FBM_PATH' ) ) {
                 define( 'FBM_PATH', dirname( __DIR__, 2 ) . '/' );
             }
+            $notices_render_count = 0;
+            $caps_count          = '0 / 0';
             ob_start();
             include FBM_PATH . 'templates/admin/diagnostics.php';
             $html = ob_get_clean();
@@ -210,6 +208,8 @@ namespace {
             if ( ! defined( 'FBM_PATH' ) ) {
                 define( 'FBM_PATH', dirname( __DIR__, 2 ) . '/' );
             }
+            $notices_render_count = 0;
+            $caps_count          = '0 / 0';
             ob_start();
             include FBM_PATH . 'templates/admin/diagnostics.php';
             $html = ob_get_clean();

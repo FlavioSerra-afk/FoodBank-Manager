@@ -10,11 +10,7 @@ if ( ! function_exists( 'wp_unslash' ) ) {
         return is_array( $value ) ? array_map( 'wp_unslash', $value ) : stripslashes( (string) $value );
     }
 }
-if ( ! function_exists( 'current_user_can' ) ) {
-    function current_user_can( string $cap ): bool {
-        return SettingsPageTest::$can;
-    }
-}
+// capability handled via $GLOBALS['fbm_user_caps']
 if ( ! function_exists( 'check_admin_referer' ) ) {
     function check_admin_referer( string $action, string $name = '_wpnonce' ): void {
         if ( empty( $_POST[ $name ] ) ) {
@@ -45,12 +41,12 @@ if ( ! function_exists( 'wp_safe_redirect' ) ) {
 }
 
 final class SettingsPageTest extends TestCase {
-    public static bool $can      = true;
     public static string $redirect = '';
 
     protected function setUp(): void {
         parent::setUp();
-        self::$can     = true;
+        fbm_reset_globals();
+        $GLOBALS['fbm_user_caps'] = ['fb_manage_settings' => true];
         self::$redirect = '';
         $_POST         = array();
         $_SERVER       = array();
@@ -69,7 +65,7 @@ final class SettingsPageTest extends TestCase {
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_POST['fbm_action']       = 'branding_save';
         $_POST['_fbm_nonce']       = 'nonce';
-        self::$can                 = false;
+        $GLOBALS['fbm_user_caps']['fb_manage_settings'] = false;
         $this->expectException( RuntimeException::class );
         SettingsPage::route();
     }

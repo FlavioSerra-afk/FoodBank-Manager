@@ -28,10 +28,7 @@ namespace FBM\Admin {
     }
     function wp_verify_nonce($nonce, $action = -1) { return true; }
     function wp_nonce_field($action = -1, $name = '_wpnonce', $referer = true, $echo = true) { return ''; }
-    function current_user_can($cap) {
-        $map = $GLOBALS['fbm_current_user_caps'] ?? [];
-        return $map[$cap] ?? true;
-    }
+    function current_user_can($cap) { return \current_user_can($cap); }
     function wp_safe_redirect($url, $status = 302) { $GLOBALS['fbm_redirect_to'] = (string)$url; return true; }
     function wp_die($message = '') { throw new \RuntimeException((string)$message ?: 'wp_die'); }
 }
@@ -78,6 +75,47 @@ namespace FBM\Mail {
  * Guarded global fallbacks (only if tests call global functions)
  * --------------------------- */
 namespace {
+    // Store simulated caps here
+    if (!isset($GLOBALS['fbm_user_caps'])) $GLOBALS['fbm_user_caps'] = [];
+
+    if (!function_exists('current_user_can')) {
+        function current_user_can($cap) {
+            $caps = $GLOBALS['fbm_user_caps'] ?? [];
+            if (array_key_exists((string)$cap, $caps)) {
+                return (bool)$caps[(string)$cap];
+            }
+            return true;
+        }
+    }
+    if (!function_exists('get_role')) {
+        function get_role($role) {
+            static $roles = [];
+            if (!isset($roles[$role])) {
+                $roles[$role] = new class {
+                    public array $caps = [];
+                    public function add_cap($cap) { $this->caps[$cap] = true; }
+                    public function remove_cap($cap) { unset($this->caps[$cap]); }
+                    public function has_cap($cap) { return isset($this->caps[$cap]); }
+                };
+            }
+            return $roles[$role];
+        }
+    }
+    if (!function_exists('user_can')) {
+        function user_can($user, $cap) { return current_user_can($cap); }
+    }
+    if (!function_exists('manage_options')) {
+        // Not a WP function, but we’ll simulate by setting a flag in tests via current_user_can('manage_options')
+    }
+    if (!function_exists('get_transient')) {
+        function get_transient($key) { return $GLOBALS['fbm_transients'][$key] ?? false; }
+    }
+    if (!function_exists('set_transient')) {
+        function set_transient($key, $value, $expiration = 0) { $GLOBALS['fbm_transients'][$key] = $value; return true; }
+    }
+    if (!function_exists('delete_transient')) {
+        function delete_transient($key) { unset($GLOBALS['fbm_transients'][$key]); return true; }
+    }
     if (!function_exists('check_admin_referer')) {
         function check_admin_referer($action = -1, $name = '_wpnonce') {
             if (empty($_REQUEST[$name])) {
@@ -92,8 +130,16 @@ namespace {
     if (!function_exists('wp_nonce_field')) {
         function wp_nonce_field($action = -1, $name = '_wpnonce', $referer = true, $echo = true) { return ''; }
     }
+    if (!function_exists('wp_create_nonce')) {
+        function wp_create_nonce($action = -1) { return 'nonce'; }
+    }
     if (!function_exists('sanitize_text_field')) {
-        function sanitize_text_field($str) { return is_string($str) ? trim($str) : ''; }
+        function sanitize_text_field($str) {
+            $str = is_string($str) ? $str : '';
+            $str = strip_tags($str);
+            $str = preg_replace('/[\r\n\t\0\x0B]/', '', $str);
+            return trim($str);
+        }
     }
     if (!function_exists('sanitize_email')) {
         function sanitize_email($email) { return filter_var((string)$email, FILTER_SANITIZE_EMAIL); }
@@ -103,6 +149,9 @@ namespace {
     }
     if (!function_exists('esc_html')) {
         function esc_html($text) { return htmlspecialchars((string)$text, ENT_QUOTES, 'UTF-8'); }
+    }
+    if (!function_exists('esc_html__')) {
+        function esc_html__($text, $domain = 'default') { return (string)$text; }
     }
     if (!function_exists('esc_attr')) {
         function esc_attr($text) { return htmlspecialchars((string)$text, ENT_QUOTES, 'UTF-8'); }
@@ -122,6 +171,9 @@ namespace {
         function header($string, $replace = true, $http_response_code = 0) {
             $GLOBALS['fbm_headers'][] = [$string, $replace, $http_response_code];
         }
+    }
+    if (!function_exists('wp_die')) {
+        function wp_die($message = '') { throw new \RuntimeException((string)$message ?: 'wp_die'); }
     }
     if (!function_exists('add_shortcode')) {
         $GLOBALS['fbm_shortcodes'] = [];

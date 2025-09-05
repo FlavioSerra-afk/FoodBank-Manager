@@ -6,10 +6,7 @@ use PHPUnit\Framework\TestCase;
 final class DashboardExportControllerTest extends TestCase {
     /** @runInSeparateProcess */
     public function testNonceRequired(): void {
-        $GLOBALS['fbm_can_dash'] = true;
-        if ( ! function_exists( 'current_user_can' ) ) {
-            function current_user_can() { return $GLOBALS['fbm_can_dash']; }
-        }
+        $GLOBALS['fbm_user_caps'] = ['fb_manage_dashboard' => true];
         if ( ! function_exists( 'wp_verify_nonce' ) ) {
             function wp_verify_nonce() { return false; }
         }

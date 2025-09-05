@@ -10,14 +10,7 @@ namespace {
     if ( ! function_exists( 'sanitize_email' ) ) {
         function sanitize_email( $email ) { return filter_var( $email, FILTER_SANITIZE_EMAIL ); }
     }
-    if ( ! function_exists( 'current_user_can' ) ) {
-        function current_user_can( string $cap ): bool {
-            if ( 'fb_view_sensitive' === $cap ) {
-                return GDPRPageTest::$can_sensitive;
-            }
-            return GDPRPageTest::$can_manage;
-        }
-    }
+    // capability handled via $GLOBALS['fbm_user_caps']
     if ( ! function_exists( 'check_admin_referer' ) ) {
         function check_admin_referer( string $action, string $name = '_fbm_nonce' ): void {
             if ( empty( $_POST[ $name ] ) ) {
@@ -85,13 +78,11 @@ namespace {
      * @runTestsInSeparateProcesses
      */
     final class GDPRPageTest extends TestCase {
-        public static bool $can_manage = true;
-        public static bool $can_sensitive = false;
         public static string $redirect = '';
 
         protected function setUp(): void {
-            self::$can_manage    = true;
-            self::$can_sensitive = false;
+            fbm_reset_globals();
+            $GLOBALS['fbm_user_caps'] = ['fb_manage_diagnostics' => true];
             self::$redirect      = '';
             $_GET = $_POST = $_SERVER = array();
             if (!class_exists('FoodBankManager\\Database\\ApplicationsRepo', false)) {
@@ -136,7 +127,7 @@ namespace {
         }
 
         public function testUnmaskedWithCapability(): void {
-            self::$can_sensitive = true;
+            $GLOBALS['fbm_user_caps']['fb_view_sensitive'] = true;
             $_SERVER['REQUEST_METHOD'] = 'POST';
             $_POST['fbm_action'] = 'export';
             $_POST['_fbm_nonce'] = 'n';
