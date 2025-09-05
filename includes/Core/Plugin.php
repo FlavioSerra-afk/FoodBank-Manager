@@ -43,9 +43,10 @@ final class Plugin {
                 if ( self::$booted ) {
                         return;
                 }
-                self::$booted = true;
-                Options::boot();
-                Retention::init();
+               self::$booted = true;
+               \FBM\Shortcodes\Shortcodes::register();
+               Options::boot();
+               Retention::init();
                 add_action(
                         'init',
                         static function (): void {

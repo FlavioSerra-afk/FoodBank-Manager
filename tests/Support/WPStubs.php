@@ -117,4 +117,22 @@ namespace {
             $GLOBALS['fbm_headers'][] = [$string, $replace, $http_response_code];
         }
     }
+    if (!function_exists('add_shortcode')) {
+        $GLOBALS['fbm_shortcodes'] = [];
+        function add_shortcode($tag, $callback) { $GLOBALS['fbm_shortcodes'][$tag] = $callback; }
+    }
+    if (!function_exists('do_shortcode')) {
+        function do_shortcode($content) {
+            return preg_replace_callback('/\[(\w+)([^\]]*)\]/', function ($m) {
+                $tag = $m[1];
+                $atts = [];
+                if (preg_match_all('/(\w+)="([^"]*)"/', $m[2], $am, PREG_SET_ORDER)) {
+                    foreach ($am as $a) { $atts[$a[1]] = $a[2]; }
+                }
+                $cb = $GLOBALS['fbm_shortcodes'][$tag] ?? null;
+                if (!$cb) return '';
+                return call_user_func($cb, $atts, '', $tag);
+            }, $content);
+        }
+    }
 }
