@@ -1,7 +1,14 @@
-Docs-Revision: 2025-09-04 (Wave v1.2.7 UI Fix)
+Docs-Revision: 2025-09-05 (Hotfix J/K)
+
+## Active Issues
+- [P0] Staging fatal on v1.2.7 — root cause: mixed namespaces + lack of production autoload; fixed via fallback PSR-4 and namespace aliases in `foodbank-manager.php`.
+- [P1] Duplicate notices on some admin pages — root cause: multiple hooks / missing printed guard; fixed by idempotent register and single-render guard, screen-gated by `toplevel_page_fbm` / `foodbank_page_fbm_*`.
+- [P2] PHPCS flood — ensure `phpcs.xml` excludes `dist/*` and `vendor/*`; run `phpcbf` then hand-fix remaining sniffs.
+- [P2] PHPUnit flakes — tests must use namespaced stubs, no anonymous providers; optional extensions gated/skipped.
+
 # FoodBank Manager — Issues & Milestones
 
-This file maps **milestones → epics → issues** so you can paste into GitHub.  
+This file maps **milestones → epics → issues** so you can paste into GitHub.
 Use alongside the PRD: `PRD-foodbank-manager.md`.
 
 _Post-release notes (2025-09-04): Reinstalled v1.2.7 ZIP on staging with quick click-through — no follow-ups identified._

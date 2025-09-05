@@ -4,6 +4,9 @@
 ### Build
 - bump version to 1.2.7.
 
+### Docs
+- document namespace bridge, bootstrap fallback, notice gating, and PHPCS exclusions; add active issues overview.
+
 ## [1.2.6] - 2025-09-05
 ### QA
 - test: replace anonymous test doubles with named stubs; add deterministic WP function shims for unit tests.
