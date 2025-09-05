@@ -19,9 +19,11 @@ if ( ! function_exists( 'esc_html' ) ) {
 }
 
 final class MenuTest extends TestCase {
+    protected function setUp(): void {
+        parent::setUp();
+        fbm_test_reset_globals();
+    }
     public function testRegisterIdempotent(): void {
-        $GLOBALS['fbm_test_calls'] = ['add_menu_page'=>[], 'add_submenu_page'=>[]];
-
         Menu::register();
         Menu::register(); // should be idempotent
 

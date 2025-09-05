@@ -45,7 +45,7 @@ final class SettingsPageTest extends TestCase {
 
     protected function setUp(): void {
         parent::setUp();
-        fbm_reset_globals();
+        fbm_test_reset_globals();
         $GLOBALS['fbm_user_caps'] = ['fb_manage_settings' => true];
         self::$redirect = '';
         $_POST         = array();

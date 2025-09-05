@@ -36,7 +36,7 @@ if (!function_exists('add_action')) {
 
 final class NoticesDeDupTest extends TestCase {
     protected function setUp(): void {
-        fbm_reset_globals();
+        fbm_test_reset_globals();
         $GLOBALS['fbm_test_screen_id'] = null;
         $GLOBALS['fbm_user_caps'] = ['manage_options' => true];
         if (!defined('FBM_KEK_BASE64')) {

@@ -50,7 +50,7 @@ use PHPUnit\Framework\TestCase;
 final class FormShortcodeTest extends TestCase {
     protected function setUp(): void {
         parent::setUp();
-        fbm_reset_globals();
+        fbm_test_reset_globals();
         $GLOBALS['fbm_options_store'] = [];
         if (!defined('FBM_PATH')) {
             define('FBM_PATH', dirname(__DIR__, 3) . '/');

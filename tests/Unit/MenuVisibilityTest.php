@@ -6,7 +6,7 @@ use FoodBankManager\Admin\Menu;
 
 final class MenuVisibilityTest extends TestCase {
     protected function setUp(): void {
-        fbm_reset_globals();
+        fbm_test_reset_globals();
         $ref = new \ReflectionClass(Menu::class);
         $prop = $ref->getProperty('registered');
         $prop->setAccessible(true);
@@ -14,7 +14,7 @@ final class MenuVisibilityTest extends TestCase {
     }
 
     protected function tearDown(): void {
-        fbm_reset_globals();
+        fbm_test_reset_globals();
     }
 
     public function testParentMenuFallsBackToManageOptions(): void {

@@ -32,7 +32,7 @@ if (!function_exists('is_email')) {
 
 final class NoticesTest extends TestCase {
     protected function setUp(): void {
-        fbm_reset_globals();
+        fbm_test_reset_globals();
         $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_diagnostics';
         $caps = array_fill_keys(\FBM\Auth\Capabilities::all(), false);
         $caps['manage_options'] = true;
