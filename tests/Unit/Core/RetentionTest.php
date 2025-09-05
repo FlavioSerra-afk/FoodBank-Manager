@@ -54,18 +54,19 @@ final class RetentionTest extends TestCase {
         if (!defined('ABSPATH')) {
             define('ABSPATH', __DIR__);
         }
-        global $fbm_test_options, $wpdb;
+        global $fbm_test_options, $fbm_options, $wpdb;
         $fbm_test_options = [
             'fbm_settings' => [
                 'privacy' => [
                     'retention' => [
                         'applications' => ['days' => 1, 'policy' => 'delete'],
                         'attendance'   => ['days' => 1, 'policy' => 'anonymise'],
-                        'mail_log'     => ['days' => 1, 'policy' => 'delete'],
+                        'mail'         => ['days' => 1, 'policy' => 'delete'],
                     ],
                 ],
             ],
         ];
+        $fbm_options =& $fbm_test_options;
         $wpdb = new RetentionDBStub();
         $wpdb->ids['wp_fb_applications'] = range(1,250);
         $wpdb->ids['wp_fb_attendance'] = [1,2];
@@ -77,7 +78,7 @@ final class RetentionTest extends TestCase {
         $summary = Retention::run(false);
         $this->assertSame(200, $summary['applications']['deleted']);
         $this->assertSame(2, $summary['attendance']['anonymised']);
-        $this->assertSame(1, $summary['mail_log']['deleted']);
+        $this->assertSame(1, $summary['mail']['deleted']);
         $all = implode(' ', $wpdb->queries);
         $this->assertStringContainsString('DELETE FROM wp_fb_applications', $all);
         $this->assertStringContainsString('UPDATE wp_fb_attendance', $all);

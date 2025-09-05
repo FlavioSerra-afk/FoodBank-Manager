@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-05 (Notices de-dup verify)
+Docs-Revision: 2025-09-05 (QA Lockdown PQR)
 # FoodBank Manager — Product Requirements Document (PRD)
 
 **Repo file:** `Docs/PRD-foodbank-manager.md`  
@@ -295,7 +295,8 @@ The Shortcodes admin page includes a builder that outputs masked shortcode strin
 ### Admin & Infrastructure
 - **Canonical Namespace:** `FBM\` is primary; `FoodBankManager\` is temporarily bridged via `class_alias` during transition.
 - **Bootstrap:** plugin must attempt `vendor/autoload.php`, then fallback PSR-4 (`FBM/` `FBManager`) with `includes/` mapping.
-- **Notices:** exactly one render per page; hook `admin_notices` only; gate by canonical screen IDs.
+- **Shortcodes:** registered by `FBM\Shortcodes\Shortcodes::register()` during `Core\Plugin::boot()`; per-form CAPTCHA renders when enabled.
+- **Notices:** single hook (`admin_notices`), single render per request, gated by canonical screen IDs.
 
 ---
 

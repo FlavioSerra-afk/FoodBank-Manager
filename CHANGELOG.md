@@ -4,8 +4,18 @@
 ### Build
 - bump version to 1.2.7.
 
+### Test
+- add WP helper stubs (absint, add_query_arg, wp_salt, …)
+
+### Fixes
+- fix(core): normalize retention config (typed)
+
+### Chore
+- chore(cs): exclude dist/, docblocks & strict types
+
 ### Docs
 - document namespace bridge, bootstrap fallback, notice gating, and PHPCS exclusions; add active issues overview.
+- PRD/Architecture/Issues updated; diagnostics surfaces notices count
 
 ## [1.2.6] - 2025-09-05
 ### QA
