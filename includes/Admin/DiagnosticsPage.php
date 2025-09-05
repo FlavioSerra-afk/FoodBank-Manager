@@ -87,6 +87,13 @@ class DiagnosticsPage {
                 $owned               = array_filter( $caps, static fn( $c ) => current_user_can( $c ) );
                 $caps_count          = count( $owned ) . ' / ' . count( $caps );
 
+                $rows = array();
+                global $menu; $count = 0;
+                if ( is_array( $menu ) ) {
+                        foreach ( $menu as $it ) { if ( isset( $it[2] ) && $it[2] === 'fbm' ) { $count++; } }
+                }
+                $rows[] = array( 'Menu parents registered', (string) $count, $count === 1 ? 'ok' : 'warn' );
+
                 /* @psalm-suppress UnresolvableInclude */
                 require FBM_PATH . 'templates/admin/diagnostics.php';
         }

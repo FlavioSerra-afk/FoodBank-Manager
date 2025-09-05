@@ -32,6 +32,7 @@ foreach ( \FoodBankManager\Admin\Menu::slugs() as $slug ) {
 $slugs_ok   = empty( $missing_slugs );
 $screen     = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
 $gating_ok  = \FoodBankManager\Core\Screen::is_fbm_screen();
+$rows       = $rows ?? array();
 ?>
 <div class="wrap fbm-admin">
     <h1><?php esc_html_e( 'Diagnostics', 'foodbank-manager' ); ?></h1>
@@ -61,6 +62,25 @@ $gating_ok  = \FoodBankManager\Core\Screen::is_fbm_screen();
         <li><?php echo esc_html( 'Last successful FBM boot (plugins_loaded): ' . $boot_status ); ?></li>
         <li><?php echo esc_html( 'Admin notices rendered this request: ' . $notices_render_count ); ?></li>
     </ul>
+    <h2><?php esc_html_e( 'Quick Checks', 'foodbank-manager' ); ?></h2>
+    <table class="widefat">
+        <thead>
+            <tr>
+                <th><?php esc_html_e( 'Check', 'foodbank-manager' ); ?></th>
+                <th><?php esc_html_e( 'Value', 'foodbank-manager' ); ?></th>
+                <th><?php esc_html_e( 'Status', 'foodbank-manager' ); ?></th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ( $rows as $row ) : ?>
+            <tr>
+                <td><?php echo esc_html( $row[0] ); ?></td>
+                <td><?php echo esc_html( $row[1] ); ?></td>
+                <td><?php echo 'ok' === $row[2] ? '✅' : '⚠️'; ?></td>
+            </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
       <h2><?php esc_html_e( 'Menu Visibility', 'foodbank-manager' ); ?></h2>
       <p><?php esc_html_e( 'FBM caps held by current user:', 'foodbank-manager' ); ?> <strong><?php echo esc_html( $caps_count ); ?></strong></p>
       <form method="post" action="">

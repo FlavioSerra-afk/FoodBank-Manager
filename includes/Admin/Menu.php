@@ -161,17 +161,18 @@ final class Menu {
 			array( \FoodBankManager\Admin\ThemePage::class, 'route' )
 		);
 
-				add_submenu_page(
-					$parent_slug,
-					esc_html__( 'Shortcodes', 'foodbank-manager' ),
-					esc_html__( 'Shortcodes', 'foodbank-manager' ),
-					self::CAP_FORMS,
-					'fbm_shortcodes',
-					array( \FoodBankManager\Admin\ShortcodesPage::class, 'route' )
-				);
+                                add_submenu_page(
+                                        $parent_slug,
+                                        esc_html__( 'Shortcodes', 'foodbank-manager' ),
+                                        esc_html__( 'Shortcodes', 'foodbank-manager' ),
+                                        self::CAP_FORMS,
+                                        'fbm_shortcodes',
+                                        array( \FoodBankManager\Admin\ShortcodesPage::class, 'route' )
+                                );
+                                do_action( 'fbm_menu_registered' );
 
-				EntryPage::register();
-	}
+                                EntryPage::register();
+        }
 
 				/**
 				 * Render the dashboard page.
