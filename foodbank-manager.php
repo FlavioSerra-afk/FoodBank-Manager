@@ -14,96 +14,135 @@
 
 declare( strict_types=1 );
 
-namespace FoodBankManager;
-
 if ( ! defined( 'ABSPATH' ) ) {
-	exit;
+    return;
 }
 
-// Paths/URLs.
 define( 'FBM_FILE', __FILE__ );
 define( 'FBM_PATH', plugin_dir_path( __FILE__ ) );
 define( 'FBM_URL', plugin_dir_url( __FILE__ ) );
 
-// Prefer Composer if present.
-if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
-        require __DIR__ . '/vendor/autoload.php';
+$fbm_autoload = FBM_PATH . 'vendor/autoload.php';
+if ( is_readable( $fbm_autoload ) ) {
+    require_once $fbm_autoload;
 }
 
-// Fallback PSR-4 autoloader for both namespaces: FBM\ and FoodBankManager\.
+/** Robust PSR-4 fallback for both namespaces */
 spl_autoload_register(
-        static function ( $class ): void {
-                if ( strncmp( $class, 'FBM\\', 4 ) !== 0 && strncmp( $class, 'FoodBankManager\\', 17 ) !== 0 ) {
-                        return;
-                }
-                $rel  = preg_replace( '#^(FBM\\\\|FoodBankManager\\\\)#', '', $class );
-                $path = __DIR__ . '/includes/' . str_replace( '\\', '/', $rel ) . '.php';
-                if ( is_file( $path ) ) {
-                        require $path;
-                }
+    static function ( $class ): void {
+        if ( strpos( $class, 'FBM\\' ) !== 0 && strpos( $class, 'FoodBankManager\\' ) !== 0 ) {
+            return;
         }
+        $base = FBM_PATH . 'includes/';
+        $rel  = str_replace( [ 'FBM\\', 'FoodBankManager\\' ], '', $class );
+        $file = $base . str_replace( '\\', '/', $rel ) . '.php';
+        if ( is_readable( $file ) ) {
+            require_once $file;
+        }
+    }
 );
 
-// Namespace bridges (temporary): map old <-> new so both references work.
-if ( ! class_exists( 'FBM\\Core\\Retention' ) && class_exists( 'FoodBankManager\\Core\\Retention' ) ) {
-        class_alias( 'FoodBankManager\\Core\\Retention', 'FBM\\Core\\Retention' );
-}
-if ( ! class_exists( 'FBM\\Exports\\SarExporter' ) && class_exists( 'FoodBankManager\\Exports\\SarExporter' ) ) {
-        class_alias( 'FoodBankManager\\Exports\\SarExporter', 'FBM\\Exports\\SarExporter' );
-}
-if ( ! class_exists( 'FBM\\Mail\\LogRepo' ) && class_exists( 'FoodBankManager\\Mail\\LogRepo' ) ) {
-        class_alias( 'FoodBankManager\\Mail\\LogRepo', 'FBM\\Mail\\LogRepo' );
+/** Namespace bridging (whichever exists first becomes canonical) */
+if ( class_exists( 'FBM\\Core\\Plugin' ) && ! class_exists( 'FoodBankManager\\Core\\Plugin' ) ) {
+    class_alias( 'FBM\\Core\\Plugin', 'FoodBankManager\\Core\\Plugin' );
+} elseif ( class_exists( 'FoodBankManager\\Core\\Plugin' ) && ! class_exists( 'FBM\\Core\\Plugin' ) ) {
+    class_alias( 'FoodBankManager\\Core\\Plugin', 'FBM\\Core\\Plugin' );
 }
 
-// If our core class still isn't available, show a safe admin notice and bail (no fatals).
+/** Boot watchdog flag each admin request */
 add_action(
-        'admin_notices',
-        static function () {
-                if ( ! class_exists( \FoodBankManager\Core\Plugin::class ) ) {
-                        $s = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-                        if ( ! $s || ( strpos( $s->id, 'toplevel_page_fbm' ) !== 0 && strpos( $s->id, 'foodbank_page_fbm_' ) !== 0 ) ) {
-                                return;
-                        }
-                        $notice = esc_html__( 'Autoloader not found.', 'foodbank-manager' ) . ' '
-                                . esc_html__( 'Please install using the Release ZIP from GitHub.', 'foodbank-manager' ) . ' '
-                                . esc_html__( 'The ZIP includes the vendor/ folder.', 'foodbank-manager' ) . ' '
-                                . esc_html__( 'Alternatively, run composer install before activation.', 'foodbank-manager' );
-                        printf(
-                                '<div class="notice notice-error"><p><strong>FoodBank Manager:</strong> %s</p></div>',
-                                esc_html( $notice )
-                        );
-                }
+    'plugins_loaded',
+    static function (): void {
+        if ( class_exists( '\FBM\Core\Plugin' ) ) {
+            \FBM\Core\Plugin::boot();
+            set_transient( 'fbm_boot_ok', time(), defined( 'MINUTE_IN_SECONDS' ) ? MINUTE_IN_SECONDS : 60 );
+            do_action( 'fbm_booted' );
         }
+    },
+    0
 );
-if ( ! class_exists( \FoodBankManager\Core\Plugin::class ) ) {
-	return;
-}
 
-// Boot plugin after all plugins load.
+/**
+ * Failsafe parent menu: always give true admins a way in.
+ * Submenus remain strictly FBM-gated in Admin\Menu as before.
+ */
 add_action(
-        'plugins_loaded',
-        static function (): void {
-                \FoodBankManager\Core\Plugin::boot();
+    'admin_menu',
+    static function (): void {
+        if ( ! current_user_can( 'manage_options' ) && ! current_user_can( 'fb_manage_dashboard' ) ) {
+            return;
         }
+
+        $root_cap = current_user_can( 'fb_manage_dashboard' ) ? 'fb_manage_dashboard' : 'manage_options';
+
+        add_menu_page(
+            __( 'FoodBank', 'foodbank-manager' ),
+            __( 'FoodBank', 'foodbank-manager' ),
+            $root_cap,
+            'fbm',
+            static function (): void {
+                if ( class_exists( '\FBM\Admin\Menu' ) && method_exists( '\FBM\Admin\Menu', 'render_dashboard' ) ) {
+                    \FBM\Admin\Menu::render_dashboard();
+                    return;
+                }
+                if ( ! current_user_can( 'manage_options' ) ) {
+                    return;
+                }
+                $diag = admin_url( 'admin.php?page=fbm_diagnostics' );
+                echo '<div class="wrap"><h1>' . esc_html__( 'FoodBank Manager', 'foodbank-manager' ) . '</h1>';
+                echo '<p>' . esc_html__( 'Plugin bootstrap has not completed yet on this request. You can still reach Diagnostics to repair capabilities or run health checks.', 'foodbank-manager' ) . '</p>';
+                echo '<p><a class="button button-primary" href="' . esc_url( $diag ) . '">' . esc_html__( 'Open Diagnostics', 'foodbank-manager' ) . '</a></p></div>';
+            },
+            'dashicons-groups',
+            58
+        );
+    },
+    9
+);
+
+/** Emergency notice if boot didn’t run on this request (admins only) */
+add_action(
+    'admin_notices',
+    static function (): void {
+        if ( ! is_admin() || ! current_user_can( 'manage_options' ) ) {
+            return;
+        }
+        if ( get_transient( 'fbm_boot_ok' ) ) {
+            return;
+        }
+        $diag = admin_url( 'admin.php?page=fbm_diagnostics' );
+        echo '<div class="notice notice-warning"><p>' .
+            esc_html__( 'FoodBank Manager is installed but did not complete bootstrap on this request.', 'foodbank-manager' ) .
+            ' <a href="' . esc_url( $diag ) . '">' . esc_html__( 'Open Diagnostics → Repair caps', 'foodbank-manager' ) . '</a>' .
+            '</p></div>';
+    },
+    1
 );
 
 // Activation/Deactivation hooks.
-register_activation_hook( FBM_FILE, [ \FoodBankManager\Core\Plugin::class, 'activate' ] );
-register_activation_hook( __FILE__, static function () {
-        if ( class_exists( \FBM\Auth\Capabilities::class ) ) {
-                \FBM\Auth\Capabilities::ensure_for_admin();
+register_activation_hook( FBM_FILE, [ \FBM\Core\Plugin::class, 'activate' ] );
+register_activation_hook(
+    __FILE__,
+    static function (): void {
+        if ( class_exists( '\FBM\Auth\Capabilities' ) ) {
+            \FBM\Auth\Capabilities::ensure_for_admin();
         }
-} );
+    }
+);
 
-if ( ! function_exists( __NAMESPACE__ . '\\pcc_fbm_deactivate' ) ) {
-		/**
-		 * Wrapper for plugin deactivation.
-		 */
-	function pcc_fbm_deactivate(): void {
-			$plugin = new \FoodBankManager\Core\Plugin();
-		if ( method_exists( $plugin, 'deactivate' ) ) {
-				$plugin->deactivate();
-		}
-	}
+if ( ! function_exists( 'fbm_deactivate' ) ) {
+    /**
+     * Wrapper for plugin deactivation.
+     */
+    function fbm_deactivate(): void {
+        if ( ! class_exists( '\FBM\Core\Plugin' ) ) {
+            return;
+        }
+        $plugin = new \FBM\Core\Plugin();
+        if ( method_exists( $plugin, 'deactivate' ) ) {
+            $plugin->deactivate();
+        }
+    }
 }
-register_deactivation_hook( __FILE__, __NAMESPACE__ . '\\pcc_fbm_deactivate' );
+register_deactivation_hook( __FILE__, 'fbm_deactivate' );
+
