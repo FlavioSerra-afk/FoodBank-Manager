@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.8 — 2025-09-05
+- chore(release): version bump only (no runtime changes)
+- docs: note test stubs (WP helpers), retention config normalizer, notices de-dup diagnostics
+
 ## [1.2.7] - 2025-09-05
 ### Build
 - bump version to 1.2.7.

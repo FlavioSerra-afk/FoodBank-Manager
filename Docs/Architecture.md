@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-05 (QA Lockdown PQR)
+Docs-Revision: 2025-09-05 (v1.2.8 release bump)
 # FoodBank Manager — Architecture
 
 ## Overview
