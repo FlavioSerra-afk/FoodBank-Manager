@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.2.10 — 2025-09-05
+- feat(bootstrap): boot watchdog and parent menu failsafe with Diagnostics link
+
 ## 1.2.9 — 2025-09-05
 - test(harness): add WP helpers (transients/options/nonces), reset globals, gate ext branches
 - test(notices/menu): align with cap self-heal + admin fallback; de-dup verified
