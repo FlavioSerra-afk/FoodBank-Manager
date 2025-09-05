@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-05 (QA Lockdown PQR)
+Docs-Revision: 2025-09-05 (v1.2.8 release bump)
 
 ## Active Issues
 - [P0] PHPUnit WP stub gaps → Fixed (Prompt P)

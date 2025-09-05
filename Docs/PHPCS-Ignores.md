@@ -1,3 +1,5 @@
+Docs-Revision: 2025-09-05 (v1.2.8 release bump)
+
 # PHPCS Ignores & Suppressed Issues Dashboard
 
 _Generated: 2025-09-05 15:14:21Z
