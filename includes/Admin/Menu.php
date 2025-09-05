@@ -66,27 +66,27 @@ final class Menu {
                 self::$registered = true;
                 $parent_slug      = 'fbm';
 
-                $root_cap = current_user_can( self::CAP_DASHBOARD )
-                        ? self::CAP_DASHBOARD
+                $root_cap = current_user_can( 'fb_manage_dashboard' )
+                        ? 'fb_manage_dashboard'
                         : ( current_user_can( 'manage_options' ) ? 'manage_options' : 'do_not_allow' );
 
                 add_menu_page(
-                                esc_html__( 'FoodBank', 'foodbank-manager' ),
-                                esc_html__( 'FoodBank', 'foodbank-manager' ),
-                                $root_cap,
-                                $parent_slug,
-                                array( self::class, 'dashboard' ),
-                                'dashicons-clipboard',
-                                58
-                        );
+                        __( 'FoodBank', 'foodbank-manager' ),
+                        __( 'FoodBank', 'foodbank-manager' ),
+                        $root_cap,
+                        $parent_slug,
+                        array( self::class, 'render_dashboard' ),
+                        'dashicons-groups',
+                        58
+                );
 
 		add_submenu_page(
-			$parent_slug,
-			esc_html__( 'Dashboard', 'foodbank-manager' ),
-			esc_html__( 'Dashboard', 'foodbank-manager' ),
-			self::CAP_DASHBOARD,
-			$parent_slug,
-			array( self::class, 'dashboard' )
+                        $parent_slug,
+                        esc_html__( 'Dashboard', 'foodbank-manager' ),
+                        esc_html__( 'Dashboard', 'foodbank-manager' ),
+                        self::CAP_DASHBOARD,
+                        $parent_slug,
+                        array( self::class, 'render_dashboard' )
 		);
 
 		add_submenu_page(
@@ -180,9 +180,9 @@ final class Menu {
 				 *
 				 * @return void
 				 */
-	public static function dashboard(): void {
-					self::include_template( 'dashboard.php' );
-	}
+        public static function render_dashboard(): void {
+                self::include_template( 'dashboard.php' );
+        }
 
 		/**
 		 * Safely include an admin template.

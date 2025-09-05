@@ -36,6 +36,7 @@ A secure, privacy-first WordPress plugin for managing Food Bank applicant intake
 - Activation/deactivation: reflection-based call to instance/static `activate()`/`deactivate()` methods.
 - During `plugins_loaded`, `Core\Plugin::boot()` registers admin menus, REST routes, shortcodes, assets, and repairs roles/capabilities. An idempotent ensurer grants Administrators all FBM capabilities on each admin request.
 - The FoodBank parent menu falls back to `manage_options` visibility if FBM caps are missing; submenus remain gated by their FBM capabilities.
+- When no FBM caps are detected for an Administrator, a transient-limited, text-only notice (no global assets) prompts Diagnostics → Repair caps and can be dismissed for 24 h.
 - Admin notices display when the vendor autoloader is missing or the KEK is not defined.
 - Diagnostics surfaces notices render count via `Notices::getRenderCount()`.
 
