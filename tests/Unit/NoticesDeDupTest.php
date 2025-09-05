@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 use FoodBankManager\Admin\Notices;
+
 if (!function_exists('get_current_screen')) {
     function get_current_screen() {
         $id = $GLOBALS['fbm_test_screen_id'] ?? null;
@@ -33,31 +34,32 @@ if (!function_exists('is_email')) {
     function is_email($email) { return true; }
 }
 
-final class NoticesTest extends TestCase {
+final class NoticesDeDupTest extends TestCase {
     protected function setUp(): void {
-        $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_diagnostics';
+        $GLOBALS['fbm_test_screen_id'] = null;
+        if (!defined('FBM_KEK_BASE64')) {
+            define('FBM_KEK_BASE64', 'dummy');
+        }
     }
 
     /** @runInSeparateProcess */
-    public function testMissingKekBailsOnNonFbmScreen(): void {
+    public function testRenderPrintsOncePerRequest(): void {
+        $GLOBALS['fbm_test_screen_id'] = 'toplevel_page_fbm';
+        Notices::missing_kek();
+        ob_start();
+        Notices::render();
+        Notices::render();
+        $out = ob_get_clean();
+        $this->assertSame(1, substr_count($out, 'encryption key is not configured'));
+    }
+
+    /** @runInSeparateProcess */
+    public function testRenderBailsOnNonFbmScreen(): void {
         $GLOBALS['fbm_test_screen_id'] = 'dashboard';
         Notices::missing_kek();
         ob_start();
         Notices::render();
         $out = ob_get_clean();
         $this->assertSame('', $out);
-    }
-
-    /** @runInSeparateProcess */
-    public function testMissingKekShowsOnFbmScreen(): void {
-        $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_diagnostics';
-        if (!defined('FBM_KEK_BASE64')) {
-            define('FBM_KEK_BASE64', 'dummy');
-        }
-        Notices::missing_kek();
-        ob_start();
-        Notices::render();
-        $out = ob_get_clean();
-        $this->assertStringContainsString('FoodBank Manager encryption key is not configured.', $out);
     }
 }

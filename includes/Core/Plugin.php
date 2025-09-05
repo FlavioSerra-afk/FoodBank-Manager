@@ -73,51 +73,6 @@ final class Plugin {
                 add_action( 'admin_post_fbm_submit', array( FormSubmitController::class, 'handle' ) );
                 add_action( 'admin_post_fbm_dash_export', array( DashboardExportController::class, 'handle' ) );
 
-                add_action(
-                        'admin_init',
-                        static function (): void {
-                                if ( ! defined( 'FBM_KEK_BASE64' ) || empty( constant( 'FBM_KEK_BASE64' ) ) ) {
-                                        add_action(
-                                                'admin_notices',
-                                                static function (): void {
-                                                        if ( ! Screen::is_fbm_screen() ) {
-                                                                return;
-                                                        }
-                                                        echo '<div class="notice notice-warning"><p>' . esc_html__( 'FoodBank Manager: Encryption key (FBM_KEK_BASE64) not set. Some features are degraded.', 'foodbank-manager' ) . '</p></div>';
-                                                }
-                                        );
-                                }
-                                $from = \FoodBankManager\Core\Options::get('emails.from_email');
-                                if ( ! is_email( $from ) ) {
-                                        add_action(
-                                                'admin_notices',
-                                                static function (): void {
-                                                        if ( ! Screen::is_fbm_screen() ) {
-                                                                return;
-                                                        }
-                                                        echo '<div class="notice notice-error"><p>' . esc_html__( 'FoodBank Manager: From email is not configured.', 'foodbank-manager' ) . '</p></div>';
-                                                }
-                                        );
-                                }
-                                $provider = \FoodBankManager\Core\Options::get('forms.captcha_provider');
-                                if ( $provider !== 'off' ) {
-                                        $site   = \FoodBankManager\Core\Options::get('forms.captcha_site_key');
-                                        $secret = \FoodBankManager\Core\Options::get('forms.captcha_secret');
-                                        if ( $site === '' || $secret === '' ) {
-                                                add_action(
-                                                        'admin_notices',
-                                                        static function (): void {
-                                                                if ( ! Screen::is_fbm_screen() ) {
-                                                                        return;
-                                                                }
-                                                                echo '<div class="notice notice-warning"><p>' . esc_html__( 'FoodBank Manager: CAPTCHA keys are missing.', 'foodbank-manager' ) . '</p></div>';
-                                                        }
-                                                );
-                                        }
-                                }
-                        }
-                );
-
                 self::get_instance()->init();
         }
 

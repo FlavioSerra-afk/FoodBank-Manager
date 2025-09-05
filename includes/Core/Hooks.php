@@ -17,8 +17,9 @@ class Hooks {
 	public function register(): void {
 		add_action( 'init', array( $this, 'register_shortcodes' ) );
 		add_action( 'rest_api_init', array( Api::class, 'register_routes' ) );
-		Logger::init();
-		add_action( 'fbm_crypto_missing_kek', array( Notices::class, 'missing_kek' ) );
+                Logger::init();
+                add_action( 'fbm_crypto_missing_kek', array( Notices::class, 'missing_kek' ) );
+                add_action( 'fbm_crypto_missing_sodium', array( Notices::class, 'missing_sodium' ) );
 	}
 
 	public function register_shortcodes(): void {

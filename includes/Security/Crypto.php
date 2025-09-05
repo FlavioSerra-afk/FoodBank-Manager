@@ -28,18 +28,7 @@ class Crypto {
 
         private static function ensure_sodium(): void {
                 if ( ! \function_exists( 'sodium_crypto_aead_xchacha20poly1305_ietf_encrypt' ) ) {
-                        if ( \function_exists( 'add_action' ) ) {
-                                \add_action(
-                                        'admin_notices',
-                                        static function () {
-                                                $s = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-                                                if ( ! $s || ( strpos( $s->id, 'toplevel_page_fbm' ) !== 0 && strpos( $s->id, 'foodbank_page_fbm_' ) !== 0 ) ) {
-                                                        return;
-                                                }
-                                                echo '<div class="notice notice-error"><p>' . \esc_html__( 'Sodium extension not available; encryption disabled.', 'foodbank-manager' ) . '</p></div>';
-                                        }
-                                );
-                        }
+                        \do_action( 'fbm_crypto_missing_sodium' );
                         throw new \RuntimeException( 'Sodium library not available' );
                 }
         }

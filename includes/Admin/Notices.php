@@ -3,19 +3,73 @@
 declare(strict_types=1);
 
 namespace FoodBankManager\Admin;
-
 use FoodBankManager\Core\Screen;
+use FoodBankManager\Core\Options;
 
 final class Notices {
+    private static bool $missingKek = false;
+    private static bool $missingSodium = false;
+
     public static function boot(): void {
-        add_action('admin_notices', [self::class, 'maybeShowCapsRepair']);
+        self::register();
         add_action('admin_init', [self::class, 'handleCapsRepair']);
     }
 
-    public static function maybeShowCapsRepair(): void {
-        if ( ! Screen::is_fbm_screen() ) {
+    public static function register(): void {
+        static $registered = false;
+        if ($registered) {
             return;
         }
+        $registered = true;
+        add_action('admin_notices', [self::class, 'render'], 10);
+    }
+
+    public static function render(): void {
+        static $printed = false;
+        if ($printed) {
+            return;
+        }
+
+        $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+        $id     = $screen ? (string) $screen->id : '';
+        $is_fbm = ($id === 'toplevel_page_fbm') || str_starts_with($id, 'foodbank_page_fbm_');
+
+        if (!$is_fbm) {
+            return;
+        }
+
+        $printed = true;
+
+        self::maybeShowCapsRepair();
+
+        if (self::$missingSodium) {
+            echo '<div class="notice notice-error"><p>' . esc_html__('Sodium extension not available; encryption disabled.', 'foodbank-manager') . '</p></div>';
+        }
+
+        if (self::$missingKek) {
+            echo '<div class="notice notice-error"><p>' . esc_html__('FoodBank Manager encryption key is not configured.', 'foodbank-manager') . '</p></div>';
+        }
+
+        if (!defined('FBM_KEK_BASE64') || empty(constant('FBM_KEK_BASE64'))) {
+            echo '<div class="notice notice-warning"><p>' . esc_html__('FoodBank Manager: Encryption key (FBM_KEK_BASE64) not set. Some features are degraded.', 'foodbank-manager') . '</p></div>';
+        }
+
+        $from = Options::get('emails.from_email');
+        if (!is_email($from)) {
+            echo '<div class="notice notice-error"><p>' . esc_html__('FoodBank Manager: From email is not configured.', 'foodbank-manager') . '</p></div>';
+        }
+
+        $provider = Options::get('forms.captcha_provider');
+        if ($provider !== 'off') {
+            $site   = Options::get('forms.captcha_site_key');
+            $secret = Options::get('forms.captcha_secret');
+            if ($site === '' || $secret === '') {
+                echo '<div class="notice notice-warning"><p>' . esc_html__('FoodBank Manager: CAPTCHA keys are missing.', 'foodbank-manager') . '</p></div>';
+            }
+        }
+    }
+
+    private static function maybeShowCapsRepair(): void {
         if (! current_user_can('administrator')) {
             return;
         }
@@ -48,20 +102,18 @@ final class Notices {
     }
 
     /**
-     * Show missing KEK notice.
+     * Mark that the KEK is missing.
      */
     public static function missing_kek(): void {
-        if (! current_user_can('manage_options')) {
-            return;
+        if (current_user_can('manage_options')) {
+            self::$missingKek = true;
         }
-        add_action(
-            'admin_notices',
-            function (): void {
-                if ( ! Screen::is_fbm_screen() ) {
-                    return;
-                }
-                echo '<div class="notice notice-error"><p>' . \esc_html__('FoodBank Manager encryption key is not configured.', 'foodbank-manager') . '</p></div>';
-            }
-        );
+    }
+
+    /**
+     * Mark that the sodium extension is missing.
+     */
+    public static function missing_sodium(): void {
+        self::$missingSodium = true;
     }
 }
