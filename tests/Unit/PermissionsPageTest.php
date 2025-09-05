@@ -7,11 +7,7 @@ use FoodBankManager\Admin\PermissionsPage;
 use FoodBankManager\Admin\UsersMeta;
 use FoodBankManager\Auth\Capabilities;
 
-if ( ! function_exists( 'current_user_can' ) ) {
-    function current_user_can( string $cap ): bool {
-        return PermissionsPageTest::$can;
-    }
-}
+// capability handled via $GLOBALS['fbm_user_caps']
 if ( ! function_exists( 'check_admin_referer' ) ) {
     function check_admin_referer( string $action, string $name = '_fbm_nonce' ): void {
         if ( empty( $_POST[ $name ] ) ) {
@@ -177,11 +173,11 @@ if ( ! function_exists( 'delete_option' ) ) {
 
 namespace {
     final class PermissionsPageTest extends \PHPUnit\Framework\TestCase {
-        public static bool $can = true;
         public static string $redirect = '';
 
         protected function setUp(): void {
-            self::$can      = true;
+            fbm_reset_globals();
+            $GLOBALS['fbm_user_caps'] = ['fb_manage_permissions' => true];
             self::$redirect = '';
             $_POST          = array();
             $_FILES         = array();

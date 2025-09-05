@@ -14,9 +14,6 @@ if (!function_exists('get_current_screen')) {
         return $o;
     }
 }
-if (!function_exists('current_user_can')) {
-    function current_user_can(string $cap): bool { return true; }
-}
 if (!function_exists('esc_html__')) {
     function esc_html__(string $text, string $domain = ''): string { return $text; }
 }
@@ -35,7 +32,11 @@ if (!function_exists('is_email')) {
 
 final class NoticesTest extends TestCase {
     protected function setUp(): void {
+        fbm_reset_globals();
         $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_diagnostics';
+        $caps = array_fill_keys(\FBM\Auth\Capabilities::all(), false);
+        $caps['manage_options'] = true;
+        $GLOBALS['fbm_user_caps'] = $caps;
     }
 
     /** @runInSeparateProcess */
@@ -59,5 +60,18 @@ final class NoticesTest extends TestCase {
         Notices::render();
         $out = ob_get_clean();
         $this->assertStringContainsString('FoodBank Manager encryption key is not configured.', $out);
+    }
+
+    /** @runInSeparateProcess */
+    public function testCapsFixNoticeShownForAdminsWithoutCaps(): void {
+        $caps = array_fill_keys(\FBM\Auth\Capabilities::all(), false);
+        $caps['manage_options'] = true;
+        $GLOBALS['fbm_user_caps'] = $caps;
+        ob_start();
+        Notices::render_caps_fix_notice();
+        Notices::render_caps_fix_notice();
+        $out = ob_get_clean();
+        $this->assertStringContainsString('fbm_diagnostics', $out);
+        $this->assertSame(1, substr_count($out, 'Open Diagnostics'));
     }
 }

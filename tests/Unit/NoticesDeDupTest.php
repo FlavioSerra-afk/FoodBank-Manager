@@ -15,9 +15,6 @@ if (!function_exists('get_current_screen')) {
         return $o;
     }
 }
-if (!function_exists('current_user_can')) {
-    function current_user_can(string $cap): bool { return true; }
-}
 if (!function_exists('esc_html__')) {
     function esc_html__(string $text, string $domain = ''): string { return $text; }
 }
@@ -39,7 +36,9 @@ if (!function_exists('add_action')) {
 
 final class NoticesDeDupTest extends TestCase {
     protected function setUp(): void {
+        fbm_reset_globals();
         $GLOBALS['fbm_test_screen_id'] = null;
+        $GLOBALS['fbm_user_caps'] = ['manage_options' => true];
         if (!defined('FBM_KEK_BASE64')) {
             define('FBM_KEK_BASE64', 'dummy');
         }

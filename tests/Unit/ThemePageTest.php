@@ -10,11 +10,7 @@ if ( ! function_exists( 'wp_unslash' ) ) {
                 return is_array( $value ) ? array_map( 'wp_unslash', $value ) : stripslashes( (string) $value );
         }
 }
-if ( ! function_exists( 'current_user_can' ) ) {
-        function current_user_can( string $cap ): bool {
-                return ThemePageTest::$can;
-        }
-}
+// capability handled via $GLOBALS['fbm_user_caps']
 if ( ! function_exists( 'check_admin_referer' ) ) {
         function check_admin_referer( string $action, string $name = '_wpnonce' ): void {
                 if ( empty( $_POST[ $name ] ) ) {
@@ -55,12 +51,12 @@ if ( ! function_exists( 'map_deep' ) ) {
 }
 
 final class ThemePageTest extends TestCase {
-        public static bool $can      = true;
         public static string $redirect = '';
 
         protected function setUp(): void {
                 parent::setUp();
-                self::$can      = true;
+                fbm_reset_globals();
+                $GLOBALS['fbm_user_caps'] = ['fb_manage_theme' => true];
                 self::$redirect = '';
                 $_POST          = array();
                 $_SERVER        = array();
@@ -77,7 +73,7 @@ final class ThemePageTest extends TestCase {
         public function testUserWithoutCapBlocked(): void {
                 $_SERVER['REQUEST_METHOD'] = 'POST';
                 $_POST['_wpnonce']         = 'nonce';
-                self::$can                 = false;
+                $GLOBALS['fbm_user_caps']['fb_manage_theme'] = false;
                 $this->expectException( RuntimeException::class );
                 ThemePage::route();
         }
