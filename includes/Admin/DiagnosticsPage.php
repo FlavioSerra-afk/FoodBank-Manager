@@ -15,6 +15,7 @@ use function sanitize_text_field;
 use function sanitize_key;
 use function wp_unslash;
 use function get_option;
+use function get_transient;
 use function wp_next_scheduled;
 use function wp_get_schedule;
 use function wp_get_schedules;
@@ -80,6 +81,8 @@ class DiagnosticsPage {
                 self::handle_actions();
 
                 $notices_render_count = Notices::getRenderCount();
+                $boot_ts             = (int) get_transient( 'fbm_boot_ok' );
+                $boot_status         = $boot_ts > 0 ? gmdate( 'Y-m-d H:i:s', $boot_ts ) : 'not recorded';
                 $caps                = Capabilities::all();
                 $owned               = array_filter( $caps, static fn( $c ) => current_user_can( $c ) );
                 $caps_count          = count( $owned ) . ' / ' . count( $caps );

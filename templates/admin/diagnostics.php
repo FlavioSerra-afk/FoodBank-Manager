@@ -58,7 +58,8 @@ $gating_ok  = \FoodBankManager\Core\Screen::is_fbm_screen();
         <li><?php echo esc_html( 'PHP ' . $php_version ); ?></li>
         <li><?php echo esc_html( 'WP ' . $wp_version ); ?></li>
         <li><?php echo esc_html( 'FBM ' . $fbm_version ); ?></li>
-        <li><?php echo esc_html( 'FBM Notices rendered this request: ' . $notices_render_count . ' (' . ( $notices_render_count === 1 ? '✅' : '⚠️' ) . ')' ); ?></li>
+        <li><?php echo esc_html( 'Last successful FBM boot (plugins_loaded): ' . $boot_status ); ?></li>
+        <li><?php echo esc_html( 'Admin notices rendered this request: ' . $notices_render_count ); ?></li>
     </ul>
       <h2><?php esc_html_e( 'Menu Visibility', 'foodbank-manager' ); ?></h2>
       <p><?php esc_html_e( 'FBM caps held by current user:', 'foodbank-manager' ); ?> <strong><?php echo esc_html( $caps_count ); ?></strong></p>

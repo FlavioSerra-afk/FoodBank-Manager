@@ -82,7 +82,7 @@ namespace {
 
         protected function setUp(): void {
             fbm_test_reset_globals();
-            $GLOBALS['fbm_user_caps'] = ['fb_manage_diagnostics' => true];
+            fbm_grant_caps(['fb_manage_diagnostics']);
             self::$redirect      = '';
             $_GET = $_POST = $_SERVER = array();
             if (!class_exists('FoodBankManager\\Database\\ApplicationsRepo', false)) {
@@ -98,7 +98,7 @@ namespace {
 
         public function testSearchPreview(): void {
             if ( ! defined( 'ABSPATH' ) ) { define( 'ABSPATH', __DIR__ ); }
-            if ( ! defined( 'FBM_PATH' ) ) { define( 'FBM_PATH', dirname( __DIR__, 2 ) . '/' ); }
+            if ( ! defined( 'FBM_PATH' ) ) { define( 'FBM_PATH', dirname( __DIR__, 3 ) . '/' ); }
             $_GET['email'] = 'user@example.com';
             ob_start();
             include FBM_PATH . 'templates/admin/gdpr.php';
@@ -128,7 +128,7 @@ namespace {
         }
 
         public function testUnmaskedWithCapability(): void {
-            $GLOBALS['fbm_user_caps']['fb_view_sensitive'] = true;
+            fbm_grant_caps(['fb_manage_diagnostics','fb_view_sensitive']);
             $_SERVER['REQUEST_METHOD'] = 'POST';
             $_POST['fbm_action'] = 'export';
             $_POST['_fbm_nonce'] = 'n';

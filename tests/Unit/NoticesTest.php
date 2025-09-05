@@ -34,9 +34,7 @@ final class NoticesTest extends TestCase {
     protected function setUp(): void {
         fbm_test_reset_globals();
         $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_diagnostics';
-        $caps = array_fill_keys(\FBM\Auth\Capabilities::all(), false);
-        $caps['manage_options'] = true;
-        $GLOBALS['fbm_user_caps'] = $caps;
+        fbm_grant_admin_only();
     }
 
     /** @runInSeparateProcess */
@@ -47,6 +45,7 @@ final class NoticesTest extends TestCase {
         Notices::render();
         $out = ob_get_clean();
         $this->assertSame('', $out);
+        $this->assertSame(0, Notices::getRenderCount());
     }
 
     /** @runInSeparateProcess */
@@ -60,15 +59,17 @@ final class NoticesTest extends TestCase {
         Notices::render();
         $out = ob_get_clean();
         $this->assertStringContainsString('FoodBank Manager encryption key is not configured.', $out);
+        $this->assertSame(1, Notices::getRenderCount());
     }
 
     /** @runInSeparateProcess */
     public function testCapsFixNoticeShownForAdminsWithoutCaps(): void {
-        $GLOBALS['fbm_user_caps'] = ['manage_options' => true, 'fb_manage_diagnostics' => false];
+        fbm_grant_admin_only();
         ob_start();
+        Notices::render_caps_fix_notice();
         Notices::render_caps_fix_notice();
         $out = ob_get_clean();
         $this->assertStringContainsString('page=fbm_diagnostics', $out);
-        $this->assertStringContainsString('Repair caps', $out);
+        $this->assertSame(1, substr_count($out, 'page=fbm_diagnostics'));
     }
 }

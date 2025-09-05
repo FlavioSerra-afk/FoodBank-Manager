@@ -169,6 +169,14 @@ if ( ! function_exists( 'delete_option' ) ) {
         return true;
     }
 }
+if ( ! function_exists( 'filter_input' ) ) {
+    function filter_input( $type, $var_name, $filter = FILTER_DEFAULT, $options = [] ) {
+        if ( $type === INPUT_POST ) {
+            return $_POST[ $var_name ] ?? null;
+        }
+        return null;
+    }
+}
 }
 
 namespace {
@@ -177,7 +185,7 @@ namespace {
 
         protected function setUp(): void {
             fbm_test_reset_globals();
-            $GLOBALS['fbm_user_caps'] = ['fb_manage_permissions' => true];
+            fbm_grant_caps(['fb_manage_permissions']);
             self::$redirect = '';
             $_POST          = array();
             $_FILES         = array();

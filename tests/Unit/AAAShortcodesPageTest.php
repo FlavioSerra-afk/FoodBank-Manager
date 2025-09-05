@@ -110,6 +110,7 @@ final class ShortcodesPageTest extends TestCase {
     protected function setUp(): void {
         self::$can         = true;
         self::$last_shortcode = '';
+        fbm_grant_caps(['fb_manage_forms']);
         if ( ! defined( 'FBM_PATH' ) ) {
             define( 'FBM_PATH', dirname( __DIR__, 2 ) . '/' );
         }
@@ -135,6 +136,7 @@ final class ShortcodesPageTest extends TestCase {
 
     public function testCapabilityRequired(): void {
         self::$can = false;
+        fbm_clear_caps();
         $this->expectException( \RuntimeException::class );
         ShortcodesPage::route();
     }
