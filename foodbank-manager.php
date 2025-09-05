@@ -25,26 +25,34 @@ define( 'FBM_FILE', __FILE__ );
 define( 'FBM_PATH', plugin_dir_path( __FILE__ ) );
 define( 'FBM_URL', plugin_dir_url( __FILE__ ) );
 
-// Try Composer autoloader first.
-$autoload = FBM_PATH . 'vendor/autoload.php';
-if ( file_exists( $autoload ) ) {
-	require_once $autoload;
-} else {
-	// Lightweight PSR-4 autoloader for our namespace so activation never fatals.
-	spl_autoload_register(
-		static function ( $class_name ): void {
-			$prefix = __NAMESPACE__ . '\\';
-			if ( strpos( $class_name, $prefix ) !== 0 ) {
-				return;
-			}
-			$rel  = substr( $class_name, strlen( $prefix ) );
-			$rel  = str_replace( '\\', DIRECTORY_SEPARATOR, $rel );
-			$file = FBM_PATH . 'includes/' . $rel . '.php';
-			if ( is_readable( $file ) ) {
-				require $file;
-			}
-		}
-	);
+// Prefer Composer if present.
+if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
+        require __DIR__ . '/vendor/autoload.php';
+}
+
+// Fallback PSR-4 autoloader for both namespaces: FBM\ and FoodBankManager\.
+spl_autoload_register(
+        static function ( $class ): void {
+                if ( strncmp( $class, 'FBM\\', 4 ) !== 0 && strncmp( $class, 'FoodBankManager\\', 17 ) !== 0 ) {
+                        return;
+                }
+                $rel  = preg_replace( '#^(FBM\\\\|FoodBankManager\\\\)#', '', $class );
+                $path = __DIR__ . '/includes/' . str_replace( '\\', '/', $rel ) . '.php';
+                if ( is_file( $path ) ) {
+                        require $path;
+                }
+        }
+);
+
+// Namespace bridges (temporary): map old <-> new so both references work.
+if ( ! class_exists( 'FBM\\Core\\Retention' ) && class_exists( 'FoodBankManager\\Core\\Retention' ) ) {
+        class_alias( 'FoodBankManager\\Core\\Retention', 'FBM\\Core\\Retention' );
+}
+if ( ! class_exists( 'FBM\\Exports\\SarExporter' ) && class_exists( 'FoodBankManager\\Exports\\SarExporter' ) ) {
+        class_alias( 'FoodBankManager\\Exports\\SarExporter', 'FBM\\Exports\\SarExporter' );
+}
+if ( ! class_exists( 'FBM\\Mail\\LogRepo' ) && class_exists( 'FoodBankManager\\Mail\\LogRepo' ) ) {
+        class_alias( 'FoodBankManager\\Mail\\LogRepo', 'FBM\\Mail\\LogRepo' );
 }
 
 // If our core class still isn't available, show a safe admin notice and bail (no fatals).
