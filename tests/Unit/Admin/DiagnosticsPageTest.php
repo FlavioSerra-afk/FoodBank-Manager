@@ -181,7 +181,7 @@ namespace {
             if ( ! defined( 'FBM_PATH' ) ) {
                 define( 'FBM_PATH', dirname( __DIR__, 2 ) . '/' );
             }
-            $notices_render_count = 0;
+            $notices_render_count = \FoodBankManager\Admin\Notices::getRenderCount();
             $caps_count          = '0 / 0';
             ob_start();
             include FBM_PATH . 'templates/admin/diagnostics.php';
@@ -208,7 +208,7 @@ namespace {
             if ( ! defined( 'FBM_PATH' ) ) {
                 define( 'FBM_PATH', dirname( __DIR__, 2 ) . '/' );
             }
-            $notices_render_count = 0;
+            $notices_render_count = \FoodBankManager\Admin\Notices::getRenderCount();
             $caps_count          = '0 / 0';
             ob_start();
             include FBM_PATH . 'templates/admin/diagnostics.php';

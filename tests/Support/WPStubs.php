@@ -116,6 +116,29 @@ namespace {
     if (!function_exists('delete_transient')) {
         function delete_transient($key) { unset($GLOBALS['fbm_transients'][$key]); return true; }
     }
+
+    // Options (for PresetsRepo, etc.)
+    if (!function_exists('get_option')) {
+        function get_option($name, $default = false) { return $GLOBALS['fbm_options'][$name] ?? $default; }
+    }
+    if (!function_exists('update_option')) {
+        function update_option($name, $value) { $GLOBALS['fbm_options'][$name] = $value; return true; }
+    }
+    if (!function_exists('delete_option')) {
+        function delete_option($name) { unset($GLOBALS['fbm_options'][$name]); return true; }
+    }
+
+    // Admin/context
+    if (!function_exists('is_admin')) {
+        function is_admin() { return true; }
+    }
+    if (!function_exists('get_current_screen')) {
+        function get_current_screen() {
+            $id = $GLOBALS['fbm_test_screen_id'] ?? null;
+            return (object) ['id' => $id];
+        }
+    }
+
     if (!function_exists('check_admin_referer')) {
         function check_admin_referer($action = -1, $name = '_wpnonce') {
             if (empty($_REQUEST[$name])) {
@@ -125,13 +148,13 @@ namespace {
         }
     }
     if (!function_exists('wp_verify_nonce')) {
-        function wp_verify_nonce($nonce, $action = -1) { return true; }
+        function wp_verify_nonce($nonce, $action = -1) { return hash_equals(wp_create_nonce($action), (string)$nonce); }
     }
     if (!function_exists('wp_nonce_field')) {
-        function wp_nonce_field($action = -1, $name = '_wpnonce', $referer = true, $echo = true) { return ''; }
+        function wp_nonce_field($action = -1, $name = '_wpnonce') { echo '<input type="hidden" name="'.$name.'" value="'.wp_create_nonce($action).'">'; }
     }
     if (!function_exists('wp_create_nonce')) {
-        function wp_create_nonce($action = -1) { return 'nonce'; }
+        function wp_create_nonce($action = -1) { return (string) $action . '_nonce'; }
     }
     if (!function_exists('sanitize_text_field')) {
         function sanitize_text_field($str) {
@@ -159,6 +182,9 @@ namespace {
     if (!function_exists('esc_url')) {
         function esc_url($url) { return filter_var((string)$url, FILTER_SANITIZE_URL); }
     }
+    if (!function_exists('esc_url_raw')) {
+        function esc_url_raw($url) { return trim((string)$url); }
+    }
     if (!function_exists('wp_kses_post')) {
         function wp_kses_post($html) { return (string)$html; }
     }
@@ -172,8 +198,16 @@ namespace {
             $GLOBALS['fbm_headers'][] = [$string, $replace, $http_response_code];
         }
     }
+    if (!function_exists('wp_safe_redirect')) {
+        function wp_safe_redirect($location, $status = 302) { $GLOBALS['fbm_redirect_to'] = (string)$location; return true; }
+    }
     if (!function_exists('wp_die')) {
         function wp_die($message = '') { throw new \RuntimeException((string)$message ?: 'wp_die'); }
+    }
+    if (!function_exists('submit_button')) {
+        function submit_button($text = '', $type = 'primary', $name = 'submit', $wrap = true) {
+            echo '<button type="submit" name="'.esc_attr($name).'">'.esc_html($text).'</button>';
+        }
     }
     if (!function_exists('add_shortcode')) {
         $GLOBALS['fbm_shortcodes'] = [];
@@ -283,4 +317,9 @@ namespace FoodBankManager\Admin {
 
 namespace FoodBankManager\Attendance {
     function wp_salt($scheme = 'auth') { return \wp_salt($scheme); }
+}
+
+namespace FoodBankManager\Exports {
+    function headers_sent() { return false; }
+    function header($string, $replace = true, $http_response_code = 0) { $GLOBALS['fbm_headers'][] = [$string, $replace, $http_response_code]; }
 }

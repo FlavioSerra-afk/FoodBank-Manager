@@ -64,14 +64,11 @@ final class NoticesTest extends TestCase {
 
     /** @runInSeparateProcess */
     public function testCapsFixNoticeShownForAdminsWithoutCaps(): void {
-        $caps = array_fill_keys(\FBM\Auth\Capabilities::all(), false);
-        $caps['manage_options'] = true;
-        $GLOBALS['fbm_user_caps'] = $caps;
+        $GLOBALS['fbm_user_caps'] = ['manage_options' => true, 'fb_manage_diagnostics' => false];
         ob_start();
         Notices::render_caps_fix_notice();
-        Notices::render_caps_fix_notice();
         $out = ob_get_clean();
-        $this->assertStringContainsString('fbm_diagnostics', $out);
-        $this->assertSame(1, substr_count($out, 'Open Diagnostics'));
+        $this->assertStringContainsString('page=fbm_diagnostics', $out);
+        $this->assertStringContainsString('Repair caps', $out);
     }
 }

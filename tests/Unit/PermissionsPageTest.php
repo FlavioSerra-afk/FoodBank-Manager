@@ -202,6 +202,7 @@ namespace {
             $_POST['_wpnonce']   = '1';
             $_POST['user_id']    = 1;
             $_POST['caps']       = array( 'fb_manage_dashboard' );
+            $_REQUEST = $_POST;
             $add = new \ReflectionMethod( \FoodBankManager\Admin\PermissionsPage::class, 'handle_user_override_add' );
             $add->setAccessible( true );
             try {
@@ -214,6 +215,7 @@ namespace {
             $_POST['_fbm_nonce'] = '1';
             $_POST['_wpnonce']   = '1';
             $_POST['user_id']    = 1;
+            $_REQUEST = $_POST;
             $rm = new \ReflectionMethod( \FoodBankManager\Admin\PermissionsPage::class, 'handle_user_override_remove' );
             $rm->setAccessible( true );
             try {
@@ -227,6 +229,7 @@ namespace {
             global $fbm_test_user_meta;
             $fbm_test_user_meta[1]['fbm_user_caps'] = array( 'fb_manage_dashboard' => true );
             $_POST['_fbm_nonce'] = '1';
+            $_REQUEST = $_POST;
             $page = new \FoodBankManager\Admin\PermissionsPage();
             $ref  = new \ReflectionMethod( \FoodBankManager\Admin\PermissionsPage::class, 'handle_export' );
             $ref->setAccessible( true );

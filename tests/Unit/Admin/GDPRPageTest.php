@@ -118,6 +118,7 @@ namespace {
             $_POST['fbm_action'] = 'export';
             $_POST['_fbm_nonce'] = 'n';
             $_POST['app_id'] = '5';
+            $_REQUEST = $_POST;
             try {
                 GDPRPage::route();
             } catch ( \RuntimeException $e ) {
@@ -132,6 +133,7 @@ namespace {
             $_POST['fbm_action'] = 'export';
             $_POST['_fbm_nonce'] = 'n';
             $_POST['app_id'] = '5';
+            $_REQUEST = $_POST;
             try {
                 GDPRPage::route();
             } catch ( \RuntimeException $e ) {

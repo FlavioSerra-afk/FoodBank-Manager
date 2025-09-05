@@ -3,7 +3,10 @@ declare(strict_types=1);
 
 namespace FoodBankManager\Admin {
     function current_user_can( string $cap ): bool {
-        return \ShortcodesPageTest::$can;
+        if ($cap === 'fb_manage_shortcodes') {
+            return \ShortcodesPageTest::$can;
+        }
+        return \current_user_can($cap);
     }
     function wp_die( $message = '' ) {
         throw new \RuntimeException( (string) $message );
@@ -27,7 +30,8 @@ namespace FoodBankManager\Admin {
         return json_encode( $data );
     }
     function check_admin_referer( string $action, string $name = '_wpnonce' ): void {
-        if ( empty( $_POST[ $name ] ) ) {
+        $nonce = $_POST[ $name ] ?? $_GET[ $name ] ?? '';
+        if ( $nonce === '' ) {
             throw new \RuntimeException( 'bad nonce' );
         }
     }
