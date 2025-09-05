@@ -2,7 +2,7 @@
 /**
  * GDPR SAR template.
  *
- * @package FoodBankManager
+ * @package FBM
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -31,7 +31,7 @@ $counts = array(
 if ( $app_id > 0 && ! empty( $results ) ) {
     $counts['files']      = count( \FoodBankManager\Database\ApplicationsRepo::get_files_for_application( $app_id ) );
     $counts['attendance'] = count( \FoodBankManager\Attendance\AttendanceRepo::find_by_application_id( $app_id ) );
-    $counts['emails']     = count( \FoodBankManager\Mail\LogRepo::find_by_application_id( $app_id ) );
+    $counts['emails']     = count( \FBM\Mail\LogRepo::find_by_application_id( $app_id ) );
 }
 ?>
 <div class="wrap fbm-admin">

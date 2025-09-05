@@ -2,12 +2,12 @@
 /**
  * Mail log repository.
  *
- * @package FoodBankManager
+ * @package FBM
  */
 
 declare(strict_types=1);
 
-namespace FoodBankManager\Mail;
+namespace FBM\Mail;
 
 use wpdb;
 use function absint;

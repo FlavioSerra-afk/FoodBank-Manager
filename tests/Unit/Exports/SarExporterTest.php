@@ -14,12 +14,18 @@ namespace {
 
 namespace {
     use PHPUnit\Framework\TestCase;
-    use FoodBankManager\Exports\SarExporter;
+    use FBM\Exports\SarExporter;
 
     /**
      * @runInSeparateProcess
      */
     final class SarExporterTest extends TestCase {
+        protected function setUp(): void {
+            parent::setUp();
+            if (!class_exists(\ZipArchive::class)) {
+                $this->markTestSkipped('ZipArchive not available in this environment.');
+            }
+        }
         public function testMaskedExport(): void {
             $tmp = tempnam(sys_get_temp_dir(), 'fbm');
             file_put_contents($tmp, 'file');

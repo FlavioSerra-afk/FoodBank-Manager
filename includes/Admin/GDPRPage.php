@@ -2,17 +2,17 @@
 /**
  * GDPR SAR admin page.
  *
- * @package FoodBankManager
+ * @package FBM
  */
 
 declare(strict_types=1);
 
-namespace FoodBankManager\Admin;
+namespace FBM\Admin;
 
-use FoodBankManager\Exports\SarExporter;
+use FBM\Exports\SarExporter;
 use FoodBankManager\Database\ApplicationsRepo;
 use FoodBankManager\Attendance\AttendanceRepo;
-use FoodBankManager\Mail\LogRepo;
+use FBM\Mail\LogRepo;
 use function absint;
 use function sanitize_key;
 use function sanitize_text_field;

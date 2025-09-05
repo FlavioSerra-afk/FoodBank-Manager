@@ -63,7 +63,7 @@ namespace {
     }
 }
 
-namespace FoodBankManager\Exports {
+namespace FBM\Exports {
     class SarExporter {
         public static array $last = array();
         public static function build_zip( array $subject, bool $masked ): string {
@@ -79,7 +79,7 @@ namespace FoodBankManager\Exports {
 
 namespace {
     use PHPUnit\Framework\TestCase;
-    use FoodBankManager\Admin\GDPRPage;
+    use FBM\Admin\GDPRPage;
 
     /**
      * @runTestsInSeparateProcesses
@@ -100,7 +100,7 @@ namespace {
             if (!class_exists('FoodBankManager\\Attendance\\AttendanceRepo', false)) {
                 require_once __DIR__ . '/../../Support/AttendanceRepoStub.php';
             }
-            if (!class_exists('FoodBankManager\\Mail\\LogRepo', false)) {
+            if (!class_exists('FBM\\Mail\\LogRepo', false)) {
                 require_once __DIR__ . '/../../Support/LogRepoStub.php';
             }
         }
@@ -132,7 +132,7 @@ namespace {
             } catch ( \RuntimeException $e ) {
                 $this->assertSame( 'redirect', $e->getMessage() );
             }
-            $this->assertTrue( \FoodBankManager\Exports\SarExporter::$last['masked'] );
+            $this->assertTrue( \FBM\Exports\SarExporter::$last['masked'] );
         }
 
         public function testUnmaskedWithCapability(): void {
@@ -146,7 +146,7 @@ namespace {
             } catch ( \RuntimeException $e ) {
                 $this->assertSame( 'redirect', $e->getMessage() );
             }
-            $this->assertFalse( \FoodBankManager\Exports\SarExporter::$last['masked'] );
+            $this->assertFalse( \FBM\Exports\SarExporter::$last['masked'] );
         }
     }
 }

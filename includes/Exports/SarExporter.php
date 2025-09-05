@@ -2,12 +2,12 @@
 /**
  * Subject Access Request exporter.
  *
- * @package FoodBankManager
+ * @package FBM
  */
 
 declare(strict_types=1);
 
-namespace FoodBankManager\Exports;
+namespace FBM\Exports;
 
 use FoodBankManager\Security\Helpers;
 use function sanitize_file_name;

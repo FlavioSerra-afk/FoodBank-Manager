@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
-use FoodBankManager\Core\Retention;
+use FBM\Core\Retention;
 class RetentionDBStub {
     public string $prefix = 'wp_';
     /** @var array<int,string> */
