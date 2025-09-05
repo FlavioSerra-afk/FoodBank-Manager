@@ -46,7 +46,7 @@ final class SettingsPageTest extends TestCase {
     protected function setUp(): void {
         parent::setUp();
         fbm_test_reset_globals();
-        $GLOBALS['fbm_user_caps'] = ['fb_manage_settings' => true];
+        fbm_grant_caps(['fb_manage_settings']);
         self::$redirect = '';
         $_POST         = array();
         $_SERVER       = array();
@@ -65,7 +65,7 @@ final class SettingsPageTest extends TestCase {
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_POST['fbm_action']       = 'branding_save';
         $_POST['_fbm_nonce']       = 'nonce';
-        $GLOBALS['fbm_user_caps']['fb_manage_settings'] = false;
+        fbm_clear_caps();
         $this->expectException( RuntimeException::class );
         SettingsPage::route();
     }

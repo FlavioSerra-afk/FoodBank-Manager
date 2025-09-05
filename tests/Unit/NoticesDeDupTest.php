@@ -38,7 +38,7 @@ final class NoticesDeDupTest extends TestCase {
     protected function setUp(): void {
         fbm_test_reset_globals();
         $GLOBALS['fbm_test_screen_id'] = null;
-        $GLOBALS['fbm_user_caps'] = ['manage_options' => true];
+        fbm_grant_admin_only();
         if (!defined('FBM_KEK_BASE64')) {
             define('FBM_KEK_BASE64', 'dummy');
         }
@@ -64,6 +64,7 @@ final class NoticesDeDupTest extends TestCase {
         Notices::render();
         $out = ob_get_clean();
         $this->assertSame('', $out);
+        $this->assertSame(0, Notices::getRenderCount());
     }
 
     /** @runInSeparateProcess */

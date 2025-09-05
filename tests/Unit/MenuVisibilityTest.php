@@ -18,33 +18,25 @@ final class MenuVisibilityTest extends TestCase {
     }
 
     public function testParentMenuFallsBackToManageOptions(): void {
-        $GLOBALS['fbm_user_caps'] = [
-            'manage_options'      => true,
-            'fb_manage_dashboard' => false,
-        ];
-
+        fbm_test_reset_globals();
+        fbm_grant_admin_only();
         Menu::register();
-
         $call = $GLOBALS['fbm_test_calls']['add_menu_page'][0];
-        self::assertSame('manage_options', $call[2]);
-
-        foreach ($GLOBALS['fbm_test_calls']['add_submenu_page'] as $args) {
-            self::assertStringStartsWith('fb_manage_', $args[3]);
+        $this->assertSame('fbm', $call['slug']);
+        $this->assertSame('manage_options', $call['cap']);
+        foreach ($GLOBALS['fbm_test_calls']['add_submenu_page'] as $sm) {
+            $this->assertStringStartsWith('fb_manage_', $sm['cap']);
         }
     }
 
     public function testParentMenuUsesFbmCapWhenPresent(): void {
-        $GLOBALS['fbm_user_caps'] = [
-            'fb_manage_dashboard' => true,
-        ];
-
+        fbm_test_reset_globals();
+        fbm_grant_fbm_all();
         Menu::register();
-
         $call = $GLOBALS['fbm_test_calls']['add_menu_page'][0];
-        self::assertSame('fb_manage_dashboard', $call[2]);
-
-        foreach ($GLOBALS['fbm_test_calls']['add_submenu_page'] as $args) {
-            self::assertStringStartsWith('fb_manage_', $args[3]);
+        $this->assertSame('fb_manage_dashboard', $call['cap']);
+        foreach ($GLOBALS['fbm_test_calls']['add_submenu_page'] as $sm) {
+            $this->assertStringStartsWith('fb_manage_', $sm['cap']);
         }
     }
 }

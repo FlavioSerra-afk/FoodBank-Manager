@@ -31,10 +31,9 @@ final class MenuTest extends TestCase {
         $subs = $GLOBALS['fbm_test_calls']['add_submenu_page'];
         self::assertGreaterThanOrEqual(9, count($subs));
 
-        [$parent, $page_title, $menu_title, $cap, $slug] = $subs[0];
-        self::assertSame('fbm', $slug);
+        $this->assertSame('fbm', $subs[0]['slug']);
 
-        $slugs = array_column($subs, 4);
+        $slugs = array_column($subs, 'slug');
         foreach (['fbm','fbm_attendance','fbm_database','fbm_forms','fbm_emails','fbm_settings','fbm_permissions','fbm_diagnostics','fbm_theme','fbm_shortcodes'] as $expected) {
             self::assertContains($expected, $slugs);
         }

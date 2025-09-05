@@ -56,12 +56,12 @@ final class ThemePageTest extends TestCase {
         protected function setUp(): void {
         parent::setUp();
         fbm_test_reset_globals();
-                $GLOBALS['fbm_user_caps'] = ['fb_manage_theme' => true];
-                self::$redirect = '';
-                $_POST          = array();
-                $_SERVER        = array();
-                global $fbm_test_options;
-                $fbm_test_options = array();
+        fbm_grant_caps(['fb_manage_theme']);
+        self::$redirect = '';
+        $_POST          = array();
+        $_SERVER        = array();
+        global $fbm_test_options;
+        $fbm_test_options = array();
         }
 
         public function testMissingNonceBlocked(): void {
@@ -73,7 +73,7 @@ final class ThemePageTest extends TestCase {
         public function testUserWithoutCapBlocked(): void {
                 $_SERVER['REQUEST_METHOD'] = 'POST';
                 $_POST['_wpnonce']         = 'nonce';
-                $GLOBALS['fbm_user_caps']['fb_manage_theme'] = false;
+                fbm_clear_caps();
                 $this->expectException( RuntimeException::class );
                 ThemePage::route();
         }

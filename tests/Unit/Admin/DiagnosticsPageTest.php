@@ -37,6 +37,9 @@ namespace {
             return $url . '?' . http_build_query( $args );
         }
     }
+    if ( ! function_exists( 'add_settings_error' ) ) {
+        function add_settings_error( $setting, $code, $message, $type = 'error' ) {}
+    }
     if ( ! function_exists( 'wp_safe_redirect' ) ) {
         function wp_safe_redirect( string $url, int $status = 302 ): void {
             DiagnosticsPageTest::$redirect = $url;
@@ -117,6 +120,20 @@ namespace FoodBankManager\Auth {
     }
 }
 
+namespace FBM\Auth {
+    class Capabilities {
+        public static bool $ensured = false;
+        public static function ensure_for_admin(): void { self::$ensured = true; }
+        public static function all(): array {
+            return [
+                'fb_manage_dashboard','fb_manage_attendance','fb_manage_database','fb_manage_forms',
+                'fb_manage_emails','fb_manage_settings','fb_manage_diagnostics','fb_manage_permissions',
+                'fb_manage_theme','fb_view_sensitive'
+            ];
+        }
+    }
+}
+
 namespace {
     use PHPUnit\Framework\TestCase;
     use FoodBankManager\Admin\DiagnosticsPage;
@@ -132,7 +149,7 @@ namespace {
 
         protected function setUp(): void {
             fbm_test_reset_globals();
-            $GLOBALS['fbm_user_caps'] = ['fb_manage_diagnostics' => true];
+            fbm_grant_caps(['fb_manage_diagnostics']);
             self::$redirect   = '';
             self::$mail_result = true;
             \FoodBankManager\Auth\Roles::$installed = false;
@@ -179,12 +196,13 @@ namespace {
                 define( 'ABSPATH', __DIR__ );
             }
             if ( ! defined( 'FBM_PATH' ) ) {
-                define( 'FBM_PATH', dirname( __DIR__, 2 ) . '/' );
+                define( 'FBM_PATH', dirname( __DIR__, 3 ) . '/' );
             }
             $notices_render_count = \FoodBankManager\Admin\Notices::getRenderCount();
-            $caps_count          = '0 / 0';
+            $boot_status          = 'not recorded';
+            $caps_count           = '0 / 0';
             ob_start();
-            include FBM_PATH . 'templates/admin/diagnostics.php';
+            \FoodBankManager\Admin\DiagnosticsPage::render();
             $html = ob_get_clean();
             $this->assertStringContainsString( 'Crypto', $html );
             $this->assertStringContainsString( 'Environment', $html );
@@ -206,16 +224,26 @@ namespace {
                 define( 'ABSPATH', __DIR__ );
             }
             if ( ! defined( 'FBM_PATH' ) ) {
-                define( 'FBM_PATH', dirname( __DIR__, 2 ) . '/' );
+                define( 'FBM_PATH', dirname( __DIR__, 3 ) . '/' );
             }
             $notices_render_count = \FoodBankManager\Admin\Notices::getRenderCount();
-            $caps_count          = '0 / 0';
+            $boot_status          = 'not recorded';
+            $caps_count           = '0 / 0';
             ob_start();
             include FBM_PATH . 'templates/admin/diagnostics.php';
             $html = ob_get_clean();
             $this->assertStringContainsString( 'fbm_retention_tick', $html );
             $this->assertStringContainsString( '⚠️', $html );
             $this->assertStringContainsString( gmdate( 'Y-m-d', 123 ), $html );
+        }
+
+        public function testRepairCapsActionEnsuresCaps(): void {
+            $_POST = [
+                'fbm_action' => 'fbm_repair_caps',
+                '_fbm_nonce' => wp_create_nonce('fbm_repair_caps'),
+            ];
+            DiagnosticsPage::render();
+            $this->assertTrue(\FBM\Auth\Capabilities::$ensured);
         }
     }
 }

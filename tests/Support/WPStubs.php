@@ -79,12 +79,29 @@ namespace {
     if (!isset($GLOBALS['fbm_user_caps']) || !is_array($GLOBALS['fbm_user_caps'])) $GLOBALS['fbm_user_caps'] = [];
     if (!isset($GLOBALS['fbm_transients']) || !is_array($GLOBALS['fbm_transients'])) $GLOBALS['fbm_transients'] = [];
     if (!isset($GLOBALS['fbm_options'])   || !is_array($GLOBALS['fbm_options']))   $GLOBALS['fbm_options']   = [];
+    if (!isset($GLOBALS['fbm_test_calls']) || !is_array($GLOBALS['fbm_test_calls'])) {
+        $GLOBALS['fbm_test_calls'] = ['add_menu_page' => [], 'add_submenu_page' => []];
+    }
 
-    // current_user_can: read from simulated caps; null-safe
+    // Cap check (reads from simulated map)
     if (!function_exists('current_user_can')) {
         function current_user_can($cap) {
             $caps = $GLOBALS['fbm_user_caps'] ?? [];
-            return !empty($caps[(string) $cap]);
+            return !empty($caps[(string)$cap]);
+        }
+    }
+
+    // Menu registration capture (for assertions)
+    if (!function_exists('add_menu_page')) {
+        function add_menu_page($page_title, $menu_title, $cap, $slug, $cb = null, $icon = null, $pos = null) {
+            $GLOBALS['fbm_test_calls']['add_menu_page'][] = compact('page_title','menu_title','cap','slug');
+            return $slug;
+        }
+    }
+    if (!function_exists('add_submenu_page')) {
+        function add_submenu_page($parent_slug, $page_title, $menu_title, $cap, $slug, $cb = null) {
+            $GLOBALS['fbm_test_calls']['add_submenu_page'][] = compact('parent_slug','page_title','menu_title','cap','slug');
+            return $slug;
         }
     }
 
@@ -95,6 +112,7 @@ namespace {
                 /** @var array<string,bool> */
                 public array $caps = [];
                 public function add_cap($cap) { $this->caps[$cap] = true; }
+                public function has_cap($cap) { return isset($this->caps[$cap]); }
             };
         }
     }
@@ -147,14 +165,14 @@ namespace {
             return true;
         }
     }
+    if (!function_exists('wp_create_nonce')) {
+        function wp_create_nonce($a = -1) { return hash('sha256', 'fbm-' . $a); }
+    }
     if (!function_exists('wp_verify_nonce')) {
-        function wp_verify_nonce($nonce, $action = -1) { return hash_equals(wp_create_nonce($action), (string)$nonce); }
+        function wp_verify_nonce($n, $a = -1) { return hash_equals(wp_create_nonce($a), (string) $n); }
     }
     if (!function_exists('wp_nonce_field')) {
         function wp_nonce_field($action = -1, $name = '_wpnonce') { echo '<input type="hidden" name="'.$name.'" value="'.wp_create_nonce($action).'">'; }
-    }
-    if (!function_exists('wp_create_nonce')) {
-        function wp_create_nonce($action = -1) { return (string) $action . '_nonce'; }
     }
     if (!function_exists('sanitize_text_field')) {
         function sanitize_text_field($str) {
@@ -180,7 +198,7 @@ namespace {
         function esc_attr($text) { return htmlspecialchars((string)$text, ENT_QUOTES, 'UTF-8'); }
     }
     if (!function_exists('esc_url')) {
-        function esc_url($url) { return filter_var((string)$url, FILTER_SANITIZE_URL); }
+        function esc_url($url) { return (string) $url; }
     }
     if (!function_exists('esc_url_raw')) {
         function esc_url_raw($url) { return trim((string)$url); }
@@ -199,7 +217,7 @@ namespace {
         }
     }
     if (!function_exists('wp_safe_redirect')) {
-        function wp_safe_redirect($location, $status = 302) { $GLOBALS['fbm_redirect_to'] = (string)$location; return true; }
+        function wp_safe_redirect($loc, $status = 302) { $GLOBALS['fbm_redirect_to'] = (string) $loc; return true; }
     }
     if (!function_exists('wp_die')) {
         function wp_die($message = '') { throw new \RuntimeException((string)$message ?: 'wp_die'); }
