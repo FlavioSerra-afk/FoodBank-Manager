@@ -23,14 +23,14 @@ class LogRepo {
 	 * @param int $application_id Application ID.
 	 * @return array<int,array>
 	 */
-        public static function find_by_application_id( int $application_id ): array {
+	public static function find_by_application_id( int $application_id ): array {
 		global $wpdb;
 		$application_id = absint( $application_id );
-				$sql    = 'SELECT id,to_email,subject,headers,body_hash,status,provider_msg,timestamp'
-				. " FROM {$wpdb->prefix}fb_mail_log WHERE application_id = %d ORDER BY timestamp ASC";
-				$query  = call_user_func_array( array( $wpdb, 'prepare' ), array( $sql, $application_id ) );
-				$rows   = call_user_func( array( $wpdb, 'get_results' ), $query, 'ARRAY_A' );
-				$out    = array();
+			$sql        = 'SELECT id,to_email,subject,headers,body_hash,status,provider_msg,timestamp'
+			. " FROM {$wpdb->prefix}fb_mail_log WHERE application_id = %d ORDER BY timestamp ASC";
+			$query      = call_user_func_array( array( $wpdb, 'prepare' ), array( $sql, $application_id ) );
+			$rows       = call_user_func( array( $wpdb, 'get_results' ), $query, 'ARRAY_A' );
+			$out        = array();
 		foreach ( $rows ? $rows : array() as $row ) {
 			$out[] = array(
 				'id'           => (int) ( $row['id'] ?? 0 ),
@@ -44,23 +44,26 @@ class LogRepo {
 			);
 		}
 		return $out;
-        }
+	}
 
-       /**
-        * Anonymise mail log entries.
-        *
-        * @param array<int> $ids IDs to anonymise.
-        * @return int Rows affected.
-        */
-       public static function anonymise_batch( array $ids ): int {
-               global $wpdb;
-               $ids = array_values( array_filter( array_map( 'absint', $ids ) ) );
-               if ( empty( $ids ) ) {
-                       return 0;
-               }
-               $placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
-               $sql = "UPDATE {$wpdb->prefix}fb_mail_log SET to_email='',subject='',headers='',provider_msg='' WHERE id IN ($placeholders)";
-               $prepared = $wpdb->prepare( $sql, $ids );
-               return (int) $wpdb->query( $prepared );
-       }
+		/**
+		 * Anonymise mail log entries.
+		 *
+		 * @param array<int> $ids IDs to anonymise.
+		 * @return int Rows affected.
+		 */
+	public static function anonymise_batch( array $ids ): int {
+			global $wpdb;
+			$ids = array_values( array_filter( array_map( 'absint', $ids ) ) );
+		if ( empty( $ids ) ) {
+				return 0;
+		}
+				return (int) $wpdb->query(
+					$wpdb->prepare(
+						'UPDATE ' . $wpdb->prefix . "fb_mail_log SET to_email='',subject='',headers='',provider_msg='' WHERE id IN ("
+								. implode( ',', array_fill( 0, count( $ids ), '%d' ) ) . ')',
+						$ids
+					)
+				);
+	}
 }

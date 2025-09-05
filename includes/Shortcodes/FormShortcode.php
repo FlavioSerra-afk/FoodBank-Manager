@@ -35,7 +35,7 @@ final class FormShortcode {
 		if ( ! $schema ) {
 			return '';
 		}
-               $captcha_enabled = ( $schema['meta']['captcha'] ?? false ) === true;
+				$captcha_enabled = ( $schema['meta']['captcha'] ?? false ) === true;
 		ob_start();
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		echo '<input type="hidden" name="action" value="fbm_submit" />';
