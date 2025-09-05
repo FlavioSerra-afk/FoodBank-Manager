@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-05 (v1.2.8 release bump)
+Docs-Revision: 2025-09-05 (v1.2.9 QA sweep)
 
 # PHPCS Ignores & Suppressed Issues Dashboard
 

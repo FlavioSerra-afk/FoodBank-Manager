@@ -1,8 +1,9 @@
 # Changelog
 
-## [1.2.9] - 2025-09-05
-### Features
-- feat(auth): self-heal Administrator capabilities with diagnostics repair control and menu visibility fallback
+## 1.2.9 — 2025-09-05
+- test(harness): add WP helpers (transients/options/nonces), reset globals, gate ext branches
+- test(notices/menu): align with cap self-heal + admin fallback; de-dup verified
+- chore(release): metadata bump only
 
 ## 1.2.8 — 2025-09-05
 - chore(release): version bump only (no runtime changes)
