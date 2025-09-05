@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.2.3 UI Fix)
+Docs-Revision: 2025-09-04 (Wave v1.2.7 UI Fix)
 # FoodBank Manager — Architecture
 
 ## Overview

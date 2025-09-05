@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.2.7] - 2025-09-05
+### Build
+- bump version to 1.2.7.
+
 ## [1.2.6] - 2025-09-05
 ### QA
 - test: replace anonymous test doubles with named stubs; add deterministic WP function shims for unit tests.

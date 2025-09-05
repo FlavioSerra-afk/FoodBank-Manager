@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.2.3-fix)
+Docs-Revision: 2025-09-04 (Wave v1.2.7-fix)
 Strict (cleaned):
 
 includes/Admin/EmailsPage.php
