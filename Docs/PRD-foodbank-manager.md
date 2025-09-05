@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-07 (AG: RBAC harness + permissions alignment)
+Docs-Revision: 2025-09-05 (v1.2.11 menu failsafe)
 # FoodBank Manager — Product Requirements Document (PRD)
 
 **Repo file:** `Docs/PRD-foodbank-manager.md`  
@@ -300,6 +300,7 @@ The Shortcodes admin page includes a builder that outputs masked shortcode strin
 - **Shortcodes:** registered by `FBM\Shortcodes\Shortcodes::register()` during `Core\Plugin::boot()`; per-form CAPTCHA renders when enabled.
 - **Notices:** single hook (`admin_notices`), single render per request, gated by canonical screen IDs.
 - **Capabilities:** on every admin request, Administrator capabilities are self-healed; Diagnostics exposes a "Repair caps" control.
+- **Admin menu:** parent may fall back to `manage_options` only when core boot/menu not registered; subpages remain FBM-capability gated; first submenu reuses parent slug.
 
 ---
 

@@ -16,7 +16,7 @@ use FoodBankManager\Core\Screen;
 
 final class Plugin {
 
-    public const FBM_VERSION = '1.2.10';
+    public const VERSION = '1.2.11';
 
         private static ?Plugin $instance = null;
         private static bool $booted = false;

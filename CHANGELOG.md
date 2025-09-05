@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.2.11] - 2025-09-05
+### Fixed
+- Admin menu de-dup: fallback parent only when core boot/menu not registered; emergency notice suppressed after boot.
+### Added
+- Diagnostics: "Menu parents registered" row for quick duplicate detection.
+### Infra
+- RBAC test harness utilities (admin-only vs FBM caps) – ongoing.
+### Known
+- PHPUnit still has permission-alignment failures in a subset of suites (tracked in Docs/ISSUES - see RBAC alignment items).
+
 ## 1.2.10 — 2025-09-05
 - feat(bootstrap): boot watchdog and parent menu failsafe with Diagnostics link
 

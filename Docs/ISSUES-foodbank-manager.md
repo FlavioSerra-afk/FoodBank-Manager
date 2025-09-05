@@ -1,10 +1,11 @@
-Docs-Revision: 2025-09-05 (v1.2.9 QA sweep)
+Docs-Revision: 2025-09-05 (v1.2.11 RBAC harness)
 
 ## Active Issues
 - [P0] PHPUnit WP stub gaps → Fixed (Prompt P)
 - [P1] Retention config normalization → Fixed (Prompt Q)
 - [P1] Admin notices duplicates → Fixed; Diagnostics shows render count
 - [P2] PHPCS flood from dist/ → Fixed (Prompt R); remaining items are docblocks/escaping
+- [P2] RBAC test failures → run `composer test`; use helpers `fbm_grant_admin_only`, `fbm_grant_fbm_all`, `fbm_grant_for_page` to align permissions
 
 ## Resolved Issues
 - Menu not visible on fresh install → Administrators now self-heal capabilities; Diagnostics includes a Repair caps control.

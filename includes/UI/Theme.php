@@ -40,7 +40,7 @@ class Theme {
 		 */
 	public static function enqueue_front(): void {
 			$vars = self::frontend_vars();
-			wp_register_style( 'fbm-frontend-theme', FBM_URL . 'assets/css/theme-frontend.css', array(), Plugin::FBM_VERSION );
+                    wp_register_style( 'fbm-frontend-theme', FBM_URL . 'assets/css/theme-frontend.css', array(), Plugin::VERSION );
 			wp_add_inline_style( 'fbm-frontend-theme', self::to_css_vars( $vars, '.fbm-scope' ) );
 			$custom = Options::get( 'theme.frontend.custom_css', '' );
 		if ( is_string( $custom ) && $custom !== '' ) {
@@ -56,7 +56,7 @@ class Theme {
 		 */
 	public static function enqueue_admin(): void {
 			$vars = self::admin_vars();
-			wp_register_style( 'fbm-admin-theme', FBM_URL . 'assets/css/theme-admin.css', array(), Plugin::FBM_VERSION );
+                    wp_register_style( 'fbm-admin-theme', FBM_URL . 'assets/css/theme-admin.css', array(), Plugin::VERSION );
 			wp_add_inline_style( 'fbm-admin-theme', self::to_css_vars( $vars, '.fbm-scope' ) );
 			$custom = Options::get( 'theme.admin.custom_css', '' );
 		if ( is_string( $custom ) && $custom !== '' ) {
@@ -127,7 +127,7 @@ class Theme {
 					'inter'  => 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap',
 					'roboto' => 'https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap',
 				);
-				wp_enqueue_style( 'fbm-font-' . $which, $map[ $family ], array(), Plugin::FBM_VERSION );
+                            wp_enqueue_style( 'fbm-font-' . $which, $map[ $family ], array(), Plugin::VERSION );
 		}
 	}
 }
