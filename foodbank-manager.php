@@ -89,6 +89,11 @@ add_action(
 
 // Activation/Deactivation hooks.
 register_activation_hook( FBM_FILE, [ \FoodBankManager\Core\Plugin::class, 'activate' ] );
+register_activation_hook( __FILE__, static function () {
+        if ( class_exists( \FBM\Auth\Capabilities::class ) ) {
+                \FBM\Auth\Capabilities::ensure_for_admin();
+        }
+} );
 
 if ( ! function_exists( __NAMESPACE__ . '\\pcc_fbm_deactivate' ) ) {
 		/**

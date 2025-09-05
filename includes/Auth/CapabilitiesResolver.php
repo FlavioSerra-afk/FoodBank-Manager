@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace FoodBankManager\Auth;
 
+use FBM\Auth\Capabilities;
+
 final class CapabilitiesResolver {
     /** @since 0.1.x */
     public static function boot(): void {

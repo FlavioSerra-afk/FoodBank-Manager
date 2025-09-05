@@ -297,6 +297,7 @@ The Shortcodes admin page includes a builder that outputs masked shortcode strin
 - **Bootstrap:** plugin must attempt `vendor/autoload.php`, then fallback PSR-4 (`FBM/` `FBManager`) with `includes/` mapping.
 - **Shortcodes:** registered by `FBM\Shortcodes\Shortcodes::register()` during `Core\Plugin::boot()`; per-form CAPTCHA renders when enabled.
 - **Notices:** single hook (`admin_notices`), single render per request, gated by canonical screen IDs.
+- **Capabilities:** on every admin request, Administrator capabilities are self-healed; Diagnostics exposes a "Repair caps" control.
 
 ---
 

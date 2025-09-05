@@ -18,8 +18,8 @@ $wp_version     = get_bloginfo( 'version' );
 $fbm_version    = defined( 'FBM_VERSION' ) ? FBM_VERSION : 'dev';
 $sodium         = extension_loaded( 'sodium' ) ? 'native' : ( class_exists( '\\ParagonIE_Sodium_Compat' ) ? 'polyfill' : 'missing' );
 $kek_defined    = defined( 'FBM_KEK_BASE64' ) && FBM_KEK_BASE64 !== '';
-$transport      = function_exists( 'wp_mail' ) ? 'wp_mail' : 'none';
-$notice        = isset( $_GET['notice'] ) ? sanitize_key( wp_unslash( $_GET['notice'] ) ) : '';
+    $transport      = function_exists( 'wp_mail' ) ? 'wp_mail' : 'none';
+    $notice        = isset( $_GET['notice'] ) ? sanitize_key( wp_unslash( $_GET['notice'] ) ) : '';
 $missing_slugs = array();
 $found_slugs   = array();
 foreach ( \FoodBankManager\Admin\Menu::slugs() as $slug ) {
@@ -35,13 +35,12 @@ $gating_ok  = \FoodBankManager\Core\Screen::is_fbm_screen();
 ?>
 <div class="wrap fbm-admin">
     <h1><?php esc_html_e( 'Diagnostics', 'foodbank-manager' ); ?></h1>
-    <?php if ( 'sent' === $notice ) : ?>
-        <div class="notice notice-success"><p><?php esc_html_e( 'Test email sent.', 'foodbank-manager' ); ?></p></div>
-    <?php elseif ( 'repaired' === $notice ) : ?>
-        <div class="notice notice-success"><p><?php esc_html_e( 'Capabilities repaired.', 'foodbank-manager' ); ?></p></div>
-    <?php elseif ( 'error' === $notice ) : ?>
-        <div class="notice notice-error"><p><?php esc_html_e( 'Action failed.', 'foodbank-manager' ); ?></p></div>
-    <?php endif; ?>
+      <?php settings_errors( 'fbm_diagnostics' ); ?>
+      <?php if ( 'sent' === $notice ) : ?>
+          <div class="notice notice-success"><p><?php esc_html_e( 'Test email sent.', 'foodbank-manager' ); ?></p></div>
+      <?php elseif ( 'error' === $notice ) : ?>
+          <div class="notice notice-error"><p><?php esc_html_e( 'Action failed.', 'foodbank-manager' ); ?></p></div>
+      <?php endif; ?>
     <h2><?php esc_html_e( 'Crypto', 'foodbank-manager' ); ?></h2>
     <ul>
         <li><?php echo esc_html( $kek_defined ? '✅ key' : '⚠️ key' ); ?></li>
@@ -61,12 +60,13 @@ $gating_ok  = \FoodBankManager\Core\Screen::is_fbm_screen();
         <li><?php echo esc_html( 'FBM ' . $fbm_version ); ?></li>
         <li><?php echo esc_html( 'FBM Notices rendered this request: ' . $notices_render_count . ' (' . ( $notices_render_count === 1 ? '✅' : '⚠️' ) . ')' ); ?></li>
     </ul>
-    <h2><?php esc_html_e( 'Actions', 'foodbank-manager' ); ?></h2>
-    <form method="post" action="">
-        <?php wp_nonce_field( 'fbm_diagnostics_repair_caps', '_fbm_nonce' ); ?>
-        <input type="hidden" name="fbm_action" value="repair_caps" />
-        <p><button type="submit" class="button"><?php esc_html_e( 'Repair Capabilities', 'foodbank-manager' ); ?></button></p>
-    </form>
+      <h2><?php esc_html_e( 'Menu Visibility', 'foodbank-manager' ); ?></h2>
+      <p><?php esc_html_e( 'FBM caps held by current user:', 'foodbank-manager' ); ?> <strong><?php echo esc_html( $caps_count ); ?></strong></p>
+      <form method="post" action="">
+          <input type="hidden" name="fbm_action" value="fbm_repair_caps" />
+          <?php wp_nonce_field( 'fbm_repair_caps' ); ?>
+          <?php submit_button( __( 'Repair caps', 'foodbank-manager' ), 'secondary', '', false ); ?>
+      </form>
     <h2><?php esc_html_e( 'Cron', 'foodbank-manager' ); ?></h2>
     <?php $cron = \FoodBankManager\Admin\DiagnosticsPage::cron_status(); ?>
     <table class="widefat">

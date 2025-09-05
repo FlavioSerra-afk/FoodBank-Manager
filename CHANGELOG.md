@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.2.9] - 2025-09-05
+### Features
+- feat(auth): self-heal Administrator capabilities with diagnostics repair control and menu visibility fallback
+
 ## 1.2.8 — 2025-09-05
 - chore(release): version bump only (no runtime changes)
 - docs: note test stubs (WP helpers), retention config normalizer, notices de-dup diagnostics

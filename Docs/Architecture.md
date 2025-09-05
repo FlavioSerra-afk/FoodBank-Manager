@@ -34,7 +34,8 @@ A secure, privacy-first WordPress plugin for managing Food Bank applicant intake
 ## Boot & lifecycle
 - `foodbank-manager.php` attempts `vendor/autoload.php` and registers a lightweight PSR-4 fallback mapping `FBM\` classes in `includes/` and aliasing `FoodBankManager\` during migration.
 - Activation/deactivation: reflection-based call to instance/static `activate()`/`deactivate()` methods.
-- During `plugins_loaded`, `Core\Plugin::boot()` registers admin menus, REST routes, shortcodes, assets, and repairs roles/capabilities.
+- During `plugins_loaded`, `Core\Plugin::boot()` registers admin menus, REST routes, shortcodes, assets, and repairs roles/capabilities. An idempotent ensurer grants Administrators all FBM capabilities on each admin request.
+- The FoodBank parent menu falls back to `manage_options` visibility if FBM caps are missing; submenus remain gated by their FBM capabilities.
 - Admin notices display when the vendor autoloader is missing or the KEK is not defined.
 - Diagnostics surfaces notices render count via `Notices::getRenderCount()`.
 

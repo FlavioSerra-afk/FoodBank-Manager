@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace FoodBankManager\Admin;
 
-use FoodBankManager\Auth\Capabilities;
+use FBM\Auth\Capabilities;
 use FoodBankManager\Auth\Roles;
 use FoodBankManager\Core\Options;
 

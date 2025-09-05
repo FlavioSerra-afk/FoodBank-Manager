@@ -1,8 +1,8 @@
 <?php
 namespace FoodBankManager\Tests\Unit {
 
-	use FoodBankManager\Auth\Capabilities;
-	use FoodBankManager\Auth\CapabilitiesResolver;
+        use FBM\Auth\Capabilities;
+        use FoodBankManager\Auth\CapabilitiesResolver;
 	use PHPUnit\Framework\TestCase;
 
 	class CapabilitiesResolverTest extends TestCase {

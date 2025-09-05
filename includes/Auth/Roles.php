@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace FoodBankManager\Auth;
 
+use FBM\Auth\Capabilities;
+
 final class Roles {
     /** @since 0.1.x */
     public static function install(): void {
@@ -33,12 +35,6 @@ final class Roles {
 
     /** @since 0.1.x */
     public static function ensure_admin_caps(): void {
-        $admin = get_role('administrator');
-        if (! $admin) {
-            return;
-        }
-        foreach (Capabilities::all() as $cap) {
-            $admin->add_cap($cap);
-        }
+        Capabilities::ensure_for_admin();
     }
 }

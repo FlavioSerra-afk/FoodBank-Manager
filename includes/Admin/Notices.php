@@ -98,7 +98,7 @@ final class Notices {
         if (! wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['_wpnonce'] ?? '')), 'fbm_repair_caps')) {
             return;
         }
-        \FoodBankManager\Auth\Roles::ensure_admin_caps();
+        \FBM\Auth\Capabilities::ensure_for_admin();
         wp_safe_redirect(remove_query_arg(['fbm_repair_caps', '_wpnonce']));
         exit;
     }
