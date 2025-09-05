@@ -75,13 +75,11 @@ namespace FBM\Mail {
  * Guarded global fallbacks (only if tests call global functions)
  * --------------------------- */
 namespace {
-    // --- Global default state (idempotent) ---
-    if (!isset($GLOBALS['fbm_user_caps']) || !is_array($GLOBALS['fbm_user_caps'])) $GLOBALS['fbm_user_caps'] = [];
-    if (!isset($GLOBALS['fbm_transients']) || !is_array($GLOBALS['fbm_transients'])) $GLOBALS['fbm_transients'] = [];
-    if (!isset($GLOBALS['fbm_options'])   || !is_array($GLOBALS['fbm_options']))   $GLOBALS['fbm_options']   = [];
-    if (!isset($GLOBALS['fbm_test_calls']) || !is_array($GLOBALS['fbm_test_calls'])) {
-        $GLOBALS['fbm_test_calls'] = ['add_menu_page' => [], 'add_submenu_page' => []];
-    }
+    // Always-initialized globals
+    $GLOBALS['fbm_user_caps']   = $GLOBALS['fbm_user_caps']   ?? [];
+    $GLOBALS['fbm_transients']  = $GLOBALS['fbm_transients']  ?? [];
+    $GLOBALS['fbm_options']     = $GLOBALS['fbm_options']     ?? [];
+    $GLOBALS['fbm_test_calls']  = $GLOBALS['fbm_test_calls']  ?? ['add_menu_page'=>[], 'add_submenu_page'=>[]];
 
     // Cap check (reads from simulated map)
     if (!function_exists('current_user_can')) {

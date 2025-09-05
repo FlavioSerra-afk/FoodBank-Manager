@@ -71,11 +71,6 @@ namespace {
         function delete_transient( string $key ): void { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
         }
     }
-    if ( ! function_exists( 'current_user_can' ) ) {
-        function current_user_can( string $cap ): bool { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            return true;
-        }
-    }
     if ( ! function_exists( 'get_option' ) ) {
         $GLOBALS['fbm_options_store'] = array();
         function get_option( string $key, $default = false ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
@@ -126,11 +121,6 @@ namespace FoodBankManager\Security {
 }
 
 namespace FoodBankManager\Admin {
-    if ( ! function_exists( __NAMESPACE__ . '\\current_user_can' ) ) {
-        function current_user_can( string $cap ): bool { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            return \FormsPresetsTest::$can;
-        }
-    }
     if ( ! function_exists( __NAMESPACE__ . '\\wp_die' ) ) {
         function wp_die( $message = '' ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
             throw new \RuntimeException( (string) $message );
@@ -171,10 +161,10 @@ use FoodBankManager\Admin\FormsPage;
 use FoodBankManager\Shortcodes\Form;
 
 final class FormsPresetsTest extends TestCase {
-    public static bool $can = true;
 
     protected function setUp(): void {
         parent::setUp();
+        fbm_test_reset_globals();
         $GLOBALS['fbm_options_store'] = array();
         if ( ! defined( 'FBM_PATH' ) ) {
             define( 'FBM_PATH', dirname( __DIR__, 2 ) . '/' );
@@ -203,18 +193,14 @@ final class FormsPresetsTest extends TestCase {
     }
 
     public function testFormsPageRequiresCap(): void {
-        $prev = \ShortcodesPageTest::$can;
-        \ShortcodesPageTest::$can = false;
+        fbm_test_reset_globals();
         $this->expectException( \RuntimeException::class );
-        try {
-            FormsPage::route();
-        } finally {
-            \ShortcodesPageTest::$can = $prev;
-        }
+        FormsPage::route();
     }
 
     public function testFormsPageListsPresets(): void {
-        self::$can = true;
+        fbm_test_reset_globals();
+        fbm_grant_for_page('fbm_forms');
         ob_start();
         FormsPage::route();
         $html = (string) ob_get_clean();

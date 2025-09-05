@@ -149,7 +149,7 @@ namespace {
 
         protected function setUp(): void {
             fbm_test_reset_globals();
-            fbm_grant_caps(['fb_manage_diagnostics']);
+            fbm_grant_for_page('fbm_diagnostics');
             self::$redirect   = '';
             self::$mail_result = true;
             \FoodBankManager\Auth\Roles::$installed = false;

@@ -82,7 +82,7 @@ namespace {
 
         protected function setUp(): void {
             fbm_test_reset_globals();
-            fbm_grant_caps(['fb_manage_diagnostics']);
+            fbm_grant_for_page('fbm_diagnostics');
             self::$redirect      = '';
             $_GET = $_POST = $_SERVER = array();
             if (!class_exists('FoodBankManager\\Database\\ApplicationsRepo', false)) {
@@ -128,6 +128,7 @@ namespace {
         }
 
         public function testUnmaskedWithCapability(): void {
+            fbm_test_reset_globals();
             fbm_grant_caps(['fb_manage_diagnostics','fb_view_sensitive']);
             $_SERVER['REQUEST_METHOD'] = 'POST';
             $_POST['fbm_action'] = 'export';

@@ -185,7 +185,7 @@ namespace {
 
         protected function setUp(): void {
             fbm_test_reset_globals();
-            fbm_grant_caps(['fb_manage_permissions']);
+            fbm_grant_for_page('fbm_permissions');
             self::$redirect = '';
             $_POST          = array();
             $_FILES         = array();

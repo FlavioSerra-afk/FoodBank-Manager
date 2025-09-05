@@ -31,15 +31,12 @@ if (!function_exists('is_email')) {
 }
 
 final class NoticesTest extends TestCase {
-    protected function setUp(): void {
-        fbm_test_reset_globals();
-        $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_diagnostics';
-        fbm_grant_admin_only();
-    }
 
     /** @runInSeparateProcess */
     public function testMissingKekBailsOnNonFbmScreen(): void {
+        fbm_test_reset_globals();
         $GLOBALS['fbm_test_screen_id'] = 'dashboard';
+        fbm_grant_admin_only();
         Notices::missing_kek();
         ob_start();
         Notices::render();
@@ -50,7 +47,9 @@ final class NoticesTest extends TestCase {
 
     /** @runInSeparateProcess */
     public function testMissingKekShowsOnFbmScreen(): void {
+        fbm_test_reset_globals();
         $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_diagnostics';
+        fbm_grant_admin_only();
         if (!defined('FBM_KEK_BASE64')) {
             define('FBM_KEK_BASE64', 'dummy');
         }
@@ -64,12 +63,12 @@ final class NoticesTest extends TestCase {
 
     /** @runInSeparateProcess */
     public function testCapsFixNoticeShownForAdminsWithoutCaps(): void {
+        fbm_test_reset_globals();
+        $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_diagnostics';
         fbm_grant_admin_only();
-        ob_start();
         Notices::render_caps_fix_notice();
-        Notices::render_caps_fix_notice();
-        $out = ob_get_clean();
-        $this->assertStringContainsString('page=fbm_diagnostics', $out);
-        $this->assertSame(1, substr_count($out, 'page=fbm_diagnostics'));
+        Notices::render();
+        $this->assertSame(1, Notices::getRenderCount());
+        $this->assertStringContainsString('page=fbm_diagnostics', $this->getActualOutputForAssertion());
     }
 }
