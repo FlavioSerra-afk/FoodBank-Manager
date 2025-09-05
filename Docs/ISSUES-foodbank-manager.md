@@ -3,6 +3,7 @@ Docs-Revision: 2025-09-05 (Hotfix J/K)
 ## Active Issues
 - [P0] Staging fatal on v1.2.7 — root cause: mixed namespaces + lack of production autoload; fixed via fallback PSR-4 and namespace aliases in `foodbank-manager.php`.
 - [P1] Duplicate notices on some admin pages — root cause: multiple hooks / missing printed guard; fixed by idempotent register and single-render guard, screen-gated by `toplevel_page_fbm` / `foodbank_page_fbm_*`.
+  - De-dup verified; Diagnostics shows count; any >1 indicates a rogue hook outside Notices::register()
 - [P2] PHPCS flood — ensure `phpcs.xml` excludes `dist/*` and `vendor/*`; run `phpcbf` then hand-fix remaining sniffs.
 - [P2] PHPUnit flakes — tests must use namespaced stubs, no anonymous providers; optional extensions gated/skipped.
 

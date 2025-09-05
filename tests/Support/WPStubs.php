@@ -135,4 +135,7 @@ namespace {
             }, $content);
         }
     }
+    if (!function_exists('wp_salt')) {
+        function wp_salt($scheme = 'auth') { return 'testsalt'; }
+    }
 }
