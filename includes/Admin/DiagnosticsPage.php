@@ -51,10 +51,11 @@ class DiagnosticsPage {
 		 */
 	public static function render(): void {
 		if ( ! current_user_can( 'fb_manage_diagnostics' ) ) {
-				wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ), '', array( 'response' => 403 ) );
+						wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ), '', array( 'response' => 403 ) );
 		}
-		/* @psalm-suppress UnresolvableInclude */
-					require FBM_PATH . 'templates/admin/diagnostics.php';
+			$notices_render_count = Notices::getRenderCount();
+			/* @psalm-suppress UnresolvableInclude */
+									require FBM_PATH . 'templates/admin/diagnostics.php';
 	}
 
 		/**

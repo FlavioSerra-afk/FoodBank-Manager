@@ -9,6 +9,7 @@ use FoodBankManager\Core\Options;
 final class Notices {
     private static bool $missingKek = false;
     private static bool $missingSodium = false;
+    private static int $renderCount = 0;
 
     public static function boot(): void {
         self::register();
@@ -38,6 +39,7 @@ final class Notices {
             return;
         }
 
+        self::$renderCount++;
         $printed = true;
 
         self::maybeShowCapsRepair();
@@ -115,5 +117,9 @@ final class Notices {
      */
     public static function missing_sodium(): void {
         self::$missingSodium = true;
+    }
+
+    public static function getRenderCount(): int {
+        return self::$renderCount;
     }
 }

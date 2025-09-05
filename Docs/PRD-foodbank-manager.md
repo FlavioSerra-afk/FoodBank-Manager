@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-05 (Hotfix J/K)
+Docs-Revision: 2025-09-05 (Notices de-dup verify)
 # FoodBank Manager — Product Requirements Document (PRD)
 
 **Repo file:** `Docs/PRD-foodbank-manager.md`  

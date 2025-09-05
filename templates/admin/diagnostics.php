@@ -59,6 +59,7 @@ $gating_ok  = \FoodBankManager\Core\Screen::is_fbm_screen();
         <li><?php echo esc_html( 'PHP ' . $php_version ); ?></li>
         <li><?php echo esc_html( 'WP ' . $wp_version ); ?></li>
         <li><?php echo esc_html( 'FBM ' . $fbm_version ); ?></li>
+        <li><?php echo esc_html( 'FBM Notices rendered this request: ' . $notices_render_count . ' (' . ( $notices_render_count === 1 ? '✅' : '⚠️' ) . ')' ); ?></li>
     </ul>
     <h2><?php esc_html_e( 'Actions', 'foodbank-manager' ); ?></h2>
     <form method="post" action="">

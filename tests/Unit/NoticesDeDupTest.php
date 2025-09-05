@@ -33,6 +33,9 @@ if (!function_exists('wp_nonce_url')) {
 if (!function_exists('is_email')) {
     function is_email($email) { return true; }
 }
+if (!function_exists('add_action')) {
+    function add_action($hook, $callback, $priority = 10) {}
+}
 
 final class NoticesDeDupTest extends TestCase {
     protected function setUp(): void {
@@ -61,5 +64,14 @@ final class NoticesDeDupTest extends TestCase {
         Notices::render();
         $out = ob_get_clean();
         $this->assertSame('', $out);
+    }
+
+    /** @runInSeparateProcess */
+    public function testRenderCountTracksSingleRender(): void {
+        $GLOBALS['fbm_test_screen_id'] = 'toplevel_page_fbm';
+        Notices::boot();
+        Notices::render();
+        Notices::render();
+        $this->assertSame(1, Notices::getRenderCount());
     }
 }
