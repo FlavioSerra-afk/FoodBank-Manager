@@ -50,6 +50,20 @@ namespace FBM\Core {
     function add_option($name, $value) { if (!isset($GLOBALS['fbm_options'][$name])) { $GLOBALS['fbm_options'][$name] = $value; } return true; }
 }
 
+namespace FoodBankManager\Core {
+    function get_current_screen() {
+        $id = $GLOBALS['fbm_test_screen_id'] ?? null;
+        if (!$id) return null;
+        $o = new \stdClass(); $o->id = (string)$id; return $o;
+    }
+    function wp_next_scheduled($hook) { return time() + 300; }
+    function is_admin() { return true; }
+    function admin_url($path = '') { return '/wp-admin/' . ltrim((string)$path, '/'); }
+    function get_option($name, $default = false) { return $GLOBALS['fbm_options'][$name] ?? $default; }
+    function update_option($name, $value) { $GLOBALS['fbm_options'][$name] = $value; return true; }
+    function add_option($name, $value) { if (!isset($GLOBALS['fbm_options'][$name])) { $GLOBALS['fbm_options'][$name] = $value; } return true; }
+}
+
 /* ---------------------------
  * FBM\Mail stubs (outbound)
  * --------------------------- */
