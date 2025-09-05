@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace FoodBankManager\Admin;
 
 use FoodBankManager\Core\Options;
-use FoodBankManager\Core\Retention;
+use FBM\Core\Retention;
 
 /**
  * Settings admin page.

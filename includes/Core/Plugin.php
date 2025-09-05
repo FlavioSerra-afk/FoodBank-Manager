@@ -10,7 +10,7 @@ use FoodBankManager\Auth\Roles;
 use FoodBankManager\Http\FormSubmitController;
 use FoodBankManager\Http\DashboardExportController;
 use FoodBankManager\Core\Options;
-use FoodBankManager\Core\Retention;
+use FBM\Core\Retention;
 use FoodBankManager\Admin\ShortcodesPage;
 use FoodBankManager\Core\Screen;
 

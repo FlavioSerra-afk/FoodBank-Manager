@@ -2,13 +2,14 @@
 /**
  * Data retention and anonymisation routines.
  *
- * @package FoodBankManager\Core
+ * @package FBM\Core
  */
 
 declare(strict_types=1);
 
-namespace FoodBankManager\Core;
+namespace FBM\Core;
 
+use FoodBankManager\Core\Options;
 use FoodBankManager\Logging\Audit;
 use function absint;
 use function array_fill;
@@ -83,7 +84,7 @@ final class Retention {
             'mail_log' => [
                 'table'   => $wpdb->prefix . 'fb_mail_log',
                 'column'  => 'timestamp',
-                'repo'    => '\\FoodBankManager\\Mail\\LogRepo',
+                'repo'    => '\\FBM\\Mail\\LogRepo',
             ],
         ];
 

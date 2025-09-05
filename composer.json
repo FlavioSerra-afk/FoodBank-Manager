@@ -10,8 +10,12 @@
   },
   "autoload": {
     "psr-4": {
+      "FBM\\": "includes/",
       "FoodBankManager\\": "includes/"
     }
+  },
+  "autoload-dev": {
+    "classmap": ["tests/Support/"]
   },
   "require-dev": {
     "cebe/markdown": "^1.2",
