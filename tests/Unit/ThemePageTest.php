@@ -54,8 +54,8 @@ final class ThemePageTest extends TestCase {
         public static string $redirect = '';
 
         protected function setUp(): void {
-                parent::setUp();
-                fbm_reset_globals();
+        parent::setUp();
+        fbm_test_reset_globals();
                 $GLOBALS['fbm_user_caps'] = ['fb_manage_theme' => true];
                 self::$redirect = '';
                 $_POST          = array();

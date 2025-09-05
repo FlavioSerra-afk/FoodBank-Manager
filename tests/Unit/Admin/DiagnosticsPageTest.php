@@ -131,7 +131,7 @@ namespace {
         public static array $cron_next = array();
 
         protected function setUp(): void {
-            fbm_reset_globals();
+            fbm_test_reset_globals();
             $GLOBALS['fbm_user_caps'] = ['fb_manage_diagnostics' => true];
             self::$redirect   = '';
             self::$mail_result = true;

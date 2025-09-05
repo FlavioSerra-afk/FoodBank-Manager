@@ -14,9 +14,6 @@ function fbm_test_reset_globals(): void {
     $GLOBALS['fbm_shortcodes'] = [];
     $GLOBALS['fbm_test_calls'] = ['add_menu_page' => [], 'add_submenu_page' => []];
 }
-
-function fbm_reset_globals(): void { fbm_test_reset_globals(); }
-
 fbm_test_reset_globals();
 
 $cache = __DIR__ . '/../.phpunit.result.cache';

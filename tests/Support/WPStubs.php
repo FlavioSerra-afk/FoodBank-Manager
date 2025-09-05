@@ -75,57 +75,57 @@ namespace FBM\Mail {
  * Guarded global fallbacks (only if tests call global functions)
  * --------------------------- */
 namespace {
-    // Store simulated caps here
-    if (!isset($GLOBALS['fbm_user_caps'])) $GLOBALS['fbm_user_caps'] = [];
+    // --- Global default state (idempotent) ---
+    if (!isset($GLOBALS['fbm_user_caps']) || !is_array($GLOBALS['fbm_user_caps'])) $GLOBALS['fbm_user_caps'] = [];
+    if (!isset($GLOBALS['fbm_transients']) || !is_array($GLOBALS['fbm_transients'])) $GLOBALS['fbm_transients'] = [];
+    if (!isset($GLOBALS['fbm_options'])   || !is_array($GLOBALS['fbm_options']))   $GLOBALS['fbm_options']   = [];
 
+    // current_user_can: read from simulated caps; null-safe
     if (!function_exists('current_user_can')) {
         function current_user_can($cap) {
             $caps = $GLOBALS['fbm_user_caps'] ?? [];
-            if (array_key_exists((string)$cap, $caps)) {
-                return (bool)$caps[(string)$cap];
-            }
-            return true;
+            return !empty($caps[(string) $cap]);
         }
     }
+
+    // Minimal get_role so Capabilities::ensure_for_admin() works in tests
     if (!function_exists('get_role')) {
         function get_role($role) {
-            static $roles = [];
-            if (!isset($roles[$role])) {
-                $roles[$role] = new class {
-                    public array $caps = [];
-                    public function add_cap($cap) { $this->caps[$cap] = true; }
-                    public function remove_cap($cap) { unset($this->caps[$cap]); }
-                    public function has_cap($cap) { return isset($this->caps[$cap]); }
-                };
-            }
-            return $roles[$role];
+            return new class {
+                /** @var array<string,bool> */
+                public array $caps = [];
+                public function add_cap($cap) { $this->caps[$cap] = true; }
+            };
         }
     }
+
+    // Transients (null-safe)
+    if (!function_exists('set_transient')) {
+        function set_transient($key, $value, $expiration = 0) { $GLOBALS['fbm_transients'][(string)$key] = $value; return true; }
+    }
+    if (!function_exists('get_transient')) {
+        function get_transient($key) { return $GLOBALS['fbm_transients'][(string)$key] ?? false; }
+    }
+    if (!function_exists('delete_transient')) {
+        function delete_transient($key) { unset($GLOBALS['fbm_transients'][(string)$key]); return true; }
+    }
+
+    // Options (null-safe)
+    if (!function_exists('get_option')) {
+        function get_option($name, $default = false) { return $GLOBALS['fbm_options'][(string)$name] ?? $default; }
+    }
+    if (!function_exists('update_option')) {
+        function update_option($name, $value) { $GLOBALS['fbm_options'][(string)$name] = $value; return true; }
+    }
+    if (!function_exists('delete_option')) {
+        function delete_option($name) { unset($GLOBALS['fbm_options'][(string)$name]); return true; }
+    }
+
     if (!function_exists('user_can')) {
         function user_can($user, $cap) { return current_user_can($cap); }
     }
     if (!function_exists('manage_options')) {
         // Not a WP function, but we’ll simulate by setting a flag in tests via current_user_can('manage_options')
-    }
-    if (!function_exists('get_transient')) {
-        function get_transient($key) { return $GLOBALS['fbm_transients'][$key] ?? false; }
-    }
-    if (!function_exists('set_transient')) {
-        function set_transient($key, $value, $expiration = 0) { $GLOBALS['fbm_transients'][$key] = $value; return true; }
-    }
-    if (!function_exists('delete_transient')) {
-        function delete_transient($key) { unset($GLOBALS['fbm_transients'][$key]); return true; }
-    }
-
-    // Options (for PresetsRepo, etc.)
-    if (!function_exists('get_option')) {
-        function get_option($name, $default = false) { return $GLOBALS['fbm_options'][$name] ?? $default; }
-    }
-    if (!function_exists('update_option')) {
-        function update_option($name, $value) { $GLOBALS['fbm_options'][$name] = $value; return true; }
-    }
-    if (!function_exists('delete_option')) {
-        function delete_option($name) { unset($GLOBALS['fbm_options'][$name]); return true; }
     }
 
     // Admin/context
