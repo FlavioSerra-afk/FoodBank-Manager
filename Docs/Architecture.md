@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-07 (AG: RBAC harness + permissions alignment)
+Docs-Revision: 2025-09-05 (v1.2.11 hooks)
 # FoodBank Manager — Architecture
 
 ## Overview
@@ -35,7 +35,8 @@ A secure, privacy-first WordPress plugin for managing Food Bank applicant intake
 - `foodbank-manager.php` attempts `vendor/autoload.php` and registers a lightweight PSR-4 fallback mapping `FBM\` classes in `includes/` and aliasing `FoodBankManager\` during migration.
 - Activation/deactivation: reflection-based call to instance/static `activate()`/`deactivate()` methods.
 - During `plugins_loaded`, `Core\Plugin::boot()` registers admin menus, REST routes, shortcodes, assets, and repairs roles/capabilities. An idempotent ensurer grants Administrators all FBM capabilities on each admin request.
-- Successful boot writes a `fbm_boot_ok` transient with the timestamp shown on the Diagnostics screen.
+- Successful boot writes a `fbm_boot_ok` transient with the timestamp shown on the Diagnostics screen and fires `fbm_booted`.
+- `fbm_menu_registered` fires after the admin menu is registered; when either hook hasn't fired, the parent menu falls back to `manage_options` to avoid duplicates while subpages remain FBM-gated.
 - The FoodBank parent menu falls back to `manage_options` for Administrators if FBM caps are missing; subpages remain FBM-gated and Diagnostics offers a nonce-protected **Repair caps** button.
 - When no FBM caps are detected for an Administrator, a transient-limited, text-only notice (no global assets) prompts Diagnostics → Repair caps and can be dismissed for 24 h.
 - Admin notices display when the vendor autoloader is missing or the KEK is not defined.

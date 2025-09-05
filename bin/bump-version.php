@@ -70,11 +70,11 @@ if ( ! $cnt1 ) {
 	exit( 1 ); }
 file_put_contents( $pluginFile, $pluginSrc );
 
-// 3) Update Plugin::FBM_VERSION
+// 3) Update Plugin::VERSION
 $cls = file_get_contents( $pluginClass );
-$cls = preg_replace( "/FBM_VERSION\s*=\s*'(\d+\.\d+\.\d+)'/", "FBM_VERSION = '$next'", $cls, 1, $cnt2 );
+$cls = preg_replace( "/VERSION\s*=\s*'(\d+\.\d+\.\d+)'/", "VERSION = '$next'", $cls, 1, $cnt2 );
 if ( ! $cnt2 ) {
-	fwrite( STDERR, "Failed to update Plugin::FBM_VERSION\n" );
+        fwrite( STDERR, "Failed to update Plugin::VERSION\n" );
 	exit( 1 ); }
 file_put_contents( $pluginClass, $cls );
 
