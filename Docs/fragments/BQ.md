@@ -1,0 +1,1 @@
+- feat: polish frontend dashboard UX with accessible filters, loading skeletons, and empty states
