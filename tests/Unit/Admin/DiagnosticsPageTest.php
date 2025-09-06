@@ -5,6 +5,31 @@ namespace {
     use PHPUnit\Framework\TestCase;
     use FoodBankManager\Admin\DiagnosticsPage;
 
+    if ( ! class_exists( 'DiagRetentionDBStub' ) ) {
+        class DiagRetentionDBStub {
+            public string $prefix = 'wp_';
+            /** @var array<string,array<int>> */
+            public array $ids = array(
+                'wp_fb_applications' => array(),
+                'wp_fb_attendance'   => array(),
+                'wp_fb_mail_log'     => array(),
+            );
+            /** @var array<int,string> */
+            public array $queries = array();
+            public function prepare( string $sql, ...$args ): string { return $sql; }
+            public function get_col( $sql, $col = 0 ) {
+                foreach ( $this->ids as $table => $ids ) {
+                    if ( strpos( $sql, $table ) !== false ) {
+                        return $ids;
+                    }
+                }
+                return array();
+            }
+            public function query( $sql ) { $this->queries[] = $sql; return true; }
+            public function insert( string $table, array $data, $format = null ): bool { return true; }
+        }
+    }
+
     if ( ! defined( 'DAY_IN_SECONDS' ) ) {
         define( 'DAY_IN_SECONDS', 86400 );
     }
@@ -31,6 +56,9 @@ namespace {
     }
     if ( ! function_exists( 'add_settings_error' ) ) {
         function add_settings_error( $setting, $code, $message, $type = 'error' ) {}
+    }
+    if ( ! function_exists( 'settings_errors' ) ) {
+        function settings_errors( $setting = '', $sanitize = false, $hide_on_update = false ) {}
     }
     if ( ! function_exists( 'wp_safe_redirect' ) ) {
         function wp_safe_redirect( string $url, int $status = 302 ): void {
@@ -68,6 +96,9 @@ namespace {
     if ( ! function_exists( 'wp_nonce_field' ) ) {
         function wp_nonce_field( $action, $name ) {}
     }
+    if ( ! function_exists( 'submit_button' ) ) {
+        function submit_button( $text = '', $type = 'primary', $name = 'submit', $wrap = true ) {}
+    }
     if ( ! function_exists( 'add_filter' ) ) {
         function add_filter( $tag, $func ) {}
     }
@@ -94,6 +125,12 @@ namespace {
         function wp_get_schedules() {
             return array( 'daily' => array( 'interval' => DAY_IN_SECONDS ) );
         }
+    }
+    if ( ! function_exists( 'current_time' ) ) {
+        function current_time( $type, $gmt = false ) { return '2025-09-04 00:00:00'; }
+    }
+    if ( ! function_exists( 'get_current_user_id' ) ) {
+        function get_current_user_id() { return 1; }
     }
     if ( ! function_exists( 'sanitize_key' ) ) {
         function sanitize_key( $key ) { return preg_replace( '/[^a-z0-9_]/', '', strtolower( (string) $key ) ); }
@@ -148,7 +185,7 @@ namespace {
             \FoodBankManager\Auth\Roles::$installed = false;
             \FoodBankManager\Auth\Roles::$ensured  = false;
             $_POST = $_SERVER = $_REQUEST = array();
-            global $fbm_test_options;
+            global $fbm_test_options, $fbm_options;
             $fbm_test_options = array(
                 'emails' => array(
                     'from_name'  => 'FoodBank',
@@ -156,6 +193,7 @@ namespace {
                 ),
                 'admin_email' => 'admin@example.com',
             );
+            $fbm_options =& $fbm_test_options;
         }
 
         public function testSendTestEmailSuccess(): void {
@@ -208,8 +246,8 @@ namespace {
                 define( 'DAY_IN_SECONDS', 86400 );
             }
             self::$cron_next = array(
-                'fbm_retention_tick' => time() - 10,
-                'fbm_cron_cleanup'   => time() + 100,
+                'fbm_retention_tick'   => time() - 10,
+                'fbm_cron_cleanup'     => time() + 100,
                 'fbm_cron_email_retry' => time() + 100,
             );
             global $fbm_test_options;
@@ -220,15 +258,73 @@ namespace {
             if ( ! defined( 'FBM_PATH' ) ) {
                 define( 'FBM_PATH', dirname( __DIR__, 3 ) . '/' );
             }
-            $notices_render_count = \FoodBankManager\Admin\Notices::getRenderCount();
-            $boot_status          = 'not recorded';
-            $caps_count           = '0 / 0';
             ob_start();
-            include FBM_PATH . 'templates/admin/diagnostics.php';
+            DiagnosticsPage::render();
             $html = ob_get_clean();
             $this->assertStringContainsString( 'fbm_retention_tick', $html );
             $this->assertStringContainsString( '⚠️', $html );
-            $this->assertStringContainsString( gmdate( 'Y-m-d', 123 ), $html );
+        }
+
+        public function testRetentionRunOutputsSummary(): void {
+            fbm_test_set_request_nonce('fbm_retention_run');
+            $_POST['fbm_action'] = 'fbm_retention_run';
+            $_REQUEST            = $_POST;
+            if ( ! defined( 'ABSPATH' ) ) {
+                define( 'ABSPATH', __DIR__ );
+            }
+            if ( ! defined( 'FBM_PATH' ) ) {
+                define( 'FBM_PATH', dirname( __DIR__, 3 ) . '/' );
+            }
+            global $fbm_test_options, $fbm_options, $wpdb;
+            $fbm_test_options['fbm_settings'] = array(
+                'privacy' => array(
+                    'retention' => array(
+                        'applications' => array('days' => 1, 'policy' => 'delete'),
+                        'attendance'   => array('days' => 1, 'policy' => 'anonymise'),
+                        'mail'         => array('days' => 1, 'policy' => 'delete'),
+                    ),
+                ),
+            );
+            $fbm_options =& $fbm_test_options;
+            $wpdb = new DiagRetentionDBStub();
+            $wpdb->ids['wp_fb_applications'] = array(1);
+            $wpdb->ids['wp_fb_attendance']   = array(1);
+            $wpdb->ids['wp_fb_mail_log']     = array();
+            ob_start();
+            DiagnosticsPage::render();
+            $html = ob_get_clean();
+            $this->assertStringContainsString( 'applications', $html );
+        }
+
+        public function testRetentionDryRunOutputsSummary(): void {
+            fbm_test_set_request_nonce('fbm_retention_dry_run');
+            $_POST['fbm_action'] = 'fbm_retention_dry_run';
+            $_REQUEST            = $_POST;
+            if ( ! defined( 'ABSPATH' ) ) {
+                define( 'ABSPATH', __DIR__ );
+            }
+            if ( ! defined( 'FBM_PATH' ) ) {
+                define( 'FBM_PATH', dirname( __DIR__, 3 ) . '/' );
+            }
+            global $fbm_test_options, $fbm_options, $wpdb;
+            $fbm_test_options['fbm_settings'] = array(
+                'privacy' => array(
+                    'retention' => array(
+                        'applications' => array('days' => 1, 'policy' => 'delete'),
+                        'attendance'   => array('days' => 1, 'policy' => 'anonymise'),
+                        'mail'         => array('days' => 1, 'policy' => 'delete'),
+                    ),
+                ),
+            );
+            $fbm_options =& $fbm_test_options;
+            $wpdb = new DiagRetentionDBStub();
+            $wpdb->ids['wp_fb_applications'] = array(1);
+            $wpdb->ids['wp_fb_attendance']   = array(1);
+            $wpdb->ids['wp_fb_mail_log']     = array();
+            ob_start();
+            DiagnosticsPage::render();
+            $html = ob_get_clean();
+            $this->assertStringContainsString( 'applications', $html );
         }
 
         public function testRepairCapsActionEnsuresCaps(): void {

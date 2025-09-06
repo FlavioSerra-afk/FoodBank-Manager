@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace FoodBankManager\Admin;
 
 use FBM\Auth\Capabilities;
+use FBM\Core\Retention;
 use FoodBankManager\Core\Options;
 use FoodBankManager\Core\Install;
 use function sanitize_text_field;
@@ -25,7 +26,12 @@ use function wp_get_schedules;
  * Diagnostics admin page.
  */
 class DiagnosticsPage {
-        private const ACTION_REPAIR_CAPS = 'fbm_repair_caps';
+       private const ACTION_REPAIR_CAPS   = 'fbm_repair_caps';
+       private const ACTION_RETENTION_RUN = 'fbm_retention_run';
+       private const ACTION_RETENTION_DRY = 'fbm_retention_dry_run';
+
+       /** @var array<string,array<string,int>> */
+       private static array $retention_summary = array();
 
         /**
          * Route the diagnostics page.
@@ -52,27 +58,39 @@ class DiagnosticsPage {
                         return;
                 }
                 $action = sanitize_key( (string) $_POST['fbm_action'] );
-                if ( self::ACTION_REPAIR_CAPS !== $action ) {
+               if ( self::ACTION_REPAIR_CAPS === $action ) {
+                        check_admin_referer( self::ACTION_REPAIR_CAPS );
+                        if ( ! current_user_can( 'fb_manage_diagnostics' ) ) {
+                                wp_die( esc_html__( 'Insufficient permissions', 'foodbank-manager' ) );
+                        }
+
+                        Capabilities::ensure_for_admin();
+
+                        add_settings_error(
+                                'fbm_diagnostics',
+                                'fbm_caps_repaired',
+                                __( 'FBM capabilities repaired for Administrator.', 'foodbank-manager' ),
+                                'updated'
+                        );
                         return;
-                }
+               }
 
-                check_admin_referer( self::ACTION_REPAIR_CAPS );
-                if ( ! current_user_can( 'fb_manage_diagnostics' ) ) {
-                        wp_die( esc_html__( 'Insufficient permissions', 'foodbank-manager' ) );
-                }
+               if ( self::ACTION_RETENTION_RUN === $action ) {
+                        check_admin_referer( self::ACTION_RETENTION_RUN );
+                        self::$retention_summary = Retention::run_now();
+                        add_settings_error( 'fbm_diagnostics', 'fbm_retention_run', __( 'Retention run executed.', 'foodbank-manager' ), 'updated' );
+                        return;
+               }
 
-                Capabilities::ensure_for_admin();
-
-                add_settings_error(
-                        'fbm_diagnostics',
-                        'fbm_caps_repaired',
-                        __( 'FBM capabilities repaired for Administrator.', 'foodbank-manager' ),
-                        'updated'
-                );
+               if ( self::ACTION_RETENTION_DRY === $action ) {
+                        check_admin_referer( self::ACTION_RETENTION_DRY );
+                        self::$retention_summary = Retention::dry_run();
+                        add_settings_error( 'fbm_diagnostics', 'fbm_retention_dry', __( 'Retention dry-run complete.', 'foodbank-manager' ), 'updated' );
+               }
         }
 
-		/**
-		 * Render diagnostics template.
+/**
+ * Render diagnostics template.
 		 */
         public static function render(): void {
                 if ( ! current_user_can( 'fb_manage_diagnostics' ) ) {
@@ -105,14 +123,28 @@ class DiagnosticsPage {
                 require FBM_PATH . 'templates/admin/diagnostics.php';
         }
 
+       /**
+        * Get summary from last retention run in this request or option.
+        *
+        * @return array<string,array<string,int>>
+        */
+       public static function retention_summary(): array {
+               if ( ! empty( self::$retention_summary ) ) {
+                       return self::$retention_summary;
+               }
+
+               $stored = get_option( 'fbm_retention_tick_last_summary', array() );
+               return is_array( $stored ) ? $stored : array();
+       }
+
 		/**
 		 * Get cron event diagnostics.
 		 *
 		 * @return array<int,array{hook:string,schedule:string,next_run:int,last_run:int,overdue:bool}>
 		 */
 	public static function cron_status(): array {
-			$hooks     = array( 'fbm_cron_cleanup', 'fbm_cron_email_retry', 'fbm_retention_tick' );
-			$schedules = wp_get_schedules();
+                       $hooks     = array_merge( array( 'fbm_cron_cleanup', 'fbm_cron_email_retry' ), Retention::events() );
+                       $schedules = wp_get_schedules();
 			$now       = time();
 			$out       = array();
 		foreach ( $hooks as $hook ) {
