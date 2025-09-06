@@ -1,17 +1,7 @@
 # Changelog
 
 ## [1.2.12] - 2025-09-06
-### Added
-- Trace comments added to all admin pages; Diagnostics shows RenderOnce badge to catch any duplicate rendering at a glance.
-### Fixed
-- Admin pages now render exactly once per request (RenderOnce guard), eliminating duplicate top blocks on several screens.
-### Diagnostics
-- Added per-request render counts and menu-parent count for quick detection.
-### Infra
-- Menu/boot remain idempotent; notices stay single and screen-gated.
-
-### QA
-- Added unit test for Trace; updated docs; no runtime changes.
+- Trace comments on all admin templates; Diagnostics RenderOnce badge; no behavior changes.
 
 ## [1.2.11] - 2025-09-05
 ### Fixed
