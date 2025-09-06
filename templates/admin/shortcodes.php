@@ -8,6 +8,7 @@
 declare(strict_types=1);
 ?>
 <div class="wrap fbm-admin">
+<?php \FBM\Core\Trace::mark( 'admin:shortcodes' ); ?>
 <h1><?php esc_html_e( 'Shortcodes', 'foodbank-manager' ); ?></h1>
 <form method="post" id="fbm-shortcodes-form">
 	<?php wp_nonce_field( 'fbm_shortcodes_preview', '_wpnonce' ); ?>

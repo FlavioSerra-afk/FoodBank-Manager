@@ -15,6 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $perms_base = menu_page_url( 'fbm_permissions', false );
 ?>
 <div class="wrap fbm-admin">
+<?php \FBM\Core\Trace::mark( 'admin:permissions' ); ?>
         <h1><?php \esc_html_e( 'Permissions', 'foodbank-manager' ); ?></h1>
 <h2 class="nav-tab-wrapper">
 <a href="<?php echo esc_url( $perms_base ); ?>"
