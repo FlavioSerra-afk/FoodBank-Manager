@@ -1,7 +1,6 @@
-<?php
-// phpcs:ignoreFile
+<?php // phpcs:ignoreFile
 /**
- * Theme helpers.
+ * Theme token helpers.
  *
  * @package FoodBankManager
  */
@@ -11,123 +10,118 @@ declare(strict_types=1);
 namespace FoodBankManager\UI;
 
 use FoodBankManager\Core\Options;
-use FoodBankManager\Core\Plugin;
 
 /**
- * Theme UI helper.
+ * Provide sanitized design tokens.
  */
 class Theme {
-		/**
-		 * Get CSS vars for frontend.
-		 *
-		 * @return array<string,string>
-		 */
-	public static function frontend_vars(): array {
-			return self::vars( 'frontend' );
+/**
+ * @deprecated No-op kept for backwards compatibility.
+ */
+public static function enqueue_front(): void {
+// Intentionally empty.
+}
+
+/**
+ * @deprecated No-op kept for backwards compatibility.
+ */
+public static function enqueue_admin(): void {
+// Intentionally empty.
+}
+	/**
+	 * Default design tokens.
+	 *
+	 * @return array{primary_color:string,density:string,font:string,dark_mode:bool}
+	 */
+	public static function defaults(): array {
+	    return array(
+	        'primary_color' => '#3b82f6',
+	        'density'       => 'comfortable',
+	        'font'          => 'system',
+	        'dark_mode'     => false,
+	    );
 	}
 
-		/**
-		 * Get CSS vars for admin.
-		 *
-		 * @return array<string,string>
-		 */
-	public static function admin_vars(): array {
-			return self::vars( 'admin' );
+	/**
+	 * Retrieve sanitized admin tokens.
+	 *
+	 * @return array{primary_color:string,density:string,font:string,dark_mode:bool}
+	 */
+	public static function admin(): array {
+	    $opt = Options::get( 'theme', array() );
+	    if ( ! is_array( $opt ) ) {
+	        $opt = array();
+	    }
+	    return self::sanitize( $opt );
 	}
 
-		/**
-		 * Enqueue frontend theme styles.
-		 */
-	public static function enqueue_front(): void {
-			$vars = self::frontend_vars();
-                    wp_register_style( 'fbm-frontend-theme', FBM_URL . 'assets/css/theme-frontend.css', array(), Plugin::VERSION );
-			wp_add_inline_style( 'fbm-frontend-theme', self::to_css_vars( $vars, '.fbm-scope' ) );
-			$custom = Options::get( 'theme.frontend.custom_css', '' );
-		if ( is_string( $custom ) && $custom !== '' ) {
-				wp_add_inline_style( 'fbm-frontend-theme', $custom );
-		}
-			wp_enqueue_style( 'fbm-frontend-theme' );
+	/**
+	 * Sanitize raw tokens against defaults.
+	 *
+	 * @param array<string,mixed> $raw Raw option values.
+	 * @return array{primary_color:string,density:string,font:string,dark_mode:bool}
+	 */
+	public static function sanitize( array $raw ): array {
+	    $defaults = self::defaults();
 
-			self::maybe_enqueue_font( 'frontend' );
+	    $color = isset( $raw['primary_color'] ) ? sanitize_hex_color( (string) $raw['primary_color'] ) : '';
+	    if ( ! is_string( $color ) || '' === $color ) {
+	        $color = $defaults['primary_color'];
+	    }
+
+	    $density = isset( $raw['density'] ) ? sanitize_text_field( (string) $raw['density'] ) : '';
+	    if ( ! in_array( $density, array( 'compact', 'comfortable' ), true ) ) {
+	        $density = $defaults['density'];
+	    }
+
+	    $font = isset( $raw['font_family'] ) ? sanitize_text_field( (string) $raw['font_family'] ) : '';
+	    if ( ! in_array( $font, array( 'system', 'inter', 'roboto' ), true ) ) {
+	        $font = $defaults['font'];
+	    }
+
+$dark = isset( $raw['dark_mode_default'] ) && in_array(
+(string) $raw['dark_mode_default'],
+array( '1', 'true', 'on' ),
+true
+);
+
+	    return array(
+	        'primary_color' => $color,
+	        'density'       => $density,
+	        'font'          => $font,
+	        'dark_mode'     => $dark,
+	    );
 	}
 
-		/**
-		 * Enqueue admin theme styles.
-		 */
-	public static function enqueue_admin(): void {
-			$vars = self::admin_vars();
-                    wp_register_style( 'fbm-admin-theme', FBM_URL . 'assets/css/theme-admin.css', array(), Plugin::VERSION );
-			wp_add_inline_style( 'fbm-admin-theme', self::to_css_vars( $vars, '.fbm-scope' ) );
-			$custom = Options::get( 'theme.admin.custom_css', '' );
-		if ( is_string( $custom ) && $custom !== '' ) {
-				wp_add_inline_style( 'fbm-admin-theme', $custom );
-		}
-			wp_enqueue_style( 'fbm-admin-theme' );
-
-			self::maybe_enqueue_font( 'admin' );
+	/**
+	 * Convert tokens to a CSS variables block.
+	 *
+	 * @param array{primary_color:string,density:string,font:string,dark_mode:bool} $tokens Tokens.
+	 * @param string $selector CSS selector.
+	 * @return string
+	 */
+	public static function to_css_vars( array $tokens, string $selector ): string {
+	    $lines = array(
+	        '--fbm-primary:' . $tokens['primary_color'] . ';',
+	        '--fbm-density:' . $tokens['density'] . ';',
+	        '--fbm-font:' . self::font_css( $tokens['font'] ) . ';',
+	        '--fbm-dark:' . ( $tokens['dark_mode'] ? '1' : '0' ) . ';',
+	    );
+	    return $selector . '{' . implode( '', $lines ) . '}';
 	}
 
-		/**
-		 * Convert associative array to CSS variables string.
-		 *
-		 * @param array<string,string> $vars Variables.
-		 * @param string               $selector CSS selector.
-		 * @return string
-		 */
-	public static function to_css_vars( array $vars, string $selector ): string {
-			$lines = array();
-		foreach ( $vars as $k => $v ) {
-				$lines[] = "--fbm-{$k}: {$v};";
-		}
-			return $selector . "{\n" . implode( "\n", $lines ) . "\n}";
-	}
-
-		/**
-		 * Map option values to CSS variables.
-		 *
-		 * @param string $which frontend|admin.
-		 * @return array<string,string>
-		 */
-	private static function vars( string $which ): array {
-			$opt = Options::get( 'theme.' . $which );
-		if ( ! is_array( $opt ) ) {
-				$opt = array();
-		}
-			$shadow_map = array(
-				'none' => 'none',
-				'sm'   => '0 1px 2px rgba(0,0,0,.05)',
-				'md'   => '0 2px 8px rgba(0,0,0,.08)',
-				'lg'   => '0 4px 16px rgba(0,0,0,.1)',
-			);
-			$font_map   = array(
-				'system'  => 'system-ui, sans-serif',
-				'inter'   => '"Inter", system-ui, sans-serif',
-				'roboto'  => '"Roboto", system-ui, sans-serif',
-				'georgia' => 'Georgia, serif',
-			);
-			$vars       = array(
-				'accent'      => (string) ( $opt['accent'] ?? '#3b82f6' ),
-				'radius'      => (string) ( (int) ( $opt['radius'] ?? 12 ) ) . 'px',
-				'shadow'      => $shadow_map[ $opt['shadow'] ?? 'md' ] ?? $shadow_map['md'],
-				'font-family' => $font_map[ $opt['font_family'] ?? 'system' ] ?? $font_map['system'],
-			);
-			return $vars;
-	}
-
-		/**
-		 * Enqueue Google Font if opted-in.
-		 *
-		 * @param string $which frontend|admin.
-		 */
-	private static function maybe_enqueue_font( string $which ): void {
-			$family = Options::get( 'theme.' . $which . '.font_family', 'system' );
-			$load   = Options::get( 'theme.' . $which . '.load_font', false );
-		if ( $load && in_array( $family, array( 'inter', 'roboto' ), true ) ) {
-				$map = array(
-					'inter'  => 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap',
-					'roboto' => 'https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap',
-				);
-                            wp_enqueue_style( 'fbm-font-' . $which, $map[ $family ], array(), Plugin::VERSION );
-		}
+	/**
+	 * Map font token to CSS value.
+	 *
+	 * @param string $font Token.
+	 * @return string
+	 */
+	private static function font_css( string $font ): string {
+	    $map = array(
+	        'system' => 'system-ui, sans-serif',
+	        'inter'  => '"Inter", system-ui, sans-serif',
+	        'roboto' => '"Roboto", system-ui, sans-serif',
+	    );
+	    return $map[ $font ] ?? $map['system'];
 	}
 }
