@@ -30,24 +30,50 @@ final class Install {
     }
 
     /**
+     * Get list of non-canonical plugin basenames.
+     *
      * @return array<int,string>
      */
     public static function duplicates(): array {
         $v = get_transient(self::TRANSIENT);
         return is_array($v) ? array_values(array_map('strval', $v)) : [];
-        }
+    }
 
+    /**
+     * Deactivate and optionally delete duplicate installs.
+     */
     public static function consolidate(): int {
         $dups = self::duplicates();
         if (!$dups) {
+            self::log(0);
             return 0;
         }
         deactivate_plugins($dups);
         if (current_user_can('delete_plugins')) {
             delete_plugins($dups);
         }
-        update_option('fbm_last_consolidation', ['ts' => time(), 'count' => count($dups)]);
+        self::log(count($dups));
         delete_transient(self::TRANSIENT);
         return count($dups);
+    }
+
+    /**
+     * Record or fetch the last consolidation log.
+     *
+     * @param int|null $count Number of duplicates removed.
+     * @return array{ts:int,count:int}
+     */
+    public static function log(?int $count = null): array {
+        $key = 'fbm_last_consolidation';
+        if (null !== $count) {
+            $entry = ['ts' => time(), 'count' => $count];
+            update_option($key, $entry);
+            return $entry;
+        }
+        $v = get_option($key, ['ts' => 0, 'count' => 0]);
+        return [
+            'ts' => (int)($v['ts'] ?? 0),
+            'count' => (int)($v['count'] ?? 0),
+        ];
     }
 }

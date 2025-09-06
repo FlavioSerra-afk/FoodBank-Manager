@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 - enforce release ZIP root slug `foodbank-manager/`
+- diagnostics: duplicate-install consolidation flow with logged results
 
 ## [1.2.13] - 2025-09-06
 ### Frontend
