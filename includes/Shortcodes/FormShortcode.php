@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace FBM\Shortcodes;
 
 use FoodBankManager\Forms\PresetsRepo;
+use FoodBankManager\Forms\Schema;
 use FoodBankManager\UI\Theme;
 use function sanitize_key;
 use function shortcode_atts;
@@ -31,9 +32,14 @@ final class FormShortcode {
 		if ( '' === $slug ) {
 			return '';
 		}
-		$schema = PresetsRepo::get_by_slug( $slug );
+				$schema = PresetsRepo::get_by_slug( $slug );
 		if ( ! $schema ) {
-			return '';
+				return '';
+		}
+		try {
+				$schema = Schema::normalize( $schema );
+		} catch ( \InvalidArgumentException $e ) {
+				return '';
 		}
 				$captcha_enabled = ( $schema['meta']['captcha'] ?? false ) === true;
 		ob_start();

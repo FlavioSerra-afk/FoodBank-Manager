@@ -26,6 +26,22 @@ namespace {
     if (!function_exists('wp_create_nonce')) {
         function wp_create_nonce(string $action) { return 'nonce'; }
     }
+    if (!function_exists('add_shortcode')) {
+        function add_shortcode(string $tag, callable $cb): void { $GLOBALS['__shortcodes'][$tag] = $cb; }
+    }
+    if (!function_exists('do_shortcode')) {
+        function do_shortcode(string $text): string {
+            return preg_replace_callback('/\[([a-z0-9_]+)([^\]]*)\]/i', function ($m) {
+                $tag = $m[1];
+                $atts = [];
+                if (preg_match_all('/(\w+)="([^"]*)"/', $m[2], $am, PREG_SET_ORDER)) {
+                    foreach ($am as $a) { $atts[$a[1]] = $a[2]; }
+                }
+                $cb = $GLOBALS['__shortcodes'][$tag] ?? null;
+                return $cb ? (string) call_user_func($cb, $atts) : '';
+            }, $text);
+        }
+    }
     $GLOBALS['fbm_options_store'] = [];
 }
 
@@ -66,10 +82,14 @@ final class FormShortcodeTest extends TestCase {
     }
 
     public function testRendersCaptchaAndFields(): void {
+        $raw = json_decode($GLOBALS['fbm_options_store']['fbm_form_test_form'], true);
+        $raw['fields'][0]['label'] = '<script>alert(1)</script>';
+        $GLOBALS['fbm_options_store']['fbm_form_test_form'] = json_encode($raw);
         Shortcodes::register();
         $html = do_shortcode('[fbm_form preset="test_form"]');
         $this->assertStringContainsString('name="captcha"', $html);
         $this->assertStringContainsString('name="email"', $html);
+        $this->assertStringNotContainsString('<script', $html);
     }
 
     public function testSubmitFlowSucceeds(): void {
@@ -85,6 +105,15 @@ final class FormShortcodeTest extends TestCase {
         $_REQUEST = $_POST;
         FormSubmitController::handle();
         $this->assertTrue(true);
+    }
+
+    public function testTamperedSchemaReturnsEmpty(): void {
+        $raw = json_decode($GLOBALS['fbm_options_store']['fbm_form_test_form'], true);
+        $raw['fields'][] = ['id' => 'hack', 'type' => 'evil', 'label' => 'Hack'];
+        $GLOBALS['fbm_options_store']['fbm_form_test_form'] = json_encode($raw);
+        Shortcodes::register();
+        $html = do_shortcode('[fbm_form preset="test_form"]');
+        $this->assertSame('', $html);
     }
 }
 

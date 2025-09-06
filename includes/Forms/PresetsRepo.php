@@ -39,12 +39,19 @@ final class PresetsRepo {
 		if ( '' === $slug ) {
 			return null;
 		}
-		$raw = get_option( 'fbm_form_' . $slug );
+				$raw = get_option( 'fbm_form_' . $slug );
 		if ( ! is_string( $raw ) ) {
-			return null;
+				return null;
 		}
-		$decoded = json_decode( $raw, true );
-		return is_array( $decoded ) ? $decoded : null;
+				$decoded = json_decode( $raw, true );
+		if ( ! is_array( $decoded ) ) {
+				return null;
+		}
+		try {
+				return Schema::normalize( $decoded );
+		} catch ( \InvalidArgumentException $e ) {
+				return null;
+		}
 	}
 
 	/**
