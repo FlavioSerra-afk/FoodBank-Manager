@@ -12,12 +12,24 @@ final class Notices {
     private static bool $missingSodium = false;
     private static int $renderCount = 0;
 
+    /**
+     * Register notice-related hooks.
+     *
+     * @return void
+     */
     public static function boot(): void {
-        add_action('admin_init', [Install::class, 'getCachedScan']);
+        add_action('admin_init', static function (): void {
+            Install::getCachedScan();
+        });
         add_action('admin_post_fbm_consolidate_plugins', [__CLASS__, 'handleConsolidatePlugins']);
         add_action('admin_post_fbm_deactivate_duplicates', [__CLASS__, 'handleDeactivateDuplicates']);
     }
 
+    /**
+     * Output admin notices for FoodBank Manager.
+     *
+     * @return void
+     */
     public static function render(): void {
         static $printed = false;
         if ($printed) {
@@ -91,6 +103,11 @@ final class Notices {
         }
     }
 
+    /**
+     * Show a notice if core capabilities are missing.
+     *
+     * @return void
+     */
     public static function render_caps_fix_notice(): void {
         static $printed = false;
         if ($printed) {
