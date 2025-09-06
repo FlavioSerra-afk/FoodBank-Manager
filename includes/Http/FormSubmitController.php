@@ -11,6 +11,7 @@ namespace FoodBankManager\Http;
 
 use FoodBankManager\Forms\PresetsRepo;
 use FoodBankManager\Forms\FieldTypes;
+use FoodBankManager\Forms\Schema;
 use function sanitize_key;
 use function sanitize_text_field;
 
@@ -25,15 +26,16 @@ final class FormSubmitController {
 	 */
 	public static function handle(): void {
 		check_admin_referer( 'fbm_submit_form', '_fbm_nonce' );
-		$slug   = sanitize_key( wp_unslash( (string) ( $_POST['preset'] ?? '' ) ) );
-		$schema = PresetsRepo::get_by_slug( $slug );
+		$slug           = sanitize_key( wp_unslash( (string) ( $_POST['preset'] ?? '' ) ) );
+				$schema = PresetsRepo::get_by_slug( $slug );
 		if ( ! $schema ) {
-			wp_die( esc_html__( 'Invalid form.', 'foodbank-manager' ) );
+				wp_die( esc_html__( 'Invalid form.', 'foodbank-manager' ) );
 		}
 		try {
-			self::validate_against_schema( $schema, $_POST );
-		} catch ( \RuntimeException $e ) {
-			wp_die( esc_html( $e->getMessage() ) );
+				$schema = Schema::normalize( $schema );
+				self::validate_against_schema( $schema, $_POST );
+		} catch ( \InvalidArgumentException | \RuntimeException $e ) {
+				wp_die( esc_html( $e->getMessage() ) );
 		}
 	}
 

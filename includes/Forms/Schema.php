@@ -26,10 +26,10 @@ final class Schema {
 	 * @throws InvalidArgumentException When schema is invalid.
 	 */
 	public static function normalize( array $schema ): array {
-		$meta_raw = $schema['meta'] ?? array();
-		$name     = sanitize_text_field( (string) ( $meta_raw['name'] ?? '' ) );
-		$slug     = sanitize_key( (string) ( $meta_raw['slug'] ?? '' ) );
-		$captcha  = ! empty( $meta_raw['captcha'] );
+		$meta_raw     = $schema['meta'] ?? array();
+				$name = sanitize_text_field( (string) ( $meta_raw['name'] ?? '' ) );
+				$slug = strtolower( sanitize_key( (string) ( $meta_raw['slug'] ?? '' ) ) );
+		$captcha      = ! empty( $meta_raw['captcha'] );
 		if ( '' === $name || '' === $slug ) {
 			throw new InvalidArgumentException( 'meta' );
 		}

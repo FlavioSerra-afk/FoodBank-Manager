@@ -35,19 +35,23 @@
 			<?php endforeach; ?>
 		</ul>
 	</div>
-	<?php if ( $current ) : ?>
-	<form method="post">
-		<input type="hidden" name="fbm_action" value="save" />
-		<input type="hidden" name="_wpnonce" value="<?php echo esc_attr( $nonce_save ); ?>" />
-		<p><label><?php esc_html_e( 'Schema JSON', 'foodbank-manager' ); ?><br />
-		<textarea name="schema" rows="10" cols="80"><?php echo esc_textarea( wp_json_encode( $current ) ); ?></textarea></label></p>
-		<p><button type="submit" class="button button-primary"><?php esc_html_e( 'Save', 'foodbank-manager' ); ?></button></p>
-	</form>
-	<form method="post" onsubmit="return confirm('Are you sure?');">
-		<input type="hidden" name="fbm_action" value="delete" />
-		<input type="hidden" name="slug" value="<?php echo esc_attr( $current['meta']['slug'] ?? '' ); ?>" />
-		<input type="hidden" name="_wpnonce" value="<?php echo esc_attr( $nonce_delete ); ?>" />
-		<p><button type="submit" class="button button-secondary"><?php esc_html_e( 'Delete', 'foodbank-manager' ); ?></button></p>
-	</form>
-	<?php endif; ?>
+		<?php if ( $current ) : ?>
+		<div class="fbm-form-preview">
+				<h2><?php esc_html_e( 'Preview', 'foodbank-manager' ); ?></h2>
+				<?php echo wp_kses_post( \FBM\Shortcodes\FormShortcode::render( array( 'preset' => $current['meta']['slug'] ?? '' ) ) ); ?>
+		</div>
+		<form method="post">
+				<input type="hidden" name="fbm_action" value="save" />
+				<input type="hidden" name="_wpnonce" value="<?php echo esc_attr( $nonce_save ); ?>" />
+				<p><label><?php esc_html_e( 'Schema JSON', 'foodbank-manager' ); ?><br />
+				<textarea name="schema" rows="10" cols="80"><?php echo esc_textarea( wp_json_encode( $current ) ); ?></textarea></label></p>
+				<p><button type="submit" class="button button-primary"><?php esc_html_e( 'Save', 'foodbank-manager' ); ?></button></p>
+		</form>
+		<form method="post" onsubmit="return confirm('Are you sure?');">
+				<input type="hidden" name="fbm_action" value="delete" />
+				<input type="hidden" name="slug" value="<?php echo esc_attr( $current['meta']['slug'] ?? '' ); ?>" />
+				<input type="hidden" name="_wpnonce" value="<?php echo esc_attr( $nonce_delete ); ?>" />
+				<p><button type="submit" class="button button-secondary"><?php esc_html_e( 'Delete', 'foodbank-manager' ); ?></button></p>
+		</form>
+		<?php endif; ?>
 </div>
