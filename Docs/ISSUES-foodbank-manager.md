@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-06 (v1.2.12 trace badge)
+Docs-Revision: 2025-09-06 (v1.2.13 fragments merged)
 
 ## Active Issues
 - [P0] PHPUnit WP stub gaps → Fixed (Prompt P)
@@ -333,6 +333,7 @@ _Post-release notes (2025-09-04): Reinstalled v1.2.7 ZIP on staging with quick c
   - **Tasks:**
     - [ ] Package entries + attendance + files into ZIP.
     - [ ] Redact internal notes if configured.
+    - [ ] Harden SAR exports with streaming ZIP (HTML fallback) and masked data by default.
   - **Acceptance Criteria:**
     - Export completes; logs include who ran it.
   - **Labels:** area:gdpr, type:feature, privacy

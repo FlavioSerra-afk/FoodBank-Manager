@@ -91,7 +91,7 @@ final class DashboardShortcodeUXTest extends TestCase {
     /** @runInSeparateProcess */
     public function testCopyShortcodeBlockAppearsWithCap(): void {
         $GLOBALS['fbm_user_caps']['fb_manage_dashboard'] = true;
-        $GLOBALS['fbm_user_caps']['manage_options'] = true;
+        fbm_grant_admin_only();
         require_once FBM_PATH . 'includes/Shortcodes/Dashboard.php';
         $html = \FoodBankManager\Shortcodes\Dashboard::render();
         $this->assertStringContainsString('fbm-copy-shortcode', $html);

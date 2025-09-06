@@ -1,7 +1,16 @@
 # Changelog
 
 ## [1.2.13] - 2025-09-06
-- QA: deterministic nonce stubs for tests; no runtime changes.
+### Frontend
+- Dashboard UX polish: empty-states, a11y labels, focus rings, skeleton loader; admin-only shortcode hint.
+### Admin
+- Email Templates: live preview with whitelisted tokens; reset to defaults; a11y labels.
+- Design & Theme: sanitized token schema, scoped CSS variables, live preview (dark-mode toggle).
+- GDPR SAR: streaming ZIP with fallback HTML; masked by default; chunking + README.txt.
+### Diagnostics
+- RenderOnce badge + per-screen render counts; menu-parents count remains 1.
+### Infra
+- Parallel-safe waves with file fences; docs merged from fragments; no runtime loosening.
 
 ## [1.2.12] - 2025-09-06
 - Trace comments on all admin templates; Diagnostics RenderOnce badge; no behavior changes.

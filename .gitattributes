@@ -2,5 +2,5 @@
 /Docs export-ignore
 /tests export-ignore
 /node_modules export-ignore
-/dist export-ignore
+dist/ export-ignore
 /phpcs-report.txt export-ignore
