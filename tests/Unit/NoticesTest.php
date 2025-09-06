@@ -17,15 +17,6 @@ if (!function_exists('get_current_screen')) {
 if (!function_exists('esc_html__')) {
     function esc_html__(string $text, string $domain = ''): string { return $text; }
 }
-if (!function_exists('esc_url')) {
-    function esc_url($url) { return $url; }
-}
-if (!function_exists('admin_url')) {
-    function admin_url($path = '') { return $path; }
-}
-if (!function_exists('wp_nonce_url')) {
-    function wp_nonce_url($url, $action) { return $url; }
-}
 if (!function_exists('is_email')) {
     function is_email($email) { return true; }
 }
@@ -36,7 +27,7 @@ final class NoticesTest extends TestCase {
     public function testMissingKekBailsOnNonFbmScreen(): void {
         fbm_test_reset_globals();
         $GLOBALS['fbm_test_screen_id'] = 'dashboard';
-        fbm_grant_admin_only();
+        fbm_grant_caps(['manage_options']);
         Notices::missing_kek();
         ob_start();
         Notices::render();
@@ -49,7 +40,7 @@ final class NoticesTest extends TestCase {
     public function testMissingKekShowsOnFbmScreen(): void {
         fbm_test_reset_globals();
         $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_diagnostics';
-        fbm_grant_admin_only();
+        fbm_grant_caps(['manage_options']);
         if (!defined('FBM_KEK_BASE64')) {
             define('FBM_KEK_BASE64', 'dummy');
         }
@@ -65,10 +56,12 @@ final class NoticesTest extends TestCase {
     public function testCapsFixNoticeShownForAdminsWithoutCaps(): void {
         fbm_test_reset_globals();
         $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_diagnostics';
-        fbm_grant_admin_only();
+        fbm_grant_caps(['manage_options']);
+        ob_start();
         Notices::render_caps_fix_notice();
         Notices::render();
+        $out = ob_get_clean();
         $this->assertSame(1, Notices::getRenderCount());
-        $this->assertStringContainsString('page=fbm_diagnostics', $this->getActualOutputForAssertion());
+        $this->assertStringContainsString('page=fbm_diagnostics', $out);
     }
 }

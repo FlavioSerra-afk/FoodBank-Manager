@@ -33,6 +33,15 @@ if (!function_exists('get_transient')) {
 if (!function_exists('delete_transient')) {
     function delete_transient($key) { unset($GLOBALS['fbm_transients'][$key]); return true; }
 }
+if (!function_exists('current_user_can')) {
+    function current_user_can($cap) {
+        $caps = $GLOBALS['fbm_user_caps'] ?? [];
+        if ($caps) {
+            return !empty($caps[$cap]) || in_array($cap, $caps, true);
+        }
+        return true;
+    }
+}
 if (!function_exists('get_plugins')) {
     function get_plugins() { return $GLOBALS['fbm_test_plugins']; }
 }
@@ -44,19 +53,6 @@ if (!function_exists('delete_plugins')) {
 }
 if (!function_exists('wp_redirect')) {
     function wp_redirect($location, $status = 302) { $GLOBALS['fbm_test_redirect'] = $location; return true; }
-}
-if (!function_exists('add_query_arg')) {
-    function add_query_arg($key, $value = false, $url = '') {
-        if (is_array($key)) {
-            $params = $key;
-            $url    = (string) $value;
-        } else {
-            $params = [$key => $value];
-        }
-        $base = (string) $url;
-        $sep  = str_contains($base, '?') ? '&' : '?';
-        return $base . ($params ? $sep . http_build_query($params) : '');
-    }
 }
 if (!function_exists('wp_create_nonce')) {
     function wp_create_nonce($action = -1) { return hash('sha256', 'fbm-' . $action); }
@@ -116,36 +112,22 @@ if (!function_exists('fbm_url_sanitize')) {
 }
 
 if (!function_exists('add_query_arg')) {
+    // Accept add_query_arg( array $args, string $url='' )
+    // OR add_query_arg( string $key, string|int $value, string $url='' )
+    // Returns a string URL with encoded query args.
     function add_query_arg(...$args) {
-        $url = '';
-        $params = [];
-        $argc = count($args);
-        if ($argc === 1) {
-            $params = is_array($args[0]) ? $args[0] : [$args[0] => null];
-        } elseif ($argc === 2) {
-            if (is_array($args[0])) {
-                $params = $args[0];
-                $url = (string) $args[1];
-            } else {
-                $params = [$args[0] => $args[1]];
-            }
-        } elseif ($argc >= 3) {
-            $params = is_array($args[0]) ? $args[0] : [$args[0] => $args[1]];
-            $url = (string) $args[2];
+        if (count($args) === 0) return '';
+        // Normalise inputs
+        if (is_array($args[0])) {
+            $params = $args[0];
+            $url = $args[1] ?? '';
+        } else {
+            $key = (string)$args[0];
+            $val = $args[1] ?? '';
+            $url = $args[2] ?? '';
+            $params = [$key => $val];
         }
-
-        $fragment = '';
-        if (false !== ($p = strpos($url, '#'))) {
-            $fragment = substr($url, $p);
-            $url = substr($url, 0, $p);
-        }
-
         $parts = parse_url($url);
-        $scheme = isset($parts['scheme']) ? $parts['scheme'] . '://' : '';
-        $host   = $parts['host'] ?? '';
-        $port   = isset($parts['port']) ? ':' . $parts['port'] : '';
-        $path   = $parts['path'] ?? '';
-
         $query = [];
         if (!empty($parts['query'])) {
             parse_str($parts['query'], $query);
@@ -153,14 +135,15 @@ if (!function_exists('add_query_arg')) {
         foreach ($params as $k => $v) {
             $query[$k] = $v;
         }
-        $query = array_filter($query, static fn($v) => $v !== null);
-        $queryString = http_build_query($query);
-
-        $base = $scheme . $host . $port . $path;
-        if ($queryString !== '') {
-            $base .= '?' . $queryString;
-        }
-        return fbm_url_sanitize($base . $fragment);
+        $parts['query'] = http_build_query($query);
+        // Rebuild
+        $scheme   = isset($parts['scheme']) ? $parts['scheme'].'://' : '';
+        $host     = $parts['host'] ?? '';
+        $port     = isset($parts['port']) ? ':'.$parts['port'] : '';
+        $path     = $parts['path'] ?? '';
+        $queryStr = $parts['query'] ? '?'.$parts['query'] : '';
+        $frag     = isset($parts['fragment']) ? '#'.$parts['fragment'] : '';
+        return $scheme.$host.$port.$path.$queryStr.$frag;
     }
 }
 
@@ -197,9 +180,7 @@ if (!function_exists('remove_query_arg')) {
 }
 
 if (!function_exists('admin_url')) {
-    function admin_url(string $path = ''): string {
-        return fbm_url_sanitize('https://example.test/wp-admin/' . ltrim($path, '/'));
-    }
+    function admin_url($path = '') { return 'https://example.test/wp-admin/' . ltrim($path, '/'); }
 }
 
 if (!function_exists('network_admin_url')) {
@@ -227,7 +208,8 @@ if (!function_exists('esc_url_raw')) {
 }
 
 if (!function_exists('wp_nonce_url')) {
-    function wp_nonce_url(string $url, $action, string $name = '_wpnonce'): string {
-        return add_query_arg($name, wp_create_nonce($action), $url);
+    function wp_nonce_url($url, $action = -1, $name = '_wpnonce') {
+        $nonce = wp_create_nonce($action);
+        return add_query_arg([$name => $nonce], $url);
     }
 }

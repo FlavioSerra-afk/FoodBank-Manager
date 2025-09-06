@@ -1,7 +1,7 @@
 # Changelog
 
 ## [Unreleased]
-
+- test(stubs): align add_query_arg and nonce URL helpers with WordPress
 ## [1.2.14] - 2025-09-06
 - packaging guard: enforce single `foodbank-manager/` slug
 - diagnostics: duplicate-install detector with one-click consolidate panel
