@@ -75,7 +75,7 @@ final class SettingsPageTest extends TestCase {
             'branding'   => array(
                 'site_name' => ' Test ',
                 'logo_url'  => ' https://example.com/logo.png ',
-                'color'     => 'blue',
+                'color'     => ' Pink<script> ',
             ),
         );
         $_REQUEST = $_POST;
@@ -86,7 +86,7 @@ final class SettingsPageTest extends TestCase {
         }
         $this->assertSame( 'Test', Options::get( 'branding.site_name' ) );
         $this->assertSame( 'https://example.com/logo.png', Options::get( 'branding.logo_url' ) );
-        $this->assertSame( 'blue', Options::get( 'branding.color' ) );
+        $this->assertSame( 'default', Options::get( 'branding.color' ) );
         $this->assertStringContainsString( 'notice=saved', self::$redirect );
         $this->assertStringContainsString( 'tab=branding', self::$redirect );
     }

@@ -123,10 +123,12 @@ final class ThemePageTest extends TestCase {
                         'font_family'      => 'foo',
                         'dark_mode_default' => 'maybe',
                 ) );
-                $this->assertSame( '#3b82f6', $tokens['primary_color'] );
-                $this->assertSame( 'comfortable', $tokens['density'] );
-                $this->assertSame( 'system', $tokens['font'] );
-                $this->assertFalse( $tokens['dark_mode'] );
+        $this->assertSame( '#3b82f6', $tokens['primary_color'] );
+        $this->assertSame( 'comfortable', $tokens['density'] );
+        $this->assertSame( 'system', $tokens['font'] );
+        $this->assertFalse( $tokens['dark_mode'] );
+        $css = $class::to_css_vars( $tokens, '.fbm-admin' );
+        $this->assertSame( '.fbm-admin{--fbm-primary:#3b82f6;--fbm-density:comfortable;--fbm-font:system-ui, sans-serif;--fbm-dark:0;}', $css );
         }
 
         public function testCssVarsOutput(): void {
@@ -138,10 +140,9 @@ final class ThemePageTest extends TestCase {
                 ) ) );
                 $class  = $this->loadTheme();
                 $tokens = $class::admin();
-                $css    = $class::to_css_vars( $tokens, '.fbm-admin' );
-                $this->assertStringContainsString( '.fbm-admin{', $css );
-                $this->assertStringContainsString( '--fbm-primary:#112233;', $css );
-                $this->assertStringContainsString( '--fbm-dark:1;', $css );
+        $css    = $class::to_css_vars( $tokens, '.fbm-admin' );
+        $expected = '.fbm-admin{--fbm-primary:#112233;--fbm-density:compact;--fbm-font:"Roboto", system-ui, sans-serif;--fbm-dark:1;}';
+        $this->assertSame( $expected, $css );
         }
 
         public function testPreviewMarkupScoped(): void {
