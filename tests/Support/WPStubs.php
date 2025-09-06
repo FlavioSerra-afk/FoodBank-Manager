@@ -1,5 +1,18 @@
 <?php declare(strict_types=1);
 
+// When running static analysis, load the official WordPress stubs instead of
+// our test implementations to avoid function redeclarations and maintain
+// accurate signatures.
+if (getenv('FBM_PHPSTAN')) {
+    require_once __DIR__ . '/../../vendor/php-stubs/wordpress-stubs/wordpress-stubs.php';
+    // Provide signatures for functions used with extended parameters.
+    if (false) {
+        function wp_die($message = '', $title = '', $args = []) {}
+        function wp_safe_redirect($location, int $status = 302) {}
+    }
+    return;
+}
+
 // Options
 $GLOBALS['fbm_options']    = $GLOBALS['fbm_options']    ?? [];
 $GLOBALS['fbm_transients'] = $GLOBALS['fbm_transients'] ?? [];
