@@ -16,7 +16,6 @@ use FBM\Mail\LogRepo;
 use function absint;
 use function sanitize_key;
 use function sanitize_text_field;
-use function sanitize_file_name;
 use function wp_unslash;
 
 /**
@@ -43,24 +42,11 @@ class GDPRPage {
 		if ( $app_id <= 0 ) {
 			return;
 		}
-		$masked   = ! current_user_can( 'fb_view_sensitive' );
-		$subject  = self::gather_subject( $app_id );
-		$zip      = SarExporter::build_zip( $subject, $masked );
-		$filename = 'sar-' . $app_id . '-' . gmdate( 'Ymd' ) . '.zip';
-		$filename = sanitize_file_name( $filename );
-		if ( headers_sent() ) {
-			return;
-		}
-		header( 'Content-Type: application/zip' );
-		header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
-		require_once ABSPATH . 'wp-admin/includes/file.php';
-		\WP_Filesystem();
-		global $wp_filesystem;
-		if ( $wp_filesystem ) {
-				echo esc_html( (string) $wp_filesystem->get_contents( $zip ) );
-				$wp_filesystem->delete( $zip );
-		}
-		exit;
+				$masked  = ! current_user_can( 'fb_view_sensitive' );
+				$subject = self::gather_subject( $app_id );
+				$name    = 'sar-' . $app_id . '-' . gmdate( 'Ymd' );
+				SarExporter::stream( $subject, $masked, $name );
+				exit;
 	}
 
 	/**

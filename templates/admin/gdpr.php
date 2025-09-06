@@ -62,7 +62,7 @@ if ( $app_id > 0 && ! empty( $results ) ) {
             <?php wp_nonce_field( 'fbm_gdpr_export', '_fbm_nonce' ); ?>
             <input type="hidden" name="fbm_action" value="export" />
             <input type="hidden" name="app_id" value="<?php echo esc_attr( $app_id ); ?>" />
-            <p><button type="submit" class="button button-primary"><?php esc_html_e( 'Generate SAR', 'foodbank-manager' ); ?></button></p>
+            <p><button type="submit" class="button button-primary"><?php esc_html_e( 'Export SAR', 'foodbank-manager' ); ?></button></p>
         </form>
     <?php endif; ?>
 </div>
