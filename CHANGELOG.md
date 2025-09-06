@@ -1,5 +1,8 @@
 # Changelog
 
+## [Unreleased]
+- enforce release ZIP root slug `foodbank-manager/`
+
 ## [1.2.13] - 2025-09-06
 ### Frontend
 - Dashboard UX polish: empty-states, a11y labels, focus rings, skeleton loader; admin-only shortcode hint.

@@ -26,6 +26,13 @@ jobs:
           composer phpstan
       - name: Package
         run: bash bin/package.sh
+      - name: Verify package slug
+        run: |
+          first=$(unzip -l dist/foodbank-manager.zip | awk 'NR==4 {print $4}')
+          if [ "$first" != 'foodbank-manager/' ]; then
+            echo "First ZIP entry '$first' is not 'foodbank-manager/'" >&2
+            exit 1
+          fi
       - name: Upload asset
         uses: softprops/action-gh-release@v2
         with:
