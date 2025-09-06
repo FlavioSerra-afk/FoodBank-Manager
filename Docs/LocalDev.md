@@ -46,4 +46,6 @@ Use wp-admin → FoodBank → Diagnostics to verify environment checks, send a t
 ```bash
 composer phpcs && composer phpstan -- --memory-limit=1G && composer test
 composer build:zip
+vendor/bin/phpunit --testsuite Unit --testdox
+vendor/bin/phpunit --filter InstallDuplicateDetectorTest --testdox
 ```

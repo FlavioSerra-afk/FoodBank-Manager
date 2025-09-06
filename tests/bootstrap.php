@@ -2,24 +2,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/Support/Rbac.php';
-require_once __DIR__ . '/Support/WPStubs.php'; // require_once ensured by PHP
-
-function fbm_test_reset_globals(): void {
-    $GLOBALS['fbm_user_caps'] = [];
-    $GLOBALS['fbm_transients'] = [];
-    $GLOBALS['fbm_options'] = [];
-    $GLOBALS['fbm_test_calls'] = ['add_menu_page' => [], 'add_submenu_page' => []];
-    $GLOBALS['fbm_headers'] = [];
-    $GLOBALS['fbm_redirect_to'] = null;
-    $GLOBALS['fbm_test_screen_id'] = null;
-    $GLOBALS['fbm_shortcodes'] = [];
+if (function_exists('fbm_test_reset_globals')) {
+    fbm_test_reset_globals();
 }
-fbm_test_reset_globals();
-
-if (!isset($GLOBALS['fbm_test_trust_nonces'])) { $GLOBALS['fbm_test_trust_nonces'] = true; }
-fbm_test_set_request_nonce('fbm'); // ensures a nonce is present by default
-
-$cache = __DIR__ . '/../.phpunit.result.cache';
-if (is_file($cache)) @unlink($cache);
 
