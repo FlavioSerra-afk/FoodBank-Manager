@@ -151,6 +151,20 @@ $rows       = $rows ?? array();
       </form>
     <h2><?php esc_html_e( 'Cron', 'foodbank-manager' ); ?></h2>
     <?php $cron = \FoodBankManager\Admin\DiagnosticsPage::cron_status(); ?>
+    <form method="post" action="" style="display:inline-block;margin-right:1em;">
+        <input type="hidden" name="fbm_action" value="fbm_retention_run" />
+        <?php wp_nonce_field( 'fbm_retention_run' ); ?>
+        <button type="submit" class="button"><?php esc_html_e( 'Run now', 'foodbank-manager' ); ?></button>
+    </form>
+    <form method="post" action="" style="display:inline-block;">
+        <input type="hidden" name="fbm_action" value="fbm_retention_dry_run" />
+        <?php wp_nonce_field( 'fbm_retention_dry_run' ); ?>
+        <button type="submit" class="button"><?php esc_html_e( 'Dry-run', 'foodbank-manager' ); ?></button>
+    </form>
+    <?php $retention_summary = \FoodBankManager\Admin\DiagnosticsPage::retention_summary(); ?>
+    <?php if ( ! empty( $retention_summary ) ) : ?>
+        <p><code><?php echo esc_html( wp_json_encode( $retention_summary ) ); ?></code></p>
+    <?php endif; ?>
     <table class="widefat">
         <thead>
             <tr>
