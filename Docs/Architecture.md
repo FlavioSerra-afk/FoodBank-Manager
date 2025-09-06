@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-06 (v1.2.13 fragments merged)
+Docs-Revision: 2025-09-07 (v1.2.15 fragments merged)
 # FoodBank Manager — Architecture
 
 ## Overview
@@ -41,6 +41,7 @@ A secure, privacy-first WordPress plugin for managing Food Bank applicant intake
 - When no FBM caps are detected for an Administrator, a transient-limited, text-only notice (no global assets) prompts Diagnostics → Repair caps and can be dismissed for 24 h.
 - Admin notices display when the vendor autoloader is missing or the KEK is not defined.
 - Diagnostics surfaces notices render count via `Notices::getRenderCount()`.
+- Callbacks explicitly return void to satisfy PHPStan; no runtime change.
 
 ## Screen gating
 Notices and assets check `$screen->id` and run only on `toplevel_page_fbm` or `foodbank_page_fbm_*`. Each notice uses a printed flag to render once per page.
@@ -53,7 +54,7 @@ Admin pages share a `FBM\Core\RenderOnce` registry. `Admin\Menu` wraps each subm
 - Diagnostics badge flips to "RenderOnce duplicates" when any key exceeds one.
 
 ## Components
- - **Admin Pages:** Dashboard (`fb_manage_dashboard`), Attendance (`fb_manage_attendance`), Database (`fb_manage_database`), Forms (`fb_manage_forms`) with a read-only presets library, Shortcodes builder with preview (`fb_manage_forms`), Email Templates (`fb_manage_emails`), Settings (`fb_manage_settings`), Diagnostics (`fb_manage_diagnostics` – environment checks, test email, repair caps), Permissions (`fb_manage_permissions`), Design & Theme (`fb_manage_theme`).
+ - **Admin Pages:** Dashboard (`fb_manage_dashboard`), Attendance (`fb_manage_attendance`), Database (`fb_manage_database`), Forms (`fb_manage_forms`) with preset-based schemas, admin builder with preview and CAPTCHA, Email Templates (`fb_manage_emails`), Settings (`fb_manage_settings`), Diagnostics (`fb_manage_diagnostics` – environment checks, test email, repair caps, cron health panel with retention run and dry-run controls), Permissions (`fb_manage_permissions`), Design & Theme (`fb_manage_theme`).
   - Database page requires `fb_manage_database`; filters are sanitized and whitelisted. It supports per-user column preferences (`fbm_db_columns`) and saved filter presets stored in options (`db_filter_presets`). Exports respect filters, sanitize filenames, include a UTF-8 BOM with translated headers, and mask PII unless the user has `fb_view_sensitive`.
 - **Shortcodes:** `[fbm_form]`, `[fb_attendance_manager]`, `[fbm_dashboard]` (manager-only card stats with trend deltas, sparkline, optional filters and summary CSV export; no PII).
 - **REST:** namespace `pcc-fb/v1`; endpoints for attendance check-in, no-show, timeline, void/unvoid/note.
@@ -61,7 +62,7 @@ Admin pages share a `FBM\Core\RenderOnce` registry. `Admin\Menu` wraps each subm
 - **Security:** libsodium/XChaCha20-Poly1305 envelope encryption (`FBM_KEK_BASE64`), `sodium_compat` fallback; masking helpers; no PII in logs.
 - **Permissions:** central caps list, Administrator guarantee, role mapping and per-user overrides (`fbm_user_caps`) with JSON export/import (Dry Run) and reset tooling.
 - **AttendanceRepo:** database access layer for attendance; all queries use `$wpdb->prepare()` with strict placeholders, mask PII by default, and have unit tests covering check-in, no-show, void/unvoid, and timeline SQL injection edges.
-- **Theme system:** global CSS variables for primary colour, density, font, dark mode default and optional custom CSS (sanitised) applied across admin and front-end.
+ - **Theme system:** global CSS variables for primary colour, density, font, dark mode default and optional custom CSS; settings input is sanitised and variables are deterministic with clamped defaults applied across admin and front-end.
 
 ### Design tokens
 

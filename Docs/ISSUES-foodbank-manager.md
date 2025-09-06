@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-06 (v1.2.13 fragments merged)
+Docs-Revision: 2025-09-07 (v1.2.15 fragments merged)
 
 ## Active Issues
 - [P0] PHPUnit WP stub gaps → Fixed (Prompt P)
@@ -13,6 +13,10 @@ Docs-Revision: 2025-09-06 (v1.2.13 fragments merged)
 - Duplicate admin blocks → Resolved in v1.2.12.
 - Duplicate installs → one-click Consolidate cleanup handles stray copies.
 - Duplicate plugin folders → auto-consolidated on activation from v1.2.13+.
+- Admin notice callbacks return void to satisfy PHPStan.
+- Settings inputs sanitized and theme CSS variables deterministic.
+- Diagnostics panel reports cron health with retention run and dry-run controls.
+- Shortcode-driven forms with preset schemas, builder preview, strict validation and CAPTCHA.
 
 # FoodBank Manager — Issues & Milestones
 
