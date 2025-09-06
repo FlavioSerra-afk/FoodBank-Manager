@@ -100,6 +100,7 @@ class DiagnosticsPage {
 
                 $install_scan       = Install::getCachedScan();
                 $last_consolidation = (array) get_option('fbm_last_consolidation', []);
+                $last_activation_consolidation = (array) get_option('fbm_last_activation_consolidation', []);
                 /* @psalm-suppress UnresolvableInclude */
                 require FBM_PATH . 'templates/admin/diagnostics.php';
         }

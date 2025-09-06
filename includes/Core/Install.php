@@ -108,6 +108,16 @@ final class Install {
         return $log;
     }
 
+    public static function onActivate(): void {
+        $result = self::consolidate(true);
+        update_option('fbm_last_activation_consolidation', [
+            'timestamp'   => time(),
+            'deactivated' => (int)$result['deactivated'],
+            'deleted'     => (int)$result['deleted'],
+            'items'       => (array)$result['items'],
+        ]);
+    }
+
     // --- Legacy wrappers -------------------------------------------------
 
     /** @deprecated */
