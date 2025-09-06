@@ -68,6 +68,21 @@ $rows       = $rows ?? array();
         <li><?php echo esc_html( 'Last successful FBM boot (plugins_loaded): ' . $boot_status ); ?></li>
         <li><?php echo esc_html( 'Admin notices rendered this request: ' . $notices_render_count ); ?></li>
     </ul>
+    <h2><?php esc_html_e( 'Install Health', 'foodbank-manager' ); ?></h2>
+    <p><?php esc_html_e( 'Canonical slug: foodbank-manager/foodbank-manager.php', 'foodbank-manager' ); ?></p>
+    <p><?php echo esc_html( sprintf( __( 'Other copies: %d', 'foodbank-manager' ), count( $dup_plugins ) ) ); ?></p>
+    <?php if ( ! empty( $dup_plugins ) ) : ?>
+    <ul>
+        <?php foreach ( $dup_plugins as $b ) : ?>
+        <li><?php echo esc_html( $b ); ?></li>
+        <?php endforeach; ?>
+    </ul>
+    <form method="post" action="">
+        <input type="hidden" name="fbm_action" value="fbm_consolidate_plugins" />
+        <?php wp_nonce_field( 'fbm_consolidate_plugins' ); ?>
+        <p><button type="submit" class="button"><?php esc_html_e( 'Consolidate duplicates', 'foodbank-manager' ); ?></button></p>
+    </form>
+    <?php endif; ?>
     <h2><?php esc_html_e( 'Quick Checks', 'foodbank-manager' ); ?></h2>
     <table class="widefat">
         <thead>

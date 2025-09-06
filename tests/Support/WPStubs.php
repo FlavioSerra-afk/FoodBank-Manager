@@ -3,6 +3,10 @@
 // Always-initialized globals
 $GLOBALS['fbm_options'] = $GLOBALS['fbm_options'] ?? [];
 $GLOBALS['fbm_test_trust_nonces'] = $GLOBALS['fbm_test_trust_nonces'] ?? true;
+$GLOBALS['fbm_transients'] = $GLOBALS['fbm_transients'] ?? [];
+$GLOBALS['fbm_test_plugins'] = $GLOBALS['fbm_test_plugins'] ?? [];
+$GLOBALS['fbm_test_deactivated'] = $GLOBALS['fbm_test_deactivated'] ?? [];
+$GLOBALS['fbm_test_deleted'] = $GLOBALS['fbm_test_deleted'] ?? [];
 
 if (!function_exists('get_option')) {
     function get_option($name, $default = false) {
@@ -18,6 +22,24 @@ if (!function_exists('update_option')) {
 }
 if (!function_exists('delete_option')) {
     function delete_option($name) { unset($GLOBALS['fbm_options'][$name]); return true; }
+}
+if (!function_exists('set_transient')) {
+    function set_transient($key, $value, $expiration = 0) { $GLOBALS['fbm_transients'][$key] = $value; return true; }
+}
+if (!function_exists('get_transient')) {
+    function get_transient($key) { return $GLOBALS['fbm_transients'][$key] ?? false; }
+}
+if (!function_exists('delete_transient')) {
+    function delete_transient($key) { unset($GLOBALS['fbm_transients'][$key]); return true; }
+}
+if (!function_exists('get_plugins')) {
+    function get_plugins() { return $GLOBALS['fbm_test_plugins']; }
+}
+if (!function_exists('deactivate_plugins')) {
+    function deactivate_plugins($plugins) { $GLOBALS['fbm_test_deactivated'] = array_merge($GLOBALS['fbm_test_deactivated'], (array)$plugins); }
+}
+if (!function_exists('delete_plugins')) {
+    function delete_plugins($plugins) { $GLOBALS['fbm_test_deleted'] = array_merge($GLOBALS['fbm_test_deleted'], (array)$plugins); }
 }
 if (!function_exists('wp_create_nonce')) {
     function wp_create_nonce($action = -1) { return hash('sha256', 'fbm-' . $action); }

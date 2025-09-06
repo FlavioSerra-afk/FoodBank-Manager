@@ -9,6 +9,7 @@
 - GDPR SAR: streaming ZIP with fallback HTML; masked by default; chunking + README.txt.
 ### Diagnostics
 - RenderOnce badge + per-screen render counts; menu-parents count remains 1.
+- Install health detects duplicate plugin copies with one-click consolidation.
 ### Infra
 - Parallel-safe waves with file fences; docs merged from fragments; no runtime loosening.
 
