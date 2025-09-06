@@ -5,8 +5,10 @@ Docs-Revision: 2025-09-06 (v1.2.13 fragments merged)
 **Project:** FoodBank Manager (WordPress plugin)  
 **Owner:** Portuguese Community Centre London  
 **Version:** 1.0 (initial)  
-**Date:** 1 Sep 2025 (Europe/London)  
+**Date:** 1 Sep 2025 (Europe/London)
 **Status:** Approved for build
+
+**Packaging:** Release ZIP root must be `foodbank-manager/` for in-place updates.
 
 ---
 
