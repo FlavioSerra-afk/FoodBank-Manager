@@ -1,13 +1,19 @@
 <?php declare(strict_types=1);
 
 // Always-initialized globals
-$GLOBALS['fbm_options'] = $GLOBALS['fbm_options'] ?? [];
+$GLOBALS['fbm_options']        = $GLOBALS['fbm_options']        ?? [];
 $GLOBALS['fbm_test_trust_nonces'] = $GLOBALS['fbm_test_trust_nonces'] ?? true;
-$GLOBALS['fbm_transients'] = $GLOBALS['fbm_transients'] ?? [];
-$GLOBALS['fbm_test_plugins'] = $GLOBALS['fbm_test_plugins'] ?? [];
-$GLOBALS['fbm_test_deactivated'] = $GLOBALS['fbm_test_deactivated'] ?? [];
-$GLOBALS['fbm_test_deleted'] = $GLOBALS['fbm_test_deleted'] ?? [];
-$GLOBALS['fbm_test_redirect'] = $GLOBALS['fbm_test_redirect'] ?? '';
+$GLOBALS['fbm_transients']     = $GLOBALS['fbm_transients']     ?? [];
+$GLOBALS['fbm_test_plugins']   = $GLOBALS['fbm_test_plugins']   ?? [];
+// Globals used by tests to assert side-effects
+$GLOBALS['fbm_active_plugins']  = $GLOBALS['fbm_active_plugins']  ?? [];
+$GLOBALS['fbm_deactivated']     = $GLOBALS['fbm_deactivated']     ?? [];
+$GLOBALS['fbm_deleted_plugins'] = $GLOBALS['fbm_deleted_plugins'] ?? [];
+$GLOBALS['__last_redirect']     = $GLOBALS['__last_redirect']     ?? '';
+// Back-compat aliases
+$GLOBALS['fbm_test_deactivated'] =& $GLOBALS['fbm_deactivated'];
+$GLOBALS['fbm_test_deleted']     =& $GLOBALS['fbm_deleted_plugins'];
+$GLOBALS['fbm_test_redirect']    =& $GLOBALS['__last_redirect'];
 
 if (!function_exists('get_option')) {
     function get_option($name, $default = false) {
@@ -45,14 +51,43 @@ if (!function_exists('current_user_can')) {
 if (!function_exists('get_plugins')) {
     function get_plugins() { return $GLOBALS['fbm_test_plugins']; }
 }
+if (!function_exists('is_plugin_active')) {
+    function is_plugin_active($basename) {
+        return in_array($basename, $GLOBALS['fbm_active_plugins'], true);
+    }
+}
 if (!function_exists('deactivate_plugins')) {
-    function deactivate_plugins($plugins) { $GLOBALS['fbm_test_deactivated'] = array_merge($GLOBALS['fbm_test_deactivated'], (array)$plugins); }
+    function deactivate_plugins($plugins) {
+        foreach ((array)$plugins as $p) {
+            $GLOBALS['fbm_deactivated'][] = $p;
+            $GLOBALS['fbm_active_plugins'] = array_values(array_diff($GLOBALS['fbm_active_plugins'], [$p]));
+        }
+    }
 }
 if (!function_exists('delete_plugins')) {
-    function delete_plugins($plugins) { $GLOBALS['fbm_test_deleted'] = array_merge($GLOBALS['fbm_test_deleted'], (array)$plugins); }
+    function delete_plugins($plugins) {
+        foreach ((array)$plugins as $p) {
+            $GLOBALS['fbm_deleted_plugins'][] = $p;
+        }
+        return true;
+    }
+}
+if (!function_exists('wp_safe_redirect')) {
+    function wp_safe_redirect($url) {
+        $GLOBALS['__last_redirect'] = (string)$url;
+        return true;
+    }
 }
 if (!function_exists('wp_redirect')) {
-    function wp_redirect($location, $status = 302) { $GLOBALS['fbm_test_redirect'] = $location; return true; }
+    function wp_redirect($url) {
+        $GLOBALS['__last_redirect'] = (string)$url;
+        return true;
+    }
+}
+if (!function_exists('wp_die')) {
+    function wp_die($msg = '') {
+        throw new RuntimeException('wp_die: ' . $msg);
+    }
 }
 if (!function_exists('wp_create_nonce')) {
     function wp_create_nonce($action = -1) { return hash('sha256', 'fbm-' . $action); }
@@ -65,16 +100,6 @@ if (!function_exists('wp_verify_nonce')) {
         return !empty($GLOBALS['fbm_test_trust_nonces'])
             ? 1
             : (hash_equals($n ?? '', wp_create_nonce($a)) ? 1 : false);
-    }
-}
-if (!function_exists('wp_nonce_field')) {
-    function wp_nonce_field($action = -1, $name = '_wpnonce', $referer = true, $echo = true) {
-        $n = wp_create_nonce($action);
-        $f = '<input type="hidden" name="' . $name . '" value="' . $n . '" />';
-        if ($echo) {
-            echo $f;
-        }
-        return $f;
     }
 }
 if (!function_exists('check_admin_referer')) {
@@ -102,6 +127,39 @@ if (!function_exists('fbm_test_trust_nonces')) {
 function fbm_test_set_request_nonce(string $action = 'fbm', string $field = '_wpnonce'): void {
     $_REQUEST[$field] = wp_create_nonce($action);
     $_POST[$field] = $_REQUEST[$field];
+}
+
+// Reset helper
+if (!function_exists('fbm_test_reset_globals')) {
+    function fbm_test_reset_globals() {
+        $GLOBALS['fbm_active_plugins']  = [];
+        $GLOBALS['fbm_deactivated']     = [];
+        $GLOBALS['fbm_deleted_plugins'] = [];
+        // keep existing nonce & cap maps initialised by AX
+    }
+}
+
+// ------- Basic escaping / sanitising
+if (!function_exists('esc_attr')) {
+    function esc_attr($s){ return htmlspecialchars((string)$s, ENT_QUOTES,'UTF-8'); }
+}
+if (!function_exists('esc_html')) {
+    function esc_html($s){ return htmlspecialchars((string)$s, ENT_QUOTES,'UTF-8'); }
+}
+if (!function_exists('wp_kses_post')) {
+    function wp_kses_post($s){ return (string)$s; }
+}
+if (!function_exists('sanitize_text_field')) {
+    function sanitize_text_field($s){ return trim((string)$s); }
+}
+if (!function_exists('sanitize_key')) {
+    function sanitize_key($s){ return preg_replace('/[^a-z0-9_\-]/i','', (string)$s); }
+}
+if (!function_exists('selected')) {
+    function selected($a,$b,$echo=false){ $out = ($a==$b)?' selected="selected"':''; if($echo) echo $out; return $out; }
+}
+if (!function_exists('checked')) {
+    function checked($a,$b=true,$echo=false){ $out = ($a==$b)?' checked="checked"':''; if($echo) echo $out; return $out; }
 }
 
 if (!function_exists('fbm_url_sanitize')) {
@@ -183,6 +241,10 @@ if (!function_exists('admin_url')) {
     function admin_url($path = '') { return 'https://example.test/wp-admin/' . ltrim($path, '/'); }
 }
 
+if (!function_exists('plugins_url')) {
+    function plugins_url($path = '') { return 'https://example.test/wp-content/plugins/' . ltrim($path, '/'); }
+}
+
 if (!function_exists('network_admin_url')) {
     function network_admin_url(string $path = ''): string {
         return admin_url($path);
@@ -196,9 +258,7 @@ if (!function_exists('self_admin_url')) {
 }
 
 if (!function_exists('esc_url')) {
-    function esc_url(string $url, ?array $protocols = null, string $context = ''): string {
-        return fbm_url_sanitize($url);
-    }
+    function esc_url($s){ return (string)$s; }
 }
 
 if (!function_exists('esc_url_raw')) {
