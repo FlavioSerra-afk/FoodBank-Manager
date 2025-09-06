@@ -6,6 +6,7 @@ Docs-Revision: 2025-09-06 (v1.2.12 trace badge)
 - [P1] Admin notices duplicates → Fixed; Diagnostics shows render count
 - [P2] PHPCS flood from dist/ → Fixed (Prompt R); remaining items are docblocks/escaping
 - [P2] RBAC test failures → run `composer test`; use helpers `fbm_grant_admin_only`, `fbm_grant_fbm_all`, `fbm_grant_for_page` to align permissions
+- [P2] Unit tests failing with bad nonce — fixed by deterministic WP nonce stubs (Wave AQ)
 
 ## Resolved Issues
 - Menu not visible on fresh install → Administrators now self-heal capabilities; Diagnostics includes a Repair caps control.

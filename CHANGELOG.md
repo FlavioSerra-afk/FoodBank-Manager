@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.2.13] - 2025-09-06
+- QA: deterministic nonce stubs for tests; no runtime changes.
+
 ## [1.2.12] - 2025-09-06
 - Trace comments on all admin templates; Diagnostics RenderOnce badge; no behavior changes.
 

@@ -21,13 +21,10 @@ namespace FBM\Admin {
         return 'foodbank_page_' . $slug;
     }
     function check_admin_referer($action = -1, $name = '_wpnonce') {
-        if (empty($_REQUEST[$name])) {
-            throw new \RuntimeException('nonce');
-        }
-        return true;
+        return \check_admin_referer($action, $name);
     }
-    function wp_verify_nonce($nonce, $action = -1) { return true; }
-    function wp_nonce_field($action = -1, $name = '_wpnonce', $referer = true, $echo = true) { return ''; }
+    function wp_verify_nonce($nonce, $action = -1) { return \wp_verify_nonce($nonce, $action); }
+    function wp_nonce_field($action = -1, $name = '_wpnonce', $referer = true, $echo = true) { return \wp_nonce_field($action, $name, $referer, $echo); }
     function current_user_can($cap) { return \current_user_can($cap); }
     function wp_safe_redirect($url, $status = 302) { $GLOBALS['fbm_redirect_to'] = (string)$url; return true; }
     function wp_die($message = '') { throw new \RuntimeException((string)$message ?: 'wp_die'); }
@@ -80,6 +77,42 @@ namespace {
     $GLOBALS['fbm_transients']  = $GLOBALS['fbm_transients']  ?? [];
     $GLOBALS['fbm_options']     = $GLOBALS['fbm_options']     ?? [];
     $GLOBALS['fbm_test_calls']  = $GLOBALS['fbm_test_calls']  ?? ['add_menu_page'=>[], 'add_submenu_page'=>[]];
+
+    // === Nonce + request ===
+    $GLOBALS['fbm_test_nonce_secret'] = 'fbm-test-secret';
+    $GLOBALS['fbm_test_trust_nonces'] = true; // default ON for unit tests
+
+    function wp_create_nonce($action = -1) {
+        // deterministic for tests
+        return hash_hmac('sha256', (string)$action, $GLOBALS['fbm_test_nonce_secret']);
+    }
+
+    function wp_verify_nonce($nonce, $action = -1) {
+        if (!empty($GLOBALS['fbm_test_trust_nonces'])) return 1;
+        return hash_equals($nonce ?? '', wp_create_nonce($action)) ? 1 : false;
+    }
+
+    function check_admin_referer($action = -1, $name = '_wpnonce') {
+        $nonce = $_REQUEST[$name] ?? '';
+        if (wp_verify_nonce($nonce, $action)) return 1;
+        // mirror WP behavior: die with message; in tests we throw to keep it visible
+        throw new \RuntimeException('bad nonce');
+    }
+
+    function wp_nonce_field($action = -1, $name = '_wpnonce', $referer = true, $echo = true) {
+        $nonce = wp_create_nonce($action);
+        $html = '<input type="hidden" name="'.esc_attr($name).'" value="'.esc_attr($nonce).'">';
+        if ($echo) { echo $html; return ''; }
+        return $html;
+    }
+
+    // === Minimal sanitizers (guarded) ===
+    if (!function_exists('sanitize_text_field')) {
+        function sanitize_text_field($str) { return is_string($str) ? trim($str) : $str; }
+    }
+    if (!function_exists('wp_unslash')) {
+        function wp_unslash($value) { return $value; }
+    }
 
     // Cap check (reads from simulated map)
     if (!function_exists('current_user_can')) {
@@ -155,31 +188,6 @@ namespace {
         }
     }
 
-    if (!function_exists('check_admin_referer')) {
-        function check_admin_referer($action = -1, $name = '_wpnonce') {
-            if (empty($_REQUEST[$name])) {
-                throw new \RuntimeException('nonce');
-            }
-            return true;
-        }
-    }
-    if (!function_exists('wp_create_nonce')) {
-        function wp_create_nonce($a = -1) { return hash('sha256', 'fbm-' . $a); }
-    }
-    if (!function_exists('wp_verify_nonce')) {
-        function wp_verify_nonce($n, $a = -1) { return hash_equals(wp_create_nonce($a), (string) $n); }
-    }
-    if (!function_exists('wp_nonce_field')) {
-        function wp_nonce_field($action = -1, $name = '_wpnonce') { echo '<input type="hidden" name="'.$name.'" value="'.wp_create_nonce($action).'">'; }
-    }
-    if (!function_exists('sanitize_text_field')) {
-        function sanitize_text_field($str) {
-            $str = is_string($str) ? $str : '';
-            $str = strip_tags($str);
-            $str = preg_replace('/[\r\n\t\0\x0B]/', '', $str);
-            return trim($str);
-        }
-    }
     if (!function_exists('sanitize_email')) {
         function sanitize_email($email) { return filter_var((string)$email, FILTER_SANITIZE_EMAIL); }
     }
@@ -254,14 +262,6 @@ namespace {
             return abs((int) $maybeint);
         }
     }
-    if (!function_exists('wp_unslash')) {
-        function wp_unslash($value) {
-            if (is_array($value)) {
-                return array_map('wp_unslash', $value);
-            }
-            return str_replace('\\', '', (string) $value);
-        }
-    }
     if (!function_exists('shortcode_atts')) {
         function shortcode_atts($pairs, $atts, $shortcode = '') {
             $atts = (array) $atts;
@@ -316,6 +316,14 @@ namespace {
         function wp_json_encode($data, $options = 0, $depth = 512) {
             return json_encode($data, $options | JSON_UNESCAPED_UNICODE, $depth);
         }
+    }
+
+    function fbm_test_trust_nonces(bool $trust): void {
+        $GLOBALS['fbm_test_trust_nonces'] = $trust;
+    }
+    function fbm_test_set_request_nonce(int|string $action = -1, string $field = '_wpnonce'): void {
+        $_REQUEST[$field] = wp_create_nonce($action);
+        $_POST[$field]    = $_REQUEST[$field];
     }
 }
 

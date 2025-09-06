@@ -11,13 +11,6 @@ if ( ! function_exists( 'wp_unslash' ) ) {
     }
 }
 // capability handled via $GLOBALS['fbm_user_caps']
-if ( ! function_exists( 'check_admin_referer' ) ) {
-    function check_admin_referer( string $action, string $name = '_wpnonce' ): void {
-        if ( empty( $_POST[ $name ] ) ) {
-            throw new RuntimeException( 'missing nonce' );
-        }
-    }
-}
 if ( ! function_exists( 'wp_die' ) ) {
     function wp_die( $message = '' ) {
         throw new RuntimeException( (string) $message );
@@ -47,14 +40,15 @@ final class SettingsPageTest extends TestCase {
         parent::setUp();
         fbm_test_reset_globals();
         fbm_grant_for_page('fbm_settings');
+        fbm_test_trust_nonces(true);
         self::$redirect = '';
-        $_POST         = array();
-        $_SERVER       = array();
+        $_POST = $_SERVER = $_REQUEST = array();
         global $fbm_test_options;
         $fbm_test_options = array();
     }
 
     public function testMissingNonceBlocked(): void {
+        fbm_test_trust_nonces(false);
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_POST['fbm_action']       = 'branding_save';
         $this->expectException( RuntimeException::class );
@@ -63,24 +57,28 @@ final class SettingsPageTest extends TestCase {
 
     public function testUserWithoutCapBlocked(): void {
         fbm_test_reset_globals();
+        fbm_test_trust_nonces(true);
         $_SERVER['REQUEST_METHOD'] = 'POST';
-        $_POST['fbm_action']       = 'branding_save';
-        $_POST['_fbm_nonce']       = 'nonce';
+        fbm_test_set_request_nonce('fbm_branding_save', '_fbm_nonce');
+        $_POST['fbm_action'] = 'branding_save';
+        $_REQUEST            = $_POST;
         $this->expectException( RuntimeException::class );
         SettingsPage::route();
     }
 
     public function testSuccessfulSaveSanitizes(): void {
+        fbm_test_set_request_nonce('fbm_branding_save', '_fbm_nonce');
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_POST                     = array(
             'fbm_action' => 'branding_save',
-            '_fbm_nonce' => 'nonce',
+            '_fbm_nonce' => $_POST['_fbm_nonce'],
             'branding'   => array(
                 'site_name' => ' Test ',
                 'logo_url'  => ' https://example.com/logo.png ',
                 'color'     => 'blue',
             ),
         );
+        $_REQUEST = $_POST;
         try {
             SettingsPage::route();
         } catch ( RuntimeException $e ) {

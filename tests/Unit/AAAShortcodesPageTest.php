@@ -23,12 +23,6 @@ namespace FoodBankManager\Admin {
     function wp_json_encode( $data ) {
         return json_encode( $data );
     }
-    function check_admin_referer( string $action, string $name = '_wpnonce' ): void {
-        $nonce = $_POST[ $name ] ?? $_GET[ $name ] ?? '';
-        if ( $nonce === '' ) {
-            throw new \RuntimeException( 'bad nonce' );
-        }
-    }
     function do_shortcode( string $shortcode ): string {
         \ShortcodesPageTest::$last_shortcode = $shortcode;
         return '<div>ok</div><script>alert(1)</script>';
@@ -103,6 +97,8 @@ final class ShortcodesPageTest extends TestCase {
     protected function setUp(): void {
         fbm_test_reset_globals();
         fbm_grant_for_page('fbm_shortcodes');
+        fbm_test_trust_nonces(true);
+        $_REQUEST = array();
         self::$last_shortcode = '';
         if ( ! defined( 'FBM_PATH' ) ) {
             define( 'FBM_PATH', dirname( __DIR__, 2 ) . '/' );
@@ -134,6 +130,7 @@ final class ShortcodesPageTest extends TestCase {
     }
 
     public function testInvalidNonceBlocksPreview(): void {
+        fbm_test_trust_nonces(false);
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_POST['fbm_action']       = 'shortcode_preview';
         $_POST['tag']              = 'fbm_form';
@@ -143,11 +140,10 @@ final class ShortcodesPageTest extends TestCase {
 
     public function testUnknownShortcodeRejected(): void {
         $_SERVER['REQUEST_METHOD'] = 'POST';
-        $_POST = array(
-            'fbm_action' => 'shortcode_preview',
-            '_wpnonce'   => 'good',
-            'tag'        => 'fbm_bad',
-        );
+        fbm_test_set_request_nonce('fbm_shortcodes_preview');
+        $_POST['fbm_action'] = 'shortcode_preview';
+        $_POST['tag']        = 'fbm_bad';
+        $_REQUEST            = $_POST;
         ob_start();
         ShortcodesPage::route();
         $html = (string) ob_get_clean();
@@ -180,12 +176,14 @@ final class ShortcodesPageTest extends TestCase {
 
     public function testPreviewFiltersHtml(): void {
         $_SERVER['REQUEST_METHOD'] = 'POST';
+        fbm_test_set_request_nonce('fbm_shortcodes_preview');
         $_POST = array(
             'fbm_action' => 'shortcode_preview',
-            '_wpnonce'   => 'good',
             'tag'        => 'fbm_form',
             'atts'       => array( 'id' => '1' ),
+            '_wpnonce'   => $_POST['_wpnonce'], // retained from helper
         );
+        $_REQUEST = $_POST;
         ob_start();
         ShortcodesPage::route();
         $html = (string) ob_get_clean();

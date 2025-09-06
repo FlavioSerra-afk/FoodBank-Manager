@@ -10,14 +10,6 @@ namespace {
     if ( ! function_exists( 'sanitize_email' ) ) {
         function sanitize_email( $email ) { return filter_var( $email, FILTER_SANITIZE_EMAIL ); }
     }
-    // capability handled via $GLOBALS['fbm_user_caps']
-    if ( ! function_exists( 'check_admin_referer' ) ) {
-        function check_admin_referer( string $action, string $name = '_fbm_nonce' ): void {
-            if ( empty( $_POST[ $name ] ) ) {
-                throw new \RuntimeException( 'nonce' );
-            }
-        }
-    }
     if ( ! function_exists( 'wp_die' ) ) {
         function wp_die( $msg = '' ) { throw new \RuntimeException( (string) $msg ); }
     }
@@ -83,8 +75,9 @@ namespace {
         protected function setUp(): void {
             fbm_test_reset_globals();
             fbm_grant_for_page('fbm_diagnostics');
+            fbm_test_trust_nonces(true);
             self::$redirect      = '';
-            $_GET = $_POST = $_SERVER = array();
+            $_GET = $_POST = $_SERVER = $_REQUEST = array();
             if (!class_exists('FoodBankManager\\Database\\ApplicationsRepo', false)) {
                 require_once __DIR__ . '/../../Support/ApplicationsRepoStub.php';
             }
@@ -107,16 +100,18 @@ namespace {
         }
 
         public function testExportRequiresNonce(): void {
+            fbm_test_trust_nonces(false);
             $_SERVER['REQUEST_METHOD'] = 'POST';
             $_POST['fbm_action'] = 'export';
+            $_REQUEST            = $_POST;
             $this->expectException( \RuntimeException::class );
             GDPRPage::route();
         }
 
         public function testMaskedByDefault(): void {
+            fbm_test_set_request_nonce('fbm_gdpr_export', '_fbm_nonce');
             $_SERVER['REQUEST_METHOD'] = 'POST';
             $_POST['fbm_action'] = 'export';
-            $_POST['_fbm_nonce'] = 'n';
             $_POST['app_id'] = '5';
             $_REQUEST = $_POST;
             try {
@@ -130,9 +125,10 @@ namespace {
         public function testUnmaskedWithCapability(): void {
             fbm_test_reset_globals();
             fbm_grant_caps(['fb_manage_diagnostics','fb_view_sensitive']);
+            fbm_test_trust_nonces(true);
+            fbm_test_set_request_nonce('fbm_gdpr_export', '_fbm_nonce');
             $_SERVER['REQUEST_METHOD'] = 'POST';
             $_POST['fbm_action'] = 'export';
-            $_POST['_fbm_nonce'] = 'n';
             $_POST['app_id'] = '5';
             $_REQUEST = $_POST;
             try {

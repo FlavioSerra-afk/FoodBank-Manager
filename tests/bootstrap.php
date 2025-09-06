@@ -17,6 +17,9 @@ function fbm_test_reset_globals(): void {
 }
 fbm_test_reset_globals();
 
+if (!isset($GLOBALS['fbm_test_trust_nonces'])) { $GLOBALS['fbm_test_trust_nonces'] = true; }
+fbm_test_set_request_nonce('fbm'); // ensures a nonce is present by default
+
 $cache = __DIR__ . '/../.phpunit.result.cache';
 if (is_file($cache)) @unlink($cache);
 
