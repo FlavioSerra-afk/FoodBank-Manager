@@ -81,6 +81,25 @@ $rows       = $rows ?? array();
             <?php endforeach; ?>
         </tbody>
     </table>
+    <?php if ( ! empty( $render_counts ) ) : ?>
+    <h2><?php esc_html_e( 'Render counts (this request)', 'foodbank-manager' ); ?></h2>
+    <table class="widefat">
+        <thead>
+            <tr>
+                <th><?php esc_html_e( 'Screen', 'foodbank-manager' ); ?></th>
+                <th><?php esc_html_e( 'Count', 'foodbank-manager' ); ?></th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ( $render_counts as $k => $v ) : ?>
+            <tr>
+                <td><?php echo esc_html( $k ); ?></td>
+                <td><?php echo esc_html( (string) $v ); ?></td>
+            </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+    <?php endif; ?>
       <h2><?php esc_html_e( 'Menu Visibility', 'foodbank-manager' ); ?></h2>
       <p><?php esc_html_e( 'FBM caps held by current user:', 'foodbank-manager' ); ?> <strong><?php echo esc_html( $caps_count ); ?></strong></p>
       <form method="post" action="">

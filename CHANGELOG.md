@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.12] - 2025-09-06
+### Fixed
+- Admin pages now render exactly once per request (RenderOnce guard), eliminating duplicate top blocks on several screens.
+### Diagnostics
+- Added per-request render counts and menu-parent count for quick detection.
+### Infra
+- Menu/boot remain idempotent; notices stay single and screen-gated.
+
 ## [1.2.11] - 2025-09-05
 ### Fixed
 - Admin menu de-dup: fallback parent only when core boot/menu not registered; emergency notice suppressed after boot.

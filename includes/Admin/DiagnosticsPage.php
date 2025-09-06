@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace FoodBankManager\Admin;
 
 use FBM\Auth\Capabilities;
+use FBM\Core\RenderOnce;
 use FoodBankManager\Core\Options;
 use function sanitize_text_field;
 use function sanitize_key;
@@ -92,7 +93,8 @@ class DiagnosticsPage {
                 if ( is_array( $menu ) ) {
                         foreach ( $menu as $it ) { if ( isset( $it[2] ) && $it[2] === 'fbm' ) { $count++; } }
                 }
-                $rows[] = array( 'Menu parents registered', (string) $count, $count === 1 ? 'ok' : 'warn' );
+                $rows[]        = array( 'Menu parents registered', (string) $count, $count === 1 ? 'ok' : 'warn' );
+                $render_counts = RenderOnce::all();
 
                 /* @psalm-suppress UnresolvableInclude */
                 require FBM_PATH . 'templates/admin/diagnostics.php';
