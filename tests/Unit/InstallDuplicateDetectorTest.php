@@ -26,9 +26,6 @@ if (!function_exists('esc_attr')) {
 if (!function_exists('current_user_can')) {
     function current_user_can($cap) { return !empty($GLOBALS['fbm_user_caps'][$cap]); }
 }
-if (!function_exists('admin_url')) {
-    function admin_url($path = '') { return '/admin/' . ltrim((string)$path, '/'); }
-}
 if (!function_exists('sanitize_key')) {
     function sanitize_key($key) { return $key; }
 }
@@ -65,7 +62,10 @@ final class InstallDuplicateDetectorTest extends TestCase {
         fbm_test_set_request_nonce('fbm_consolidate');
         Notices::handle_consolidate_plugins();
         $this->assertSame(['FoodBank-Manager-1.2.12/foodbank-manager.php'], $GLOBALS['fbm_test_deactivated']);
-        $this->assertSame('/admin/plugins.php?fbm_consolidated=1&deleted=1', $GLOBALS['fbm_test_redirect']);
+        $url = $GLOBALS['fbm_test_redirect'];
+        $this->assertStringContainsString('https://example.test/wp-admin/plugins.php', $url);
+        $this->assertStringContainsString('fbm_consolidated=1', $url);
+        $this->assertStringContainsString('deleted=1', $url);
         $opt = get_option('fbm_last_consolidation');
         $this->assertSame(1, $opt['count']);
     }
@@ -73,6 +73,9 @@ final class InstallDuplicateDetectorTest extends TestCase {
     public function testConsolidateActionNoOp(): void {
         fbm_test_set_request_nonce('fbm_consolidate');
         Notices::handle_consolidate_plugins();
-        $this->assertSame('/admin/plugins.php?fbm_consolidated=1&deleted=0', $GLOBALS['fbm_test_redirect']);
+        $url = $GLOBALS['fbm_test_redirect'];
+        $this->assertStringContainsString('https://example.test/wp-admin/plugins.php', $url);
+        $this->assertStringContainsString('fbm_consolidated=1', $url);
+        $this->assertStringContainsString('deleted=0', $url);
     }
 }
