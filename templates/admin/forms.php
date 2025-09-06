@@ -17,7 +17,8 @@ if ( ! current_user_can( 'fb_manage_forms' ) ) {
 }
 ?>
 <div class="wrap fbm-admin">
-		<h1><?php \esc_html_e( 'Forms', 'foodbank-manager' ); ?></h1>
+<?php \FBM\Core\Trace::mark( 'admin:forms' ); ?>
+				<h1><?php \esc_html_e( 'Forms', 'foodbank-manager' ); ?></h1>
 		<table class="wp-list-table widefat fixed striped">
 				<thead>
 						<tr>

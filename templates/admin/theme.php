@@ -21,6 +21,7 @@ $densities = array(
 );
 ?>
 <div class="wrap fbm-admin">
+<?php \FBM\Core\Trace::mark( 'admin:theme' ); ?>
         <h1><?php esc_html_e( 'Design & Theme', 'foodbank-manager' ); ?></h1>
         <?php if ( isset( $_GET['notice'] ) && 'saved' === $_GET['notice'] ) : ?>
                 <div class="notice notice-success"><p><?php esc_html_e( 'Settings saved.', 'foodbank-manager' ); ?></p></div>

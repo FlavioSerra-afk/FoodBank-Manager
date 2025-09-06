@@ -19,6 +19,7 @@ if ( ! current_user_can( 'fb_manage_dashboard' ) && ! current_user_can( 'manage_
 }
 ?>
 <div class="wrap fbm-admin">
+<?php \FBM\Core\Trace::mark( 'admin:dashboard' ); ?>
                 <h1><?php \esc_html_e( 'Dashboard', 'foodbank-manager' ); ?></h1>
                 <p><?php \esc_html_e( 'Coming soon.', 'foodbank-manager' ); ?></p>
 </div>

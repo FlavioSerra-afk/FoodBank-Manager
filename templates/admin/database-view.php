@@ -23,6 +23,7 @@ if ( ! $can_sensitive ) {
 }
 ?>
 <div class="wrap fbm-admin">
+<?php \FBM\Core\Trace::mark( 'admin:database_view' ); ?>
 <h1>
 	<?php esc_html_e( 'Entry', 'foodbank-manager' ); ?> #<?php echo esc_html( (string) $entry['id'] ); ?>
 </h1>

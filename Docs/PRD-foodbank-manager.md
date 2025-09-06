@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-06 (v1.2.12 render guard)
+Docs-Revision: 2025-09-06 (Wave AN)
 # FoodBank Manager — Product Requirements Document (PRD)
 
 **Repo file:** `Docs/PRD-foodbank-manager.md`  

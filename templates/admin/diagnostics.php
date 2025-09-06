@@ -35,7 +35,13 @@ $gating_ok  = \FoodBankManager\Core\Screen::is_fbm_screen();
 $rows       = $rows ?? array();
 ?>
 <div class="wrap fbm-admin">
+<?php \FBM\Core\Trace::mark( 'admin:diagnostics' ); ?>
     <h1><?php esc_html_e( 'Diagnostics', 'foodbank-manager' ); ?></h1>
+      <?php if ( ! empty( $render_ok ) ) : ?>
+          <span class="fbm-badge fbm-badge--ok">RenderOnce OK</span>
+      <?php else : ?>
+          <span class="fbm-badge fbm-badge--warn">RenderOnce duplicates</span>
+      <?php endif; ?>
       <?php settings_errors( 'fbm_diagnostics' ); ?>
       <?php if ( 'sent' === $notice ) : ?>
           <div class="notice notice-success"><p><?php esc_html_e( 'Test email sent.', 'foodbank-manager' ); ?></p></div>
@@ -81,7 +87,7 @@ $rows       = $rows ?? array();
             <?php endforeach; ?>
         </tbody>
     </table>
-    <?php if ( ! empty( $render_counts ) ) : ?>
+    <?php if ( ! empty( $counts ) ) : ?>
     <h2><?php esc_html_e( 'Render counts (this request)', 'foodbank-manager' ); ?></h2>
     <table class="widefat">
         <thead>
@@ -91,7 +97,7 @@ $rows       = $rows ?? array();
             </tr>
         </thead>
         <tbody>
-            <?php foreach ( $render_counts as $k => $v ) : ?>
+            <?php foreach ( $counts as $k => $v ) : ?>
             <tr>
                 <td><?php echo esc_html( $k ); ?></td>
                 <td><?php echo esc_html( (string) $v ); ?></td>
@@ -99,6 +105,9 @@ $rows       = $rows ?? array();
             <?php endforeach; ?>
         </tbody>
     </table>
+    <?php if ( ! empty( $dupes ) ) : ?>
+    <p><?php esc_html_e( 'Duplicates:', 'foodbank-manager' ); ?> <?php echo esc_html( implode( ', ', array_keys( $dupes ) ) ); ?></p>
+    <?php endif; ?>
     <?php endif; ?>
       <h2><?php esc_html_e( 'Menu Visibility', 'foodbank-manager' ); ?></h2>
       <p><?php esc_html_e( 'FBM caps held by current user:', 'foodbank-manager' ); ?> <strong><?php echo esc_html( $caps_count ); ?></strong></p>

@@ -10,7 +10,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 ?>
 <div class="wrap fbm-admin">
-	<h1><?php esc_html_e( 'Email Templates', 'foodbank-manager' ); ?></h1>
+<?php \FBM\Core\Trace::mark( 'admin:emails' ); ?>
+		<h1><?php esc_html_e( 'Email Templates', 'foodbank-manager' ); ?></h1>
 	<ul>
 		<?php foreach ( $templates as $key => $tpl ) : ?>
 			<li>

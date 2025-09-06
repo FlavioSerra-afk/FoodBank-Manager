@@ -15,6 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 ?>
 <div class="wrap fbm-admin">
+<?php \FBM\Core\Trace::mark( 'admin:database' ); ?>
 <h1><?php esc_html_e( 'Database', 'foodbank-manager' ); ?></h1>
 <div class="fbm-preset-bar">
 <form method="post" style="display:inline">
