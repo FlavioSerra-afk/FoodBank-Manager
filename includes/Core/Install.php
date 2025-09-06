@@ -5,75 +5,125 @@ declare(strict_types=1);
 namespace FoodBankManager\Core;
 
 final class Install {
-    private const TRANSIENT = 'fbm_dup_plugins';
-    private const CANONICAL_DIR = 'foodbank-manager';
+    private const TRANSIENT = 'fbm_install_scan';
+    private const CANONICAL = 'foodbank-manager/foodbank-manager.php';
+    private const TTL = 300; // 5 minutes
 
-    public static function detect_duplicates(): void {
-        if (!function_exists('get_plugins') || !current_user_can('manage_options')) {
-            return;
+    /** @var array<string,mixed>|null */
+    private static ?array $scanCache = null;
+
+    /**
+     * Perform a fresh scan of installed plugins.
+     *
+     * @return array{canonical:string,duplicates:array<int,array{basename:string,version:string,dir:string}>}
+     */
+    public static function detectDuplicates(): array {
+        if (!function_exists('get_plugins')) {
+            return ['canonical' => self::CANONICAL, 'duplicates' => []];
         }
         $plugins = get_plugins();
-        $dups = [];
+        $dups    = [];
         foreach ($plugins as $basename => $data) {
             $name = (string)($data['Name'] ?? '');
-            $dir  = explode('/', (string)$basename)[0];
-            if ($name === 'FoodBank Manager' && $dir !== self::CANONICAL_DIR) {
-                $dups[] = (string)$basename;
+            if ($name !== 'FoodBank Manager') {
+                continue;
             }
+            if ($basename === self::CANONICAL) {
+                continue;
+            }
+            $dir = explode('/', (string) $basename)[0];
+            $dups[] = [
+                'basename' => (string) $basename,
+                'version'  => (string)($data['Version'] ?? ''),
+                'dir'      => (string) $dir,
+            ];
         }
-        if ($dups) {
-            $exp = defined('MINUTE_IN_SECONDS') ? MINUTE_IN_SECONDS : 60;
-            set_transient(self::TRANSIENT, $dups, $exp);
-        } else {
-            delete_transient(self::TRANSIENT);
-        }
+        return [
+            'canonical'  => self::CANONICAL,
+            'duplicates' => $dups,
+        ];
     }
 
     /**
-     * Get list of non-canonical plugin basenames.
+     * Return cached scan results, performing a scan if needed.
      *
+     * @return array{canonical:string,duplicates:array<int,array{basename:string,version:string,dir:string}>}
+     */
+    public static function getCachedScan(): array {
+        if (is_array(self::$scanCache)) {
+            return self::$scanCache;
+        }
+        $scan = get_transient(self::TRANSIENT);
+        if (!is_array($scan)) {
+            $scan = self::detectDuplicates();
+            $exp  = defined('MINUTE_IN_SECONDS') ? 5 * MINUTE_IN_SECONDS : self::TTL;
+            set_transient(self::TRANSIENT, $scan, $exp);
+        }
+        self::$scanCache = $scan;
+        return $scan;
+    }
+
+    /**
+     * Deactivate duplicates and optionally delete their plugin folders.
+     *
+     * @param bool $delete Whether to delete duplicate folders after deactivation.
+     * @return array{timestamp:int,deactivated:int,deleted:int,items:array<int,string>,count:int}
+     */
+    public static function consolidate(bool $delete = true): array {
+        $scan = self::$scanCache;
+        if (!is_array($scan)) {
+            $scan = get_transient(self::TRANSIENT);
+            if (!is_array($scan)) {
+                $scan = ['canonical' => self::CANONICAL, 'duplicates' => []];
+            }
+        }
+        $items = array_map(static fn(array $d) => $d['basename'], $scan['duplicates']);
+        if (!$items) {
+            $log = [
+                'timestamp'   => time(),
+                'deactivated' => 0,
+                'deleted'     => 0,
+                'items'       => [],
+                'count'       => 0,
+            ];
+            update_option('fbm_last_consolidation', $log);
+            return $log;
+        }
+        deactivate_plugins($items);
+        $deleted = 0;
+        if ($delete && current_user_can('delete_plugins')) {
+            delete_plugins($items);
+            $deleted = count($items);
+        }
+        $log = [
+            'timestamp'   => time(),
+            'deactivated' => count($items),
+            'deleted'     => $deleted,
+            'items'       => $items,
+            'count'       => count($items),
+        ];
+        update_option('fbm_last_consolidation', $log);
+        delete_transient(self::TRANSIENT);
+        self::$scanCache = null;
+        return $log;
+    }
+
+    // --- Legacy wrappers -------------------------------------------------
+
+    /** @deprecated */
+    public static function detect_duplicates(): void {
+        $scan = self::detectDuplicates();
+        $exp  = defined('MINUTE_IN_SECONDS') ? 5 * MINUTE_IN_SECONDS : self::TTL;
+        set_transient(self::TRANSIENT, $scan, $exp);
+        self::$scanCache = $scan;
+    }
+
+    /**
+     * @deprecated
      * @return array<int,string>
      */
     public static function duplicates(): array {
-        $v = get_transient(self::TRANSIENT);
-        return is_array($v) ? array_values(array_map('strval', $v)) : [];
-    }
-
-    /**
-     * Deactivate and optionally delete duplicate installs.
-     */
-    public static function consolidate(): int {
-        $dups = self::duplicates();
-        if (!$dups) {
-            self::log(0);
-            return 0;
-        }
-        deactivate_plugins($dups);
-        if (current_user_can('delete_plugins')) {
-            delete_plugins($dups);
-        }
-        self::log(count($dups));
-        delete_transient(self::TRANSIENT);
-        return count($dups);
-    }
-
-    /**
-     * Record or fetch the last consolidation log.
-     *
-     * @param int|null $count Number of duplicates removed.
-     * @return array{ts:int,count:int}
-     */
-    public static function log(?int $count = null): array {
-        $key = 'fbm_last_consolidation';
-        if (null !== $count) {
-            $entry = ['ts' => time(), 'count' => $count];
-            update_option($key, $entry);
-            return $entry;
-        }
-        $v = get_option($key, ['ts' => 0, 'count' => 0]);
-        return [
-            'ts' => (int)($v['ts'] ?? 0),
-            'count' => (int)($v['count'] ?? 0),
-        ];
+        $scan = self::getCachedScan();
+        return array_values(array_map(static fn(array $d): string => $d['basename'], $scan['duplicates']));
     }
 }

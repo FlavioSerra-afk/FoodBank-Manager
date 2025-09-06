@@ -5,13 +5,18 @@ declare(strict_types=1);
 namespace FoodBankManager\Admin;
 use FoodBankManager\Core\Screen;
 use FoodBankManager\Core\Options;
+use FoodBankManager\Core\Install;
 
 final class Notices {
     private static bool $missingKek = false;
     private static bool $missingSodium = false;
     private static int $renderCount = 0;
 
-    public static function boot(): void {}
+    public static function boot(): void {
+        add_action('admin_init', [Install::class, 'getCachedScan']);
+        add_action('admin_post_fbm_consolidate_plugins', [__CLASS__, 'handleConsolidatePlugins']);
+        add_action('admin_post_fbm_deactivate_duplicates', [__CLASS__, 'handleDeactivateDuplicates']);
+    }
 
     public static function render(): void {
         static $printed = false;
@@ -30,14 +35,22 @@ final class Notices {
         self::$renderCount++;
         $printed = true;
 
-        $dups = \FoodBankManager\Core\Install::duplicates();
-        if ($dups && $is_fbm) {
-            $action = 'fbm_consolidate_plugins';
-            $url    = add_query_arg('action', $action, admin_url('admin-post.php'));
-            echo '<div class="notice notice-warning"><p>' . esc_html__('Multiple FoodBank Manager copies detected.', 'foodbank-manager') . '</p>';
-            echo '<form method="post" action="' . esc_url($url) . '">';
-            wp_nonce_field('fbm_consolidate');
-            echo '<p><button class="button">' . esc_html__('Consolidate', 'foodbank-manager') . '</button></p></form></div>';
+        $scan = Install::getCachedScan();
+        $dups = $scan['duplicates'];
+        if ($dups && $is_fbm && current_user_can('manage_options')) {
+            echo '<div class="notice notice-warning"><p>' . esc_html__('Multiple FoodBank Manager copies detected', 'foodbank-manager') . '</p>';
+            echo '<ul>';
+            foreach ($dups as $d) {
+                echo '<li>' . esc_html($d['dir'] . ' (' . $d['version'] . ')') . '</li>';
+            }
+            echo '</ul>';
+            $url = admin_url('admin-post.php');
+            echo '<form method="post" action="' . esc_url($url) . '"><input type="hidden" name="action" value="fbm_consolidate_plugins" />';
+            wp_nonce_field('fbm_consolidate_plugins');
+            echo '<p><button class="button button-primary">' . esc_html__('Consolidate (deactivate & delete)', 'foodbank-manager') . '</button></p></form>';
+            echo '<form method="post" action="' . esc_url($url) . '"><input type="hidden" name="action" value="fbm_deactivate_duplicates" />';
+            wp_nonce_field('fbm_deactivate_duplicates');
+            echo '<p><button class="button">' . esc_html__('Deactivate only', 'foodbank-manager') . '</button></p></form></div>';
         }
 
         if (isset($_GET['fbm_consolidated'])) {
@@ -154,16 +167,38 @@ final class Notices {
         }
     }
 
+    public static function handleConsolidatePlugins(): void {
+        check_admin_referer('fbm_consolidate_plugins');
+        if (!current_user_can('manage_options')) {
+            wp_die(esc_html__('Insufficient permissions', 'foodbank-manager'));
+        }
+        Install::consolidate(true);
+        $url = admin_url('admin.php?page=fbm_diagnostics&fbm_consolidated=1');
+        wp_safe_redirect($url);
+        exit;
+    }
+
+    public static function handleDeactivateDuplicates(): void {
+        check_admin_referer('fbm_deactivate_duplicates');
+        if (!current_user_can('manage_options')) {
+            wp_die(esc_html__('Insufficient permissions', 'foodbank-manager'));
+        }
+        Install::consolidate(false);
+        $url = admin_url('admin.php?page=fbm_diagnostics&fbm_consolidated=1');
+        wp_safe_redirect($url);
+        exit;
+    }
+
     public static function handle_consolidate_plugins(): void {
         check_admin_referer('fbm_consolidate');
         if (!current_user_can('manage_options')) {
             wp_die(esc_html__('Insufficient permissions', 'foodbank-manager'));
         }
-        $count = \FoodBankManager\Core\Install::consolidate();
+        $res = Install::consolidate(true);
         $url = add_query_arg(
             [
                 'fbm_consolidated' => '1',
-                'deleted' => (string) $count,
+                'deleted' => (string) $res['deleted'],
             ],
             admin_url('plugins.php')
         );
