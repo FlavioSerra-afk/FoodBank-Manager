@@ -11,6 +11,7 @@ Docs-Revision: 2025-09-06 (v1.2.13 fragments merged)
 ## Resolved Issues
 - Menu not visible on fresh install → Administrators now self-heal capabilities; Diagnostics includes a Repair caps control.
 - Duplicate admin blocks → Resolved in v1.2.12.
+- Duplicate installs → one-time Consolidate cleanup handles stray copies.
 
 # FoodBank Manager — Issues & Milestones
 

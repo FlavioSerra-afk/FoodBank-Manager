@@ -10,16 +10,24 @@ use FoodBankManager\Shortcodes\Dashboard;
 use FoodBankManager\Rest\Api;
 use FoodBankManager\Mail\Logger;
 use FoodBankManager\Admin\Notices;
+use FoodBankManager\Core\Install;
 
 class Hooks {
 
-	public function register(): void {
-		add_action( 'init', array( $this, 'register_shortcodes' ) );
-		add_action( 'rest_api_init', array( Api::class, 'register_routes' ) );
+        public function register(): void {
+                add_action( 'init', array( $this, 'register_shortcodes' ) );
+                add_action( 'rest_api_init', array( Api::class, 'register_routes' ) );
                 Logger::init();
                 add_action( 'fbm_crypto_missing_kek', array( Notices::class, 'missing_kek' ) );
                 add_action( 'fbm_crypto_missing_sodium', array( Notices::class, 'missing_sodium' ) );
-	}
+                if ( is_admin() ) {
+                        add_action( 'admin_init', array( Install::class, 'detect_duplicates' ) );
+                        add_action( 'admin_init', array( Notices::class, 'handleCapsRepair' ) );
+                        add_action( 'admin_init', array( Notices::class, 'maybe_handle_consolidate_plugins' ) );
+                        add_action( 'admin_notices', array( Notices::class, 'render' ), 10 );
+                        add_action( 'admin_notices', array( Notices::class, 'render_caps_fix_notice' ), 5 );
+                }
+        }
 
        public function register_shortcodes(): void {
                \FBM\Shortcodes\Shortcodes::register();

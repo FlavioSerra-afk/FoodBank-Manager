@@ -11,6 +11,7 @@ namespace FoodBankManager\Admin;
 
 use FBM\Auth\Capabilities;
 use FoodBankManager\Core\Options;
+use FoodBankManager\Core\Install;
 use function sanitize_text_field;
 use function sanitize_key;
 use function wp_unslash;
@@ -97,6 +98,7 @@ class DiagnosticsPage {
                 $dupes    = array_filter( $counts, static fn( $c ) => $c > 1 );
                 $render_ok = empty( $dupes );
 
+                $dup_plugins = Install::duplicates();
                 /* @psalm-suppress UnresolvableInclude */
                 require FBM_PATH . 'templates/admin/diagnostics.php';
         }
