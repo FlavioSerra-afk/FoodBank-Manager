@@ -9,7 +9,7 @@ Docs-Revision: 2025-09-06 (v1.2.12 trace badge)
 
 ## Resolved Issues
 - Menu not visible on fresh install → Administrators now self-heal capabilities; Diagnostics includes a Repair caps control.
-- Duplicate admin blocks → Resolved in v1.2.12 via Trace + Diagnostics badge.
+- Duplicate admin blocks → Resolved in v1.2.12.
 
 # FoodBank Manager — Issues & Milestones
 
