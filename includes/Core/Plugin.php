@@ -16,7 +16,7 @@ use FoodBankManager\Core\Screen;
 
 final class Plugin {
 
-    public const VERSION = '1.2.11';
+    public const VERSION = '1.2.12';
 
         private static ?Plugin $instance = null;
         private static bool $booted = false;
@@ -67,13 +67,6 @@ final class Plugin {
                 if ( is_admin() ) {
                         \FoodBankManager\Admin\Notices::boot();
                         add_action( 'admin_menu', [\FoodBankManager\Admin\Menu::class, 'register'], 9 );
-                        add_action( 'load-foodbank_page_fbm_database', [\FoodBankManager\Admin\DatabasePage::class, 'route'] );
-                        add_action( 'load-foodbank_page_fbm_attendance', [\FoodBankManager\Admin\AttendancePage::class, 'route'] );
-                        add_action( 'load-foodbank_page_fbm_permissions', [\FoodBankManager\Admin\PermissionsPage::class, 'route'] );
-                        add_action( 'load-foodbank_page_fbm_theme', [\FoodBankManager\Admin\ThemePage::class, 'route'] );
-                        add_action( 'load-foodbank_page_fbm_emails', [\FoodBankManager\Admin\EmailsPage::class, 'route'] );
-                        add_action( 'load-foodbank_page_fbm_diagnostics', [\FoodBankManager\Admin\DiagnosticsPage::class, 'route'] );
-                        add_action( 'load-foodbank_page_fbm_shortcodes', [ShortcodesPage::class, 'route'] );
                         // Theme CSS enqueued via Core\Assets.
                 }
 

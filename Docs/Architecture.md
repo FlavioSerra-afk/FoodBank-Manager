@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-05 (v1.2.11 hooks)
+Docs-Revision: 2025-09-06 (v1.2.12 render guard)
 # FoodBank Manager — Architecture
 
 ## Overview
@@ -44,6 +44,9 @@ A secure, privacy-first WordPress plugin for managing Food Bank applicant intake
 
 ## Screen gating
 Notices and assets check `$screen->id` and run only on `toplevel_page_fbm` or `foodbank_page_fbm_*`. Each notice uses a printed flag to render once per page.
+
+## Render guard
+Admin pages share a `FBM\Core\RenderOnce` registry. `Admin\Menu` wraps each submenu callback with `render_once()` so a screen's template is included only once per request. No page may output UI outside its guarded callback; duplicate paths are ignored.
 
 ## Components
  - **Admin Pages:** Dashboard (`fb_manage_dashboard`), Attendance (`fb_manage_attendance`), Database (`fb_manage_database`), Forms (`fb_manage_forms`) with a read-only presets library, Shortcodes builder with preview (`fb_manage_forms`), Email Templates (`fb_manage_emails`), Settings (`fb_manage_settings`), Diagnostics (`fb_manage_diagnostics` – environment checks, test email, repair caps), Permissions (`fb_manage_permissions`), Design & Theme (`fb_manage_theme`).
