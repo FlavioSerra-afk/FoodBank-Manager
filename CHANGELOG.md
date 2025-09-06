@@ -10,6 +10,9 @@
 ### Infra
 - Menu/boot remain idempotent; notices stay single and screen-gated.
 
+### QA
+- Added unit test for Trace; updated docs; no runtime changes.
+
 ## [1.2.11] - 2025-09-05
 ### Fixed
 - Admin menu de-dup: fallback parent only when core boot/menu not registered; emergency notice suppressed after boot.
