@@ -41,23 +41,16 @@ namespace {
         function menu_page_url( string $slug, bool $echo = true ): string { return 'admin.php?page=' . $slug; }
     }
     if ( ! function_exists( 'wp_safe_redirect' ) ) {
-        function wp_safe_redirect( string $url, int $status = 302 ): void { GDPRPageTest::$redirect = $url; throw new \RuntimeException('redirect'); }
-    }
-    if ( ! function_exists( 'readfile' ) ) {
-        function readfile( $filename ) { return ''; }
+        function wp_safe_redirect( string $url, int $status = 302 ): void {}
     }
 }
 
 namespace FBM\Exports {
     class SarExporter {
         public static array $last = array();
-        public static function build_zip( array $subject, bool $masked ): string {
-            self::$last = array( 'masked' => $masked, 'subject' => $subject );
-            $tmp = tempnam(sys_get_temp_dir(), 'sar');
-            $z = new \ZipArchive();
-            $z->open($tmp, \ZipArchive::CREATE);
-            $z->close();
-            return $tmp;
+        public static function stream( array $subject, bool $masked, string $name ): void {
+            self::$last = array( 'masked' => $masked, 'subject' => $subject, 'name' => $name );
+            throw new \RuntimeException('stream');
         }
     }
 }
@@ -70,13 +63,10 @@ namespace {
      * @runTestsInSeparateProcesses
      */
     final class GDPRPageTest extends TestCase {
-        public static string $redirect = '';
-
         protected function setUp(): void {
             fbm_test_reset_globals();
             fbm_grant_for_page('fbm_diagnostics');
             fbm_test_trust_nonces(true);
-            self::$redirect      = '';
             $_GET = $_POST = $_SERVER = $_REQUEST = array();
             if (!class_exists('FoodBankManager\\Database\\ApplicationsRepo', false)) {
                 require_once __DIR__ . '/../../Support/ApplicationsRepoStub.php';
@@ -117,7 +107,7 @@ namespace {
             try {
                 GDPRPage::route();
             } catch ( \RuntimeException $e ) {
-                $this->assertSame( 'redirect', $e->getMessage() );
+                $this->assertSame( 'stream', $e->getMessage() );
             }
             $this->assertTrue( \FBM\Exports\SarExporter::$last['masked'] );
         }
@@ -134,7 +124,7 @@ namespace {
             try {
                 GDPRPage::route();
             } catch ( \RuntimeException $e ) {
-                $this->assertSame( 'redirect', $e->getMessage() );
+                $this->assertSame( 'stream', $e->getMessage() );
             }
             $this->assertFalse( \FBM\Exports\SarExporter::$last['masked'] );
         }
