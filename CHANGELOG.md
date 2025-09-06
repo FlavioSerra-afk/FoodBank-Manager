@@ -1,11 +1,13 @@
 # Changelog
 
 ## [Unreleased]
-- BB-RESOLVE: standardized phpunit.xml testsuite; Composer dev autoload loads single-source WP stubs; removed duplicate stub definitions.
-- AX: URL/Nonce stubs for tests (add_query_arg poly, admin_url/wp_nonce_url shims)
-- AY: Duplicate-install consolidate UX + logging in Diagnostics
-- AZ: WP stubs pack for tests
-- Auto-consolidate duplicate installs on activation; summary in Diagnostics.
+
+## [1.2.15] - 2025-09-07
+- PHPStan green
+- Settings/Theme sanitize + deterministic CSS
+- Diagnostics Cron panel
+- Forms MVP e2e
+- no regressions
 ## [1.2.14] - 2025-09-06
 - packaging guard: enforce single `foodbank-manager/` slug
 - diagnostics: duplicate-install detector with one-click consolidate panel

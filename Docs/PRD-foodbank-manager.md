@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-06 (v1.2.14 fragments merged)
+Docs-Revision: 2025-09-07 (v1.2.15 fragments merged)
 # FoodBank Manager — Product Requirements Document (PRD)
 
 **Repo file:** `Docs/PRD-foodbank-manager.md`  
@@ -21,7 +21,7 @@ FoodBank Manager is a secure, mobile-first WordPress plugin to:
 - Store submissions in a secure database with encryption at rest.
 - Provide admin and front-end dashboards to search, filter, export, and (for Managers) **track attendance** at distribution sessions.
 - Allow administrators to configure branding and default email senders via a validated settings page.
-- Offer a Design & Theme settings page for primary colour, density, font, default dark mode and optional custom CSS (sanitised) applied across admin and front-end.
+ - Offer a Design & Theme settings page for primary colour, density, font, default dark mode and optional custom CSS; inputs are sanitised and theme CSS variables are deterministic with clamped defaults applied across admin and front-end.
 - Admin pages are wrapped in a namespaced `.fbm-admin` container with plugin CSS and notices loaded only on FoodBank Manager screens.
 - Each admin page renders exactly once per request via a shared `RenderOnce` guard; no page may echo UI outside its submenu callback.
 - Administrators always see a FoodBank parent menu (falls back to `manage_options`), while subpages remain FBM-capability gated; Diagnostics includes a nonce-protected **Repair caps** button and duplicate-install consolidation.
@@ -33,9 +33,7 @@ FoodBank Manager is a secure, mobile-first WordPress plugin to:
 - Emitted right after `.wrap.fbm-admin` opens on admin pages.
 - Diagnostics badge shows "RenderOnce OK" unless duplicate passes are detected.
 
-The plugin must reproduce the current Food Bank form at `https://pcclondon.uk/food-bank/` exactly as a starter preset, and allow building additional custom forms with full control over fields, layout, logic, and data handling.
-
-- Phase 1 introduces a read-only **Presets Library** listing built-in and custom presets. Administrators can copy a `[fbm_form preset="…"]` shortcode for each preset. Future waves will add a visual builder and advanced field types.
+The plugin must reproduce the current Food Bank form at `https://pcclondon.uk/food-bank/` exactly as a starter preset, and allow building additional custom forms with full control over fields, layout, logic, and data handling. Shortcode-driven forms store schemas in presets with strict validation, CAPTCHA, and an admin builder with live preview.
 
 ---
 
@@ -130,7 +128,7 @@ Roles map to WordPress **capabilities** (granular; see §10 Security).
 - **Entry view:** all fields, internal notes, status (new/review/approved/declined/archived), actions: Edit, PDF, CSV, Delete (with confirm).
 - **Email Templates:** WYSIWYG editor, variables list, live preview with token helper, reset-to-defaults, a11y labels, send test.
 - **Settings:** branding, date/time, email defaults, spam protection keys, file policy, retention/anonymisation, encryption controls (see §10).
-- **Diagnostics:** email logs, resend, test email, repair capabilities, environment checks (PHP/WP version, cron, KEK, mail transport).
+- **Diagnostics:** email logs, resend, test email, repair capabilities, environment checks (PHP/WP version, cron, KEK, mail transport), and a cron health panel with retention run and dry-run controls.
 - **Permissions:** map capabilities to roles and set per-user overrides.
 - **Attendance repository:** all queries use `$wpdb->prepare()` with strict placeholders; results mask PII unless `fb_view_sensitive` is granted; unit tests cover check-in, no-show, void/unvoid, and policy edge cases.
 
@@ -474,8 +472,8 @@ Error format: `{ error: { code, message } }`
 **M1 — Foundations (Infra & Security)**  
 Custom tables, roles/caps, nonces, encryption scaffolding, Action Scheduler.
 
-**M2 — Forms & Submissions**  
-Builder, rendering, validation, files, emails, logging, default Food Bank preset.
+**M2 — Forms & Submissions**
+Builder, rendering, validation, files, emails, logging, default Food Bank preset, CAPTCHA, and an admin builder with live preview.
 
 **M3 — Admin & Front-End Dashboards**  
 Database list/detail, exports, viewer/manager dashboards.
@@ -516,7 +514,7 @@ PDF templates, theming presets, PT translations, docs.
 ## 18) Monitoring & Diagnostics
 
 - Email log (sent/failed), resend, provider messages.
-- Cron/queue status; pending jobs; last run times.
+- Cron/queue status with next/last run times, retention job controls, and dry-run options.
 - Environment checks (PHP/WP versions, KEK presence, mail transport, cron schedules).
 - Self-check warnings if encryption/CAPTCHA/SMTP not configured.
 
