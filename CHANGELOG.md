@@ -4,6 +4,7 @@
 - AX: URL/Nonce stubs for tests (add_query_arg poly, admin_url/wp_nonce_url shims)
 - AY: Duplicate-install consolidate UX + logging in Diagnostics
 - AZ: WP stubs pack for tests
+- Auto-consolidate duplicate installs on activation; summary in Diagnostics.
 ## [1.2.14] - 2025-09-06
 - packaging guard: enforce single `foodbank-manager/` slug
 - diagnostics: duplicate-install detector with one-click consolidate panel

@@ -75,6 +75,9 @@ $rows       = $rows ?? array();
     <?php if ( ! empty( $last_consolidation ) ) : ?>
     <p><?php echo esc_html( sprintf( __( 'Last consolidation: %s (deactivated %d, deleted %d)', 'foodbank-manager' ), isset( $last_consolidation['timestamp'] ) ? gmdate( 'Y-m-d H:i', (int) $last_consolidation['timestamp'] ) : __( 'never', 'foodbank-manager' ), (int) ( $last_consolidation['deactivated'] ?? 0 ), (int) ( $last_consolidation['deleted'] ?? 0 ) ) ); ?></p>
     <?php endif; ?>
+    <?php if ( ! empty( $last_activation_consolidation ) ) : ?>
+    <p><?php echo esc_html( sprintf( __( 'Last activation cleanup: %s (deactivated %d, deleted %d)', 'foodbank-manager' ), isset( $last_activation_consolidation['timestamp'] ) ? gmdate( 'Y-m-d H:i', (int) $last_activation_consolidation['timestamp'] ) : __( 'never', 'foodbank-manager' ), (int) ( $last_activation_consolidation['deactivated'] ?? 0 ), (int) ( $last_activation_consolidation['deleted'] ?? 0 ) ) ); ?></p>
+    <?php endif; ?>
     <?php if ( ! empty( $install_scan['duplicates'] ) ) : ?>
     <table class="widefat">
         <thead>

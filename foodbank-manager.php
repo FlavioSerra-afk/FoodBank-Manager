@@ -133,6 +133,15 @@ register_activation_hook(
         }
     }
 );
+register_activation_hook(
+    __FILE__,
+    static function (): void {
+        if ( class_exists( '\FBM\Core\Install' ) ) {
+            \FBM\Core\Install::onActivate();
+        }
+    }
+);
+
 
 if ( ! function_exists( 'fbm_deactivate' ) ) {
     /**
