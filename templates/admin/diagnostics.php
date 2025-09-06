@@ -69,19 +69,24 @@ $rows       = $rows ?? array();
         <li><?php echo esc_html( 'Admin notices rendered this request: ' . $notices_render_count ); ?></li>
     </ul>
     <h2><?php esc_html_e( 'Install Health', 'foodbank-manager' ); ?></h2>
-    <p><?php esc_html_e( 'Canonical slug: foodbank-manager/foodbank-manager.php', 'foodbank-manager' ); ?></p>
+    <p><?php echo esc_html( sprintf( __( 'Canonical slug: %s', 'foodbank-manager' ), $canonical_slug ) ); ?></p>
     <p><?php echo esc_html( sprintf( __( 'Other copies: %d', 'foodbank-manager' ), count( $dup_plugins ) ) ); ?></p>
-    <p><?php echo esc_html( sprintf( __( 'Last consolidation: %s (%d removed)', 'foodbank-manager' ), $last_consolidation['ts'] ? gmdate( 'Y-m-d H:i', $last_consolidation['ts'] ) : __( 'never', 'foodbank-manager' ), $last_consolidation['count'] ) ); ?></p>
+    <p><?php echo esc_html( sprintf( __( 'Last consolidation: %s (deactivated %d, deleted %d)', 'foodbank-manager' ), $last_consolidation['ts'] ? gmdate( 'Y-m-d H:i', $last_consolidation['ts'] ) : __( 'never', 'foodbank-manager' ), $last_consolidation['deactivated'], $last_consolidation['deleted'] ) ); ?></p>
     <?php if ( ! empty( $dup_plugins ) ) : ?>
     <ul>
         <?php foreach ( $dup_plugins as $b ) : ?>
-        <li><?php echo esc_html( $b ); ?></li>
+        <li><?php echo esc_html( $b['dir'] . ' (' . $b['version'] . ')' ); ?></li>
         <?php endforeach; ?>
     </ul>
     <?php $action_url = add_query_arg( 'action', 'fbm_consolidate_plugins', admin_url( 'admin-post.php' ) ); ?>
     <form method="post" action="<?php echo esc_url( $action_url ); ?>">
         <?php wp_nonce_field( 'fbm_consolidate' ); ?>
-        <p><button type="submit" class="button"><?php esc_html_e( 'Consolidate duplicates', 'foodbank-manager' ); ?></button></p>
+        <p><button type="submit" class="button button-primary"><?php esc_html_e( 'Consolidate duplicates', 'foodbank-manager' ); ?></button></p>
+    </form>
+    <?php $deactivate_url = add_query_arg( 'action', 'fbm_deactivate_duplicates', admin_url( 'admin-post.php' ) ); ?>
+    <form method="post" action="<?php echo esc_url( $deactivate_url ); ?>">
+        <?php wp_nonce_field( 'fbm_deactivate' ); ?>
+        <p><button type="submit" class="button"><?php esc_html_e( 'Deactivate duplicates', 'foodbank-manager' ); ?></button></p>
     </form>
     <?php endif; ?>
     <h2><?php esc_html_e( 'Quick Checks', 'foodbank-manager' ); ?></h2>

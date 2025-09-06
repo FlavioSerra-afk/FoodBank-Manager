@@ -45,34 +45,61 @@ final class InstallDuplicateDetectorTest extends TestCase {
         $GLOBALS['fbm_test_screen_id'] = 'toplevel_page_fbm';
         $GLOBALS['fbm_user_caps'] = ['manage_options' => true, 'delete_plugins' => true];
         $GLOBALS['fbm_test_plugins'] = [
-            'foodbank-manager/foodbank-manager.php' => ['Name' => 'FoodBank Manager'],
-            'FoodBank-Manager-1.2.12/foodbank-manager.php' => ['Name' => 'FoodBank Manager'],
+            'foodbank-manager/foodbank-manager.php' => ['Name' => 'FoodBank Manager', 'Version' => '1.2.14'],
+            'FoodBank-Manager-1.2.12/foodbank-manager.php' => ['Name' => 'FoodBank Manager', 'Version' => '1.2.12'],
+            'FoodBank-Manager-1.2.10/foodbank-manager.php' => ['Name' => 'FoodBank Manager', 'Version' => '1.2.10'],
         ];
         $GLOBALS['fbm_test_deactivated'] = [];
         $GLOBALS['fbm_test_deleted'] = [];
     }
 
     public function testNoticeRendersForDuplicates(): void {
-        Install::detect_duplicates();
+        Install::detectDuplicates();
         ob_start();
         Notices::render();
         $out = ob_get_clean();
         $this->assertStringContainsString('Multiple FoodBank Manager copies detected', $out);
+        $this->assertStringContainsString('FoodBank-Manager-1.2.12', $out);
+        $this->assertStringContainsString('FoodBank-Manager-1.2.10', $out);
     }
 
     public function testConsolidateActionDeactivatesDuplicates(): void {
-        Install::detect_duplicates();
+        Install::detectDuplicates();
         fbm_test_set_request_nonce('fbm_consolidate');
         Notices::handle_consolidate_plugins();
-        $this->assertSame(['FoodBank-Manager-1.2.12/foodbank-manager.php'], $GLOBALS['fbm_test_deactivated']);
-        $this->assertSame('/admin/plugins.php?fbm_consolidated=1&deleted=1', $GLOBALS['fbm_test_redirect']);
+        $expected = [
+            'FoodBank-Manager-1.2.12/foodbank-manager.php',
+            'FoodBank-Manager-1.2.10/foodbank-manager.php',
+        ];
+        $this->assertSame($expected, $GLOBALS['fbm_test_deactivated']);
+        $this->assertSame($expected, $GLOBALS['fbm_test_deleted']);
+        $this->assertSame('/admin/plugins.php?fbm_consolidated=1&deactivated=2&deleted=2', $GLOBALS['fbm_test_redirect']);
         $opt = get_option('fbm_last_consolidation');
-        $this->assertSame(1, $opt['count']);
+        $this->assertSame(2, $opt['deactivated']);
+        $this->assertSame(2, $opt['deleted']);
+        $this->assertSame($expected, $opt['items']);
+    }
+
+    public function testDeactivateActionOnly(): void {
+        Install::detectDuplicates();
+        fbm_test_set_request_nonce('fbm_deactivate');
+        Notices::handle_deactivate_duplicates();
+        $expected = [
+            'FoodBank-Manager-1.2.12/foodbank-manager.php',
+            'FoodBank-Manager-1.2.10/foodbank-manager.php',
+        ];
+        $this->assertSame($expected, $GLOBALS['fbm_test_deactivated']);
+        $this->assertSame([], $GLOBALS['fbm_test_deleted']);
+        $this->assertSame('/admin/plugins.php?fbm_consolidated=1&deactivated=2&deleted=0&s=FoodBank+Manager', $GLOBALS['fbm_test_redirect']);
+        $opt = get_option('fbm_last_consolidation');
+        $this->assertSame(2, $opt['deactivated']);
+        $this->assertSame(0, $opt['deleted']);
+        $this->assertSame($expected, $opt['items']);
     }
 
     public function testConsolidateActionNoOp(): void {
         fbm_test_set_request_nonce('fbm_consolidate');
         Notices::handle_consolidate_plugins();
-        $this->assertSame('/admin/plugins.php?fbm_consolidated=1&deleted=0', $GLOBALS['fbm_test_redirect']);
+        $this->assertSame('/admin/plugins.php?fbm_consolidated=1&deactivated=0&deleted=0', $GLOBALS['fbm_test_redirect']);
     }
 }

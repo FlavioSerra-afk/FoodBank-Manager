@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- diagnostics: duplicate install notice lists versions and logs consolidation
+
 ## [1.2.14] - 2025-09-06
 - packaging guard: enforce single `foodbank-manager/` slug
 - diagnostics: duplicate-install detector with one-click consolidate panel

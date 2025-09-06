@@ -32,22 +32,36 @@ final class Notices {
 
         $dups = \FoodBankManager\Core\Install::duplicates();
         if ($dups && $is_fbm) {
-            $action = 'fbm_consolidate_plugins';
-            $url    = add_query_arg('action', $action, admin_url('admin-post.php'));
-            echo '<div class="notice notice-warning"><p>' . esc_html__('Multiple FoodBank Manager copies detected.', 'foodbank-manager') . '</p>';
-            echo '<form method="post" action="' . esc_url($url) . '">';
-            wp_nonce_field('fbm_consolidate');
-            echo '<p><button class="button">' . esc_html__('Consolidate', 'foodbank-manager') . '</button></p></form></div>';
+            echo '<div class="notice notice-warning"><p><strong>' . esc_html__('Multiple FoodBank Manager copies detected', 'foodbank-manager') . '</strong></p><ul>';
+            foreach ($dups as $d) {
+                echo '<li>' . esc_html($d['dir'] . ' (' . $d['version'] . ')') . '</li>';
+            }
+            echo '</ul>';
+            $base = admin_url('admin-post.php');
+            if (current_user_can('delete_plugins')) {
+                $url = add_query_arg('action', 'fbm_consolidate_plugins', $base);
+                echo '<form method="post" action="' . esc_url($url) . '">';
+                wp_nonce_field('fbm_consolidate');
+                echo '<p><button class="button button-primary">' . esc_html__('Consolidate', 'foodbank-manager') . '</button></p></form>';
+            }
+            $url2 = add_query_arg('action', 'fbm_deactivate_duplicates', $base);
+            echo '<form method="post" action="' . esc_url($url2) . '">';
+            wp_nonce_field('fbm_deactivate');
+            echo '<p><button class="button">' . esc_html__('Deactivate only', 'foodbank-manager') . '</button></p></form>';
+            echo '</div>';
         }
 
         if (isset($_GET['fbm_consolidated'])) {
-            $deleted = (int)($_GET['deleted'] ?? 0);
-            $msg     = $deleted > 0
-                ? (current_user_can('delete_plugins')
-                    ? __('Duplicate installs consolidated.', 'foodbank-manager')
-                    : __('Duplicates deactivated. Go to Plugins to delete.', 'foodbank-manager'))
+            $deactivated = (int)($_GET['deactivated'] ?? 0);
+            $deleted     = (int)($_GET['deleted'] ?? 0);
+            $msg         = $deactivated > 0
+                ? sprintf(
+                    current_user_can('delete_plugins') ? __('Duplicates deactivated: %1$d, deleted: %2$d', 'foodbank-manager') : __('Duplicates deactivated: %1$d', 'foodbank-manager'),
+                    $deactivated,
+                    $deleted
+                )
                 : __('No duplicate installs found.', 'foodbank-manager');
-            $class = $deleted > 0 ? 'notice-success' : 'notice-info';
+            $class = $deactivated > 0 ? 'notice-success' : 'notice-info';
             echo '<div class="notice ' . esc_attr($class) . '"><p>' . esc_html($msg) . '</p></div>';
         }
 
@@ -159,11 +173,30 @@ final class Notices {
         if (!current_user_can('manage_options')) {
             wp_die(esc_html__('Insufficient permissions', 'foodbank-manager'));
         }
-        $count = \FoodBankManager\Core\Install::consolidate();
+        $res = \FoodBankManager\Core\Install::consolidate(true);
         $url = add_query_arg(
             [
                 'fbm_consolidated' => '1',
-                'deleted' => (string) $count,
+                'deactivated'      => (string) $res['deactivated'],
+                'deleted'          => (string) $res['deleted'],
+            ],
+            admin_url('plugins.php')
+        );
+        wp_redirect($url);
+    }
+
+    public static function handle_deactivate_duplicates(): void {
+        check_admin_referer('fbm_deactivate');
+        if (!current_user_can('manage_options')) {
+            wp_die(esc_html__('Insufficient permissions', 'foodbank-manager'));
+        }
+        $res = \FoodBankManager\Core\Install::consolidate(false);
+        $url = add_query_arg(
+            [
+                'fbm_consolidated' => '1',
+                'deactivated'      => (string) $res['deactivated'],
+                'deleted'          => (string) $res['deleted'],
+                's'                => 'FoodBank Manager',
             ],
             admin_url('plugins.php')
         );
