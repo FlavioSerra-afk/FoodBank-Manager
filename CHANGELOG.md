@@ -1,8 +1,12 @@
 # Changelog
 
 ## [Unreleased]
-- enforce release ZIP root slug `foodbank-manager/`
-- diagnostics: duplicate-install consolidation flow with logged results
+
+## [1.2.14] - 2025-09-06
+- packaging guard: enforce single `foodbank-manager/` slug
+- diagnostics: duplicate-install detector with one-click consolidate panel
+- test-harness URL shims
+- no schema changes
 
 ## [1.2.13] - 2025-09-06
 ### Frontend

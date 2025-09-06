@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-06 (v1.2.13 fragments merged)
+Docs-Revision: 2025-09-06 (v1.2.14 fragments merged)
 # FoodBank Manager — Product Requirements Document (PRD)
 
 **Repo file:** `Docs/PRD-foodbank-manager.md`  
@@ -8,7 +8,7 @@ Docs-Revision: 2025-09-06 (v1.2.13 fragments merged)
 **Date:** 1 Sep 2025 (Europe/London)
 **Status:** Approved for build
 
-**Packaging:** Release ZIP root must be `foodbank-manager/` for in-place updates.
+**Packaging:** Release ZIP root must be `foodbank-manager/` for in-place updates. A packaging guard enforces the slug and offers one-click consolidation for duplicates.
 
 ---
 
@@ -24,7 +24,7 @@ FoodBank Manager is a secure, mobile-first WordPress plugin to:
 - Offer a Design & Theme settings page for primary colour, density, font, default dark mode and optional custom CSS (sanitised) applied across admin and front-end.
 - Admin pages are wrapped in a namespaced `.fbm-admin` container with plugin CSS and notices loaded only on FoodBank Manager screens.
 - Each admin page renders exactly once per request via a shared `RenderOnce` guard; no page may echo UI outside its submenu callback.
-- Administrators always see a FoodBank parent menu (falls back to `manage_options`), while subpages remain FBM-capability gated; Diagnostics includes a nonce-protected **Repair caps** button.
+- Administrators always see a FoodBank parent menu (falls back to `manage_options`), while subpages remain FBM-capability gated; Diagnostics includes a nonce-protected **Repair caps** button and duplicate-install consolidation.
 - Diagnostics records the last successful boot timestamp (`fbm_boot_ok`) for display on the Diagnostics screen.
 - Ensure compliance with UK GDPR and follow best-practice WordPress security.
 
