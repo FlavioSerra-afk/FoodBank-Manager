@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="tests/bootstrap.php" cacheResult="false" colors="true">
+<phpunit bootstrap="tests/bootstrap.php" colors="true" verbose="true" executionOrder="default">
   <testsuites>
-    <testsuite name="FoodBank Manager Unit Tests">
+    <testsuite name="Unit">
       <directory suffix="Test.php">tests/Unit</directory>
     </testsuite>
   </testsuites>
+  <source>
+    <include>
+      <directory>includes</directory>
+    </include>
+  </source>
 </phpunit>
