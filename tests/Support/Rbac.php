@@ -8,6 +8,10 @@ function fbm_grant_caps(array $caps): void {
 
 function fbm_grant_admin_only(): void { fbm_grant_caps(['manage_options' => true]); }
 
+function fbm_grant_permissions_admin(): void {
+    fbm_grant_caps(['fb_manage_permissions' => true, 'fb_manage_diagnostics'=>true]);
+}
+
 function fbm_grant_fbm_all(): void {
     fbm_grant_caps([
         'fb_manage_dashboard','fb_manage_attendance','fb_manage_database','fb_manage_forms',

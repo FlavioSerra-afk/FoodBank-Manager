@@ -47,6 +47,14 @@ namespace FBM\Core {
     function add_option($name, $value) { if (!isset($GLOBALS['fbm_options'][$name])) { $GLOBALS['fbm_options'][$name] = $value; } return true; }
 }
 
+namespace FoodBankManager\Admin {
+    function filter_input($type, $var_name, $filter = FILTER_DEFAULT, $options = []) {
+        if ($type === INPUT_POST) { return $_POST[$var_name] ?? null; }
+        return null;
+    }
+    function header($string) { return true; }
+}
+
 namespace FoodBankManager\Core {
     function get_current_screen() {
         $id = $GLOBALS['fbm_test_screen_id'] ?? null;
@@ -79,24 +87,20 @@ namespace {
     $GLOBALS['fbm_test_calls']  = $GLOBALS['fbm_test_calls']  ?? ['add_menu_page'=>[], 'add_submenu_page'=>[]];
 
     // === Nonce + request ===
-    $GLOBALS['fbm_test_nonce_secret'] = 'fbm-test-secret';
-    $GLOBALS['fbm_test_trust_nonces'] = true; // default ON for unit tests
+    $GLOBALS['fbm_test_trust_nonces'] = $GLOBALS['fbm_test_trust_nonces'] ?? true;
 
-    function wp_create_nonce($action = -1) {
-        // deterministic for tests
-        return hash_hmac('sha256', (string)$action, $GLOBALS['fbm_test_nonce_secret']);
+    if (!function_exists('wp_create_nonce')) {
+        function wp_create_nonce($action=-1){ return hash('sha256','fbm-'.$action); }
     }
-
-    function wp_verify_nonce($nonce, $action = -1) {
-        if (!empty($GLOBALS['fbm_test_trust_nonces'])) return 1;
-        return hash_equals($nonce ?? '', wp_create_nonce($action)) ? 1 : false;
+    if (!function_exists('wp_verify_nonce')) {
+        function wp_verify_nonce($n,$a=-1){ return !empty($GLOBALS['fbm_test_trust_nonces']) ? 1 : (hash_equals($n ?? '', wp_create_nonce($a)) ? 1 : false); }
     }
-
-    function check_admin_referer($action = -1, $name = '_wpnonce') {
-        $nonce = $_REQUEST[$name] ?? '';
-        if (wp_verify_nonce($nonce, $action)) return 1;
-        // mirror WP behavior: die with message; in tests we throw to keep it visible
-        throw new \RuntimeException('bad nonce');
+    if (!function_exists('check_admin_referer')) {
+        function check_admin_referer($action=-1,$name='_wpnonce'){
+            $n = $_REQUEST[$name] ?? '';
+            if (!wp_verify_nonce($n,$action)) throw new \RuntimeException('bad nonce');
+            return true;
+        }
     }
 
     function wp_nonce_field($action = -1, $name = '_wpnonce', $referer = true, $echo = true) {
@@ -321,9 +325,9 @@ namespace {
     function fbm_test_trust_nonces(bool $trust): void {
         $GLOBALS['fbm_test_trust_nonces'] = $trust;
     }
-    function fbm_test_set_request_nonce(int|string $action = -1, string $field = '_wpnonce'): void {
+    function fbm_test_set_request_nonce(string $action='fbm', string $field='_wpnonce'): void {
         $_REQUEST[$field] = wp_create_nonce($action);
-        $_POST[$field]    = $_REQUEST[$field];
+        $_POST[$field] = $_REQUEST[$field];
     }
 }
 

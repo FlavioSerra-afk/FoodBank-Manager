@@ -176,9 +176,6 @@ namespace {
         public static string $redirect = '';
 
         protected function setUp(): void {
-            fbm_test_reset_globals();
-            fbm_grant_for_page('fbm_permissions');
-            fbm_test_trust_nonces(true);
             self::$redirect = '';
             $_POST = $_FILES = $_REQUEST = array();
             global $fbm_test_user_meta, $fbm_test_options;
@@ -187,7 +184,15 @@ namespace {
         }
 
         public function test_import_rejects_bad_json(): void {
+            fbm_test_reset_globals();
+            global $fbm_test_user_meta, $fbm_test_options;
+            $fbm_test_user_meta = array( 1 => array() );
+            $fbm_test_options   = array();
+            fbm_grant_permissions_admin();
             fbm_test_set_request_nonce('fbm_permissions_perm_import');
+            $_POST = array_merge($_POST, [
+                'action' => 'fbm_permissions_save',
+            ]);
             $_POST['fbm_action'] = 'perm_import';
             $_POST['json']       = 'bad';
             $_REQUEST            = $_POST;
@@ -199,7 +204,15 @@ namespace {
         }
 
         public function test_user_override_add_and_remove(): void {
+            fbm_test_reset_globals();
+            global $fbm_test_user_meta, $fbm_test_options;
+            $fbm_test_user_meta = array( 1 => array() );
+            $fbm_test_options   = array();
+            fbm_grant_permissions_admin();
             fbm_test_set_request_nonce('fbm_permissions_perm_user_override_add');
+            $_POST = array_merge($_POST, [
+                'action' => 'fbm_permissions_save',
+            ]);
             $_POST['user_id'] = 1;
             $_POST['caps']    = array( 'fb_manage_dashboard' );
             $_REQUEST         = $_POST;
@@ -225,9 +238,17 @@ namespace {
         }
 
         public function test_export_json(): void {
+            fbm_test_reset_globals();
+            global $fbm_test_user_meta, $fbm_test_options;
+            $fbm_test_user_meta = array( 1 => array() );
+            $fbm_test_options   = array();
+            fbm_grant_permissions_admin();
+            fbm_test_set_request_nonce('fbm_permissions_perm_export');
+            $_POST = array_merge($_POST, [
+                'action' => 'fbm_permissions_save',
+            ]);
             global $fbm_test_user_meta;
             $fbm_test_user_meta[1]['fbm_user_caps'] = array( 'fb_manage_dashboard' => true );
-            $_POST['_fbm_nonce'] = '1';
             $_REQUEST = $_POST;
             $page = new \FoodBankManager\Admin\PermissionsPage();
             $ref  = new \ReflectionMethod( \FoodBankManager\Admin\PermissionsPage::class, 'handle_export' );
