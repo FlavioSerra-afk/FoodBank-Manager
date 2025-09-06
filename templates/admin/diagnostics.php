@@ -69,19 +69,33 @@ $rows       = $rows ?? array();
         <li><?php echo esc_html( 'Admin notices rendered this request: ' . $notices_render_count ); ?></li>
     </ul>
     <h2><?php esc_html_e( 'Install Health', 'foodbank-manager' ); ?></h2>
-    <p><?php esc_html_e( 'Canonical slug: foodbank-manager/foodbank-manager.php', 'foodbank-manager' ); ?></p>
-    <p><?php echo esc_html( sprintf( __( 'Other copies: %d', 'foodbank-manager' ), count( $dup_plugins ) ) ); ?></p>
-    <p><?php echo esc_html( sprintf( __( 'Last consolidation: %s (%d removed)', 'foodbank-manager' ), $last_consolidation['ts'] ? gmdate( 'Y-m-d H:i', $last_consolidation['ts'] ) : __( 'never', 'foodbank-manager' ), $last_consolidation['count'] ) ); ?></p>
-    <?php if ( ! empty( $dup_plugins ) ) : ?>
-    <ul>
-        <?php foreach ( $dup_plugins as $b ) : ?>
-        <li><?php echo esc_html( $b ); ?></li>
+    <p><?php esc_html_e( 'Only one copy of the plugin should remain installed under foodbank-manager/.', 'foodbank-manager' ); ?></p>
+    <p><?php echo esc_html( sprintf( __( 'Canonical slug: %s', 'foodbank-manager' ), $install_scan['canonical'] ) ); ?></p>
+    <p><?php echo esc_html( sprintf( __( 'Duplicate copies: %d', 'foodbank-manager' ), count( $install_scan['duplicates'] ) ) ); ?></p>
+    <?php if ( ! empty( $last_consolidation ) ) : ?>
+    <p><?php echo esc_html( sprintf( __( 'Last consolidation: %s (deactivated %d, deleted %d)', 'foodbank-manager' ), isset( $last_consolidation['timestamp'] ) ? gmdate( 'Y-m-d H:i', (int) $last_consolidation['timestamp'] ) : __( 'never', 'foodbank-manager' ), (int) ( $last_consolidation['deactivated'] ?? 0 ), (int) ( $last_consolidation['deleted'] ?? 0 ) ) ); ?></p>
+    <?php endif; ?>
+    <?php if ( ! empty( $install_scan['duplicates'] ) ) : ?>
+    <table class="widefat">
+        <thead>
+            <tr><th><?php esc_html_e( 'Directory', 'foodbank-manager' ); ?></th><th><?php esc_html_e( 'Version', 'foodbank-manager' ); ?></th></tr>
+        </thead>
+        <tbody>
+        <?php foreach ( $install_scan['duplicates'] as $d ) : ?>
+            <tr><td><?php echo esc_html( $d['dir'] ); ?></td><td><?php echo esc_html( $d['version'] ); ?></td></tr>
         <?php endforeach; ?>
-    </ul>
-    <?php $action_url = add_query_arg( 'action', 'fbm_consolidate_plugins', admin_url( 'admin-post.php' ) ); ?>
-    <form method="post" action="<?php echo esc_url( $action_url ); ?>">
-        <?php wp_nonce_field( 'fbm_consolidate' ); ?>
-        <p><button type="submit" class="button"><?php esc_html_e( 'Consolidate duplicates', 'foodbank-manager' ); ?></button></p>
+        </tbody>
+    </table>
+    <?php $post_url = admin_url( 'admin-post.php' ); ?>
+    <form method="post" action="<?php echo esc_url( $post_url ); ?>">
+        <input type="hidden" name="action" value="fbm_consolidate_plugins" />
+        <?php wp_nonce_field( 'fbm_consolidate_plugins' ); ?>
+        <p><button type="submit" class="button button-primary"><?php esc_html_e( 'Consolidate (deactivate & delete)', 'foodbank-manager' ); ?></button></p>
+    </form>
+    <form method="post" action="<?php echo esc_url( $post_url ); ?>">
+        <input type="hidden" name="action" value="fbm_deactivate_duplicates" />
+        <?php wp_nonce_field( 'fbm_deactivate_duplicates' ); ?>
+        <p><button type="submit" class="button"><?php esc_html_e( 'Deactivate only', 'foodbank-manager' ); ?></button></p>
     </form>
     <?php endif; ?>
     <h2><?php esc_html_e( 'Quick Checks', 'foodbank-manager' ); ?></h2>
