@@ -14,13 +14,6 @@ if ( ! function_exists( 'current_user_can' ) ) {
         return true;
     }
 }
-if ( ! function_exists( 'check_admin_referer' ) ) {
-    function check_admin_referer( string $action, string $name = '_wpnonce' ): void {
-        if ( empty( $_POST[ $name ] ) ) {
-            throw new RuntimeException( 'missing nonce' );
-        }
-    }
-}
 if ( ! function_exists( 'wp_die' ) ) {
     function wp_die( $message = '' ) {
         throw new RuntimeException( (string) $message );
@@ -98,8 +91,9 @@ final class DatabasePageTest extends TestCase {
     }
 
     public function testExportRequiresNonce(): void {
+        fbm_test_trust_nonces(false);
         $_SERVER['REQUEST_METHOD'] = 'POST';
-        $_POST   = array( 'fbm_action' => 'export_entries' );
+        $_REQUEST = $_POST = array( 'fbm_action' => 'export_entries' );
         $this->expectException( RuntimeException::class );
         DatabasePage::route();
     }

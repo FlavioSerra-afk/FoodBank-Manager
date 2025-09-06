@@ -14,14 +14,6 @@ namespace {
             return is_array( $value ) ? array_map( 'wp_unslash', $value ) : stripslashes( (string) $value );
         }
     }
-    // capability handled via $GLOBALS['fbm_user_caps']
-    if ( ! function_exists( 'check_admin_referer' ) ) {
-        function check_admin_referer( string $action, string $name = '_fbm_nonce' ): void {
-            if ( empty( $_POST[ $name ] ) ) {
-                throw new \RuntimeException( 'missing nonce' );
-            }
-        }
-    }
     if ( ! function_exists( 'wp_die' ) ) {
         function wp_die( $message = '' ) {
             throw new \RuntimeException( (string) $message );
@@ -150,12 +142,12 @@ namespace {
         protected function setUp(): void {
             fbm_test_reset_globals();
             fbm_grant_for_page('fbm_diagnostics');
+            fbm_test_trust_nonces(true);
             self::$redirect   = '';
             self::$mail_result = true;
             \FoodBankManager\Auth\Roles::$installed = false;
             \FoodBankManager\Auth\Roles::$ensured  = false;
-            $_POST   = array();
-            $_SERVER = array();
+            $_POST = $_SERVER = $_REQUEST = array();
             global $fbm_test_options;
             $fbm_test_options = array(
                 'emails' => array(
@@ -167,9 +159,10 @@ namespace {
         }
 
         public function testSendTestEmailSuccess(): void {
+            fbm_test_set_request_nonce('fbm_diag_mail_test', '_fbm_nonce');
             $_SERVER['REQUEST_METHOD'] = 'POST';
-            $_POST['_fbm_nonce']       = 'n';
             $_POST['fbm_action']       = 'mail_test';
+            $_REQUEST                  = $_POST;
             try {
                 DiagnosticsPage::route();
             } catch ( \RuntimeException $e ) {
@@ -179,10 +172,11 @@ namespace {
         }
 
         public function testSendTestEmailFailure(): void {
+            fbm_test_set_request_nonce('fbm_diag_mail_test', '_fbm_nonce');
             $_SERVER['REQUEST_METHOD'] = 'POST';
-            $_POST['_fbm_nonce']       = 'n';
             $_POST['fbm_action']       = 'mail_test';
             self::$mail_result         = false;
+            $_REQUEST                  = $_POST;
             try {
                 DiagnosticsPage::route();
             } catch ( \RuntimeException $e ) {

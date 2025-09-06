@@ -10,14 +10,6 @@ if ( ! function_exists( 'wp_unslash' ) ) {
                 return is_array( $value ) ? array_map( 'wp_unslash', $value ) : stripslashes( (string) $value );
         }
 }
-// capability handled via $GLOBALS['fbm_user_caps']
-if ( ! function_exists( 'check_admin_referer' ) ) {
-        function check_admin_referer( string $action, string $name = '_wpnonce' ): void {
-                if ( empty( $_POST[ $name ] ) ) {
-                        throw new RuntimeException( 'missing nonce' );
-                }
-        }
-}
 if ( ! function_exists( 'wp_die' ) ) {
         function wp_die( $message = '' ) {
                 throw new RuntimeException( (string) $message );
@@ -57,14 +49,15 @@ final class ThemePageTest extends TestCase {
         parent::setUp();
         fbm_test_reset_globals();
         fbm_grant_for_page('fbm_theme');
+        fbm_test_trust_nonces(true);
         self::$redirect = '';
-        $_POST          = array();
-        $_SERVER        = array();
+        $_POST = $_SERVER = $_REQUEST = array();
         global $fbm_test_options;
         $fbm_test_options = array();
         }
 
         public function testMissingNonceBlocked(): void {
+                fbm_test_trust_nonces(false);
                 $_SERVER['REQUEST_METHOD'] = 'POST';
                 $this->expectException( RuntimeException::class );
                 ThemePage::route();
@@ -72,20 +65,23 @@ final class ThemePageTest extends TestCase {
 
         public function testUserWithoutCapBlocked(): void {
                 fbm_test_reset_globals();
+                fbm_test_trust_nonces(true);
                 $_SERVER['REQUEST_METHOD'] = 'POST';
-                $_POST['_wpnonce']         = 'nonce';
+                fbm_test_set_request_nonce('fbm_theme_save');
                 $this->expectException( RuntimeException::class );
                 ThemePage::route();
         }
 
         public function testSuccessfulSave(): void {
+                fbm_test_set_request_nonce('fbm_theme_save');
                 $_SERVER['REQUEST_METHOD'] = 'POST';
                 $_POST                     = array(
-                        '_wpnonce'  => 'nonce',
+                        '_wpnonce'  => $_POST['_wpnonce'],
                         'fbm_theme' => array(
                                 'primary_color' => '#445566',
                         ),
                 );
+                $_REQUEST = $_POST;
                 try {
                         ThemePage::route();
                 } catch ( RuntimeException $e ) {

@@ -9,14 +9,6 @@ namespace {
             return is_array($value) ? array_map('wp_unslash', $value) : stripslashes((string) $value);
         }
     }
-    if (!function_exists('check_admin_referer')) {
-        function check_admin_referer(string $action, string $name = '_wpnonce'): void {
-            $nonce = $_POST[$name] ?? $_GET[$name] ?? '';
-            if ($nonce === '') {
-                throw new \RuntimeException('nonce');
-            }
-        }
-    }
     if (!function_exists('wp_die')) {
         function wp_die($msg = ''): void { throw new \RuntimeException((string) $msg); }
     }
@@ -50,7 +42,8 @@ namespace {
 
         protected function setUp(): void {
             self::$caps = ['fb_manage_database' => true, 'fb_view_sensitive' => false];
-            $_GET = $_POST = $_SERVER = [];
+            fbm_test_trust_nonces(true);
+            $_GET = $_POST = $_SERVER = $_REQUEST = [];
             $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_database';
             $GLOBALS['fbm_caps'] = self::$caps;
             if (function_exists('header_remove')) {
@@ -64,9 +57,13 @@ namespace {
         }
 
         public function testViewMasksEmailWithoutCapability(): void {
-            $_GET['fbm_action'] = 'view_entry';
-            $_GET['entry_id'] = '1';
-            $_GET['_wpnonce'] = 'n';
+            fbm_test_set_request_nonce('fbm_entry_view');
+            $_GET = array(
+                'fbm_action' => 'view_entry',
+                'entry_id'   => '1',
+                '_wpnonce'   => $_POST['_wpnonce'],
+            );
+            $_REQUEST = $_GET;
             ob_start();
             EntryPage::handle();
             $html = ob_get_clean();
@@ -77,18 +74,24 @@ namespace {
 
         public function testUnmaskShowsPlaintextWithCapability(): void {
             self::$caps['fb_view_sensitive'] = true;
-            $_GET['fbm_action'] = 'view_entry';
-            $_GET['entry_id'] = '1';
-            $_GET['_wpnonce'] = 'n';
+            fbm_test_set_request_nonce('fbm_entry_view');
+            $_GET = array(
+                'fbm_action' => 'view_entry',
+                'entry_id'   => '1',
+                '_wpnonce'   => $_POST['_wpnonce'],
+            );
+            $_REQUEST = $_GET;
             ob_start();
             EntryPage::handle();
             $html = ob_get_clean();
             $this->assertStringContainsString('Unmask', $html);
             $this->assertStringContainsString('j***@example.com', $html);
 
+            fbm_test_set_request_nonce('fbm_entry_unmask', 'fbm_nonce');
             $_SERVER['REQUEST_METHOD'] = 'POST';
             $_POST['fbm_action'] = 'unmask_entry';
-            $_POST['fbm_nonce'] = 'n';
+            $_POST['fbm_nonce']  = $_POST['fbm_nonce'];
+            $_REQUEST            = array_merge($_GET, $_POST);
             ob_start();
             EntryPage::handle();
             $html = ob_get_clean();
@@ -97,8 +100,14 @@ namespace {
 
         public function testUnmaskDeniedWithoutNonce(): void {
             self::$caps['fb_view_sensitive'] = true;
-            $_GET['fbm_action'] = 'view_entry';
-            $_GET['entry_id'] = '1';
+            fbm_test_set_request_nonce('fbm_entry_view');
+            fbm_test_trust_nonces(false);
+            $_GET = array(
+                'fbm_action' => 'view_entry',
+                'entry_id'   => '1',
+                '_wpnonce'   => $_POST['_wpnonce'],
+            );
+            $_REQUEST = $_GET;
             $_SERVER['REQUEST_METHOD'] = 'POST';
             $_POST['fbm_action'] = 'unmask_entry';
             $this->expectException(\RuntimeException::class);
@@ -106,9 +115,14 @@ namespace {
         }
 
         public function testPdfDeniedWithoutNonce(): void {
-            $_GET['fbm_action'] = 'view_entry';
-            $_GET['entry_id'] = '1';
-            $_GET['_wpnonce'] = 'n';
+            fbm_test_set_request_nonce('fbm_entry_view');
+            fbm_test_trust_nonces(false);
+            $_GET = array(
+                'fbm_action' => 'view_entry',
+                'entry_id'   => '1',
+                '_wpnonce'   => $_POST['_wpnonce'],
+            );
+            $_REQUEST = $_GET;
             $_SERVER['REQUEST_METHOD'] = 'POST';
             $_POST['fbm_action'] = 'entry_pdf';
             $this->expectException(\RuntimeException::class);
@@ -116,12 +130,18 @@ namespace {
         }
 
         public function testPdfExportHandlesEngines(): void {
-            $_GET['fbm_action'] = 'view_entry';
-            $_GET['entry_id'] = '2';
-            $_GET['_wpnonce'] = 'n';
+            fbm_test_set_request_nonce('fbm_entry_view');
+            $_GET = array(
+                'fbm_action' => 'view_entry',
+                'entry_id'   => '2',
+                '_wpnonce'   => $_POST['_wpnonce'],
+            );
+            $_REQUEST = $_GET;
+            fbm_test_set_request_nonce('fbm_entry_pdf', 'fbm_nonce');
             $_SERVER['REQUEST_METHOD'] = 'POST';
             $_POST['fbm_action'] = 'entry_pdf';
-            $_POST['fbm_nonce'] = 'n';
+            $_POST['fbm_nonce']  = $_POST['fbm_nonce'];
+            $_REQUEST            = array_merge($_GET, $_POST);
             ob_start();
             EntryPage::handle();
             $body = ob_get_clean();
