@@ -39,3 +39,38 @@ flex-wrap:wrap;
 .fbm-dashboard .fbm-filter-row .fbm-download {
 margin-left:auto;
 }
+.fbm-dashboard .fbm-filter-row input:focus,
+.fbm-dashboard .fbm-filter-row select:focus,
+.fbm-dashboard .fbm-filter-row button:focus,
+.fbm-dashboard .fbm-filter-row a:focus {
+outline:2px solid var(--fbm-accent);
+outline-offset:2px;
+}
+.fbm-dashboard .fbm-results-count {
+margin-bottom:1rem;
+}
+.fbm-dashboard .fbm-empty {
+padding:2rem;
+color:#666;
+font-size:.875rem;
+}
+.fbm-dashboard .fbm-copy-shortcode {
+margin-bottom:1rem;
+font-size:.875rem;
+}
+.fbm-dashboard.fbm-loading .fbm-card-value,
+.fbm-dashboard.fbm-loading .fbm-card-label,
+.fbm-dashboard.fbm-loading .fbm-card-delta,
+.fbm-dashboard.fbm-loading .fbm-results-count,
+.fbm-dashboard.fbm-loading .fbm-sparkline,
+.fbm-dashboard.fbm-loading .fbm-dashboard-meta {
+color:transparent;
+background:linear-gradient(90deg,#eee,#ddd,#eee);
+background-size:200% 100%;
+animation:fbm-dash-skel 1.2s infinite;
+border-radius:4px;
+}
+@keyframes fbm-dash-skel {
+0%{background-position:-200% 0;}
+100%{background-position:200% 0;}
+}
