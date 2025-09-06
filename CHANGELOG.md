@@ -1,6 +1,7 @@
 # Changelog
 
 ## [Unreleased]
+- BB-RESOLVE: standardized phpunit.xml testsuite; Composer dev autoload loads single-source WP stubs; removed duplicate stub definitions.
 - AX: URL/Nonce stubs for tests (add_query_arg poly, admin_url/wp_nonce_url shims)
 - AY: Duplicate-install consolidate UX + logging in Diagnostics
 - AZ: WP stubs pack for tests

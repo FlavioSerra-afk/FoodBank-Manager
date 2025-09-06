@@ -15,7 +15,10 @@
     }
   },
   "autoload-dev": {
-    "classmap": ["tests/Support/"]
+    "files": [
+      "tests/Support/WPStubs.php",
+      "tests/Support/Rbac.php"
+    ]
   },
   "require-dev": {
     "cebe/markdown": "^1.2",
@@ -66,5 +69,5 @@
     },
     "sort-packages": true
   },
-    "version": "1.2.14"
+  "version": "1.2.14"
 }
