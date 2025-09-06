@@ -41,9 +41,27 @@ if ( ! function_exists( 'map_deep' ) ) {
                 return $callback( $value );
         }
 }
+if ( ! function_exists( 'sanitize_hex_color' ) ) {
+        function sanitize_hex_color( $color ) {
+                $color = is_string( $color ) ? trim( $color ) : '';
+                return preg_match( '/^#(?:[0-9a-fA-F]{3}){1,2}$/', $color ) ? strtolower( $color ) : '';
+        }
+}
 
 final class ThemePageTest extends TestCase {
         public static string $redirect = '';
+
+        private function loadTheme(): string {
+                if ( class_exists( 'FoodBankManager\\UITest\\ThemeReal', false ) ) {
+                        return 'FoodBankManager\\UITest\\ThemeReal';
+                }
+                $code = file_get_contents( __DIR__ . '/../../includes/UI/Theme.php' );
+                $code = preg_replace( '/^<\?php[^\n]*\n/', '', $code );
+                $code = str_replace( 'namespace FoodBankManager\\UI;', 'namespace FoodBankManager\\UITest;', $code );
+                $code = str_replace( 'class Theme', 'class ThemeReal', $code );
+                eval( $code );
+                return 'FoodBankManager\\UITest\\ThemeReal';
+        }
 
         protected function setUp(): void {
         parent::setUp();
@@ -54,6 +72,12 @@ final class ThemePageTest extends TestCase {
         $_POST = $_SERVER = $_REQUEST = array();
         global $fbm_test_options;
         $fbm_test_options = array();
+        if ( ! defined( 'FBM_PATH' ) ) {
+                define( 'FBM_PATH', dirname( __DIR__, 2 ) . '/' );
+        }
+        if ( ! defined( 'ABSPATH' ) ) {
+                define( 'ABSPATH', FBM_PATH );
+        }
         }
 
         public function testMissingNonceBlocked(): void {
@@ -89,5 +113,41 @@ final class ThemePageTest extends TestCase {
                 }
                 $this->assertSame( '#445566', Options::get( 'theme.primary_color' ) );
                 $this->assertStringContainsString( 'notice=saved', self::$redirect );
+        }
+
+        public function testInvalidTokensClampToDefaults(): void {
+                $class  = $this->loadTheme();
+                $tokens = $class::sanitize( array(
+                        'primary_color'    => 'bad',
+                        'density'          => 'nope',
+                        'font_family'      => 'foo',
+                        'dark_mode_default' => 'maybe',
+                ) );
+                $this->assertSame( '#3b82f6', $tokens['primary_color'] );
+                $this->assertSame( 'comfortable', $tokens['density'] );
+                $this->assertSame( 'system', $tokens['font'] );
+                $this->assertFalse( $tokens['dark_mode'] );
+        }
+
+        public function testCssVarsOutput(): void {
+                Options::update( array( 'theme' => array(
+                        'primary_color'    => '#112233',
+                        'density'          => 'compact',
+                        'font_family'      => 'roboto',
+                        'dark_mode_default' => true,
+                ) ) );
+                $class  = $this->loadTheme();
+                $tokens = $class::admin();
+                $css    = $class::to_css_vars( $tokens, '.fbm-admin' );
+                $this->assertStringContainsString( '.fbm-admin{', $css );
+                $this->assertStringContainsString( '--fbm-primary:#112233;', $css );
+                $this->assertStringContainsString( '--fbm-dark:1;', $css );
+        }
+
+        public function testPreviewMarkupScoped(): void {
+                $tpl = file_get_contents( FBM_PATH . 'templates/admin/theme.php' );
+                $this->assertStringContainsString( 'wrap fbm-admin', $tpl );
+                $this->assertStringContainsString( 'fbm-theme-preview', $tpl );
+                $this->assertStringNotContainsString( ':root', $tpl );
         }
 }
