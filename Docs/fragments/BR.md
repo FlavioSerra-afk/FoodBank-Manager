@@ -1,1 +1,0 @@
-- Harden SAR exports with streaming ZIP (HTML fallback) and masked data by default.

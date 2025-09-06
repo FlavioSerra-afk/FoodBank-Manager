@@ -1,6 +1,7 @@
 /vendor/*
 !/vendor/.gitkeep
 .phpunit.result.cache
+/dist/
 
 # Ignore common binaries
 *.png

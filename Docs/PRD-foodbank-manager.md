@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-06 (Wave AP)
+Docs-Revision: 2025-09-06 (v1.2.13 fragments merged)
 # FoodBank Manager — Product Requirements Document (PRD)
 
 **Repo file:** `Docs/PRD-foodbank-manager.md`  
@@ -74,7 +74,7 @@ Roles map to WordPress **capabilities** (granular; see §10 Security).
 - Email confirmations (applicant) and notifications (admin); HTML templates.
 - Data storage in custom tables with **field-level encryption**.
 - Back-end Database tab (list, view, edit, delete, export).
-- Front-end dashboard (authenticated) for **Viewer/Manager** with optional filters (event, type, policy-only) and an aggregated CSV export; **Manager** can mark attendance.
+- Front-end dashboard (authenticated) for **Viewer/Manager** with accessible filters, loading skeletons, and empty states; optional filters (event, type, policy-only) and an aggregated CSV export; **Manager** can mark attendance.
 - Diagnostics tab: email logs, resend, test email, repair caps, environment checks.
 - Exports: CSV/XLSX, single & bulk PDF.
 - GDPR: consent logs, SAR export, retention/anonymisation.
@@ -126,7 +126,7 @@ Roles map to WordPress **capabilities** (granular; see §10 Security).
   - **Capabilities:** viewing and exporting require `fb_manage_database`; sensitive fields unmasked only with `fb_view_sensitive`.
   - **Exports:** CSV export respects current filters, sanitizes filenames, starts with a UTF-8 BOM and translated headers, and masks sensitive fields by default.
 - **Entry view:** all fields, internal notes, status (new/review/approved/declined/archived), actions: Edit, PDF, CSV, Delete (with confirm).
-- **Email Templates:** WYSIWYG editor, variables list, preview, send test.
+- **Email Templates:** WYSIWYG editor, variables list, live preview with token helper, reset-to-defaults, a11y labels, send test.
 - **Settings:** branding, date/time, email defaults, spam protection keys, file policy, retention/anonymisation, encryption controls (see §10).
 - **Diagnostics:** email logs, resend, test email, repair capabilities, environment checks (PHP/WP version, cron, KEK, mail transport).
 - **Permissions:** map capabilities to roles and set per-user overrides.

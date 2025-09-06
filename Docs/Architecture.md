@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-06 (Wave AP)
+Docs-Revision: 2025-09-06 (v1.2.13 fragments merged)
 # FoodBank Manager — Architecture
 
 ## Overview
@@ -62,6 +62,19 @@ Admin pages share a `FBM\Core\RenderOnce` registry. `Admin\Menu` wraps each subm
 - **Permissions:** central caps list, Administrator guarantee, role mapping and per-user overrides (`fbm_user_caps`) with JSON export/import (Dry Run) and reset tooling.
 - **AttendanceRepo:** database access layer for attendance; all queries use `$wpdb->prepare()` with strict placeholders, mask PII by default, and have unit tests covering check-in, no-show, void/unvoid, and timeline SQL injection edges.
 - **Theme system:** global CSS variables for primary colour, density, font, dark mode default and optional custom CSS (sanitised) applied across admin and front-end.
+
+### Design tokens
+
+The Design & Theme page exposes four tokens used throughout the admin UI:
+
+- `primary_color` — hex colour value.
+- `density` — `compact` or `comfortable` spacing.
+- `font` — `system`, `inter` or `roboto`.
+- `dark_mode` — default mode toggle.
+
+Tokens output to the `.fbm-admin` namespace as CSS variables and can be
+previewed live, including a dark-mode switch that does not persist until
+settings are saved.
 
 ## Data model (tables)
 - `wp_fbm_applications`: `id`, `form_id`, `status`, `data_json`, `pii_encrypted_blob`, consent fields, timestamps.
