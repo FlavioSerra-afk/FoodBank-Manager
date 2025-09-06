@@ -48,11 +48,9 @@ public static function enqueue_admin(): void {
 	 * @return array{primary_color:string,density:string,font:string,dark_mode:bool}
 	 */
 	public static function admin(): array {
-	    $opt = Options::get( 'theme', array() );
-	    if ( ! is_array( $opt ) ) {
-	        $opt = array();
-	    }
-	    return self::sanitize( $opt );
+            $all = Options::all();
+            $opt = $all['theme'] ?? array();
+            return self::sanitize( is_array( $opt ) ? $opt : array() );
 	}
 
 	/**
@@ -64,26 +62,27 @@ public static function enqueue_admin(): void {
 	public static function sanitize( array $raw ): array {
 	    $defaults = self::defaults();
 
-	    $color = isset( $raw['primary_color'] ) ? sanitize_hex_color( (string) $raw['primary_color'] ) : '';
-	    if ( ! is_string( $color ) || '' === $color ) {
-	        $color = $defaults['primary_color'];
-	    }
+            $color_raw = $raw['primary_color'] ?? $raw['primary'] ?? '';
+            $color     = sanitize_hex_color( (string) $color_raw );
+            if ( ! is_string( $color ) || '' === $color ) {
+                $color = $defaults['primary_color'];
+            }
 
-	    $density = isset( $raw['density'] ) ? sanitize_text_field( (string) $raw['density'] ) : '';
-	    if ( ! in_array( $density, array( 'compact', 'comfortable' ), true ) ) {
-	        $density = $defaults['density'];
-	    }
+            $density_raw = $raw['density'] ?? '';
+            $density     = sanitize_key( (string) $density_raw );
+            if ( ! in_array( $density, array( 'compact', 'comfortable' ), true ) ) {
+                $density = $defaults['density'];
+            }
 
-	    $font = isset( $raw['font_family'] ) ? sanitize_text_field( (string) $raw['font_family'] ) : '';
-	    if ( ! in_array( $font, array( 'system', 'inter', 'roboto' ), true ) ) {
-	        $font = $defaults['font'];
-	    }
+            $font_raw = $raw['font_family'] ?? $raw['font'] ?? '';
+            $font     = sanitize_key( (string) $font_raw );
+            if ( ! in_array( $font, array( 'system', 'inter', 'roboto' ), true ) ) {
+                $font = $defaults['font'];
+            }
 
-$dark = isset( $raw['dark_mode_default'] ) && in_array(
-(string) $raw['dark_mode_default'],
-array( '1', 'true', 'on' ),
-true
-);
+            $dark_raw = $raw['dark_mode_default'] ?? $raw['dark_mode'] ?? null;
+            $dark_val = filter_var( $dark_raw, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE );
+            $dark     = null === $dark_val ? $defaults['dark_mode'] : (bool) $dark_val;
 
 	    return array(
 	        'primary_color' => $color,
@@ -101,13 +100,18 @@ true
 	 * @return string
 	 */
 	public static function to_css_vars( array $tokens, string $selector ): string {
-	    $lines = array(
-	        '--fbm-primary:' . $tokens['primary_color'] . ';',
-	        '--fbm-density:' . $tokens['density'] . ';',
-	        '--fbm-font:' . self::font_css( $tokens['font'] ) . ';',
-	        '--fbm-dark:' . ( $tokens['dark_mode'] ? '1' : '0' ) . ';',
-	    );
-	    return $selector . '{' . implode( '', $lines ) . '}';
+            $tokens = self::sanitize( $tokens );
+            $vars   = array(
+                '--fbm-primary' => $tokens['primary_color'],
+                '--fbm-density' => $tokens['density'],
+                '--fbm-font'    => self::font_css( $tokens['font'] ),
+                '--fbm-dark'    => $tokens['dark_mode'] ? '1' : '0',
+            );
+            $css = '';
+            foreach ( $vars as $k => $v ) {
+                $css .= $k . ':' . $v . ';';
+            }
+            return $selector . '{' . $css . '}';
 	}
 
 	/**
