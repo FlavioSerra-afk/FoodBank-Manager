@@ -98,7 +98,8 @@ class DiagnosticsPage {
                 $dupes    = array_filter( $counts, static fn( $c ) => $c > 1 );
                 $render_ok = empty( $dupes );
 
-                $dup_plugins = Install::duplicates();
+                $dup_plugins        = Install::duplicates();
+                $last_consolidation = Install::log();
                 /* @psalm-suppress UnresolvableInclude */
                 require FBM_PATH . 'templates/admin/diagnostics.php';
         }

@@ -10,7 +10,6 @@ final class Notices {
     private static bool $missingKek = false;
     private static bool $missingSodium = false;
     private static int $renderCount = 0;
-    private static ?string $dupMessage = null;
 
     public static function boot(): void {}
 
@@ -23,8 +22,8 @@ final class Notices {
         $screen = function_exists('get_current_screen') ? get_current_screen() : null;
         $id     = $screen ? (string) $screen->id : '';
         $is_fbm = ($id === 'toplevel_page_fbm') || str_starts_with($id, 'foodbank_page_fbm_');
-
-        if (!$is_fbm) {
+        $show   = $is_fbm || isset($_GET['fbm_consolidated']);
+        if (!$show) {
             return;
         }
 
@@ -32,17 +31,24 @@ final class Notices {
         $printed = true;
 
         $dups = \FoodBankManager\Core\Install::duplicates();
-        if ($dups) {
+        if ($dups && $is_fbm) {
             $action = 'fbm_consolidate_plugins';
+            $url    = add_query_arg('action', $action, admin_url('admin-post.php'));
             echo '<div class="notice notice-warning"><p>' . esc_html__('Multiple FoodBank Manager copies detected.', 'foodbank-manager') . '</p>';
-            echo '<form method="post" action=""><input type="hidden" name="fbm_action" value="' . esc_attr($action) . '" />';
-            wp_nonce_field($action);
+            echo '<form method="post" action="' . esc_url($url) . '">';
+            wp_nonce_field('fbm_consolidate');
             echo '<p><button class="button">' . esc_html__('Consolidate', 'foodbank-manager') . '</button></p></form></div>';
         }
 
-        if (self::$dupMessage) {
-            echo '<div class="notice notice-success"><p>' . esc_html(self::$dupMessage) . '</p></div>';
-            self::$dupMessage = null;
+        if (isset($_GET['fbm_consolidated'])) {
+            $deleted = (int)($_GET['deleted'] ?? 0);
+            $msg     = $deleted > 0
+                ? (current_user_can('delete_plugins')
+                    ? __('Duplicate installs consolidated.', 'foodbank-manager')
+                    : __('Duplicates deactivated. Go to Plugins to delete.', 'foodbank-manager'))
+                : __('No duplicate installs found.', 'foodbank-manager');
+            $class = $deleted > 0 ? 'notice-success' : 'notice-info';
+            echo '<div class="notice ' . esc_attr($class) . '"><p>' . esc_html($msg) . '</p></div>';
         }
 
         if (self::$missingSodium) {
@@ -148,26 +154,20 @@ final class Notices {
         }
     }
 
-    public static function maybe_handle_consolidate_plugins(): void {
-        if (empty($_POST['fbm_action'])) {
-            return;
-        }
-        $action = sanitize_key((string) $_POST['fbm_action']);
-        if ($action !== 'fbm_consolidate_plugins') {
-            return;
-        }
-        check_admin_referer($action);
+    public static function handle_consolidate_plugins(): void {
+        check_admin_referer('fbm_consolidate');
         if (!current_user_can('manage_options')) {
-            return;
+            wp_die(esc_html__('Insufficient permissions', 'foodbank-manager'));
         }
         $count = \FoodBankManager\Core\Install::consolidate();
-        if ($count > 0) {
-            self::$dupMessage = current_user_can('delete_plugins')
-                ? __('Duplicate installs consolidated.', 'foodbank-manager')
-                : __('Duplicates deactivated. Go to Plugins to delete.', 'foodbank-manager');
-        } else {
-            self::$dupMessage = __('No duplicate installs found.', 'foodbank-manager');
-        }
+        $url = add_query_arg(
+            [
+                'fbm_consolidated' => '1',
+                'deleted' => (string) $count,
+            ],
+            admin_url('plugins.php')
+        );
+        wp_redirect($url);
     }
 
     /**

@@ -23,7 +23,7 @@ class Hooks {
                 if ( is_admin() ) {
                         add_action( 'admin_init', array( Install::class, 'detect_duplicates' ) );
                         add_action( 'admin_init', array( Notices::class, 'handleCapsRepair' ) );
-                        add_action( 'admin_init', array( Notices::class, 'maybe_handle_consolidate_plugins' ) );
+                        add_action( 'admin_post_fbm_consolidate_plugins', array( Notices::class, 'handle_consolidate_plugins' ) );
                         add_action( 'admin_notices', array( Notices::class, 'render' ), 10 );
                         add_action( 'admin_notices', array( Notices::class, 'render_caps_fix_notice' ), 5 );
                 }

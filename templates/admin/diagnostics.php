@@ -71,15 +71,16 @@ $rows       = $rows ?? array();
     <h2><?php esc_html_e( 'Install Health', 'foodbank-manager' ); ?></h2>
     <p><?php esc_html_e( 'Canonical slug: foodbank-manager/foodbank-manager.php', 'foodbank-manager' ); ?></p>
     <p><?php echo esc_html( sprintf( __( 'Other copies: %d', 'foodbank-manager' ), count( $dup_plugins ) ) ); ?></p>
+    <p><?php echo esc_html( sprintf( __( 'Last consolidation: %s (%d removed)', 'foodbank-manager' ), $last_consolidation['ts'] ? gmdate( 'Y-m-d H:i', $last_consolidation['ts'] ) : __( 'never', 'foodbank-manager' ), $last_consolidation['count'] ) ); ?></p>
     <?php if ( ! empty( $dup_plugins ) ) : ?>
     <ul>
         <?php foreach ( $dup_plugins as $b ) : ?>
         <li><?php echo esc_html( $b ); ?></li>
         <?php endforeach; ?>
     </ul>
-    <form method="post" action="">
-        <input type="hidden" name="fbm_action" value="fbm_consolidate_plugins" />
-        <?php wp_nonce_field( 'fbm_consolidate_plugins' ); ?>
+    <?php $action_url = add_query_arg( 'action', 'fbm_consolidate_plugins', admin_url( 'admin-post.php' ) ); ?>
+    <form method="post" action="<?php echo esc_url( $action_url ); ?>">
+        <?php wp_nonce_field( 'fbm_consolidate' ); ?>
         <p><button type="submit" class="button"><?php esc_html_e( 'Consolidate duplicates', 'foodbank-manager' ); ?></button></p>
     </form>
     <?php endif; ?>
