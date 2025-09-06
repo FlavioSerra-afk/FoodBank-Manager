@@ -26,13 +26,21 @@ class Templates {
 		'appointment_time',
 	);
 
+	private const TOKEN_DESCRIPTIONS = array(
+		'first_name'       => 'Recipient first name',
+		'last_name'        => 'Recipient last name',
+		'application_id'   => 'Application ID',
+		'site_name'        => 'Site name',
+		'appointment_time' => 'Appointment date/time',
+	);
+
 		/**
 		 * Get allowed token placeholders.
 		 *
 		 * @return string[]
 		 */
 	public static function tokens(): array {
-			return self::TOKEN_WHITELIST;
+					return self::TOKEN_DESCRIPTIONS;
 	}
 
 	/**
@@ -142,11 +150,23 @@ class Templates {
 	private static function replace_tokens( string $text, array $vars, bool $escape ): string {
 		foreach ( self::TOKEN_WHITELIST as $token ) {
 			if ( ! array_key_exists( $token, $vars ) ) {
-				continue;
+					continue;
 			}
-			$value = $escape ? esc_html( (string) $vars[ $token ] ) : (string) $vars[ $token ];
-			$text  = str_replace( '{' . $token . '}', $value, $text );
+				$value = $escape ? esc_html( (string) $vars[ $token ] ) : (string) $vars[ $token ];
+				$text  = str_replace( '{' . $token . '}', $value, $text );
 		}
-		return $text;
+			return $text;
+	}
+
+		/**
+		 * Public token replace helper.
+		 *
+		 * @param string               $text   Text with tokens.
+		 * @param array<string,string> $vars   Variables.
+		 * @param bool                 $escape Whether to escape values.
+		 * @return string
+		 */
+	public static function apply_tokens( string $text, array $vars, bool $escape = true ): string {
+			return self::replace_tokens( $text, $vars, $escape );
 	}
 }

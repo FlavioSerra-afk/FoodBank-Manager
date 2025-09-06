@@ -45,31 +45,34 @@ final class EmailsPage {
 		}
 				unset( $tpl );
 
-				$preview = array(
-					'subject'   => '',
-					'body_html' => '',
-				);
+								$preview = array(
+									'subject'   => '',
+									'body_html' => '',
+								);
 
-				$method = strtoupper( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ?? '' ) ) );
-				if ( 'POST' === $method ) {
-						$action = sanitize_key( wp_unslash( $_POST['fbm_action'] ?? '' ) );
-					if ( in_array( $action, array( 'emails_save', 'emails_preview', 'emails_reset' ), true ) ) {
-							check_admin_referer( 'fbm_' . $action, '_fbm_nonce' );
-						if ( 'emails_save' === $action ) {
-								self::handle_save( $templates );
-						} elseif ( 'emails_preview' === $action ) {
-									$preview = self::handle_preview( $templates );
-						} elseif ( 'emails_reset' === $action ) {
-								self::handle_reset( $templates );
-						}
-					}
-				}
+								$method = strtoupper( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ?? '' ) ) );
+								if ( 'POST' === $method ) {
+												$action = sanitize_key( wp_unslash( $_POST['fbm_action'] ?? '' ) );
+									if ( in_array( $action, array( 'emails_save', 'emails_preview', 'emails_reset' ), true ) ) {
+													check_admin_referer( 'fbm_' . $action, '_fbm_nonce' );
+										if ( 'emails_save' === $action ) {
+														self::handle_save( $templates );
+										} elseif ( 'emails_preview' === $action ) {
+																$preview = self::handle_preview( $templates );
+											if ( isset( $_POST['fbm_ajax'] ) ) {
+												\wp_send_json( $preview );
+											}
+										} elseif ( 'emails_reset' === $action ) {
+														self::handle_reset( $templates );
+										}
+									}
+								}
 
-				$current = isset( $_GET['tpl'] ) ? sanitize_key( (string) $_GET['tpl'] ) : '';
+								$current = isset( $_GET['tpl'] ) ? sanitize_key( (string) $_GET['tpl'] ) : '';
 
-				$allowed_tokens = Templates::tokens();
+								$allowed_tokens = Templates::tokens();
 
-				require FBM_PATH . 'templates/admin/emails.php';
+								require FBM_PATH . 'templates/admin/emails.php';
 	}
 
 		/**
@@ -158,17 +161,33 @@ final class EmailsPage {
 					wp_die( esc_html__( 'Invalid template.', 'foodbank-manager' ) );
 		}
 
-			$vars = array(
-				'first_name'       => '***',
-				'last_name'        => '***',
-				'application_id'   => '***',
-				'site_name'        => get_bloginfo( 'name' ),
-				'appointment_time' => '***',
-			);
+		$subject   = isset( $_POST['subject'] )
+		? sanitize_text_field( wp_unslash( (string) $_POST['subject'] ) )
+		: ( $templates[ $tpl ]['subject'] ?? '' );
+		$body_html = isset( $_POST['body_html'] )
+		? wp_kses_post( wp_unslash( (string) $_POST['body_html'] ) )
+		: ( $templates[ $tpl ]['body_html'] ?? '' );
+
+				$vars = array(
+					'first_name'       => '***',
+					'last_name'        => '***',
+					'application_id'   => '***',
+					'site_name'        => get_bloginfo( 'name' ),
+					'appointment_time' => '***',
+				);
+
+				$subject = Templates::apply_tokens( $subject, $vars, false );
+				$subject = wp_strip_all_tags( $subject );
+				if ( strlen( $subject ) > 255 ) {
+						$subject = mb_substr( $subject, 0, 255 );
+				}
+
+				$body_html = Templates::apply_tokens( $body_html, $vars, true );
+				$body_html = wp_kses_post( $body_html );
 
 				return array(
-					'subject'   => Templates::render_subject( $tpl, $vars ),
-					'body_html' => wp_kses_post( Templates::render_body( $tpl, $vars ) ),
+					'subject'   => $subject,
+					'body_html' => $body_html,
 				);
 	}
 }

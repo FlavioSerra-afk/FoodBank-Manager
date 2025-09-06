@@ -60,6 +60,13 @@ if ( ! function_exists( 'get_bloginfo' ) ) {
     }
 }
 
+if ( ! function_exists( 'wp_send_json' ) ) {
+    function wp_send_json( $response ) {
+        echo json_encode( $response );
+        throw new RuntimeException( 'json' );
+    }
+}
+
 final class EmailsPageTest extends TestCase {
     public static string $redirect = '';
 
@@ -150,8 +157,14 @@ final class EmailsPageTest extends TestCase {
             'fbm_action' => 'emails_preview',
             'tpl'        => 'applicant_confirmation',
         );
+        unset( $_REQUEST['_fbm_nonce'] );
+        $GLOBALS['fbm_test_trust_nonces'] = false;
         $this->expectException( RuntimeException::class );
-        EmailsPage::route();
+        try {
+            EmailsPage::route();
+        } finally {
+            $GLOBALS['fbm_test_trust_nonces'] = true;
+        }
     }
 
     public function testPreviewRequiresCapability(): void {
@@ -166,20 +179,28 @@ final class EmailsPageTest extends TestCase {
         EmailsPage::route();
     }
 
-    public function testPreviewRendersAndFilters(): void {
+    public function testPreviewSubstitutesTokens(): void {
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_POST = array(
             'fbm_action' => 'emails_preview',
             '_fbm_nonce' => 'nonce',
             'tpl'        => 'applicant_confirmation',
+            'subject'    => 'Hi {first_name} {unknown}',
+            'body_html'  => '<p>Hello {first_name} {unknown}</p><script>bad</script>',
+            'fbm_ajax'   => '1',
         );
-        $_GET['tpl'] = 'applicant_confirmation';
         ob_start();
-        EmailsPage::route();
-        $html = (string) ob_get_clean();
-        $this->assertStringContainsString( 'Preview', $html );
-        $this->assertStringContainsString( '***', $html );
-        $this->assertStringNotContainsString( '<script', $html );
+        try {
+            EmailsPage::route();
+        } catch ( RuntimeException $e ) {
+            $this->assertSame( 'json', $e->getMessage() );
+        }
+        $out = (string) ob_get_clean();
+        $data = json_decode( $out, true );
+        $this->assertSame( 'Hi *** {unknown}', $data['subject'] );
+        $this->assertStringContainsString( '***', $data['body_html'] );
+        $this->assertStringContainsString( '{unknown}', $data['body_html'] );
+        $this->assertStringNotContainsString( '<script', $data['body_html'] );
     }
 
     public function testResetMissingNonceBlocked(): void {
@@ -228,6 +249,13 @@ final class EmailsPageTest extends TestCase {
         $this->assertSame( '', $data['body_html'] );
         $this->assertStringContainsString( 'notice=reset', self::$redirect );
         $this->assertStringContainsString( 'tpl=applicant_confirmation', self::$redirect );
+
+        $_SERVER = array();
+        $_GET['tpl'] = 'applicant_confirmation';
+        ob_start();
+        EmailsPage::route();
+        $html = (string) ob_get_clean();
+        $this->assertStringContainsString( 'We received your application', $html );
     }
 }
 }
