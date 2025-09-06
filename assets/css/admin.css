@@ -10,4 +10,7 @@
 .fbm-admin .fbm-badge{display:inline-block;padding:.2rem .5rem;border-radius:.25rem;font-weight:600}
 .fbm-admin .fbm-badge--ok{background:#e6ffea;border:1px solid #2ecc71;color:#1e7e34}
 .fbm-admin .fbm-badge--warn{background:#fff9e6;border:1px solid #f39c12;color:#b9770e}
+.fbm-admin .fbm-preview{border:1px solid #ccd0d4;padding:1em;background:#fff}
+.fbm-admin .fbm-token-list{list-style:disc;margin-left:1.5em}
+.fbm-admin .fbm-token-list code{margin-right:.5em}
 

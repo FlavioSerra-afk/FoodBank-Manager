@@ -1,0 +1,1 @@
+- Admin email templates now include live preview with token helper and reset-to-defaults.
