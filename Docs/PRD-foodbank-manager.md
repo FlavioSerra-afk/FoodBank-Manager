@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-06 (Wave AN)
+Docs-Revision: 2025-09-06 (v1.2.12 trace comments)
 # FoodBank Manager — Product Requirements Document (PRD)
 
 **Repo file:** `Docs/PRD-foodbank-manager.md`  
@@ -25,6 +25,11 @@ FoodBank Manager is a secure, mobile-first WordPress plugin to:
 - Administrators always see a FoodBank parent menu (falls back to `manage_options`), while subpages remain FBM-capability gated; Diagnostics includes a nonce-protected **Repair caps** button.
 - Diagnostics records the last successful boot timestamp (`fbm_boot_ok`) for display on the Diagnostics screen.
 - Ensure compliance with UK GDPR and follow best-practice WordPress security.
+
+### Trace Comments (RenderOnce)
+- Comments: `<!-- fbm-render {key} pass={n} -->` (one line).
+- Emitted right after `.wrap.fbm-admin` opens on admin pages.
+- Diagnostics badge shows "RenderOnce OK" unless duplicate passes are detected.
 
 The plugin must reproduce the current Food Bank form at `https://pcclondon.uk/food-bank/` exactly as a starter preset, and allow building additional custom forms with full control over fields, layout, logic, and data handling.
 

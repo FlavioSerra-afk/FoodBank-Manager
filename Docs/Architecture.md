@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-06 (Wave AN)
+Docs-Revision: 2025-09-06 (v1.2.12 trace comments)
 # FoodBank Manager — Architecture
 
 ## Overview
@@ -47,6 +47,10 @@ Notices and assets check `$screen->id` and run only on `toplevel_page_fbm` or `f
 
 ## Render guard
 Admin pages share a `FBM\Core\RenderOnce` registry. `Admin\Menu` wraps each submenu callback with `render_once()` so a screen's template is included only once per request. No page may output UI outside its guarded callback; duplicate paths are ignored.
+
+### Trace Comments (RenderOnce)
+- `<!-- fbm-render {key} pass={n} -->` emitted after `.wrap.fbm-admin`.
+- Diagnostics badge flips to "RenderOnce duplicates" when any key exceeds one.
 
 ## Components
  - **Admin Pages:** Dashboard (`fb_manage_dashboard`), Attendance (`fb_manage_attendance`), Database (`fb_manage_database`), Forms (`fb_manage_forms`) with a read-only presets library, Shortcodes builder with preview (`fb_manage_forms`), Email Templates (`fb_manage_emails`), Settings (`fb_manage_settings`), Diagnostics (`fb_manage_diagnostics` – environment checks, test email, repair caps), Permissions (`fb_manage_permissions`), Design & Theme (`fb_manage_theme`).
