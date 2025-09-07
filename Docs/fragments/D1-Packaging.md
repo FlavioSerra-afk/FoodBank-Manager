@@ -1,1 +1,1 @@
-Packaging guard enforces a single `foodbank-manager/` root and bundles `foodbank-manager.php`; build fails if missing.
+Packaging guard asserts the first ZIP entry is `foodbank-manager/` and bundles `foodbank-manager.php`; build fails if either is missing.
