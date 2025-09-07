@@ -52,7 +52,7 @@ class LogRepo {
 		 * @param array<int> $ids IDs to anonymise.
 		 * @return int Rows affected.
 		 */
-	public static function anonymise_batch( array $ids ): int {
+        public static function anonymise_batch( array $ids ): int {
 			global $wpdb;
 			$ids = array_values( array_filter( array_map( 'absint', $ids ) ) );
 		if ( empty( $ids ) ) {
@@ -64,6 +64,35 @@ class LogRepo {
 								. implode( ',', array_fill( 0, count( $ids ), '%d' ) ) . ')',
 						$ids
 					)
-				);
-	}
+                                );
+        }
+
+        /**
+         * Insert a log entry.
+         *
+         * @param int    $application_id Application ID.
+         * @param string $to_email       Recipient email.
+         * @param string $subject        Subject line.
+         * @param string $body_hash      Body hash.
+         * @param string $status         Status.
+         * @param string $provider_msg   Provider message.
+         * @return bool
+         */
+        public static function insert( int $application_id, string $to_email, string $subject, string $body_hash, string $status, string $provider_msg = '' ): bool {
+                global $wpdb;
+                return (bool) $wpdb->insert(
+                        $wpdb->prefix . 'fb_mail_log',
+                        array(
+                                'application_id' => $application_id,
+                                'to_email'       => $to_email,
+                                'subject'        => $subject,
+                                'headers'        => '',
+                                'body_hash'      => $body_hash,
+                                'status'         => $status,
+                                'provider_msg'   => $provider_msg,
+                                'timestamp'      => gmdate( 'Y-m-d H:i:s' ),
+                        ),
+                        array( '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s' )
+                );
+        }
 }
