@@ -38,6 +38,7 @@ final class SettingsPageTest extends TestCase {
         SettingsPage::route();
     }
 
+    /** @runInSeparateProcess */
     public function testSuccessfulSaveSanitizes(): void {
         fbm_test_set_request_nonce('fbm_branding_save', '_fbm_nonce');
         $_SERVER['REQUEST_METHOD'] = 'POST';
@@ -59,7 +60,7 @@ final class SettingsPageTest extends TestCase {
         $this->assertSame( 'Test', Options::get( 'branding.site_name' ) );
         $this->assertSame( 'https://example.com/logo.png', Options::get( 'branding.logo_url' ) );
         $this->assertSame( 'default', Options::get( 'branding.color' ) );
-        $this->assertStringContainsString( 'notice=saved', (string) $GLOBALS['__last_redirect'] );
-        $this->assertStringContainsString( 'tab=branding', (string) $GLOBALS['__last_redirect'] );
+        $this->assertStringContainsString( 'notice=saved', self::$redirect );
+        $this->assertStringContainsString( 'tab=branding', self::$redirect );
     }
 }

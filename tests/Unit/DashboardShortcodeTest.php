@@ -1,89 +1,89 @@
 <?php
 declare(strict_types=1);
 
-namespace FoodBankManagerTest;
+namespace {
+    if (!function_exists('esc_html_e')) {
+        function esc_html_e(string $text, string $domain = 'default'): void { echo $text; }
+    }
+    if (!function_exists('number_format_i18n')) {
+        function number_format_i18n($n): string { return (string) $n; }
+    }
+    if (!function_exists('current_time')) {
+        function current_time($type, $gmt = false) { return '2025-09-04 00:00:00'; }
+    }
+    if (!function_exists('wp_enqueue_style')) {
+        function wp_enqueue_style($handle): void {}
+    }
+    if (!function_exists('get_current_user_id')) {
+        function get_current_user_id(): int { return 1; }
+    }
+}
+
+namespace FoodBankManagerTest {
 
 use PHPUnit\Framework\TestCase;
 
 final class DashboardShortcodeTest extends TestCase {
+    protected function setUp(): void {
+        parent::setUp();
+        \fbm_test_reset_globals();
+        if (!defined('FBM_PATH')) {
+            define('FBM_PATH', dirname(__DIR__, 2) . '/');
+        }
+    }
+
     public function testSanitizePeriod(): void {
-        require_once __DIR__ . '/../../includes/Shortcodes/Dashboard.php';
-        $this->assertSame( '7d', \FoodBankManager\Shortcodes\Dashboard::sanitize_period( 'bad' ) );
+        require_once FBM_PATH . 'includes/Shortcodes/Dashboard.php';
+        $this->assertSame('7d', \FoodBankManager\Shortcodes\Dashboard::sanitize_period('bad'));
     }
 
     public function testSanitizeTypeAndEvent(): void {
-        require_once __DIR__ . '/../../includes/Shortcodes/Dashboard.php';
-        $this->assertSame( 'all', \FoodBankManager\Shortcodes\Dashboard::sanitize_type( 'bogus' ) );
-        $this->assertSame( 'delivery', \FoodBankManager\Shortcodes\Dashboard::sanitize_type( 'delivery' ) );
-        $this->assertNull( \FoodBankManager\Shortcodes\Dashboard::sanitize_event( '' ) );
-        $this->assertSame( 'abc', \FoodBankManager\Shortcodes\Dashboard::sanitize_event( 'abc' ) );
+        require_once FBM_PATH . 'includes/Shortcodes/Dashboard.php';
+        $this->assertSame('all', \FoodBankManager\Shortcodes\Dashboard::sanitize_type('bogus'));
+        $this->assertSame('delivery', \FoodBankManager\Shortcodes\Dashboard::sanitize_type('delivery'));
+        $this->assertNull(\FoodBankManager\Shortcodes\Dashboard::sanitize_event(''));
+        $this->assertSame('abc', \FoodBankManager\Shortcodes\Dashboard::sanitize_event('abc'));
     }
 
     /** @runInSeparateProcess */
     public function testUnauthorizedGated(): void {
-        $GLOBALS['fbm_can_dashboard'] = false;
-        if ( ! function_exists( 'esc_html__' ) ) {
-            function esc_html__( $t, $d = null ) { return $t; }
-        }
-        $GLOBALS['fbm_test_current_user_id'] = 0;
-        require_once __DIR__ . '/../../includes/Shortcodes/Dashboard.php';
-        $out = \FoodBankManager\Shortcodes\Dashboard::render();
-        $this->assertStringContainsString( 'You do not have permission', $out );
+        require_once FBM_PATH . 'includes/Shortcodes/Dashboard.php';
+        $html = \FoodBankManager\Shortcodes\Dashboard::render();
+        $expected = '<div class="fbm-no-permission">You do not have permission to view the dashboard.</div>';
+        $this->assertSame($expected, $html);
     }
 
     /** @runInSeparateProcess */
     public function testSafeHtmlOutput(): void {
-        $GLOBALS['fbm_can_dashboard'] = true;
-        if ( ! function_exists( 'esc_html__' ) ) {
-            function esc_html__( $t, $d = null ) { return $t; }
-        }
-        if ( ! function_exists( 'esc_html_e' ) ) {
-            function esc_html_e( $t, $d = null ) { echo $t; }
-        }
-        if ( ! function_exists( 'esc_url' ) ) {
-            function esc_url( $u ) { return $u; }
-        }
-        if ( ! function_exists( 'selected' ) ) {
-            function selected( $a, $b ) {}
-        }
-        if ( ! function_exists( 'checked' ) ) {
-            function checked( $a, $b = true ) {}
-        }
-        if ( ! function_exists( 'sanitize_key' ) ) {
-            function sanitize_key( $k ) { return $k; }
-        }
-        if ( ! function_exists( 'shortcode_atts' ) ) {
-            function shortcode_atts( $pairs, $atts, $shortcode = '' ) { return array_merge( $pairs, $atts ); }
-        }
-        $GLOBALS['fbm_test_current_user_id'] = 1;
-        if ( ! function_exists( 'current_time' ) ) {
-            function current_time( $t, $g = false ) { return '2025-09-04 00:00:00'; }
-        }
-        if ( ! function_exists( 'wp_enqueue_style' ) ) {
-            function wp_enqueue_style( $h ) {}
-        }
-        if ( ! function_exists( 'wp_nonce_url' ) ) {
-            function wp_nonce_url( $u ) { return $u; }
-        }
-        if ( ! function_exists( 'admin_url' ) ) {
-            function admin_url( $u ) { return $u; }
-        }
-        if ( ! function_exists( 'add_query_arg' ) ) {
-            function add_query_arg( $a ) { return ''; }
-        }
-        if ( ! function_exists( 'number_format_i18n' ) ) {
-            function number_format_i18n( $n ) { return (string) $n; }
-        }
-        // Stub Theme and AttendanceRepo
-        if (! class_exists('FoodBankManager\\UI\\Theme')) {
+        \fbm_grant_caps(['fb_manage_dashboard']);
+        if (!class_exists('FoodBankManager\\UI\\Theme', false)) {
             eval('namespace FoodBankManager\\UI; class Theme { public static function enqueue_front(): void {} }');
         }
-        if (! class_exists('FoodBankManager\\Attendance\\AttendanceRepo')) {
-            eval('namespace FoodBankManager\\Attendance; class AttendanceRepo { public static function daily_present_counts($s){ return array(1,2,3); } public static function period_totals($s){ return array("present"=>3,"households"=>2,"no_shows"=>1,"in_person"=>1,"delivery"=>2,"voided"=>0); } }');
-        }
-        require_once __DIR__ . '/../../includes/Shortcodes/Dashboard.php';
-        $out = \FoodBankManager\Shortcodes\Dashboard::render( array( 'period'=>'today', 'compare'=>'1', 'sparkline'=>'1' ) );
-        $this->assertStringContainsString( '<svg', $out );
-        $this->assertStringNotContainsString( '<script', $out );
+        $hash = md5('today||all|0');
+        $base = 'fbm_dash_1_today_' . $hash . '_';
+        $GLOBALS['fbm_transients'][$base . 'series'] = array(1, 2, 3);
+        $GLOBALS['fbm_transients'][$base . 'totals'] = array(
+            'present' => 3,
+            'households' => 2,
+            'no_shows' => 1,
+            'in_person' => 1,
+            'delivery' => 2,
+            'voided' => 0,
+        );
+        $GLOBALS['fbm_transients'][$base . 'prev'] = array(
+            'present' => 2,
+            'households' => 1,
+            'no_shows' => 0,
+            'in_person' => 1,
+            'delivery' => 1,
+            'voided' => 0,
+        );
+        require_once FBM_PATH . 'includes/Shortcodes/Dashboard.php';
+        $html = \FoodBankManager\Shortcodes\Dashboard::render(array('period' => 'today', 'compare' => '1', 'sparkline' => '1'));
+        $this->assertStringContainsString('<svg', $html);
+        $this->assertStringNotContainsString('<script', $html);
     }
 }
+
+}
+
