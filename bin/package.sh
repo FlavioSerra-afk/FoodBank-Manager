@@ -8,6 +8,13 @@ WORK="$DIST/$SLUG"
 rm -rf "$WORK" "$DIST/$SLUG.zip"
 mkdir -p "$WORK"
 
+# Ensure main file exists in repository root and copy it into the package first
+if [[ ! -f "$SLUG.php" ]]; then
+  echo "Error: Missing $SLUG.php in repository root" >&2
+  exit 1
+fi
+cp "$SLUG.php" "$WORK/$SLUG.php"
+
 # Copy tracked plugin files into a stable folder name
 rsync -a --delete \
   --exclude ".git" \
@@ -18,13 +25,8 @@ rsync -a --delete \
   --exclude "dist" \
   --exclude ".DS_Store" \
   --exclude "*.zip" \
+  --exclude "$SLUG.php" \
   ./ "$WORK/"
-
-# Ensure main file exists where WP expects it
-if [[ ! -f "$WORK/$SLUG.php" ]]; then
-  echo "Error: Expected main file at $SLUG/$SLUG.php" >&2
-  exit 1
-fi
 
 # Build the ZIP with a stable top-level directory
 ( cd "$DIST" && zip -rq "$SLUG.zip" "$SLUG" )
@@ -37,7 +39,13 @@ if [[ "$FIRST_ENTRY" != "$SLUG/" ]]; then
 fi
 
 # Ensure main file exists inside the ZIP
-if ! unzip -l "$DIST/$SLUG.zip" | awk '{print $4}' | grep -qx "$SLUG/$SLUG.php"; then
+set +e
+set +o pipefail
+unzip -l "$DIST/$SLUG.zip" | grep -Fq "$SLUG/$SLUG.php"
+FOUND=$?
+set -e
+set -o pipefail
+if [[ $FOUND -ne 0 ]]; then
   echo "Error: $SLUG/$SLUG.php missing from ZIP" >&2
   exit 1
 fi
