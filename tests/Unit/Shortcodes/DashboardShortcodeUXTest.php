@@ -14,31 +14,11 @@ namespace {
     if (!function_exists('esc_attr_e')) {
         function esc_attr_e($text, $domain = 'default'): void { echo $text; }
     }
-    if (!function_exists('selected')) {
-        function selected($a, $b, $echo = true) {
-            $r = (string) ($a === $b ? ' selected="selected"' : '');
-            if ($echo) { echo $r; }
-            return $r;
-        }
-    }
-    if (!function_exists('checked')) {
-        function checked($a, $b = true, $echo = true) {
-            $r = (string) ($a === $b ? ' checked="checked"' : '');
-            if ($echo) { echo $r; }
-            return $r;
-        }
-    }
     if (!function_exists('current_time')) {
         function current_time($type, $gmt = false) { return '2025-09-04 00:00:00'; }
     }
     if (!function_exists('wp_enqueue_style')) {
         function wp_enqueue_style($h) {}
-    }
-    if (!function_exists('wp_nonce_url')) {
-        function wp_nonce_url($url) { return $url; }
-    }
-    if (!function_exists('admin_url')) {
-        function admin_url($path = '') { return '/admin/' . ltrim($path, '/'); }
     }
 }
 

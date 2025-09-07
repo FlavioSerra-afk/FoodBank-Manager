@@ -69,7 +69,8 @@ final class ThemePageTest extends TestCase {
                         $this->assertSame( 'redirect', $e->getMessage() );
                 }
                 $this->assertSame( '#445566', Options::get( 'theme.primary_color' ) );
-                $this->assertStringContainsString( 'notice=saved', (string) $GLOBALS['__last_redirect'] );
+                $redirect = self::$redirect !== '' ? self::$redirect : (string) $GLOBALS['__last_redirect'];
+                $this->assertStringContainsString( 'notice=saved', $redirect );
         }
 
         public function testInvalidTokensClampToDefaults(): void {
