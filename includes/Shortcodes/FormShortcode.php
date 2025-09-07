@@ -13,6 +13,7 @@ use FoodBankManager\Forms\PresetsRepo;
 use FoodBankManager\Forms\Schema;
 use function sanitize_key;
 use function shortcode_atts;
+use function wp_nonce_field;
 
 /**
  * Form shortcode.
@@ -42,9 +43,9 @@ final class FormShortcode {
 				$captcha_enabled = ( $schema['meta']['captcha'] ?? false ) === true;
 		ob_start();
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
-		echo '<input type="hidden" name="action" value="fbm_submit" />';
-		echo '<input type="hidden" name="preset" value="' . esc_attr( $slug ) . '" />';
-		echo '<input type="hidden" name="_fbm_nonce" value="' . esc_attr( wp_create_nonce( 'fbm_submit_form' ) ) . '" />';
+				echo '<input type="hidden" name="action" value="fbm_submit" />';
+				echo '<input type="hidden" name="preset" value="' . esc_attr( $slug ) . '" />';
+				wp_nonce_field( 'fbm_submit_form', '_fbm_nonce', false );
 		foreach ( $schema['fields'] as $field ) {
 			self::render_field( $field );
 		}

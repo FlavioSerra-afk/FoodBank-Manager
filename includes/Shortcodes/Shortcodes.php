@@ -16,33 +16,37 @@ use function add_shortcode;
  * Handles registration of shortcodes.
  */
 final class Shortcodes {
-        /**
-         * Bootstrap shortcode registration.
-         */
-        public static function register(): void {
-                static $boot = false;
-                if ( $boot ) {
-                        return;
-                }
-                $boot = true;
+		/**
+		 * Bootstrap shortcode registration.
+		 *
+		 * @return void
+		 */
+	public static function register(): void {
+			static $boot = false;
+		if ( $boot ) {
+				return;
+		}
+			$boot = true;
 
-                if ( function_exists( 'add_action' ) ) {
-                        add_action( 'init', array( __CLASS__, 'add_shortcodes' ) );
-                }
-                self::add_shortcodes();
-        }
+		if ( function_exists( 'add_action' ) ) {
+				add_action( 'init', array( __CLASS__, 'add_shortcodes' ) );
+		}
+			self::add_shortcodes();
+	}
 
-        /**
-         * Actually register the shortcodes.
-         */
-        public static function add_shortcodes(): void {
-                static $done = false;
-                if ( $done ) {
-                        return;
-                }
-                $done = true;
+		/**
+		 * Actually register the shortcodes.
+		 *
+		 * @return void
+		 */
+	public static function add_shortcodes(): void {
+			static $done = false;
+		if ( $done ) {
+				return;
+		}
+			$done = true;
 
-                add_shortcode( 'fbm_form', array( FormShortcode::class, 'render' ) );
-                add_shortcode( 'fbm_dashboard', array( DashboardShortcode::class, 'render' ) );
-        }
+			add_shortcode( 'fbm_form', array( FormShortcode::class, 'render' ) );
+			add_shortcode( 'fbm_dashboard', array( DashboardShortcode::class, 'render' ) );
+	}
 }
