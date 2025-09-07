@@ -58,5 +58,18 @@ final class SchemaTest extends TestCase {
             )
         );
     }
+
+    public function testConsentAndFileFieldsNormalized(): void {
+        $schema = array(
+            'meta'   => array( 'name' => 'T', 'slug' => 't' ),
+            'fields' => array(
+                array( 'id' => 'agree', 'type' => 'consent', 'label' => 'Yes', 'required' => true ),
+                array( 'id' => 'upload', 'type' => 'file', 'label' => 'Doc', 'required' => false ),
+            ),
+        );
+        $normalized = Schema::normalize( $schema );
+        $this->assertSame( 'agree', $normalized['fields'][0]['id'] );
+        $this->assertSame( 'file', $normalized['fields'][1]['type'] );
+    }
 }
 }

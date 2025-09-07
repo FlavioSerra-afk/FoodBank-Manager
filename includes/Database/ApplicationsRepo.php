@@ -6,6 +6,8 @@ declare(strict_types=1);
 namespace FoodBankManager\Database;
 
 use wpdb;
+use FoodBankManager\Security\Crypto;
+use function wp_json_encode;
 
 class ApplicationsRepo {
         /**
@@ -188,7 +190,7 @@ class ApplicationsRepo {
         * @param int $id Application ID.
         * @return array<int,array>
         */
-        public static function get_files_for_application( int $id ): array {
+       public static function get_files_for_application( int $id ): array {
                global $wpdb;
                $sql     = "SELECT id, stored_path, original_name, mime FROM {$wpdb->prefix}fb_files WHERE application_id = %d";
                $query   = $wpdb->prepare( $sql, $id );
@@ -221,5 +223,58 @@ class ApplicationsRepo {
                $sql = "UPDATE {$wpdb->prefix}fb_applications SET data_json='{}',pii_encrypted_blob=NULL WHERE id IN ($placeholders)";
                $prepared = $wpdb->prepare( $sql, $ids );
                return (int) $wpdb->query( $prepared );
+       }
+
+       /**
+        * Insert an application with optional files.
+        *
+        * @param int                                                       $form_id Form ID.
+        * @param array<string,string>                                      $data    Non-sensitive data.
+        * @param array<string,string>                                      $pii     Sensitive data.
+        * @param array{text_hash?:string,timestamp?:string,ip?:string}     $consent Consent info.
+        * @param array<int,array{stored_path:string,original_name:string,mime:string,size:int,sha256:string}> $files Files.
+        * @return int Insert ID.
+        */
+       public static function insert( int $form_id, array $data, array $pii, array $consent, array $files = array() ): int {
+               global $wpdb;
+               $now     = gmdate( 'Y-m-d H:i:s' );
+               $pii_enc = '';
+               try {
+                       $pii_enc = Crypto::encryptSensitive( $pii );
+               } catch ( \Throwable $e ) {
+                       $pii_enc = '';
+               }
+               $wpdb->insert(
+                       $wpdb->prefix . 'fb_applications',
+                       array(
+                               'form_id'            => $form_id,
+                               'status'             => 'new',
+                               'data_json'          => wp_json_encode( $data ),
+                               'pii_encrypted_blob' => $pii_enc,
+                               'consent_text_hash'  => $consent['text_hash'] ?? '',
+                               'consent_timestamp'  => $consent['timestamp'] ?? '',
+                               'consent_ip'         => $consent['ip'] ?? '',
+                               'created_at'         => $now,
+                               'updated_at'         => $now,
+                       ),
+                       array( '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' )
+               );
+               $id = (int) $wpdb->insert_id;
+               foreach ( $files as $file ) {
+                       $wpdb->insert(
+                               $wpdb->prefix . 'fb_files',
+                               array(
+                                       'application_id' => $id,
+                                       'stored_path'    => $file['stored_path'],
+                                       'original_name'  => $file['original_name'],
+                                       'mime'           => $file['mime'],
+                                       'size_bytes'     => (int) $file['size'],
+                                       'sha256'         => $file['sha256'],
+                                       'created_at'     => $now,
+                               ),
+                               array( '%d', '%s', '%s', '%s', '%d', '%s', '%s' )
+                       );
+               }
+               return $id;
        }
 }
