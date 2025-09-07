@@ -6,7 +6,6 @@ use FoodBankManager\Admin\ThemePage;
 use FoodBankManager\Core\Options;
 
 final class ThemePageTest extends TestCase {
-        public static string $redirect = '';
 
         private function loadTheme(): string {
                 if ( class_exists( 'FoodBankManager\\UITest\\ThemeReal', false ) ) {
@@ -25,7 +24,6 @@ final class ThemePageTest extends TestCase {
         fbm_test_reset_globals();
         fbm_grant_for_page('fbm_theme');
         fbm_test_trust_nonces(true);
-        self::$redirect = '';
         $_POST = $_SERVER = $_REQUEST = array();
         global $fbm_test_options;
         $fbm_test_options = array();
@@ -68,9 +66,8 @@ final class ThemePageTest extends TestCase {
                 } catch ( RuntimeException $e ) {
                         $this->assertSame( 'redirect', $e->getMessage() );
                 }
-                $this->assertSame( '#445566', Options::get( 'theme.primary_color' ) );
-                $redirect = self::$redirect !== '' ? self::$redirect : (string) $GLOBALS['__last_redirect'];
-                $this->assertStringContainsString( 'notice=saved', $redirect );
+        $this->assertSame( '#445566', Options::get( 'theme.primary_color' ) );
+        $this->assertStringContainsString( 'notice=saved', (string) $GLOBALS['__last_redirect'] );
         }
 
         public function testInvalidTokensClampToDefaults(): void {

@@ -47,6 +47,7 @@ final class DashboardShortcodeUXTest extends TestCase {
         parent::setUp();
         \fbm_test_reset_globals();
         $_GET = [];
+        \fbm_test_set_request_nonce('fbm_dash_export');
         if (!defined('FBM_PATH')) {
             define('FBM_PATH', dirname(__DIR__, 3) . '/');
         }
@@ -61,9 +62,12 @@ final class DashboardShortcodeUXTest extends TestCase {
 
     public function testFilterFormLabelsAndValues(): void {
         \fbm_grant_caps(['fb_manage_dashboard']);
-        $_GET = ['fbm_type' => 'delivery', 'fbm_event' => 'abc', 'fbm_policy_only' => '1'];
         require_once FBM_PATH . 'includes/Shortcodes/DashboardShortcode.php';
-        $html = \FBM\Shortcodes\DashboardShortcode::render();
+        $html = \FBM\Shortcodes\DashboardShortcode::render([
+            'type'        => 'delivery',
+            'event'       => 'abc',
+            'policy_only' => '1',
+        ]);
         $this->assertStringContainsString('label for="fbm_type"', $html);
         $this->assertStringContainsString('id="fbm_event"', $html);
         $this->assertStringContainsString('value="abc"', $html);

@@ -6,14 +6,12 @@ use FoodBankManager\Admin\SettingsPage;
 use FoodBankManager\Core\Options;
 
 final class SettingsPageTest extends TestCase {
-    public static string $redirect = '';
 
     protected function setUp(): void {
         parent::setUp();
         fbm_test_reset_globals();
         fbm_grant_for_page('fbm_settings');
         fbm_test_trust_nonces(true);
-        self::$redirect = '';
         $_POST = $_SERVER = $_REQUEST = array();
         global $fbm_test_options;
         $fbm_test_options = array();
@@ -60,7 +58,7 @@ final class SettingsPageTest extends TestCase {
         $this->assertSame( 'Test', Options::get( 'branding.site_name' ) );
         $this->assertSame( 'https://example.com/logo.png', Options::get( 'branding.logo_url' ) );
         $this->assertSame( 'default', Options::get( 'branding.color' ) );
-        $this->assertStringContainsString( 'notice=saved', self::$redirect );
-        $this->assertStringContainsString( 'tab=branding', self::$redirect );
+        $this->assertStringContainsString( 'notice=saved', (string) $GLOBALS['__last_redirect'] );
+        $this->assertStringContainsString( 'tab=branding', (string) $GLOBALS['__last_redirect'] );
     }
 }

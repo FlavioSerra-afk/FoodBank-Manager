@@ -10,21 +10,7 @@ namespace FoodBankManager\Core {
     }
 }
 
-namespace FoodBankManager\Admin {
-    function wp_safe_redirect( string $url, int $status = 302 ): void {
-        \EmailsPageTest::$redirect = $url;
-        if ( class_exists( '\\DiagnosticsPageTest', false ) ) {
-            \DiagnosticsPageTest::$redirect = $url;
-        }
-        if ( class_exists( '\\SettingsPageTest', false ) ) {
-            \SettingsPageTest::$redirect = $url;
-        }
-        if ( class_exists( '\\ThemePageTest', false ) ) {
-            \ThemePageTest::$redirect = $url;
-        }
-        throw new \RuntimeException( 'redirect' );
-    }
-}
+namespace FoodBankManager\Admin {}
 
 namespace {
 use PHPUnit\Framework\TestCase;
@@ -68,7 +54,6 @@ if ( ! function_exists( 'wp_send_json' ) ) {
 }
 
 final class EmailsPageTest extends TestCase {
-    public static string $redirect = '';
 
     protected function setUp(): void {
         fbm_test_reset_globals();
@@ -82,7 +67,6 @@ final class EmailsPageTest extends TestCase {
         $_GET = array();
         $_POST = array();
         $_SERVER = array();
-        self::$redirect = '';
         global $fbm_test_options;
         $fbm_test_options = array();
     }
@@ -147,8 +131,8 @@ final class EmailsPageTest extends TestCase {
         $this->assertSame( 255, strlen( $data['subject'] ) );
         $this->assertStringNotContainsString( '<script', $data['body_html'] );
         $this->assertSame( 32768, strlen( $data['body_html'] ) );
-        $this->assertStringContainsString( 'notice=saved', self::$redirect );
-        $this->assertStringContainsString( 'tpl=applicant_confirmation', self::$redirect );
+        $this->assertStringContainsString( 'notice=saved', (string) $GLOBALS['__last_redirect'] );
+        $this->assertStringContainsString( 'tpl=applicant_confirmation', (string) $GLOBALS['__last_redirect'] );
     }
 
     public function testPreviewMissingNonceBlocked(): void {
@@ -247,8 +231,8 @@ final class EmailsPageTest extends TestCase {
         $data = Options::get_template( 'applicant_confirmation' );
         $this->assertSame( '', $data['subject'] );
         $this->assertSame( '', $data['body_html'] );
-        $this->assertStringContainsString( 'notice=reset', self::$redirect );
-        $this->assertStringContainsString( 'tpl=applicant_confirmation', self::$redirect );
+        $this->assertStringContainsString( 'notice=reset', (string) $GLOBALS['__last_redirect'] );
+        $this->assertStringContainsString( 'tpl=applicant_confirmation', (string) $GLOBALS['__last_redirect'] );
 
         $_SERVER = array();
         $_GET['tpl'] = 'applicant_confirmation';

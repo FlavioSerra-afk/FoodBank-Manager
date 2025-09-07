@@ -40,9 +40,6 @@ namespace {
     if ( ! function_exists( 'menu_page_url' ) ) {
         function menu_page_url( string $slug, bool $echo = true ): string { return 'admin.php?page=' . $slug; }
     }
-    if ( ! function_exists( 'wp_safe_redirect' ) ) {
-        function wp_safe_redirect( string $url, int $status = 302 ): void {}
-    }
 }
 
 namespace FBM\Exports {

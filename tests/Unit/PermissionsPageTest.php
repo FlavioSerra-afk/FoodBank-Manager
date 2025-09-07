@@ -22,12 +22,6 @@ if ( ! function_exists( 'add_query_arg' ) ) {
         return $url . '?' . http_build_query( $args );
     }
 }
-if ( ! function_exists( 'wp_safe_redirect' ) ) {
-    function wp_safe_redirect( string $url, int $status = 303 ): void {
-        PermissionsPageTest::$redirect = $url;
-        throw new \RuntimeException( 'redirect' );
-    }
-}
 if ( ! function_exists( 'is_email' ) ) {
     function is_email( $email ) {
         return (bool) filter_var( $email, FILTER_VALIDATE_EMAIL );
@@ -89,12 +83,6 @@ if ( ! function_exists( 'get_editable_roles' ) ) {
             'editor'        => array( 'name' => 'Editor' ),
         );
     }
-}
-class WP_Role {
-    public $caps = array();
-    public function add_cap( $cap ) { $this->caps[ $cap ] = true; }
-    public function remove_cap( $cap ) { unset( $this->caps[ $cap ] ); }
-    public function has_cap( $cap ) { return isset( $this->caps[ $cap ] ); }
 }
 if ( ! function_exists( 'get_role' ) ) {
     function get_role( $role ) {
@@ -180,7 +168,6 @@ if ( ! function_exists( 'filter_input' ) ) {
 
 namespace {
     final class PermissionsPageTest extends \PHPUnit\Framework\TestCase {
-        public static string $redirect = '';
 
     public function test_import_rejects_bad_json(): void {
         fbm_test_reset_globals();
