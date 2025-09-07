@@ -5,49 +5,6 @@ use PHPUnit\Framework\TestCase;
 use FoodBankManager\Admin\ThemePage;
 use FoodBankManager\Core\Options;
 
-if ( ! function_exists( 'wp_unslash' ) ) {
-        function wp_unslash( $value ) {
-                return is_array( $value ) ? array_map( 'wp_unslash', $value ) : stripslashes( (string) $value );
-        }
-}
-if ( ! function_exists( 'wp_die' ) ) {
-        function wp_die( $message = '' ) {
-                throw new RuntimeException( (string) $message );
-        }
-}
-if ( ! function_exists( 'menu_page_url' ) ) {
-        function menu_page_url( string $slug, bool $echo = true ): string {
-                return 'admin.php?page=' . $slug;
-        }
-}
-if ( ! function_exists( 'add_query_arg' ) ) {
-        function add_query_arg( array $args, string $url ): string {
-                return $url . '?' . http_build_query( $args );
-        }
-}
-if ( ! function_exists( 'wp_safe_redirect' ) ) {
-        function wp_safe_redirect( string $url, int $status = 302 ): void {
-                ThemePageTest::$redirect = $url;
-                throw new RuntimeException( 'redirect' );
-        }
-}
-if ( ! function_exists( 'map_deep' ) ) {
-        function map_deep( $value, $callback ) {
-                if ( is_array( $value ) ) {
-                        return array_map( function ( $v ) use ( $callback ) {
-                                return map_deep( $v, $callback );
-                        }, $value );
-                }
-                return $callback( $value );
-        }
-}
-if ( ! function_exists( 'sanitize_hex_color' ) ) {
-        function sanitize_hex_color( $color ) {
-                $color = is_string( $color ) ? trim( $color ) : '';
-                return preg_match( '/^#(?:[0-9a-fA-F]{3}){1,2}$/', $color ) ? strtolower( $color ) : '';
-        }
-}
-
 final class ThemePageTest extends TestCase {
         public static string $redirect = '';
 
@@ -112,7 +69,7 @@ final class ThemePageTest extends TestCase {
                         $this->assertSame( 'redirect', $e->getMessage() );
                 }
                 $this->assertSame( '#445566', Options::get( 'theme.primary_color' ) );
-                $this->assertStringContainsString( 'notice=saved', self::$redirect );
+                $this->assertStringContainsString( 'notice=saved', (string) $GLOBALS['__last_redirect'] );
         }
 
         public function testInvalidTokensClampToDefaults(): void {

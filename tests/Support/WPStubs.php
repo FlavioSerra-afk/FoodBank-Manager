@@ -93,25 +93,56 @@ if (!function_exists('add_query_arg')) {
     return $scheme.$host.$port.$path.$q.$frag;
   }
 }
+if (!function_exists('remove_query_arg')) {
+  function remove_query_arg($keys, string $url=''){ 
+    $keys=(array)$keys; $parts=parse_url($url); $query=[];
+    if(!empty($parts['query'])) parse_str($parts['query'],$query);
+    foreach($keys as $k){ unset($query[$k]); }
+    $parts['query']=http_build_query($query);
+    $scheme=isset($parts['scheme'])?$parts['scheme'].'://':''; $host=$parts['host']??''; $port=isset($parts['port'])?':'.$parts['port']:''; $path=$parts['path']??'';
+    $q=$parts['query']?('?'.$parts['query']):''; $frag=isset($parts['fragment'])?('#'.$parts['fragment']):'';
+    return $scheme.$host.$port.$path.$q.$frag;
+  }
+}
 if (!function_exists('admin_url')) { function admin_url($p=''){ return 'https://example.test/wp-admin/'.ltrim($p,'/'); } }
+if (!function_exists('menu_page_url')) { function menu_page_url(string $slug, bool $echo=true){ $u='admin.php?page='.$slug; if($echo) echo $u; return $u; } }
 if (!function_exists('plugins_url')) { function plugins_url($p=''){ return 'https://example.test/wp-content/plugins/'.ltrim($p,'/'); } }
 if (!function_exists('wp_nonce_url')) { function wp_nonce_url($u,$a=-1,$n='_wpnonce'){ return add_query_arg([$n=>wp_create_nonce($a)],$u); } }
-if (!function_exists('wp_safe_redirect')) { function wp_safe_redirect($u){ $GLOBALS['__last_redirect']=(string)$u; return true; } }
-if (!function_exists('wp_redirect')) { function wp_redirect($u){ $GLOBALS['__last_redirect']=(string)$u; return true; } }
-if (!function_exists('wp_die')) { function wp_die($m=''){ throw new RuntimeException('wp_die: '.$m); } }
+if (!function_exists('wp_safe_redirect')) { /** @return void */ function wp_safe_redirect($u){ $GLOBALS['__last_redirect']=(string)$u; throw new RuntimeException('redirect'); } }
+if (!function_exists('wp_redirect')) { /** @return void */ function wp_redirect($u){ $GLOBALS['__last_redirect']=(string)$u; throw new RuntimeException('redirect'); } }
+if (!function_exists('wp_die')) { /** @return void */ function wp_die($m=''){ throw new RuntimeException('wp_die: '.$m); } }
 
 // Basic escaping/sanitizing
 if (!function_exists('esc_attr')){ function esc_attr($s){ return htmlspecialchars((string)$s, ENT_QUOTES,'UTF-8'); } }
 if (!function_exists('esc_html')){ function esc_html($s){ return htmlspecialchars((string)$s, ENT_QUOTES,'UTF-8'); } }
 if (!function_exists('esc_url')){ function esc_url($s){ return (string)$s; } }
+if (!function_exists('esc_url_raw')){ function esc_url_raw($s){ return (string)$s; } }
 if (!function_exists('wp_kses_post')){ function wp_kses_post($s){ return (string)$s; } }
 if (!function_exists('sanitize_text_field')){ function sanitize_text_field($s){ return trim((string)$s); } }
 if (!function_exists('sanitize_key')){ function sanitize_key($s){ return preg_replace('/[^a-z0-9_\-]/i','', (string)$s); } }
+if (!function_exists('sanitize_hex_color')){ function sanitize_hex_color($c){ $c=is_string($c)?trim($c):''; return preg_match('/^#(?:[0-9a-fA-F]{3}){1,2}$/',$c)?strtolower($c):''; } }
 if (!function_exists('selected')){ function selected($a,$b,$echo=false){ $o=($a==$b)?' selected="selected"':''; if($echo) echo $o; return $o; } }
 if (!function_exists('checked')){ function checked($a,$b=true,$echo=false){ $o=($a==$b)?' checked="checked"':''; if($echo) echo $o; return $o; } }
 if (!function_exists('esc_html__')){ function esc_html__($t, $d='default'){ return $t; } }
 if (!function_exists('wp_unslash')){ function wp_unslash($s){ return $s; } }
 if (!function_exists('shortcode_atts')){ function shortcode_atts(array $pairs, array $atts, string $shortcode=''){ return array_merge($pairs, $atts); } }
+if (!function_exists('map_deep')) { function map_deep($v, $cb){ if(is_array($v)) return array_map(fn($x)=>map_deep($x,$cb), $v); return $cb($v); } }
+if (!function_exists('wp_salt')){ function wp_salt($scheme='auth'){ return hash('sha256',(string)$scheme); } }
+if (!function_exists('wp_enqueue_scripts')) { /** @return void */ function wp_enqueue_scripts(){} }
+if (!isset($GLOBALS['fbm_shortcodes'])) $GLOBALS['fbm_shortcodes']=[];
+if (!function_exists('add_shortcode')) { /** @return void */ function add_shortcode(string $tag, callable $cb){ $GLOBALS['fbm_shortcodes'][$tag]=$cb; } }
+if (!function_exists('do_shortcode')) {
+  function do_shortcode(string $text): string {
+    return preg_replace_callback('/\[([a-z0-9_]+)([^\]]*)\]/i', function($m){
+      $tag=$m[1]; $atts=[];
+      if(preg_match_all('/(\w+)="([^"]*)"/',$m[2],$am,PREG_SET_ORDER)){
+        foreach($am as $a){ $atts[$a[1]]=$a[2]; }
+      }
+      $cb=$GLOBALS['fbm_shortcodes'][$tag]??null;
+      return $cb ? (string)call_user_func($cb,$atts) : '';
+    }, $text);
+  }
+}
 if (!function_exists('get_current_screen')){ function get_current_screen(){ $id=$GLOBALS['fbm_test_screen_id']??''; if(!$id) return null; $o=new stdClass(); $o->id=$id; return $o; } }
 
 // Global reset (used by bootstrap)
