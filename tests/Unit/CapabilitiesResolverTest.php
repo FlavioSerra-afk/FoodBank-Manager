@@ -5,13 +5,11 @@ namespace FoodBankManager\Tests\Unit {
         use FoodBankManager\Auth\CapabilitiesResolver;
 	use PHPUnit\Framework\TestCase;
 
-	class CapabilitiesResolverTest extends TestCase {
-		/** @var array<int,array<string,bool>> */
-		public static array $meta = array();
+        class CapabilitiesResolverTest extends TestCase {
 
-		protected function setUp(): void {
-			self::$meta = array();
-		}
+                protected function setUp(): void {
+                        \fbm_test_reset_globals();
+                }
 
                 public function testGrantAdmins(): void {
                         $user        = new \WP_User();
@@ -25,10 +23,8 @@ namespace FoodBankManager\Tests\Unit {
                 }
 
                 public function testUserOverridesApply(): void {
-                        self::$meta[2] = array(
-                                'fb_manage_dashboard' => true,
-                                'fb_manage_forms'     => false,
-                        );
+                        $GLOBALS['fbm_user_meta'][2]['fb_manage_dashboard'][0] = true;
+                        $GLOBALS['fbm_user_meta'][2]['fb_manage_forms'][0]     = false;
                         $user        = new \WP_User();
                         $user->ID    = 2;
                         $user->roles = array( 'subscriber' );
@@ -39,24 +35,22 @@ namespace FoodBankManager\Tests\Unit {
                 }
 
                 public function testUnknownCapsIgnored(): void {
-                        self::$meta[3] = array( 'unknown_cap' => true );
+                        $GLOBALS['fbm_user_meta'][3]['unknown_cap'][0] = true;
                         $user          = new \WP_User();
                         $user->ID      = 3;
                         $user->roles   = array();
                         $resolved      = CapabilitiesResolver::applyUserOverrides( array(), array(), array(), $user );
                         $this->assertArrayNotHasKey( 'unknown_cap', $resolved );
                 }
-	}
+        }
 }
 
 namespace {
-	class WP_User {
-		public int $ID;
-		/** @var string[] */
-		public array $roles = array();
-	}
-
-	function get_user_meta( $user_id, $key, $single ) {
-		return \FoodBankManager\Tests\Unit\CapabilitiesResolverTest::$meta[ $user_id ] ?? array();
-	}
+        if ( ! class_exists( 'WP_User' ) ) {
+                class WP_User {
+                        public int $ID;
+                        /** @var string[] */
+                        public array $roles = array();
+                }
+        }
 }

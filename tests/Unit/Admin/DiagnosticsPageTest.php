@@ -60,12 +60,6 @@ namespace {
     if ( ! function_exists( 'settings_errors' ) ) {
         function settings_errors( $setting = '', $sanitize = false, $hide_on_update = false ) {}
     }
-    if ( ! function_exists( 'wp_safe_redirect' ) ) {
-        function wp_safe_redirect( string $url, int $status = 302 ): void {
-            DiagnosticsPageTest::$redirect = $url;
-            throw new \RuntimeException( 'redirect' );
-        }
-    }
     if ( ! function_exists( 'wp_mail' ) ) {
         function wp_mail( $to, $subject, $message ): bool {
             return DiagnosticsPageTest::$mail_result;
@@ -171,7 +165,6 @@ namespace {
      * @runInSeparateProcess
      */
     final class DiagnosticsPageTest extends TestCase {
-        public static string $redirect = '';
         public static bool $mail_result = true;
         /** @var array<string,int> */
         public static array $cron_next = array();
@@ -180,7 +173,6 @@ namespace {
             fbm_test_reset_globals();
             fbm_grant_for_page('fbm_diagnostics');
             fbm_test_trust_nonces(true);
-            self::$redirect   = '';
             self::$mail_result = true;
             \FoodBankManager\Auth\Roles::$installed = false;
             \FoodBankManager\Auth\Roles::$ensured  = false;
@@ -206,7 +198,7 @@ namespace {
             } catch ( \RuntimeException $e ) {
                 $this->assertSame( 'redirect', $e->getMessage() );
             }
-            $this->assertStringContainsString( 'notice=sent', self::$redirect );
+            $this->assertStringContainsString( 'notice=sent', (string) $GLOBALS['__last_redirect'] );
         }
 
         public function testSendTestEmailFailure(): void {
@@ -220,7 +212,7 @@ namespace {
             } catch ( \RuntimeException $e ) {
                 $this->assertSame( 'redirect', $e->getMessage() );
             }
-            $this->assertStringContainsString( 'notice=error', self::$redirect );
+            $this->assertStringContainsString( 'notice=error', (string) $GLOBALS['__last_redirect'] );
         }
 
         public function testTemplateRendersCrypto(): void {
