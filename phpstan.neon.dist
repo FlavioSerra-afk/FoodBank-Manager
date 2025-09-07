@@ -20,7 +20,6 @@ parameters:
 
   bootstrapFiles:
     - phpstan-bootstrap.php
-    - tests/Support/WPStubs.php
 
   # WordPress environment assumptions
   # Keep false positives down

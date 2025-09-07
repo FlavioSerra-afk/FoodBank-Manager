@@ -1,95 +1,6 @@
 <?php
 declare(strict_types=1);
 
-namespace {
-    if ( ! function_exists( 'shortcode_atts' ) ) {
-        function shortcode_atts( array $pairs, array $atts, string $shortcode = '' ): array { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            return array_merge( $pairs, $atts );
-        }
-    }
-    if ( ! function_exists( 'sanitize_text_field' ) ) {
-        function sanitize_text_field( $str ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            return trim( strip_tags( (string) $str ) );
-        }
-    }
-    if ( ! function_exists( 'sanitize_key' ) ) {
-        function sanitize_key( $key ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            return preg_replace( '/[^a-z0-9_]/', '', strtolower( (string) $key ) );
-        }
-    }
-    if ( ! function_exists( 'esc_html__' ) ) {
-        function esc_html__( string $text, string $domain = 'default' ): string { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            return $text;
-        }
-    }
-    if ( ! function_exists( '__' ) ) {
-        function __( string $text, string $domain = 'default' ): string { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            return $text;
-        }
-    }
-    if ( ! function_exists( 'esc_html' ) ) {
-        function esc_html( $text ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            return htmlspecialchars( (string) $text, ENT_QUOTES );
-        }
-    }
-    if ( ! function_exists( 'esc_attr' ) ) {
-        function esc_attr( $text ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            return htmlspecialchars( (string) $text, ENT_QUOTES );
-        }
-    }
-    if ( ! function_exists( 'esc_url' ) ) {
-        function esc_url( $url ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            return (string) $url;
-        }
-    }
-    if ( ! function_exists( 'esc_js' ) ) {
-        function esc_js( $text ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            return addslashes( (string) $text );
-        }
-    }
-    if ( ! function_exists( 'wp_create_nonce' ) ) {
-        function wp_create_nonce( string $action ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            return 'nonce';
-        }
-    }
-    if ( ! function_exists( 'admin_url' ) ) {
-        function admin_url( string $path = '' ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            return '/admin/' . ltrim( $path, '/' );
-        }
-    }
-    if ( ! function_exists( 'wp_unslash' ) ) {
-        function wp_unslash( $value ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            return $value;
-        }
-    }
-    if ( ! function_exists( 'get_transient' ) ) {
-        function get_transient( string $key ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            return false;
-        }
-    }
-    if ( ! function_exists( 'delete_transient' ) ) {
-        function delete_transient( string $key ): void { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-        }
-    }
-    if ( ! function_exists( 'get_option' ) ) {
-        $GLOBALS['fbm_options_store'] = array();
-        function get_option( string $key, $default = false ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            return $GLOBALS['fbm_options_store'][ $key ] ?? $default;
-        }
-    }
-    if ( ! function_exists( 'update_option' ) ) {
-        function update_option( string $key, $value ): bool { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            $GLOBALS['fbm_options_store'][ $key ] = $value;
-            return true;
-        }
-    }
-    if ( ! function_exists( 'wp_die' ) ) {
-        function wp_die( $message = '' ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            throw new \RuntimeException( (string) $message );
-        }
-    }
-}
-
 namespace FoodBankManager\UI {
     class Theme {
         public static function enqueue_front(): void {}
@@ -165,7 +76,6 @@ final class FormsPresetsTest extends TestCase {
     protected function setUp(): void {
         parent::setUp();
         fbm_test_reset_globals();
-        $GLOBALS['fbm_options_store'] = array();
         if ( ! defined( 'FBM_PATH' ) ) {
             define( 'FBM_PATH', dirname( __DIR__, 2 ) . '/' );
         }
