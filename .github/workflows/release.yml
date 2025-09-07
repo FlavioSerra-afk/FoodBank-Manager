@@ -28,12 +28,12 @@ jobs:
         run: bash bin/package.sh
       - name: Verify package slug
         run: |
-          first=$(unzip -l dist/foodbank-manager.zip | awk 'NR==4 {print $4}')
+          first=$(zipinfo -1 dist/foodbank-manager.zip | head -n1)
           if [ "$first" != 'foodbank-manager/' ]; then
             echo "First ZIP entry '$first' is not 'foodbank-manager/'" >&2
             exit 1
           fi
-          if ! unzip -l dist/foodbank-manager.zip | awk '{print $4}' | grep -qx 'foodbank-manager/foodbank-manager.php'; then
+          if ! zipinfo -1 dist/foodbank-manager.zip | grep -Fxq 'foodbank-manager/foodbank-manager.php'; then
             echo "Missing foodbank-manager/foodbank-manager.php in ZIP" >&2
             exit 1
           fi

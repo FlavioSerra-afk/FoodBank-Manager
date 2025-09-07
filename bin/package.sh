@@ -31,23 +31,23 @@ rsync -a --delete \
 # Build the ZIP with a stable top-level directory
 ( cd "$DIST" && zip -rq "$SLUG.zip" "$SLUG" )
 
-# Verify ZIP root directory
-FIRST_ENTRY=$(unzip -l "$DIST/$SLUG.zip" | awk 'NR==4 {print $4}')
+# Verify first ZIP entry is the slug directory
+set +o pipefail
+FIRST_ENTRY=$(zipinfo -1 "$DIST/$SLUG.zip" | head -n1)
+set -o pipefail
 if [[ "$FIRST_ENTRY" != "$SLUG/" ]]; then
-  echo "Error: ZIP root is '$FIRST_ENTRY' (expected '$SLUG/')" >&2
+  echo "Error: ZIP first entry '$FIRST_ENTRY' is not '$SLUG/'" >&2
   exit 1
 fi
 
 # Ensure main file exists inside the ZIP
-set +e
 set +o pipefail
-unzip -l "$DIST/$SLUG.zip" | grep -Fq "$SLUG/$SLUG.php"
-FOUND=$?
-set -e
-set -o pipefail
-if [[ $FOUND -ne 0 ]]; then
+if unzip -l "$DIST/$SLUG.zip" | grep -Fq "$SLUG/$SLUG.php"; then
+  true
+else
   echo "Error: $SLUG/$SLUG.php missing from ZIP" >&2
   exit 1
 fi
+set -o pipefail
 
 echo "Built $DIST/$SLUG.zip"
