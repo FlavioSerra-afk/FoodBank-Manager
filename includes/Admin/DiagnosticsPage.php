@@ -29,6 +29,7 @@ class DiagnosticsPage {
        private const ACTION_REPAIR_CAPS   = 'fbm_repair_caps';
        private const ACTION_RETENTION_RUN = 'fbm_retention_run';
        private const ACTION_RETENTION_DRY = 'fbm_retention_dry_run';
+       private const OVERDUE_GRACE       = 300;
 
        /** @var array<string,array<string,int>> */
        private static array $retention_summary = array();
@@ -142,26 +143,36 @@ class DiagnosticsPage {
 		 *
 		 * @return array<int,array{hook:string,schedule:string,next_run:int,last_run:int,overdue:bool}>
 		 */
-	public static function cron_status(): array {
-                       $hooks     = array_merge( array( 'fbm_cron_cleanup', 'fbm_cron_email_retry' ), Retention::events() );
-                       $schedules = wp_get_schedules();
-			$now       = time();
-			$out       = array();
-		foreach ( $hooks as $hook ) {
-				$next     = (int) wp_next_scheduled( $hook );
-				$schedule = (string) wp_get_schedule( $hook );
-				$interval = isset( $schedules[ $schedule ]['interval'] ) ? $schedules[ $schedule ]['interval'] : 0;
-				$last     = (int) get_option( $hook . '_last_run', 0 );
-				$out[]    = array(
-					'hook'     => $hook,
-					'schedule' => $schedule,
-					'next_run' => $next,
-					'last_run' => $last,
-					'overdue'  => $next > 0 && $next < $now,
-				);
-		}
-			return $out;
-	}
+       public static function cron_status(): array {
+               $schedules  = wp_get_schedules();
+               $now        = time();
+               $cron       = (array) get_option( 'cron', array() );
+               $hooks      = Retention::events();
+               foreach ( $cron as $events ) {
+                       foreach ( $events as $hook => $details ) {
+                               if ( str_starts_with( (string) $hook, 'fbm_' ) ) {
+                                       $hooks[] = (string) $hook;
+                               }
+                       }
+               }
+               $hooks = array_unique( $hooks );
+               $out   = array();
+               foreach ( $hooks as $hook ) {
+                       $next     = (int) wp_next_scheduled( $hook );
+                       $schedule = (string) wp_get_schedule( $hook );
+                       $interval = isset( $schedules[ $schedule ]['interval'] ) ? (int) $schedules[ $schedule ]['interval'] : self::OVERDUE_GRACE;
+                       $last     = (int) get_option( $hook . '_last_run', 0 );
+                       $grace    = min( self::OVERDUE_GRACE, $interval );
+                       $out[]    = array(
+                               'hook'     => (string) $hook,
+                               'schedule' => $schedule,
+                               'next_run' => $next,
+                               'last_run' => $last,
+                               'overdue'  => $next > 0 && $now > $next + $grace,
+                       );
+               }
+               return $out;
+       }
 
 	/**
 	 * Send a test email to the current user.

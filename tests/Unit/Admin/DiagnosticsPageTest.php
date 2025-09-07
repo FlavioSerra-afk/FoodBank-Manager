@@ -245,13 +245,21 @@ namespace {
             if ( ! defined( 'DAY_IN_SECONDS' ) ) {
                 define( 'DAY_IN_SECONDS', 86400 );
             }
+            $now            = time();
             self::$cron_next = array(
-                'fbm_retention_tick'   => time() - 10,
-                'fbm_cron_cleanup'     => time() + 100,
-                'fbm_cron_email_retry' => time() + 100,
+                'fbm_retention_tick'   => $now - 400,
+                'fbm_cron_cleanup'     => $now + 100,
+                'fbm_cron_email_retry' => $now + 100,
             );
             global $fbm_test_options;
             $fbm_test_options['fbm_retention_tick_last_run'] = 123;
+            $fbm_test_options['cron'] = array(
+                $now - 400 => array( 'fbm_retention_tick' => array() ),
+               $now + 100 => array(
+                    'fbm_cron_cleanup'     => array(),
+                    'fbm_cron_email_retry' => array(),
+                ),
+            );
             if ( ! defined( 'ABSPATH' ) ) {
                 define( 'ABSPATH', __DIR__ );
             }
