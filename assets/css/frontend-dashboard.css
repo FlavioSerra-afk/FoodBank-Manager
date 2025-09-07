@@ -1,5 +1,5 @@
 .fbm-dashboard {
-font-family: var(--fbm-font-family);
+font-family: var(--fbm-font);
 }
 .fbm-dashboard .fbm-dashboard-grid {
 display: grid;

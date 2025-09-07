@@ -29,7 +29,7 @@ $p_in       = $tot ? 100 - $p_del : 0;
 <?php if ( current_user_can( 'manage_options' ) ) : ?>
 <div class="fbm-copy-shortcode"><code>[fbm_dashboard]</code></div>
 <?php endif; ?>
-<form class="fbm-filter-row" method="get">
+<form class="fbm-filter-row" method="get" aria-label="<?php esc_attr_e( 'Dashboard filters', 'foodbank-manager' ); ?>">
     <div class="fbm-field">
         <label for="fbm_type"><?php esc_html_e( 'Type', 'foodbank-manager' ); ?></label>
         <select id="fbm_type" name="fbm_type">

@@ -6,6 +6,7 @@ namespace FoodBankManager\Core;
 
 use FoodBankManager\Core\Options;
 use FoodBankManager\Core\Screen;
+use FoodBankManager\UI\Theme;
 use function get_post;
 use function has_shortcode;
 use function is_singular;
@@ -19,12 +20,25 @@ class Assets {
         }
 
         public function enqueue_front(): void {
-                if ( function_exists( 'has_shortcode' ) && is_singular() ) {
-                        $post = get_post();
-                        if ( $post && has_shortcode( (string) $post->post_content, 'fbm_dashboard' ) ) {
-                                wp_register_style( 'fbm-frontend-dashboard', FBM_URL . 'assets/css/frontend-dashboard.css', array(), Plugin::VERSION );
-                                wp_enqueue_style( 'fbm-frontend-dashboard' );
-                        }
+                if ( ! function_exists( 'has_shortcode' ) || ! is_singular() ) {
+                        return;
+                }
+                $post = get_post();
+                if ( ! $post ) {
+                        return;
+                }
+                $content   = (string) $post->post_content;
+                $has_form  = has_shortcode( $content, 'fbm_form' );
+                $has_dash  = has_shortcode( $content, 'fbm_dashboard' );
+                if ( ! $has_form && ! $has_dash ) {
+                        return;
+                }
+
+                Theme::enqueue_front();
+
+                if ( $has_dash ) {
+                        wp_register_style( 'fbm-frontend-dashboard', FBM_URL . 'assets/css/frontend-dashboard.css', array(), Plugin::VERSION );
+                        wp_enqueue_style( 'fbm-frontend-dashboard' );
                 }
         }
 
