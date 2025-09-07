@@ -5,34 +5,6 @@ use PHPUnit\Framework\TestCase;
 use FoodBankManager\Admin\SettingsPage;
 use FoodBankManager\Core\Options;
 
-if ( ! function_exists( 'wp_unslash' ) ) {
-    function wp_unslash( $value ) {
-        return is_array( $value ) ? array_map( 'wp_unslash', $value ) : stripslashes( (string) $value );
-    }
-}
-// capability handled via $GLOBALS['fbm_user_caps']
-if ( ! function_exists( 'wp_die' ) ) {
-    function wp_die( $message = '' ) {
-        throw new RuntimeException( (string) $message );
-    }
-}
-if ( ! function_exists( 'menu_page_url' ) ) {
-    function menu_page_url( string $slug, bool $echo = true ): string {
-        return 'admin.php?page=' . $slug;
-    }
-}
-if ( ! function_exists( 'add_query_arg' ) ) {
-    function add_query_arg( array $args, string $url ): string {
-        return $url . '?' . http_build_query( $args );
-    }
-}
-if ( ! function_exists( 'wp_safe_redirect' ) ) {
-    function wp_safe_redirect( string $url, int $status = 302 ): void {
-        SettingsPageTest::$redirect = $url;
-        throw new RuntimeException( 'redirect' );
-    }
-}
-
 final class SettingsPageTest extends TestCase {
     public static string $redirect = '';
 
@@ -87,7 +59,7 @@ final class SettingsPageTest extends TestCase {
         $this->assertSame( 'Test', Options::get( 'branding.site_name' ) );
         $this->assertSame( 'https://example.com/logo.png', Options::get( 'branding.logo_url' ) );
         $this->assertSame( 'default', Options::get( 'branding.color' ) );
-        $this->assertStringContainsString( 'notice=saved', self::$redirect );
-        $this->assertStringContainsString( 'tab=branding', self::$redirect );
+        $this->assertStringContainsString( 'notice=saved', (string) $GLOBALS['__last_redirect'] );
+        $this->assertStringContainsString( 'tab=branding', (string) $GLOBALS['__last_redirect'] );
     }
 }
