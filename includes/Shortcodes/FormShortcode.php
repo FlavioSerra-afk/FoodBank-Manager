@@ -11,7 +11,6 @@ namespace FBM\Shortcodes;
 
 use FoodBankManager\Forms\PresetsRepo;
 use FoodBankManager\Forms\Schema;
-use FoodBankManager\UI\Theme;
 use function sanitize_key;
 use function shortcode_atts;
 
@@ -26,7 +25,6 @@ final class FormShortcode {
 	 * @return string
 	 */
 	public static function render( array $atts = array() ): string {
-		Theme::enqueue_front();
 		$atts = shortcode_atts( array( 'preset' => '' ), $atts, 'fbm_form' );
 		$slug = sanitize_key( (string) $atts['preset'] );
 		if ( '' === $slug ) {
