@@ -149,7 +149,7 @@ $rows       = $rows ?? array();
           <?php wp_nonce_field( 'fbm_repair_caps' ); ?>
           <?php submit_button( __( 'Repair caps', 'foodbank-manager' ), 'secondary', '', false ); ?>
       </form>
-    <h2><?php esc_html_e( 'Cron', 'foodbank-manager' ); ?></h2>
+    <h2><?php esc_html_e( 'Cron Health', 'foodbank-manager' ); ?></h2>
     <?php $cron = \FoodBankManager\Admin\DiagnosticsPage::cron_status(); ?>
     <form method="post" action="" style="display:inline-block;margin-right:1em;">
         <input type="hidden" name="fbm_action" value="fbm_retention_run" />
