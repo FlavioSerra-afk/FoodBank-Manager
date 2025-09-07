@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-07 (v1.2.15 fragments merged)
+Docs-Revision: 2025-09-07 (v1.2.16 fragments merged)
 # FoodBank Manager — Product Requirements Document (PRD)
 
 **Repo file:** `Docs/PRD-foodbank-manager.md`  
@@ -33,7 +33,7 @@ FoodBank Manager is a secure, mobile-first WordPress plugin to:
 - Emitted right after `.wrap.fbm-admin` opens on admin pages.
 - Diagnostics badge shows "RenderOnce OK" unless duplicate passes are detected.
 
-The plugin must reproduce the current Food Bank form at `https://pcclondon.uk/food-bank/` exactly as a starter preset, and allow building additional custom forms with full control over fields, layout, logic, and data handling. Shortcode-driven forms store schemas in presets with strict validation, CAPTCHA, and an admin builder with live preview.
+The plugin must reproduce the current Food Bank form at `https://pcclondon.uk/food-bank/` exactly as a starter preset, and allow building additional custom forms with full control over fields, layout, logic, and data handling. Shortcode-driven forms store schemas in presets with strict validation, CAPTCHA, and an admin builder with live preview. Submissions run an end-to-end pipeline with schema validation, consent hashing, safe uploads, email send & log, and a success reference.
 
 ---
 
@@ -128,7 +128,7 @@ Roles map to WordPress **capabilities** (granular; see §10 Security).
 - **Entry view:** all fields, internal notes, status (new/review/approved/declined/archived), actions: Edit, PDF, CSV, Delete (with confirm).
 - **Email Templates:** WYSIWYG editor, variables list, live preview with token helper, reset-to-defaults, a11y labels, send test.
 - **Settings:** branding, date/time, email defaults, spam protection keys, file policy, retention/anonymisation, encryption controls (see §10).
-- **Diagnostics:** email logs, resend, test email, repair capabilities, environment checks (PHP/WP version, cron, KEK, mail transport), and a cron health panel with retention run and dry-run controls.
+- **Diagnostics:** email logs, resend, test email, repair capabilities, environment checks (PHP/WP version, cron, KEK, mail transport), and a cron health panel listing FBM hooks with last/next run times, overdue flags, and run-now/dry-run controls that output masked JSON summaries.
 - **Permissions:** map capabilities to roles and set per-user overrides.
 - **Attendance repository:** all queries use `$wpdb->prepare()` with strict placeholders; results mask PII unless `fb_view_sensitive` is granted; unit tests cover check-in, no-show, void/unvoid, and policy edge cases.
 
@@ -232,10 +232,9 @@ Row actions: **View attendee list**, **Export roster (CSV/PDF)**, **Print-friend
 
 | Shortcode | Attributes (default) |
 | --- | --- |
-| `[fbm_form]` | `id` (string, default "1") |
-| `[fbm_entries]` | _None_ |
-| `[fbm_attendance_manager]` | _None_ |
-The Shortcodes admin page includes a builder that outputs masked shortcode strings with a nonce-protected, server-side preview.
+| `[fbm_form]` | `preset` (string, slug) |
+| `[fbm_dashboard]` | `period` ("today"\|"7d"\|"30d"), `compare` ("1"\|"0"), `sparkline` ("1"\|"0") |
+The Shortcodes admin page includes a builder that outputs masked shortcode strings with a nonce-protected, server-side preview. Assets for these shortcodes load only when present on the front end. The dashboard requires `fb_manage_dashboard` or `fb_view_dashboard`; others see a friendly notice.
 - Consent logging (timestamp, IP, user agent, consent text hash).
 - SAR export by email lookup (entries, files, attendance).
 - Retention policies per form (auto-anonymise after X months).
@@ -514,7 +513,7 @@ PDF templates, theming presets, PT translations, docs.
 ## 18) Monitoring & Diagnostics
 
 - Email log (sent/failed), resend, provider messages.
-- Cron/queue status with next/last run times, retention job controls, and dry-run options.
+- Cron/queue status with next/last run times, overdue flags, and retention job Run now/Dry-run controls outputting masked JSON summaries.
 - Environment checks (PHP/WP versions, KEK presence, mail transport, cron schedules).
 - Self-check warnings if encryption/CAPTCHA/SMTP not configured.
 

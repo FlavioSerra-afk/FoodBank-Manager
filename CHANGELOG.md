@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [1.2.16] - 2025-09-07
+- End-to-end form submissions with schema validation, consent hashing, safe uploads, email send & log, and success reference.
+- Canonical WP stubs with deterministic shims keep PHPStan and tests green.
+- Shortcode assets load only when the shortcode appears; `[fbm_dashboard]` gated by capability.
+- Diagnostics Cron Health panel lists hooks with last/next runs, overdue flags, and run-now/dry-run controls.
+
 ## [1.2.15] - 2025-09-07
 - PHPStan green
 - Settings/Theme sanitize + deterministic CSS

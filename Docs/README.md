@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-05 (v1.2.9 QA sweep)
+Docs-Revision: 2025-09-07 (v1.2.16 fragments merged)
 # FoodBank Manager (WordPress Plugin)
 
 A secure, mobile‑first WordPress plugin for Food Bank applications, encrypted data storage, operational dashboards, and **attendance tracking** with QR codes. Administrators can configure branding and default email senders via a validated settings page. The Shortcodes page includes a builder with masked, nonce‑protected previews.
@@ -27,13 +27,14 @@ composer phpcs && composer phpstan -- --memory-limit=1G && composer test
 - **Exact Food Bank form preset** matching the live site.
 - **Read-only Presets Library** with copyable `[fbm_form preset="…"]` shortcodes.
 - **Email confirmations & admin notifications** (HTML), with **logging** and resend.
+- **End-to-end form submissions** with schema validation, consent hashing, safe uploads, email logging, and success references.
 - **Email templates admin page** (list with edit skeleton).
 - **Custom database** with **field‑level encryption** (libsodium AEAD, envelope keys).
 - **Front‑end dashboard** (Viewer/Manager) with sanitized filters and CSV/XLSX/PDF exports that sanitize filenames, include a UTF‑8 BOM with translated headers, and mask sensitive fields unless the user has `fb_view_sensitive`. Manager dashboard cards via `[fbm_dashboard]` show aggregated, non‑PII stats with optional % change vs previous period and a daily check-ins sparkline. It supports optional filters (event, type, policy-only) and a summary CSV download. Default period is 7 days.
 - **Database filter presets and per-user column toggles** on the admin Database page.
 - **Attendance module**: events (optional), admin‑only QR check‑in links (REST nonce, no PII), override reasons, scan/manual check‑in, policy rules, reports. Attendance repository queries use `$wpdb->prepare()` with strict placeholders, mask PII by default, and are covered by unit tests.
 - **GDPR helpers**: consent logs, SAR export, retention/anonymisation.
-- **Diagnostics**: mail failures, environment checks, test email, repair capabilities.
+- **Diagnostics**: mail failures, environment checks, test email, repair capabilities, and a cron health panel with run-now and dry-run controls.
 - Accessible, responsive, EN/PT translations.
 
 ## ✅ Requirements
@@ -74,12 +75,12 @@ Alternatively build locally with `composer build:zip` and upload that ZIP.
 1. **Create a Form** (FoodBank → Forms) or use the **“Food Bank Intake”** preset.
 2. Drop the shortcode on a page:
    ```
-   [fbm_form id="123"]
+   [fbm_form preset="slug"]
    ```
 3. Submit a test entry → verify applicant & admin emails appear under **Diagnostics**.
 4. Add the front‑end dashboard for team members:
    ```
-   [fbm_entries]
+   [fbm_dashboard]
    ```
 5. Try **Attendance → Scan** (QR embedded in confirmation email).
 
@@ -87,10 +88,10 @@ Alternatively build locally with `composer build:zip` and upload that ZIP.
 
 | Shortcode | Attributes (default) |
 | --- | --- |
-| `[fbm_form]` | `id` (string, default "1") |
-| `[fbm_entries]` | _None_ |
-| `[fbm_attendance_manager]` | _None_ |
+| `[fbm_form]` | `preset` (string, slug) |
 | `[fbm_dashboard]` | `period` ("today"\|"7d"\|"30d"), `compare` ("1"\|"0"), `sparkline` ("1"\|"0") |
+
+Assets for these shortcodes load only when present on the front end. The dashboard requires `fb_manage_dashboard` or `fb_view_dashboard`; others see a friendly notice.
 
 ## 📚 Docs
 - **PRD:** [`Docs/PRD-foodbank-manager.md`](Docs/PRD-foodbank-manager.md)

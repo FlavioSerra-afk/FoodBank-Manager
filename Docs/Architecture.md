@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-07 (v1.2.15 fragments merged)
+Docs-Revision: 2025-09-07 (v1.2.16 fragments merged)
 # FoodBank Manager — Architecture
 
 ## Overview
@@ -29,7 +29,7 @@ A secure, privacy-first WordPress plugin for managing Food Bank applicant intake
 - `includes/UI/Theme.php`, `assets/css/{theme-*.css,frontend-dashboard.css}`, `includes/Security/CssSanitizer.php`.
 - `includes/Logging/Audit.php`.
 - QA/CI: `.github/workflows/release.yml`, `phpcs.xml`, `phpstan.neon`, `phpstan-bootstrap.php`, `composer.json` scripts.
-- Tests use deterministic WP stubs (`tests/Support/WPStubs.php`) providing fallbacks for core helpers.
+- Canonical WP stubs (`tests/Support/WPStubs.php`) with deterministic shims keep PHPStan and tests green.
 
 ## Boot & lifecycle
 - `foodbank-manager.php` attempts `vendor/autoload.php` and registers a lightweight PSR-4 fallback mapping `FBM\` classes in `includes/` and aliasing `FoodBankManager\` during migration.
@@ -54,9 +54,10 @@ Admin pages share a `FBM\Core\RenderOnce` registry. `Admin\Menu` wraps each subm
 - Diagnostics badge flips to "RenderOnce duplicates" when any key exceeds one.
 
 ## Components
- - **Admin Pages:** Dashboard (`fb_manage_dashboard`), Attendance (`fb_manage_attendance`), Database (`fb_manage_database`), Forms (`fb_manage_forms`) with preset-based schemas, admin builder with preview and CAPTCHA, Email Templates (`fb_manage_emails`), Settings (`fb_manage_settings`), Diagnostics (`fb_manage_diagnostics` – environment checks, test email, repair caps, cron health panel with retention run and dry-run controls), Permissions (`fb_manage_permissions`), Design & Theme (`fb_manage_theme`).
+ - **Admin Pages:** Dashboard (`fb_manage_dashboard`), Attendance (`fb_manage_attendance`), Database (`fb_manage_database`), Forms (`fb_manage_forms`) with preset-based schemas, admin builder with preview and CAPTCHA, Email Templates (`fb_manage_emails`), Settings (`fb_manage_settings`), Diagnostics (`fb_manage_diagnostics` – environment checks, test email, repair caps, cron health panel listing FBM hooks with last/next run times, overdue flags, and run-now/dry-run controls that output masked JSON summaries), Permissions (`fb_manage_permissions`), Design & Theme (`fb_manage_theme`).
   - Database page requires `fb_manage_database`; filters are sanitized and whitelisted. It supports per-user column preferences (`fbm_db_columns`) and saved filter presets stored in options (`db_filter_presets`). Exports respect filters, sanitize filenames, include a UTF-8 BOM with translated headers, and mask PII unless the user has `fb_view_sensitive`.
-- **Shortcodes:** `[fbm_form]`, `[fb_attendance_manager]`, `[fbm_dashboard]` (manager-only card stats with trend deltas, sparkline, optional filters and summary CSV export; no PII).
+ - **Form submissions:** schema validation, consent hashing, safe uploads, email send & log, and success reference.
+ - **Shortcodes:** `[fbm_form preset="slug"]` and `[fbm_dashboard]` load assets only when present; the dashboard shows manager stats with optional filters and summary CSV export (no PII) for users who can `fb_manage_dashboard` or `fb_view_dashboard`.
 - **REST:** namespace `pcc-fb/v1`; endpoints for attendance check-in, no-show, timeline, void/unvoid/note.
  - Admin Attendance page generates REST-nonce QR check-in URLs (no PII) and an override reason form.
 - **Security:** libsodium/XChaCha20-Poly1305 envelope encryption (`FBM_KEK_BASE64`), `sodium_compat` fallback; masking helpers; no PII in logs.
