@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-07 (v1.2.15 fragments merged)
+Docs-Revision: 2025-09-07 (v1.2.16 fragments merged)
 
 ## Active Issues
 - [P0] PHPUnit WP stub gaps → Fixed (Prompt P)
@@ -15,8 +15,10 @@ Docs-Revision: 2025-09-07 (v1.2.15 fragments merged)
 - Duplicate plugin folders → auto-consolidated on activation from v1.2.13+.
 - Admin notice callbacks return void to satisfy PHPStan.
 - Settings inputs sanitized and theme CSS variables deterministic.
-- Diagnostics panel reports cron health with retention run and dry-run controls.
-- Shortcode-driven forms with preset schemas, builder preview, strict validation and CAPTCHA.
+- Diagnostics panel reports cron health, listing FBM hooks with last/next run times, overdue flags, and run-now/dry-run controls.
+- Shortcode-driven forms with preset schemas, builder preview, strict validation and CAPTCHA; assets load only when a shortcode is present and the dashboard requires `fb_manage_dashboard` or `fb_view_dashboard`.
+- End-to-end form submissions with schema validation, consent hashing, safe uploads, email send & log, and success reference.
+- Canonical WP stubs with deterministic shims keep PHPStan and PHPUnit green.
 
 # FoodBank Manager — Issues & Milestones
 
