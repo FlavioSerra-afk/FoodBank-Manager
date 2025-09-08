@@ -1,5 +1,7 @@
 <?php declare(strict_types=1);
 
+use Tests\Support\Exceptions\FbmDieException;
+
 if (defined('FBM_WPSTUBS_LOADED')) {
     return;
 }
@@ -78,7 +80,15 @@ $GLOBALS['fbm_test_nonce_secret'] = $GLOBALS['fbm_test_nonce_secret'] ?? 'fbm-te
 $GLOBALS['fbm_test_trust_nonces'] = $GLOBALS['fbm_test_trust_nonces'] ?? true;
 if (!function_exists('wp_create_nonce')) { function wp_create_nonce($a=-1){ return hash_hmac('sha256', (string)$a, $GLOBALS['fbm_test_nonce_secret']); } }
 if (!function_exists('wp_verify_nonce')) { function wp_verify_nonce($n,$a=-1){ return !empty($GLOBALS['fbm_test_trust_nonces']) ? 1 : (hash_equals($n ?? '', wp_create_nonce($a)) ? 1 : false); } }
-if (!function_exists('check_admin_referer')) { function check_admin_referer($a=-1,$name='_wpnonce'){ $n=$_REQUEST[$name]??''; if(!wp_verify_nonce($n,$a)) throw new RuntimeException('bad nonce'); return true; } }
+  if (!function_exists('check_admin_referer')) {
+    function check_admin_referer($a=-1, $name='_wpnonce'){
+      $n = $_REQUEST[$name] ?? '';
+      if (!wp_verify_nonce($n, $a)) {
+        throw new FbmDieException('bad nonce');
+      }
+      return true;
+    }
+  }
 if (!function_exists('fbm_test_trust_nonces')) { function fbm_test_trust_nonces(bool $t){ $GLOBALS['fbm_test_trust_nonces']=$t; } }
 if (!function_exists('fbm_test_set_request_nonce')) { function fbm_test_set_request_nonce(string $a='fbm', string $f='_wpnonce'){ $_REQUEST[$f]=wp_create_nonce($a); $_POST[$f]=$_REQUEST[$f]; } }
 if (!function_exists('wp_nonce_field')) {
@@ -123,7 +133,7 @@ if (!function_exists('menu_page_url')) { function menu_page_url(string $slug, bo
 if (!function_exists('plugins_url')) { function plugins_url($p=''){ return 'https://example.test/wp-content/plugins/'.ltrim($p,'/'); } }
 if (!function_exists('site_url')) { function site_url($p='', $scheme = null){ return 'https://example.test/'.ltrim($p,'/'); } }
 if (!function_exists('wp_nonce_url')) { function wp_nonce_url($u,$a=-1,$n='_wpnonce'){ return add_query_arg([$n=>wp_create_nonce($a)],$u); } }
-if (!function_exists('wp_safe_redirect')) { /** @return void */ function wp_safe_redirect($u){ $GLOBALS['__last_redirect']=(string)$u; throw new RuntimeException('redirect'); } }
+if (!function_exists('wp_safe_redirect')) { /** @return void */ function wp_safe_redirect($u, $status = 302){ $GLOBALS['__last_redirect']=(string)$u; throw new RuntimeException('redirect'); } }
 if (!function_exists('wp_redirect')) { /** @return void */ function wp_redirect($u){ $GLOBALS['__last_redirect']=(string)$u; throw new RuntimeException('redirect'); } }
 if (!function_exists('wp_die')) { /** @return void */ function wp_die($m=''){ throw new FbmDieException((string)$m); } }
 

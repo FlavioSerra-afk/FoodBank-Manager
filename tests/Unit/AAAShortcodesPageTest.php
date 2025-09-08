@@ -16,8 +16,6 @@ final class ShortcodesPageTest extends BaseTestCase {
     protected function setUp(): void {
         parent::setUp();
         fbm_grant_for_page('fbm_shortcodes');
-        fbm_test_trust_nonces(true);
-        $_REQUEST = array();
         self::$last_shortcode = '';
         if (!defined('FBM_PATH')) {
             define('FBM_PATH', dirname(__DIR__, 2) . '/');
@@ -47,10 +45,8 @@ final class ShortcodesPageTest extends BaseTestCase {
 
     public function testCapabilityRequired(): void {
         fbm_grant_caps([]);
-        ob_start();
+        $this->expectException(\Tests\Support\Exceptions\FbmDieException::class);
         ShortcodesPage::route();
-        $html = (string) ob_get_clean();
-        $this->assertStringContainsString('You do not have permission to access this page.', $html);
     }
 
     public function testInvalidNonceBlocksPreview(): void {
@@ -71,8 +67,9 @@ final class ShortcodesPageTest extends BaseTestCase {
         ob_start();
         ShortcodesPage::route();
         $html = (string) ob_get_clean();
-        $this->assertStringContainsString( 'Invalid shortcode', $html );
-        $this->assertSame( '', self::$last_shortcode );
+        $this->assertStringContainsString('<div class="wrap fbm-admin">', $html);
+        $this->assertStringContainsString('Invalid shortcode', $html);
+        $this->assertSame('', self::$last_shortcode);
     }
 
     public function testAttributeSanitizer(): void {
@@ -111,8 +108,9 @@ final class ShortcodesPageTest extends BaseTestCase {
         ob_start();
         ShortcodesPage::route();
         $html = (string) ob_get_clean();
-        $this->assertStringContainsString( '<div class="fbm-preview"><div>ok</div><script>alert(1)</script></div>', $html );
-        $this->assertSame( '[fbm_form id="1" preset="basic_intake" mask_sensitive="true"]', self::$last_shortcode );
+        $this->assertStringContainsString('<div class="wrap fbm-admin">', $html);
+        $this->assertStringContainsString('<div class="fbm-preview"><div>ok</div><script>alert(1)</script></div>', $html);
+        $this->assertSame('[fbm_form id="1" preset="basic_intake" mask_sensitive="true"]', self::$last_shortcode);
     }
 }
 }

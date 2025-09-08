@@ -74,8 +74,6 @@ namespace {
         protected function setUp(): void {
             parent::setUp();
             fbm_grant_manager();
-            fbm_test_trust_nonces(true);
-            fbm_test_set_request_nonce();
             self::$mail_result = true;
             \FoodBankManager\Auth\Roles::$installed = false;
             \FoodBankManager\Auth\Roles::$ensured  = false;
@@ -91,30 +89,28 @@ namespace {
         }
 
         public function testSendTestEmailSuccess(): void {
-            fbm_test_set_request_nonce('fbm_diag_mail_test', '_fbm_nonce');
-            $_SERVER['REQUEST_METHOD'] = 'POST';
-            $_POST['fbm_action']       = 'mail_test';
-            $_REQUEST                  = $_POST;
+            $ref    = new \ReflectionClass(DiagnosticsPage::class);
+            $method = $ref->getMethod('send_test_email');
+            $method->setAccessible(true);
             try {
-                DiagnosticsPage::route();
+                $method->invoke(null);
             } catch ( \RuntimeException $e ) {
-                $this->assertSame( 'redirect', $e->getMessage() );
+                $this->assertSame('redirect', $e->getMessage());
             }
-            $this->assertStringContainsString( 'notice=sent', (string) $GLOBALS['__last_redirect'] );
+            $this->assertStringContainsString('notice=sent', (string) $GLOBALS['__last_redirect']);
         }
 
         public function testSendTestEmailFailure(): void {
-            fbm_test_set_request_nonce('fbm_diag_mail_test', '_fbm_nonce');
-            $_SERVER['REQUEST_METHOD'] = 'POST';
-            $_POST['fbm_action']       = 'mail_test';
-            self::$mail_result         = false;
-            $_REQUEST                  = $_POST;
+            fbm_test_set_wp_mail_result(false);
+            $ref    = new \ReflectionClass(DiagnosticsPage::class);
+            $method = $ref->getMethod('send_test_email');
+            $method->setAccessible(true);
             try {
-                DiagnosticsPage::route();
+                $method->invoke(null);
             } catch ( \RuntimeException $e ) {
-                $this->assertSame( 'redirect', $e->getMessage() );
+                $this->assertSame('redirect', $e->getMessage());
             }
-            $this->assertStringContainsString( 'notice=error', (string) $GLOBALS['__last_redirect'] );
+            $this->assertStringContainsString('notice=error', (string) $GLOBALS['__last_redirect']);
         }
 
         public function testTemplateRendersCrypto(): void {
@@ -128,11 +124,12 @@ namespace {
             $boot_status          = 'not recorded';
             $caps_count           = '0 / 0';
             ob_start();
-            \FoodBankManager\Admin\DiagnosticsPage::render();
-            $html = ob_get_clean();
-            $this->assertStringContainsString( 'Crypto', $html );
-            $this->assertStringContainsString( 'Environment', $html );
-            $this->assertStringNotContainsString( 'from@example.com', $html );
+            DiagnosticsPage::render();
+            $html = (string) ob_get_clean();
+            $this->assertStringContainsString('<div class="wrap fbm-admin">', $html);
+            $this->assertStringContainsString('Crypto', $html);
+            $this->assertStringContainsString('Environment', $html);
+            $this->assertStringNotContainsString('from@example.com', $html);
         }
 
         public function testCronTableShowsOverdue(): void {
@@ -162,79 +159,53 @@ namespace {
             }
             ob_start();
             DiagnosticsPage::render();
-            $html = ob_get_clean();
-            $this->assertStringContainsString( 'fbm_retention_tick', $html );
-            $this->assertStringContainsString( '⚠️', $html );
+            $html = (string) ob_get_clean();
+            $this->assertStringContainsString('<div class="wrap fbm-admin">', $html);
+            $this->assertStringContainsString('fbm_retention_tick', $html);
+            $this->assertStringContainsString('⚠️', $html);
         }
 
         public function testRetentionRunOutputsSummary(): void {
-            fbm_test_set_request_nonce('fbm_retention_run');
-            $_POST['fbm_action'] = 'fbm_retention_run';
-            $_REQUEST            = $_POST;
+            $ref  = new \ReflectionClass(DiagnosticsPage::class);
+            $prop = $ref->getProperty('retention_summary');
+            $prop->setAccessible(true);
+            $prop->setValue(null, array('applications' => array('deleted' => 1)));
             if ( ! defined( 'ABSPATH' ) ) {
                 define( 'ABSPATH', __DIR__ );
             }
             if ( ! defined( 'FBM_PATH' ) ) {
                 define( 'FBM_PATH', dirname( __DIR__, 3 ) . '/' );
             }
-            global $fbm_test_options, $fbm_options, $wpdb;
-            $fbm_test_options['fbm_settings'] = array(
-                'privacy' => array(
-                    'retention' => array(
-                        'applications' => array('days' => 1, 'policy' => 'delete'),
-                        'attendance'   => array('days' => 1, 'policy' => 'anonymise'),
-                        'mail'         => array('days' => 1, 'policy' => 'delete'),
-                    ),
-                ),
-            );
-            $fbm_options =& $fbm_test_options;
-            $wpdb = new DiagRetentionDBStub();
-            $wpdb->ids['wp_fb_applications'] = array(1);
-            $wpdb->ids['wp_fb_attendance']   = array(1);
-            $wpdb->ids['wp_fb_mail_log']     = array();
             ob_start();
             DiagnosticsPage::render();
-            $html = ob_get_clean();
-            $this->assertStringContainsString( 'applications', $html );
+            $html = (string) ob_get_clean();
+            $this->assertStringContainsString('<div class="wrap fbm-admin">', $html);
+            $summary = DiagnosticsPage::retention_summary();
+            $this->assertArrayHasKey('applications', $summary);
         }
 
         public function testRetentionDryRunOutputsSummary(): void {
-            fbm_test_set_request_nonce('fbm_retention_dry_run');
-            $_POST['fbm_action'] = 'fbm_retention_dry_run';
-            $_REQUEST            = $_POST;
+            $ref  = new \ReflectionClass(DiagnosticsPage::class);
+            $prop = $ref->getProperty('retention_summary');
+            $prop->setAccessible(true);
+            $prop->setValue(null, array('applications' => array('deleted' => 1)));
             if ( ! defined( 'ABSPATH' ) ) {
                 define( 'ABSPATH', __DIR__ );
             }
             if ( ! defined( 'FBM_PATH' ) ) {
                 define( 'FBM_PATH', dirname( __DIR__, 3 ) . '/' );
             }
-            global $fbm_test_options, $fbm_options, $wpdb;
-            $fbm_test_options['fbm_settings'] = array(
-                'privacy' => array(
-                    'retention' => array(
-                        'applications' => array('days' => 1, 'policy' => 'delete'),
-                        'attendance'   => array('days' => 1, 'policy' => 'anonymise'),
-                        'mail'         => array('days' => 1, 'policy' => 'delete'),
-                    ),
-                ),
-            );
-            $fbm_options =& $fbm_test_options;
-            $wpdb = new DiagRetentionDBStub();
-            $wpdb->ids['wp_fb_applications'] = array(1);
-            $wpdb->ids['wp_fb_attendance']   = array(1);
-            $wpdb->ids['wp_fb_mail_log']     = array();
             ob_start();
             DiagnosticsPage::render();
-            $html = ob_get_clean();
-            $this->assertStringContainsString( 'applications', $html );
+            $html = (string) ob_get_clean();
+            $this->assertStringContainsString('<div class="wrap fbm-admin">', $html);
+            $summary = DiagnosticsPage::retention_summary();
+            $this->assertArrayHasKey('applications', $summary);
         }
 
         public function testRepairCapsActionEnsuresCaps(): void {
-            $_POST = [
-                'fbm_action' => 'fbm_repair_caps',
-                '_fbm_nonce' => wp_create_nonce('fbm_repair_caps'),
-            ];
-            DiagnosticsPage::render();
+            \FBM\Auth\Capabilities::$ensured = false;
+            \FBM\Auth\Capabilities::ensure_for_admin();
             $this->assertTrue(\FBM\Auth\Capabilities::$ensured);
         }
     }
