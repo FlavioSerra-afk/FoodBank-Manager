@@ -36,6 +36,35 @@ namespace {
 
 }
 
+namespace FBM\Core {
+    class Retention {
+        public static function run_now(): array {
+            return array( 'applications' => array( 'deleted' => 1 ) );
+        }
+        public static function dry_run(): array {
+            return array( 'applications' => array( 'deleted' => 1 ) );
+        }
+        public static function events(): array {
+            return array();
+        }
+    }
+}
+
+namespace FoodBankManager\Admin {
+    function filter_input( int $type, $var, $filter = FILTER_DEFAULT, $options = [] ) {
+        if ( INPUT_POST === $type ) {
+            return $_POST[ $var ] ?? null;
+        }
+        if ( INPUT_GET === $type ) {
+            return $_GET[ $var ] ?? null;
+        }
+        if ( INPUT_SERVER === $type ) {
+            return $_SERVER[ $var ] ?? null;
+        }
+        return null;
+    }
+}
+
 namespace FoodBankManager\Auth {
     class Roles {
         public static bool $installed = false;
@@ -71,10 +100,10 @@ namespace {
         /** @var array<string,int> */
         public static array $cron_next = array();
 
-        protected function setUp(): void {
-            parent::setUp();
-            fbm_grant_manager();
-            self::$mail_result = true;
+    protected function setUp(): void {
+        parent::setUp();
+        fbm_grant_manager();
+        self::$mail_result = true;
             \FoodBankManager\Auth\Roles::$installed = false;
             \FoodBankManager\Auth\Roles::$ensured  = false;
             global $fbm_test_options, $fbm_options;
@@ -85,15 +114,18 @@ namespace {
                 ),
                 'admin_email' => 'admin@example.com',
             );
-            $fbm_options =& $fbm_test_options;
-        }
+        $fbm_options =& $fbm_test_options;
+    }
 
         public function testSendTestEmailSuccess(): void {
-            $ref    = new \ReflectionClass(DiagnosticsPage::class);
-            $method = $ref->getMethod('send_test_email');
-            $method->setAccessible(true);
+            fbm_seed_nonce('unit-seed');
+            $_SERVER['REQUEST_METHOD'] = 'POST';
+            $_POST = array(
+                'fbm_action' => 'mail_test',
+                '_fbm_nonce' => wp_create_nonce('fbm_diag_mail_test'),
+            );
             try {
-                $method->invoke(null);
+                DiagnosticsPage::route();
             } catch ( \RuntimeException $e ) {
                 $this->assertSame('redirect', $e->getMessage());
             }
@@ -102,11 +134,14 @@ namespace {
 
         public function testSendTestEmailFailure(): void {
             fbm_test_set_wp_mail_result(false);
-            $ref    = new \ReflectionClass(DiagnosticsPage::class);
-            $method = $ref->getMethod('send_test_email');
-            $method->setAccessible(true);
+            fbm_seed_nonce('unit-seed');
+            $_SERVER['REQUEST_METHOD'] = 'POST';
+            $_POST = array(
+                'fbm_action' => 'mail_test',
+                '_fbm_nonce' => wp_create_nonce('fbm_diag_mail_test'),
+            );
             try {
-                $method->invoke(null);
+                DiagnosticsPage::route();
             } catch ( \RuntimeException $e ) {
                 $this->assertSame('redirect', $e->getMessage());
             }
@@ -166,41 +201,45 @@ namespace {
         }
 
         public function testRetentionRunOutputsSummary(): void {
-            $ref  = new \ReflectionClass(DiagnosticsPage::class);
-            $prop = $ref->getProperty('retention_summary');
-            $prop->setAccessible(true);
-            $prop->setValue(null, array('applications' => array('deleted' => 1)));
+            fbm_seed_nonce('unit-seed');
             if ( ! defined( 'ABSPATH' ) ) {
                 define( 'ABSPATH', __DIR__ );
             }
             if ( ! defined( 'FBM_PATH' ) ) {
                 define( 'FBM_PATH', dirname( __DIR__, 3 ) . '/' );
             }
+            $_SERVER['REQUEST_METHOD'] = 'POST';
+            $_POST = array(
+                'fbm_action' => 'fbm_retention_run',
+                '_wpnonce'   => wp_create_nonce('fbm_retention_run'),
+            );
             ob_start();
             DiagnosticsPage::render();
             $html = (string) ob_get_clean();
             $this->assertStringContainsString('<div class="wrap fbm-admin">', $html);
-            $summary = DiagnosticsPage::retention_summary();
-            $this->assertArrayHasKey('applications', $summary);
+            $this->assertStringContainsString('Cron Health', $html);
+            $this->assertStringContainsString('"deleted":1', $html);
         }
 
         public function testRetentionDryRunOutputsSummary(): void {
-            $ref  = new \ReflectionClass(DiagnosticsPage::class);
-            $prop = $ref->getProperty('retention_summary');
-            $prop->setAccessible(true);
-            $prop->setValue(null, array('applications' => array('deleted' => 1)));
+            fbm_seed_nonce('unit-seed');
             if ( ! defined( 'ABSPATH' ) ) {
                 define( 'ABSPATH', __DIR__ );
             }
             if ( ! defined( 'FBM_PATH' ) ) {
                 define( 'FBM_PATH', dirname( __DIR__, 3 ) . '/' );
             }
+            $_SERVER['REQUEST_METHOD'] = 'POST';
+            $_POST = array(
+                'fbm_action' => 'fbm_retention_dry_run',
+                '_wpnonce'   => wp_create_nonce('fbm_retention_dry_run'),
+            );
             ob_start();
             DiagnosticsPage::render();
             $html = (string) ob_get_clean();
             $this->assertStringContainsString('<div class="wrap fbm-admin">', $html);
-            $summary = DiagnosticsPage::retention_summary();
-            $this->assertArrayHasKey('applications', $summary);
+            $this->assertStringContainsString('Cron Health', $html);
+            $this->assertStringContainsString('"deleted":1', $html);
         }
 
         public function testRepairCapsActionEnsuresCaps(): void {
