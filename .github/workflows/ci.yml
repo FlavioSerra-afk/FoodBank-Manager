@@ -15,6 +15,12 @@ jobs:
           tools: composer
       - name: Install
         run: composer install --no-interaction --prefer-dist
+      - name: Guard: no WP functions in tests
+        run: |
+          if rg -n -P '^[ \t]*function (?!fbm_)' tests | grep -v 'tests/Support/WPStubs.php'; then
+            echo 'WP function declarations found in tests';
+            exit 1;
+          fi
       - name: PHPCS lane
         run: |
           vendor/bin/phpcs --standard=phpcs.xml --report=summary \
@@ -29,4 +35,6 @@ jobs:
             templates/public/form-success.php \
             templates/public/dashboard.php
       - name: QA
+        env:
+          FBM_PHPSTAN: 1
         run: composer qa

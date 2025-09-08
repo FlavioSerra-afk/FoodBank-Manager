@@ -1,14 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace FoodBankManager\Core {
-    function wp_strip_all_tags( string $text ): string {
-        return strip_tags( $text );
-    }
-    function wp_kses_post( $data ) {
-        return strip_tags( (string) $data, '<p>' );
-    }
-}
+namespace FoodBankManager\Core {}
 
 namespace FoodBankManager\Admin {}
 
@@ -16,42 +9,6 @@ namespace {
 use PHPUnit\Framework\TestCase;
 use FoodBankManager\Admin\EmailsPage;
 use FoodBankManager\Core\Options;
-
-if ( ! function_exists( 'wp_unslash' ) ) {
-    function wp_unslash( $value ) {
-        return is_array( $value ) ? array_map( 'wp_unslash', $value ) : stripslashes( (string) $value );
-    }
-}
-if ( ! function_exists( 'menu_page_url' ) ) {
-    function menu_page_url( string $slug, bool $echo = true ): string {
-        return 'admin.php?page=' . $slug;
-    }
-}
-if ( ! function_exists( 'add_query_arg' ) ) {
-    function add_query_arg( array $args, string $url ): string {
-        return $url . '?' . http_build_query( $args );
-    }
-}
-if ( ! function_exists( 'wp_nonce_field' ) ) {
-    function wp_nonce_field( $action, $name ) {}
-}
-if ( ! function_exists( 'esc_textarea' ) ) {
-    function esc_textarea( $text ) {
-        return htmlspecialchars( (string) $text, ENT_QUOTES );
-    }
-}
-if ( ! function_exists( 'get_bloginfo' ) ) {
-    function get_bloginfo( $show = '', $filter = 'raw' ) {
-        return 'Test Site';
-    }
-}
-
-if ( ! function_exists( 'wp_send_json' ) ) {
-    function wp_send_json( $response ) {
-        echo json_encode( $response );
-        throw new RuntimeException( 'json' );
-    }
-}
 
 final class EmailsPageTest extends TestCase {
 
@@ -67,8 +24,7 @@ final class EmailsPageTest extends TestCase {
         $_GET = array();
         $_POST = array();
         $_SERVER = array();
-        global $fbm_test_options;
-        $fbm_test_options = array();
+        $GLOBALS['fbm_options'] = array();
     }
 
     public function testCapabilityRequired(): void {

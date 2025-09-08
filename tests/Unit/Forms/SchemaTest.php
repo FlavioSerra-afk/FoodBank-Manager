@@ -1,19 +1,6 @@
 <?php
 declare(strict_types=1);
 
-namespace {
-    if ( ! function_exists( 'sanitize_key' ) ) {
-        function sanitize_key( $key ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            return preg_replace( '/[^a-z0-9_]/', '', strtolower( (string) $key ) );
-        }
-    }
-    if ( ! function_exists( 'sanitize_text_field' ) ) {
-        function sanitize_text_field( $str ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            return trim( strip_tags( (string) $str ) );
-        }
-    }
-}
-
 namespace FoodBankManager\Tests\Unit\Forms {
 
 use FoodBankManager\Forms\Schema;

@@ -3,23 +3,6 @@ declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 use FoodBankManager\Admin\Notices;
-if (!function_exists('get_current_screen')) {
-    function get_current_screen() {
-        $id = $GLOBALS['fbm_test_screen_id'] ?? null;
-        if (!$id) {
-            return null;
-        }
-        $o = new stdClass();
-        $o->id = (string) $id;
-        return $o;
-    }
-}
-if (!function_exists('esc_html__')) {
-    function esc_html__(string $text, string $domain = ''): string { return $text; }
-}
-if (!function_exists('is_email')) {
-    function is_email($email) { return true; }
-}
 
 final class NoticesTest extends TestCase {
 

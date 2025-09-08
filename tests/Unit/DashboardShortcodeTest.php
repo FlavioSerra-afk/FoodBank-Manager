@@ -1,24 +1,6 @@
 <?php
 declare(strict_types=1);
 
-namespace {
-    if (!function_exists('esc_html_e')) {
-        function esc_html_e(string $text, string $domain = 'default'): void { echo $text; }
-    }
-    if (!function_exists('number_format_i18n')) {
-        function number_format_i18n($n): string { return (string) $n; }
-    }
-    if (!function_exists('current_time')) {
-        function current_time($type, $gmt = false) { return '2025-09-04 00:00:00'; }
-    }
-    if (!function_exists('wp_enqueue_style')) {
-        function wp_enqueue_style($handle): void {}
-    }
-    if (!function_exists('get_current_user_id')) {
-        function get_current_user_id(): int { return 1; }
-    }
-}
-
 namespace FoodBankManagerTest {
 
 use PHPUnit\Framework\TestCase;

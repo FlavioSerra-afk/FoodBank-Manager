@@ -4,20 +4,6 @@ declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 use FoodBankManager\Admin\Menu;
 
-if ( ! function_exists( 'current_action' ) ) {
-    function current_action() { return 'admin_menu'; }
-}
-if ( ! function_exists( 'esc_html__' ) ) {
-    function esc_html__( string $text, string $domain = 'default' ): string {
-        return $text;
-    }
-}
-if ( ! function_exists( 'esc_html' ) ) {
-    function esc_html( $text ) {
-        return (string) $text;
-    }
-}
-
 final class MenuTest extends TestCase {
     protected function setUp(): void {
         parent::setUp();

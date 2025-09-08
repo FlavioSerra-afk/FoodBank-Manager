@@ -19,7 +19,7 @@ final class MenuVisibilityTest extends TestCase {
 
     public function testParentMenuFallsBackToManageOptions(): void {
         fbm_test_reset_globals();
-        fbm_grant_admin_only();
+        fbm_grant_caps(['manage_options']);
         Menu::register();
         $call = $GLOBALS['fbm_test_calls']['add_menu_page'][0];
         $this->assertSame('fbm', $call['slug']);
@@ -31,7 +31,7 @@ final class MenuVisibilityTest extends TestCase {
 
     public function testParentMenuUsesFbmCapWhenPresent(): void {
         fbm_test_reset_globals();
-        fbm_grant_fbm_all();
+        fbm_grant_manager();
         Menu::register();
         $call = $GLOBALS['fbm_test_calls']['add_menu_page'][0];
         $this->assertSame('fb_manage_dashboard', $call['cap']);

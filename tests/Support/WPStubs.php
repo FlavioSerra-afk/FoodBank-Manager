@@ -106,7 +106,7 @@ if (!function_exists('add_query_arg')) {
   }
 }
 if (!function_exists('remove_query_arg')) {
-  function remove_query_arg($keys, string $url=''){ 
+  function remove_query_arg($keys, string $url=''){
     $keys=(array)$keys; $parts=parse_url($url); $query=[];
     if(!empty($parts['query'])) parse_str($parts['query'],$query);
     foreach($keys as $k){ unset($query[$k]); }
@@ -117,6 +117,8 @@ if (!function_exists('remove_query_arg')) {
   }
 }
 if (!function_exists('admin_url')) { function admin_url($p=''){ return 'https://example.test/wp-admin/'.ltrim($p,'/'); } }
+if (!isset($GLOBALS['fbm_current_action'])) $GLOBALS['fbm_current_action'] = 'admin_menu';
+if (!function_exists('current_action')) { function current_action(){ return $GLOBALS['fbm_current_action']; } }
 if (!function_exists('menu_page_url')) { function menu_page_url(string $slug, bool $echo=true){ $u='admin.php?page='.$slug; if($echo) echo $u; return $u; } }
 if (!function_exists('plugins_url')) { function plugins_url($p=''){ return 'https://example.test/wp-content/plugins/'.ltrim($p,'/'); } }
 if (!function_exists('wp_nonce_url')) { function wp_nonce_url($u,$a=-1,$n='_wpnonce'){ return add_query_arg([$n=>wp_create_nonce($a)],$u); } }
@@ -176,7 +178,22 @@ if (!function_exists('apply_filters')){ function apply_filters($hook, $val, ...$
 if (!function_exists('add_settings_error')){ function add_settings_error($setting,$code,$message,$type='error'){ $GLOBALS['fbm_settings_errors'][]=[$setting,$code,$message,$type]; } }
 if (!function_exists('settings_errors')){ function settings_errors($setting='', $sanitize=false, $hide_on_update=false){ return $GLOBALS['fbm_settings_errors']??[]; } }
 if (!function_exists('submit_button')){ function submit_button($text='', $type='primary', $name='submit', $wrap=true){ echo '<button type="submit" class="button">'.esc_html($text ?: 'Submit').'</button>'; } }
-if (!function_exists('filter_input')){ function filter_input($type,$var,$filter=FILTER_DEFAULT,$options=[]){ if($type===INPUT_POST){ return $_POST[$var]??null;} if($type===INPUT_GET){ return $_GET[$var]??null;} return null; } }
+if (!function_exists('filter_input')) {
+  function filter_input($type, $var, $filter = FILTER_DEFAULT, $options = []) {
+    if ($type === INPUT_POST) { return $_POST[$var] ?? null; }
+    if ($type === INPUT_GET) { return $_GET[$var] ?? null; }
+    if ($type === INPUT_SERVER) { return $_SERVER[$var] ?? null; }
+    return null;
+  }
+}
+if (!function_exists('filter_input_array')) {
+  function filter_input_array(int $type, $definition = FILTER_DEFAULT, bool $add_empty = true) {
+    if ($type === INPUT_POST) { return $_POST; }
+    if ($type === INPUT_GET) { return $_GET; }
+    if ($type === INPUT_SERVER) { return $_SERVER; }
+    return null;
+  }
+}
 if (!isset($GLOBALS['fbm_user_meta'])) $GLOBALS['fbm_user_meta']=[];
 if (!function_exists('get_user_meta')){ function get_user_meta($id,$key,$single=false){ $v=$GLOBALS['fbm_user_meta'][$id][$key]??null; return $single?($v[0]??null):($v??[]); } }
 if (!function_exists('update_user_meta')){ function update_user_meta($id,$key,$val){ $GLOBALS['fbm_user_meta'][$id][$key]=[$val]; return true; } }

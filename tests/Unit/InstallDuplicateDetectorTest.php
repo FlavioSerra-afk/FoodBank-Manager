@@ -5,37 +5,6 @@ use PHPUnit\Framework\TestCase;
 use FoodBankManager\Core\Install;
 use FoodBankManager\Admin\Notices;
 
-if (!function_exists('get_current_screen')) {
-    function get_current_screen() {
-        $id = $GLOBALS['fbm_test_screen_id'] ?? '';
-        if (!$id) return null;
-        $o = new stdClass();
-        $o->id = $id;
-        return $o;
-    }
-}
-if (!function_exists('esc_html__')) {
-    function esc_html__(string $t, string $d = ''): string { return $t; }
-}
-if (!function_exists('esc_html')) {
-    function esc_html($t) { return $t; }
-}
-if (!function_exists('esc_attr')) {
-    function esc_attr($t) { return $t; }
-}
-if (!function_exists('current_user_can')) {
-    function current_user_can($cap) { return !empty($GLOBALS['fbm_user_caps'][$cap]); }
-}
-if (!function_exists('sanitize_key')) {
-    function sanitize_key($key) { return $key; }
-}
-if (!function_exists('sanitize_text_field')) {
-    function sanitize_text_field($str) { return $str; }
-}
-if (!function_exists('wp_unslash')) {
-    function wp_unslash($str) { return $str; }
-}
-
 final class InstallDuplicateDetectorTest extends TestCase {
     protected function setUp(): void {
         fbm_test_reset_globals();

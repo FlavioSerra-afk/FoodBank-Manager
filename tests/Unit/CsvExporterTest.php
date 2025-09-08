@@ -4,17 +4,6 @@ declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 use FoodBankManager\Exports\CsvExporter;
 
-if ( ! function_exists( 'sanitize_file_name' ) ) {
-    function sanitize_file_name( string $filename ): string {
-        return preg_replace( '/[^A-Za-z0-9._-]/', '', $filename );
-    }
-}
-if ( ! function_exists( '__' ) ) {
-    function __( string $text, ?string $domain = null ): string {
-        return $text;
-    }
-}
-
 final class CsvExporterTest extends TestCase {
     protected function setUp(): void {
         parent::setUp();

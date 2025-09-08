@@ -1,15 +1,6 @@
 <?php
 declare(strict_types=1);
 
-namespace {
-    $GLOBALS['fbm_options_store'] = [];
-}
-
-namespace FoodBankManager\Forms {
-    function get_option(string $key, $default = false) { return $GLOBALS['fbm_options_store'][$key] ?? $default; }
-    function update_option(string $key, $value): bool { $GLOBALS['fbm_options_store'][$key] = $value; return true; }
-}
-
 namespace FoodBankManager\UI {
     if (!class_exists(Theme::class)) {
         class Theme { public static function enqueue_front(): void {} }
@@ -30,7 +21,6 @@ final class FormShortcodeTest extends TestCase {
         fbm_grant_viewer();
         fbm_test_trust_nonces(true);
         fbm_test_set_request_nonce('fbm_submit_form', '_fbm_nonce');
-        $GLOBALS['fbm_options_store'] = [];
         if (!defined('FBM_PATH')) {
             define('FBM_PATH', dirname(__DIR__, 3) . '/');
         }
@@ -45,9 +35,9 @@ final class FormShortcodeTest extends TestCase {
     }
 
     public function testRendersCaptchaAndFields(): void {
-        $raw = json_decode($GLOBALS['fbm_options_store']['fbm_form_test_form'], true);
+        $raw = json_decode($GLOBALS['fbm_options']['fbm_form_test_form'], true);
         $raw['fields'][0]['label'] = '<script>alert(1)</script>';
-        $GLOBALS['fbm_options_store']['fbm_form_test_form'] = json_encode($raw);
+        $GLOBALS['fbm_options']['fbm_form_test_form'] = json_encode($raw);
         Shortcodes::register();
         $html = do_shortcode('[fbm_form preset="test_form"]');
         $this->assertStringContainsString('name="captcha"', $html);
@@ -71,9 +61,9 @@ final class FormShortcodeTest extends TestCase {
     }
 
     public function testTamperedSchemaReturnsEmpty(): void {
-        $raw = json_decode($GLOBALS['fbm_options_store']['fbm_form_test_form'], true);
+        $raw = json_decode($GLOBALS['fbm_options']['fbm_form_test_form'], true);
         $raw['fields'][] = ['id' => 'hack', 'type' => 'evil', 'label' => 'Hack'];
-        $GLOBALS['fbm_options_store']['fbm_form_test_form'] = json_encode($raw);
+        $GLOBALS['fbm_options']['fbm_form_test_form'] = json_encode($raw);
         Shortcodes::register();
         $html = do_shortcode('[fbm_form preset="test_form"]');
         $this->assertSame('', $html);
