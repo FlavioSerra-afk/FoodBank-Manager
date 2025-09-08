@@ -34,7 +34,6 @@ namespace FoodBankManager\Security {
 namespace {
 use BaseTestCase;
 use FoodBankManager\Forms\Presets;
-use FoodBankManager\Core\Options;
 use FoodBankManager\Admin\FormsPage;
 use FoodBankManager\Shortcodes\Form;
 
@@ -59,8 +58,7 @@ final class FormsPresetsTest extends BaseTestCase {
                 array( 'name' => 'y', 'type' => 'unknown', 'label' => 'Y' ),
             ),
         );
-        Options::set_form_presets_custom( $raw );
-        $stored = Options::get_form_presets_custom();
+        $stored = Presets::sanitize_all( $raw );
         $this->assertArrayHasKey( 'custom', $stored );
         $this->assertSame( 'x', $stored['custom'][0]['name'] );
         $this->assertArrayNotHasKey( 'bad', $stored['custom'][0] );

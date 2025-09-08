@@ -92,7 +92,7 @@ namespace {
     use BaseTestCase;
 
     /**
-     * @runInSeparateProcess
+     * @runTestsInSeparateProcesses
      */
     final class DiagnosticsPageTest extends BaseTestCase {
         /** @var array<string,int> */

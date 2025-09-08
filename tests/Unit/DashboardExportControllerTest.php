@@ -36,11 +36,15 @@ final class DashboardExportControllerTest extends TestCase {
         require_once __DIR__ . '/../../includes/Http/DashboardExportController.php';
         $cb = static function () { return false; };
         add_filter('fbm_http_exit', $cb);
-        $this->expectOutputString("Metric,Count\n");
+        $prev = error_reporting();
+        error_reporting($prev & ~E_DEPRECATED);
+        ob_start();
         \FoodBankManager\Http\DashboardExportController::handle();
-        $headers = headers_list();
-        // headers_list() is empty on CLI; ensure it returns an array for best effort.
-        $this->assertIsArray($headers);
+        $out = ob_get_clean();
+        $headers = $GLOBALS['__fbm_sent_headers'] ?? array();
+        $this->assertStringContainsString('text/csv', $headers[0] ?? '');
+        $this->assertStringStartsWith("\xEF\xBB\xBFMetric,Count\n", $out); // Expect BOM + header.
+        error_reporting($prev);
         remove_filter('fbm_http_exit', $cb);
     }
 }

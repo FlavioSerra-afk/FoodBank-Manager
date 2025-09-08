@@ -9,14 +9,16 @@ final class NoticesDeDupTest extends BaseTestCase {
         $GLOBALS['fbm_test_screen_id'] = null;
         fbm_grant_admin();
         if (!defined('FBM_KEK_BASE64')) {
-            define('FBM_KEK_BASE64', 'dummy');
+            define('FBM_KEK_BASE64', base64_encode(str_repeat('K', 32)));
         }
+        $GLOBALS['fbm_test_options'] = ['emails' => ['from_email' => 'from@example.com']];
+        $GLOBALS['fbm_options'] = ['fbm_options' => $GLOBALS['fbm_test_options']];
         do_action('fbm_test_reset_notices');
     }
 
     public function testRenderPrintsOncePerRequest(): void {
         $GLOBALS['fbm_test_screen_id'] = 'toplevel_page_fbm';
-        do_action('fbm_test_set_missing_kek');
+        Notices::missing_kek();
         ob_start();
         Notices::render();
         Notices::render();
@@ -27,7 +29,7 @@ final class NoticesDeDupTest extends BaseTestCase {
 
     public function testRenderBailsOnNonFbmScreen(): void {
         $GLOBALS['fbm_test_screen_id'] = 'dashboard';
-        do_action('fbm_test_set_missing_kek');
+        Notices::missing_kek();
         ob_start();
         Notices::render();
         $out = ob_get_clean();
