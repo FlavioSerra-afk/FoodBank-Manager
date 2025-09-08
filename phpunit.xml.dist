@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="tests/bootstrap.php" colors="true" verbose="true" executionOrder="default">
+<phpunit bootstrap="tests/bootstrap.php" colors="true" verbose="true" executionOrder="default" backupGlobals="false" backupStaticAttributes="false">
   <testsuites>
     <testsuite name="Unit">
       <directory suffix="Test.php">tests/Unit</directory>
     </testsuite>
   </testsuites>
-  <source>
+  <coverage>
     <include>
       <directory>includes</directory>
     </include>
-  </source>
+  </coverage>
 </phpunit>
