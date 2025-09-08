@@ -57,15 +57,14 @@ final class FormShortcodeTest extends TestCase {
 
     public function testSubmitFlowSucceeds(): void {
         Shortcodes::register();
-        fbm_test_set_request_nonce('fbm_submit_form', '_fbm_nonce');
         $_POST = [
             'action' => 'fbm_submit',
             'preset' => 'test_form',
-            '_fbm_nonce' => $_POST['_fbm_nonce'],
             'email' => 'a@example.com',
             'consent' => '1',
             'captcha' => 'token',
         ];
+        fbm_test_set_request_nonce('fbm_submit_form', '_fbm_nonce');
         $_REQUEST = $_POST;
         FormSubmitController::handle();
         $this->assertTrue(true);
