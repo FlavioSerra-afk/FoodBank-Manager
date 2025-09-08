@@ -6,30 +6,26 @@ namespace FoodBankManager\Core {}
 namespace FoodBankManager\Admin {}
 
 namespace {
-use PHPUnit\Framework\TestCase;
+use BaseTestCase;
 use FoodBankManager\Admin\EmailsPage;
 use FoodBankManager\Core\Options;
 
-final class EmailsPageTest extends TestCase {
-
+final class EmailsPageTest extends BaseTestCase {
     protected function setUp(): void {
-        fbm_test_reset_globals();
+        parent::setUp();
         fbm_grant_for_page('fbm_emails');
-        if ( ! defined( 'FBM_PATH' ) ) {
-            define( 'FBM_PATH', dirname( __DIR__, 1 ) . '/../' );
+        if (!defined('FBM_PATH')) {
+            define('FBM_PATH', dirname(__DIR__, 1) . '/../');
         }
-        if ( ! defined( 'ABSPATH' ) ) {
-            define( 'ABSPATH', __DIR__ );
+        if (!defined('ABSPATH')) {
+            define('ABSPATH', __DIR__);
         }
-        $_GET = array();
-        $_POST = array();
-        $_SERVER = array();
         $GLOBALS['fbm_options'] = array();
     }
 
     public function testCapabilityRequired(): void {
-        fbm_test_reset_globals();
-        $this->expectException( RuntimeException::class );
+        fbm_grant_caps([]);
+        $this->expectException(RuntimeException::class);
         EmailsPage::route();
     }
 
@@ -62,8 +58,8 @@ final class EmailsPageTest extends TestCase {
             'subject'    => 'Hi',
             'body_html'  => '<p>Hello</p>',
         );
-        fbm_test_reset_globals();
-        $this->expectException( RuntimeException::class );
+        fbm_grant_caps([]);
+        $this->expectException(RuntimeException::class);
         EmailsPage::route();
     }
 
@@ -114,8 +110,8 @@ final class EmailsPageTest extends TestCase {
             '_fbm_nonce' => 'nonce',
             'tpl'        => 'applicant_confirmation',
         );
-        fbm_test_reset_globals();
-        $this->expectException( RuntimeException::class );
+        fbm_grant_caps([]);
+        $this->expectException(RuntimeException::class);
         EmailsPage::route();
     }
 
@@ -160,8 +156,8 @@ final class EmailsPageTest extends TestCase {
             '_fbm_nonce' => 'nonce',
             'tpl'        => 'applicant_confirmation',
         );
-        fbm_test_reset_globals();
-        $this->expectException( RuntimeException::class );
+        fbm_grant_caps([]);
+        $this->expectException(RuntimeException::class);
         EmailsPage::route();
     }
 

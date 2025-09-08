@@ -1,14 +1,9 @@
 <?php
 declare(strict_types=1);
 
-use PHPUnit\Framework\TestCase;
 use FoodBankManager\Admin\Menu;
 
-final class MenuTest extends TestCase {
-    protected function setUp(): void {
-        parent::setUp();
-        fbm_test_reset_globals();
-    }
+final class MenuTest extends BaseTestCase {
     public function testRegisterIdempotent(): void {
         Menu::register();
         Menu::register(); // should be idempotent

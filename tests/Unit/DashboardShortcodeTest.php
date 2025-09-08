@@ -3,12 +3,11 @@ declare(strict_types=1);
 
 namespace FoodBankManagerTest {
 
-use PHPUnit\Framework\TestCase;
+use \BaseTestCase;
 
-final class DashboardShortcodeTest extends TestCase {
+final class DashboardShortcodeTest extends BaseTestCase {
     protected function setUp(): void {
         parent::setUp();
-        \fbm_test_reset_globals();
         if (!defined('FBM_PATH')) {
             define('FBM_PATH', dirname(__DIR__, 2) . '/');
         }
@@ -27,7 +26,6 @@ final class DashboardShortcodeTest extends TestCase {
         $this->assertSame('abc', \FoodBankManager\Shortcodes\Dashboard::sanitize_event('abc'));
     }
 
-    /** @runInSeparateProcess */
     public function testUnauthorizedGated(): void {
         require_once FBM_PATH . 'includes/Shortcodes/Dashboard.php';
         $html = \FoodBankManager\Shortcodes\Dashboard::render();
@@ -35,7 +33,6 @@ final class DashboardShortcodeTest extends TestCase {
         $this->assertSame($expected, $html);
     }
 
-    /** @runInSeparateProcess */
     public function testSafeHtmlOutput(): void {
         \fbm_grant_caps(['fb_manage_dashboard']);
         if (!class_exists('FoodBankManager\\UI\\Theme', false)) {

@@ -1,14 +1,10 @@
 <?php
 declare(strict_types=1);
 
-use PHPUnit\Framework\TestCase;
 use FoodBankManager\Admin\Notices;
 
-final class NoticesTest extends TestCase {
-
-    /** @runInSeparateProcess */
+final class NoticesTest extends BaseTestCase {
     public function testMissingKekBailsOnNonFbmScreen(): void {
-        fbm_test_reset_globals();
         $GLOBALS['fbm_test_screen_id'] = 'dashboard';
         fbm_grant_admin();
         Notices::missing_kek();
@@ -19,9 +15,7 @@ final class NoticesTest extends TestCase {
         $this->assertSame(0, Notices::getRenderCount());
     }
 
-    /** @runInSeparateProcess */
     public function testMissingKekShowsOnFbmScreen(): void {
-        fbm_test_reset_globals();
         $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_diagnostics';
         fbm_grant_admin();
         if (!defined('FBM_KEK_BASE64')) {
@@ -35,9 +29,7 @@ final class NoticesTest extends TestCase {
         $this->assertSame(1, Notices::getRenderCount());
     }
 
-    /** @runInSeparateProcess */
     public function testCapsFixNoticeShownForAdminsWithoutCaps(): void {
-        fbm_test_reset_globals();
         $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_diagnostics';
         fbm_grant_admin();
         ob_start();

@@ -2,15 +2,14 @@
 declare(strict_types=1);
 
 namespace {
-    use PHPUnit\Framework\TestCase;
+    use BaseTestCase;
     use FoodBankManager\Admin\PermissionsPage;
     use FoodBankManager\Admin\UsersMeta;
     use FoodBankManager\Auth\Capabilities;
 
-    final class PermissionsPageTest extends TestCase {
+    final class PermissionsPageTest extends BaseTestCase {
 
     public function test_import_rejects_bad_json(): void {
-        fbm_test_reset_globals();
         fbm_grant_admin();
         fbm_test_set_request_nonce('fbm_permissions_perm_import');
         $_POST = array_merge($_POST, [
@@ -30,7 +29,6 @@ namespace {
     }
 
     public function test_user_override_add_and_remove(): void {
-        fbm_test_reset_globals();
         fbm_grant_admin();
         fbm_test_set_request_nonce('fbm_permissions_perm_user_override_add');
         $_POST = array_merge($_POST, [
@@ -69,7 +67,6 @@ namespace {
     }
 
     public function test_export_json(): void {
-        fbm_test_reset_globals();
         fbm_grant_admin();
         fbm_test_set_request_nonce('fbm_permissions_perm_export');
         $_POST = array_merge($_POST, [

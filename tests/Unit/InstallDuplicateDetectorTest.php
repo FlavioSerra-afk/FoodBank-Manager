@@ -1,15 +1,15 @@
 <?php
 declare(strict_types=1);
 
-use PHPUnit\Framework\TestCase;
 use FoodBankManager\Core\Install;
 use FoodBankManager\Admin\Notices;
 
-final class InstallDuplicateDetectorTest extends TestCase {
+final class InstallDuplicateDetectorTest extends BaseTestCase {
     protected function setUp(): void {
-        fbm_test_reset_globals();
+        parent::setUp();
         $GLOBALS['fbm_test_screen_id'] = 'toplevel_page_fbm';
-        $GLOBALS['fbm_user_caps'] = ['manage_options' => true, 'delete_plugins' => true];
+        fbm_grant_admin();
+        $GLOBALS['fbm_user_caps']['delete_plugins'] = true;
         $GLOBALS['fbm_test_plugins'] = [
             'foodbank-manager/foodbank-manager.php' => ['Name' => 'FoodBank Manager'],
             'FoodBank-Manager-1.2.12/foodbank-manager.php' => ['Name' => 'FoodBank Manager'],

@@ -2,19 +2,18 @@
 declare(strict_types=1);
 
 namespace {
-    use PHPUnit\Framework\TestCase;
+    use BaseTestCase;
     use FoodBankManager\Admin\EntryPage;
 
     /**
      * @runTestsInSeparateProcesses
      */
-    final class EntryPageTest extends TestCase {
+    final class EntryPageTest extends BaseTestCase {
         protected function setUp(): void {
-            fbm_test_reset_globals();
+            parent::setUp();
             fbm_grant_manager();
             fbm_test_trust_nonces(true);
             fbm_test_set_request_nonce('fbm_entry_view');
-            $_GET = $_POST = $_SERVER = $_REQUEST = [];
             $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_database';
             if (function_exists('header_remove')) {
                 header_remove();

@@ -6,23 +6,23 @@ namespace FoodBankManager\Admin {}
 namespace {}
 
 namespace {
-use PHPUnit\Framework\TestCase;
+use BaseTestCase;
 use FoodBankManager\Admin\ShortcodesPage;
 
- /** @backupGlobals disabled */
- final class ShortcodesPageTest extends TestCase {
+/** @backupGlobals disabled */
+final class ShortcodesPageTest extends BaseTestCase {
     public static string $last_shortcode = '';
 
     protected function setUp(): void {
-        fbm_test_reset_globals();
+        parent::setUp();
         fbm_grant_for_page('fbm_shortcodes');
         fbm_test_trust_nonces(true);
         $_REQUEST = array();
         self::$last_shortcode = '';
-        if ( ! defined( 'FBM_PATH' ) ) {
-            define( 'FBM_PATH', dirname( __DIR__, 2 ) . '/' );
+        if (!defined('FBM_PATH')) {
+            define('FBM_PATH', dirname(__DIR__, 2) . '/');
         }
-        add_shortcode('fbm_form', function(array $atts): string {
+        add_shortcode('fbm_form', function (array $atts): string {
             $id = $atts['id'] ?? '1';
             ShortcodesPageTest::$last_shortcode = sprintf('[fbm_form id="%s" preset="basic_intake" mask_sensitive="true"]', $id);
             return '<div>ok</div><script>alert(1)</script>';
@@ -30,11 +30,8 @@ use FoodBankManager\Admin\ShortcodesPage;
     }
 
     protected function tearDown(): void {
-        parent::tearDown();
-        $_POST = array();
-        $_SERVER['REQUEST_METHOD'] = 'GET';
-        self::$last_shortcode = '';
         $GLOBALS['fbm_shortcodes'] = array();
+        parent::tearDown();
     }
 
     public function testDiscoverShortcodesMetadata(): void {
@@ -49,7 +46,7 @@ use FoodBankManager\Admin\ShortcodesPage;
     }
 
     public function testCapabilityRequired(): void {
-        fbm_test_reset_globals();
+        fbm_grant_caps([]);
         ob_start();
         ShortcodesPage::route();
         $html = (string) ob_get_clean();
