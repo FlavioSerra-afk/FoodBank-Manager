@@ -36,25 +36,28 @@ final class RetentionConfig {
 			$raw = $raw['retention'];
 		}
 
-		$map = array(
-			'applications' => 'applications',
-			'attendance'   => 'attendance',
-			'mail_log'     => 'mail',
-			'mail'         => 'mail',
-		);
+                $map = array(
+                        'applications' => 'applications',
+                        'attendance'   => 'attendance',
+                        'mail'         => 'mail',
+                        'mail_log'     => 'mail',
+                );
 
-		$out = array();
-		foreach ( $map as $in => $out_key ) {
-				$section         = isset( $raw[ $in ] ) && is_array( $raw[ $in ] ) ? $raw[ $in ] : array();
-				$days            = isset( $section['days'] ) ? max( 0, (int) $section['days'] ) : 0;
-				$policy          = isset( $section['policy'] ) && in_array( $section['policy'], array( 'delete', 'anonymise' ), true )
-						? $section['policy']
-						: 'delete';
-				$out[ $out_key ] = array(
-					'days'   => $days,
-					'policy' => $policy,
-				);
-		}
+                $out = array();
+                foreach ( $map as $in => $out_key ) {
+                                if ( isset( $out[ $out_key ] ) ) {
+                                        continue;
+                                }
+                                $section         = isset( $raw[ $in ] ) && is_array( $raw[ $in ] ) ? $raw[ $in ] : array();
+                                $days            = isset( $section['days'] ) ? max( 0, (int) $section['days'] ) : 0;
+                                $policy          = isset( $section['policy'] ) && in_array( $section['policy'], array( 'delete', 'anonymise' ), true )
+                                                ? $section['policy']
+                                                : 'delete';
+                                $out[ $out_key ] = array(
+                                        'days'   => $days,
+                                        'policy' => $policy,
+                                );
+                }
 
 		return $out;
 	}

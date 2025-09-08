@@ -35,9 +35,7 @@ final class GDPRPageTest extends \BaseTestCase {
         if ( ! class_exists( 'FBM\\Tests\\Support\\WPDBStub', false ) ) {
             require_once __DIR__ . '/../../Support/WPDBStub.php';
         }
-        if ( ! isset( $GLOBALS['wpdb'] ) ) {
-            $GLOBALS['wpdb'] = new \FBM\Tests\Support\WPDBStub();
-        }
+        $GLOBALS['wpdb'] = new \FBM\Tests\Support\WPDBStub();
         if ( ! defined( 'ABSPATH' ) ) {
             define( 'ABSPATH', __DIR__ );
         }

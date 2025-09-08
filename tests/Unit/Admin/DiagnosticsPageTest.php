@@ -2,7 +2,6 @@
 declare(strict_types=1);
 
 namespace {
-    use BaseTestCase;
     use FoodBankManager\Admin\DiagnosticsPage;
 
     if ( ! class_exists( 'DiagRetentionDBStub' ) ) {
@@ -30,6 +29,20 @@ namespace {
         }
     }
 
+    if ( ! class_exists( 'DiagRetention' ) ) {
+        class DiagRetention {
+            public static function run_now(): array {
+                return array( 'applications' => array( 'deleted' => 1 ) );
+            }
+            public static function dry_run(): array {
+                return array( 'applications' => array( 'deleted' => 1 ) );
+            }
+            public static function events(): array {
+                return array();
+            }
+        }
+    }
+
     if ( ! defined( 'DAY_IN_SECONDS' ) ) {
         define( 'DAY_IN_SECONDS', 86400 );
     }
@@ -47,21 +60,6 @@ namespace {
     }
 
 }
-
-namespace FBM\Core {
-    class Retention {
-        public static function run_now(): array {
-            return array( 'applications' => array( 'deleted' => 1 ) );
-        }
-        public static function dry_run(): array {
-            return array( 'applications' => array( 'deleted' => 1 ) );
-        }
-        public static function events(): array {
-            return array();
-        }
-    }
-}
-
 
 namespace FoodBankManager\Auth {
     class Roles {
@@ -91,6 +89,7 @@ namespace FBM\Auth {
 namespace {
     use PHPUnit\Framework\TestCase;
     use FoodBankManager\Admin\DiagnosticsPage;
+    use BaseTestCase;
 
     /**
      * @runInSeparateProcess
@@ -101,6 +100,9 @@ namespace {
 
     protected function setUp(): void {
         parent::setUp();
+        if ( ! class_exists( '\\FBM\\Core\\Retention', false ) ) {
+            class_alias( DiagRetention::class, '\\FBM\\Core\\Retention' );
+        }
         fbm_grant_manager();
         \FoodBankManager\Auth\Roles::$installed = false;
         \FoodBankManager\Auth\Roles::$ensured  = false;
