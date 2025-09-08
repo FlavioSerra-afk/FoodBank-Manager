@@ -8,6 +8,7 @@ function fbm_grant_caps(array $caps): void {
     foreach ($caps as $cap) {
         $GLOBALS['fbm_user_caps'][(string) $cap] = true;
     }
+    $GLOBALS['fbm_current_user_roles'] = [];
 }
 
 function fbm_grant_viewer(): void {
@@ -42,6 +43,7 @@ function fbm_grant_admin(): void {
         'fb_view_sensitive',
         'manage_options',
     ]);
+    $GLOBALS['fbm_current_user_roles'] = ['administrator'];
 }
 
 /** Minimal page→cap mapping used by admin page tests */

@@ -7,4 +7,7 @@ require_once __DIR__ . '/Support/WPDBStub.php';
 require_once __DIR__ . '/../includes/Attendance/AttendanceRepo.php';
 
 fbm_test_reset_globals();
+if (!defined('FBM_TESTS')) {
+    define('FBM_TESTS', true);
+}
 

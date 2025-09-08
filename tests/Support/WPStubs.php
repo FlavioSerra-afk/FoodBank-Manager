@@ -75,8 +75,22 @@ if (!function_exists('delete_plugins')) {
 }
 
 // Caps & nonces (deterministic)
-$GLOBALS['fbm_user_caps'] = $GLOBALS['fbm_user_caps'] ?? [];
-if (!function_exists('current_user_can')) { function current_user_can($cap){ return !empty($GLOBALS['fbm_user_caps'][(string)$cap]); } }
+$GLOBALS['fbm_user_caps']         = $GLOBALS['fbm_user_caps']         ?? [];
+$GLOBALS['fbm_current_user_roles'] = $GLOBALS['fbm_current_user_roles'] ?? [];
+$GLOBALS['fbm_current_user']       = $GLOBALS['fbm_current_user']       ?? 0;
+if (!function_exists('current_user_can')) {
+  function current_user_can($cap){
+    $all = $GLOBALS['fbm_user_caps'];
+    foreach($GLOBALS['fbm_current_user_roles'] as $role){
+      if(isset($GLOBALS['fbm_roles'][$role])){
+        $all += $GLOBALS['fbm_roles'][$role]->caps;
+      }
+    }
+    $user = (object)['ID'=>$GLOBALS['fbm_current_user'], 'roles'=>$GLOBALS['fbm_current_user_roles']];
+    $all = apply_filters('user_has_cap', $all, [(string)$cap], [(string)$cap, $user->ID], $user);
+    return !empty($all[(string)$cap]);
+  }
+}
 
 $GLOBALS['fbm_test_nonce_secret'] = $GLOBALS['fbm_test_nonce_secret'] ?? 'fbm-test';
 $GLOBALS['fbm_test_trust_nonces'] = $GLOBALS['fbm_test_trust_nonces'] ?? true;
@@ -148,7 +162,7 @@ if (!function_exists('esc_html')){ function esc_html($s){ return htmlspecialchar
 if (!function_exists('esc_url')){ function esc_url($s){ return (string)$s; } }
 if (!function_exists('esc_url_raw')){ function esc_url_raw($s){ return (string)$s; } }
 if (!function_exists('wp_kses_post')){ function wp_kses_post($s){ return (string)$s; } }
-if (!function_exists('sanitize_text_field')){ function sanitize_text_field($s){ return trim((string)$s); } }
+if (!function_exists('sanitize_text_field')){ function sanitize_text_field($s){ return trim(strip_tags((string)$s)); } }
 if (!function_exists('sanitize_key')){ function sanitize_key($s){ return preg_replace('/[^a-z0-9_\-]/i','', (string)$s); } }
 if (!function_exists('sanitize_hex_color')){ function sanitize_hex_color($c){ $c=is_string($c)?trim($c):''; return preg_match('/^#(?:[0-9a-fA-F]{3}){1,2}$/',$c)?strtolower($c):''; } }
 if (!function_exists('sanitize_title')){ function sanitize_title($t){ $t=strtolower((string)$t); $t=preg_replace('/[^a-z0-9]+/','-',$t); return trim($t,'-'); } }
@@ -232,8 +246,24 @@ if (!isset($GLOBALS['fbm_users'])) $GLOBALS['fbm_users']=[];
 if (!function_exists('get_user_by')){ function get_user_by($field,$value){ foreach($GLOBALS['fbm_users'] as $u){ if($u[$field]==$value) return (object)$u; } return false; } }
 if (!function_exists('get_users')){ function get_users($args=[]){ return array_map(fn($u)=>(object)$u, $GLOBALS['fbm_users']); } }
 if (!isset($GLOBALS['fbm_roles'])) $GLOBALS['fbm_roles']=[];
-if (!class_exists('WP_Role')){ class WP_Role{ public $caps=[]; public function add_cap($c){$this->caps[$c]=true;} public function remove_cap($c){unset($this->caps[$c]);} public function has_cap($c){return isset($this->caps[$c]);} } }
-if (!function_exists('get_role')){ function get_role($role){ if(!isset($GLOBALS['fbm_roles'][$role])) $GLOBALS['fbm_roles'][$role]=new WP_Role(); return $GLOBALS['fbm_roles'][$role]; } }
+if (!class_exists('WP_Role')){
+  class WP_Role{
+    public array $caps;
+    public function __construct(array $caps = []){ $this->caps=$caps; }
+    public function add_cap($cap, $grant = true){ if($grant){ $this->caps[$cap]=true; } else { unset($this->caps[$cap]); } }
+    public function remove_cap($cap){ unset($this->caps[$cap]); }
+    public function has_cap($cap){ return !empty($this->caps[$cap]); }
+  }
+}
+if (!function_exists('get_role')){
+  function get_role($role){ return $GLOBALS['fbm_roles'][$role] ?? null; }
+}
+if (!function_exists('add_role')){
+  function add_role($role, $display_name = '', $caps = [] ){ $GLOBALS['fbm_roles'][$role]=new WP_Role($caps); return $GLOBALS['fbm_roles'][$role]; }
+}
+if (!function_exists('remove_role')){
+  function remove_role($role){ unset($GLOBALS['fbm_roles'][$role]); }
+}
 if (!function_exists('get_editable_roles')){ function get_editable_roles(){ $out=[]; foreach($GLOBALS['fbm_roles'] as $k=>$r){ $out[$k]=['name'=>$k]; } return $out; } }
 if (!function_exists('wp_unslash')){ function wp_unslash($s){ return $s; } }
 if (!function_exists('shortcode_atts')){ function shortcode_atts(array $pairs, array $atts, string $shortcode=''){ return array_merge($pairs, $atts); } }
@@ -289,6 +319,12 @@ if (!function_exists('fbm_test_reset_globals')) {
     $GLOBALS['fbm_deactivated']     = [];
     $GLOBALS['fbm_deleted_plugins'] = [];
     $GLOBALS['fbm_user_caps'] = [];
+    $GLOBALS['fbm_roles'] = [];
+    $GLOBALS['fbm_user_meta'] = [];
+    $GLOBALS['fbm_users'] = [];
+    $GLOBALS['fbm_current_user_roles'] = [];
+    $GLOBALS['fbm_current_user'] = 0;
+    add_role('administrator', 'Administrator');
     $GLOBALS['fbm_actions'] = [];
     $GLOBALS['fbm_filters'] = [];
     $GLOBALS['fbm_shortcodes'] = [];
