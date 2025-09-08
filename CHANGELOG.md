@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+## [1.3.0-alpha.1] — 2025-09-08
+
+Added: SMTP Diagnostics panel; deterministic admin CSS vars; Entry/GDPR gated render; AttendanceRepo BC shims.
+
+Fixed: Capability self-heal & resolver; dashboard export nonce/cap flow; diagnostics POST handling; test stubs for filter_input/get_current_screen/roles.
+
+Security: Consistent sanitization & 255-char clamp for email settings; strict nonces + caps on handlers.
+
+Docs-Revision: 2025-09-08 (Wave U2)
+
 ## [1.2.16] - 2025-09-07
 - End-to-end form submissions with schema validation, consent hashing, safe uploads, email send & log, and success reference.
 - Canonical WP stubs with deterministic shims keep PHPStan and tests green.
