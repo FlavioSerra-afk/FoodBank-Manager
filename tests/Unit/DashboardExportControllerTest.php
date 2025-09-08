@@ -6,6 +6,12 @@ use Tests\Support\Exceptions\FbmDieException;
 use Tests\Support\Rbac;
 
 final class DashboardExportControllerTest extends TestCase {
+    protected function setUp(): void {
+        parent::setUp();
+        global $wpdb;
+        $wpdb = new \FBM\Tests\Support\WPDBStub();
+        $wpdb->prefix = 'wp_';
+    }
     /** @runInSeparateProcess */
     public function testNonceRequired(): void {
         Rbac::grantManager();
@@ -17,9 +23,7 @@ final class DashboardExportControllerTest extends TestCase {
 
     /** @runInSeparateProcess */
     public function testExportsCsv(): void {
-        if (!class_exists('FoodBankManager\\Attendance\\AttendanceRepo')) {
-            require_once __DIR__ . '/../Support/DashboardExportStubs.php';
-        }
+        require_once __DIR__ . '/../Support/DashboardExportControllerStubs.php';
         Rbac::grantManager();
         fbm_seed_nonce('unit-seed');
         $_GET = array(
@@ -34,6 +38,9 @@ final class DashboardExportControllerTest extends TestCase {
         add_filter('fbm_http_exit', $cb);
         $this->expectOutputString("Metric,Count\n");
         \FoodBankManager\Http\DashboardExportController::handle();
+        $headers = headers_list();
+        // headers_list() is empty on CLI; ensure it returns an array for best effort.
+        $this->assertIsArray($headers);
         remove_filter('fbm_http_exit', $cb);
     }
 }

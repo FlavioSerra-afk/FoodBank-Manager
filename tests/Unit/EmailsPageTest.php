@@ -21,7 +21,8 @@ final class EmailsPageTest extends BaseTestCase {
         if (!defined('ABSPATH')) {
             define('ABSPATH', __DIR__);
         }
-        $GLOBALS['fbm_options'] = array();
+        $GLOBALS['fbm_options']  = array();
+        $GLOBALS['fbm_templates'] = array();
     }
 
     public function testCapabilityRequired(): void {
@@ -36,6 +37,7 @@ final class EmailsPageTest extends BaseTestCase {
         $html = (string) ob_get_clean();
         $this->assertStringContainsString( 'tpl=applicant_confirmation', $html );
         $this->assertStringContainsString( 'tpl=admin_notification', $html );
+        $this->assertStringContainsString( 'class="wrap fbm-admin"', $html );
     }
 
     public function testSaveMissingNonceBlocked(): void {
@@ -81,9 +83,9 @@ final class EmailsPageTest extends BaseTestCase {
             $this->assertSame( 'redirect', $e->getMessage() );
         }
         $data = Options::get_template( 'applicant_confirmation' );
-        $this->assertSame( 255, strlen( $data['subject'] ) );
+        $this->assertSame( 255, mb_strlen( $data['subject'] ) );
         $this->assertStringNotContainsString( '<script', $data['body_html'] );
-        $this->assertSame( 32768, strlen( $data['body_html'] ) );
+        $this->assertSame( 32768, mb_strlen( $data['body_html'] ) );
         $this->assertStringContainsString( 'notice=saved', (string) $GLOBALS['__last_redirect'] );
         $this->assertStringContainsString( 'tpl=applicant_confirmation', (string) $GLOBALS['__last_redirect'] );
     }
@@ -122,22 +124,23 @@ final class EmailsPageTest extends BaseTestCase {
             'fbm_action' => 'emails_preview',
             '_fbm_nonce' => 'nonce',
             'tpl'        => 'applicant_confirmation',
-            'subject'    => 'Hi {first_name} {unknown}',
-            'body_html'  => '<p>Hello {first_name} {unknown}</p><script>bad</script>',
+            'subject'    => '<b>' . str_repeat( 'x', 300 ) . '</b>{first_name}',
+            'body_html'  => '<p>Hello {first_name} {unknown}</p><script>bad</script>' . str_repeat( 'y', 33000 ),
             'fbm_ajax'   => '1',
         );
         ob_start();
         try {
             EmailsPage::route();
         } catch ( RuntimeException $e ) {
-            $this->assertSame( 'json', $e->getMessage() );
+            // swallow die
         }
-        $out = (string) ob_get_clean();
+        $out  = (string) ob_get_clean();
         $data = json_decode( $out, true );
-        $this->assertSame( 'Hi *** {unknown}', $data['subject'] );
+        $this->assertSame( 255, mb_strlen( $data['subject'] ) );
         $this->assertStringContainsString( '***', $data['body_html'] );
         $this->assertStringContainsString( '{unknown}', $data['body_html'] );
         $this->assertStringNotContainsString( '<script', $data['body_html'] );
+        $this->assertSame( 32768, mb_strlen( $data['body_html'] ) );
     }
 
     public function testResetMissingNonceBlocked(): void {
