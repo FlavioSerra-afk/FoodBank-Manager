@@ -1,53 +1,6 @@
 <?php
 declare(strict_types=1);
 
-namespace {
-    if ( ! function_exists( 'sanitize_text_field' ) ) {
-        function sanitize_text_field( $str ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            return trim( strip_tags( (string) $str ) );
-        }
-    }
-    if ( ! function_exists( 'sanitize_key' ) ) {
-        function sanitize_key( $key ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            return preg_replace( '/[^a-z0-9_]/', '', strtolower( (string) $key ) );
-        }
-    }
-    if ( ! function_exists( 'sanitize_email' ) ) {
-        function sanitize_email( $email ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            return filter_var( $email, FILTER_SANITIZE_EMAIL );
-        }
-    }
-    if ( ! function_exists( 'is_email' ) ) {
-        function is_email( $email ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            return (bool) filter_var( $email, FILTER_VALIDATE_EMAIL );
-        }
-    }
-    if ( ! function_exists( 'sanitize_file_name' ) ) {
-        function sanitize_file_name( $name ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            return preg_replace( '/[^a-zA-Z0-9_\.\-]/', '', (string) $name );
-        }
-    }
-    if ( ! function_exists( 'wp_json_encode' ) ) {
-        function wp_json_encode( $data ) { return json_encode( $data ); }
-    }
-    if ( ! function_exists( 'wp_mail' ) ) {
-        function wp_mail( $to, $subject, $message, $headers = array() ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            $GLOBALS['fbm_test_mail'][] = compact( 'to', 'subject', 'message', 'headers' );
-            return true;
-        }
-    }
-    if ( ! function_exists( 'wp_strip_all_tags' ) ) {
-        function wp_strip_all_tags( $text ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            return strip_tags( (string) $text );
-        }
-    }
-    if ( ! function_exists( 'do_action' ) ) {
-        function do_action( $tag, ...$args ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            return null;
-        }
-    }
-}
-
 namespace FoodBankManager\Tests\Unit\Http {
 
 use FoodBankManager\Forms\PresetsRepo;

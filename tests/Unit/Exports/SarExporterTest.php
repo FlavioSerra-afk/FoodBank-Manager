@@ -2,23 +2,6 @@
 declare(strict_types=1);
 
 namespace {
-    if ( ! function_exists( 'sanitize_file_name' ) ) {
-        function sanitize_file_name( string $filename ): string {
-            return preg_replace( '/[^A-Za-z0-9\.\-_]/', '', $filename );
-        }
-    }
-    if ( ! function_exists( 'wp_json_encode' ) ) {
-        function wp_json_encode( $data ) { return json_encode( $data ); }
-    }
-    if ( ! function_exists( 'wp_delete_file' ) ) {
-        function wp_delete_file( $file ) { return unlink($file); }
-    }
-    if ( ! function_exists( 'esc_html' ) ) {
-        function esc_html( $t ) { return (string) $t; }
-    }
-}
-
-namespace {
     use PHPUnit\Framework\TestCase;
     use FBM\Exports\SarExporter;
 

@@ -4,18 +4,6 @@ declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 use FoodBankManager\Mail\Templates;
 
-if ( ! function_exists( 'esc_html' ) ) {
-    function esc_html( $text ) {
-        return htmlspecialchars( (string) $text, ENT_QUOTES, 'UTF-8' );
-    }
-}
-
-if ( ! function_exists( 'wp_strip_all_tags' ) ) {
-    function wp_strip_all_tags( string $text ): string {
-        return strip_tags( $text );
-    }
-}
-
 final class TemplatesTest extends TestCase {
     public function testDefaultsContainTemplates(): void {
         $defaults = Templates::defaults();
