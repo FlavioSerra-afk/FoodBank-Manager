@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 use FoodBankManager\Security\Crypto;
 
-/** @runTestsInSeparateProcesses */
 final class SecurityCryptoTest extends BaseTestCase {
         protected function setUp(): void {
                 parent::setUp();
@@ -14,8 +13,9 @@ final class SecurityCryptoTest extends BaseTestCase {
                         $this->markTestSkipped( 'sodium functions unavailable' );
                 }
                 if ( ! defined( 'FBM_KEK_BASE64' ) ) {
-                        define( 'FBM_KEK_BASE64', base64_encode( random_bytes( SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_KEYBYTES ) ) );
+                        define( 'FBM_KEK_BASE64', base64_encode( str_repeat( 'K', SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_KEYBYTES ) ) );
                 }
+                do_action('fbm_test_reset_notices');
         }
 	public function testRoundTrip(): void {
 		$data = array( 'foo' => 'bar' );
