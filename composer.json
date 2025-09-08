@@ -47,6 +47,7 @@
   "scripts": {
     "lint": "find . -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l",
     "phpcs": "php -d memory_limit=512M vendor/bin/phpcs --standard=phpcs.xml --report=summary --report-width=120",
+    "phpcs:lanes": "php -d memory_limit=512M vendor/bin/phpcs --standard=phpcs.xml --report=summary --report-width=120 includes/Http/FormSubmitController.php includes/Database/ApplicationsRepo.php includes/Mail/LogRepo.php includes/Shortcodes/Shortcodes.php includes/Shortcodes/FormShortcode.php includes/Shortcodes/DashboardShortcode.php includes/Core/Assets.php includes/Admin/DiagnosticsPage.php includes/Admin/SettingsPage.php includes/Core/Retention.php templates/public/form-success.php templates/public/dashboard.php",
     "phpcbf": "php -d memory_limit=512M vendor/bin/phpcbf --standard=phpcs.xml",
     "phpstan": "phpstan analyse -c phpstan.neon --no-progress --memory-limit=1G",
     "phpstan:fast": "phpstan analyse -c phpstan.neon --no-progress --level=5 --memory-limit=1G",
