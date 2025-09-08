@@ -14,29 +14,29 @@
 - PHP: 8.4.12
 
 ## 2) PHPUnit (Unit) — Summary
-- Tests: 135  Assertions: 231  Errors: 28  Failures: 20
+- Tests: 135  Assertions: 242  Errors: 28  Failures: 18
 ### Top failing tests (first 10)
-1. ShortcodesPageTest::testCapabilityRequired — FbmDieException: You do not have permission to access this page.
-2. DiagnosticsPageTest::testSendTestEmailSuccess — Failed asserting that '' contains "notice=sent".
-3. DiagnosticsPageTest::testSendTestEmailFailure — Failed asserting that '' contains "notice=error".
-4. DiagnosticsPageTest::testRetentionRunOutputsSummary — Failed asserting that '<div class="wrap fbm-admin">\\n'.
-5. DiagnosticsPageTest::testRetentionDryRunOutputsSummary — Failed asserting that '<div class="wrap fbm-admin">\\n'.
-6. DiagnosticsPageTest::testRepairCapsActionEnsuresCaps — Failed asserting that false is true.
-7. EntryPageTest::testViewMasksEmailWithoutCapability — Fatal error: Uncaught FbmDieException: You do not have permission to access this page.
-8. EntryPageTest::testUnmaskShowsPlaintextWithCapability — Fatal error: Uncaught FbmDieException: You do not have permission to access this page.
-9. EntryPageTest::testUnmaskDeniedWithoutNonce — Fatal error: Uncaught FbmDieException: You do not have permission to access this page.
-10. EntryPageTest::testPdfDeniedWithoutNonce — Fatal error: Uncaught FbmDieException: You do not have permission to access this page.
+1. DiagnosticsPageTest::testSendTestEmailSuccess — Failed asserting that '' contains "notice=sent".
+2. DiagnosticsPageTest::testSendTestEmailFailure — Failed asserting that '' contains "notice=error".
+3. DiagnosticsPageTest::testCronTableShowsOverdue — Failed asserting that '<div class="wrap fbm-admin">\\n' contains expected data.
+4. DiagnosticsPageTest::testRetentionRunOutputsSummary — Failed asserting that '<div class="wrap fbm-admin">\\n' contains expected summary.
+5. DiagnosticsPageTest::testRetentionDryRunOutputsSummary — Failed asserting that '<div class="wrap fbm-admin">\\n' contains expected summary.
+6. EntryPageTest::testViewMasksEmailWithoutCapability — Fatal error: Uncaught FbmDieException: You do not have permission to access this page.
+7. EntryPageTest::testUnmaskShowsPlaintextWithCapability — Fatal error: Uncaught FbmDieException: You do not have permission to access this page.
+8. EntryPageTest::testUnmaskDeniedWithoutNonce — Fatal error: Uncaught FbmDieException: You do not have permission to access this page.
+9. EntryPageTest::testPdfDeniedWithoutNonce — Fatal error: Uncaught FbmDieException: You do not have permission to access this page.
+10. EntryPageTest::testPdfExportHandlesEngines — Fatal error: Uncaught FbmDieException: You do not have permission to access this page.
 ### Failure taxonomy & hints
 - Handler Denial: 8
 - Gated UI / Escaping mismatches: 40
 
 ## 3) PHPStan — Summary
-- Fast: 0 (analysis failed: Cannot redeclare function get_plugins)
-- Full: 0 (analysis failed: Cannot redeclare function get_plugins)
+- Fast: 0
+- Full: 0
 ### Top 10 files by error count
-- N/A (run failed)
+- N/A (no errors)
 ### Most common messages
-- N/A (run failed)
+- N/A (no errors)
 
 ## 4) PHPCS (lanes) — Summary
 - Errors: 0  Warnings: 0
