@@ -133,7 +133,7 @@ final class AttendanceRepo {
 		 *   total:int
 		 * }
 		 */
-	public static function people_summary( array $args ): array {
+        public static function people_summary( array $args ): array {
 			global $wpdb;
 			$self  = new self();
 			$t_att = $wpdb->prefix . 'fb_attendance';
@@ -312,11 +312,22 @@ SELECT COUNT(*) FROM (
 
 			$rows = $rows ? array_values( $rows ) : array();
 
-			return array(
-				'rows'  => $rows,
-				'total' => $total,
-			);
-	}
+                        return array(
+                                'rows'  => $rows,
+                                'total' => $total,
+                        );
+        }
+
+        /**
+         * @deprecated 1.2.16 Use people_summary() instead.
+         * @codeCoverageIgnore
+         *
+         * @param array<string,mixed> $args Arguments.
+         * @return array{rows:list<array{application_id:int,last_attended:string|null,visits_range:int,noshows_range:int,visits_12m:int,policy_breach:int}>,total:int}
+         */
+        public static function peopleSummary( array $args ): array {
+                return self::people_summary( $args );
+        }
 
 		/**
 		 * Retrieve attendance timeline rows for an application.
@@ -673,18 +684,41 @@ ORDER BY created_at ASC
 			$days      = $now->diff( $since )->days;
 			$len       = $days + 1;
 			$out       = array_fill( 0, (int) $len, 0 );
-			$since_day = strtotime( $since->format( 'Y-m-d' ) );
-		if ( is_array( $rows ) ) {
-			foreach ( $rows as $row ) {
-				$d   = sanitize_text_field( (string) $row->d );
-				$idx = (int) floor( ( strtotime( $d ) - $since_day ) / 86400 );
-				if ( $idx >= 0 && $idx < $len ) {
-						$out[ $idx ] = (int) $row->c;
-				}
-			}
-		}
-			return $out;
-	}
+                        $since_day = strtotime( $since->format( 'Y-m-d' ) );
+                if ( is_array( $rows ) ) {
+                        foreach ( $rows as $row ) {
+                                $d   = sanitize_text_field( (string) $row->d );
+                                $idx = (int) floor( ( strtotime( $d ) - $since_day ) / 86400 );
+                                if ( $idx >= 0 && $idx < $len ) {
+                                                $out[ $idx ] = (int) $row->c;
+                                }
+                        }
+                }
+                        return $out;
+        }
+
+        /**
+         * Get daily counts since a date.
+         *
+         * @param DateTimeImmutable   $since   Start date/time (UTC).
+         * @param array<string,mixed> $filters Optional filters.
+         * @return array<int,int> One value per day (or hour for today).
+         */
+        public static function daily_counts( DateTimeImmutable $since, array $filters = array() ): array {
+                return self::daily_present_counts( $since, $filters );
+        }
+
+        /**
+         * @deprecated 1.2.16 Use daily_counts() instead.
+         * @codeCoverageIgnore
+         *
+         * @param DateTimeImmutable   $since   Start date/time (UTC).
+         * @param array<string,mixed> $filters Optional filters.
+         * @return array<int,int> One value per day (or hour for today).
+         */
+        public static function getDailyCounts( DateTimeImmutable $since, array $filters = array() ): array {
+                return self::daily_counts( $since, $filters );
+        }
 
 				/**
 				 * Get totals for the period since a date.
@@ -693,18 +727,62 @@ ORDER BY created_at ASC
 				 * @param array<string,mixed> $filters Optional filters.
 				 * @return array{present:int,households:int,no_shows:int,in_person:int,delivery:int,voided:int}
 				 */
-	public static function period_totals( DateTimeImmutable $since, array $filters = array() ): array {
-					$since_str     = sanitize_text_field( $since->format( 'Y-m-d H:i:s' ) );
-							$types = self::count_by_type( $since_str, $filters );
-							return array(
-								'present'    => self::count_present( $since_str, $filters ),
-								'households' => self::count_unique_households( $since_str, $filters ),
-								'no_shows'   => self::count_no_shows( $since_str, $filters ),
-								'in_person'  => (int) $types['in_person'],
-								'delivery'   => (int) $types['delivery'],
-								'voided'     => self::count_voided( $since_str, $filters ),
-							);
-	}
+        public static function period_totals( DateTimeImmutable $since, array $filters = array() ): array {
+                                        $since_str     = sanitize_text_field( $since->format( 'Y-m-d H:i:s' ) );
+                                                        $types = self::count_by_type( $since_str, $filters );
+                                                        return array(
+                                                                'present'    => self::count_present( $since_str, $filters ),
+                                                                'households' => self::count_unique_households( $since_str, $filters ),
+                                                                'no_shows'   => self::count_no_shows( $since_str, $filters ),
+                                                                'in_person'  => (int) $types['in_person'],
+                                                                'delivery'   => (int) $types['delivery'],
+                                                                'voided'     => self::count_voided( $since_str, $filters ),
+                                                        );
+        }
+
+        /**
+         * Get totals for the period since a date.
+         *
+         * @param DateTimeImmutable   $since   Start date/time (UTC).
+         * @param array<string,mixed> $filters Optional filters.
+         * @return array{present:int,households:int,no_shows:int,in_person:int,delivery:int,voided:int}
+         */
+        public static function counts( DateTimeImmutable $since, array $filters = array() ): array {
+                return self::period_totals( $since, $filters );
+        }
+
+        /**
+         * @deprecated 1.2.16 Use counts() instead.
+         * @codeCoverageIgnore
+         *
+         * @param DateTimeImmutable   $since   Start date/time (UTC).
+         * @param array<string,mixed> $filters Optional filters.
+         * @return array{present:int,households:int,no_shows:int,in_person:int,delivery:int,voided:int}
+         */
+        public static function getCounts( DateTimeImmutable $since, array $filters = array() ): array {
+                return self::counts( $since, $filters );
+        }
+
+        /**
+         * Prepare filter SQL and arguments.
+         *
+         * @param array<string,mixed> $filters Filters.
+         * @return array{0:string,1:array}
+         */
+        public static function filters_prepared( array $filters ): array {
+                return self::build_filter_clauses( $filters );
+        }
+
+        /**
+         * @deprecated 1.2.16 Use filters_prepared() instead.
+         * @codeCoverageIgnore
+         *
+         * @param array<string,mixed> $filters Filters.
+         * @return array{0:string,1:array}
+         */
+        public static function filtersPrepared( array $filters ): array {
+                return self::filters_prepared( $filters );
+        }
 
 	/**
 	 * Join WHERE clauses.
@@ -712,7 +790,7 @@ ORDER BY created_at ASC
 	 * @param array $clauses Clauses.
 	 * @return string WHERE clause.
 	 */
-	private function fbm_sql_where( array $clauses ): string {
+        private function fbm_sql_where( array $clauses ): string {
 			return $clauses ? 'WHERE ' . implode( ' AND ', $clauses ) : '';
 	}
 
