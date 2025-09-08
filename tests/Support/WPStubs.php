@@ -254,7 +254,31 @@ if (!function_exists('do_shortcode')) {
     }, $text);
   }
 }
-if (!function_exists('get_current_screen')){ function get_current_screen(){ $id=$GLOBALS['fbm_test_screen_id']??''; if(!$id) return null; $o=new stdClass(); $o->id=$id; return $o; } }
+if (!function_exists('has_shortcode')) {
+  function has_shortcode($content, $tag) {
+    return false !== strpos((string)$content, '[' . $tag);
+  }
+}
+if (!function_exists('is_singular')) {
+  function is_singular() {
+    return !empty($GLOBALS['fbm_is_singular']);
+  }
+}
+if (!function_exists('get_post')) {
+  function get_post() {
+    $content = $GLOBALS['fbm_post_content'] ?? '';
+    return (object)['post_content' => $content];
+  }
+}
+if (!function_exists('get_current_screen')) {
+  function get_current_screen() {
+    $id = $GLOBALS['fbm_test_screen_id'] ?? '';
+    if ($id === '') {
+      return null;
+    }
+    return (object)['id' => $id];
+  }
+}
 
 // Global reset (used by bootstrap)
 if (!function_exists('fbm_test_reset_globals')) {
@@ -268,6 +292,12 @@ if (!function_exists('fbm_test_reset_globals')) {
     $GLOBALS['fbm_actions'] = [];
     $GLOBALS['fbm_filters'] = [];
     $GLOBALS['fbm_shortcodes'] = [];
+    $GLOBALS['fbm_styles'] = [];
+    $GLOBALS['fbm_scripts'] = [];
+    $GLOBALS['fbm_inline_styles'] = [];
+    $GLOBALS['fbm_post_content'] = '';
+    $GLOBALS['fbm_is_singular'] = false;
+    $GLOBALS['fbm_test_screen_id'] = null;
     $_GET = $_POST = $_REQUEST = [];
     $GLOBALS['__last_redirect'] = null;
   }
