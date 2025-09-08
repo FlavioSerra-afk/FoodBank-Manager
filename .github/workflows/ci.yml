@@ -15,5 +15,18 @@ jobs:
           tools: composer
       - name: Install
         run: composer install --no-interaction --prefer-dist
+      - name: PHPCS lane
+        run: |
+          vendor/bin/phpcs --standard=phpcs.xml --report=summary \
+            includes/Http/FormSubmitController.php \
+            includes/Database/ApplicationsRepo.php \
+            includes/Mail/LogRepo.php \
+            includes/Shortcodes/Shortcodes.php \
+            includes/Shortcodes/FormShortcode.php \
+            includes/Shortcodes/DashboardShortcode.php \
+            includes/Core/Assets.php \
+            includes/Admin/DiagnosticsPage.php \
+            templates/public/form-success.php \
+            templates/public/dashboard.php
       - name: QA
         run: composer qa
