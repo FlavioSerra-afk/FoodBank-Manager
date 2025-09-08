@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace FoodBankManager\Attendance {
     class AttendanceRepo {
         public static function period_totals($since, array $filters): array { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-            return array('total' => 1);
+            return array('present'=>1,'households'=>1,'no_shows'=>0,'in_person'=>1,'delivery'=>0,'voided'=>0);
         }
         public static function daily_present_counts($since, array $filters): array { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
             return array();
@@ -20,13 +20,5 @@ namespace FoodBankManager\Shortcodes {
         }
         public static function sanitize_event(string $event): ?string { return '' === $event ? null : $event; }
         public static function sanitize_type(string $type): string { return $type; }
-    }
-}
-
-namespace FoodBankManager\Exports {
-    class DashboardCsv {
-        public static function render($totals, $series, $period, $filters): string { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-            return "Metric,Count\n";
-        }
     }
 }
