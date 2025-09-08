@@ -12,13 +12,11 @@ namespace FBM\Tests\Unit\Shortcodes {
 use FBM\Shortcodes\Shortcodes;
 use FoodBankManager\Forms\PresetsRepo;
 use FoodBankManager\Http\FormSubmitController;
-use PHPUnit\Framework\TestCase;
+use \BaseTestCase;
 
-final class FormShortcodeTest extends TestCase {
+final class FormShortcodeTest extends BaseTestCase {
     protected function setUp(): void {
         parent::setUp();
-        fbm_test_reset_globals();
-        fbm_grant_viewer();
         fbm_test_trust_nonces(true);
         fbm_test_set_request_nonce('fbm_submit_form', '_fbm_nonce');
         if (!defined('FBM_PATH')) {

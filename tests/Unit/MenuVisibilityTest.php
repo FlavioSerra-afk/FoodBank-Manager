@@ -1,24 +1,18 @@
 <?php
 declare(strict_types=1);
 
-use PHPUnit\Framework\TestCase;
 use FoodBankManager\Admin\Menu;
 
-final class MenuVisibilityTest extends TestCase {
+final class MenuVisibilityTest extends BaseTestCase {
     protected function setUp(): void {
-        fbm_test_reset_globals();
+        parent::setUp();
         $ref = new \ReflectionClass(Menu::class);
         $prop = $ref->getProperty('registered');
         $prop->setAccessible(true);
         $prop->setValue(null, false);
     }
 
-    protected function tearDown(): void {
-        fbm_test_reset_globals();
-    }
-
     public function testParentMenuFallsBackToManageOptions(): void {
-        fbm_test_reset_globals();
         fbm_grant_caps(['manage_options']);
         Menu::register();
         $call = $GLOBALS['fbm_test_calls']['add_menu_page'][0];
@@ -30,7 +24,6 @@ final class MenuVisibilityTest extends TestCase {
     }
 
     public function testParentMenuUsesFbmCapWhenPresent(): void {
-        fbm_test_reset_globals();
         fbm_grant_manager();
         Menu::register();
         $call = $GLOBALS['fbm_test_calls']['add_menu_page'][0];

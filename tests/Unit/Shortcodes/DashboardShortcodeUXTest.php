@@ -19,13 +19,11 @@ namespace FoodBankManager\Attendance {
 }
 
 namespace FBM\Tests\Unit\Shortcodes {
-use PHPUnit\Framework\TestCase;
+use \BaseTestCase;
 
-final class DashboardShortcodeUXTest extends TestCase {
+final class DashboardShortcodeUXTest extends BaseTestCase {
     protected function setUp(): void {
         parent::setUp();
-        \fbm_test_reset_globals();
-        \fbm_grant_viewer();
         $_GET = [];
         \fbm_test_set_request_nonce('fbm_dash_export');
         if (!defined('FBM_PATH')) {
@@ -53,7 +51,6 @@ final class DashboardShortcodeUXTest extends TestCase {
         $this->assertStringContainsString('value="abc"', $html);
     }
 
-    /** @runInSeparateProcess */
     public function testCopyShortcodeBlockAppearsWithCap(): void {
         \fbm_grant_admin();
         require_once FBM_PATH . 'includes/Shortcodes/DashboardShortcode.php';
@@ -61,7 +58,6 @@ final class DashboardShortcodeUXTest extends TestCase {
         $this->assertStringContainsString('fbm-copy-shortcode', $html);
     }
 
-    /** @runInSeparateProcess */
     public function testCopyShortcodeBlockHiddenWithoutCap(): void {
         \fbm_grant_viewer();
         require_once FBM_PATH . 'includes/Shortcodes/DashboardShortcode.php';

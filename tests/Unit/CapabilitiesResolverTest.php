@@ -3,13 +3,9 @@ namespace FoodBankManager\Tests\Unit {
 
         use FBM\Auth\Capabilities;
         use FoodBankManager\Auth\CapabilitiesResolver;
-	use PHPUnit\Framework\TestCase;
+        use \BaseTestCase;
 
-        class CapabilitiesResolverTest extends TestCase {
-
-                protected function setUp(): void {
-                        \fbm_test_reset_globals();
-                }
+        class CapabilitiesResolverTest extends BaseTestCase {
 
                 public function testGrantAdmins(): void {
                         $user        = new \WP_User();

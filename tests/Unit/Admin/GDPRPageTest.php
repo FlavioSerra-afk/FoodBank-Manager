@@ -1,11 +1,6 @@
 <?php
 declare(strict_types=1);
 
-namespace {
-    use PHPUnit\Framework\TestCase;
-
-}
-
 namespace FBM\Exports {
     class SarExporter {
         public static array $last = array();
@@ -17,19 +12,15 @@ namespace FBM\Exports {
 }
 
 namespace {
-    use PHPUnit\Framework\TestCase;
+    use BaseTestCase;
     use FBM\Admin\GDPRPage;
 
-    /**
-     * @runTestsInSeparateProcesses
-     */
-    final class GDPRPageTest extends TestCase {
+    final class GDPRPageTest extends BaseTestCase {
         protected function setUp(): void {
-            fbm_test_reset_globals();
+            parent::setUp();
             fbm_grant_manager();
             fbm_test_trust_nonces(true);
             fbm_test_set_request_nonce();
-            $_GET = $_POST = $_SERVER = $_REQUEST = array();
             if (!class_exists('FoodBankManager\\Database\\ApplicationsRepo', false)) {
                 require_once __DIR__ . '/../../Support/ApplicationsRepoStub.php';
             }
@@ -75,7 +66,6 @@ namespace {
         }
 
         public function testUnmaskedWithCapability(): void {
-            fbm_test_reset_globals();
             fbm_grant_admin();
             fbm_test_trust_nonces(true);
             fbm_test_set_request_nonce('fbm_gdpr_export', '_fbm_nonce');

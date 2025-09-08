@@ -1,20 +1,18 @@
 <?php
 declare(strict_types=1);
 
-use PHPUnit\Framework\TestCase;
 use FoodBankManager\Admin\Notices;
 
-final class NoticesDeDupTest extends TestCase {
+final class NoticesDeDupTest extends BaseTestCase {
     protected function setUp(): void {
-        fbm_test_reset_globals();
+        parent::setUp();
         $GLOBALS['fbm_test_screen_id'] = null;
-        fbm_grant_caps(['manage_options']);
+        fbm_grant_admin();
         if (!defined('FBM_KEK_BASE64')) {
             define('FBM_KEK_BASE64', 'dummy');
         }
     }
 
-    /** @runInSeparateProcess */
     public function testRenderPrintsOncePerRequest(): void {
         $GLOBALS['fbm_test_screen_id'] = 'toplevel_page_fbm';
         Notices::missing_kek();
@@ -26,7 +24,6 @@ final class NoticesDeDupTest extends TestCase {
         $this->assertSame(1, Notices::getRenderCount());
     }
 
-    /** @runInSeparateProcess */
     public function testRenderBailsOnNonFbmScreen(): void {
         $GLOBALS['fbm_test_screen_id'] = 'dashboard';
         Notices::missing_kek();
@@ -37,7 +34,6 @@ final class NoticesDeDupTest extends TestCase {
         $this->assertSame(0, Notices::getRenderCount());
     }
 
-    /** @runInSeparateProcess */
     public function testRenderCountTracksSingleRender(): void {
         $GLOBALS['fbm_test_screen_id'] = 'toplevel_page_fbm';
         Notices::boot();

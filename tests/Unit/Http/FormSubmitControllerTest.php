@@ -5,14 +5,13 @@ namespace FoodBankManager\Tests\Unit\Http {
 
 use FoodBankManager\Forms\PresetsRepo;
 use FoodBankManager\Http\FormSubmitController;
-use PHPUnit\Framework\TestCase;
+use \BaseTestCase;
 
-final class FormSubmitControllerTest extends TestCase {
+final class FormSubmitControllerTest extends BaseTestCase {
     private array $schema;
 
     protected function setUp(): void {
         parent::setUp();
-        \fbm_test_reset_globals();
         $GLOBALS['fbm_test_mail'] = array();
         if ( ! defined( 'FBM_PATH' ) ) {
             define( 'FBM_PATH', dirname( __DIR__, 3 ) . '/' );

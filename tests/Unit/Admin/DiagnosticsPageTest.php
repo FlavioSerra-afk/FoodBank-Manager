@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 namespace {
-    use PHPUnit\Framework\TestCase;
+    use BaseTestCase;
     use FoodBankManager\Admin\DiagnosticsPage;
 
     if ( ! class_exists( 'DiagRetentionDBStub' ) ) {
@@ -66,20 +66,19 @@ namespace {
     /**
      * @runInSeparateProcess
      */
-    final class DiagnosticsPageTest extends TestCase {
+    final class DiagnosticsPageTest extends BaseTestCase {
         public static bool $mail_result = true;
         /** @var array<string,int> */
         public static array $cron_next = array();
 
         protected function setUp(): void {
-            fbm_test_reset_globals();
+            parent::setUp();
             fbm_grant_manager();
             fbm_test_trust_nonces(true);
             fbm_test_set_request_nonce();
             self::$mail_result = true;
             \FoodBankManager\Auth\Roles::$installed = false;
             \FoodBankManager\Auth\Roles::$ensured  = false;
-            $_POST = $_SERVER = $_REQUEST = array();
             global $fbm_test_options, $fbm_options;
             $fbm_test_options = array(
                 'emails' => array(

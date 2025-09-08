@@ -1,11 +1,10 @@
 <?php
 declare(strict_types=1);
 
-use PHPUnit\Framework\TestCase;
 use FoodBankManager\Admin\ThemePage;
 use FoodBankManager\Core\Options;
 
-final class ThemePageTest extends TestCase {
+final class ThemePageTest extends BaseTestCase {
 
         private function loadTheme(): string {
                 if ( class_exists( 'FoodBankManager\\UITest\\ThemeReal', false ) ) {
@@ -21,17 +20,13 @@ final class ThemePageTest extends TestCase {
 
         protected function setUp(): void {
         parent::setUp();
-        fbm_test_reset_globals();
         fbm_grant_for_page('fbm_theme');
         fbm_test_trust_nonces(true);
-        $_POST = $_SERVER = $_REQUEST = array();
-        global $fbm_test_options;
-        $fbm_test_options = array();
-        if ( ! defined( 'FBM_PATH' ) ) {
-                define( 'FBM_PATH', dirname( __DIR__, 2 ) . '/' );
+        if (!defined('FBM_PATH')) {
+                define('FBM_PATH', dirname(__DIR__, 2) . '/');
         }
-        if ( ! defined( 'ABSPATH' ) ) {
-                define( 'ABSPATH', FBM_PATH );
+        if (!defined('ABSPATH')) {
+                define('ABSPATH', FBM_PATH);
         }
         }
 
@@ -43,7 +38,7 @@ final class ThemePageTest extends TestCase {
         }
 
         public function testUserWithoutCapBlocked(): void {
-                fbm_test_reset_globals();
+                fbm_grant_viewer();
                 fbm_test_trust_nonces(true);
                 $_SERVER['REQUEST_METHOD'] = 'POST';
                 fbm_test_set_request_nonce('fbm_theme_save');

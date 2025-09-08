@@ -32,19 +32,17 @@ namespace FoodBankManager\Security {
 }
 
 namespace {
-use PHPUnit\Framework\TestCase;
+use BaseTestCase;
 use FoodBankManager\Forms\Presets;
 use FoodBankManager\Core\Options;
 use FoodBankManager\Admin\FormsPage;
 use FoodBankManager\Shortcodes\Form;
 
-final class FormsPresetsTest extends TestCase {
-
+final class FormsPresetsTest extends BaseTestCase {
     protected function setUp(): void {
         parent::setUp();
-        fbm_test_reset_globals();
-        if ( ! defined( 'FBM_PATH' ) ) {
-            define( 'FBM_PATH', dirname( __DIR__, 2 ) . '/' );
+        if (!defined('FBM_PATH')) {
+            define('FBM_PATH', dirname(__DIR__, 2) . '/');
         }
     }
 
@@ -70,18 +68,17 @@ final class FormsPresetsTest extends TestCase {
     }
 
     public function testFormsPageRequiresCap(): void {
-        fbm_test_reset_globals();
+        fbm_grant_caps([]);
         $this->expectException( \RuntimeException::class );
         FormsPage::route();
     }
 
     public function testFormsPageListsPresets(): void {
-        fbm_test_reset_globals();
         fbm_grant_for_page('fbm_forms');
         ob_start();
         FormsPage::route();
         $html = (string) ob_get_clean();
-        $this->assertStringContainsString( '[fbm_form preset', $html );
+        $this->assertStringContainsString('[fbm_form preset', $html);
     }
 
     public function testShortcodePresetFallback(): void {
