@@ -55,24 +55,21 @@ class SettingsPage {
 				wp_die( esc_html__( 'You do not have permission to perform this action.', 'foodbank-manager' ) );
 		}
 
-               $raw  = filter_input( INPUT_POST, 'branding', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
-               if ( null === $raw ) {
-                       $raw = $_POST['branding'] ?? array();
-               }
-               $raw  = is_array( $raw ) ? array_map( 'wp_unslash', $raw ) : array();
-               $data = array();
-               if ( isset( $raw['site_name'] ) ) {
-                       $data['site_name'] = sanitize_text_field( (string) $raw['site_name'] );
-               }
-               if ( isset( $raw['logo_url'] ) ) {
-                       $data['logo_url'] = esc_url_raw( trim( (string) $raw['logo_url'] ) );
-               }
-               if ( isset( $raw['color'] ) ) {
-                       $color = sanitize_key( (string) $raw['color'] );
-                       $allowed = array( 'default', 'blue', 'green', 'red', 'orange', 'purple' );
-                       $data['color'] = in_array( $color, $allowed, true ) ? $color : 'default';
-               }
-               Options::save( array( 'branding' => $data ) );
+		$raw          = filter_input( INPUT_POST, 'branding', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
+		$raw          = is_array( $raw ) ? array_map( 'wp_unslash', $raw ) : array();
+				$data = array();
+		if ( isset( $raw['site_name'] ) ) {
+				$data['site_name'] = sanitize_text_field( (string) $raw['site_name'] );
+		}
+		if ( isset( $raw['logo_url'] ) ) {
+				$data['logo_url'] = esc_url_raw( trim( (string) $raw['logo_url'] ) );
+		}
+		if ( isset( $raw['color'] ) ) {
+				$color         = sanitize_key( (string) $raw['color'] );
+				$allowed       = array( 'default', 'blue', 'green', 'red', 'orange', 'purple' );
+				$data['color'] = in_array( $color, $allowed, true ) ? $color : 'default';
+		}
+				Options::save( array( 'branding' => $data ) );
 
 			$url = add_query_arg(
 				array(
@@ -94,22 +91,19 @@ class SettingsPage {
 				wp_die( esc_html__( 'You do not have permission to perform this action.', 'foodbank-manager' ) );
 		}
 
-               $raw  = filter_input( INPUT_POST, 'emails', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
-               if ( null === $raw ) {
-                       $raw = $_POST['emails'] ?? array();
-               }
-               $raw  = is_array( $raw ) ? array_map( 'wp_unslash', $raw ) : array();
-               $data = array();
-               if ( isset( $raw['from_name'] ) ) {
-                       $data['from_name'] = sanitize_text_field( (string) $raw['from_name'] );
-               }
-               if ( isset( $raw['from_address'] ) ) {
-                       $data['from_address'] = sanitize_email( (string) $raw['from_address'] );
-               }
-               if ( isset( $raw['reply_to'] ) ) {
-                       $data['reply_to'] = sanitize_email( (string) $raw['reply_to'] );
-               }
-               Options::save( array( 'emails' => $data ) );
+		$raw          = filter_input( INPUT_POST, 'emails', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
+		$raw          = is_array( $raw ) ? array_map( 'wp_unslash', $raw ) : array();
+				$data = array();
+		if ( isset( $raw['from_name'] ) ) {
+				$data['from_name'] = sanitize_text_field( (string) $raw['from_name'] );
+		}
+		if ( isset( $raw['from_address'] ) ) {
+				$data['from_address'] = sanitize_email( (string) $raw['from_address'] );
+		}
+		if ( isset( $raw['reply_to'] ) ) {
+				$data['reply_to'] = sanitize_email( (string) $raw['reply_to'] );
+		}
+				Options::save( array( 'emails' => $data ) );
 
 		$url = add_query_arg(
 			array(
