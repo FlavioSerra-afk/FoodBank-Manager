@@ -23,14 +23,14 @@ class CsvExporter {
 	 * @param string           $filename       Output filename.
 	 */
 	public static function stream_list( array $rows, bool $mask_sensitive = true, string $filename = 'fbm-entries.csv' ): void {
-		if ( headers_sent() ) {
-			return;
-		}
-		$filename = sanitize_file_name( $filename );
-		header( 'Content-Type: text/csv; charset=UTF-8' );
-		header( 'X-Content-Type-Options: nosniff' );
-		header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
-		echo "\xEF\xBB\xBF"; // UTF-8 BOM.
+                $filename = sanitize_file_name( $filename );
+                $headers  = array(
+                        'Content-Type: text/csv; charset=UTF-8',
+                        'X-Content-Type-Options: nosniff',
+                        'Content-Disposition: attachment; filename="' . $filename . '"',
+                );
+                fbm_send_headers( $headers );
+                echo "\xEF\xBB\xBF"; // UTF-8 BOM.
 
 		$keys    = array( 'id', 'created_at', 'name', 'email', 'postcode', 'status' );
 		$headers = array(
@@ -43,22 +43,22 @@ class CsvExporter {
 		);
 
 		if ( class_exists( '\\League\\Csv\\Writer' ) ) {
-			$csv = \League\Csv\Writer::createFromFileObject( new \SplTempFileObject() );
-			if ( ! empty( $rows ) ) {
-				$csv->insertOne( $headers );
-				foreach ( $rows as $row ) {
-					if ( $mask_sensitive ) {
-						$row['email']    = Helpers::mask_email( (string) ( $row['email'] ?? '' ) );
-						$row['postcode'] = Helpers::mask_postcode( (string) ( $row['postcode'] ?? '' ) );
-					}
-					$out_row = array();
-					foreach ( $keys as $k ) {
-						$out_row[] = $row[ $k ] ?? '';
-					}
-					$csv->insertOne( $out_row );
-				}
-			}
-			$csv->output( $filename );
+                        $csv = \League\Csv\Writer::createFromFileObject( new \SplTempFileObject() );
+                        if ( ! empty( $rows ) ) {
+                                $csv->insertOne( $headers );
+                                foreach ( $rows as $row ) {
+                                        if ( $mask_sensitive ) {
+                                                $row['email']    = Helpers::mask_email( (string) ( $row['email'] ?? '' ) );
+                                                $row['postcode'] = Helpers::mask_postcode( (string) ( $row['postcode'] ?? '' ) );
+                                        }
+                                        $out_row = array();
+                                        foreach ( $keys as $k ) {
+                                                $out_row[] = $row[ $k ] ?? '';
+                                        }
+                                        $csv->insertOne( $out_row );
+                                }
+                        }
+                        echo $csv->toString();
 		} else {
 			$out = fopen( 'php://output', 'wb' );
 			if ( ! empty( $rows ) ) {
@@ -92,14 +92,14 @@ class CsvExporter {
 		bool $include_voided = false,
 		string $filename = 'fbm-attendance.csv'
 	): void {
-		if ( headers_sent() ) {
-			return;
-		}
-		$filename = sanitize_file_name( $filename );
-		header( 'Content-Type: text/csv; charset=UTF-8' );
-		header( 'X-Content-Type-Options: nosniff' );
-		header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
-		echo "\xEF\xBB\xBF";
+                $filename = sanitize_file_name( $filename );
+                $headers  = array(
+                        'Content-Type: text/csv; charset=UTF-8',
+                        'X-Content-Type-Options: nosniff',
+                        'Content-Disposition: attachment; filename="' . $filename . '"',
+                );
+                fbm_send_headers( $headers );
+                echo "\xEF\xBB\xBF";
 
 		$header = array(
 			__( 'Application ID', 'foodbank-manager' ),
@@ -116,32 +116,32 @@ class CsvExporter {
 			$header[] = __( 'Voided', 'foodbank-manager' );
 		}
 		if ( class_exists( '\\League\\Csv\\Writer' ) ) {
-			$csv = \League\Csv\Writer::createFromFileObject( new \SplTempFileObject() );
-			if ( ! empty( $rows ) ) {
-				$csv->insertOne( $header );
-				foreach ( $rows as $row ) {
-					if ( $mask_sensitive ) {
-						$row['email']    = Helpers::mask_email( (string) ( $row['email'] ?? '' ) );
-						$row['postcode'] = Helpers::mask_postcode( (string) ( $row['postcode'] ?? '' ) );
-					}
-					$row_out = array(
-						$row['application_id'] ?? '',
-						$row['name'] ?? '',
-						$row['email'] ?? '',
-						$row['postcode'] ?? '',
-						$row['last_attended'] ?? '',
-						$row['visits_range'] ?? '',
-						$row['noshows_range'] ?? '',
-						$row['visits_12m'] ?? '',
-						$row['policy_badge'] ?? '',
-					);
-					if ( $include_voided ) {
-						$row_out[] = ! empty( $row['is_void'] ) ? __( 'Yes', 'foodbank-manager' ) : __( 'No', 'foodbank-manager' );
-					}
-					$csv->insertOne( $row_out );
-				}
-			}
-			$csv->output( $filename );
+                        $csv = \League\Csv\Writer::createFromFileObject( new \SplTempFileObject() );
+                        if ( ! empty( $rows ) ) {
+                                $csv->insertOne( $header );
+                                foreach ( $rows as $row ) {
+                                        if ( $mask_sensitive ) {
+                                                $row['email']    = Helpers::mask_email( (string) ( $row['email'] ?? '' ) );
+                                                $row['postcode'] = Helpers::mask_postcode( (string) ( $row['postcode'] ?? '' ) );
+                                        }
+                                        $row_out = array(
+                                                $row['application_id'] ?? '',
+                                                $row['name'] ?? '',
+                                                $row['email'] ?? '',
+                                                $row['postcode'] ?? '',
+                                                $row['last_attended'] ?? '',
+                                                $row['visits_range'] ?? '',
+                                                $row['noshows_range'] ?? '',
+                                                $row['visits_12m'] ?? '',
+                                                $row['policy_badge'] ?? '',
+                                        );
+                                        if ( $include_voided ) {
+                                                $row_out[] = ! empty( $row['is_void'] ) ? __( 'Yes', 'foodbank-manager' ) : __( 'No', 'foodbank-manager' );
+                                        }
+                                        $csv->insertOne( $row_out );
+                                }
+                        }
+                        echo $csv->toString();
 		} else {
 			$out = fopen( 'php://output', 'wb' );
 			if ( ! empty( $rows ) ) {

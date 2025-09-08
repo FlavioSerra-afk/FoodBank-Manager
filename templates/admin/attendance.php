@@ -32,13 +32,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<select name="status[]" multiple>
 		<option value="present" 
 		<?php
-		if ( isset( $filters['status'] ) && in_array( 'present', $filters['status'], true ) ) {
+                if ( isset( $filters['status'] ) && in_array( 'present', (array) $filters['status'], true ) ) {
 			echo 'selected';}
 		?>
 		><?php esc_html_e( 'Present', 'foodbank-manager' ); ?></option>
 		<option value="no_show" 
 		<?php
-		if ( isset( $filters['status'] ) && in_array( 'no_show', $filters['status'], true ) ) {
+                if ( isset( $filters['status'] ) && in_array( 'no_show', (array) $filters['status'], true ) ) {
 			echo 'selected';}
 		?>
 		><?php esc_html_e( 'No-show', 'foodbank-manager' ); ?></option>
@@ -48,13 +48,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<select name="type[]" multiple>
 		<option value="in_person" 
 		<?php
-		if ( isset( $filters['type'] ) && in_array( 'in_person', $filters['type'], true ) ) {
+                if ( isset( $filters['type'] ) && in_array( 'in_person', (array) $filters['type'], true ) ) {
 			echo 'selected';}
 		?>
 		><?php esc_html_e( 'In person', 'foodbank-manager' ); ?></option>
 		<option value="delivery" 
 		<?php
-		if ( isset( $filters['type'] ) && in_array( 'delivery', $filters['type'], true ) ) {
+                if ( isset( $filters['type'] ) && in_array( 'delivery', (array) $filters['type'], true ) ) {
 			echo 'selected';}
 		?>
 		><?php esc_html_e( 'Delivery', 'foodbank-manager' ); ?></option>

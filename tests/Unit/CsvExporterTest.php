@@ -8,7 +8,7 @@ final class CsvExporterTest extends TestCase {
     protected $backupGlobals = false;
     protected function setUp(): void {
         parent::setUp();
-        $this->markTestSkipped('Header output not supported in this environment');
+        unset( $GLOBALS['__fbm_sent_headers'] );
     }
 
     public function testStreamListMasksSensitiveByDefault(): void {
@@ -25,7 +25,7 @@ final class CsvExporterTest extends TestCase {
         ob_start();
         CsvExporter::stream_list( $rows );
         $output  = ob_get_clean();
-        header_remove();
+        $this->assertStringContainsString( 'text/csv', $GLOBALS['__fbm_sent_headers'][0] ?? '' );
 
         $this->assertStringStartsWith( "\xEF\xBB\xBF", $output );
         $output = preg_replace( '/^\xEF\xBB\xBF/', '', $output );
@@ -56,7 +56,7 @@ final class CsvExporterTest extends TestCase {
         ob_start();
         CsvExporter::stream_list( $rows, false );
         $output = ob_get_clean();
-        header_remove();
+        $this->assertStringContainsString( 'text/csv', $GLOBALS['__fbm_sent_headers'][0] ?? '' );
         $output = preg_replace( '/^\xEF\xBB\xBF/', '', $output );
         $lines  = array_values( array_filter( array_map( 'trim', explode( "\n", $output ) ), 'strlen' ) );
         $this->assertCount( 3, $lines );
@@ -68,7 +68,7 @@ final class CsvExporterTest extends TestCase {
         ob_start();
         CsvExporter::stream_list( array() );
         $output = ob_get_clean();
-        header_remove();
+        $this->assertStringContainsString( 'text/csv', $GLOBALS['__fbm_sent_headers'][0] ?? '' );
         $this->assertSame( "\xEF\xBB\xBF", $output );
     }
 }

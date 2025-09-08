@@ -204,8 +204,8 @@ class AttendanceController {
 		}
 
 		$event_id = (int) $request->get_param( 'event_id' );
-		$type     = Helpers::sanitize_text( (string) $request->get_param( 'type' ) );
-		if ( $type === '' || ! in_array( $type, Options::get( 'attendance.types' ), true ) ) {
+                $type     = Helpers::sanitize_text( (string) $request->get_param( 'type' ) );
+                if ( $type === '' || ! in_array( $type, (array) Options::get( 'attendance.types' ), true ) ) {
 				$type = 'in_person';
 		}
 		$method = Helpers::sanitize_text( (string) $request->get_param( 'method' ) );
@@ -286,8 +286,8 @@ class AttendanceController {
 				);
 		}
 		$event_id = (int) $request->get_param( 'event_id' );
-		$type     = Helpers::sanitize_text( (string) $request->get_param( 'type' ) );
-		if ( $type === '' || ! in_array( $type, Options::get( 'attendance_types' ), true ) ) {
+                $type     = Helpers::sanitize_text( (string) $request->get_param( 'type' ) );
+                if ( $type === '' || ! in_array( $type, (array) Options::get( 'attendance_types' ), true ) ) {
 				$type = 'in_person';
 		}
 		$reason = Helpers::sanitize_text( (string) $request->get_param( 'reason' ) );

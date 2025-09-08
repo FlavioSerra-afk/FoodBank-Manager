@@ -9,7 +9,7 @@ namespace {
         protected $backupGlobals = false;
         protected function setUp(): void {
             parent::setUp();
-            $this->markTestSkipped('Header output not supported in this environment');
+            unset( $GLOBALS['__fbm_sent_headers'] );
         }
         private function requireZip(): void {
             if ( ! class_exists( \ZipArchive::class ) ) {
@@ -112,6 +112,21 @@ namespace {
             $html = SarExporter::render_html($subject, true);
             $this->assertStringNotContainsString('..', $html);
             $this->assertMatchesRegularExpression('/[a-f0-9]{8}\.txt/', $html);
+        }
+
+        public function testStreamOutputsHeaders(): void {
+            $subject = array();
+            ob_start();
+            SarExporter::stream( $subject, true, 'entry-1' );
+            $body = ob_get_clean();
+            $headers = $GLOBALS['__fbm_sent_headers'] ?? array();
+            if ( class_exists( \ZipArchive::class ) ) {
+                $this->assertStringContainsString( 'application/zip', $headers[0] ?? '' );
+                $this->assertNotSame( '', $body );
+            } else {
+                $this->assertStringContainsString( 'text/html', $headers[0] ?? '' );
+                $this->assertStringContainsString( 'ZipArchive not available', $body );
+            }
         }
     }
 }

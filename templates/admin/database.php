@@ -101,19 +101,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 <form method="post" class="fbm-columns" style="margin:10px 0;">
 		<input type="hidden" name="fbm_action" value="db_columns_save" />
 		<?php wp_nonce_field( 'fbm_database_db_columns_save' ); ?>
-		<?php foreach ( UsersMeta::db_column_labels() as $col_id => $label ) : ?>
-				<label class="fbm-column-toggle">
-												<input type="checkbox"
-														name="columns[]"
-														value="<?php echo esc_attr( $col_id ); ?>"
-														<?php checked( in_array( $col_id, $columns, true ) ); ?>
-												/>
-						<?php echo esc_html( $label ); ?>
-				</label>
-		<?php endforeach; ?>
-		<button class="button" type="submit"><?php esc_html_e( 'Save Columns', 'foodbank-manager' ); ?></button>
+                <?php foreach ( UsersMeta::db_column_labels() as $col_id => $label ) : ?>
+                                <label class="fbm-column-toggle">
+                                                                                                <input type="checkbox"
+                                                                                                                name="columns[]"
+                                                                                                                value="<?php echo esc_attr( $col_id ); ?>"
+                                                                                                                <?php checked( in_array( $col_id, (array) $columns, true ) ); ?>
+                                                                                                />
+                                                <?php echo esc_html( $label ); ?>
+                                </label>
+                <?php endforeach; ?>
+                <button class="button" type="submit"><?php esc_html_e( 'Save Columns', 'foodbank-manager' ); ?></button>
 </form>
-<?php $col_vis = array_flip( $columns ); ?>
+<?php $col_vis = array_flip( (array) $columns ); ?>
 <table class="wp-list-table widefat fixed striped">
 <thead><tr>
 <th class="column-id"<?php echo isset( $col_vis['id'] ) ? '' : ' style="display:none"'; ?>><?php esc_html_e( 'ID', 'foodbank-manager' ); ?></th>
@@ -210,7 +210,8 @@ endif;
 </tbody>
 </table>
 <?php
-$total_pages = max( 1, ceil( $total / $per_page ) );
+$pp          = max( 1, (int) $per_page );
+$total_pages = max( 1, (int) ceil( $total / $pp ) );
 $base_url    = remove_query_arg( 'paged' );
 ?>
 <div class="tablenav">
