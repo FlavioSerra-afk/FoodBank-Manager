@@ -32,33 +32,35 @@ final class RetentionConfig {
 			$raw = array();
 		}
 
-		if ( isset( $raw['retention'] ) && is_array( $raw['retention'] ) ) {
-			$raw = $raw['retention'];
-		}
+                if ( isset( $raw['retention'] ) && is_array( $raw['retention'] ) ) {
+                        $raw = $raw['retention'];
+                }
 
-                $map = array(
-                        'applications' => 'applications',
-                        'attendance'   => 'attendance',
-                        'mail'         => 'mail',
-                        'mail_log'     => 'mail',
+                $mail_raw = array();
+                if ( isset( $raw['mail'] ) && is_array( $raw['mail'] ) ) {
+                        $mail_raw = $raw['mail'];
+                } elseif ( isset( $raw['mail_log'] ) && is_array( $raw['mail_log'] ) ) {
+                        $mail_raw = $raw['mail_log'];
+                }
+
+                $sections = array(
+                        'applications' => isset( $raw['applications'] ) && is_array( $raw['applications'] ) ? $raw['applications'] : array(),
+                        'attendance'   => isset( $raw['attendance'] ) && is_array( $raw['attendance'] ) ? $raw['attendance'] : array(),
+                        'mail'         => $mail_raw,
                 );
 
                 $out = array();
-                foreach ( $map as $in => $out_key ) {
-                                if ( isset( $out[ $out_key ] ) ) {
-                                        continue;
-                                }
-                                $section         = isset( $raw[ $in ] ) && is_array( $raw[ $in ] ) ? $raw[ $in ] : array();
-                                $days            = isset( $section['days'] ) ? max( 0, (int) $section['days'] ) : 0;
-                                $policy          = isset( $section['policy'] ) && in_array( $section['policy'], array( 'delete', 'anonymise' ), true )
-                                                ? $section['policy']
-                                                : 'delete';
-                                $out[ $out_key ] = array(
-                                        'days'   => $days,
-                                        'policy' => $policy,
-                                );
+                foreach ( $sections as $out_key => $section ) {
+                        $days   = isset( $section['days'] ) ? max( 0, (int) $section['days'] ) : 0;
+                        $policy = isset( $section['policy'] ) && in_array( $section['policy'], array( 'delete', 'anonymise' ), true )
+                                ? $section['policy']
+                                : 'delete';
+                        $out[ $out_key ] = array(
+                                'days'   => $days,
+                                'policy' => $policy,
+                        );
                 }
 
-		return $out;
-	}
+                return $out;
+        }
 }

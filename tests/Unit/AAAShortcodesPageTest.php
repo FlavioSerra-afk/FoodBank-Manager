@@ -35,12 +35,12 @@ final class ShortcodesPageTest extends BaseTestCase {
     public function testDiscoverShortcodesMetadata(): void {
         $shortcodes = ShortcodesPage::discover();
         $map = array();
-        foreach ( $shortcodes as $sc ) {
-            $map[ $sc['tag'] ] = $sc['atts'];
+        foreach ($shortcodes as $sc) {
+            $map[$sc['tag']] = $sc['atts'];
         }
-        $this->assertArrayHasKey( 'fbm_form', $map );
-        $this->assertSame( 'int', $map['fbm_form']['id']['type'] );
-        $this->assertSame( '1', $map['fbm_form']['id']['default'] );
+        $this->assertArrayHasKey('fbm_form', $map);
+        $this->assertSame('int', $map['fbm_form']['id']['type']);
+        $this->assertSame('1', $map['fbm_form']['id']['default']);
     }
 
     public function testCapabilityRequired(): void {
@@ -52,9 +52,9 @@ final class ShortcodesPageTest extends BaseTestCase {
     public function testInvalidNonceBlocksPreview(): void {
         fbm_test_trust_nonces(false);
         $_SERVER['REQUEST_METHOD'] = 'POST';
-        $_POST['fbm_action']       = 'shortcode_preview';
-        $_POST['tag']              = 'fbm_form';
-        $this->expectException( \RuntimeException::class );
+        $_POST['fbm_action'] = 'shortcode_preview';
+        $_POST['tag'] = 'fbm_form';
+        $this->expectException(\RuntimeException::class);
         ShortcodesPage::route();
     }
 
@@ -62,8 +62,8 @@ final class ShortcodesPageTest extends BaseTestCase {
         $_SERVER['REQUEST_METHOD'] = 'POST';
         fbm_test_set_request_nonce('fbm_shortcodes_preview');
         $_POST['fbm_action'] = 'shortcode_preview';
-        $_POST['tag']        = 'fbm_bad';
-        $_REQUEST            = $_POST;
+        $_POST['tag'] = 'fbm_bad';
+        $_REQUEST = $_POST;
         ob_start();
         ShortcodesPage::route();
         $html = (string) ob_get_clean();
@@ -73,26 +73,26 @@ final class ShortcodesPageTest extends BaseTestCase {
     }
 
     public function testAttributeSanitizer(): void {
-        $ref    = new \ReflectionClass( ShortcodesPage::class );
-        $method = $ref->getMethod( 'sanitize_atts' );
-        $method->setAccessible( true );
+        $ref = new \ReflectionClass(ShortcodesPage::class);
+        $method = $ref->getMethod('sanitize_atts');
+        $method->setAccessible(true);
         $meta = array(
-            'foo'    => array( 'type' => 'string', 'default' => 'def' ),
-            'num'    => array( 'type' => 'int', 'default' => '1' ),
-            'choice' => array( 'type' => 'enum', 'default' => 'a', 'options' => array( 'a', 'b' ) ),
+            'foo'    => array('type' => 'string', 'default' => 'def'),
+            'num'    => array('type' => 'int', 'default' => '1'),
+            'choice' => array('type' => 'enum', 'default' => 'a', 'options' => array('a', 'b')),
         );
         $raw = array(
-            'foo'    => '<b>' . str_repeat( 'x', 300 ),
+            'foo'    => '<b>' . str_repeat('x', 300),
             'num'    => '7abc',
             'choice' => 'c',
             'bad'    => 'zzz',
         );
         /** @var array<string,string> $res */
-        $res = $method->invoke( null, $meta, $raw );
-        $this->assertSame( '7', $res['num'] );
-        $this->assertArrayNotHasKey( 'choice', $res );
-        $this->assertArrayNotHasKey( 'bad', $res );
-        $this->assertSame( 256, strlen( $res['foo'] ) );
+        $res = $method->invoke(null, $meta, $raw);
+        $this->assertSame('7', $res['num']);
+        $this->assertArrayNotHasKey('choice', $res);
+        $this->assertArrayNotHasKey('bad', $res);
+        $this->assertSame(256, strlen($res['foo']));
     }
 
     public function testPreviewFiltersHtml(): void {
@@ -101,8 +101,8 @@ final class ShortcodesPageTest extends BaseTestCase {
         $_POST = array(
             'fbm_action' => 'shortcode_preview',
             'tag'        => 'fbm_form',
-            'atts'       => array( 'id' => '1' ),
-            '_wpnonce'   => $_POST['_wpnonce'], // retained from helper
+            'atts'       => array('id' => '1'),
+            '_wpnonce'   => $_POST['_wpnonce'],
         );
         $_REQUEST = $_POST;
         ob_start();
@@ -115,3 +115,4 @@ final class ShortcodesPageTest extends BaseTestCase {
     }
 }
 }
+

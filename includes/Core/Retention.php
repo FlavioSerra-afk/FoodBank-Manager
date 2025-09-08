@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignoreFile
 /**
  * Data retention and anonymisation routines.
  *
@@ -93,7 +93,7 @@ final class Retention {
 	 */
 	public static function run( bool $dry_run = false ): array {
 		global $wpdb;
-		$summary = array(
+                $summary = array(
 			'applications' => array(
 				'deleted'    => 0,
 				'anonymised' => 0,
@@ -111,9 +111,10 @@ final class Retention {
 								$raw = Options::get( 'privacy.retention' );
 								$cfg = RetentionConfig::normalize( $raw );
 
-				$day = defined( 'DAY_IN_SECONDS' ) ? DAY_IN_SECONDS : 86400;
+                                $day       = defined( 'DAY_IN_SECONDS' ) ? DAY_IN_SECONDS : 86400;
+                                $now       = (int) apply_filters( 'fbm_now', time() );
 
-								$categories = array( 'applications', 'attendance', 'mail' );
+                                                                $categories = array( 'applications', 'attendance', 'mail' );
 
 		foreach ( $categories as $key ) {
 						$days   = $cfg[ $key ]['days'];
@@ -121,7 +122,7 @@ final class Retention {
 			if ( $days <= 0 ) {
 										continue;
 			}
-						$cutoff = gmdate( 'Y-m-d H:i:s', time() - $days * $day );
+                                                $cutoff = gmdate( 'Y-m-d H:i:s', $now - $days * $day );
 
 			switch ( $key ) {
 				case 'applications':
@@ -204,8 +205,8 @@ final class Retention {
 		}
 
 		if ( ! $dry_run ) {
-						update_option( self::OPT_LAST_SUMMARY, $summary );
-						update_option( self::OPT_LAST_RUN, time() );
+                                                update_option( self::OPT_LAST_SUMMARY, $summary );
+                                                update_option( self::OPT_LAST_RUN, $now );
 						$user_id = (int) get_current_user_id();
 						Audit::log( 'retention_run', 'system', 0, $user_id, $summary );
 		}

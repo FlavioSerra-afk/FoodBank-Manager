@@ -15,5 +15,9 @@ namespace FoodBankManager\Database {
             $e['id'] = $id;
             return $e;
         }
+        /** @param array<string,mixed> $filters */
+        public static function list(array $filters): array { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+            return array('rows' => array(), 'total' => 0);
+        }
     }
 }
