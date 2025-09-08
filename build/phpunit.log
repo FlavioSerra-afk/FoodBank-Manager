@@ -1,0 +1,572 @@
+
+Warning: The use statement with non-compound name 'BaseTestCase' has no effect in /workspace/FoodBank-Manager/tests/Unit/AAAShortcodesPageTest.php on line 9
+
+Warning: The use statement with non-compound name 'BaseTestCase' has no effect in /workspace/FoodBank-Manager/tests/Unit/Admin/DiagnosticsPageTest.php on line 5
+
+Warning: The use statement with non-compound name 'BaseTestCase' has no effect in /workspace/FoodBank-Manager/tests/Unit/Admin/EntryPageTest.php on line 5
+
+Warning: The use statement with non-compound name 'BaseTestCase' has no effect in /workspace/FoodBank-Manager/tests/Unit/Admin/GDPRPageTest.php on line 15
+
+Warning: The use statement with non-compound name 'BaseTestCase' has no effect in /workspace/FoodBank-Manager/tests/Unit/EmailsPageTest.php on line 9
+
+Warning: The use statement with non-compound name 'BaseTestCase' has no effect in /workspace/FoodBank-Manager/tests/Unit/FormsPresetsTest.php on line 35
+
+Warning: The use statement with non-compound name 'BaseTestCase' has no effect in /workspace/FoodBank-Manager/tests/Unit/PermissionsPageTest.php on line 5
+PHPUnit 9.6.25 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.12
+Configuration: /workspace/FoodBank-Manager/phpunit.xml.dist
+
+  Warning - The configuration file did not pass validation!
+  The following problems have been detected:
+
+  Line 8:
+  - Element 'source': This element is not expected.
+
+  Test results may not be as expected.
+
+
+Shortcodes Page
+ ✔ Discover shortcodes metadata [3.23 ms]
+ ✔ Capability required [0.33 ms]
+ ✔ Invalid nonce blocks preview [0.34 ms]
+ ✔ Unknown shortcode rejected [0.52 ms]
+ ✔ Attribute sanitizer [0.37 ms]
+ ✔ Preview filters html [0.31 ms]
+
+Diagnostics Page
+ ✔ Send test email success [0.91 ms]
+ ✔ Send test email failure [0.07 ms]
+ ✔ Template renders crypto [1.12 ms]
+ ✔ Cron table shows overdue [0.45 ms]
+ ✔ Retention run outputs summary [0.28 ms]
+ ✔ Retention dry run outputs summary [0.28 ms]
+ ✔ Repair caps action ensures caps [0.08 ms]
+
+Entry Page
+ ✘ View masks email without capability [0.00 ms]
+   │
+   │ PHPUnit\Framework\Exception: Fatal error: Uncaught Tests\Support\Exceptions\FbmDieException: You do not have permission to access this page. in /workspace/FoodBank-Manager/tests/Support/WPStubs.php:143
+   │ Stack trace:
+   │ #0 /workspace/FoodBank-Manager/templates/admin/diagnostics.php(13): wp_die('You do not have...')
+   │ #1 Standard input code(578): require_once('/workspace/Food...')
+   │ #2 {main}
+   │   thrown in /workspace/FoodBank-Manager/tests/Support/WPStubs.php on line 143
+   │
+
+ ✘ Unmask shows plaintext with capability [0.00 ms]
+   │
+   │ PHPUnit\Framework\Exception: Fatal error: Uncaught Tests\Support\Exceptions\FbmDieException: You do not have permission to access this page. in /workspace/FoodBank-Manager/tests/Support/WPStubs.php:143
+   │ Stack trace:
+   │ #0 /workspace/FoodBank-Manager/templates/admin/diagnostics.php(13): wp_die('You do not have...')
+   │ #1 Standard input code(578): require_once('/workspace/Food...')
+   │ #2 {main}
+   │   thrown in /workspace/FoodBank-Manager/tests/Support/WPStubs.php on line 143
+   │
+
+ ✘ Unmask denied without nonce [0.00 ms]
+   │
+   │ PHPUnit\Framework\Exception: Fatal error: Uncaught Tests\Support\Exceptions\FbmDieException: You do not have permission to access this page. in /workspace/FoodBank-Manager/tests/Support/WPStubs.php:143
+   │ Stack trace:
+   │ #0 /workspace/FoodBank-Manager/templates/admin/diagnostics.php(13): wp_die('You do not have...')
+   │ #1 Standard input code(578): require_once('/workspace/Food...')
+   │ #2 {main}
+   │   thrown in /workspace/FoodBank-Manager/tests/Support/WPStubs.php on line 143
+   │
+
+ ✘ Pdf denied without nonce [0.00 ms]
+   │
+   │ PHPUnit\Framework\Exception: Fatal error: Uncaught Tests\Support\Exceptions\FbmDieException: You do not have permission to access this page. in /workspace/FoodBank-Manager/tests/Support/WPStubs.php:143
+   │ Stack trace:
+   │ #0 /workspace/FoodBank-Manager/templates/admin/diagnostics.php(13): wp_die('You do not have...')
+   │ #1 Standard input code(578): require_once('/workspace/Food...')
+   │ #2 {main}
+   │   thrown in /workspace/FoodBank-Manager/tests/Support/WPStubs.php on line 143
+   │
+
+ ✘ Pdf export handles engines [0.00 ms]
+   │
+   │ PHPUnit\Framework\Exception: Fatal error: Uncaught Tests\Support\Exceptions\FbmDieException: You do not have permission to access this page. in /workspace/FoodBank-Manager/tests/Support/WPStubs.php:143
+   │ Stack trace:
+   │ #0 /workspace/FoodBank-Manager/templates/admin/diagnostics.php(13): wp_die('You do not have...')
+   │ #1 Standard input code(578): require_once('/workspace/Food...')
+   │ #2 {main}
+   │   thrown in /workspace/FoodBank-Manager/tests/Support/WPStubs.php on line 143
+   │
+
+GDPRPage
+ ✔ Search preview [0.45 ms]
+ ✔ Export requires nonce [0.19 ms]
+ ✘ Masked by default [0.19 ms]
+   │
+   │ Error: Call to undefined method FoodBankManager\Attendance\AttendanceRepo::find_by_application_id()
+   │
+   │ /workspace/FoodBank-Manager/includes/Admin/GDPRPage.php:76
+   │ /workspace/FoodBank-Manager/includes/Admin/GDPRPage.php:46
+   │ /workspace/FoodBank-Manager/tests/Unit/Admin/GDPRPageTest.php:61
+   │
+
+ ✘ Unmasked with capability [0.08 ms]
+   │
+   │ Error: Call to undefined method FoodBankManager\Attendance\AttendanceRepo::find_by_application_id()
+   │
+   │ /workspace/FoodBank-Manager/includes/Admin/GDPRPage.php:76
+   │ /workspace/FoodBank-Manager/includes/Admin/GDPRPage.php:46
+   │ /workspace/FoodBank-Manager/tests/Unit/Admin/GDPRPageTest.php:77
+   │
+
+Admin Templates
+ ✔ Settings template wrapped [0.04 ms]
+
+Assets
+ ✘ Theme css contains variables [0.35 ms]
+   │
+   │ Failed asserting that ':root{--fbm-primary:#3b82f6;--fbm-density:comfortable;--fbm-font:system-ui, sans-serif;--fbm-dark:0;}' contains "--fbm-primary:#010203".
+   │
+   │ /workspace/FoodBank-Manager/tests/Unit/AssetsTest.php:39
+   │
+
+ ✔ Admin css only enqueued on fbm screens [0.17 ms]
+
+Attendance Policy
+ ✔ Breach within days [0.27 ms]
+
+Attendance Repo Counts
+ ✘ Counts return ints [0.05 ms]
+   │
+   │ Error: Class "FBM\Tests\Support\WPDBStub" not found
+   │
+   │ /workspace/FoodBank-Manager/tests/Unit/AttendanceRepoCountsTest.php:11
+   │
+
+Attendance Repo Daily Counts
+ ✘ Counts length [0.03 ms]
+   │
+   │ Error: Class "FBM\Tests\Support\WPDBStub" not found
+   │
+   │ /workspace/FoodBank-Manager/tests/Unit/AttendanceRepoDailyCountsTest.php:11
+   │
+
+Attendance Repo Filter
+ ✘ Filters prepared [0.03 ms]
+   │
+   │ Error: Class "FBM\Tests\Support\WPDBStub" not found
+   │
+   │ /workspace/FoodBank-Manager/tests/Unit/AttendanceRepoFilterTest.php:11
+   │
+
+Attendance Repo
+ ✘ People summary excludes voided by default [0.07 ms]
+   │
+   │ Error: Class "FBM\Tests\Support\WPDBStub" not found
+   │
+   │ /workspace/FoodBank-Manager/tests/Unit/AttendanceRepoTest.php:11
+   │
+
+Audit
+ ✘ Log inserts row [0.03 ms]
+   │
+   │ Error: Class "FBM\Tests\Support\WPDBStub" not found
+   │
+   │ /workspace/FoodBank-Manager/tests/Unit/AuditTest.php:11
+   │
+
+Capabilities
+ ✘ Ensure for admin adds all caps [0.08 ms]
+   │
+   │ Failed asserting that an array has the key 'fb_manage_dashboard'.
+   │
+   │ /workspace/FoodBank-Manager/tests/Unit/Auth/CapabilitiesTest.php:15
+   │
+
+Capabilities Resolver (FoodBankManager\Tests\Unit\CapabilitiesResolver)
+ ✔ Grant admins [0.17 ms]
+ ✘ User overrides apply [0.11 ms]
+   │
+   │ Undefined array key "fb_manage_dashboard"
+   │
+   │ /workspace/FoodBank-Manager/tests/Unit/CapabilitiesResolverTest.php:28
+   │
+
+ ✔ Unknown caps ignored [0.03 ms]
+
+Retention Config
+ ✔ Null yields defaults [0.17 ms]
+ ✔ Json string is parsed [0.09 ms]
+ ✔ Invalid policy and negative days are corrected [0.02 ms]
+ ✘ Mail log key is mapped [0.20 ms]
+   │
+   │ Failed asserting that two strings are identical.
+   │ --- Expected
+   │ +++ Actual
+   │ @@ @@
+   │ -'anonymise'
+   │ +'delete'
+   │
+   │ /workspace/FoodBank-Manager/tests/Unit/Core/RetentionConfigTest.php:35
+   │
+
+Retention
+ ✘ Run processes and limits [0.05 ms]
+   │
+   │ Error: Call to undefined method FBM\Core\Retention::run()
+   │
+   │ /workspace/FoodBank-Manager/tests/Unit/Core/RetentionTest.php:78
+   │
+
+ ✘ Dry run does not write [0.03 ms]
+   │
+   │ Error: Call to undefined method FBM\Core\Retention::run()
+   │
+   │ /workspace/FoodBank-Manager/tests/Unit/Core/RetentionTest.php:90
+   │
+
+Trace
+ ✔ Counts increment [0.05 ms]
+
+<!-- fbm-render count-test pass=1 -->
+
+<!-- fbm-render count-test pass=2 -->
+ ✔ Mark outputs comment [0.04 ms]
+
+Css Sanitizer
+ ✔ Strips forbidden [0.22 ms]
+
+Csv Exporter
+ ✘ Stream list masks sensitive by default [0.00 ms]
+   │
+   │ PHPUnit\Framework\Exception: Fatal error: Uncaught Tests\Support\Exceptions\FbmDieException: You do not have permission to access this page. in /workspace/FoodBank-Manager/tests/Support/WPStubs.php:143
+   │ Stack trace:
+   │ #0 /workspace/FoodBank-Manager/templates/admin/diagnostics.php(13): wp_die('You do not have...')
+   │ #1 Standard input code(578): require_once('/workspace/Food...')
+   │ #2 {main}
+   │   thrown in /workspace/FoodBank-Manager/tests/Support/WPStubs.php on line 143
+   │
+
+ ✘ Stream list unmasked when allowed [0.00 ms]
+   │
+   │ PHPUnit\Framework\Exception: Fatal error: Uncaught Tests\Support\Exceptions\FbmDieException: You do not have permission to access this page. in /workspace/FoodBank-Manager/tests/Support/WPStubs.php:143
+   │ Stack trace:
+   │ #0 /workspace/FoodBank-Manager/templates/admin/diagnostics.php(13): wp_die('You do not have...')
+   │ #1 Standard input code(578): require_once('/workspace/Food...')
+   │ #2 {main}
+   │   thrown in /workspace/FoodBank-Manager/tests/Support/WPStubs.php on line 143
+   │
+
+ ✘ Stream list empty rows outputs only bom [0.00 ms]
+   │
+   │ PHPUnit\Framework\Exception: Fatal error: Uncaught Tests\Support\Exceptions\FbmDieException: You do not have permission to access this page. in /workspace/FoodBank-Manager/tests/Support/WPStubs.php:143
+   │ Stack trace:
+   │ #0 /workspace/FoodBank-Manager/templates/admin/diagnostics.php(13): wp_die('You do not have...')
+   │ #1 Standard input code(578): require_once('/workspace/Food...')
+   │ #2 {main}
+   │   thrown in /workspace/FoodBank-Manager/tests/Support/WPStubs.php on line 143
+   │
+
+Dashboard Csv
+ ✔ Bom and headers [0.59 ms]
+
+Deprecated: fputcsv(): the $escape parameter must be provided as its default value will change in /workspace/FoodBank-Manager/includes/Exports/DashboardCsv.php on line 31
+
+Deprecated: fputcsv(): the $escape parameter must be provided as its default value will change in /workspace/FoodBank-Manager/includes/Exports/DashboardCsv.php on line 34
+
+Deprecated: fputcsv(): the $escape parameter must be provided as its default value will change in /workspace/FoodBank-Manager/includes/Exports/DashboardCsv.php on line 34
+
+Deprecated: fputcsv(): the $escape parameter must be provided as its default value will change in /workspace/FoodBank-Manager/includes/Exports/DashboardCsv.php on line 34
+
+Deprecated: fputcsv(): the $escape parameter must be provided as its default value will change in /workspace/FoodBank-Manager/includes/Exports/DashboardCsv.php on line 34
+
+Deprecated: fputcsv(): the $escape parameter must be provided as its default value will change in /workspace/FoodBank-Manager/includes/Exports/DashboardCsv.php on line 34
+
+Deprecated: fputcsv(): the $escape parameter must be provided as its default value will change in /workspace/FoodBank-Manager/includes/Exports/DashboardCsv.php on line 34
+
+Deprecated: fputcsv(): the $escape parameter must be provided as its default value will change in /workspace/FoodBank-Manager/includes/Exports/DashboardCsv.php on line 37
+
+Deprecated: fputcsv(): the $escape parameter must be provided as its default value will change in /workspace/FoodBank-Manager/includes/Exports/DashboardCsv.php on line 38
+
+Deprecated: fputcsv(): the $escape parameter must be provided as its default value will change in /workspace/FoodBank-Manager/includes/Exports/DashboardCsv.php on line 42
+
+Dashboard Delta
+ ✔ Delta math [0.45 ms]
+
+Dashboard Export Controller
+ ✘ Nonce required [0.00 ms]
+   │
+   │ PHPUnit\Framework\Exception: Fatal error: Uncaught Tests\Support\Exceptions\FbmDieException: You do not have permission to access this page. in /workspace/FoodBank-Manager/tests/Support/WPStubs.php:143
+   │ Stack trace:
+   │ #0 /workspace/FoodBank-Manager/templates/admin/diagnostics.php(13): wp_die('You do not have...')
+   │ #1 Standard input code(578): require_once('/workspace/Food...')
+   │ #2 {main}
+   │   thrown in /workspace/FoodBank-Manager/tests/Support/WPStubs.php on line 143
+   │
+
+ ✘ Exports csv [0.00 ms]
+   │
+   │ PHPUnit\Framework\Exception: Fatal error: Uncaught Tests\Support\Exceptions\FbmDieException: You do not have permission to access this page. in /workspace/FoodBank-Manager/tests/Support/WPStubs.php:143
+   │ Stack trace:
+   │ #0 /workspace/FoodBank-Manager/templates/admin/diagnostics.php(13): wp_die('You do not have...')
+   │ #1 Standard input code(578): require_once('/workspace/Food...')
+   │ #2 {main}
+   │   thrown in /workspace/FoodBank-Manager/tests/Support/WPStubs.php on line 143
+   │
+
+Dashboard Shortcode (FoodBankManagerTest\DashboardShortcode)
+ ✔ Sanitize period [0.11 ms]
+ ✔ Sanitize type and event [0.05 ms]
+ ✘ Unauthorized gated [0.56 ms]
+   │
+   │ Failed asserting that two strings are identical.
+   │ --- Expected
+   │ +++ Actual
+   │ @@ @@
+   │ -'<div class="fbm-no-permission">You do not have permission to view the dashboard.</div>'
+   │ +'<div class="fbm-dashboard fbm-loading" aria-busy="true">
+   │ +<form class="fbm-filter-row" method="get" aria-label="Dashboard filters">
+   │ +	<div class="fbm-field">
+   │ +		<label for="fbm_type">Type</label>
+   │ +		<select id="fbm_type" name="fbm_type">
+   │ +			<option value="all">All</option>
+   │ +			<option value="in_person">In person</option>
+   │ +			<option value="delivery">Delivery</option>
+   │ +		</select>
+   │ +	</div>
+   │ +	<div class="fbm-field">
+   │ +		<label for="fbm_event">Event</label>
+   │ +		<input id="fbm_event" type="text" name="fbm_event" value="" />
+   │ +	</div>
+   │ +	<div class="fbm-field">
+   │ +		<input id="fbm_policy_only" type="checkbox" name="fbm_policy_only" value="1"  />
+   │ +		<label for="fbm_policy_only">Policy only</label>
+   │ +	</div>
+   │ +	<button type="submit">Apply</button>
+   │ +	<a class="fbm-download" href="https://example.test/wp-admin/admin-post.php?action=fbm_dash_export&period=7d&event=&type=all&policy_only=0&_wpnonce=8bd5987779f780a9275dd18d16b63676a78d9811610babf3b31203455e4bee9f">Download CSV</a>
+   │ +</form>
+   │ +<div class="fbm-results-count" aria-live="polite">
+   │ +0 results</div>
+   │ +<div class="fbm-dashboard-grid">
+   │ +<div class="fbm-card fbm-empty">No data for selected filters.</div>
+   │ +</div>
+   │ +<div class="fbm-empty">No trend data.</div>
+   │ +<div class="fbm-dashboard-meta">
+   │ +<span class="fbm-updated">
+   │ +Last updated 2025-09-08 13:55:48</span>
+   │ +<a class="fbm-refresh" href="">Refresh</a>
+   │ +</div>
+   │ +</div>
+   │ +'
+   │
+   │ /workspace/FoodBank-Manager/tests/Unit/DashboardShortcodeTest.php:33
+   │
+
+ ✔ Safe html output [0.38 ms]
+
+Database Page
+ ✘ Filter sanitization and whitelist [0.75 ms]
+   │
+   │ Failed asserting that two strings are identical.
+   │ --- Expected
+   │ +++ Actual
+   │ @@ @@
+   │ -'hello'
+   │ +'<b>hello</b>'
+   │
+   │ /workspace/FoodBank-Manager/tests/Unit/DatabasePageTest.php:38
+   │ /workspace/FoodBank-Manager/vendor/bin/phpunit:122
+   │
+
+ ✔ Valid orderby mapping [0.04 ms]
+ ✔ Default filters [0.03 ms]
+ ✔ Export requires nonce [0.03 ms]
+
+Emails Page
+ ✔ Capability required [0.41 ms]
+ ✔ List renders [0.42 ms]
+ ✔ Save missing nonce blocked [0.06 ms]
+ ✔ Save requires capability [0.03 ms]
+ ✘ Successful save sanitizes [0.10 ms]
+   │
+   │ Failed asserting that two strings are identical.
+   │ --- Expected
+   │ +++ Actual
+   │ @@ @@
+   │ -'redirect'
+   │ +'bad nonce'
+   │
+   │ /workspace/FoodBank-Manager/tests/Unit/EmailsPageTest.php:80
+   │ /workspace/FoodBank-Manager/vendor/bin/phpunit:122
+   │
+
+ ✔ Preview missing nonce blocked [0.05 ms]
+ ✔ Preview requires capability [0.04 ms]
+ ✘ Preview substitutes tokens [0.21 ms]
+   │
+   │ Failed asserting that two strings are identical.
+   │ --- Expected
+   │ +++ Actual
+   │ @@ @@
+   │ -'json'
+   │ +''
+   │
+   │ /workspace/FoodBank-Manager/tests/Unit/EmailsPageTest.php:132
+   │ /workspace/FoodBank-Manager/vendor/bin/phpunit:122
+   │
+
+ ✔ Reset missing nonce blocked [0.11 ms]
+ ✔ Reset requires capability [0.04 ms]
+ ✔ Reset restores defaults [0.25 ms]
+
+Pdf Exporter
+ ✔ Render entry handles engines [0.20 ms]
+
+Sar Exporter
+ ✘ Masked export [0.00 ms]
+   │
+   │ PHPUnit\Framework\Exception: Fatal error: Uncaught Tests\Support\Exceptions\FbmDieException: You do not have permission to access this page. in /workspace/FoodBank-Manager/tests/Support/WPStubs.php:143
+   │ Stack trace:
+   │ #0 /workspace/FoodBank-Manager/templates/admin/diagnostics.php(13): wp_die('You do not have...')
+   │ #1 Standard input code(578): require_once('/workspace/Food...')
+   │ #2 {main}
+   │   thrown in /workspace/FoodBank-Manager/tests/Support/WPStubs.php on line 143
+   │
+   │ /workspace/FoodBank-Manager/vendor/bin/phpunit:122
+   │
+
+ ✘ Unmasked export [0.00 ms]
+   │
+   │ PHPUnit\Framework\Exception: Fatal error: Uncaught Tests\Support\Exceptions\FbmDieException: You do not have permission to access this page. in /workspace/FoodBank-Manager/tests/Support/WPStubs.php:143
+   │ Stack trace:
+   │ #0 /workspace/FoodBank-Manager/templates/admin/diagnostics.php(13): wp_die('You do not have...')
+   │ #1 Standard input code(578): require_once('/workspace/Food...')
+   │ #2 {main}
+   │   thrown in /workspace/FoodBank-Manager/tests/Support/WPStubs.php on line 143
+   │
+   │ /workspace/FoodBank-Manager/vendor/bin/phpunit:122
+   │
+
+ ✘ Filename sanitized [0.00 ms]
+   │
+   │ PHPUnit\Framework\Exception: Fatal error: Uncaught Tests\Support\Exceptions\FbmDieException: You do not have permission to access this page. in /workspace/FoodBank-Manager/tests/Support/WPStubs.php:143
+   │ Stack trace:
+   │ #0 /workspace/FoodBank-Manager/templates/admin/diagnostics.php(13): wp_die('You do not have...')
+   │ #1 Standard input code(578): require_once('/workspace/Food...')
+   │ #2 {main}
+   │   thrown in /workspace/FoodBank-Manager/tests/Support/WPStubs.php on line 143
+   │
+   │ /workspace/FoodBank-Manager/vendor/bin/phpunit:122
+   │
+
+ ✘ Html fallback [0.00 ms]
+   │
+   │ PHPUnit\Framework\Exception: Fatal error: Uncaught Tests\Support\Exceptions\FbmDieException: You do not have permission to access this page. in /workspace/FoodBank-Manager/tests/Support/WPStubs.php:143
+   │ Stack trace:
+   │ #0 /workspace/FoodBank-Manager/templates/admin/diagnostics.php(13): wp_die('You do not have...')
+   │ #1 Standard input code(578): require_once('/workspace/Food...')
+   │ #2 {main}
+   │   thrown in /workspace/FoodBank-Manager/tests/Support/WPStubs.php on line 143
+   │
+   │ /workspace/FoodBank-Manager/vendor/bin/phpunit:122
+   │
+
+Presets Repo (FoodBankManager\Tests\Unit\Forms\PresetsRepo)
+ ✔ Upsert get delete [1.10 ms]
+
+Schema (FoodBankManager\Tests\Unit\Forms\Schema)
+ ✔ Normalize valid [0.05 ms]
+ ✔ Invalid type throws [0.04 ms]
+ ✔ Duplicate id throws [0.04 ms]
+ ✔ Consent and file fields normalized [0.02 ms]
+
+Forms Presets
+ ✔ Resolve builtin [0.34 ms]
+ ✘ Options sanitize custom presets [0.06 ms]
+   │
+   │ Error: Call to undefined method FoodBankManager\Core\Options::set_form_presets_custom()
+   │
+   │ /workspace/FoodBank-Manager/tests/Unit/FormsPresetsTest.php:62
+   │ /workspace/FoodBank-Manager/vendor/bin/phpunit:122
+   │
+
+ ✔ Forms page requires cap [0.09 ms]
+ ✔ Forms page lists presets [0.15 ms]
+ ✔ Shortcode preset fallback [0.34 ms]
+
+Form Submit Controller (FoodBankManager\Tests\Unit\Http\FormSubmitController)
+ ✔ Happy path [0.60 ms]
+ ✔ Unknown field rejected [0.15 ms]
+ ✔ Captcha failure [0.05 ms]
+ ✔ Handle rejects invalid nonce [0.05 ms]
+ ✔ Handle requires captcha [0.04 ms]
+
+Install Duplicate Detector
+ ✔ Notice renders for duplicates [0.11 ms]
+ ✘ Consolidate action deactivates duplicates [0.09 ms]
+   │
+   │ RuntimeException: redirect
+   │
+   │ /workspace/FoodBank-Manager/tests/Support/WPStubs.php:142
+   │ /workspace/FoodBank-Manager/includes/Admin/Notices.php:222
+   │ /workspace/FoodBank-Manager/tests/Unit/InstallDuplicateDetectorTest.php:32
+   │ /workspace/FoodBank-Manager/vendor/bin/phpunit:122
+   │
+
+ ✘ Consolidate action no op [0.12 ms]
+   │
+   │ RuntimeException: redirect
+   │
+   │ /workspace/FoodBank-Manager/tests/Support/WPStubs.php:142
+   │ /workspace/FoodBank-Manager/includes/Admin/Notices.php:222
+   │ /workspace/FoodBank-Manager/tests/Unit/InstallDuplicateDetectorTest.php:44
+   │ /workspace/FoodBank-Manager/vendor/bin/phpunit:122
+   │
+
+Menu
+ ✔ Register idempotent [0.87 ms]
+
+Menu Visibility
+ ✔ Parent menu falls back to manage options [0.05 ms]
+ ✔ Parent menu uses fbm cap when present [0.03 ms]
+
+Notices De Dup
+ ✘ Render prints once per request [0.05 ms]
+   │
+   │ Failed asserting that '' contains "encryption key is not configured".
+   │
+   │ /workspace/FoodBank-Manager/tests/Unit/NoticesDeDupTest.php:23
+   │ /workspace/FoodBank-Manager/vendor/bin/phpunit:122
+   │
+
+ ✔ Render bails on non fbm screen [0.04 ms]
+ ✘ Render count tracks single render [0.11 ms]
+   │
+   │ Failed asserting that 0 is identical to 1.
+   │
+   │ /workspace/FoodBank-Manager/tests/Unit/NoticesDeDupTest.php:42
+   │ /workspace/FoodBank-Manager/vendor/bin/phpunit:122
+   │
+
+Notices
+ ✔ Missing kek bails on non fbm screen [0.03 ms]
+ ✘ Missing kek shows on fbm screen [0.04 ms]
+   │
+   │ Failed asserting that '' contains "FoodBank Manager encryption key is not configured.".
+   │
+   │ /workspace/FoodBank-Manager/tests/Unit/NoticesTest.php:28
+   │ /workspace/FoodBank-Manager/vendor/bin/phpunit:122
+   │
+
+ ✘ Caps fix notice shown for admins without caps [0.13 ms]
+   │
+   │ Failed asserting that 0 is identical to 1.
+   │
+   │ /workspace/FoodBank-Manager/tests/Unit/NoticesTest.php:39
+   │ /workspace/FoodBank-Manager/vendor/bin/phpunit:122
+   │
+
+Options
+ ✔ Defaults and save [0.37 ms]
+
+Permissions Page
+ ✔ Import rejects bad json [1.14 ms]
+ ✔ User override add and remove [0.22 ms]
+ ✔ Export json [0.06 ms]
+{"roles":{"administrator":[]},"overrides":[]}Serialization of 'Closure' is not allowed
