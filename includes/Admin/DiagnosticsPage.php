@@ -11,30 +11,21 @@ namespace FoodBankManager\Admin;
 
 use FBM\Auth\Capabilities;
 use FBM\Core\Retention;
-use FoodBankManager\Core\Options;
 use FoodBankManager\Core\Install;
-use function sanitize_text_field;
+use FoodBankManager\Security\Helpers;
+use FoodBankManager\Http\DiagnosticsController;
 use function sanitize_key;
-use function sanitize_email;
 use function wp_unslash;
 use function get_option;
 use function get_transient;
 use function wp_next_scheduled;
 use function wp_get_schedule;
 use function wp_get_schedules;
-use function add_query_arg;
-use function menu_page_url;
-use function wp_safe_redirect;
-use function esc_url_raw;
 use function current_user_can;
 use function wp_die;
 use function esc_html__;
 use function add_settings_error;
-use function is_email;
-use function add_filter;
-use function remove_filter;
-use function apply_filters;
-use function wp_mail;
+use function filter_input;
 
 /**
  * Diagnostics admin page.
@@ -53,37 +44,16 @@ class DiagnosticsPage {
 	private static array $retention_summary = array();
 
 		/**
-		 * Route the diagnostics page.
-		 */
-	public static function route(): void {
-		if ( ! current_user_can( 'fb_manage_diagnostics' ) ) {
-				wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ), '', array( 'response' => 403 ) );
-		}
-
-			$method = strtoupper( sanitize_text_field( (string) filter_input( INPUT_SERVER, 'REQUEST_METHOD', FILTER_UNSAFE_RAW ) ) );
-		if ( 'POST' !== $method ) {
-			return;
-		}
-
-			$action_raw = filter_input( INPUT_POST, 'fbm_action', FILTER_UNSAFE_RAW );
-			$action     = sanitize_key( (string) wp_unslash( $action_raw ?? '' ) );
-		if ( 'mail_test' === $action ) {
-				check_admin_referer( 'fbm_diag_mail_test', '_fbm_nonce' );
-				self::send_test_email();
-		}
-	}
-
-		/**
 		 * Handle POST actions.
 		 *
 		 * @return void
 		 */
 	private static function handle_actions(): void {
-			$action_raw = filter_input( INPUT_POST, 'fbm_action', FILTER_UNSAFE_RAW );
+		$action_raw = filter_input( INPUT_POST, 'fbm_action', FILTER_UNSAFE_RAW );
 		if ( null === $action_raw ) {
 			return;
 		}
-			$action = sanitize_key( (string) wp_unslash( $action_raw ) );
+		$action = sanitize_key( (string) wp_unslash( $action_raw ) );
 		if ( self::ACTION_REPAIR_CAPS === $action ) {
 					check_admin_referer( self::ACTION_REPAIR_CAPS );
 			if ( ! current_user_can( 'fb_manage_diagnostics' ) ) {
@@ -149,11 +119,14 @@ class DiagnosticsPage {
 			$dupes      = array_filter( $counts, static fn( $c ) => $c > 1 );
 			$render_ok  = empty( $dupes );
 
-			$install_scan                  = Install::getCachedScan();
-			$last_consolidation            = (array) get_option( 'fbm_last_consolidation', array() );
-			$last_activation_consolidation = (array) get_option( 'fbm_last_activation_consolidation', array() );
-			/* @psalm-suppress UnresolvableInclude */
-			require FBM_PATH . 'templates/admin/diagnostics.php';
+						$install_scan                  = Install::getCachedScan();
+						$last_consolidation            = (array) get_option( 'fbm_last_consolidation', array() );
+						$last_activation_consolidation = (array) get_option( 'fbm_last_activation_consolidation', array() );
+						$smtp                          = DiagnosticsController::transport_info();
+						$test_to                       = Helpers::mask_email( (string) get_option( 'admin_email' ) );
+						$notice                        = sanitize_key( (string) filter_input( INPUT_GET, 'notice', FILTER_UNSAFE_RAW ) );
+						/* @psalm-suppress UnresolvableInclude */
+						require FBM_PATH . 'templates/admin/diagnostics.php';
 	}
 
 		/**
@@ -205,46 +178,5 @@ class DiagnosticsPage {
 					);
 		}
 			return $out;
-	}
-
-	/**
-	 * Send a test email to the current user.
-	 */
-	private static function send_test_email(): void {
-					$to         = sanitize_email( (string) get_option( 'admin_email' ) );
-					$from_name  = sanitize_text_field( (string) Options::get( 'emails.from_name' ) );
-					$from_email = sanitize_email( (string) Options::get( 'emails.from_email' ) );
-
-		$from_filter     = static function () use ( $from_email ): string {
-			return $from_email;
-		};
-			$name_filter = static function () use ( $from_name ): string {
-				return $from_name;
-			};
-
-		if ( is_email( $from_email ) ) {
-			add_filter( 'wp_mail_from', $from_filter );
-		}
-		if ( '' !== $from_name ) {
-			add_filter( 'wp_mail_from_name', $name_filter );
-		}
-
-			$sent = wp_mail(
-				$to,
-				__( 'FoodBank Manager test email', 'foodbank-manager' ),
-				__( 'This is a test email from FoodBank Manager.', 'foodbank-manager' )
-			);
-
-		if ( is_email( $from_email ) ) {
-			remove_filter( 'wp_mail_from', $from_filter );
-		}
-		if ( '' !== $from_name ) {
-			remove_filter( 'wp_mail_from_name', $name_filter );
-		}
-
-			$notice = $sent ? 'sent' : 'error';
-			$url    = add_query_arg( array( 'notice' => $notice ), menu_page_url( 'fbm_diagnostics', false ) );
-			wp_safe_redirect( esc_url_raw( $url ), 303 );
-			exit;
 	}
 }

@@ -34,6 +34,18 @@ namespace {
         define( 'DAY_IN_SECONDS', 86400 );
     }
 
+    if ( ! function_exists( 'wp_get_phpmailer' ) ) {
+        function wp_get_phpmailer() {
+            return (object) array(
+                'Mailer'     => 'smtp',
+                'Host'       => 'smtp.example.com',
+                'Port'       => 25,
+                'SMTPSecure' => 'tls',
+                'SMTPAuth'   => true,
+            );
+        }
+    }
+
 }
 
 namespace FBM\Core {
@@ -82,82 +94,42 @@ namespace {
      * @runInSeparateProcess
      */
     final class DiagnosticsPageTest extends BaseTestCase {
-        public static bool $mail_result = true;
         /** @var array<string,int> */
         public static array $cron_next = array();
 
     protected function setUp(): void {
         parent::setUp();
         fbm_grant_manager();
-        self::$mail_result = true;
-            \FoodBankManager\Auth\Roles::$installed = false;
-            \FoodBankManager\Auth\Roles::$ensured  = false;
-            global $fbm_test_options, $fbm_options;
-            $fbm_test_options = array(
-                'emails' => array(
+        \FoodBankManager\Auth\Roles::$installed = false;
+        \FoodBankManager\Auth\Roles::$ensured  = false;
+        global $fbm_test_options, $fbm_options;
+        $fbm_test_options = array(
+            'emails' => array(
                     'from_name'  => 'FoodBank',
                     'from_email' => 'from@example.com',
                 ),
                 'admin_email' => 'admin@example.com',
             );
         $fbm_options =& $fbm_test_options;
+        update_option( 'admin_email', 'admin@example.com' );
     }
 
-        public function testSendTestEmailSuccess(): void {
-            fbm_seed_nonce('unit-seed');
-            fbm_test_set_request_nonce('fbm_diag_mail_test', '_fbm_nonce');
-            $_SERVER['REQUEST_METHOD'] = 'POST';
-            $nonce = $_POST['_fbm_nonce'];
-            $_POST = array(
-                'fbm_action' => 'mail_test',
-                '_fbm_nonce' => $nonce,
-            );
-            $_REQUEST = $_POST;
-            try {
-                DiagnosticsPage::route();
-            } catch ( \RuntimeException $e ) {
-                $this->assertSame('redirect', $e->getMessage());
-            }
-            $this->assertStringContainsString('notice=sent', (string) $GLOBALS['__last_redirect']);
+    public function testTemplateRendersSmtpInfo(): void {
+        if ( ! defined( 'ABSPATH' ) ) {
+            define( 'ABSPATH', __DIR__ );
         }
-
-        public function testSendTestEmailFailure(): void {
-            fbm_test_set_wp_mail_result(false);
-            fbm_seed_nonce('unit-seed');
-            fbm_test_set_request_nonce('fbm_diag_mail_test', '_fbm_nonce');
-            $_SERVER['REQUEST_METHOD'] = 'POST';
-            $nonce = $_POST['_fbm_nonce'];
-            $_POST = array(
-                'fbm_action' => 'mail_test',
-                '_fbm_nonce' => $nonce,
-            );
-            $_REQUEST = $_POST;
-            try {
-                DiagnosticsPage::route();
-            } catch ( \RuntimeException $e ) {
-                $this->assertSame('redirect', $e->getMessage());
-            }
-            $this->assertStringContainsString('notice=error', (string) $GLOBALS['__last_redirect']);
+        if ( ! defined( 'FBM_PATH' ) ) {
+            define( 'FBM_PATH', dirname( __DIR__, 3 ) . '/' );
         }
-
-        public function testTemplateRendersCrypto(): void {
-            if ( ! defined( 'ABSPATH' ) ) {
-                define( 'ABSPATH', __DIR__ );
-            }
-            if ( ! defined( 'FBM_PATH' ) ) {
-                define( 'FBM_PATH', dirname( __DIR__, 3 ) . '/' );
-            }
-            $notices_render_count = \FoodBankManager\Admin\Notices::getRenderCount();
-            $boot_status          = 'not recorded';
-            $caps_count           = '0 / 0';
-            ob_start();
-            DiagnosticsPage::render();
-            $html = (string) ob_get_clean();
-            $this->assertStringContainsString('<div class="wrap fbm-admin">', $html);
-            $this->assertStringContainsString('Crypto', $html);
-            $this->assertStringContainsString('Environment', $html);
-            $this->assertStringNotContainsString('from@example.com', $html);
-        }
+        ob_start();
+        DiagnosticsPage::render();
+        $html = (string) ob_get_clean();
+        $this->assertStringContainsString('<div class="wrap fbm-admin">', $html);
+        $this->assertStringContainsString('Mailer:', $html);
+        $this->assertStringContainsString('smtp.example.com', $html);
+        $this->assertStringContainsString('a***@example.com', $html);
+        $this->assertStringNotContainsString('admin@example.com', $html);
+    }
 
         public function testCronTableShowsOverdue(): void {
             if ( ! defined( 'DAY_IN_SECONDS' ) ) {
