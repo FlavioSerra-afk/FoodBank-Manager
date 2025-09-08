@@ -19,16 +19,16 @@
 1. ShortcodesPageTest::testCapabilityRequired — FbmDieException: You do not have permission to access this page.
 2. DiagnosticsPageTest::testSendTestEmailSuccess — Failed asserting that '' contains "notice=sent".
 3. DiagnosticsPageTest::testSendTestEmailFailure — Failed asserting that '' contains "notice=error".
-4. DiagnosticsPageTest::testRetentionRunOutputsSummary — Failed asserting that '<div class="wrap fbm-admin">\n'
-5. DiagnosticsPageTest::testRetentionDryRunOutputsSummary — Failed asserting that '<div class="wrap fbm-admin">\n'
+4. DiagnosticsPageTest::testRetentionRunOutputsSummary — Failed asserting that '<div class="wrap fbm-admin">\\n'.
+5. DiagnosticsPageTest::testRetentionDryRunOutputsSummary — Failed asserting that '<div class="wrap fbm-admin">\\n'.
 6. DiagnosticsPageTest::testRepairCapsActionEnsuresCaps — Failed asserting that false is true.
-7. EntryPageTest::testViewMasksEmailWithoutCapability — PHPUnit\Framework\Exception: Fatal error: Uncaught FbmDieException: You do not have permission to access this page.
-8. EntryPageTest::testUnmaskShowsPlaintextWithCapability — PHPUnit\Framework\Exception: Fatal error: Uncaught FbmDieException: You do not have permission to access this page.
-9. EntryPageTest::testUnmaskDeniedWithoutNonce — PHPUnit\Framework\Exception: Fatal error: Uncaught FbmDieException: You do not have permission to access this page.
-10. EntryPageTest::testPdfDeniedWithoutNonce — PHPUnit\Framework\Exception: Fatal error: Uncaught FbmDieException: You do not have permission to access this page.
+7. EntryPageTest::testViewMasksEmailWithoutCapability — Fatal error: Uncaught FbmDieException: You do not have permission to access this page.
+8. EntryPageTest::testUnmaskShowsPlaintextWithCapability — Fatal error: Uncaught FbmDieException: You do not have permission to access this page.
+9. EntryPageTest::testUnmaskDeniedWithoutNonce — Fatal error: Uncaught FbmDieException: You do not have permission to access this page.
+10. EntryPageTest::testPdfDeniedWithoutNonce — Fatal error: Uncaught FbmDieException: You do not have permission to access this page.
 ### Failure taxonomy & hints
-- Handler Denial: 1 — Use `expectException(FbmDieException::class)` or grant caps/nonce.
-- Gated UI / Escaping mismatches: 11 — Assert escaped output; set viewer/manager caps.
+- Handler Denial: 8
+- Gated UI / Escaping mismatches: 40
 
 ## 3) PHPStan — Summary
 - Fast: 0 (analysis failed: Cannot redeclare function get_plugins)
@@ -59,7 +59,7 @@
 ## 6) Prioritized next actions (errors-first)
 1) **P0 Unit** — Normalize tests onto BaseTestCase; fix denial policies; seed nonces.
 2) **P1 PHPStan** — Composer-only bootstrap; remove duplicate stubs; fix signatures/docblocks.
-3) **P2 PHPCS (lanes)** — Keep curated set green; do not broaden scope.
+3) **P2 PHPCS (lanes)** — Keep curated set green.
 4) **Release (text-only)** once green; bump versions; package.
 
 ## 7) Appendix — Raw artifact paths
