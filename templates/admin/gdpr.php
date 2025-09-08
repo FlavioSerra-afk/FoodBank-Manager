@@ -9,10 +9,6 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-if ( ! current_user_can( 'fb_manage_diagnostics' ) ) {
-    wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ) );
-}
-
 $email = isset( $_GET['email'] ) ? sanitize_email( wp_unslash( (string) $_GET['email'] ) ) : '';
 $app_id = isset( $_GET['app_id'] ) ? absint( $_GET['app_id'] ) : 0;
 $results = array();
