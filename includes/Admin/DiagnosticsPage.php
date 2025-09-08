@@ -17,7 +17,6 @@ use function sanitize_text_field;
 use function sanitize_key;
 use function sanitize_email;
 use function wp_unslash;
-use function filter_input;
 use function get_option;
 use function get_transient;
 use function wp_next_scheduled;
@@ -34,6 +33,7 @@ use function add_settings_error;
 use function is_email;
 use function add_filter;
 use function remove_filter;
+use function apply_filters;
 use function wp_mail;
 
 /**
@@ -62,7 +62,7 @@ class DiagnosticsPage {
 
 			$method = strtoupper( sanitize_text_field( (string) filter_input( INPUT_SERVER, 'REQUEST_METHOD', FILTER_UNSAFE_RAW ) ) );
 		if ( 'POST' !== $method ) {
-				return;
+			return;
 		}
 
 			$action_raw = filter_input( INPUT_POST, 'fbm_action', FILTER_UNSAFE_RAW );
@@ -81,7 +81,7 @@ class DiagnosticsPage {
 	private static function handle_actions(): void {
 			$action_raw = filter_input( INPUT_POST, 'fbm_action', FILTER_UNSAFE_RAW );
 		if ( null === $action_raw ) {
-				return;
+			return;
 		}
 			$action = sanitize_key( (string) wp_unslash( $action_raw ) );
 		if ( self::ACTION_REPAIR_CAPS === $action ) {
@@ -98,14 +98,14 @@ class DiagnosticsPage {
 						__( 'FBM capabilities repaired for Administrator.', 'foodbank-manager' ),
 						'updated'
 					);
-					return;
+			return;
 		}
 
 		if ( self::ACTION_RETENTION_RUN === $action ) {
 				check_admin_referer( self::ACTION_RETENTION_RUN );
 				self::$retention_summary = Retention::run_now();
 				add_settings_error( 'fbm_diagnostics', 'fbm_retention_run', __( 'Retention run executed.', 'foodbank-manager' ), 'updated' );
-				return;
+			return;
 		}
 
 		if ( self::ACTION_RETENTION_DRY === $action ) {
@@ -163,11 +163,12 @@ class DiagnosticsPage {
 		 */
 	public static function retention_summary(): array {
 		if ( ! empty( self::$retention_summary ) ) {
-				return self::$retention_summary;
+			return self::$retention_summary;
 		}
-
-			$stored = get_option( 'fbm_retention_tick_last_summary', array() );
-			return is_array( $stored ) ? $stored : array();
+			$stored  = get_option( 'fbm_retention_tick_last_summary', array() );
+			$summary = is_array( $stored ) ? $stored : array();
+			$summary = apply_filters( 'fbm_retention_summary', $summary );
+			return $summary;
 	}
 
 		/**

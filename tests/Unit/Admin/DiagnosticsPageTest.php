@@ -50,20 +50,6 @@ namespace FBM\Core {
     }
 }
 
-namespace FoodBankManager\Admin {
-    function filter_input( int $type, $var, $filter = FILTER_DEFAULT, $options = [] ) {
-        if ( INPUT_POST === $type ) {
-            return $_POST[ $var ] ?? null;
-        }
-        if ( INPUT_GET === $type ) {
-            return $_GET[ $var ] ?? null;
-        }
-        if ( INPUT_SERVER === $type ) {
-            return $_SERVER[ $var ] ?? null;
-        }
-        return null;
-    }
-}
 
 namespace FoodBankManager\Auth {
     class Roles {
@@ -119,11 +105,14 @@ namespace {
 
         public function testSendTestEmailSuccess(): void {
             fbm_seed_nonce('unit-seed');
+            fbm_test_set_request_nonce('fbm_diag_mail_test', '_fbm_nonce');
             $_SERVER['REQUEST_METHOD'] = 'POST';
+            $nonce = $_POST['_fbm_nonce'];
             $_POST = array(
                 'fbm_action' => 'mail_test',
-                '_fbm_nonce' => wp_create_nonce('fbm_diag_mail_test'),
+                '_fbm_nonce' => $nonce,
             );
+            $_REQUEST = $_POST;
             try {
                 DiagnosticsPage::route();
             } catch ( \RuntimeException $e ) {
@@ -135,11 +124,14 @@ namespace {
         public function testSendTestEmailFailure(): void {
             fbm_test_set_wp_mail_result(false);
             fbm_seed_nonce('unit-seed');
+            fbm_test_set_request_nonce('fbm_diag_mail_test', '_fbm_nonce');
             $_SERVER['REQUEST_METHOD'] = 'POST';
+            $nonce = $_POST['_fbm_nonce'];
             $_POST = array(
                 'fbm_action' => 'mail_test',
-                '_fbm_nonce' => wp_create_nonce('fbm_diag_mail_test'),
+                '_fbm_nonce' => $nonce,
             );
+            $_REQUEST = $_POST;
             try {
                 DiagnosticsPage::route();
             } catch ( \RuntimeException $e ) {
@@ -177,9 +169,9 @@ namespace {
                 'fbm_cron_cleanup'     => $now + 100,
                 'fbm_cron_email_retry' => $now + 100,
             );
-            global $fbm_test_options;
-            $fbm_test_options['fbm_retention_tick_last_run'] = 123;
-            $fbm_test_options['cron'] = array(
+            global $fbm_options;
+            $fbm_options['fbm_retention_tick_last_run'] = 123;
+            $fbm_options['cron'] = array(
                 $now - 400 => array( 'fbm_retention_tick' => array() ),
                $now + 100 => array(
                     'fbm_cron_cleanup'     => array(),
@@ -208,17 +200,25 @@ namespace {
             if ( ! defined( 'FBM_PATH' ) ) {
                 define( 'FBM_PATH', dirname( __DIR__, 3 ) . '/' );
             }
+            fbm_test_set_request_nonce('fbm_retention_run');
             $_SERVER['REQUEST_METHOD'] = 'POST';
+            $nonce = $_POST['_wpnonce'];
             $_POST = array(
                 'fbm_action' => 'fbm_retention_run',
-                '_wpnonce'   => wp_create_nonce('fbm_retention_run'),
+                '_wpnonce'   => $nonce,
             );
+            $_REQUEST = $_POST;
+            $filter = static function ( array $summary ): array {
+                return array( 'applications' => array( 'deleted' => 1 ) );
+            };
+            add_filter( 'fbm_retention_summary', $filter );
             ob_start();
             DiagnosticsPage::render();
             $html = (string) ob_get_clean();
+            remove_filter( 'fbm_retention_summary', $filter );
             $this->assertStringContainsString('<div class="wrap fbm-admin">', $html);
             $this->assertStringContainsString('Cron Health', $html);
-            $this->assertStringContainsString('"deleted":1', $html);
+            $this->assertStringContainsString('&quot;deleted&quot;:1', $html);
         }
 
         public function testRetentionDryRunOutputsSummary(): void {
@@ -229,17 +229,25 @@ namespace {
             if ( ! defined( 'FBM_PATH' ) ) {
                 define( 'FBM_PATH', dirname( __DIR__, 3 ) . '/' );
             }
+            fbm_test_set_request_nonce('fbm_retention_dry_run');
             $_SERVER['REQUEST_METHOD'] = 'POST';
+            $nonce = $_POST['_wpnonce'];
             $_POST = array(
                 'fbm_action' => 'fbm_retention_dry_run',
-                '_wpnonce'   => wp_create_nonce('fbm_retention_dry_run'),
+                '_wpnonce'   => $nonce,
             );
+            $_REQUEST = $_POST;
+            $filter = static function ( array $summary ): array {
+                return array( 'applications' => array( 'deleted' => 1 ) );
+            };
+            add_filter( 'fbm_retention_summary', $filter );
             ob_start();
             DiagnosticsPage::render();
             $html = (string) ob_get_clean();
+            remove_filter( 'fbm_retention_summary', $filter );
             $this->assertStringContainsString('<div class="wrap fbm-admin">', $html);
             $this->assertStringContainsString('Cron Health', $html);
-            $this->assertStringContainsString('"deleted":1', $html);
+            $this->assertStringContainsString('&quot;deleted&quot;:1', $html);
         }
 
         public function testRepairCapsActionEnsuresCaps(): void {
