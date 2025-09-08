@@ -11,6 +11,7 @@ final class Notices {
     private static bool $missingKek = false;
     private static bool $missingSodium = false;
     private static int $renderCount = 0;
+    private static bool $printed = false;
 
     /**
      * Register notice-related hooks.
@@ -31,8 +32,7 @@ final class Notices {
      * @return void
      */
     public static function render(): void {
-        static $printed = false;
-        if ($printed) {
+        if (self::$printed) {
             return;
         }
 
@@ -45,7 +45,7 @@ final class Notices {
         }
 
         self::$renderCount++;
-        $printed = true;
+        self::$printed = true;
 
         $scan = Install::getCachedScan();
         $dups = $scan['duplicates'];
@@ -232,4 +232,27 @@ final class Notices {
     public static function getRenderCount(): int {
         return self::$renderCount;
     }
+
+    /**
+     * Reset counters for tests.
+     */
+    public static function reset_for_tests(): void {
+        self::$missingKek = false;
+        self::$missingSodium = false;
+        self::$renderCount = 0;
+        self::$printed = false;
+    }
+}
+
+\class_alias( __NAMESPACE__ . '\\Notices', 'FBM\\Admin\\Notices' );
+
+if (defined('FBM_TESTS')) {
+    add_action('fbm_test_reset_notices', static function (): void {
+        /** @phpstan-ignore-next-line */
+        \FBM\Admin\Notices::reset_for_tests();
+    });
+    add_action('fbm_test_set_missing_kek', static function (): void {
+        /** @phpstan-ignore-next-line */
+        \FBM\Admin\Notices::missing_kek();
+    });
 }

@@ -21,6 +21,7 @@ use function wp_safe_redirect;
 use function esc_url_raw;
 use function sanitize_email;
 use function sanitize_text_field;
+use function sanitize_key;
 use function is_email;
 use function get_option;
 use function esc_html__;
@@ -28,6 +29,18 @@ use function __;
 use function wp_die;
 
 final class DiagnosticsController {
+    /**
+     * Handle Diagnostics HTTP requests.
+     *
+     * @return void
+     */
+    public function handle(): void {
+        $action = sanitize_key( (string) ( $_POST['fbm_action'] ?? '' ) );
+        if ( $action === 'mail_test' ) {
+            self::mail_test();
+        }
+    }
+
     /**
      * Handle test email POST action.
      *
@@ -99,3 +112,5 @@ final class DiagnosticsController {
         return $info;
     }
 }
+
+\class_alias( __NAMESPACE__ . '\\DiagnosticsController', 'FBM\\Http\\DiagnosticsController' );

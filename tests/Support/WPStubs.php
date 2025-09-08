@@ -66,6 +66,7 @@ $GLOBALS['fbm_plugins']        = $GLOBALS['fbm_plugins']        ?? [];
 $GLOBALS['fbm_active_plugins']  = $GLOBALS['fbm_active_plugins']  ?? [];
 $GLOBALS['fbm_deactivated']     = $GLOBALS['fbm_deactivated']     ?? [];
 $GLOBALS['fbm_deleted_plugins'] = $GLOBALS['fbm_deleted_plugins'] ?? [];
+$GLOBALS['__deactivated_plugins'] = $GLOBALS['__deactivated_plugins'] ?? [];
 $GLOBALS['__last_redirect']     = $GLOBALS['__last_redirect']     ?? null;
 $GLOBALS['fbm_test_plugins']    =& $GLOBALS['fbm_plugins'];
 $GLOBALS['fbm_test_deactivated'] =& $GLOBALS['fbm_deactivated'];
@@ -78,7 +79,19 @@ if (!function_exists('is_plugin_active')) {
   function is_plugin_active($basename){ return in_array($basename, $GLOBALS['fbm_active_plugins'], true); }
 }
 if (!function_exists('deactivate_plugins')) {
-  function deactivate_plugins($plugins){ foreach ((array)$plugins as $p){ $GLOBALS['fbm_deactivated'][]=$p; $GLOBALS['fbm_active_plugins']=array_values(array_diff($GLOBALS['fbm_active_plugins'],[$p])); } }
+  function deactivate_plugins($plugins, $silent = false, $network_wide = null) {
+    $list = (array) $plugins;
+    foreach ($list as $p) {
+      $GLOBALS['fbm_deactivated'][] = $p;
+    }
+    $existing = $GLOBALS['__deactivated_plugins'] ?? [];
+    $GLOBALS['__deactivated_plugins'] = array_values(array_unique(array_merge($existing, $list)));
+    $GLOBALS['fbm_active_plugins'] = array_values(array_diff($GLOBALS['fbm_active_plugins'], $list));
+    return null;
+  }
+}
+if (!function_exists('plugin_basename')) {
+  function plugin_basename($file) { return basename((string) $file); }
 }
 if (!function_exists('delete_plugins')) {
   function delete_plugins($plugins){ foreach ((array)$plugins as $p){ $GLOBALS['fbm_deleted_plugins'][]=$p; } return true; }
@@ -118,6 +131,9 @@ if (!function_exists('wp_verify_nonce')) { function wp_verify_nonce($n,$a=-1){ r
 if (!function_exists('fbm_test_trust_nonces')) { function fbm_test_trust_nonces(bool $t){ $GLOBALS['fbm_test_trust_nonces']=$t; } }
 if (!function_exists('fbm_seed_nonce')) {
   function fbm_seed_nonce(string $seed): void { $GLOBALS['fbm_test_nonce_secret'] = $seed; }
+}
+if (!function_exists('fbm_nonce')) {
+  function fbm_nonce(string $action): string { return wp_create_nonce($action); }
 }
 if (!function_exists('fbm_test_set_request_nonce')) { function fbm_test_set_request_nonce(string $a='fbm', string $f='_wpnonce'){ $_REQUEST[$f]=wp_create_nonce($a); $_POST[$f]=$_REQUEST[$f]; } }
 if (!function_exists('wp_nonce_field')) {
@@ -332,6 +348,7 @@ if (!function_exists('fbm_test_reset_globals')) {
     $GLOBALS['fbm_active_plugins']  = [];
     $GLOBALS['fbm_deactivated']     = [];
     $GLOBALS['fbm_deleted_plugins'] = [];
+    $GLOBALS['__deactivated_plugins'] = [];
     $GLOBALS['fbm_user_caps'] = [];
     $GLOBALS['fbm_roles'] = [];
     $GLOBALS['fbm_user_meta'] = [];

@@ -109,7 +109,8 @@ final class ShortcodesPageTest extends BaseTestCase {
         ShortcodesPage::route();
         $html = (string) ob_get_clean();
         $this->assertStringContainsString('<div class="wrap fbm-admin">', $html);
-        $this->assertStringContainsString('<div class="fbm-preview"><div>ok</div><script>alert(1)</script></div>', $html);
+        $this->assertStringContainsString('<div class="fbm-preview"><div>ok</div></div>', $html);
+        $this->assertStringNotContainsString('<script>alert', $html);
         $this->assertSame('[fbm_form id="1" preset="basic_intake" mask_sensitive="true"]', self::$last_shortcode);
     }
 }

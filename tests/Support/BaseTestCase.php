@@ -71,6 +71,7 @@ abstract class BaseTestCase extends TestCase {
             'missingKek'    => false,
             'missingSodium' => false,
             'renderCount'   => 0,
+            'printed'       => false,
         ] as $prop => $value) {
             if ($ref->hasProperty($prop)) {
                 $p = $ref->getProperty($prop);

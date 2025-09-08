@@ -43,8 +43,8 @@ final class ShortcodesPage {
 				$atts['mask_sensitive'] = 'true';
 				$current_tag            = $tag;
 				$current_atts           = $atts;
-				$shortcode              = self::build_shortcode( $tag, $atts );
-				$preview_html           = wp_kses_post( do_shortcode( $shortcode ) );
+                                $shortcode              = self::build_shortcode( $tag, $atts );
+                                $preview_html           = do_shortcode( $shortcode );
 			} else {
 				$preview_html = '<div class="notice notice-error"><p>' . esc_html__( 'Invalid shortcode.', 'foodbank-manager' ) . '</p></div>';
 			}
