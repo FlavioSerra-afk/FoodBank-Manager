@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace FBM\Exports;
 
-class SarExporter {
+class SarExporterStub {
     public static array $last = array();
     public static function stream( array $subject, bool $masked, string $name ): void {
         self::$last = array( 'masked' => $masked, 'subject' => $subject, 'name' => $name );
@@ -17,6 +17,9 @@ use FBM\Admin\GDPRPage;
 use Tests\Support\Exceptions\FbmDieException;
 use Tests\Support\Rbac;
 
+/**
+ * @runTestsInSeparateProcesses
+ */
 final class GDPRPageTest extends \BaseTestCase {
         protected function setUp(): void {
             parent::setUp();
@@ -41,6 +44,9 @@ final class GDPRPageTest extends \BaseTestCase {
         }
             if ( ! defined( 'FBM_PATH' ) ) {
                 define( 'FBM_PATH', dirname( __DIR__, 3 ) . '/' );
+            }
+            if ( ! class_exists( '\\FBM\\Exports\\SarExporter', false ) ) {
+                class_alias( \FBM\Exports\SarExporterStub::class, '\\FBM\\Exports\\SarExporter' );
             }
         }
 

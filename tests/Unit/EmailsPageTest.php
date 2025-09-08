@@ -70,13 +70,16 @@ final class EmailsPageTest extends BaseTestCase {
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $long_subject = '<b>' . str_repeat( 'a', 300 ) . '</b>';
         $long_body    = '<script>alert(1)</script><p>' . str_repeat( 'b', 33000 ) . '</p>';
-        $_POST        = array(
+        fbm_seed_nonce('unit-seed');
+        fbm_test_set_request_nonce('fbm_emails_save', '_fbm_nonce');
+        $_POST = array(
             'fbm_action' => 'emails_save',
-            '_fbm_nonce' => 'nonce',
+            '_fbm_nonce' => $_POST['_fbm_nonce'],
             'tpl'        => 'applicant_confirmation',
             'subject'    => $long_subject,
             'body_html'  => $long_body,
         );
+        $_REQUEST = $_POST;
         try {
             EmailsPage::route();
         } catch ( RuntimeException $e ) {
