@@ -14,21 +14,22 @@
 - PHP: 8.4.12
 
 ## 2) PHPUnit (Unit) — Summary
-- Tests: 135  Assertions: 242  Errors: 28  Failures: 18
+- Tests: 135  Assertions: 245  Errors: 28  Failures: 13
 ### Top failing tests (first 10)
-1. DiagnosticsPageTest::testSendTestEmailSuccess — Failed asserting that '' contains "notice=sent".
-2. DiagnosticsPageTest::testSendTestEmailFailure — Failed asserting that '' contains "notice=error".
-3. DiagnosticsPageTest::testCronTableShowsOverdue — Failed asserting that '<div class="wrap fbm-admin">\\n' contains expected data.
-4. DiagnosticsPageTest::testRetentionRunOutputsSummary — Failed asserting that '<div class="wrap fbm-admin">\\n' contains expected summary.
-5. DiagnosticsPageTest::testRetentionDryRunOutputsSummary — Failed asserting that '<div class="wrap fbm-admin">\\n' contains expected summary.
-6. EntryPageTest::testViewMasksEmailWithoutCapability — Fatal error: Uncaught FbmDieException: You do not have permission to access this page.
-7. EntryPageTest::testUnmaskShowsPlaintextWithCapability — Fatal error: Uncaught FbmDieException: You do not have permission to access this page.
-8. EntryPageTest::testUnmaskDeniedWithoutNonce — Fatal error: Uncaught FbmDieException: You do not have permission to access this page.
-9. EntryPageTest::testPdfDeniedWithoutNonce — Fatal error: Uncaught FbmDieException: You do not have permission to access this page.
-10. EntryPageTest::testPdfExportHandlesEngines — Fatal error: Uncaught FbmDieException: You do not have permission to access this page.
+1. EntryPageTest::testViewMasksEmailWithoutCapability — FbmDieException: You do not have permission to access this page.
+2. EntryPageTest::testUnmaskShowsPlaintextWithCapability — FbmDieException: You do not have permission to access this page.
+3. EntryPageTest::testUnmaskDeniedWithoutNonce — FbmDieException: You do not have permission to access this page.
+4. EntryPageTest::testPdfExportHandlesEngines — FbmDieException: You do not have permission to access this page.
+5. GDPRPageTest::testMaskedByDefault — Error: Call to undefined method AttendanceRepo::find_by_application_id().
+6. GDPRPageTest::testUnmaskedWithCapability — Error: Call to undefined method AttendanceRepo::find_by_application_id().
+7. AssetsTest::testThemeCssContainsVariables — Failed asserting that ':root{--fbm-primary:#3b82f6;--fbm-density:comfortable;--fbm-font:system-ui, sans-serif;--fbm-dark:0;}' contains '--fbm-primary:#010203'.
+8. AttendanceRepoCountsTest::testCountsReturnInts — Error: Class "FBM\Tests\Support\WPDBStub" not found.
+9. AttendanceRepoDailyCountsTest::testCountsLength — Error: Class "FBM\Tests\Support\WPDBStub" not found.
+10. AttendanceRepoFilterTest::testFiltersPrepared — Error: Class "FBM\Tests\Support\WPDBStub" not found.
 ### Failure taxonomy & hints
-- Handler Denial: 8
-- Gated UI / Escaping mismatches: 40
+- Handler denial and nonce/capability gaps remain.
+- Missing repository stubs/methods in Attendance and GDPR tests.
+- Theme CSS assertions expect specific tokens.
 
 ## 3) PHPStan — Summary
 - Fast: 0
@@ -69,3 +70,4 @@
 - build/phpcs-lanes.json
 - build/zip-root.txt
 - build/zip-main.txt
+

@@ -1,5 +1,7 @@
 <?php declare(strict_types=1);
 
+namespace {
+
 if (defined('FBM_WPSTUBS_LOADED')) {
     return;
 }
@@ -198,12 +200,20 @@ if (!function_exists('apply_filters')){ function apply_filters($hook, $val, ...$
 if (!function_exists('add_settings_error')){ function add_settings_error($setting,$code,$message,$type='error'){ $GLOBALS['fbm_settings_errors'][]=[$setting,$code,$message,$type]; } }
 if (!function_exists('settings_errors')){ function settings_errors($setting='', $sanitize=false, $hide_on_update=false){ return $GLOBALS['fbm_settings_errors']??[]; } }
 if (!function_exists('submit_button')){ function submit_button($text='', $type='primary', $name='submit', $wrap=true){ echo '<button type="submit" class="button">'.esc_html($text ?: 'Submit').'</button>'; } }
+if (!defined('INPUT_POST')) {
+  define('INPUT_POST', 0);
+}
+if (!defined('INPUT_GET')) {
+  define('INPUT_GET', 1);
+}
+
 if (!function_exists('filter_input')) {
   function filter_input($type, $var, $filter = FILTER_DEFAULT, $options = []) {
-    if ($type === INPUT_POST) { return $_POST[$var] ?? null; }
-    if ($type === INPUT_GET) { return $_GET[$var] ?? null; }
-    if ($type === INPUT_SERVER) { return $_SERVER[$var] ?? null; }
-    return null;
+    $src = ($type === INPUT_POST) ? $_POST : (($type === INPUT_GET) ? $_GET : (($type === INPUT_SERVER) ? $_SERVER : null));
+    if ($src === null) {
+      return null;
+    }
+    return $src[$var] ?? null;
   }
 }
 if (!function_exists('filter_input_array')) {
@@ -257,6 +267,20 @@ if (!function_exists('fbm_test_reset_globals')) {
     $GLOBALS['fbm_user_caps'] = [];
     $_GET = $_POST = $_REQUEST = [];
     $GLOBALS['__last_redirect'] = null;
+  }
+}
+
+}
+
+namespace FoodBankManager\Admin {
+  if (!function_exists(__NAMESPACE__ . '\\filter_input')) {
+    function filter_input($type, $var, $filter = FILTER_DEFAULT, $options = []) {
+      $src = ($type === \INPUT_POST) ? $_POST : (($type === \INPUT_GET) ? $_GET : (($type === \INPUT_SERVER) ? $_SERVER : null));
+      if ($src === null) {
+        return null;
+      }
+      return $src[$var] ?? null;
+    }
   }
 }
 
