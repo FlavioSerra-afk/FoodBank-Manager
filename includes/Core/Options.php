@@ -123,15 +123,25 @@ namespace FBM\Core {
 
         /** @return array{subject:string,body_html:string,updated_at:string} */
         public static function get_template(string $id): array {
-            return ['subject' => '', 'body_html' => '', 'updated_at' => ''];
+            $all   = $GLOBALS['fbm_templates'] ?? [];
+            $tpl   = $all[$id] ?? [];
+            $tpl  += ['subject' => '', 'body_html' => '', 'updated_at' => ''];
+            return $tpl;
         }
 
         /** @param array<string,string> $data */
         public static function set_template(string $id, array $data): bool {
+            $all                 = $GLOBALS['fbm_templates'] ?? [];
+            $data               += ['subject' => '', 'body_html' => '', 'updated_at' => current_time('mysql')];
+            $all[$id]            = $data;
+            $GLOBALS['fbm_templates'] = $all;
             return true;
         }
 
         public static function reset_template(string $id): bool {
+            $all = $GLOBALS['fbm_templates'] ?? [];
+            unset($all[$id]);
+            $GLOBALS['fbm_templates'] = $all;
             return true;
         }
     }

@@ -92,8 +92,16 @@ final class EmailsPage {
 					wp_die( esc_html__( 'Invalid template.', 'foodbank-manager' ) );
 		}
 
-				$subject   = isset( $_POST['subject'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['subject'] ) ) : '';
-				$body_html = isset( $_POST['body_html'] ) ? wp_kses_post( wp_unslash( (string) $_POST['body_html'] ) ) : '';
+                $subject   = isset( $_POST['subject'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['subject'] ) ) : '';
+                $subject   = trim( $subject );
+                if ( mb_strlen( $subject ) > 255 ) {
+                        $subject = mb_substr( $subject, 0, 255 );
+                }
+                $body_html = isset( $_POST['body_html'] ) ? wp_kses_post( wp_unslash( (string) $_POST['body_html'] ) ) : '';
+                $body_html = trim( $body_html );
+                if ( mb_strlen( $body_html ) > 32768 ) {
+                        $body_html = mb_substr( $body_html, 0, 32768 );
+                }
 
 			Options::set_template(
 				$tpl,
@@ -161,12 +169,14 @@ final class EmailsPage {
 					wp_die( esc_html__( 'Invalid template.', 'foodbank-manager' ) );
 		}
 
-		$subject   = isset( $_POST['subject'] )
-		? sanitize_text_field( wp_unslash( (string) $_POST['subject'] ) )
-		: ( $templates[ $tpl ]['subject'] ?? '' );
-		$body_html = isset( $_POST['body_html'] )
-		? wp_kses_post( wp_unslash( (string) $_POST['body_html'] ) )
-		: ( $templates[ $tpl ]['body_html'] ?? '' );
+                $subject   = isset( $_POST['subject'] )
+                ? sanitize_text_field( wp_unslash( (string) $_POST['subject'] ) )
+                : ( $templates[ $tpl ]['subject'] ?? '' );
+                $subject   = trim( $subject );
+                $body_html = isset( $_POST['body_html'] )
+                ? wp_kses_post( wp_unslash( (string) $_POST['body_html'] ) )
+                : ( $templates[ $tpl ]['body_html'] ?? '' );
+                $body_html = trim( $body_html );
 
 				$vars = array(
 					'first_name'       => '***',
@@ -176,18 +186,21 @@ final class EmailsPage {
 					'appointment_time' => '***',
 				);
 
-				$subject = Templates::apply_tokens( $subject, $vars, false );
-				$subject = wp_strip_all_tags( $subject );
-				if ( strlen( $subject ) > 255 ) {
-						$subject = mb_substr( $subject, 0, 255 );
-				}
+                $subject = Templates::apply_tokens( $subject, $vars, false );
+                $subject = wp_strip_all_tags( $subject );
+                if ( mb_strlen( $subject ) > 255 ) {
+                                $subject = mb_substr( $subject, 0, 255 );
+                }
 
-				$body_html = Templates::apply_tokens( $body_html, $vars, true );
-				$body_html = wp_kses_post( $body_html );
+                $body_html = Templates::apply_tokens( $body_html, $vars, true );
+                $body_html = wp_kses_post( $body_html );
+                if ( mb_strlen( $body_html ) > 32768 ) {
+                                $body_html = mb_substr( $body_html, 0, 32768 );
+                }
 
-				return array(
-					'subject'   => $subject,
-					'body_html' => $body_html,
-				);
-	}
+                return array(
+                        'subject'   => $subject,
+                        'body_html' => $body_html,
+                );
+        }
 }
