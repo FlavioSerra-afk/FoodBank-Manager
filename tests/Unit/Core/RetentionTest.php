@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-use PHPUnit\Framework\TestCase;
+use BaseTestCase;
 use FBM\Core\Retention;
 class RetentionDBStub {
     public string $prefix = 'wp_';
@@ -48,13 +48,17 @@ class RetentionDBStub {
     }
 }
 
-final class RetentionTest extends TestCase {
+final class RetentionTest extends BaseTestCase {
+    /** @var mixed */
+    private $orig_wpdb;
+
     protected function setUp(): void {
         parent::setUp();
         if (!defined('ABSPATH')) {
             define('ABSPATH', __DIR__);
         }
         global $fbm_test_options, $fbm_options, $wpdb;
+        $this->orig_wpdb = $wpdb ?? null;
         $fbm_test_options = [
             'fbm_settings' => [
                 'privacy' => [
@@ -71,6 +75,12 @@ final class RetentionTest extends TestCase {
         $wpdb->ids['wp_fb_applications'] = range(1,250);
         $wpdb->ids['wp_fb_attendance'] = [1,2];
         $wpdb->ids['wp_fb_mail_log'] = [5];
+    }
+
+    protected function tearDown(): void {
+        global $wpdb;
+        $wpdb = $this->orig_wpdb;
+        parent::tearDown();
     }
 
     public function testRunProcessesAndLimits(): void {

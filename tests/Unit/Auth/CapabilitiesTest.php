@@ -1,14 +1,13 @@
 <?php
 declare(strict_types=1);
 
-use PHPUnit\Framework\TestCase;
+use BaseTestCase;
 use FBM\Auth\Capabilities;
 
-class CapabilitiesTest extends TestCase {
+class CapabilitiesTest extends BaseTestCase {
     protected function setUp(): void {
         parent::setUp();
-        fbm_test_reset_globals();
-        do_action('fbm_test_reset_caps');
+        Capabilities::$ensured = false;
     }
 
     public function testEnsureForAdminAddsAllCapsIdempotently(): void {
