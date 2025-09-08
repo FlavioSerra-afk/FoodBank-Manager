@@ -1,16 +1,16 @@
 <?php declare(strict_types=1);
 
-use Tests\Support\Exceptions\FbmDieException;
-
 if (defined('FBM_WPSTUBS_LOADED')) {
     return;
 }
 define('FBM_WPSTUBS_LOADED', true);
 
+use Tests\Support\Exceptions\FbmDieException;
+
 // When running static analysis, load the official WordPress stubs instead of
 // our test implementations to avoid function redeclarations and maintain
 // accurate signatures.
-if (getenv('FBM_PHPSTAN')) {
+if (defined('PHPSTAN_RUNNING') || defined('__PHPSTAN_RUNNING__')) {
     require_once __DIR__ . '/../../vendor/php-stubs/wordpress-stubs/wordpress-stubs.php';
     // Provide signatures for functions used with extended parameters.
     if (false) {
@@ -60,7 +60,7 @@ $GLOBALS['fbm_test_deactivated'] =& $GLOBALS['fbm_deactivated'];
 $GLOBALS['fbm_test_deleted']     =& $GLOBALS['fbm_deleted_plugins'];
 $GLOBALS['fbm_test_redirect']    =& $GLOBALS['__last_redirect'];
 if (!function_exists('get_plugins')) {
-  function get_plugins(){ return $GLOBALS['fbm_plugins'] ?? []; }
+  function get_plugins(): array { return $GLOBALS['fbm_plugins'] ?? []; }
 }
 if (!function_exists('is_plugin_active')) {
   function is_plugin_active($basename){ return in_array($basename, $GLOBALS['fbm_active_plugins'], true); }
