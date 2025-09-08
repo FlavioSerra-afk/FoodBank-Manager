@@ -24,6 +24,8 @@ namespace {
         }
 
         public function testViewMasksEmailWithoutCapability(): void {
+            fbm_grant_caps(['fb_manage_database']);
+            fbm_seed_nonce('unit-seed');
             fbm_test_set_request_nonce('fbm_entry_view');
             $_GET = array(
                 'fbm_action' => 'view_entry',
@@ -33,7 +35,7 @@ namespace {
             $_REQUEST = $_GET;
             ob_start();
             EntryPage::handle();
-            $html = ob_get_clean();
+            $html = (string) ob_get_clean();
             $this->assertStringContainsString('<div class="wrap fbm-admin">', $html);
             $this->assertStringContainsString('j***@example.com', $html);
             $this->assertStringNotContainsString('john@example.com', $html);
@@ -42,6 +44,7 @@ namespace {
 
         public function testUnmaskShowsPlaintextWithCapability(): void {
             fbm_grant_admin();
+            fbm_seed_nonce('unit-seed');
             fbm_test_set_request_nonce('fbm_entry_view');
             $_GET = array(
                 'fbm_action' => 'view_entry',
@@ -51,25 +54,26 @@ namespace {
             $_REQUEST = $_GET;
             ob_start();
             EntryPage::handle();
-            $html = ob_get_clean();
+            $html = (string) ob_get_clean();
             $this->assertStringContainsString('<div class="wrap fbm-admin">', $html);
             $this->assertStringContainsString('Unmask', $html);
             $this->assertStringContainsString('j***@example.com', $html);
 
+            fbm_seed_nonce('unit-seed');
             fbm_test_set_request_nonce('fbm_entry_unmask', 'fbm_nonce');
             $_SERVER['REQUEST_METHOD'] = 'POST';
             $_POST['fbm_action'] = 'unmask_entry';
-            $_POST['fbm_nonce']  = $_POST['fbm_nonce'];
             $_REQUEST            = array_merge($_GET, $_POST);
             ob_start();
             EntryPage::handle();
-            $html = ob_get_clean();
+            $html = (string) ob_get_clean();
             $this->assertStringContainsString('<div class="wrap fbm-admin">', $html);
             $this->assertStringContainsString('john@example.com', $html);
         }
 
         public function testUnmaskDeniedWithoutNonce(): void {
             fbm_grant_admin();
+            fbm_seed_nonce('unit-seed');
             fbm_test_trust_nonces(false);
             fbm_test_set_request_nonce('fbm_entry_view');
             $_GET = array(
@@ -85,6 +89,7 @@ namespace {
         }
 
         public function testPdfDeniedWithoutNonce(): void {
+            fbm_seed_nonce('unit-seed');
             fbm_test_trust_nonces(false);
             fbm_test_set_request_nonce('fbm_entry_view');
             $_GET = array(
@@ -100,6 +105,7 @@ namespace {
         }
 
         public function testPdfExportHandlesEngines(): void {
+            fbm_seed_nonce('unit-seed');
             fbm_test_set_request_nonce('fbm_entry_view');
             $_GET = array(
                 'fbm_action' => 'view_entry',
@@ -107,6 +113,7 @@ namespace {
                 '_wpnonce'   => $_POST['_wpnonce'],
             );
             $_REQUEST = $_GET;
+            fbm_seed_nonce('unit-seed');
             fbm_test_set_request_nonce('fbm_entry_pdf', 'fbm_nonce');
             $_SERVER['REQUEST_METHOD'] = 'POST';
             $_POST['fbm_action'] = 'entry_pdf';

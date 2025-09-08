@@ -90,6 +90,9 @@ if (!function_exists('wp_verify_nonce')) { function wp_verify_nonce($n,$a=-1){ r
     }
   }
 if (!function_exists('fbm_test_trust_nonces')) { function fbm_test_trust_nonces(bool $t){ $GLOBALS['fbm_test_trust_nonces']=$t; } }
+if (!function_exists('fbm_seed_nonce')) {
+  function fbm_seed_nonce(string $seed): void { $GLOBALS['fbm_test_nonce_secret'] = $seed; }
+}
 if (!function_exists('fbm_test_set_request_nonce')) { function fbm_test_set_request_nonce(string $a='fbm', string $f='_wpnonce'){ $_REQUEST[$f]=wp_create_nonce($a); $_POST[$f]=$_REQUEST[$f]; } }
 if (!function_exists('wp_nonce_field')) {
   function wp_nonce_field($a=-1,$name='_wpnonce',$referer=true,$echo=true){
