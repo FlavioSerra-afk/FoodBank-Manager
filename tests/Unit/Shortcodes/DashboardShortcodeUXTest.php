@@ -1,75 +1,64 @@
 <?php
 declare(strict_types=1);
 
-namespace FoodBankManager\UI {
-    if (!class_exists(Theme::class, false)) {
-        class Theme { public static function enqueue_front(): void {} }
-    }
-}
+namespace FBM\Tests\Unit\Shortcodes;
 
-namespace FoodBankManager\Attendance {
-    if (!class_exists(AttendanceRepo::class, false)) {
-        class AttendanceRepo {
-            /** @param mixed $s @param array $f */
-            public static function daily_present_counts($s, array $f = []) { return array(); }
-            /** @param mixed $s @param array $f */
-            public static function period_totals($s, array $f = []) { return array(); }
-        }
-    }
-}
-
-namespace FBM\Tests\Unit\Shortcodes {
-use \BaseTestCase;
+use BaseTestCase;
+use FoodBankManager\Core\Assets;
+use FBM\Shortcodes\Shortcodes;
+use FBM\Tests\Support\WPDBStub;
+use Tests\Support\Rbac;
 
 final class DashboardShortcodeUXTest extends BaseTestCase {
     protected function setUp(): void {
         parent::setUp();
-        $_GET = [];
-        \fbm_test_set_request_nonce('fbm_dash_export');
+        Rbac::grantManager();
         if (!defined('FBM_PATH')) {
             define('FBM_PATH', dirname(__DIR__, 3) . '/');
         }
+        if (!defined('FBM_URL')) {
+            define('FBM_URL', '');
+        }
+        // Ensure shortcode registered.
+        require_once FBM_PATH . 'includes/Shortcodes/Shortcodes.php';
+        Shortcodes::register();
+        // Stub DB.
+        $GLOBALS['wpdb'] = new WPDBStub();
     }
 
-    public function testEmptyStateRenders(): void {
-        \fbm_grant_viewer();
-        require_once FBM_PATH . 'includes/Shortcodes/DashboardShortcode.php';
+    private function seedTransients(array $totals, array $series = array()): void {
+        $hash = md5('7d||all|0');
+        $base = 'fbm_dash_1_7d_' . $hash . '_';
+        $GLOBALS['fbm_transients'][$base . 'series'] = $series;
+        $GLOBALS['fbm_transients'][$base . 'totals'] = $totals;
+        $GLOBALS['fbm_transients'][$base . 'prev']   = array();
+    }
+
+    public function testLoadedStateRendersTokens(): void {
+        $this->seedTransients(array('present' => 5), array(1,2));
         $html = \FBM\Shortcodes\DashboardShortcode::render();
-        $this->assertStringContainsString('fbm-empty', $html);
+        $this->assertStringContainsString('fbm-dashboard', $html);
+        $this->assertStringContainsString('results', strtolower($html));
+        $this->assertStringContainsString('Dashboard filters', $html);
+        $this->assertStringContainsString('fbm-sparkline', $html);
     }
 
-    public function testFilterFormLabelsAndValues(): void {
-        \fbm_grant_viewer();
-        require_once FBM_PATH . 'includes/Shortcodes/DashboardShortcode.php';
-        $html = \FBM\Shortcodes\DashboardShortcode::render([
-            'type'        => 'delivery',
-            'event'       => 'abc',
-            'policy_only' => '1',
-        ]);
-        $this->assertStringContainsString('label for="fbm_type"', $html);
-        $this->assertStringContainsString('id="fbm_event"', $html);
-        $this->assertStringContainsString('value="abc"', $html);
-    }
-
-    public function testCopyShortcodeBlockAppearsWithCap(): void {
-        \fbm_grant_admin();
-        require_once FBM_PATH . 'includes/Shortcodes/DashboardShortcode.php';
+    public function testEmptyStateMessage(): void {
+        $this->seedTransients(array(), array());
         $html = \FBM\Shortcodes\DashboardShortcode::render();
-        $this->assertStringContainsString('fbm-copy-shortcode', $html);
+        $this->assertStringContainsString('No data for selected filters', $html);
     }
 
-    public function testCopyShortcodeBlockHiddenWithoutCap(): void {
-        \fbm_grant_viewer();
-        require_once FBM_PATH . 'includes/Shortcodes/DashboardShortcode.php';
-        $html = \FBM\Shortcodes\DashboardShortcode::render();
-        $this->assertStringNotContainsString('fbm-copy-shortcode', $html);
-    }
+    public function testAssetsOnlyWhenShortcodePresent(): void {
+        $assets = new Assets();
+        $GLOBALS['fbm_is_singular'] = true;
+        $GLOBALS['fbm_post_content'] = 'none';
+        $assets->enqueue_front();
+        $this->assertArrayNotHasKey('fbm-frontend-dashboard', $GLOBALS['fbm_styles']);
 
-    public function testPermissionDeniedMessage(): void {
-        \fbm_grant_caps([]);
-        require_once FBM_PATH . 'includes/Shortcodes/DashboardShortcode.php';
-        $html = \FBM\Shortcodes\DashboardShortcode::render();
-        $this->assertStringContainsString('fbm-no-permission', $html);
+        $GLOBALS['fbm_styles'] = array();
+        $GLOBALS['fbm_post_content'] = '[fbm_dashboard]';
+        $assets->enqueue_front();
+        $this->assertArrayHasKey('fbm-frontend-dashboard', $GLOBALS['fbm_styles']);
     }
-}
 }

@@ -48,7 +48,7 @@ $p_in       = $tot ? 100 - $p_del : 0;
 	<button type="submit"><?php esc_html_e( 'Apply', 'foodbank-manager' ); ?></button>
 	<a class="fbm-download" href="<?php echo esc_url( $csv_url_attr ); ?>"><?php esc_html_e( 'Download CSV', 'foodbank-manager' ); ?></a>
 </form>
-<div class="fbm-results-count" aria-live="polite">
+<div class="fbm-results-count" data-testid="fbm-summary" aria-live="polite">
 <?php
 printf(
 		/* translators: %s: result count. */
