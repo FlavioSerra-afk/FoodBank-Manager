@@ -9,6 +9,7 @@ use FoodBankManager\Db\Migrations;
 use FoodBankManager\Auth\Roles;
 use FoodBankManager\Http\FormSubmitController;
 use FoodBankManager\Http\DashboardExportController;
+use FoodBankManager\Http\DiagnosticsController;
 use FoodBankManager\Core\Options;
 use FBM\Core\Retention;
 use FoodBankManager\Admin\ShortcodesPage;
@@ -73,6 +74,7 @@ final class Plugin {
                 add_action( 'admin_post_nopriv_fbm_submit', array( FormSubmitController::class, 'handle' ) );
                 add_action( 'admin_post_fbm_submit', array( FormSubmitController::class, 'handle' ) );
                 add_action( 'admin_post_fbm_dash_export', array( DashboardExportController::class, 'handle' ) );
+                add_action( 'admin_post_fbm_diag_mail_test', array( DiagnosticsController::class, 'mail_test' ) );
 
                 self::get_instance()->init();
         }

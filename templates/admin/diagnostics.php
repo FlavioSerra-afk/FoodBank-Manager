@@ -9,17 +9,18 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-if ( ! current_user_can( 'fb_manage_diagnostics' ) ) {
-    wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ) );
-}
-
 $php_version    = PHP_VERSION;
 $wp_version     = get_bloginfo( 'version' );
 $fbm_version    = defined( 'FBM_VERSION' ) ? FBM_VERSION : 'dev';
 $sodium         = extension_loaded( 'sodium' ) ? 'native' : ( class_exists( '\\ParagonIE_Sodium_Compat' ) ? 'polyfill' : 'missing' );
 $kek_defined    = defined( 'FBM_KEK_BASE64' ) && FBM_KEK_BASE64 !== '';
-    $transport      = function_exists( 'wp_mail' ) ? 'wp_mail' : 'none';
-    $notice        = isset( $_GET['notice'] ) ? sanitize_key( wp_unslash( $_GET['notice'] ) ) : '';
+$notice         = $notice ?? '';
+$notices_render_count = $notices_render_count ?? 0;
+$boot_status          = $boot_status ?? '';
+$caps_count           = $caps_count ?? '';
+$install_scan         = $install_scan ?? array( 'canonical' => '', 'duplicates' => array() );
+$last_consolidation   = $last_consolidation ?? array();
+$last_activation_consolidation = $last_activation_consolidation ?? array();
 $missing_slugs = array();
 $found_slugs   = array();
 foreach ( \FoodBankManager\Admin\Menu::slugs() as $slug ) {
@@ -54,10 +55,17 @@ $rows       = $rows ?? array();
         <li><?php echo esc_html( 'sodium: ' . $sodium ); ?></li>
     </ul>
     <h2><?php esc_html_e( 'SMTP', 'foodbank-manager' ); ?></h2>
-    <p><?php echo esc_html( sprintf( __( 'Transport: %s', 'foodbank-manager' ), $transport ) ); ?></p>
-    <form method="post" action="">
+    <ul>
+        <li><?php echo esc_html( sprintf( __( 'Mailer: %s', 'foodbank-manager' ), $smtp['mailer'] ?? '' ) ); ?></li>
+        <li><?php echo esc_html( sprintf( __( 'Host: %s', 'foodbank-manager' ), $smtp['host'] ?? '' ) ); ?></li>
+        <li><?php echo esc_html( sprintf( __( 'Port: %s', 'foodbank-manager' ), $smtp['port'] ?? '' ) ); ?></li>
+        <li><?php echo esc_html( sprintf( __( 'Encryption: %s', 'foodbank-manager' ), $smtp['encryption'] ?? '' ) ); ?></li>
+        <li><?php echo esc_html( sprintf( __( 'Auth: %s', 'foodbank-manager' ), $smtp['auth'] ?? '' ) ); ?></li>
+        <li><?php echo esc_html( sprintf( __( 'Test recipient: %s', 'foodbank-manager' ), $test_to ) ); ?></li>
+    </ul>
+    <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+        <input type="hidden" name="action" value="fbm_diag_mail_test" />
         <?php wp_nonce_field( 'fbm_diag_mail_test', '_fbm_nonce' ); ?>
-        <input type="hidden" name="fbm_action" value="mail_test" />
         <p><button type="submit" class="button"><?php esc_html_e( 'Send test email', 'foodbank-manager' ); ?></button></p>
     </form>
     <h2><?php esc_html_e( 'Environment', 'foodbank-manager' ); ?></h2>
