@@ -62,8 +62,9 @@ namespace {
     final class GDPRPageTest extends TestCase {
         protected function setUp(): void {
             fbm_test_reset_globals();
-            fbm_grant_for_page('fbm_diagnostics');
+            fbm_grant_manager();
             fbm_test_trust_nonces(true);
+            fbm_test_set_request_nonce();
             $_GET = $_POST = $_SERVER = $_REQUEST = array();
             if (!class_exists('FoodBankManager\\Database\\ApplicationsRepo', false)) {
                 require_once __DIR__ . '/../../Support/ApplicationsRepoStub.php';
@@ -111,7 +112,7 @@ namespace {
 
         public function testUnmaskedWithCapability(): void {
             fbm_test_reset_globals();
-            fbm_grant_caps(['fb_manage_diagnostics','fb_view_sensitive']);
+            fbm_grant_admin();
             fbm_test_trust_nonces(true);
             fbm_test_set_request_nonce('fbm_gdpr_export', '_fbm_nonce');
             $_SERVER['REQUEST_METHOD'] = 'POST';

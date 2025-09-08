@@ -27,6 +27,9 @@ final class FormShortcodeTest extends TestCase {
     protected function setUp(): void {
         parent::setUp();
         fbm_test_reset_globals();
+        fbm_grant_viewer();
+        fbm_test_trust_nonces(true);
+        fbm_test_set_request_nonce('fbm_submit_form', '_fbm_nonce');
         $GLOBALS['fbm_options_store'] = [];
         if (!defined('FBM_PATH')) {
             define('FBM_PATH', dirname(__DIR__, 3) . '/');
@@ -54,10 +57,11 @@ final class FormShortcodeTest extends TestCase {
 
     public function testSubmitFlowSucceeds(): void {
         Shortcodes::register();
+        fbm_test_set_request_nonce('fbm_submit_form', '_fbm_nonce');
         $_POST = [
             'action' => 'fbm_submit',
             'preset' => 'test_form',
-            '_fbm_nonce' => 'fbm_submit_form_nonce',
+            '_fbm_nonce' => $_POST['_fbm_nonce'],
             'email' => 'a@example.com',
             'consent' => '1',
             'captcha' => 'token',

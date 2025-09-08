@@ -171,8 +171,9 @@ namespace {
 
         protected function setUp(): void {
             fbm_test_reset_globals();
-            fbm_grant_for_page('fbm_diagnostics');
+            fbm_grant_manager();
             fbm_test_trust_nonces(true);
+            fbm_test_set_request_nonce();
             self::$mail_result = true;
             \FoodBankManager\Auth\Roles::$installed = false;
             \FoodBankManager\Auth\Roles::$ensured  = false;

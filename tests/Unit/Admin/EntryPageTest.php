@@ -38,14 +38,13 @@ namespace {
      * @runTestsInSeparateProcesses
      */
     final class EntryPageTest extends TestCase {
-        public static array $caps = [];
-
         protected function setUp(): void {
-            self::$caps = ['fb_manage_database' => true, 'fb_view_sensitive' => false];
+            fbm_test_reset_globals();
+            fbm_grant_manager();
             fbm_test_trust_nonces(true);
+            fbm_test_set_request_nonce('fbm_entry_view');
             $_GET = $_POST = $_SERVER = $_REQUEST = [];
             $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_database';
-            $GLOBALS['fbm_caps'] = self::$caps;
             if (function_exists('header_remove')) {
                 header_remove();
             }
@@ -73,7 +72,7 @@ namespace {
         }
 
         public function testUnmaskShowsPlaintextWithCapability(): void {
-            self::$caps['fb_view_sensitive'] = true;
+            fbm_grant_admin();
             fbm_test_set_request_nonce('fbm_entry_view');
             $_GET = array(
                 'fbm_action' => 'view_entry',
@@ -99,7 +98,7 @@ namespace {
         }
 
         public function testUnmaskDeniedWithoutNonce(): void {
-            self::$caps['fb_view_sensitive'] = true;
+            fbm_grant_admin();
             fbm_test_set_request_nonce('fbm_entry_view');
             fbm_test_trust_nonces(false);
             $_GET = array(

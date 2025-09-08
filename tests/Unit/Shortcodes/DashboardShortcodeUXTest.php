@@ -46,6 +46,7 @@ final class DashboardShortcodeUXTest extends TestCase {
     protected function setUp(): void {
         parent::setUp();
         \fbm_test_reset_globals();
+        \fbm_grant_viewer();
         $_GET = [];
         \fbm_test_set_request_nonce('fbm_dash_export');
         if (!defined('FBM_PATH')) {
@@ -54,14 +55,14 @@ final class DashboardShortcodeUXTest extends TestCase {
     }
 
     public function testEmptyStateRenders(): void {
-        \fbm_grant_caps(['fb_manage_dashboard']);
+        \fbm_grant_viewer();
         require_once FBM_PATH . 'includes/Shortcodes/DashboardShortcode.php';
         $html = \FBM\Shortcodes\DashboardShortcode::render();
         $this->assertStringContainsString('fbm-empty', $html);
     }
 
     public function testFilterFormLabelsAndValues(): void {
-        \fbm_grant_caps(['fb_manage_dashboard']);
+        \fbm_grant_viewer();
         require_once FBM_PATH . 'includes/Shortcodes/DashboardShortcode.php';
         $html = \FBM\Shortcodes\DashboardShortcode::render([
             'type'        => 'delivery',
@@ -75,7 +76,7 @@ final class DashboardShortcodeUXTest extends TestCase {
 
     /** @runInSeparateProcess */
     public function testCopyShortcodeBlockAppearsWithCap(): void {
-        \fbm_grant_caps(['fb_manage_dashboard','manage_options']);
+        \fbm_grant_admin();
         require_once FBM_PATH . 'includes/Shortcodes/DashboardShortcode.php';
         $html = \FBM\Shortcodes\DashboardShortcode::render();
         $this->assertStringContainsString('fbm-copy-shortcode', $html);
@@ -83,13 +84,14 @@ final class DashboardShortcodeUXTest extends TestCase {
 
     /** @runInSeparateProcess */
     public function testCopyShortcodeBlockHiddenWithoutCap(): void {
-        \fbm_grant_caps(['fb_manage_dashboard']);
+        \fbm_grant_viewer();
         require_once FBM_PATH . 'includes/Shortcodes/DashboardShortcode.php';
         $html = \FBM\Shortcodes\DashboardShortcode::render();
         $this->assertStringNotContainsString('fbm-copy-shortcode', $html);
     }
 
     public function testPermissionDeniedMessage(): void {
+        \fbm_grant_caps([]);
         require_once FBM_PATH . 'includes/Shortcodes/DashboardShortcode.php';
         $html = \FBM\Shortcodes\DashboardShortcode::render();
         $this->assertStringContainsString('fbm-no-permission', $html);

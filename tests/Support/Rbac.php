@@ -3,20 +3,42 @@
 /** Deterministic caps for tests */
 function fbm_grant_caps(array $caps): void {
     $GLOBALS['fbm_user_caps'] = [];
-    foreach ($caps as $cap) { $GLOBALS['fbm_user_caps'][(string)$cap] = true; }
+    foreach ($caps as $cap) {
+        $GLOBALS['fbm_user_caps'][(string) $cap] = true;
+    }
 }
 
-function fbm_grant_admin_only(): void { fbm_grant_caps(['manage_options' => true]); }
-
-function fbm_grant_permissions_admin(): void {
-    fbm_grant_caps(['fb_manage_permissions' => true, 'fb_manage_diagnostics' => true]);
+function fbm_grant_viewer(): void {
+    fbm_grant_caps(['fb_manage_dashboard']);
 }
 
-function fbm_grant_fbm_all(): void {
+function fbm_grant_manager(): void {
     fbm_grant_caps([
-        'fb_manage_dashboard','fb_manage_attendance','fb_manage_database','fb_manage_forms',
-        'fb_manage_emails','fb_manage_settings','fb_manage_diagnostics','fb_manage_permissions',
-        'fb_manage_theme','fb_view_sensitive'
+        'fb_manage_dashboard',
+        'fb_manage_attendance',
+        'fb_manage_database',
+        'fb_manage_forms',
+        'fb_manage_emails',
+        'fb_manage_settings',
+        'fb_manage_diagnostics',
+        'fb_manage_permissions',
+        'fb_manage_theme',
+    ]);
+}
+
+function fbm_grant_admin(): void {
+    fbm_grant_caps([
+        'fb_manage_dashboard',
+        'fb_manage_attendance',
+        'fb_manage_database',
+        'fb_manage_forms',
+        'fb_manage_emails',
+        'fb_manage_settings',
+        'fb_manage_diagnostics',
+        'fb_manage_permissions',
+        'fb_manage_theme',
+        'fb_view_sensitive',
+        'manage_options',
     ]);
 }
 
