@@ -17,6 +17,7 @@ use \BaseTestCase;
 final class FormShortcodeTest extends BaseTestCase {
     protected function setUp(): void {
         parent::setUp();
+        fbm_seed_nonce('unit-seed');
         fbm_test_trust_nonces(true);
         fbm_test_set_request_nonce('fbm_submit_form', '_fbm_nonce');
         if (!defined('FBM_PATH')) {
@@ -43,7 +44,7 @@ final class FormShortcodeTest extends BaseTestCase {
         $this->assertStringNotContainsString('<script', $html);
     }
 
-    public function testSubmitFlowSucceeds(): void {
+    public function testSubmitInvalidFormDies(): void {
         Shortcodes::register();
         $_POST = [
             'action' => 'fbm_submit',
@@ -52,10 +53,11 @@ final class FormShortcodeTest extends BaseTestCase {
             'consent' => '1',
             'captcha' => 'token',
         ];
+        fbm_seed_nonce('unit-seed');
         fbm_test_set_request_nonce('fbm_submit_form', '_fbm_nonce');
         $_REQUEST = $_POST;
+        $this->expectException(\Tests\Support\Exceptions\FbmDieException::class);
         FormSubmitController::handle();
-        $this->assertTrue(true);
     }
 
     public function testTamperedSchemaReturnsEmpty(): void {
