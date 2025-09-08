@@ -10,11 +10,14 @@ namespace FoodBankManager\Shortcodes {
     }
 }
 
-namespace FoodBankManager\Exports {
-    if ( ! class_exists( DashboardCsv::class, false ) ) {
-        class DashboardCsv {
-            public static function render( $totals, $series, $period, $filters ): string { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
-                return "Metric,Count\n";
+namespace FoodBankManager\Attendance {
+    if ( ! class_exists( AttendanceRepo::class, false ) ) {
+        class AttendanceRepo {
+            public static function period_totals( $since, array $filters ): array { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
+                return array( 'present' => 1, 'households' => 1, 'no_shows' => 0, 'in_person' => 1, 'delivery' => 0, 'voided' => 0 );
+            }
+            public static function daily_present_counts( $since, array $filters ): array { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
+                return array();
             }
         }
     }

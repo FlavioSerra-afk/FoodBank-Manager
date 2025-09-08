@@ -9,9 +9,10 @@ declare(strict_types=1);
 
 namespace FoodBankManager\Http;
 
+use DateInterval;
 use FoodBankManager\Attendance\AttendanceRepo;
-use FoodBankManager\Exports\DashboardCsv;
 use FoodBankManager\Shortcodes\Dashboard;
+use FBM\Exports\CsvWriter;
 use function current_user_can;
 use function esc_html__;
 use function apply_filters;
@@ -42,18 +43,31 @@ final class DashboardExportController {
 			'type'        => $type,
 			'policy_only' => $policy,
 		);
-		$totals  = AttendanceRepo::period_totals( $since, $filters );
-		$series  = AttendanceRepo::daily_present_counts( $since, $filters );
-		$csv     = DashboardCsv::render( $totals, $series, $period, $filters );
-		$date    = gmdate( 'Ymd' );
+                $totals  = AttendanceRepo::period_totals( $since, $filters );
+                $series  = AttendanceRepo::daily_present_counts( $since, $filters );
+                $date    = gmdate( 'Ymd' );
                 $headers = array(
                         'Content-Type: text/csv; charset=utf-8',
                         'Content-Disposition: attachment; filename="fbm-dashboard-' . $date . '.csv"',
                 );
                 fbm_send_headers( $headers );
-                echo $csv;
+                $out = fopen( 'php://output', 'wb' );
+                CsvWriter::writeBom( $out );
+                CsvWriter::put( $out, array( __( 'Metric', 'foodbank-manager' ), __( 'Count', 'foodbank-manager' ) ), ',', '"', '\\' );
+                foreach ( $totals as $k => $v ) {
+                        $label = ucwords( str_replace( '_', ' ', $k ) );
+                        CsvWriter::put( $out, array( __( $label, 'foodbank-manager' ), (string) (int) $v ), ',', '"', '\\' );
+                }
+                if ( $series ) {
+                        CsvWriter::put( $out, array(), ',', '"', '\\' );
+                        CsvWriter::put( $out, array( __( 'Day', 'foodbank-manager' ), __( 'Present', 'foodbank-manager' ) ), ',', '"', '\\' );
+                        for ( $i = 0; $i < count( $series ); $i++ ) {
+                                $day = $since->add( new DateInterval( 'P' . $i . 'D' ) );
+                                CsvWriter::put( $out, array( $day->format( 'Y-m-d' ), (string) $series[ $i ] ), ',', '"', '\\' );
+                        }
+                }
                 if ( apply_filters( 'fbm_http_exit', true ) ) {
                         exit;
                 }
-	}
+        }
 }
