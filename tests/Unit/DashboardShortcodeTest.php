@@ -28,6 +28,7 @@ final class DashboardShortcodeTest extends BaseTestCase {
 
     public function testUnauthorizedGated(): void {
         require_once FBM_PATH . 'includes/Shortcodes/Dashboard.php';
+        \fbm_grant_caps(array());
         $html = \FoodBankManager\Shortcodes\Dashboard::render();
         $expected = '<div class="fbm-no-permission">You do not have permission to view the dashboard.</div>';
         $this->assertSame($expected, $html);
