@@ -73,15 +73,17 @@ namespace FoodBankManager\Auth {
 }
 
 namespace FBM\Auth {
-    class Capabilities {
-        public static bool $ensured = false;
-        public static function ensure_for_admin(): void { self::$ensured = true; }
-        public static function all(): array {
-            return [
-                'fb_manage_dashboard','fb_manage_attendance','fb_manage_database','fb_manage_forms',
-                'fb_manage_emails','fb_manage_settings','fb_manage_diagnostics','fb_manage_permissions',
-                'fb_manage_theme','fb_view_sensitive'
-            ];
+    if (!class_exists(Capabilities::class)) {
+        class Capabilities {
+            public static bool $ensured = false;
+            public static function ensure_for_admin(): void { self::$ensured = true; }
+            public static function all(): array {
+                return [
+                    'fb_manage_dashboard','fb_manage_attendance','fb_manage_database','fb_manage_forms',
+                    'fb_manage_emails','fb_manage_settings','fb_manage_diagnostics','fb_manage_permissions',
+                    'fb_manage_theme','fb_view_sensitive'
+                ];
+            }
         }
     }
 }

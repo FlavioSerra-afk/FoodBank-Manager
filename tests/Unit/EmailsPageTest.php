@@ -9,6 +9,7 @@ namespace {
 use BaseTestCase;
 use FoodBankManager\Admin\EmailsPage;
 use FoodBankManager\Core\Options;
+use Tests\Support\Rbac;
 
 final class EmailsPageTest extends BaseTestCase {
     protected function setUp(): void {
@@ -24,7 +25,7 @@ final class EmailsPageTest extends BaseTestCase {
     }
 
     public function testCapabilityRequired(): void {
-        fbm_grant_caps([]);
+        Rbac::revokeAll();
         $this->expectException(RuntimeException::class);
         EmailsPage::route();
     }
@@ -58,7 +59,7 @@ final class EmailsPageTest extends BaseTestCase {
             'subject'    => 'Hi',
             'body_html'  => '<p>Hello</p>',
         );
-        fbm_grant_caps([]);
+        Rbac::revokeAll();
         $this->expectException(RuntimeException::class);
         EmailsPage::route();
     }
@@ -110,7 +111,7 @@ final class EmailsPageTest extends BaseTestCase {
             '_fbm_nonce' => 'nonce',
             'tpl'        => 'applicant_confirmation',
         );
-        fbm_grant_caps([]);
+        Rbac::revokeAll();
         $this->expectException(RuntimeException::class);
         EmailsPage::route();
     }
@@ -156,7 +157,7 @@ final class EmailsPageTest extends BaseTestCase {
             '_fbm_nonce' => 'nonce',
             'tpl'        => 'applicant_confirmation',
         );
-        fbm_grant_caps([]);
+        Rbac::revokeAll();
         $this->expectException(RuntimeException::class);
         EmailsPage::route();
     }

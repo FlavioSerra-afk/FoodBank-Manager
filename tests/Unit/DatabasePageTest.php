@@ -3,8 +3,15 @@ declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 use FoodBankManager\Admin\DatabasePage;
+use Tests\Support\Rbac;
 
 final class DatabasePageTest extends TestCase {
+    protected function setUp(): void {
+        parent::setUp();
+        fbm_test_reset_globals();
+        Rbac::grantManager();
+        fbm_test_set_request_nonce();
+    }
     private function getFilters(): array {
         $ref    = new ReflectionClass( DatabasePage::class );
         $method = $ref->getMethod( 'get_filters' );

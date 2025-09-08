@@ -1,52 +1,37 @@
-<?php
-namespace FoodBankManager\Tests\Unit {
+<?php declare(strict_types=1);
 
-        use FBM\Auth\Capabilities;
-        use FoodBankManager\Auth\CapabilitiesResolver;
-        use \BaseTestCase;
+use FBM\Auth\Capabilities;
+use PHPUnit\Framework\TestCase;
 
-        class CapabilitiesResolverTest extends BaseTestCase {
+final class CapabilitiesResolverTest extends TestCase {
+    protected function setUp(): void {
+        parent::setUp();
+        fbm_test_reset_globals();
+        do_action('fbm_test_reset_caps');
+    }
 
-                public function testGrantAdmins(): void {
-                        $user        = new \WP_User();
-                        $user->ID    = 1;
-                        $user->roles = array( 'administrator' );
-                        $resolved    = CapabilitiesResolver::grantAdmins( array(), array(), array(), $user );
-                        foreach ( Capabilities::all() as $cap ) {
-                                $this->assertArrayHasKey( $cap, $resolved );
-                                $this->assertTrue( $resolved[ $cap ] );
-                        }
-                }
+    public function testMergesRoleAndOverrides(): void {
+        add_role('editor', 'Editor', ['fb_manage_dashboard' => true]);
+        $user_id = 10;
+        $GLOBALS['fbm_users'][] = ['ID' => $user_id, 'roles' => ['editor']];
+        update_user_meta($user_id, 'fbm_user_caps', [
+            'fb_manage_forms'    => true,
+            'fb_manage_dashboard' => false,
+        ]);
 
-                public function testUserOverridesApply(): void {
-                        $GLOBALS['fbm_user_meta'][2]['fb_manage_dashboard'][0] = true;
-                        $GLOBALS['fbm_user_meta'][2]['fb_manage_forms'][0]     = false;
-                        $user        = new \WP_User();
-                        $user->ID    = 2;
-                        $user->roles = array( 'subscriber' );
-                        $resolved    = CapabilitiesResolver::applyUserOverrides( array( 'fb_manage_database' => true ), array(), array(), $user );
-                        $this->assertTrue( $resolved['fb_manage_dashboard'] );
-                        $this->assertFalse( $resolved['fb_manage_forms'] );
-                        $this->assertTrue( $resolved['fb_manage_database'] );
-                }
+        $caps = Capabilities::effective_caps_for_user($user_id);
+        $this->assertArrayHasKey('fb_manage_forms', $caps);
+        $this->assertTrue($caps['fb_manage_forms']);
+        $this->assertArrayNotHasKey('fb_manage_dashboard', $caps);
+    }
 
-                public function testUnknownCapsIgnored(): void {
-                        $GLOBALS['fbm_user_meta'][3]['unknown_cap'][0] = true;
-                        $user          = new \WP_User();
-                        $user->ID      = 3;
-                        $user->roles   = array();
-                        $resolved      = CapabilitiesResolver::applyUserOverrides( array(), array(), array(), $user );
-                        $this->assertArrayNotHasKey( 'unknown_cap', $resolved );
-                }
-        }
+    public function testUnknownCapsIgnored(): void {
+        $uid = 11;
+        $GLOBALS['fbm_users'][] = ['ID' => $uid, 'roles' => []];
+        update_user_meta($uid, 'fbm_user_caps', ['unknown_cap' => true]);
+
+        $caps = Capabilities::effective_caps_for_user($uid);
+        $this->assertArrayNotHasKey('unknown_cap', $caps);
+    }
 }
 
-namespace {
-        if ( ! class_exists( 'WP_User' ) ) {
-                class WP_User {
-                        public int $ID;
-                        /** @var string[] */
-                        public array $roles = array();
-                }
-        }
-}
