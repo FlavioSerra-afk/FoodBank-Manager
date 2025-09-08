@@ -7,14 +7,9 @@ final class DashboardExportControllerTest extends TestCase {
     /** @runInSeparateProcess */
     public function testNonceRequired(): void {
         fbm_grant_for_page('fbm');
-        if ( ! function_exists( 'wp_verify_nonce' ) ) {
-            function wp_verify_nonce() { return false; }
-        }
-        if ( ! function_exists( 'wp_die' ) ) {
-            function wp_die( $msg ) { throw new Exception( $msg ); }
-        }
+        fbm_test_trust_nonces(false);
         require_once __DIR__ . '/../../includes/Http/DashboardExportController.php';
-        $this->expectException( Exception::class );
+        $this->expectException( RuntimeException::class );
         \FoodBankManager\Http\DashboardExportController::handle();
     }
 }

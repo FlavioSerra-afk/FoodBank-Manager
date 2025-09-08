@@ -1,40 +1,6 @@
 <?php
 declare(strict_types=1);
 
-namespace {
-    if ( ! function_exists( 'sanitize_key' ) ) {
-        function sanitize_key( $key ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            return preg_replace( '/[^a-z0-9_]/', '', strtolower( (string) $key ) );
-        }
-    }
-    if ( ! function_exists( 'sanitize_text_field' ) ) {
-        function sanitize_text_field( $str ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            return trim( strip_tags( (string) $str ) );
-        }
-    }
-    if ( ! function_exists( 'get_option' ) ) {
-        $GLOBALS['fbm_options_store'] = array();
-        function get_option( string $key, $default = false ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            return $GLOBALS['fbm_options_store'][ $key ] ?? $default;
-        }
-    }
-    if ( ! function_exists( 'update_option' ) ) {
-        function update_option( string $key, $value ): bool { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            $GLOBALS['fbm_options_store'][ $key ] = $value;
-            return true;
-        }
-    }
-    if ( ! function_exists( 'delete_option' ) ) {
-        function delete_option( string $key ): bool { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            unset( $GLOBALS['fbm_options_store'][ $key ] );
-            return true;
-        }
-    }
-    if ( ! function_exists( 'wp_json_encode' ) ) {
-        function wp_json_encode( $data ) { return json_encode( $data ); }
-    }
-}
-
 namespace FoodBankManager\Tests\Unit\Forms {
 
 use FoodBankManager\Forms\PresetsRepo;
@@ -43,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 final class PresetsRepoTest extends TestCase {
     protected function setUp(): void {
         parent::setUp();
-        $GLOBALS['fbm_options_store'] = array();
+        fbm_test_reset_globals();
     }
 
     public function testUpsertGetDelete(): void {

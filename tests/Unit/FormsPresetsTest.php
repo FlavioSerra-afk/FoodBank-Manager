@@ -31,38 +31,7 @@ namespace FoodBankManager\Security {
     }
 }
 
-namespace FoodBankManager\Admin {
-    if ( ! function_exists( __NAMESPACE__ . '\\wp_die' ) ) {
-        function wp_die( $message = '' ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            throw new \RuntimeException( (string) $message );
-        }
-    }
-    if ( ! function_exists( __NAMESPACE__ . '\\esc_html__' ) ) {
-        function esc_html__( string $text, string $domain = 'default' ): string { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            return $text;
-        }
-    }
-    if ( ! function_exists( __NAMESPACE__ . '\\esc_html_e' ) ) {
-        function esc_html_e( string $text, string $domain = 'default' ): void { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            echo $text;
-        }
-    }
-    if ( ! function_exists( __NAMESPACE__ . '\\esc_html' ) ) {
-        function esc_html( $text ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            return \esc_html( $text );
-        }
-    }
-    if ( ! function_exists( __NAMESPACE__ . '\\esc_attr' ) ) {
-        function esc_attr( $text ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            return \esc_attr( $text );
-        }
-    }
-    if ( ! function_exists( __NAMESPACE__ . '\\esc_url' ) ) {
-        function esc_url( $url ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
-            return $url;
-        }
-    }
-}
+namespace FoodBankManager\Admin {}
 
 namespace {
 use PHPUnit\Framework\TestCase;

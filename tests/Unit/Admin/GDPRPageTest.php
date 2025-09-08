@@ -3,43 +3,6 @@ declare(strict_types=1);
 
 namespace {
     use PHPUnit\Framework\TestCase;
-
-    if ( ! function_exists( 'wp_unslash' ) ) {
-        function wp_unslash( $value ) { return is_array( $value ) ? array_map( 'wp_unslash', $value ) : stripslashes( (string) $value ); }
-    }
-    if ( ! function_exists( 'sanitize_email' ) ) {
-        function sanitize_email( $email ) { return filter_var( $email, FILTER_SANITIZE_EMAIL ); }
-    }
-    if ( ! function_exists( 'wp_die' ) ) {
-        function wp_die( $msg = '' ) { throw new \RuntimeException( (string) $msg ); }
-    }
-    if ( ! function_exists( 'wp_nonce_field' ) ) {
-        function wp_nonce_field( $action, $name ) {}
-    }
-    if ( ! function_exists( 'esc_html__' ) ) {
-        function esc_html__( string $t, string $d = 'default' ): string { return $t; }
-    }
-    if ( ! function_exists( 'esc_html_e' ) ) {
-        function esc_html_e( string $t, string $d = 'default' ): void { echo $t; }
-    }
-    if ( ! function_exists( 'esc_attr' ) ) {
-        function esc_attr( $t ) { return (string) $t; }
-    }
-    if ( ! function_exists( 'esc_html' ) ) {
-        function esc_html( $t ) { return (string) $t; }
-    }
-    if ( ! function_exists( 'esc_url_raw' ) ) {
-        function esc_url_raw( $t ) { return (string) $t; }
-    }
-    if ( ! function_exists( 'sanitize_file_name' ) ) {
-        function sanitize_file_name( $f ) { return preg_replace( '/[^A-Za-z0-9\.\-_]/', '', (string) $f ); }
-    }
-    if ( ! function_exists( 'add_query_arg' ) ) {
-        function add_query_arg( array $args, string $url ): string { return $url . '?' . http_build_query( $args ); }
-    }
-    if ( ! function_exists( 'menu_page_url' ) ) {
-        function menu_page_url( string $slug, bool $echo = true ): string { return 'admin.php?page=' . $slug; }
-    }
 }
 
 namespace FBM\Exports {

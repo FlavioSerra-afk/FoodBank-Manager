@@ -4,23 +4,12 @@ declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 use FoodBankManager\Admin\DatabasePage;
 
-if ( ! function_exists( 'wp_unslash' ) ) {
-    function wp_unslash( $value ) {
-        return is_array( $value ) ? array_map( 'wp_unslash', $value ) : stripslashes( (string) $value );
-    }
-}
-if ( ! function_exists( 'current_user_can' ) ) {
-    function current_user_can( string $cap ): bool {
-        return true;
-    }
-}
-if ( ! function_exists( 'wp_die' ) ) {
-    function wp_die( $message = '' ) {
-        throw new RuntimeException( (string) $message );
-    }
-}
-
 final class DatabasePageTest extends TestCase {
+    protected function setUp(): void {
+        parent::setUp();
+        fbm_test_reset_globals();
+        fbm_grant_for_page('fbm_database');
+    }
     private function getFilters(): array {
         $ref    = new ReflectionClass( DatabasePage::class );
         $method = $ref->getMethod( 'get_filters' );

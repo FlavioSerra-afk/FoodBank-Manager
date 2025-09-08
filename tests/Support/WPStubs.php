@@ -130,7 +130,7 @@ if (!function_exists('esc_html')){ function esc_html($s){ return htmlspecialchar
 if (!function_exists('esc_url')){ function esc_url($s){ return (string)$s; } }
 if (!function_exists('esc_url_raw')){ function esc_url_raw($s){ return (string)$s; } }
 if (!function_exists('wp_kses_post')){ function wp_kses_post($s){ return (string)$s; } }
-if (!function_exists('sanitize_text_field')){ function sanitize_text_field($s){ return trim((string)$s); } }
+if (!function_exists('sanitize_text_field')){ function sanitize_text_field($s){ return trim(strip_tags((string)$s)); } }
 if (!function_exists('sanitize_key')){ function sanitize_key($s){ return preg_replace('/[^a-z0-9_\-]/i','', (string)$s); } }
 if (!function_exists('sanitize_hex_color')){ function sanitize_hex_color($c){ $c=is_string($c)?trim($c):''; return preg_match('/^#(?:[0-9a-fA-F]{3}){1,2}$/',$c)?strtolower($c):''; } }
 if (!function_exists('selected')){ function selected($a,$b,$echo=false){ $o=($a==$b)?' selected="selected"':''; if($echo) echo $o; return $o; } }
@@ -165,9 +165,12 @@ if (!function_exists('wp_mail')) {
         return $GLOBALS['fbm_wp_mail_result'] ?? true;
     }
 }
-if (!function_exists('wp_next_scheduled')){ function wp_next_scheduled($hook){ return false; } }
-if (!function_exists('wp_get_schedule')){ function wp_get_schedule($hook){ return false; } }
-if (!function_exists('wp_get_schedules')){ function wp_get_schedules(){ return []; } }
+if (!isset($GLOBALS['fbm_cron_next'])) $GLOBALS['fbm_cron_next'] = [];
+if (!function_exists('wp_next_scheduled')){ function wp_next_scheduled($hook){ return $GLOBALS['fbm_cron_next'][$hook] ?? false; } }
+if (!isset($GLOBALS['fbm_cron_schedule'])) $GLOBALS['fbm_cron_schedule'] = [];
+if (!function_exists('wp_get_schedule')){ function wp_get_schedule($hook){ return $GLOBALS['fbm_cron_schedule'][$hook] ?? false; } }
+if (!isset($GLOBALS['fbm_cron_schedules'])) $GLOBALS['fbm_cron_schedules'] = [];
+if (!function_exists('wp_get_schedules')){ function wp_get_schedules(){ return $GLOBALS['fbm_cron_schedules']; } }
 if (!function_exists('add_action')){ function add_action($hook, $cb, $prio=10, $args=1){ $GLOBALS['fbm_actions'][$hook][]=$cb; } }
 if (!function_exists('do_action')){ function do_action($hook, ...$args){ foreach($GLOBALS['fbm_actions'][$hook]??[] as $cb){ call_user_func_array($cb,$args); } } }
 if (!function_exists('add_filter')){ function add_filter($hook, $cb, $prio=10){ $GLOBALS['fbm_filters'][$hook][]=$cb; } }
@@ -176,7 +179,8 @@ if (!function_exists('apply_filters')){ function apply_filters($hook, $val, ...$
 if (!function_exists('add_settings_error')){ function add_settings_error($setting,$code,$message,$type='error'){ $GLOBALS['fbm_settings_errors'][]=[$setting,$code,$message,$type]; } }
 if (!function_exists('settings_errors')){ function settings_errors($setting='', $sanitize=false, $hide_on_update=false){ return $GLOBALS['fbm_settings_errors']??[]; } }
 if (!function_exists('submit_button')){ function submit_button($text='', $type='primary', $name='submit', $wrap=true){ echo '<button type="submit" class="button">'.esc_html($text ?: 'Submit').'</button>'; } }
-if (!function_exists('filter_input')){ function filter_input($type,$var,$filter=FILTER_DEFAULT,$options=[]){ if($type===INPUT_POST){ return $_POST[$var]??null;} if($type===INPUT_GET){ return $_GET[$var]??null;} return null; } }
+if (!function_exists('filter_input')){ function filter_input(int $type, string $var_name, int $filter = FILTER_DEFAULT, array|int $options = []){ if($type===INPUT_POST){ return wp_unslash($_POST[$var_name] ?? null);} if($type===INPUT_GET){ return wp_unslash($_GET[$var_name] ?? null);} if($type===INPUT_SERVER){ return $_SERVER[$var_name] ?? null;} return null; } }
+if (!function_exists('filter_input_array')){ function filter_input_array(int $type, $definition = FILTER_DEFAULT, bool $add_empty = true){ if($type===INPUT_POST){ return wp_unslash($_POST); } if($type===INPUT_GET){ return wp_unslash($_GET); } if($type===INPUT_SERVER){ return $_SERVER; } return null; } }
 if (!isset($GLOBALS['fbm_user_meta'])) $GLOBALS['fbm_user_meta']=[];
 if (!function_exists('get_user_meta')){ function get_user_meta($id,$key,$single=false){ $v=$GLOBALS['fbm_user_meta'][$id][$key]??null; return $single?($v[0]??null):($v??[]); } }
 if (!function_exists('update_user_meta')){ function update_user_meta($id,$key,$val){ $GLOBALS['fbm_user_meta'][$id][$key]=[$val]; return true; } }
@@ -188,7 +192,9 @@ if (!isset($GLOBALS['fbm_roles'])) $GLOBALS['fbm_roles']=[];
 if (!class_exists('WP_Role')){ class WP_Role{ public $caps=[]; public function add_cap($c){$this->caps[$c]=true;} public function remove_cap($c){unset($this->caps[$c]);} public function has_cap($c){return isset($this->caps[$c]);} } }
 if (!function_exists('get_role')){ function get_role($role){ if(!isset($GLOBALS['fbm_roles'][$role])) $GLOBALS['fbm_roles'][$role]=new WP_Role(); return $GLOBALS['fbm_roles'][$role]; } }
 if (!function_exists('get_editable_roles')){ function get_editable_roles(){ $out=[]; foreach($GLOBALS['fbm_roles'] as $k=>$r){ $out[$k]=['name'=>$k]; } return $out; } }
-if (!function_exists('wp_unslash')){ function wp_unslash($s){ return $s; } }
+if (!function_exists('wp_unslash')){ function wp_unslash($value){ return is_array($value) ? array_map('wp_unslash', $value) : stripslashes((string)$value); } }
+
+if (!function_exists('current_action')){ function current_action(){ return 'admin_menu'; } }
 if (!function_exists('shortcode_atts')){ function shortcode_atts(array $pairs, array $atts, string $shortcode=''){ return array_merge($pairs, $atts); } }
 if (!function_exists('map_deep')) { function map_deep($v, $cb){ if(is_array($v)) return array_map(fn($x)=>map_deep($x,$cb), $v); return $cb($v); } }
 if (!function_exists('wp_salt')){ function wp_salt($scheme='auth'){ return hash('sha256',(string)$scheme); } }
