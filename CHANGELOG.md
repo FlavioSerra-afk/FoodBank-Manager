@@ -1,3 +1,12 @@
+## [1.3.0.1] — 2025-09-08
+### Maintenance
+- Version alignment (composer.json, plugin header, Core constant) with **no runtime changes**.
+- Packaging discipline: slug remains `foodbank-manager/`; main file present at `foodbank-manager/foodbank-manager.php`.
+### QA
+- PHPStan: 0 errors (fast/full).
+- PHPCS (lanes): 0 errors / 0 warnings.
+- Packaging guards: PASS.
+
 # Changelog
 
 ## [Unreleased]
