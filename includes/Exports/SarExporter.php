@@ -29,13 +29,14 @@ class SarExporter {
 		 */
 	public static function stream( array $subject, bool $masked, string $base_name ): void {
 			$base_name = sanitize_file_name( $base_name );
-		if ( class_exists( \ZipArchive::class ) ) {
-				$zip      = self::build_zip( $subject, $masked );
-				$filename = $base_name . '.zip';
-			if ( ! headers_sent() ) {
-				header( 'Content-Type: application/zip' );
-				header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
-			}
+                if ( class_exists( \ZipArchive::class ) ) {
+                                $zip      = self::build_zip( $subject, $masked );
+                                $filename = $base_name . '.zip';
+                        $headers = array(
+                                'Content-Type: application/zip',
+                                'Content-Disposition: attachment; filename="' . $filename . '"',
+                        );
+                        fbm_send_headers( $headers );
 			$handle = fopen( $zip, 'rb' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 			if ( $handle ) {
 				while ( ! feof( $handle ) ) {
@@ -50,12 +51,10 @@ class SarExporter {
 				rmdir( dirname( $zip ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_rmdir
 			}
 		} else {
-			if ( ! headers_sent() ) {
-					header( 'Content-Type: text/html; charset=utf-8' );
-			}
-						echo self::render_html( $subject, $masked ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		}
-	}
+                        fbm_send_headers( array( 'Content-Type: text/html; charset=utf-8' ) );
+                                                echo self::render_html( $subject, $masked ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                }
+        }
 
 		/**
 		 * Build a SAR ZIP from provided data.

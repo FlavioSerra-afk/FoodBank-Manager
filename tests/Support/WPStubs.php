@@ -76,7 +76,7 @@ if (!function_exists('get_plugins')) {
   function get_plugins(): array { return $GLOBALS['fbm_plugins'] ?? []; }
 }
 if (!function_exists('is_plugin_active')) {
-  function is_plugin_active($basename){ return in_array($basename, $GLOBALS['fbm_active_plugins'], true); }
+  function is_plugin_active($basename){ return in_array($basename, (array) $GLOBALS['fbm_active_plugins'], true); }
 }
 if (!function_exists('deactivate_plugins')) {
   function deactivate_plugins($plugins, $silent = false, $network_wide = null) {
@@ -181,6 +181,7 @@ if (!function_exists('wp_nonce_url')) { function wp_nonce_url($u,$a=-1,$n='_wpno
 if (!function_exists('wp_safe_redirect')) { /** @return void */ function wp_safe_redirect($u, $status = 302){ $GLOBALS['__last_redirect']=(string)$u; throw new FbmDieException('redirect'); } }
 if (!function_exists('wp_redirect')) { /** @return void */ function wp_redirect($u){ $GLOBALS['__last_redirect']=(string)$u; throw new FbmDieException('redirect'); } }
 if (!function_exists('wp_die')) { /** @return void */ function wp_die($m=''){ throw new FbmDieException((string)$m); } }
+if (!function_exists('headers_sent')) { function headers_sent(){ return false; } }
 
 // Basic escaping/sanitizing
 if (!function_exists('esc_attr')){ function esc_attr($s){ return htmlspecialchars((string)$s, ENT_QUOTES,'UTF-8'); } }
@@ -198,6 +199,11 @@ if (!function_exists('sanitize_hex_color')){ function sanitize_hex_color($c){ $c
 if (!function_exists('sanitize_title')){ function sanitize_title($t){ $t=strtolower((string)$t); $t=preg_replace('/[^a-z0-9]+/','-',$t); return trim($t,'-'); } }
 if (!function_exists('selected')){ function selected($a,$b,$echo=false){ $o=($a==$b)?' selected="selected"':''; if($echo) echo $o; return $o; } }
 if (!function_exists('checked')){ function checked($a,$b=true,$echo=false){ $o=($a==$b)?' checked="checked"':''; if($echo) echo $o; return $o; } }
+if (!function_exists('fbm_send_headers')) {
+  function fbm_send_headers(array $headers): void {
+    $GLOBALS['__fbm_sent_headers'] = $headers;
+  }
+}
 if (!function_exists('esc_html__')){ function esc_html__($t, $d='default'){ return $t; } }
 if (!function_exists('__')){ function __($t, $d='default'){ return $t; } }
 if (!function_exists('esc_html_e')){ function esc_html_e($t, $d='default'){ echo esc_html($t); } }

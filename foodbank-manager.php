@@ -27,6 +27,8 @@ if ( is_readable( $fbm_autoload ) ) {
     require_once $fbm_autoload;
 }
 
+require_once FBM_PATH . 'includes/Core/Headers.php';
+
 /** Robust PSR-4 fallback for both namespaces */
 spl_autoload_register(
     static function ( $class ): void {

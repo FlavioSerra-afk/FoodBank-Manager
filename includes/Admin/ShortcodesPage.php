@@ -83,7 +83,7 @@ final class ShortcodesPage {
 					break;
 				case 'enum':
 									$val = sanitize_text_field( (string) $val );
-					if ( empty( $info['options'] ) || ! in_array( $val, $info['options'], true ) ) {
+                                        if ( empty( $info['options'] ) || ! in_array( $val, (array) $info['options'], true ) ) {
 							continue 2;
 					}
 					break;
