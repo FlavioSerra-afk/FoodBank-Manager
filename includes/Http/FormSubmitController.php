@@ -135,11 +135,14 @@ final class FormSubmitController {
 				$data[ $id ] = $value;
 				$allowed[]   = $id;
 		}
-                foreach ( $post as $key => $v ) {
-                        if ( ! in_array( (string) $key, (array) $allowed, true ) && ! in_array( (string) $key, array( '_fbm_nonce', 'preset', 'action', 'captcha' ), true ) ) {
-                                throw new \RuntimeException( 'unknown' );
-                        }
-                }
+		foreach ( $post as $key => $v ) {
+			if (
+						! in_array( (string) $key, (array) $allowed, true )
+						&& ! in_array( (string) $key, array( '_fbm_nonce', 'preset', 'action', 'captcha' ), true )
+				) {
+						throw new \RuntimeException( 'unknown' );
+			}
+		}
 		if ( ! empty( $schema['meta']['captcha'] ) ) {
 			$token = sanitize_text_field( (string) ( $post['captcha'] ?? '' ) );
 			if ( '' === $token ) {
