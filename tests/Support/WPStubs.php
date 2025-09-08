@@ -1,5 +1,10 @@
 <?php declare(strict_types=1);
 
+if (defined('FBM_WPSTUBS_LOADED')) {
+    return;
+}
+define('FBM_WPSTUBS_LOADED', true);
+
 // When running static analysis, load the official WordPress stubs instead of
 // our test implementations to avoid function redeclarations and maintain
 // accurate signatures.
@@ -22,6 +27,7 @@ if (getenv('FBM_PHPSTAN')) {
 // Options
 $GLOBALS['fbm_options']    = $GLOBALS['fbm_options']    ?? [];
 $GLOBALS['fbm_transients'] = $GLOBALS['fbm_transients'] ?? [];
+$GLOBALS['fbm_wp_mail_result'] = $GLOBALS['fbm_wp_mail_result'] ?? true;
 if (!function_exists('get_option')) {
   function get_option($name, $default=false){ return $GLOBALS['fbm_options'][$name] ?? $default; }
 }
@@ -153,7 +159,12 @@ if (!function_exists('sanitize_file_name')){ function sanitize_file_name($f){ re
 if (!function_exists('get_bloginfo')){ function get_bloginfo($show='', $filter='raw'){ if($show==='version') return '6.5.0'; return ''; } }
 if (!function_exists('get_current_user_id')){ function get_current_user_id(){ return 1; } }
 if (!function_exists('nocache_headers')){ function nocache_headers(){} }
-if (!function_exists('wp_mail')){ function wp_mail($to,$sub,$msg,$headers='',$attachments=[]){ $GLOBALS['fbm_last_mail']=[$to,$sub,$msg,$headers,$attachments]; return true; } }
+if (!function_exists('wp_mail')) {
+    function wp_mail($to, $sub, $msg, $headers = '', $attachments = []) {
+        $GLOBALS['fbm_last_mail'] = [$to, $sub, $msg, $headers, $attachments];
+        return $GLOBALS['fbm_wp_mail_result'] ?? true;
+    }
+}
 if (!function_exists('wp_next_scheduled')){ function wp_next_scheduled($hook){ return false; } }
 if (!function_exists('wp_get_schedule')){ function wp_get_schedule($hook){ return false; } }
 if (!function_exists('wp_get_schedules')){ function wp_get_schedules(){ return []; } }

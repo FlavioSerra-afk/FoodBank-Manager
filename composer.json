@@ -16,6 +16,7 @@
   },
   "autoload-dev": {
     "files": [
+      "phpstan-bootstrap.php",
       "tests/Support/WPStubs.php",
       "tests/Support/Rbac.php"
     ]

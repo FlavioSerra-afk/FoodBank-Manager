@@ -1,6 +1,6 @@
 # QA — PHPStan with WP Stubs
 
-PHPStan runs against the plugin code using the Composer dev autoloader to load the custom WordPress stubs once. The `tests/Support/WPStubs.php` file loads shim implementations at runtime and switches to the official `php-stubs/wordpress-stubs` signatures when the `FBM_PHPSTAN` environment variable is set.
+PHPStan runs against the plugin code using the Composer dev autoloader to load the custom WordPress stubs once. The `tests/Support/WPStubs.php` file loads shim implementations at runtime and switches to the official `php-stubs/wordpress-stubs` signatures when the `FBM_PHPSTAN` environment variable is set. Stubs must come from a single source and be autoloaded only once.
 
 Steps:
 

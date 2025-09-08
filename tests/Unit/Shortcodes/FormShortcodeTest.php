@@ -2,46 +2,6 @@
 declare(strict_types=1);
 
 namespace {
-    if (!function_exists('shortcode_atts')) {
-        function shortcode_atts(array $pairs, array $atts, string $shortcode = ''): array { return array_merge($pairs, $atts); }
-    }
-    if (!function_exists('sanitize_key')) {
-        function sanitize_key($key) { return preg_replace('/[^a-z0-9_]/', '', strtolower((string)$key)); }
-    }
-    if (!function_exists('esc_html__')) {
-        function esc_html__(string $text, string $domain = 'default'): string { return $text; }
-    }
-    if (!function_exists('esc_html')) {
-        function esc_html($text) { return htmlspecialchars((string)$text, ENT_QUOTES); }
-    }
-    if (!function_exists('esc_attr')) {
-        function esc_attr($text) { return htmlspecialchars((string)$text, ENT_QUOTES); }
-    }
-    if (!function_exists('esc_url')) {
-        function esc_url($url) { return (string)$url; }
-    }
-    if (!function_exists('admin_url')) {
-        function admin_url(string $path = '') { return '/admin/' . ltrim($path, '/'); }
-    }
-    if (!function_exists('wp_create_nonce')) {
-        function wp_create_nonce(string $action) { return 'nonce'; }
-    }
-    if (!function_exists('add_shortcode')) {
-        function add_shortcode(string $tag, callable $cb): void { $GLOBALS['__shortcodes'][$tag] = $cb; }
-    }
-    if (!function_exists('do_shortcode')) {
-        function do_shortcode(string $text): string {
-            return preg_replace_callback('/\[([a-z0-9_]+)([^\]]*)\]/i', function ($m) {
-                $tag = $m[1];
-                $atts = [];
-                if (preg_match_all('/(\w+)="([^"]*)"/', $m[2], $am, PREG_SET_ORDER)) {
-                    foreach ($am as $a) { $atts[$a[1]] = $a[2]; }
-                }
-                $cb = $GLOBALS['__shortcodes'][$tag] ?? null;
-                return $cb ? (string) call_user_func($cb, $atts) : '';
-            }, $text);
-        }
-    }
     $GLOBALS['fbm_options_store'] = [];
 }
 

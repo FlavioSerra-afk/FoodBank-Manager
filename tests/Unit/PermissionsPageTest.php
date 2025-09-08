@@ -2,172 +2,12 @@
 declare(strict_types=1);
 
 namespace {
-use PHPUnit\Framework\TestCase;
-use FoodBankManager\Admin\PermissionsPage;
-use FoodBankManager\Admin\UsersMeta;
-use FoodBankManager\Auth\Capabilities;
+    use PHPUnit\Framework\TestCase;
+    use FoodBankManager\Admin\PermissionsPage;
+    use FoodBankManager\Admin\UsersMeta;
+    use FoodBankManager\Auth\Capabilities;
 
-if ( ! function_exists( 'wp_die' ) ) {
-    function wp_die( $message = '' ) {
-        throw new \RuntimeException( (string) $message );
-    }
-}
-if ( ! function_exists( 'menu_page_url' ) ) {
-    function menu_page_url( string $slug, bool $echo = true ): string {
-        return 'admin.php?page=' . $slug;
-    }
-}
-if ( ! function_exists( 'add_query_arg' ) ) {
-    function add_query_arg( array $args, string $url ): string {
-        return $url . '?' . http_build_query( $args );
-    }
-}
-if ( ! function_exists( 'is_email' ) ) {
-    function is_email( $email ) {
-        return (bool) filter_var( $email, FILTER_VALIDATE_EMAIL );
-    }
-}
-if ( ! function_exists( 'absint' ) ) {
-    function absint( $maybeint ) {
-        return abs( (int) $maybeint );
-    }
-}
-if ( ! function_exists( 'sanitize_key' ) ) {
-    function sanitize_key( $key ) {
-        return preg_replace( '/[^a-z0-9_]/', '', strtolower( (string) $key ) );
-    }
-}
-if ( ! function_exists( 'sanitize_email' ) ) {
-    function sanitize_email( $email ) {
-        return filter_var( $email, FILTER_SANITIZE_EMAIL );
-    }
-}
-if ( ! function_exists( '__' ) ) {
-    function __( string $text, string $domain = 'default' ): string {
-        return $text;
-    }
-}
-if ( ! function_exists( 'esc_html__' ) ) {
-    function esc_html__( string $text, string $domain = 'default' ): string {
-        return $text;
-    }
-}
-if ( ! function_exists( 'esc_html_e' ) ) {
-    function esc_html_e( string $text, string $domain = 'default' ): void {
-        echo $text;
-    }
-}
-if ( ! function_exists( 'wp_json_encode' ) ) {
-    function wp_json_encode( $data ) {
-        return json_encode( $data );
-    }
-}
-if ( ! function_exists( 'wp_send_json' ) ) {
-    function wp_send_json( $data ) {
-        echo wp_json_encode( $data );
-        wp_die();
-    }
-}
-if ( ! function_exists( 'nocache_headers' ) ) {
-    function nocache_headers() {}
-}
-if ( ! function_exists( 'header' ) ) {
-    function header( $string ) {
-        $GLOBALS['fbm_headers'][] = $string;
-    }
-}
-if ( ! function_exists( 'get_editable_roles' ) ) {
-    function get_editable_roles() {
-        return array(
-            'administrator' => array( 'name' => 'Administrator' ),
-            'editor'        => array( 'name' => 'Editor' ),
-        );
-    }
-}
-if ( ! function_exists( 'get_role' ) ) {
-    function get_role( $role ) {
-        static $roles = array();
-        if ( ! isset( $roles[ $role ] ) ) {
-            $roles[ $role ] = new WP_Role();
-        }
-        return $roles[ $role ];
-    }
-}
-if ( ! function_exists( 'get_user_by' ) ) {
-    function get_user_by( $field, $value ) {
-        if ( 'email' === $field ) {
-            return (object) array( 'ID' => 1, 'user_email' => $value, 'user_login' => 'user1' );
-        }
-        if ( 'id' === $field ) {
-            return (object) array( 'ID' => $value, 'user_email' => 'u' . $value . '@example.com', 'user_login' => 'user' . $value );
-        }
-        return false;
-    }
-}
-if ( ! function_exists( 'get_users' ) ) {
-    function get_users( $args = array() ) {
-        global $fbm_test_user_meta;
-        $out = array();
-        foreach ( $fbm_test_user_meta as $id => $meta ) {
-            if ( isset( $meta['fbm_user_caps'] ) ) {
-                $out[] = (object) array( 'ID' => $id, 'user_login' => 'user' . $id, 'user_email' => 'u' . $id . '@example.com' );
-            }
-        }
-        return $out;
-    }
-}
-if ( ! function_exists( 'get_user_meta' ) ) {
-    function get_user_meta( $user_id, $key, $single ) {
-        global $fbm_test_user_meta;
-        return $fbm_test_user_meta[ $user_id ][ $key ] ?? array();
-    }
-}
-if ( ! function_exists( 'update_user_meta' ) ) {
-    function update_user_meta( $user_id, $key, $value ) {
-        global $fbm_test_user_meta;
-        $fbm_test_user_meta[ $user_id ][ $key ] = $value;
-        return true;
-    }
-}
-if ( ! function_exists( 'delete_user_meta' ) ) {
-    function delete_user_meta( $user_id, $key ) {
-        global $fbm_test_user_meta;
-        unset( $fbm_test_user_meta[ $user_id ][ $key ] );
-        return true;
-    }
-}
-if ( ! function_exists( 'update_option' ) ) {
-    function update_option( $key, $value ) {
-        global $fbm_test_options;
-        $fbm_test_options[ $key ] = $value;
-        return true;
-    }
-}
-if ( ! function_exists( 'get_option' ) ) {
-    function get_option( $key, $default = array() ) {
-        global $fbm_test_options;
-        return $fbm_test_options[ $key ] ?? $default;
-    }
-}
-if ( ! function_exists( 'delete_option' ) ) {
-    function delete_option( $key ) {
-        global $fbm_test_options;
-        unset( $fbm_test_options[ $key ] );
-        return true;
-    }
-}
-if ( ! function_exists( 'filter_input' ) ) {
-    function filter_input( $type, $var_name, $filter = FILTER_DEFAULT, $options = [] ) {
-        if ( $type === INPUT_POST ) {
-            return $_POST[ $var_name ] ?? null;
-        }
-        return null;
-    }
-}
-}
-
-namespace {
-    final class PermissionsPageTest extends \PHPUnit\Framework\TestCase {
+    final class PermissionsPageTest extends TestCase {
 
     public function test_import_rejects_bad_json(): void {
         fbm_test_reset_globals();
@@ -179,9 +19,9 @@ namespace {
         ]);
         $_REQUEST = $_POST;
         $_FILES   = array();
-        global $fbm_test_user_meta, $fbm_test_options;
-        $fbm_test_user_meta = array(1 => array());
-        $fbm_test_options   = array();
+        global $fbm_user_meta, $fbm_options;
+        $fbm_user_meta = array(1 => array());
+        $fbm_options   = array();
         $page = new \FoodBankManager\Admin\PermissionsPage();
         $ref  = new \ReflectionMethod( \FoodBankManager\Admin\PermissionsPage::class, 'handle_import' );
         $ref->setAccessible(true);
@@ -200,9 +40,9 @@ namespace {
         ]);
         $_REQUEST = $_POST;
         $_FILES   = array();
-        global $fbm_test_user_meta, $fbm_test_options;
-        $fbm_test_user_meta = array(1 => array());
-        $fbm_test_options   = array();
+        global $fbm_user_meta, $fbm_options;
+        $fbm_user_meta = array(1 => array());
+        $fbm_options   = array();
         $add = new \ReflectionMethod( \FoodBankManager\Admin\PermissionsPage::class, 'handle_user_override_add' );
         $add->setAccessible(true);
         try {
@@ -237,9 +77,9 @@ namespace {
         ]);
         $_REQUEST = $_POST;
         $_FILES   = array();
-        global $fbm_test_user_meta, $fbm_test_options;
-        $fbm_test_user_meta = array(1 => array('fbm_user_caps' => array('fb_manage_dashboard' => true)));
-        $fbm_test_options   = array();
+        global $fbm_user_meta, $fbm_options;
+        $fbm_user_meta = array(1 => array('fbm_user_caps' => array('fb_manage_dashboard' => true)));
+        $fbm_options   = array();
         $page = new \FoodBankManager\Admin\PermissionsPage();
         $ref  = new \ReflectionMethod( \FoodBankManager\Admin\PermissionsPage::class, 'handle_export' );
         $ref->setAccessible(true);

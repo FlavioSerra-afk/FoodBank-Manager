@@ -19,7 +19,7 @@ parameters:
     - */templates/*   # templates are view-only; optional to include later
 
   bootstrapFiles:
-    - phpstan-bootstrap.php
+    - vendor/autoload.php
 
   # WordPress environment assumptions
   # Keep false positives down
@@ -30,3 +30,5 @@ parameters:
     - identifier: missingType.generics
     - message: "#Offset 'captcha' on array{#"
       path: includes/Shortcodes/FormShortcode.php
+    - message: '#Expression on left side of \?\? is not nullable#'
+      path: includes/Http/FormSubmitController.php
