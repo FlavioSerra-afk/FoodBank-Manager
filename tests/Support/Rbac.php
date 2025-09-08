@@ -1,5 +1,7 @@
 <?php declare(strict_types=1);
 
+namespace {
+
 /** Deterministic caps for tests */
 function fbm_grant_caps(array $caps): void {
     $GLOBALS['fbm_user_caps'] = [];
@@ -62,4 +64,31 @@ function fbm_required_cap_for_page(string $slug): string {
 /** Grant exactly what a given page needs */
 function fbm_grant_for_page(string $page_slug): void {
     fbm_grant_caps([fbm_required_cap_for_page($page_slug)]);
+}
+}
+
+namespace Tests\Support {
+
+final class Rbac {
+    public static function revokeAll(): void {
+        \fbm_grant_caps(array());
+    }
+
+    public static function grantViewer(): void {
+        \fbm_grant_viewer();
+    }
+
+    public static function grantManager(): void {
+        \fbm_grant_manager();
+    }
+
+    public static function grantAdmin(): void {
+        \fbm_grant_admin();
+    }
+
+    public static function grantForPage(string $page_slug): void {
+        \fbm_grant_for_page($page_slug);
+    }
+}
+
 }
