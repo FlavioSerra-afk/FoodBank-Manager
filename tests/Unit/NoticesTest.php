@@ -27,7 +27,7 @@ final class NoticesTest extends TestCase {
     public function testMissingKekBailsOnNonFbmScreen(): void {
         fbm_test_reset_globals();
         $GLOBALS['fbm_test_screen_id'] = 'dashboard';
-        fbm_grant_caps(['manage_options']);
+        fbm_grant_admin();
         Notices::missing_kek();
         ob_start();
         Notices::render();
@@ -40,7 +40,7 @@ final class NoticesTest extends TestCase {
     public function testMissingKekShowsOnFbmScreen(): void {
         fbm_test_reset_globals();
         $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_diagnostics';
-        fbm_grant_caps(['manage_options']);
+        fbm_grant_admin();
         if (!defined('FBM_KEK_BASE64')) {
             define('FBM_KEK_BASE64', 'dummy');
         }
@@ -56,7 +56,7 @@ final class NoticesTest extends TestCase {
     public function testCapsFixNoticeShownForAdminsWithoutCaps(): void {
         fbm_test_reset_globals();
         $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_diagnostics';
-        fbm_grant_caps(['manage_options']);
+        fbm_grant_admin();
         ob_start();
         Notices::render_caps_fix_notice();
         Notices::render();

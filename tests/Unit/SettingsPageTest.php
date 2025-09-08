@@ -10,7 +10,7 @@ final class SettingsPageTest extends TestCase {
     protected function setUp(): void {
         parent::setUp();
         fbm_test_reset_globals();
-        fbm_grant_manager();
+        fbm_grant_admin();
         fbm_test_trust_nonces(true);
         fbm_test_set_request_nonce('fbm_branding_save', '_fbm_nonce');
         $_POST = $_SERVER = $_REQUEST = array();
