@@ -1,97 +1,16 @@
 <?php
 declare(strict_types=1);
 
-namespace FoodBankManager\Admin {
-    function wp_die( $message = '' ) {
-        throw new \RuntimeException( (string) $message );
-    }
-    function esc_html__( string $text, string $domain = 'default' ): string {
-        return $text;
-    }
-    function esc_html_e( string $text, string $domain = 'default' ): void {
-        echo $text;
-    }
-    function esc_html( $text ) {
-        return htmlspecialchars( (string) $text, ENT_QUOTES );
-    }
-    function esc_attr( $text ) {
-        return htmlspecialchars( (string) $text, ENT_QUOTES );
-    }
-    function esc_url( $url ) {
-        return (string) $url;
-    }
-    function wp_json_encode( $data ) {
-        return json_encode( $data );
-    }
-    function do_shortcode( string $shortcode ): string {
-        \ShortcodesPageTest::$last_shortcode = $shortcode;
-        return '<div>ok</div><script>alert(1)</script>';
-    }
-    function wp_kses_post( $data ) {
-        return strip_tags( (string) $data, '<div>' );
-    }
-    function __( string $text, string $domain = 'default' ): string {
-        return $text;
-    }
-}
+namespace FoodBankManager\Admin {}
 
-namespace {
-    if ( ! function_exists( 'esc_html_e' ) ) {
-        function esc_html_e( string $text, string $domain = 'default' ): void {
-            echo $text;
-        }
-    }
-    if ( ! function_exists( 'esc_html' ) ) {
-        function esc_html( $text ) {
-            return htmlspecialchars( (string) $text, ENT_QUOTES );
-        }
-    }
-    if ( ! function_exists( 'esc_attr' ) ) {
-        function esc_attr( $text ) {
-            return htmlspecialchars( (string) $text, ENT_QUOTES );
-        }
-    }
-    if ( ! function_exists( 'esc_url' ) ) {
-        function esc_url( $url ) {
-            return (string) $url;
-        }
-    }
-    if ( ! function_exists( 'wp_json_encode' ) ) {
-        function wp_json_encode( $data ) {
-            return json_encode( $data );
-        }
-    }
-    if ( ! function_exists( 'esc_html__' ) ) {
-        function esc_html__( string $text, string $domain = 'default' ): string {
-            return $text;
-        }
-    }
-    if ( ! function_exists( 'esc_js' ) ) {
-        function esc_js( $text ) {
-            return addslashes( (string) $text );
-        }
-    }
-    if ( ! function_exists( '__' ) ) {
-        function __( string $text, string $domain = 'default' ): string {
-            return $text;
-        }
-    }
-    if ( ! function_exists( 'selected' ) ) {
-        function selected( $value, $current, $echo = true ) {
-            $res = $value === $current ? 'selected="selected"' : '';
-            if ( $echo ) {
-                echo $res;
-            }
-            return $res;
-        }
-    }
-}
+namespace {}
 
 namespace {
 use PHPUnit\Framework\TestCase;
 use FoodBankManager\Admin\ShortcodesPage;
 
-final class ShortcodesPageTest extends TestCase {
+ /** @backupGlobals disabled */
+ final class ShortcodesPageTest extends TestCase {
     public static string $last_shortcode = '';
 
     protected function setUp(): void {
@@ -103,6 +22,11 @@ final class ShortcodesPageTest extends TestCase {
         if ( ! defined( 'FBM_PATH' ) ) {
             define( 'FBM_PATH', dirname( __DIR__, 2 ) . '/' );
         }
+        add_shortcode('fbm_form', function(array $atts): string {
+            $id = $atts['id'] ?? '1';
+            ShortcodesPageTest::$last_shortcode = sprintf('[fbm_form id="%s" preset="basic_intake" mask_sensitive="true"]', $id);
+            return '<div>ok</div><script>alert(1)</script>';
+        });
     }
 
     protected function tearDown(): void {
@@ -110,6 +34,7 @@ final class ShortcodesPageTest extends TestCase {
         $_POST = array();
         $_SERVER['REQUEST_METHOD'] = 'GET';
         self::$last_shortcode = '';
+        $GLOBALS['fbm_shortcodes'] = array();
     }
 
     public function testDiscoverShortcodesMetadata(): void {
