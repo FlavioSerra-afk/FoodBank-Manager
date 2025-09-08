@@ -6,7 +6,7 @@ namespace {
     use FBM\Exports\SarExporter;
 
     /**
-     * @runInSeparateProcess
+     * @runTestsInSeparateProcesses
      */
     final class SarExporterTest extends TestCase {
         private function requireZip(): void {

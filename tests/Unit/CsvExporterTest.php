@@ -4,6 +4,7 @@ declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 use FoodBankManager\Exports\CsvExporter;
 
+/** @runTestsInSeparateProcesses */
 final class CsvExporterTest extends TestCase {
     protected function setUp(): void {
         parent::setUp();

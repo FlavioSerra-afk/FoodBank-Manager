@@ -15,6 +15,7 @@ use FoodBankManager\Shortcodes\Dashboard;
 use function current_user_can;
 use function esc_html__;
 use function header;
+use function apply_filters;
 use function sanitize_key;
 use function wp_die;
 use function wp_verify_nonce;
@@ -46,9 +47,11 @@ final class DashboardExportController {
 		$series  = AttendanceRepo::daily_present_counts( $since, $filters );
 		$csv     = DashboardCsv::render( $totals, $series, $period, $filters );
 		$date    = gmdate( 'Ymd' );
-		header( 'Content-Type: text/csv; charset=utf-8' );
-		header( 'Content-Disposition: attachment; filename="fbm-dashboard-' . $date . '.csv"' );
-		echo $csv;
-		exit;
+                header( 'Content-Type: text/csv; charset=utf-8' );
+                header( 'Content-Disposition: attachment; filename="fbm-dashboard-' . $date . '.csv"' );
+                echo $csv;
+                if ( apply_filters( 'fbm_http_exit', true ) ) {
+                        exit;
+                }
 	}
 }
