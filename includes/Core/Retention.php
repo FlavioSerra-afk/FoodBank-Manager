@@ -14,9 +14,7 @@ use FoodBankManager\Core\Options;
 use FoodBankManager\Logging\Audit;
 use wpdb;
 
-use function absint;
 use function array_fill;
-use function esc_sql;
 use function get_current_user_id;
 use function update_option;
 use function wp_next_scheduled;
@@ -40,18 +38,22 @@ final class Retention {
 			return array( self::EVENT );
 	}
 
-	/**
-	 * Register cron hook.
-	 */
+		/**
+		 * Register cron hook.
+		 *
+		 * @return void
+		 */
 	public static function init(): void {
-		add_action( self::EVENT, array( self::class, 'tick' ) );
+			add_action( self::EVENT, array( self::class, 'tick' ) );
 	}
 
 		/**
 		 * Cron tick handler.
+		 *
+		 * @return void
 		 */
 	public static function tick(): void {
-			self::run( false );
+					self::run( false );
 	}
 
 		/**
@@ -72,12 +74,14 @@ final class Retention {
 			return self::run( true );
 	}
 
-	/**
-	 * Schedule cron event if missing.
-	 */
+		/**
+		 * Schedule cron event if missing.
+		 *
+		 * @return void
+		 */
 	public static function schedule(): void {
 		if ( ! wp_next_scheduled( self::EVENT ) ) {
-			wp_schedule_event( time() + 300, 'daily', self::EVENT );
+				wp_schedule_event( time() + 300, 'daily', self::EVENT );
 		}
 	}
 
