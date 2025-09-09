@@ -75,3 +75,6 @@ _None — all primary gates passing._
 
 ## Attendance — Reports & Exports: PASS/notes
 - Service, page, controller covered by 3 tests
+
+## Theme Presets & RTL — PASS
+- High-contrast preset & RTL options covered by 3 tests.

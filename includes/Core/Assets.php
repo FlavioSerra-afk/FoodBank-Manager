@@ -12,7 +12,9 @@ namespace FoodBankManager\Core;
 use FoodBankManager\Core\Options;
 use FoodBankManager\Core\Screen;
 use FoodBankManager\UI\Theme;
+use FBM\UI\ThemePresets;
 use function add_action;
+use function get_user_option;
 use function get_post;
 use function has_shortcode;
 use function is_singular;
@@ -77,12 +79,12 @@ class Assets {
 		 */
 	public function enqueue_admin(): void {
 		if ( ! Screen::is_fbm_screen() ) {
-						return;
+										return;
 		}
-					$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-			wp_register_style( 'fbm-admin', FBM_URL . 'assets/css/admin.css', array(), Plugin::VERSION );
-			wp_add_inline_style( 'fbm-admin', self::theme_css() );
-			wp_enqueue_style( 'fbm-admin' );
+										$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+						wp_register_style( 'fbm-admin', FBM_URL . 'assets/css/admin.css', array(), Plugin::VERSION );
+						wp_add_inline_style( 'fbm-admin', self::theme_css() );
+						wp_enqueue_style( 'fbm-admin' );
 
 		if ( $screen && 'foodbank_page_fbm_attendance' === $screen->id && current_user_can( 'fb_manage_attendance' ) ) {
 			wp_enqueue_script( 'fbm-qrcode', FBM_URL . 'assets/js/qrcode.min.js', array(), Plugin::VERSION, true );
@@ -104,21 +106,37 @@ class Assets {
 		if ( 'toplevel_page_fbm' !== $id && ! str_starts_with( $id, 'foodbank_page_fbm_' ) ) {
 					return;
 		}
-			$opt     = Options::get( 'theme', array() );
-			$density = sanitize_key( (string) ( $opt['density'] ?? 'comfortable' ) );
-		if ( ! in_array( $density, array( 'compact', 'comfortable' ), true ) ) {
-					$density = 'comfortable';
+						$all       = Options::all();
+						$opt       = $all['theme'] ?? array();
+						$preset    = sanitize_key( (string) ( $opt['preset'] ?? 'system' ) );
+						$allowed_p = array( 'system', 'light', 'dark', 'high_contrast' );
+		if ( ! in_array( $preset, $allowed_p, true ) ) {
+				$preset = 'system';
 		}
-				$dark = ! empty( $opt['dark_mode_default'] );
-				$bg   = $dark ? '#1f2937' : '#ffffff';
-				$fg   = $dark ? '#f3f4f6' : '#000000';
-				$css  = ':root{' .
-					'--fbm-color-bg:' . $bg . ';' .
-					'--fbm-color-fg:' . $fg . ';' .
-					'--fbm-density:' . $density . ';' .
-					'--fbm-radius:12px;}';
-				echo '<style id="fbm-css-vars">' . esc_html( $css ) . '</style>';
-				$done = true;
+		if ( 'system' === $preset ) {
+				$scheme = function_exists( 'get_user_option' ) ? (string) get_user_option( 'admin_color' ) : '';
+				$preset = in_array( $scheme, array( 'midnight', 'ectoplasm', 'coffee' ), true ) ? 'dark' : 'light';
+		}
+
+						$rtl_raw   = sanitize_key( (string) ( $opt['rtl'] ?? 'auto' ) );
+						$allowed_r = array( 'auto', 'force_on', 'force_off' );
+		if ( ! in_array( $rtl_raw, $allowed_r, true ) ) {
+				$rtl_raw = 'auto';
+		}
+						$force = null;
+		if ( 'force_on' === $rtl_raw ) {
+				$force = true;
+		} elseif ( 'force_off' === $rtl_raw ) {
+				$force = false;
+		}
+
+						$css  = ThemePresets::css_vars( $preset );
+						$css .= '.fbm-admin{direction:' . ( true === $force ? 'rtl' : 'ltr' ) . ';}';
+		if ( false !== $force ) {
+				$css .= 'html[dir="rtl"] .fbm-admin, .fbm-admin[dir="rtl"]{direction:rtl;}';
+		}
+						echo '<style id="fbm-css-vars">' . esc_html( $css ) . '</style>';
+						$done = true;
 	}
 
 		/**

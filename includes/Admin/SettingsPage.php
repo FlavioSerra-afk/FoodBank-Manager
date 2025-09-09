@@ -34,17 +34,19 @@ class SettingsPage {
 				return;
 		}
 
-			$action = sanitize_key( wp_unslash( $_POST['fbm_action'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- validated in handler
+				$action = sanitize_key( wp_unslash( $_POST['fbm_action'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- validated in handler
 		if ( 'branding_save' === $action ) {
-						self::handle_branding();
+										self::handle_branding();
 		} elseif ( 'email_save' === $action ) {
-						self::handle_email();
+										self::handle_email();
+		} elseif ( 'theme_save' === $action ) {
+										self::handle_theme();
 		} elseif ( 'retention_save' === $action ) {
-						self::handle_retention_save();
+										self::handle_retention_save();
 		} elseif ( 'retention_run' === $action ) {
-						self::handle_retention_run( false );
+										self::handle_retention_run( false );
 		} elseif ( 'retention_dryrun' === $action ) {
-						self::handle_retention_run( true );
+										self::handle_retention_run( true );
 		}
 	}
 
@@ -92,34 +94,76 @@ class SettingsPage {
 				 * @return void
 				 */
 	private static function handle_email(): void {
-		check_admin_referer( 'fbm_email_save', '_fbm_nonce' );
+			check_admin_referer( 'fbm_email_save', '_fbm_nonce' );
 		if ( ! current_user_can( 'fb_manage_settings' ) ) {
-				wp_die( esc_html__( 'You do not have permission to perform this action.', 'foodbank-manager' ) );
+						wp_die( esc_html__( 'You do not have permission to perform this action.', 'foodbank-manager' ) );
 		}
 
-		$raw      = filter_input( INPUT_POST, 'emails', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
-		$raw      = is_array( $raw ) ? array_map( 'wp_unslash', $raw ) : array();
+			$raw  = filter_input( INPUT_POST, 'emails', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
+			$raw  = is_array( $raw ) ? array_map( 'wp_unslash', $raw ) : array();
 			$data = array();
 		if ( isset( $raw['from_name'] ) ) {
-				$data['from_name'] = sanitize_text_field( (string) $raw['from_name'] );
+			$data['from_name'] = sanitize_text_field( (string) $raw['from_name'] );
 		}
 		if ( isset( $raw['from_address'] ) ) {
-				$data['from_address'] = sanitize_email( (string) $raw['from_address'] );
+			$data['from_address'] = sanitize_email( (string) $raw['from_address'] );
 		}
 		if ( isset( $raw['reply_to'] ) ) {
-				$data['reply_to'] = sanitize_email( (string) $raw['reply_to'] );
+			$data['reply_to'] = sanitize_email( (string) $raw['reply_to'] );
 		}
 			Options::save( array( 'emails' => $data ) );
 
-		$url = add_query_arg(
-			array(
-				'notice' => 'saved',
-				'tab'    => 'email',
-			),
-			menu_page_url( 'fbm_settings', false )
-		);
-		wp_safe_redirect( esc_url_raw( $url ), 303 );
-		exit;
+			$url = add_query_arg(
+				array(
+					'notice' => 'saved',
+					'tab'    => 'email',
+				),
+				menu_page_url( 'fbm_settings', false )
+			);
+			wp_safe_redirect( esc_url_raw( $url ), 303 );
+			exit;
+	}
+
+								/**
+								 * Handle theme settings save.
+								 *
+								 * @return void
+								 */
+	private static function handle_theme(): void {
+			check_admin_referer( 'fbm_theme_save', '_fbm_nonce' );
+		if ( ! current_user_can( 'fb_manage_settings' ) ) {
+						wp_die( esc_html__( 'You do not have permission to perform this action.', 'foodbank-manager' ) );
+		}
+
+			$raw = filter_input( INPUT_POST, 'theme', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
+			$raw = is_array( $raw ) ? array_map( 'wp_unslash', $raw ) : array();
+
+			$preset_raw = sanitize_key( (string) ( $raw['preset'] ?? '' ) );
+			$allowed_p  = array( 'system', 'light', 'dark', 'high_contrast' );
+			$preset     = in_array( $preset_raw, $allowed_p, true ) ? $preset_raw : 'system';
+
+			$rtl_raw   = sanitize_key( (string) ( $raw['rtl'] ?? '' ) );
+			$allowed_r = array( 'auto', 'force_on', 'force_off' );
+			$rtl       = in_array( $rtl_raw, $allowed_r, true ) ? $rtl_raw : 'auto';
+
+			Options::save(
+				array(
+					'theme' => array(
+						'preset' => $preset,
+						'rtl'    => $rtl,
+					),
+				)
+			);
+
+			$url = add_query_arg(
+				array(
+					'notice' => 'saved',
+					'tab'    => 'appearance',
+				),
+				menu_page_url( 'fbm_settings', false )
+			);
+			wp_safe_redirect( esc_url_raw( $url ), 303 );
+			exit;
 	}
 
 				/**
