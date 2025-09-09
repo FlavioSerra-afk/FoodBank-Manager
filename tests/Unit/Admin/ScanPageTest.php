@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Admin;
 
-use BaseTestCase;
 use FBM\Admin\ScanPage;
 use FBM\Attendance\TicketService;
 use FBM\Attendance\EventsRepo;
@@ -15,7 +14,7 @@ if (!defined('FBM_KEK_BASE64')) {
     define('FBM_KEK_BASE64', base64_encode(str_repeat('k', 32)));
 }
 
-final class ScanPageTest extends BaseTestCase {
+final class ScanPageTest extends \BaseTestCase {
     private EventsDbStub $db;
 
     protected function setUp(): void {
@@ -25,10 +24,10 @@ final class ScanPageTest extends BaseTestCase {
         $ref = new \ReflectionClass(CheckinsRepo::class);
         $p = $ref->getProperty('store');
         $p->setAccessible(true);
-        $p->setValue(array());
+        $p->setValue(null, array());
         $p2 = $ref->getProperty('next_id');
         $p2->setAccessible(true);
-        $p2->setValue(1);
+        $p2->setValue(null, 1);
         $GLOBALS['fbm_filters']['fbm_now'][] = static fn($v) => 1700000000;
         if (!defined('FBM_PATH')) {
             define('FBM_PATH', dirname(__DIR__, 3) . '/');

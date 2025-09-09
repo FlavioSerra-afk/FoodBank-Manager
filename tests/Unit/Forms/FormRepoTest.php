@@ -4,9 +4,8 @@ declare(strict_types=1);
 namespace Tests\Unit\Forms;
 
 use FBM\Forms\FormRepo;
-use BaseTestCase;
 
-final class FormRepoTest extends BaseTestCase {
+final class FormRepoTest extends \BaseTestCase {
     public function testCreateAndGet(): void {
         $id = FormRepo::create([
             'title' => 'My Form',

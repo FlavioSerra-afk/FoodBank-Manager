@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 use FoodBankManager\Admin\Notices;
 
-final class NoticesDeDupTest extends BaseTestCase {
+final class NoticesDeDupTest extends \BaseTestCase {
     protected function setUp(): void {
         parent::setUp();
         $GLOBALS['fbm_test_screen_id'] = null;

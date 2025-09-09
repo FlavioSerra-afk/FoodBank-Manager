@@ -49,10 +49,26 @@ if ( $app_id > 0 && ! empty( $results ) ) {
     <?php if ( $counts['applications'] > 0 ) : ?>
         <h2><?php esc_html_e( 'Preview', 'foodbank-manager' ); ?></h2>
         <ul>
-            <li><?php echo esc_html( sprintf( __( 'Applications: %d', 'foodbank-manager' ), $counts['applications'] ) ); ?></li>
-            <li><?php echo esc_html( sprintf( __( 'Attachments: %d', 'foodbank-manager' ), $counts['files'] ) ); ?></li>
-            <li><?php echo esc_html( sprintf( __( 'Attendance: %d', 'foodbank-manager' ), $counts['attendance'] ) ); ?></li>
-            <li><?php echo esc_html( sprintf( __( 'Email logs: %d', 'foodbank-manager' ), $counts['emails'] ) ); ?></li>
+            <li><?php echo esc_html( sprintf(
+                /* translators: %d: applications count */
+                __( 'Applications: %d', 'foodbank-manager' ),
+                $counts['applications']
+            ) ); ?></li>
+            <li><?php echo esc_html( sprintf(
+                /* translators: %d: attachments count */
+                __( 'Attachments: %d', 'foodbank-manager' ),
+                $counts['files']
+            ) ); ?></li>
+            <li><?php echo esc_html( sprintf(
+                /* translators: %d: attendance records count */
+                __( 'Attendance: %d', 'foodbank-manager' ),
+                $counts['attendance']
+            ) ); ?></li>
+            <li><?php echo esc_html( sprintf(
+                /* translators: %d: email logs count */
+                __( 'Email logs: %d', 'foodbank-manager' ),
+                $counts['emails']
+            ) ); ?></li>
         </ul>
         <form method="post" action="">
             <?php wp_nonce_field( 'fbm_gdpr_export', '_fbm_nonce' ); ?>

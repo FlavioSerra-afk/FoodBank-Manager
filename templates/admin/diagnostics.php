@@ -56,12 +56,36 @@ $rows       = $rows ?? array();
     </ul>
     <h2><?php esc_html_e( 'SMTP', 'foodbank-manager' ); ?></h2>
     <ul>
-        <li><?php echo esc_html( sprintf( __( 'Mailer: %s', 'foodbank-manager' ), $smtp['mailer'] ?? '' ) ); ?></li>
-        <li><?php echo esc_html( sprintf( __( 'Host: %s', 'foodbank-manager' ), $smtp['host'] ?? '' ) ); ?></li>
-        <li><?php echo esc_html( sprintf( __( 'Port: %s', 'foodbank-manager' ), $smtp['port'] ?? '' ) ); ?></li>
-        <li><?php echo esc_html( sprintf( __( 'Encryption: %s', 'foodbank-manager' ), $smtp['encryption'] ?? '' ) ); ?></li>
-        <li><?php echo esc_html( sprintf( __( 'Auth: %s', 'foodbank-manager' ), $smtp['auth'] ?? '' ) ); ?></li>
-        <li><?php echo esc_html( sprintf( __( 'Test recipient: %s', 'foodbank-manager' ), $test_to ) ); ?></li>
+        <li><?php echo esc_html( sprintf(
+            /* translators: %s: mailer name */
+            __( 'Mailer: %s', 'foodbank-manager' ),
+            $smtp['mailer'] ?? ''
+        ) ); ?></li>
+        <li><?php echo esc_html( sprintf(
+            /* translators: %s: SMTP host */
+            __( 'Host: %s', 'foodbank-manager' ),
+            $smtp['host'] ?? ''
+        ) ); ?></li>
+        <li><?php echo esc_html( sprintf(
+            /* translators: %s: SMTP port */
+            __( 'Port: %s', 'foodbank-manager' ),
+            $smtp['port'] ?? ''
+        ) ); ?></li>
+        <li><?php echo esc_html( sprintf(
+            /* translators: %s: SMTP encryption */
+            __( 'Encryption: %s', 'foodbank-manager' ),
+            $smtp['encryption'] ?? ''
+        ) ); ?></li>
+        <li><?php echo esc_html( sprintf(
+            /* translators: %s: SMTP authentication method */
+            __( 'Auth: %s', 'foodbank-manager' ),
+            $smtp['auth'] ?? ''
+        ) ); ?></li>
+        <li><?php echo esc_html( sprintf(
+            /* translators: %s: email address */
+            __( 'Test recipient: %s', 'foodbank-manager' ),
+            $test_to
+        ) ); ?></li>
     </ul>
     <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
         <input type="hidden" name="action" value="fbm_diag_mail_test" />
@@ -78,13 +102,33 @@ $rows       = $rows ?? array();
     </ul>
     <h2><?php esc_html_e( 'Install Health', 'foodbank-manager' ); ?></h2>
     <p><?php esc_html_e( 'Only one copy of the plugin should remain installed under foodbank-manager/.', 'foodbank-manager' ); ?></p>
-    <p><?php echo esc_html( sprintf( __( 'Canonical slug: %s', 'foodbank-manager' ), $install_scan['canonical'] ) ); ?></p>
-    <p><?php echo esc_html( sprintf( __( 'Duplicate copies: %d', 'foodbank-manager' ), count( $install_scan['duplicates'] ) ) ); ?></p>
+    <p><?php echo esc_html( sprintf(
+        /* translators: %s: canonical plugin slug */
+        __( 'Canonical slug: %s', 'foodbank-manager' ),
+        $install_scan['canonical']
+    ) ); ?></p>
+    <p><?php echo esc_html( sprintf(
+        /* translators: %d: number of duplicate plugin copies */
+        __( 'Duplicate copies: %d', 'foodbank-manager' ),
+        count( $install_scan['duplicates'] )
+    ) ); ?></p>
     <?php if ( ! empty( $last_consolidation ) ) : ?>
-    <p><?php echo esc_html( sprintf( __( 'Last consolidation: %s (deactivated %d, deleted %d)', 'foodbank-manager' ), isset( $last_consolidation['timestamp'] ) ? gmdate( 'Y-m-d H:i', (int) $last_consolidation['timestamp'] ) : __( 'never', 'foodbank-manager' ), (int) ( $last_consolidation['deactivated'] ?? 0 ), (int) ( $last_consolidation['deleted'] ?? 0 ) ) ); ?></p>
+    <p><?php echo esc_html( sprintf(
+        /* translators: 1: timestamp of last consolidation, 2: deactivated count, 3: deleted count */
+        __( 'Last consolidation: %1$s (deactivated %2$d, deleted %3$d)', 'foodbank-manager' ),
+        isset( $last_consolidation['timestamp'] ) ? gmdate( 'Y-m-d H:i', (int) $last_consolidation['timestamp'] ) : __( 'never', 'foodbank-manager' ),
+        (int) ( $last_consolidation['deactivated'] ?? 0 ),
+        (int) ( $last_consolidation['deleted'] ?? 0 )
+    ) ); ?></p>
     <?php endif; ?>
     <?php if ( ! empty( $last_activation_consolidation ) ) : ?>
-    <p><?php echo esc_html( sprintf( __( 'Last activation cleanup: %s (deactivated %d, deleted %d)', 'foodbank-manager' ), isset( $last_activation_consolidation['timestamp'] ) ? gmdate( 'Y-m-d H:i', (int) $last_activation_consolidation['timestamp'] ) : __( 'never', 'foodbank-manager' ), (int) ( $last_activation_consolidation['deactivated'] ?? 0 ), (int) ( $last_activation_consolidation['deleted'] ?? 0 ) ) ); ?></p>
+    <p><?php echo esc_html( sprintf(
+        /* translators: 1: timestamp of last activation cleanup, 2: deactivated count, 3: deleted count */
+        __( 'Last activation cleanup: %1$s (deactivated %2$d, deleted %3$d)', 'foodbank-manager' ),
+        isset( $last_activation_consolidation['timestamp'] ) ? gmdate( 'Y-m-d H:i', (int) $last_activation_consolidation['timestamp'] ) : __( 'never', 'foodbank-manager' ),
+        (int) ( $last_activation_consolidation['deactivated'] ?? 0 ),
+        (int) ( $last_activation_consolidation['deleted'] ?? 0 )
+    ) ); ?></p>
     <?php endif; ?>
     <?php if ( ! empty( $install_scan['duplicates'] ) ) : ?>
     <table class="widefat">

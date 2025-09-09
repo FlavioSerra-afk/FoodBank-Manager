@@ -32,12 +32,11 @@ namespace FoodBankManager\Security {
 }
 
 namespace {
-use BaseTestCase;
 use FoodBankManager\Forms\Presets;
 use FoodBankManager\Admin\FormsPage;
 use FoodBankManager\Shortcodes\Form;
 
-final class FormsPresetsTest extends BaseTestCase {
+final class FormsPresetsTest extends \BaseTestCase {
     protected function setUp(): void {
         parent::setUp();
         if (!defined('FBM_PATH')) {

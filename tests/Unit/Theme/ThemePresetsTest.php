@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use FBM\UI\ThemePresets;
 
-final class ThemePresetsTest extends BaseTestCase {
+final class ThemePresetsTest extends \BaseTestCase {
     public function test_high_contrast_tokens_differ(): void {
         $light = ThemePresets::tokens('light');
         $hc    = ThemePresets::tokens('high_contrast');

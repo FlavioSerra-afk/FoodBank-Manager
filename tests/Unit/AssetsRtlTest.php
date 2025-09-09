@@ -5,7 +5,7 @@ declare(strict_types=1);
 use FoodBankManager\Core\Assets;
 use FoodBankManager\Core\Options;
 
-final class AssetsRtlTest extends BaseTestCase {
+final class AssetsRtlTest extends \BaseTestCase {
     /** @runInSeparateProcess */
     public function test_high_contrast_force_on_emits_rtl_selector(): void {
         Options::save(['theme' => ['preset' => 'high_contrast', 'rtl' => 'force_on']]);

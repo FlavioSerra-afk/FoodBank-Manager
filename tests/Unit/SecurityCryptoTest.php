@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 use FoodBankManager\Security\Crypto;
 
-final class SecurityCryptoTest extends BaseTestCase {
+final class SecurityCryptoTest extends \BaseTestCase {
         protected function setUp(): void {
                 parent::setUp();
                 if ( ! extension_loaded( 'sodium' ) && ! class_exists( 'ParagonIE_Sodium_Compat' ) ) {

@@ -5,7 +5,7 @@ use FoodBankManager\Core\Install;
 use FoodBankManager\Admin\Notices;
 use Tests\Support\Exceptions\FbmDieException;
 
-final class InstallDuplicateDetectorTest extends BaseTestCase {
+final class InstallDuplicateDetectorTest extends \BaseTestCase {
     protected function setUp(): void {
         parent::setUp();
         $GLOBALS['fbm_test_screen_id'] = 'toplevel_page_fbm';

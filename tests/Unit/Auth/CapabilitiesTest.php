@@ -1,10 +1,9 @@
 <?php
 declare(strict_types=1);
 
-use BaseTestCase;
 use FBM\Auth\Capabilities;
 
-class CapabilitiesTest extends BaseTestCase {
+class CapabilitiesTest extends \BaseTestCase {
     protected function setUp(): void {
         parent::setUp();
         Capabilities::$ensured = false;

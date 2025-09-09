@@ -6,12 +6,11 @@ namespace FoodBankManager\Core {}
 namespace FoodBankManager\Admin {}
 
 namespace {
-use BaseTestCase;
 use FoodBankManager\Admin\EmailsPage;
 use FoodBankManager\Core\Options;
 use Tests\Support\Rbac;
 
-final class EmailsPageTest extends BaseTestCase {
+final class EmailsPageTest extends \BaseTestCase {
     protected function setUp(): void {
         parent::setUp();
         fbm_grant_for_page('fbm_emails');

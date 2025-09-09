@@ -79,7 +79,11 @@ $densities = array(
                                 <th scope="row"><label for="fbm_custom_css"><?php esc_html_e( 'Custom CSS', 'foodbank-manager' ); ?></label></th>
                                 <td>
                                         <textarea id="fbm_custom_css" name="fbm_theme[custom_css]" rows="8" class="large-text code"><?php echo esc_textarea( $theme['custom_css'] ?? '' ); ?></textarea>
-                                        <p class="description"><?php printf( esc_html__( '%d bytes after sanitisation.', 'foodbank-manager' ), strlen( $theme['custom_css'] ?? '' ) ); ?></p>
+                                        <p class="description"><?php printf( esc_html__(
+                                                /* translators: %d: length of custom CSS after sanitisation in bytes */
+                                                '%d bytes after sanitisation.',
+                                                'foodbank-manager'
+                                        ), strlen( $theme['custom_css'] ?? '' ) ); ?></p>
                                 </td>
                         </tr>
                 </table>

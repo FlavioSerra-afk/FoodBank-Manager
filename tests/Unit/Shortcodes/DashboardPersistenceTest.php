@@ -3,11 +3,10 @@ declare(strict_types=1);
 
 namespace FBM\Tests\Unit\Shortcodes;
 
-use BaseTestCase;
 use FBM\Shortcodes\Shortcodes;
 use Tests\Support\Rbac;
 
-final class DashboardPersistenceTest extends BaseTestCase {
+final class DashboardPersistenceTest extends \BaseTestCase {
     protected function setUp(): void {
         parent::setUp();
         Rbac::grantManager();

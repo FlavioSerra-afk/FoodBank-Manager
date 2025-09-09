@@ -4,7 +4,7 @@ declare(strict_types=1);
 use FoodBankManager\Admin\ThemePage;
 use FoodBankManager\Core\Options;
 
-final class ThemePageTest extends BaseTestCase {
+final class ThemePageTest extends \BaseTestCase {
 
         private function loadTheme(): string {
                 if ( class_exists( 'FoodBankManager\\UITest\\ThemeReal', false ) ) {

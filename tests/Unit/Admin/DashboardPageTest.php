@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Admin;
 
-use BaseTestCase;
 use FBM\Admin\DashboardPage;
 use FBM\Attendance\CheckinsRepo;
 use FBM\Attendance\EventsRepo;
@@ -14,7 +13,7 @@ function fbm_dashboard_now($v) { // @phpstan-ignore-line
     return 1700000000;
 }
 
-final class DashboardPageTest extends BaseTestCase {
+final class DashboardPageTest extends \BaseTestCase {
     private $oldDb;
 
     protected function setUp(): void {

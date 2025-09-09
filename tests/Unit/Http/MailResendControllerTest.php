@@ -23,13 +23,12 @@ namespace FBM\Mail {
 
 namespace FoodBankManager\Tests\Unit\Http {
 
-use BaseTestCase;
 use Tests\Support\Rbac;
 use Tests\Support\Exceptions\FbmDieException;
 use FBM\Http\MailResendController;
 use FBM\Mail\LogRepo;
 
-final class MailResendControllerTest extends BaseTestCase {
+final class MailResendControllerTest extends \BaseTestCase {
     protected function setUp(): void {
         parent::setUp();
         Rbac::grantManager();

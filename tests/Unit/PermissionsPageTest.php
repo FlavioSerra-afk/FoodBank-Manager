@@ -2,12 +2,11 @@
 declare(strict_types=1);
 
 namespace {
-    use BaseTestCase;
     use FoodBankManager\Admin\PermissionsPage;
     use FoodBankManager\Admin\UsersMeta;
     use FoodBankManager\Auth\Capabilities;
 
-    final class PermissionsPageTest extends BaseTestCase {
+    final class PermissionsPageTest extends \BaseTestCase {
 
     public function test_import_rejects_bad_json(): void {
         fbm_grant_admin();

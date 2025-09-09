@@ -5,9 +5,8 @@ namespace Tests\Unit\Admin;
 
 use FBM\Admin\FormBuilderPage;
 use Tests\Support\Rbac;
-use BaseTestCase;
 
-final class FormBuilderPageTest extends BaseTestCase {
+final class FormBuilderPageTest extends \BaseTestCase {
     public function testRenderDenied(): void {
         Rbac::revokeAll();
         ob_start();

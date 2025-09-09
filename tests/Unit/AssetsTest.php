@@ -6,7 +6,7 @@ if (!defined('FBM_URL')) {
     define('FBM_URL', '');
 }
 
-final class AssetsTest extends BaseTestCase {
+final class AssetsTest extends \BaseTestCase {
     public function test_admin_css_vars_only_on_fbm_screens(): void {
         $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_database';
         ob_start();

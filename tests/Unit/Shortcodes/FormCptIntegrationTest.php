@@ -6,9 +6,8 @@ namespace Tests\Unit\Shortcodes;
 use FBM\Shortcodes\FormShortcode;
 use FBM\Forms\FormRepo;
 use FoodBankManager\Forms\PresetsRepo;
-use BaseTestCase;
 
-final class FormCptIntegrationTest extends BaseTestCase {
+final class FormCptIntegrationTest extends \BaseTestCase {
     public function testRenderFromCpt(): void {
         $id = FormRepo::create([
             'title' => 'CPT Form',

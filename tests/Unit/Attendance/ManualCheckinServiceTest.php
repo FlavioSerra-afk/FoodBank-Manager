@@ -3,13 +3,12 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Attendance;
 
-use BaseTestCase;
 use FBM\Attendance\EventsRepo;
 use FBM\Attendance\ManualCheckinService;
 use FBM\Attendance\CheckinsRepo;
 use Tests\Support\EventsDbStub;
 
-final class ManualCheckinServiceTest extends BaseTestCase {
+final class ManualCheckinServiceTest extends \BaseTestCase {
     private EventsDbStub $db;
 
     protected function setUp(): void {
@@ -19,10 +18,10 @@ final class ManualCheckinServiceTest extends BaseTestCase {
         $ref = new \ReflectionClass(CheckinsRepo::class);
         $p = $ref->getProperty('store');
         $p->setAccessible(true);
-        $p->setValue(array());
+        $p->setValue(null, array());
         $p2 = $ref->getProperty('next_id');
         $p2->setAccessible(true);
-        $p2->setValue(1);
+        $p2->setValue(null, 1);
         $GLOBALS['fbm_filters']['fbm_now'][] = static fn($v) => 1700000000;
         EventsRepo::create(array(
             'title'     => 'Event',

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 use FoodBankManager\Admin\Notices;
 
-final class NoticesTest extends BaseTestCase {
+final class NoticesTest extends \BaseTestCase {
     protected function setUp(): void {
         parent::setUp();
         if (!defined('FBM_KEK_BASE64')) {

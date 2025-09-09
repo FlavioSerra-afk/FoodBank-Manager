@@ -7,7 +7,7 @@ namespace FoodBankManager\Tests\Unit\Http {
     use Tests\Support\Exceptions\FbmDieException;
     use FBM\Http\ExportController;
 
-    final class ExportControllerTest extends BaseTestCase {
+    final class ExportControllerTest extends \BaseTestCase {
         protected function setUp(): void {
             parent::setUp();
             Rbac::grantManager();

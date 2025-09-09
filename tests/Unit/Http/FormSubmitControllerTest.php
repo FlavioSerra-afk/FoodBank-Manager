@@ -7,7 +7,7 @@ use FoodBankManager\Forms\PresetsRepo;
 use FoodBankManager\Http\FormSubmitController;
 use \BaseTestCase;
 
-final class FormSubmitControllerTest extends BaseTestCase {
+final class FormSubmitControllerTest extends \BaseTestCase {
     private array $schema;
 
     protected function setUp(): void {

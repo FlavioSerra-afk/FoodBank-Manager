@@ -3,14 +3,13 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Admin;
 
-use BaseTestCase;
 use FBM\Admin\ReportsPage;
 use FBM\Attendance\CheckinsRepo;
 use FBM\Attendance\EventsRepo;
 use Tests\Support\EventsDbStub;
 use Tests\Support\Rbac;
 
-final class ReportsPageTest extends BaseTestCase {
+final class ReportsPageTest extends \BaseTestCase {
     private $oldDb;
 
     protected function setUp(): void {

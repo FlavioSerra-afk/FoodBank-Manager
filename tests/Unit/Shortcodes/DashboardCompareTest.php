@@ -3,11 +3,10 @@ declare(strict_types=1);
 
 namespace FBM\Tests\Unit\Shortcodes;
 
-use BaseTestCase;
 use FBM\Shortcodes\Shortcodes;
 use Tests\Support\Rbac;
 
-final class DashboardCompareTest extends BaseTestCase {
+final class DashboardCompareTest extends \BaseTestCase {
     private $nowFilter;
 
     protected function setUp(): void {

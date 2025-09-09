@@ -89,12 +89,11 @@ namespace FBM\Auth {
 namespace {
     use PHPUnit\Framework\TestCase;
     use FoodBankManager\Admin\DiagnosticsPage;
-    use BaseTestCase;
 
     /**
      * @runTestsInSeparateProcesses
      */
-    final class DiagnosticsPageTest extends BaseTestCase {
+    final class DiagnosticsPageTest extends \BaseTestCase {
         /** @var array<string,int> */
         public static array $cron_next = array();
 

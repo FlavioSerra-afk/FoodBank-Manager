@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the FoodBank Manager plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: FoodBank Manager 1.4.0-rc.3\n"
+"Project-Id-Version: FoodBank Manager 1.4.0-rc.4\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/FoodBank-Manager\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-09-09T21:53:42+00:00\n"
+"POT-Creation-Date: 2025-09-09T22:07:12+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: foodbank-manager\n"
@@ -218,12 +218,12 @@ msgid "Multiple FoodBank Manager copies detected"
 msgstr ""
 
 #: includes/Admin/Notices.php:62
-#: templates/admin/diagnostics.php:104
+#: templates/admin/diagnostics.php:148
 msgid "Consolidate (deactivate & delete)"
 msgstr ""
 
 #: includes/Admin/Notices.php:65
-#: templates/admin/diagnostics.php:109
+#: templates/admin/diagnostics.php:153
 msgid "Deactivate only"
 msgstr ""
 
@@ -384,8 +384,8 @@ msgstr ""
 #: templates/admin/database-view.php:41
 #: templates/admin/database.php:65
 #: templates/admin/database.php:133
-#: templates/admin/diagnostics.php:118
-#: templates/admin/diagnostics.php:183
+#: templates/admin/diagnostics.php:162
+#: templates/admin/diagnostics.php:227
 #: templates/admin/events-tickets.php:18
 #: templates/admin/events.php:35
 #: templates/admin/events.php:73
@@ -486,7 +486,7 @@ msgstr ""
 
 #: includes/Http/DashboardExportController.php:56
 #: includes/Http/ExportController.php:116
-#: templates/admin/diagnostics.php:137
+#: templates/admin/diagnostics.php:181
 msgid "Count"
 msgstr ""
 
@@ -660,7 +660,7 @@ msgid "To"
 msgstr ""
 
 #: templates/admin/attendance.php:30
-#: templates/admin/diagnostics.php:179
+#: templates/admin/diagnostics.php:223
 #: templates/admin/reports.php:15
 #: templates/public/dashboard.php:55
 msgid "Event"
@@ -929,144 +929,154 @@ msgstr ""
 msgid "SMTP"
 msgstr ""
 
-#: templates/admin/diagnostics.php:59
+#. translators: %s: mailer name
+#: templates/admin/diagnostics.php:61
 #, php-format
 msgid "Mailer: %s"
 msgstr ""
 
-#: templates/admin/diagnostics.php:60
+#. translators: %s: SMTP host
+#: templates/admin/diagnostics.php:66
 #, php-format
 msgid "Host: %s"
 msgstr ""
 
-#: templates/admin/diagnostics.php:61
+#. translators: %s: SMTP port
+#: templates/admin/diagnostics.php:71
 #, php-format
 msgid "Port: %s"
 msgstr ""
 
-#: templates/admin/diagnostics.php:62
+#. translators: %s: SMTP encryption
+#: templates/admin/diagnostics.php:76
 #, php-format
 msgid "Encryption: %s"
 msgstr ""
 
-#: templates/admin/diagnostics.php:63
+#. translators: %s: SMTP authentication method
+#: templates/admin/diagnostics.php:81
 #, php-format
 msgid "Auth: %s"
 msgstr ""
 
-#: templates/admin/diagnostics.php:64
+#. translators: %s: email address
+#: templates/admin/diagnostics.php:86
 #, php-format
 msgid "Test recipient: %s"
 msgstr ""
 
-#: templates/admin/diagnostics.php:69
+#: templates/admin/diagnostics.php:93
 msgid "Send test email"
 msgstr ""
 
-#: templates/admin/diagnostics.php:71
+#: templates/admin/diagnostics.php:95
 msgid "Environment"
 msgstr ""
 
-#: templates/admin/diagnostics.php:79
+#: templates/admin/diagnostics.php:103
 msgid "Install Health"
 msgstr ""
 
-#: templates/admin/diagnostics.php:80
+#: templates/admin/diagnostics.php:104
 msgid "Only one copy of the plugin should remain installed under foodbank-manager/."
 msgstr ""
 
-#: templates/admin/diagnostics.php:81
+#. translators: %s: canonical plugin slug
+#: templates/admin/diagnostics.php:107
 #, php-format
 msgid "Canonical slug: %s"
 msgstr ""
 
-#: templates/admin/diagnostics.php:82
+#. translators: %d: number of duplicate plugin copies
+#: templates/admin/diagnostics.php:112
 #, php-format
 msgid "Duplicate copies: %d"
 msgstr ""
 
-#: templates/admin/diagnostics.php:84
+#. translators: 1: timestamp of last consolidation, 2: deactivated count, 3: deleted count
+#: templates/admin/diagnostics.php:118
 #, php-format
-msgid "Last consolidation: %s (deactivated %d, deleted %d)"
+msgid "Last consolidation: %1$s (deactivated %2$d, deleted %3$d)"
 msgstr ""
 
-#: templates/admin/diagnostics.php:84
-#: templates/admin/diagnostics.php:87
+#: templates/admin/diagnostics.php:119
+#: templates/admin/diagnostics.php:128
 msgid "never"
 msgstr ""
 
-#: templates/admin/diagnostics.php:87
+#. translators: 1: timestamp of last activation cleanup, 2: deactivated count, 3: deleted count
+#: templates/admin/diagnostics.php:127
 #, php-format
-msgid "Last activation cleanup: %s (deactivated %d, deleted %d)"
-msgstr ""
-
-#: templates/admin/diagnostics.php:92
-msgid "Directory"
-msgstr ""
-
-#: templates/admin/diagnostics.php:92
-msgid "Version"
-msgstr ""
-
-#: templates/admin/diagnostics.php:112
-msgid "Quick Checks"
-msgstr ""
-
-#: templates/admin/diagnostics.php:116
-msgid "Check"
-msgstr ""
-
-#: templates/admin/diagnostics.php:117
-msgid "Value"
-msgstr ""
-
-#: templates/admin/diagnostics.php:132
-msgid "Render counts (this request)"
+msgid "Last activation cleanup: %1$s (deactivated %2$d, deleted %3$d)"
 msgstr ""
 
 #: templates/admin/diagnostics.php:136
-msgid "Screen"
+msgid "Directory"
 msgstr ""
 
-#: templates/admin/diagnostics.php:150
-msgid "Duplicates:"
+#: templates/admin/diagnostics.php:136
+msgid "Version"
 msgstr ""
 
-#: templates/admin/diagnostics.php:153
-msgid "Menu Visibility"
-msgstr ""
-
-#: templates/admin/diagnostics.php:154
-msgid "FBM caps held by current user:"
-msgstr ""
-
-#: templates/admin/diagnostics.php:158
-msgid "Repair caps"
+#: templates/admin/diagnostics.php:156
+msgid "Quick Checks"
 msgstr ""
 
 #: templates/admin/diagnostics.php:160
+msgid "Check"
+msgstr ""
+
+#: templates/admin/diagnostics.php:161
+msgid "Value"
+msgstr ""
+
+#: templates/admin/diagnostics.php:176
+msgid "Render counts (this request)"
+msgstr ""
+
+#: templates/admin/diagnostics.php:180
+msgid "Screen"
+msgstr ""
+
+#: templates/admin/diagnostics.php:194
+msgid "Duplicates:"
+msgstr ""
+
+#: templates/admin/diagnostics.php:197
+msgid "Menu Visibility"
+msgstr ""
+
+#: templates/admin/diagnostics.php:198
+msgid "FBM caps held by current user:"
+msgstr ""
+
+#: templates/admin/diagnostics.php:202
+msgid "Repair caps"
+msgstr ""
+
+#: templates/admin/diagnostics.php:204
 msgid "Cron Health"
 msgstr ""
 
-#: templates/admin/diagnostics.php:165
+#: templates/admin/diagnostics.php:209
 #: templates/admin/jobs.php:9
 #: templates/admin/settings.php:122
 msgid "Run now"
 msgstr ""
 
-#: templates/admin/diagnostics.php:170
+#: templates/admin/diagnostics.php:214
 msgid "Dry-run"
 msgstr ""
 
-#: templates/admin/diagnostics.php:180
+#: templates/admin/diagnostics.php:224
 msgid "Schedule"
 msgstr ""
 
-#: templates/admin/diagnostics.php:181
+#: templates/admin/diagnostics.php:225
 msgid "Last run"
 msgstr ""
 
-#: templates/admin/diagnostics.php:182
+#: templates/admin/diagnostics.php:226
 msgid "Next run"
 msgstr ""
 
@@ -1263,27 +1273,31 @@ msgstr ""
 msgid "GDPR Export"
 msgstr ""
 
-#: templates/admin/gdpr.php:52
+#. translators: %d: applications count
+#: templates/admin/gdpr.php:54
 #, php-format
 msgid "Applications: %d"
 msgstr ""
 
-#: templates/admin/gdpr.php:53
+#. translators: %d: attachments count
+#: templates/admin/gdpr.php:59
 #, php-format
 msgid "Attachments: %d"
 msgstr ""
 
-#: templates/admin/gdpr.php:54
+#. translators: %d: attendance records count
+#: templates/admin/gdpr.php:64
 #, php-format
 msgid "Attendance: %d"
 msgstr ""
 
-#: templates/admin/gdpr.php:55
+#. translators: %d: email logs count
+#: templates/admin/gdpr.php:69
 #, php-format
 msgid "Email logs: %d"
 msgstr ""
 
-#: templates/admin/gdpr.php:61
+#: templates/admin/gdpr.php:77
 msgid "Export SAR"
 msgstr ""
 
@@ -1535,6 +1549,7 @@ msgstr ""
 msgid "Custom CSS"
 msgstr ""
 
+#. translators: %d: length of custom CSS after sanitisation in bytes
 #: templates/admin/theme.php:82
 #, php-format
 msgid "%d bytes after sanitisation."

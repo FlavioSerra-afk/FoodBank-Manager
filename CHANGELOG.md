@@ -1,3 +1,9 @@
+## v1.4.0-rc.4 — Dashboard v1 (Glass)
+- feat(admin): Dashboard v1 with glass KPI tiles (registrations, check-ins Today/Week/Month, tickets scanned 7d), 6-month sparkline, and shortcuts
+- feat(ui): glass tokens (accent/blur/elevation) with high-contrast & reduced-transparency fallbacks
+- chore(i18n): update POT/PO; compile .mo during packaging if msgfmt is available
+- docs: PRD/DesignSystem updated for glass; menu deep-link for Scan → Attendance tab
+
 ## 1.4.0-rc.3 — 2025-09-09
 - fix(packaging): restore dist/foodbank-manager.zip with correct root slug and main file guard
 - fix(static): remove duplicate ABSPATH bootstrap warning in PHPStan runs

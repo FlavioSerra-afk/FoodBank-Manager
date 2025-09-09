@@ -23,7 +23,6 @@ namespace FBM\Mail { if (!class_exists('FBM\\Mail\\LogRepo')) { class LogRepo { 
 namespace FBM\Logging { if (!class_exists('FBM\\Logging\\Audit')) { class Audit { public static array $logs=array(); public static function log($a,$t,$id,$actor,$details=array()){ self::$logs[]=$a; } } } }
 
 namespace FoodBankManager\Tests\Unit\Http {
-use BaseTestCase;
 use FBM\Http\TicketsController;
 use FBM\Attendance\TicketService;
 use FBM\Mail\LogRepo;
@@ -31,7 +30,7 @@ use FBM\Logging\Audit;
 use Tests\Support\Rbac;
 use Tests\Support\Exceptions\FbmDieException;
 
-final class TicketsControllerTest extends BaseTestCase {
+final class TicketsControllerTest extends \BaseTestCase {
     protected function setUp(): void {
         parent::setUp();
         Rbac::grantManager();
