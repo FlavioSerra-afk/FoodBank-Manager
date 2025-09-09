@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-05 (v1.2.9 QA sweep)
+Docs-Revision: 2025-09-09 (Wave RC3 Fix Pack)
 # Database Schema (summary)
 
 ## fb_applications
@@ -23,10 +23,29 @@ Docs-Revision: 2025-09-05 (v1.2.9 QA sweep)
 - id PK, attendance_id FK, user_id, note_text, created_at
 - Indexes: (attendance_id), (created_at)
 
-## fb_mail_log
-- id PK, to_hash, subject_hash, body_hash, provider, status, created_at
+## fbm_events
+- id PK, title, starts_at, ends_at, status
+- Indexes: (status)
+
+## fbm_tickets
+- id PK, event_id, recipient, token_hash, issued_at, used_at
+- Indexes: (event_id), (token_hash)
+
+## fbm_checkins
+- id PK, event_id, method, recipient, note, created_at
+- Indexes: (event_id), (created_at)
+
+## fbm_export_jobs
+- id PK, type, args JSON, status ENUM('queued','running','done','failed'), tries, claimed_at, finished_at
+
+## fbm_mail_log
+- id PK, to_hash, subject_hash, body_hash, provider, status, resend_audit_json, created_at
 - Indexes: (created_at), (status)
 
 ## fb_audit_log
 - id PK, actor_user_id, action, target_type, target_id, details_json, created_at
 - Indexes: (target_type, target_id), (created_at)
+
+### Notes
+- Input sanitized; token stored as hash
+- Job claim via JobsRepo is atomic

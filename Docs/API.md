@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-05 (v1.2.9 QA sweep)
+Docs-Revision: 2025-09-09 (Wave RC3 Fix Pack)
 # REST API (pcc-fb/v1)
 
 Base namespace: `pcc-fb/v1`. All write endpoints require `X-WP-Nonce` and capabilities.
@@ -7,7 +7,59 @@ Dashboard summary CSV downloads use `admin-post.php?action=fbm_dash_export` with
 Design & Theme options are configuration-only; no REST endpoints expose or modify them.
 Admin screens are wrapped in `.fbm-admin` with assets/notices loaded only on FoodBank Manager pages.
 
-## Attendance
+## HTTP Controllers
+
+### ExportController
+- Route: `admin-post.php?action=fbm_export`
+- Method: GET
+- Requires: capability and `_wpnonce`
+- 200: PDF, ZIP, or XLSX download (masked by default)
+- 4xx: safe redirect with `notice=denied|error`
+
+### AttendanceExportController
+- Route: `admin-post.php?action=fbm_attendance_export`
+- Method: GET
+- Requires: capability and `_wpnonce`
+- 200: CSV/XLSX mirror visible columns
+- 4xx: safe redirect with `notice=denied|error`
+
+### MailResendController
+- Route: `admin-post.php?action=fbm_mail_resend`
+- Method: POST
+- Requires: capability and `_wpnonce`
+- 200: redirect with `notice=resent`
+- 4xx: redirect with `notice=denied|error`
+
+### DiagnosticsController
+- Route: `admin-post.php?action=fbm_diagnostics_mail`
+- Method: POST
+- Requires: capability and `_wpnonce`
+- 200: redirect with `notice=sent`
+- 4xx: redirect with `notice=error`
+
+### DashboardExportController
+- Route: `admin-post.php?action=fbm_dash_export`
+- Method: GET
+- Requires: capability and `_wpnonce`
+- 200: CSV via CsvWriter (BOM, explicit delimiter)
+- 4xx: safe redirect with `notice=denied|error`
+
+### ExportJobsController
+- Route: `admin-post.php?action=fbm_export_jobs`
+- Method: POST
+- Requires: capability and `_wpnonce`
+- 200: queue/list/download export jobs
+- 4xx: redirect with `notice=denied|error`
+
+## REST
+
+### ScanController
+- Route: `POST /scan`
+- Requires: `fb_manage_attendance` and `X-WP-Nonce`
+- 200: `{ status: 'ok', data: masked }`
+- 4xx: `{ error: 'invalid|used|expired' }`
+
+### Attendance
 - `POST /attendance/checkin`
   - Body: `{ token|string OR application_id:int, event_id?:int, type?:string, method?:'qr'|'manual', override?:{ allowed:bool, note?:string } }`
   - Perm: `attendance_checkin`

@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-07 (v1.2.16 fragments merged)
+Docs-Revision: 2025-09-09 (Wave RC3 Fix Pack)
 # FoodBank Manager — Product Requirements Document (PRD)
 
 **Repo file:** `Docs/PRD-foodbank-manager.md`  
@@ -9,6 +9,18 @@ Docs-Revision: 2025-09-07 (v1.2.16 fragments merged)
 **Status:** Approved for build
 
 **Packaging:** Release ZIP root must be `foodbank-manager/` for in-place updates. A packaging guard enforces the slug and offers one-click consolidation for duplicates.
+
+## Information Architecture (RC3)
+
+- Dashboard — Manager KPIs (registrations, check-ins Today/Week/Month, tickets scanned) + 6-month sparkline + shortcuts.
+- Attendance — Hub with tabs: Today, Scan, Manual, History. (Scan moved here; standalone menu removed.)
+- Submissions — Schema-aware “database” table with dynamic columns, per-user column prefs, masked detail view; exports mirror visible columns (CSV/XLSX/PDF).
+- Forms — List + Builder + Live preview (CF7-like ergonomics; shortcode helper).
+- Reports — Period/daily summaries, compare mode, export links.
+- Emails — Templates, log, resend actions, diagnostics links.
+- Settings — General, Email defaults, API/SMTP keys placeholders, Encryption KEK status, Front-end, Admin Theme (Light/Dark/High-Contrast, RTL).
+- Diagnostics — SMTP test, Cron health, Export Jobs list, Cap repair.
+- Events (optional) — Hidden by default; toggle in Settings.
 
 ---
 
@@ -121,16 +133,22 @@ Roles map to WordPress **capabilities** (granular; see §10 Security).
 - Compatible with SMTP/transactional providers via site’s chosen plugin.
 
 ### 5.5 Admin (wp-admin) Interface
-- **Menu:** FoodBank → **Dashboard**, **Attendance**, **Database**, **Forms**, **Email Templates**, **Settings**, **Permissions**, **Diagnostics**. The parent menu always falls back to `manage_options` so Administrators can reach it even if custom FBM caps are missing. Subpages remain gated by their FBM capabilities. When caps are absent, a one-time, text-only admin notice (no global CSS/JS) links to Diagnostics → Repair caps and can be dismissed for a day.
-- **Database list:** filters (date, status, city, postcode, has file, consent), saveable filter presets, per-user column toggles, pagination.
-  - **Capabilities:** viewing and exporting require `fb_manage_database`; sensitive fields unmasked only with `fb_view_sensitive`.
-  - **Exports:** CSV export respects current filters, sanitizes filenames, starts with a UTF-8 BOM and translated headers, and masks sensitive fields by default.
-- **Entry view:** all fields, internal notes, status (new/review/approved/declined/archived), actions: Edit, PDF, CSV, Delete (with confirm).
+- **Navigation:** FoodBank parent menu remains; items per Information Architecture (RC3). Parent menu falls back to `manage_options` so Administrators can reach it even if custom FBM caps are missing. Subpages remain gated by their FBM capabilities. When caps are absent, a one-time, text-only admin notice (no global CSS/JS) links to Diagnostics → Repair caps and can be dismissed for a day.
+- **Submissions:** schema-aware table with dynamic columns, per-user column prefs, masked detail view; exports mirror visible columns (CSV/XLSX/PDF, masked by default).
+- **Reports:** period/daily summaries with compare mode and export links.
+- **Forms:** builder with live preview and shortcode helper.
 - **Email Templates:** WYSIWYG editor, variables list, live preview with token helper, reset-to-defaults, a11y labels, send test.
 - **Settings:** branding, date/time, email defaults, spam protection keys, file policy, retention/anonymisation, encryption controls (see §10).
 - **Diagnostics:** email logs, resend, test email, repair capabilities, environment checks (PHP/WP version, cron, KEK, mail transport), and a cron health panel listing FBM hooks with last/next run times, overdue flags, and run-now/dry-run controls that output masked JSON summaries.
 - **Permissions:** map capabilities to roles and set per-user overrides.
 - **Attendance repository:** all queries use `$wpdb->prepare()` with strict placeholders; results mask PII unless `fb_view_sensitive` is granted; unit tests cover check-in, no-show, void/unvoid, and policy edge cases.
+
+### Dashboard (Admin) — RC3 MVP
+- Tiles: Total registrations; Check-ins (Today / Week / Month); Recent tickets scanned (7d).
+- Trend: 6-month sparkline (server-rendered).
+- Shortcuts: Create Form, Open Submissions, Start Scan, Export Reports.
+- Security/Perf: Masked counts, no PII; target ≤300ms render; assets only on FBM screens.
+- Acceptance: Tiles present w/ deterministic tests; sparkline renders; shortcuts visible.
 
 **Permissions tab — Acceptance Criteria**
 - Admins can map caps to roles (except Administrator which is fixed).
@@ -143,7 +161,9 @@ Roles map to WordPress **capabilities** (granular; see §10 Security).
 
 #### Attendance (Admin Tab)
 
-**Purpose**  
+Hub with tabs: Today, Scan, Manual, History. Scan moved here; standalone menu removed.
+
+**Purpose**
 Provide administrators a fast, trustworthy overview of attendance across all applicants, with common time windows (**Last 7 days**, **Last 30 days**, **Last 6 months**, **Last 12 months**, **Custom range**) and powerful filtering, summaries, and exports.
 
 **Header Filters (persist across pagination/exports)**  
@@ -483,8 +503,15 @@ Events (optional), QR issuance, Scan/Manual flows, policy rules, reports.
 **M5 — GDPR & Diagnostics**  
 SAR export, retention/anonymisation, diagnostics panel, test email.
 
-**M6 — Polish**  
+**M6 — Polish**
 PDF templates, theming presets, PT translations, docs.
+
+### RC3 Fix Pack — Implemented
+- [x] Packaging artifact + slug guard restored.
+- [x] ABSPATH bootstrap warning removed.
+- [x] ScanController tests stabilized (deterministic nonce/time + header seam).
+- [x] Admin Dashboard MVP implemented.
+- [x] .mo compiled in packaging when msgfmt available (soft warn if not).
 
 ---
 

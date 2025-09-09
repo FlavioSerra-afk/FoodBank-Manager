@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-07 (v1.2.16 fragments merged)
+Docs-Revision: 2025-09-09 (Wave RC3 Fix Pack)
 # FoodBank Manager — Architecture
 
 ## Overview
@@ -63,7 +63,35 @@ Admin pages share a `FBM\Core\RenderOnce` registry. `Admin\Menu` wraps each subm
 - **Security:** libsodium/XChaCha20-Poly1305 envelope encryption (`FBM_KEK_BASE64`), `sodium_compat` fallback; masking helpers; no PII in logs.
 - **Permissions:** central caps list, Administrator guarantee, role mapping and per-user overrides (`fbm_user_caps`) with JSON export/import (Dry Run) and reset tooling.
 - **AttendanceRepo:** database access layer for attendance; all queries use `$wpdb->prepare()` with strict placeholders, mask PII by default, and have unit tests covering check-in, no-show, void/unvoid, and timeline SQL injection edges.
- - **Theme system:** global CSS variables for primary colour, density, font, dark mode default and optional custom CSS; settings input is sanitised and variables are deterministic with clamped defaults applied across admin and front-end.
+- **Theme system:** global CSS variables for primary colour, density, font, dark mode default and optional custom CSS; settings input is sanitised and variables are deterministic with clamped defaults applied across admin and front-end.
+
+## RC3 Components
+
+### Exports
+- CsvWriter (UTF-8 BOM, type-safe, delimiter explicit)
+- XlsxWriter (OOXML inline strings)
+- PdfReceipt (masked default, HTML fallback)
+- BulkPdfZip (deterministic filenames)
+
+### Jobs
+- Core/Jobs/JobsRepo (atomic claim/retry)
+- Core/Jobs/JobsWorker (cron) + Http/ExportJobsController
+
+### Attendance
+- EventsRepo, TicketsRepo, TicketService (KEK-backed HMAC, base64url), CheckinsRepo, ManualCheckinService, ReportsService
+
+### UI/UX
+- Admin/DashboardPage (MVP), Attendance Hub tabs, schema-aware Submissions, Form Builder (CPT + Repo + JS)
+
+### HTTP/REST
+- DiagnosticsController (mail test), MailResendController, AttendanceExportController, ExportController, TicketsController, DashboardExportController, Rest/ScanController
+
+### Seams
+- fbm_send_headers() (header seam), deterministic clock/nonce seams, WP stubs single source, FbmDieException for wp_die in tests
+
+### Sequences
+- Scan flow: ScanController → TicketService validate (HMAC + replay) → CheckinsRepo insert → masked response.
+- Export job: enqueue → JobsRepo claim → JobsWorker generate (CSV/XLSX/PDF) → store → download endpoint.
 
 ### Design tokens
 

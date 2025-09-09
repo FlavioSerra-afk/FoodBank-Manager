@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Package builder: enforces foodbank-manager/ slug and compiles .mo when msgfmt is available.
 set -euo pipefail
 
 SLUG="foodbank-manager"
