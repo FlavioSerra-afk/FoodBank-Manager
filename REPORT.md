@@ -72,3 +72,6 @@ _None — all primary gates passing._
 
 ## Email Resend — PASS
 - Admins can resend logged emails with caps/nonce checks and audit trail.
+
+## Attendance — Reports & Exports: PASS/notes
+- Service, page, controller covered by 3 tests

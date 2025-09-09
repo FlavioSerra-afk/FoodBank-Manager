@@ -9,6 +9,7 @@ use FBM\Attendance\TicketService;
 use FBM\Attendance\EventsRepo;
 use FBM\Attendance\CheckinsRepo;
 use Tests\Support\EventsDbStub;
+require_once __DIR__ . '/../../Support/EventsDbStub.php';
 use Tests\Support\Rbac;
 use WP_REST_Request;
 
@@ -23,6 +24,7 @@ final class ScanControllerTest extends BaseTestCase {
         parent::setUp();
         $this->db = new EventsDbStub();
         $GLOBALS['wpdb'] = $this->db;
+        fbm_test_trust_nonces(true);
         $ref = new \ReflectionClass(CheckinsRepo::class);
         $p = $ref->getProperty('store');
         $p->setAccessible(true);
