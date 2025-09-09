@@ -1,0 +1,10 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: FoodBank Manager\n"
+"Language: en_GB\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "FoodBank Manager"
+msgstr "FoodBank Manager"

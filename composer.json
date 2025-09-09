@@ -62,7 +62,11 @@
     "cs:fix": "composer phpcbf && composer phpcs || true",
     "qa": "composer phpcs && composer phpstan && composer test",
     "qa:fast": "composer phpcs && composer phpstan:fast && composer test",
-    "build:zip": "bash bin/package.sh"
+    "build:zip": "bash bin/package.sh",
+    "i18n:compile": "msgfmt languages/foodbank-manager-en_GB.po -o languages/foodbank-manager-en_GB.mo",
+    "i18n:all": [
+      "@i18n:compile"
+    ]
   },
   "config": {
     "allow-plugins": {

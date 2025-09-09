@@ -15,6 +15,14 @@ if [[ ! -f "$SLUG.php" ]]; then
 fi
 cp "$SLUG.php" "$WORK/$SLUG.php"
 
+# Compile translations if msgfmt is available (soft fail otherwise)
+if command -v msgfmt >/dev/null 2>&1; then
+  echo "[i18n] Compiling .mo files..."
+  msgfmt languages/foodbank-manager-en_GB.po -o languages/foodbank-manager-en_GB.mo || true
+else
+  echo "[i18n] msgfmt not found; skipping .mo compile (POT/PO still included)."
+fi
+
 # Copy tracked plugin files into a stable folder name
 rsync -a --delete \
   --exclude ".git" \
