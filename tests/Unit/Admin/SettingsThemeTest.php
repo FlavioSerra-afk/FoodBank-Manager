@@ -1,57 +1,72 @@
 <?php
-
 declare(strict_types=1);
 
-use FoodBankManager\Admin\SettingsPage;
-use FoodBankManager\Core\Options;
-use Tests\Support\Exceptions\FbmDieException;
+use FoodBankManager\UI\Theme;
 
 final class SettingsThemeTest extends \BaseTestCase {
-    protected function setUp(): void {
-        parent::setUp();
-        fbm_grant_admin();
+    public function test_valid_values_emit_tokens(): void {
+        $raw = array(
+            'admin' => array(
+                'style' => 'glass',
+                'preset' => 'dark',
+                'accent' => '#112233',
+                'glass' => array('alpha' => 0.2, 'blur' => 10, 'elev' => 4, 'radius' => 10, 'border' => 2),
+            ),
+            'front' => array(
+                'style' => 'basic',
+                'preset' => 'light',
+                'accent' => '#112233',
+                'glass' => array('alpha' => 0.1, 'blur' => 5, 'elev' => 2, 'radius' => 6, 'border' => 1),
+                'enabled' => true,
+            ),
+            'match_front_to_admin' => false,
+        );
+        $san = Theme::sanitize($raw);
+        $css = Theme::css_vars($san['admin'], '.test');
+        $this->assertStringContainsString('--fbm-color-accent:#112233', $css);
+        $this->assertStringContainsString('--fbm-glass-blur:10px', $css);
     }
 
-    public function test_saves_and_renders_theme_options(): void {
-        fbm_test_set_request_nonce('fbm_theme_save');
-        $_SERVER['REQUEST_METHOD'] = 'POST';
-        $_POST['_fbm_nonce'] = 'fbm_theme_save';
-        $_POST['fbm_action'] = 'theme_save';
-        $_POST['theme'] = array(
-            'preset' => 'high_contrast<script>',
-            'rtl'    => 'force_on<script>',
+    public function test_invalid_values_clamped(): void {
+        $raw = array(
+            'admin' => array(
+                'style' => 'weird',
+                'preset' => 'nope',
+                'accent' => 'zzzz',
+                'glass' => array('alpha' => 99, 'blur' => 99, 'elev' => 99, 'radius' => 1, 'border' => 9),
+            ),
         );
-        $this->expectException(FbmDieException::class);
-        SettingsPage::route();
-
-        $opts = Options::all();
-        $this->assertSame('high_contrast', $opts['theme']['preset']);
-        $this->assertSame('force_on', $opts['theme']['rtl']);
-
-        fbm_test_reset_globals();
-        fbm_grant_admin();
-        $_GET['tab'] = 'appearance';
-        ob_start();
-        SettingsPage::route();
-        $html = ob_get_clean();
-        $this->assertStringContainsString('class="wrap fbm-admin"', $html);
-        $this->assertStringContainsString('value="high_contrast" selected', $html);
-        $this->assertStringContainsString('value="force_on" selected', $html);
+        $san = Theme::sanitize($raw);
+        $this->assertSame('glass', $san['admin']['style']);
+        $this->assertSame('light', $san['admin']['preset']);
+        $this->assertSame('#3B82F6', $san['admin']['accent']);
+        $this->assertSame(20, $san['admin']['glass']['blur']);
+        $this->assertSame(24, $san['admin']['glass']['elev']);
+        $this->assertSame(6, $san['admin']['glass']['radius']);
+        $this->assertSame(2, $san['admin']['glass']['border']);
     }
 
-    public function test_invalid_rtl_falls_back_to_auto(): void {
-        fbm_test_set_request_nonce('fbm_theme_save');
-        $_SERVER['REQUEST_METHOD'] = 'POST';
-        $_POST['_fbm_nonce'] = 'fbm_theme_save';
-        $_POST['fbm_action'] = 'theme_save';
-        $_POST['theme'] = array(
-            'preset' => 'dark',
-            'rtl'    => 'bad',
+    public function test_match_front_to_admin_mirrors(): void {
+        $raw = array(
+            'admin' => array(
+                'style' => 'basic',
+                'preset' => 'dark',
+                'accent' => '#000000',
+                'glass' => array('alpha' => 0.3, 'blur' => 5, 'elev' => 2, 'radius' => 8, 'border' => 1),
+            ),
+            'front' => array(
+                'style' => 'glass',
+                'preset' => 'light',
+                'accent' => '#ffffff',
+                'glass' => array('alpha' => 0.1, 'blur' => 4, 'elev' => 1, 'radius' => 6, 'border' => 1),
+                'enabled' => true,
+            ),
+            'match_front_to_admin' => true,
         );
-        $this->expectException(FbmDieException::class);
-        SettingsPage::route();
-        $opts = Options::all();
-        $this->assertSame('dark', $opts['theme']['preset']);
-        $this->assertSame('auto', $opts['theme']['rtl']);
+        $san = Theme::sanitize($raw);
+        $this->assertTrue($san['match_front_to_admin']);
+        $this->assertSame($san['admin']['style'], $san['front']['style']);
+        $this->assertSame($san['admin']['preset'], $san['front']['preset']);
+        $this->assertSame($san['admin']['accent'], $san['front']['accent']);
     }
 }

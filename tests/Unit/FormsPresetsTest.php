@@ -1,12 +1,6 @@
 <?php
 declare(strict_types=1);
 
-namespace FoodBankManager\UI {
-    class Theme {
-        public static function enqueue_front(): void {}
-    }
-}
-
 namespace FoodBankManager\Security {
     class Helpers {
         public static function sanitize_text( string $text ): string {

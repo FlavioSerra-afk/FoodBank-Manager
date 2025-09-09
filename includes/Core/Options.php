@@ -14,10 +14,32 @@ namespace FBM\Core {
                     ],
                 ],
                 'theme' => [
-                    'primary_color' => '#106ebe',
-                    'density'       => 'normal',
-                    'font'          => 'system',
-                    'dark_mode'     => false,
+                    'admin' => [
+                        'style'  => 'glass',
+                        'preset' => 'light',
+                        'accent' => '#3B82F6',
+                        'glass'  => [
+                            'alpha'  => 0.10,
+                            'blur'   => 12,
+                            'elev'   => 8,
+                            'radius' => 12,
+                            'border' => 1,
+                        ],
+                    ],
+                    'front' => [
+                        'style'   => 'basic',
+                        'preset'  => 'light',
+                        'accent'  => '#3B82F6',
+                        'glass'   => [
+                            'alpha'  => 0.10,
+                            'blur'   => 12,
+                            'elev'   => 8,
+                            'radius' => 12,
+                            'border' => 1,
+                        ],
+                        'enabled' => false,
+                    ],
+                    'match_front_to_admin' => false,
                 ],
                 'emails' => [
                     'from_name'    => '',

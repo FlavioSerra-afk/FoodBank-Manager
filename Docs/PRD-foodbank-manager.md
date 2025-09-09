@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-09 (Wave UI/UX Glass + Dashboard First)
+Docs-Revision: 2025-09-09 (Wave UI/UX Glass — Theme Tab)
 # FoodBank Manager — Product Requirements Document (PRD)
 
 **Repo file:** `Docs/PRD-foodbank-manager.md`  
@@ -21,7 +21,7 @@ Docs-Revision: 2025-09-09 (Wave UI/UX Glass + Dashboard First)
 - Settings — General, Email defaults, API/SMTP keys placeholders, Encryption KEK status, Front-end, Admin Theme (Light/Dark/High-Contrast, RTL).
 - Permissions — Role mapping and per-user overrides.
 - Diagnostics — SMTP test, Cron health, Export Jobs list, Cap repair.
-- Design & Theme — Admin theme presets, custom CSS.
+- Design & Theme — two subtabs (Admin UI, Front-end UI) with mode matrix (Glass/Basic × Light/Dark/High-Contrast), granular tokens (accent colour, blur, elevation, radius, border, surface alpha), and a "Match front-end to admin" toggle; accessibility fallbacks: High-Contrast disables blur/transparency and `prefers-reduced-transparency` forces solid surfaces.
 - Shortcodes — Helper reference and examples.
 - Events (optional) — Off by default; toggle in Settings.
 
@@ -48,7 +48,7 @@ FoodBank Manager is a secure, mobile-first WordPress plugin to:
 - Store submissions in a secure database with encryption at rest.
 - Provide admin and front-end dashboards to search, filter, export, and (for Managers) **track attendance** at distribution sessions.
 - Allow administrators to configure branding and default email senders via a validated settings page.
- - Offer a Design & Theme settings page for primary colour, density, font, default dark mode and optional custom CSS; inputs are sanitised and theme CSS variables are deterministic with clamped defaults applied across admin and front-end.
+- Offer a Design & Theme settings page with Admin UI and Front-end UI subtabs; modes (Glass or Basic) combine with Light/Dark/High-Contrast presets and granular tokens (accent, blur, elevation, radius, border, surface alpha) plus a Match front-end to admin toggle; inputs are sanitised and theme CSS variables are deterministic with clamped defaults applied across admin and front-end.
 - Admin pages are wrapped in a namespaced `.fbm-admin` container with plugin CSS and notices loaded only on FoodBank Manager screens.
 - Each admin page renders exactly once per request via a shared `RenderOnce` guard; no page may echo UI outside its submenu callback.
 - Administrators always see a FoodBank parent menu (falls back to `manage_options`), while subpages remain FBM-capability gated; Diagnostics includes a nonce-protected **Repair caps** button and duplicate-install consolidation.
