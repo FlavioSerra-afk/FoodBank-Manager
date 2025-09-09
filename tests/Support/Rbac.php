@@ -21,6 +21,7 @@ function fbm_grant_manager(): void {
         'fb_manage_attendance',
         'fb_manage_database',
         'fb_manage_forms',
+        'fbm_manage_forms',
         'fb_manage_emails',
         'fb_manage_settings',
         'fb_manage_diagnostics',
@@ -36,6 +37,7 @@ function fbm_grant_admin(): void {
         'fb_manage_attendance',
         'fb_manage_database',
         'fb_manage_forms',
+        'fbm_manage_forms',
         'fb_manage_emails',
         'fb_manage_settings',
         'fb_manage_diagnostics',
@@ -62,6 +64,7 @@ function fbm_required_cap_for_page(string $slug): string {
         'fbm_theme'         => 'fb_manage_theme',
         'fbm_events'       => 'fbm_manage_events',
         'fbm_scan'         => 'fbm_manage_events',
+        'fbm_form_builder' => 'fbm_manage_forms',
         'fbm_shortcodes'    => 'fb_manage_forms', // shortcodes builder is admin-only; tie to forms
     ];
     return $map[$slug] ?? 'fb_manage_dashboard';

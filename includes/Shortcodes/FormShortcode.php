@@ -14,6 +14,7 @@ use FoodBankManager\Forms\Schema;
 use function sanitize_key;
 use function shortcode_atts;
 use function wp_nonce_field;
+use function get_post_type;
 
 /**
  * Form shortcode.
@@ -26,25 +27,44 @@ final class FormShortcode {
 	 * @return string
 	 */
 	public static function render( array $atts = array() ): string {
-		$atts = shortcode_atts( array( 'preset' => '' ), $atts, 'fbm_form' );
-		$slug = sanitize_key( (string) $atts['preset'] );
-		if ( '' === $slug ) {
-			return '';
-		}
+		$atts = shortcode_atts(
+			array(
+				'id'     => '',
+				'preset' => '',
+			),
+			$atts,
+			'fbm_form'
+		);
+		$id   = (int) $atts['id'];
+		$slug = '';
+		if ( $id > 0 && function_exists( 'get_post_type' ) && 'fb_form' === get_post_type( $id ) ) {
+				$form = \FBM\Forms\FormRepo::get( $id );
+			if ( ! $form ) {
+					return '';
+			}
+				$schema = $form['schema'];
+		} else {
+				$slug = sanitize_key( (string) $atts['preset'] );
+			if ( '' === $slug ) {
+					return '';
+			}
 				$schema = PresetsRepo::get_by_slug( $slug );
-		if ( ! $schema ) {
-				return '';
+			if ( ! $schema ) {
+					return '';
+			}
 		}
 		try {
-				$schema = Schema::normalize( $schema );
+						$schema = Schema::normalize( $schema );
 		} catch ( \InvalidArgumentException $e ) {
-				return '';
+						return '';
 		}
 				$captcha_enabled = ( $schema['meta']['captcha'] ?? false ) === true;
 		ob_start();
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 				echo '<input type="hidden" name="action" value="fbm_submit" />';
+		if ( '' !== $slug ) {
 				echo '<input type="hidden" name="preset" value="' . esc_attr( $slug ) . '" />';
+		}
 				wp_nonce_field( 'fbm_submit_form', '_fbm_nonce', false );
 		foreach ( $schema['fields'] as $field ) {
 			self::render_field( $field );

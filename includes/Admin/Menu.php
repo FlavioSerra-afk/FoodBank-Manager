@@ -21,6 +21,7 @@ final class Menu {
         private const CAP_ATTENDANCE  = 'fb_manage_attendance';
         private const CAP_DATABASE    = 'fb_manage_database';
         private const CAP_FORMS       = 'fb_manage_forms';
+        private const CAP_FORM_BUILDER = 'fbm_manage_forms';
         private const CAP_EMAILS      = 'fb_manage_emails';
         private const CAP_SETTINGS    = 'fb_manage_settings';
         private const CAP_DIAGNOSTICS = 'fb_manage_diagnostics';
@@ -44,6 +45,7 @@ final class Menu {
                         'fbm_scan',
                         'fbm_database',
                         'fbm_forms',
+                        'fbm_form_builder',
                         'fbm_emails',
                         'fbm_settings',
                         'fbm_permissions',
@@ -153,6 +155,15 @@ final class Menu {
 
                 add_submenu_page(
                         $parent_slug,
+                        esc_html__( 'Forms (Builder)', 'foodbank-manager' ),
+                        esc_html__( 'Forms (Builder)', 'foodbank-manager' ),
+                        self::CAP_FORM_BUILDER,
+                        'fbm_form_builder',
+                        array( self::class, 'render_form_builder' )
+                );
+
+                add_submenu_page(
+                        $parent_slug,
                         esc_html__( 'Email Templates', 'foodbank-manager' ),
                         esc_html__( 'Email Templates', 'foodbank-manager' ),
                         self::CAP_EMAILS,
@@ -250,6 +261,12 @@ final class Menu {
         public static function render_forms(): void {
                 self::render_once( 'admin:forms', static function (): void {
                         \FoodBankManager\Admin\FormsPage::route();
+                } );
+        }
+
+        public static function render_form_builder(): void {
+                self::render_once( 'admin:form_builder', static function (): void {
+                        \FBM\Admin\FormBuilderPage::route();
                 } );
         }
 
