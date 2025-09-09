@@ -37,6 +37,11 @@ TL;DR: Unit=0/0, PHPStan=0, PHPCS(Lanes)=0/0, Packaging=PASS
 - ZIP root: `foodbank-manager/` (expect `foodbank-manager/`) — PASS
 - Main file present: PASS
 
+## PDF & XLSX Exports
+- Entry PDF receipts, bulk ZIPs, and dashboard XLSX exports covered by tests.
+- Headers sent via fbm_send_headers; masked by default with optional unmask.
+- Filenames follow expected patterns.
+
 ## 6) Prioritized next actions (errors-first)
 _None — all primary gates passing._
 

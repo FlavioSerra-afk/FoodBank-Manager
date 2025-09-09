@@ -1,267 +1,259 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="" tests="135" assertions="345" errors="0" warnings="0" failures="0" skipped="0" time="0.079663">
-    <testsuite name="Unit" tests="135" assertions="345" errors="0" warnings="0" failures="0" skipped="0" time="0.079663">
-      <testsuite name="ShortcodesPageTest" file="/workspace/FoodBank-Manager/tests/Unit/AAAShortcodesPageTest.php" tests="6" assertions="16" errors="0" warnings="0" failures="0" skipped="0" time="0.004998">
-        <testcase name="testDiscoverShortcodesMetadata" class="ShortcodesPageTest" classname="ShortcodesPageTest" file="/workspace/FoodBank-Manager/tests/Unit/AAAShortcodesPageTest.php" line="35" assertions="3" time="0.002949"/>
-        <testcase name="testCapabilityRequired" class="ShortcodesPageTest" classname="ShortcodesPageTest" file="/workspace/FoodBank-Manager/tests/Unit/AAAShortcodesPageTest.php" line="46" assertions="1" time="0.000425"/>
-        <testcase name="testInvalidNonceBlocksPreview" class="ShortcodesPageTest" classname="ShortcodesPageTest" file="/workspace/FoodBank-Manager/tests/Unit/AAAShortcodesPageTest.php" line="52" assertions="1" time="0.000279"/>
-        <testcase name="testUnknownShortcodeRejected" class="ShortcodesPageTest" classname="ShortcodesPageTest" file="/workspace/FoodBank-Manager/tests/Unit/AAAShortcodesPageTest.php" line="61" assertions="3" time="0.000575"/>
-        <testcase name="testAttributeSanitizer" class="ShortcodesPageTest" classname="ShortcodesPageTest" file="/workspace/FoodBank-Manager/tests/Unit/AAAShortcodesPageTest.php" line="75" assertions="4" time="0.000426"/>
-        <testcase name="testPreviewFiltersHtml" class="ShortcodesPageTest" classname="ShortcodesPageTest" file="/workspace/FoodBank-Manager/tests/Unit/AAAShortcodesPageTest.php" line="98" assertions="4" time="0.000343"/>
+  <testsuite name="" tests="143" assertions="362" errors="0" warnings="0" failures="0" skipped="0" time="0.114289">
+    <testsuite name="Unit" tests="143" assertions="362" errors="0" warnings="0" failures="0" skipped="0" time="0.114289">
+      <testsuite name="ShortcodesPageTest" file="/workspace/FoodBank-Manager/tests/Unit/AAAShortcodesPageTest.php" tests="6" assertions="16" errors="0" warnings="0" failures="0" skipped="0" time="0.007738">
+        <testcase name="testDiscoverShortcodesMetadata" class="ShortcodesPageTest" classname="ShortcodesPageTest" file="/workspace/FoodBank-Manager/tests/Unit/AAAShortcodesPageTest.php" line="35" assertions="3" time="0.004387"/>
+        <testcase name="testCapabilityRequired" class="ShortcodesPageTest" classname="ShortcodesPageTest" file="/workspace/FoodBank-Manager/tests/Unit/AAAShortcodesPageTest.php" line="46" assertions="1" time="0.000523"/>
+        <testcase name="testInvalidNonceBlocksPreview" class="ShortcodesPageTest" classname="ShortcodesPageTest" file="/workspace/FoodBank-Manager/tests/Unit/AAAShortcodesPageTest.php" line="52" assertions="1" time="0.000479"/>
+        <testcase name="testUnknownShortcodeRejected" class="ShortcodesPageTest" classname="ShortcodesPageTest" file="/workspace/FoodBank-Manager/tests/Unit/AAAShortcodesPageTest.php" line="61" assertions="3" time="0.000885"/>
+        <testcase name="testAttributeSanitizer" class="ShortcodesPageTest" classname="ShortcodesPageTest" file="/workspace/FoodBank-Manager/tests/Unit/AAAShortcodesPageTest.php" line="75" assertions="4" time="0.000628"/>
+        <testcase name="testPreviewFiltersHtml" class="ShortcodesPageTest" classname="ShortcodesPageTest" file="/workspace/FoodBank-Manager/tests/Unit/AAAShortcodesPageTest.php" line="98" assertions="4" time="0.000837"/>
       </testsuite>
-      <testsuite name="Tests\Unit\Admin\DatabasePageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/DatabasePageTest.php" tests="2" assertions="7" errors="0" warnings="0" failures="0" skipped="0" time="0.001964">
-        <testcase name="testRenderDenied" class="Tests\Unit\Admin\DatabasePageTest" classname="Tests.Unit.Admin.DatabasePageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/DatabasePageTest.php" line="21" assertions="2" time="0.000905"/>
-        <testcase name="testFilterInputsSanitizedAndWhitelisted" class="Tests\Unit\Admin\DatabasePageTest" classname="Tests.Unit.Admin.DatabasePageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/DatabasePageTest.php" line="28" assertions="5" time="0.001059"/>
+      <testsuite name="Tests\Unit\Admin\DatabasePageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/DatabasePageTest.php" tests="2" assertions="7" errors="0" warnings="0" failures="0" skipped="0" time="0.002633">
+        <testcase name="testRenderDenied" class="Tests\Unit\Admin\DatabasePageTest" classname="Tests.Unit.Admin.DatabasePageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/DatabasePageTest.php" line="21" assertions="2" time="0.001263"/>
+        <testcase name="testFilterInputsSanitizedAndWhitelisted" class="Tests\Unit\Admin\DatabasePageTest" classname="Tests.Unit.Admin.DatabasePageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/DatabasePageTest.php" line="28" assertions="5" time="0.001370"/>
       </testsuite>
-      <testsuite name="DiagnosticsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/DiagnosticsPageTest.php" tests="5" assertions="15" errors="0" warnings="0" failures="0" skipped="0" time="0.015106">
-        <testcase name="testTemplateRendersSmtpInfo" class="DiagnosticsPageTest" classname="DiagnosticsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/DiagnosticsPageTest.php" line="121" assertions="5" time="0.003532"/>
-        <testcase name="testCronTableShowsOverdue" class="DiagnosticsPageTest" classname="DiagnosticsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/DiagnosticsPageTest.php" line="138" assertions="3" time="0.003120"/>
-        <testcase name="testRetentionRunOutputsSummary" class="DiagnosticsPageTest" classname="DiagnosticsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/DiagnosticsPageTest.php" line="171" assertions="3" time="0.003262"/>
-        <testcase name="testRetentionDryRunOutputsSummary" class="DiagnosticsPageTest" classname="DiagnosticsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/DiagnosticsPageTest.php" line="200" assertions="3" time="0.003301"/>
-        <testcase name="testRepairCapsActionEnsuresCaps" class="DiagnosticsPageTest" classname="DiagnosticsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/DiagnosticsPageTest.php" line="229" assertions="1" time="0.001891"/>
+      <testsuite name="DiagnosticsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/DiagnosticsPageTest.php" tests="5" assertions="15" errors="0" warnings="0" failures="0" skipped="0" time="0.022065">
+        <testcase name="testTemplateRendersSmtpInfo" class="DiagnosticsPageTest" classname="DiagnosticsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/DiagnosticsPageTest.php" line="121" assertions="5" time="0.005179"/>
+        <testcase name="testCronTableShowsOverdue" class="DiagnosticsPageTest" classname="DiagnosticsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/DiagnosticsPageTest.php" line="138" assertions="3" time="0.004785"/>
+        <testcase name="testRetentionRunOutputsSummary" class="DiagnosticsPageTest" classname="DiagnosticsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/DiagnosticsPageTest.php" line="171" assertions="3" time="0.004668"/>
+        <testcase name="testRetentionDryRunOutputsSummary" class="DiagnosticsPageTest" classname="DiagnosticsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/DiagnosticsPageTest.php" line="200" assertions="3" time="0.004992"/>
+        <testcase name="testRepairCapsActionEnsuresCaps" class="DiagnosticsPageTest" classname="DiagnosticsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/DiagnosticsPageTest.php" line="229" assertions="1" time="0.002441"/>
       </testsuite>
-      <testsuite name="Tests\Unit\Admin\EntryPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/EntryPageTest.php" tests="6" assertions="10" errors="0" warnings="0" failures="0" skipped="0" time="0.013651">
-        <testcase name="testRenderDenied" class="Tests\Unit\Admin\EntryPageTest" classname="Tests.Unit.Admin.EntryPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/EntryPageTest.php" line="35" assertions="2" time="0.002006"/>
-        <testcase name="testRenderMasksEmailWithoutSensitiveCap" class="Tests\Unit\Admin\EntryPageTest" classname="Tests.Unit.Admin.EntryPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/EntryPageTest.php" line="50" assertions="4" time="0.002550"/>
-        <testcase name="testUnmaskShowsPlaintextWithCapability" class="Tests\Unit\Admin\EntryPageTest" classname="Tests.Unit.Admin.EntryPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/EntryPageTest.php" line="67" assertions="1" time="0.002189"/>
-        <testcase name="testUnmaskDeniedWithoutNonce" class="Tests\Unit\Admin\EntryPageTest" classname="Tests.Unit.Admin.EntryPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/EntryPageTest.php" line="91" assertions="1" time="0.002334"/>
-        <testcase name="testPdfDeniedWithoutNonce" class="Tests\Unit\Admin\EntryPageTest" classname="Tests.Unit.Admin.EntryPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/EntryPageTest.php" line="107" assertions="1" time="0.002183"/>
-        <testcase name="testPdfExportHandlesEngines" class="Tests\Unit\Admin\EntryPageTest" classname="Tests.Unit.Admin.EntryPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/EntryPageTest.php" line="122" assertions="1" time="0.002389"/>
+      <testsuite name="Tests\Unit\Admin\EntryPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/EntryPageTest.php" tests="6" assertions="10" errors="0" warnings="0" failures="0" skipped="0" time="0.019260">
+        <testcase name="testRenderDenied" class="Tests\Unit\Admin\EntryPageTest" classname="Tests.Unit.Admin.EntryPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/EntryPageTest.php" line="35" assertions="2" time="0.003044"/>
+        <testcase name="testRenderMasksEmailWithoutSensitiveCap" class="Tests\Unit\Admin\EntryPageTest" classname="Tests.Unit.Admin.EntryPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/EntryPageTest.php" line="50" assertions="4" time="0.003449"/>
+        <testcase name="testUnmaskShowsPlaintextWithCapability" class="Tests\Unit\Admin\EntryPageTest" classname="Tests.Unit.Admin.EntryPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/EntryPageTest.php" line="67" assertions="1" time="0.003254"/>
+        <testcase name="testUnmaskDeniedWithoutNonce" class="Tests\Unit\Admin\EntryPageTest" classname="Tests.Unit.Admin.EntryPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/EntryPageTest.php" line="91" assertions="1" time="0.003141"/>
+        <testcase name="testPdfDeniedWithoutNonce" class="Tests\Unit\Admin\EntryPageTest" classname="Tests.Unit.Admin.EntryPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/EntryPageTest.php" line="107" assertions="1" time="0.003286"/>
+        <testcase name="testPdfExportHandlesEngines" class="Tests\Unit\Admin\EntryPageTest" classname="Tests.Unit.Admin.EntryPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/EntryPageTest.php" line="122" assertions="1" time="0.003086"/>
       </testsuite>
-      <testsuite name="Tests\Unit\Admin\GDPRPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/GDPRPageTest.php" tests="5" assertions="8" errors="0" warnings="0" failures="0" skipped="0" time="0.010927">
-        <testcase name="testRenderDenied" class="Tests\Unit\Admin\GDPRPageTest" classname="Tests.Unit.Admin.GDPRPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/GDPRPageTest.php" line="53" assertions="2" time="0.002134"/>
-        <testcase name="testSearchPreview" class="Tests\Unit\Admin\GDPRPageTest" classname="Tests.Unit.Admin.GDPRPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/GDPRPageTest.php" line="62" assertions="1" time="0.002306"/>
-        <testcase name="testExportRequiresNonce" class="Tests\Unit\Admin\GDPRPageTest" classname="Tests.Unit.Admin.GDPRPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/GDPRPageTest.php" line="70" assertions="1" time="0.002251"/>
-        <testcase name="testMaskedByDefault" class="Tests\Unit\Admin\GDPRPageTest" classname="Tests.Unit.Admin.GDPRPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/GDPRPageTest.php" line="79" assertions="2" time="0.002149"/>
-        <testcase name="testUnmaskedWithCapability" class="Tests\Unit\Admin\GDPRPageTest" classname="Tests.Unit.Admin.GDPRPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/GDPRPageTest.php" line="94" assertions="2" time="0.002086"/>
+      <testsuite name="Tests\Unit\Admin\GDPRPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/GDPRPageTest.php" tests="5" assertions="8" errors="0" warnings="0" failures="0" skipped="0" time="0.015005">
+        <testcase name="testRenderDenied" class="Tests\Unit\Admin\GDPRPageTest" classname="Tests.Unit.Admin.GDPRPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/GDPRPageTest.php" line="53" assertions="2" time="0.002871"/>
+        <testcase name="testSearchPreview" class="Tests\Unit\Admin\GDPRPageTest" classname="Tests.Unit.Admin.GDPRPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/GDPRPageTest.php" line="62" assertions="1" time="0.002759"/>
+        <testcase name="testExportRequiresNonce" class="Tests\Unit\Admin\GDPRPageTest" classname="Tests.Unit.Admin.GDPRPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/GDPRPageTest.php" line="70" assertions="1" time="0.003070"/>
+        <testcase name="testMaskedByDefault" class="Tests\Unit\Admin\GDPRPageTest" classname="Tests.Unit.Admin.GDPRPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/GDPRPageTest.php" line="79" assertions="2" time="0.003529"/>
+        <testcase name="testUnmaskedWithCapability" class="Tests\Unit\Admin\GDPRPageTest" classname="Tests.Unit.Admin.GDPRPageTest" file="/workspace/FoodBank-Manager/tests/Unit/Admin/GDPRPageTest.php" line="94" assertions="2" time="0.002777"/>
       </testsuite>
-      <testsuite name="AdminTemplatesTest" file="/workspace/FoodBank-Manager/tests/Unit/AdminTemplatesTest.php" tests="1" assertions="1" errors="0" warnings="0" failures="0" skipped="0" time="0.000084">
-        <testcase name="testSettingsTemplateWrapped" class="AdminTemplatesTest" classname="AdminTemplatesTest" file="/workspace/FoodBank-Manager/tests/Unit/AdminTemplatesTest.php" line="8" assertions="1" time="0.000084"/>
+      <testsuite name="AdminTemplatesTest" file="/workspace/FoodBank-Manager/tests/Unit/AdminTemplatesTest.php" tests="1" assertions="1" errors="0" warnings="0" failures="0" skipped="0" time="0.000141">
+        <testcase name="testSettingsTemplateWrapped" class="AdminTemplatesTest" classname="AdminTemplatesTest" file="/workspace/FoodBank-Manager/tests/Unit/AdminTemplatesTest.php" line="8" assertions="1" time="0.000141"/>
       </testsuite>
-      <testsuite name="AssetsTest" file="/workspace/FoodBank-Manager/tests/Unit/AssetsTest.php" tests="2" assertions="9" errors="0" warnings="0" failures="0" skipped="0" time="0.000665">
-        <testcase name="test_admin_css_vars_only_on_fbm_screens" class="AssetsTest" classname="AssetsTest" file="/workspace/FoodBank-Manager/tests/Unit/AssetsTest.php" line="10" assertions="7" time="0.000413"/>
-        <testcase name="test_frontend_dashboard_css_gated_by_shortcode" class="AssetsTest" classname="AssetsTest" file="/workspace/FoodBank-Manager/tests/Unit/AssetsTest.php" line="33" assertions="2" time="0.000252"/>
+      <testsuite name="AssetsTest" file="/workspace/FoodBank-Manager/tests/Unit/AssetsTest.php" tests="2" assertions="9" errors="0" warnings="0" failures="0" skipped="0" time="0.000930">
+        <testcase name="test_admin_css_vars_only_on_fbm_screens" class="AssetsTest" classname="AssetsTest" file="/workspace/FoodBank-Manager/tests/Unit/AssetsTest.php" line="10" assertions="7" time="0.000549"/>
+        <testcase name="test_frontend_dashboard_css_gated_by_shortcode" class="AssetsTest" classname="AssetsTest" file="/workspace/FoodBank-Manager/tests/Unit/AssetsTest.php" line="33" assertions="2" time="0.000381"/>
       </testsuite>
-      <testsuite name="AttendanceRepoCompatTest" file="/workspace/FoodBank-Manager/tests/Unit/Attendance/AttendanceRepoCompatTest.php" tests="1" assertions="4" errors="0" warnings="0" failures="0" skipped="0" time="0.000385">
-        <testcase name="testCamelCaseProxies" class="AttendanceRepoCompatTest" classname="AttendanceRepoCompatTest" file="/workspace/FoodBank-Manager/tests/Unit/Attendance/AttendanceRepoCompatTest.php" line="15" assertions="4" time="0.000385"/>
+      <testsuite name="AttendanceRepoCompatTest" file="/workspace/FoodBank-Manager/tests/Unit/Attendance/AttendanceRepoCompatTest.php" tests="1" assertions="4" errors="0" warnings="0" failures="0" skipped="0" time="0.000415">
+        <testcase name="testCamelCaseProxies" class="AttendanceRepoCompatTest" classname="AttendanceRepoCompatTest" file="/workspace/FoodBank-Manager/tests/Unit/Attendance/AttendanceRepoCompatTest.php" line="15" assertions="4" time="0.000415"/>
       </testsuite>
-      <testsuite name="AttendancePolicyTest" file="/workspace/FoodBank-Manager/tests/Unit/AttendancePolicyTest.php" tests="1" assertions="3" errors="0" warnings="0" failures="0" skipped="0" time="0.000210">
-        <testcase name="testBreachWithinDays" class="AttendancePolicyTest" classname="AttendancePolicyTest" file="/workspace/FoodBank-Manager/tests/Unit/AttendancePolicyTest.php" line="8" assertions="3" time="0.000210"/>
+      <testsuite name="AttendancePolicyTest" file="/workspace/FoodBank-Manager/tests/Unit/AttendancePolicyTest.php" tests="1" assertions="3" errors="0" warnings="0" failures="0" skipped="0" time="0.000322">
+        <testcase name="testBreachWithinDays" class="AttendancePolicyTest" classname="AttendancePolicyTest" file="/workspace/FoodBank-Manager/tests/Unit/AttendancePolicyTest.php" line="8" assertions="3" time="0.000322"/>
       </testsuite>
-      <testsuite name="AttendanceRepoCountsTest" file="/workspace/FoodBank-Manager/tests/Unit/AttendanceRepoCountsTest.php" tests="1" assertions="5" errors="0" warnings="0" failures="0" skipped="0" time="0.000055">
-        <testcase name="testCountsReturnInts" class="AttendanceRepoCountsTest" classname="AttendanceRepoCountsTest" file="/workspace/FoodBank-Manager/tests/Unit/AttendanceRepoCountsTest.php" line="14" assertions="5" time="0.000055"/>
+      <testsuite name="AttendanceRepoCountsTest" file="/workspace/FoodBank-Manager/tests/Unit/AttendanceRepoCountsTest.php" tests="1" assertions="5" errors="0" warnings="0" failures="0" skipped="0" time="0.000092">
+        <testcase name="testCountsReturnInts" class="AttendanceRepoCountsTest" classname="AttendanceRepoCountsTest" file="/workspace/FoodBank-Manager/tests/Unit/AttendanceRepoCountsTest.php" line="14" assertions="5" time="0.000092"/>
       </testsuite>
-      <testsuite name="AttendanceRepoDailyCountsTest" file="/workspace/FoodBank-Manager/tests/Unit/AttendanceRepoDailyCountsTest.php" tests="1" assertions="3" errors="0" warnings="0" failures="0" skipped="0" time="0.000314">
-        <testcase name="testCountsLength" class="AttendanceRepoDailyCountsTest" classname="AttendanceRepoDailyCountsTest" file="/workspace/FoodBank-Manager/tests/Unit/AttendanceRepoDailyCountsTest.php" line="14" assertions="3" time="0.000314"/>
+      <testsuite name="AttendanceRepoDailyCountsTest" file="/workspace/FoodBank-Manager/tests/Unit/AttendanceRepoDailyCountsTest.php" tests="1" assertions="3" errors="0" warnings="0" failures="0" skipped="0" time="0.000368">
+        <testcase name="testCountsLength" class="AttendanceRepoDailyCountsTest" classname="AttendanceRepoDailyCountsTest" file="/workspace/FoodBank-Manager/tests/Unit/AttendanceRepoDailyCountsTest.php" line="14" assertions="3" time="0.000368"/>
       </testsuite>
-      <testsuite name="AttendanceRepoFilterTest" file="/workspace/FoodBank-Manager/tests/Unit/AttendanceRepoFilterTest.php" tests="1" assertions="4" errors="0" warnings="0" failures="0" skipped="0" time="0.000045">
-        <testcase name="testFiltersPrepared" class="AttendanceRepoFilterTest" classname="AttendanceRepoFilterTest" file="/workspace/FoodBank-Manager/tests/Unit/AttendanceRepoFilterTest.php" line="14" assertions="4" time="0.000045"/>
+      <testsuite name="AttendanceRepoFilterTest" file="/workspace/FoodBank-Manager/tests/Unit/AttendanceRepoFilterTest.php" tests="1" assertions="4" errors="0" warnings="0" failures="0" skipped="0" time="0.000049">
+        <testcase name="testFiltersPrepared" class="AttendanceRepoFilterTest" classname="AttendanceRepoFilterTest" file="/workspace/FoodBank-Manager/tests/Unit/AttendanceRepoFilterTest.php" line="14" assertions="4" time="0.000049"/>
       </testsuite>
-      <testsuite name="AttendanceRepoTest" file="/workspace/FoodBank-Manager/tests/Unit/AttendanceRepoTest.php" tests="1" assertions="4" errors="0" warnings="0" failures="0" skipped="0" time="0.000210">
-        <testcase name="testPeopleSummaryExcludesVoidedByDefault" class="AttendanceRepoTest" classname="AttendanceRepoTest" file="/workspace/FoodBank-Manager/tests/Unit/AttendanceRepoTest.php" line="9" assertions="4" time="0.000210"/>
+      <testsuite name="AttendanceRepoTest" file="/workspace/FoodBank-Manager/tests/Unit/AttendanceRepoTest.php" tests="1" assertions="4" errors="0" warnings="0" failures="0" skipped="0" time="0.000171">
+        <testcase name="testPeopleSummaryExcludesVoidedByDefault" class="AttendanceRepoTest" classname="AttendanceRepoTest" file="/workspace/FoodBank-Manager/tests/Unit/AttendanceRepoTest.php" line="9" assertions="4" time="0.000171"/>
       </testsuite>
-      <testsuite name="AuditTest" file="/workspace/FoodBank-Manager/tests/Unit/AuditTest.php" tests="1" assertions="4" errors="0" warnings="0" failures="0" skipped="0" time="0.000125">
-        <testcase name="testLogInsertsRow" class="AuditTest" classname="AuditTest" file="/workspace/FoodBank-Manager/tests/Unit/AuditTest.php" line="9" assertions="4" time="0.000125"/>
+      <testsuite name="AuditTest" file="/workspace/FoodBank-Manager/tests/Unit/AuditTest.php" tests="1" assertions="4" errors="0" warnings="0" failures="0" skipped="0" time="0.000191">
+        <testcase name="testLogInsertsRow" class="AuditTest" classname="AuditTest" file="/workspace/FoodBank-Manager/tests/Unit/AuditTest.php" line="9" assertions="4" time="0.000191"/>
       </testsuite>
-      <testsuite name="CapabilitiesTest" file="/workspace/FoodBank-Manager/tests/Unit/Auth/CapabilitiesTest.php" tests="1" assertions="11" errors="0" warnings="0" failures="0" skipped="0" time="0.000070">
-        <testcase name="testEnsureForAdminAddsAllCapsIdempotently" class="CapabilitiesTest" classname="CapabilitiesTest" file="/workspace/FoodBank-Manager/tests/Unit/Auth/CapabilitiesTest.php" line="13" assertions="11" time="0.000070"/>
+      <testsuite name="CapabilitiesTest" file="/workspace/FoodBank-Manager/tests/Unit/Auth/CapabilitiesTest.php" tests="1" assertions="11" errors="0" warnings="0" failures="0" skipped="0" time="0.000086">
+        <testcase name="testEnsureForAdminAddsAllCapsIdempotently" class="CapabilitiesTest" classname="CapabilitiesTest" file="/workspace/FoodBank-Manager/tests/Unit/Auth/CapabilitiesTest.php" line="13" assertions="11" time="0.000086"/>
       </testsuite>
-      <testsuite name="CapabilitiesResolverTest" file="/workspace/FoodBank-Manager/tests/Unit/CapabilitiesResolverTest.php" tests="2" assertions="4" errors="0" warnings="0" failures="0" skipped="0" time="0.000091">
-        <testcase name="testMergesRoleAndOverrides" class="CapabilitiesResolverTest" classname="CapabilitiesResolverTest" file="/workspace/FoodBank-Manager/tests/Unit/CapabilitiesResolverTest.php" line="13" assertions="3" time="0.000070"/>
-        <testcase name="testUnknownCapsIgnored" class="CapabilitiesResolverTest" classname="CapabilitiesResolverTest" file="/workspace/FoodBank-Manager/tests/Unit/CapabilitiesResolverTest.php" line="28" assertions="1" time="0.000022"/>
+      <testsuite name="CapabilitiesResolverTest" file="/workspace/FoodBank-Manager/tests/Unit/CapabilitiesResolverTest.php" tests="2" assertions="4" errors="0" warnings="0" failures="0" skipped="0" time="0.000075">
+        <testcase name="testMergesRoleAndOverrides" class="CapabilitiesResolverTest" classname="CapabilitiesResolverTest" file="/workspace/FoodBank-Manager/tests/Unit/CapabilitiesResolverTest.php" line="13" assertions="3" time="0.000048"/>
+        <testcase name="testUnknownCapsIgnored" class="CapabilitiesResolverTest" classname="CapabilitiesResolverTest" file="/workspace/FoodBank-Manager/tests/Unit/CapabilitiesResolverTest.php" line="28" assertions="1" time="0.000027"/>
       </testsuite>
-      <testsuite name="RetentionConfigTest" file="/workspace/FoodBank-Manager/tests/Unit/Core/RetentionConfigTest.php" tests="4" assertions="6" errors="0" warnings="0" failures="0" skipped="0" time="0.000217">
-        <testcase name="testNullYieldsDefaults" class="RetentionConfigTest" classname="RetentionConfigTest" file="/workspace/FoodBank-Manager/tests/Unit/Core/RetentionConfigTest.php" line="9" assertions="1" time="0.000151"/>
-        <testcase name="testJsonStringIsParsed" class="RetentionConfigTest" classname="RetentionConfigTest" file="/workspace/FoodBank-Manager/tests/Unit/Core/RetentionConfigTest.php" line="15" assertions="2" time="0.000029"/>
-        <testcase name="testInvalidPolicyAndNegativeDaysAreCorrected" class="RetentionConfigTest" classname="RetentionConfigTest" file="/workspace/FoodBank-Manager/tests/Unit/Core/RetentionConfigTest.php" line="23" assertions="2" time="0.000021"/>
-        <testcase name="testMailLogKeyIsMapped" class="RetentionConfigTest" classname="RetentionConfigTest" file="/workspace/FoodBank-Manager/tests/Unit/Core/RetentionConfigTest.php" line="31" assertions="1" time="0.000016"/>
+      <testsuite name="RetentionConfigTest" file="/workspace/FoodBank-Manager/tests/Unit/Core/RetentionConfigTest.php" tests="4" assertions="6" errors="0" warnings="0" failures="0" skipped="0" time="0.000299">
+        <testcase name="testNullYieldsDefaults" class="RetentionConfigTest" classname="RetentionConfigTest" file="/workspace/FoodBank-Manager/tests/Unit/Core/RetentionConfigTest.php" line="9" assertions="1" time="0.000194"/>
+        <testcase name="testJsonStringIsParsed" class="RetentionConfigTest" classname="RetentionConfigTest" file="/workspace/FoodBank-Manager/tests/Unit/Core/RetentionConfigTest.php" line="15" assertions="2" time="0.000042"/>
+        <testcase name="testInvalidPolicyAndNegativeDaysAreCorrected" class="RetentionConfigTest" classname="RetentionConfigTest" file="/workspace/FoodBank-Manager/tests/Unit/Core/RetentionConfigTest.php" line="23" assertions="2" time="0.000041"/>
+        <testcase name="testMailLogKeyIsMapped" class="RetentionConfigTest" classname="RetentionConfigTest" file="/workspace/FoodBank-Manager/tests/Unit/Core/RetentionConfigTest.php" line="31" assertions="1" time="0.000022"/>
       </testsuite>
-      <testsuite name="RetentionTest" file="/workspace/FoodBank-Manager/tests/Unit/Core/RetentionTest.php" tests="2" assertions="9" errors="0" warnings="0" failures="0" skipped="0" time="0.000536">
-        <testcase name="testRunProcessesAndLimits" class="RetentionTest" classname="RetentionTest" file="/workspace/FoodBank-Manager/tests/Unit/Core/RetentionTest.php" line="108" assertions="6" time="0.000434"/>
-        <testcase name="testDryRunDoesNotWrite" class="RetentionTest" classname="RetentionTest" file="/workspace/FoodBank-Manager/tests/Unit/Core/RetentionTest.php" line="120" assertions="3" time="0.000102"/>
+      <testsuite name="RetentionTest" file="/workspace/FoodBank-Manager/tests/Unit/Core/RetentionTest.php" tests="2" assertions="9" errors="0" warnings="0" failures="0" skipped="0" time="0.000841">
+        <testcase name="testRunProcessesAndLimits" class="RetentionTest" classname="RetentionTest" file="/workspace/FoodBank-Manager/tests/Unit/Core/RetentionTest.php" line="108" assertions="6" time="0.000591"/>
+        <testcase name="testDryRunDoesNotWrite" class="RetentionTest" classname="RetentionTest" file="/workspace/FoodBank-Manager/tests/Unit/Core/RetentionTest.php" line="120" assertions="3" time="0.000250"/>
       </testsuite>
-      <testsuite name="TraceTest" file="/workspace/FoodBank-Manager/tests/Unit/Core/TraceTest.php" tests="2" assertions="2" errors="0" warnings="0" failures="0" skipped="0" time="0.000060">
-        <testcase name="testCountsIncrement" class="TraceTest" classname="TraceTest" file="/workspace/FoodBank-Manager/tests/Unit/Core/TraceTest.php" line="8" assertions="1" time="0.000035">
+      <testsuite name="TraceTest" file="/workspace/FoodBank-Manager/tests/Unit/Core/TraceTest.php" tests="2" assertions="2" errors="0" warnings="0" failures="0" skipped="0" time="0.000066">
+        <testcase name="testCountsIncrement" class="TraceTest" classname="TraceTest" file="/workspace/FoodBank-Manager/tests/Unit/Core/TraceTest.php" line="8" assertions="1" time="0.000029">
           <system-out>
 &lt;!-- fbm-render count-test pass=1 --&gt;
 
 &lt;!-- fbm-render count-test pass=2 --&gt;
 </system-out>
         </testcase>
-        <testcase name="testMarkOutputsComment" class="TraceTest" classname="TraceTest" file="/workspace/FoodBank-Manager/tests/Unit/Core/TraceTest.php" line="15" assertions="1" time="0.000025"/>
+        <testcase name="testMarkOutputsComment" class="TraceTest" classname="TraceTest" file="/workspace/FoodBank-Manager/tests/Unit/Core/TraceTest.php" line="15" assertions="1" time="0.000037"/>
       </testsuite>
-      <testsuite name="CssSanitizerTest" file="/workspace/FoodBank-Manager/tests/Unit/CssSanitizerTest.php" tests="1" assertions="1" errors="0" warnings="0" failures="0" skipped="0" time="0.000195">
-        <testcase name="testStripsForbidden" class="CssSanitizerTest" classname="CssSanitizerTest" file="/workspace/FoodBank-Manager/tests/Unit/CssSanitizerTest.php" line="8" assertions="1" time="0.000195"/>
+      <testsuite name="CssSanitizerTest" file="/workspace/FoodBank-Manager/tests/Unit/CssSanitizerTest.php" tests="1" assertions="1" errors="0" warnings="0" failures="0" skipped="0" time="0.000236">
+        <testcase name="testStripsForbidden" class="CssSanitizerTest" classname="CssSanitizerTest" file="/workspace/FoodBank-Manager/tests/Unit/CssSanitizerTest.php" line="8" assertions="1" time="0.000236"/>
       </testsuite>
-      <testsuite name="CsvExporterTest" file="/workspace/FoodBank-Manager/tests/Unit/CsvExporterTest.php" tests="3" assertions="10" errors="0" warnings="0" failures="0" skipped="0" time="0.001877">
-        <testcase name="testStreamListMasksSensitiveByDefault" class="CsvExporterTest" classname="CsvExporterTest" file="/workspace/FoodBank-Manager/tests/Unit/CsvExporterTest.php" line="14" assertions="4" time="0.001754"/>
-        <testcase name="testStreamListUnmaskedWhenAllowed" class="CsvExporterTest" classname="CsvExporterTest" file="/workspace/FoodBank-Manager/tests/Unit/CsvExporterTest.php" line="37" assertions="4" time="0.000081"/>
-        <testcase name="testStreamListEmptyRowsOutputsOnlyBom" class="CsvExporterTest" classname="CsvExporterTest" file="/workspace/FoodBank-Manager/tests/Unit/CsvExporterTest.php" line="67" assertions="2" time="0.000042"/>
+      <testsuite name="CsvExporterTest" file="/workspace/FoodBank-Manager/tests/Unit/CsvExporterTest.php" tests="3" assertions="8" errors="0" warnings="0" failures="0" skipped="0" time="0.000780">
+        <testcase name="testStreamListMasksSensitiveByDefault" class="CsvExporterTest" classname="CsvExporterTest" file="/workspace/FoodBank-Manager/tests/Unit/CsvExporterTest.php" line="14" assertions="3" time="0.000690"/>
+        <testcase name="testStreamListUnmaskedWhenAllowed" class="CsvExporterTest" classname="CsvExporterTest" file="/workspace/FoodBank-Manager/tests/Unit/CsvExporterTest.php" line="36" assertions="4" time="0.000055"/>
+        <testcase name="testStreamListEmptyRowsOutputsOnlyBom" class="CsvExporterTest" classname="CsvExporterTest" file="/workspace/FoodBank-Manager/tests/Unit/CsvExporterTest.php" line="66" assertions="1" time="0.000035"/>
       </testsuite>
-      <testsuite name="DashboardCsvTest" file="/workspace/FoodBank-Manager/tests/Unit/DashboardCsvTest.php" tests="1" assertions="2" errors="0" warnings="0" failures="0" skipped="0" time="0.000214">
-        <testcase name="testBomAndHeaders" class="DashboardCsvTest" classname="DashboardCsvTest" file="/workspace/FoodBank-Manager/tests/Unit/DashboardCsvTest.php" line="8" assertions="2" time="0.000214">
-          <system-out>
-Deprecated: fputcsv(): the $escape parameter must be provided as its default value will change in /workspace/FoodBank-Manager/includes/Exports/DashboardCsv.php on line 31
-
-Deprecated: fputcsv(): the $escape parameter must be provided as its default value will change in /workspace/FoodBank-Manager/includes/Exports/DashboardCsv.php on line 34
-
-Deprecated: fputcsv(): the $escape parameter must be provided as its default value will change in /workspace/FoodBank-Manager/includes/Exports/DashboardCsv.php on line 34
-
-Deprecated: fputcsv(): the $escape parameter must be provided as its default value will change in /workspace/FoodBank-Manager/includes/Exports/DashboardCsv.php on line 34
-
-Deprecated: fputcsv(): the $escape parameter must be provided as its default value will change in /workspace/FoodBank-Manager/includes/Exports/DashboardCsv.php on line 34
-
-Deprecated: fputcsv(): the $escape parameter must be provided as its default value will change in /workspace/FoodBank-Manager/includes/Exports/DashboardCsv.php on line 34
-
-Deprecated: fputcsv(): the $escape parameter must be provided as its default value will change in /workspace/FoodBank-Manager/includes/Exports/DashboardCsv.php on line 34
-
-Deprecated: fputcsv(): the $escape parameter must be provided as its default value will change in /workspace/FoodBank-Manager/includes/Exports/DashboardCsv.php on line 37
-
-Deprecated: fputcsv(): the $escape parameter must be provided as its default value will change in /workspace/FoodBank-Manager/includes/Exports/DashboardCsv.php on line 38
-
-Deprecated: fputcsv(): the $escape parameter must be provided as its default value will change in /workspace/FoodBank-Manager/includes/Exports/DashboardCsv.php on line 42
-</system-out>
-        </testcase>
+      <testsuite name="DashboardDeltaTest" file="/workspace/FoodBank-Manager/tests/Unit/DashboardDeltaTest.php" tests="1" assertions="3" errors="0" warnings="0" failures="0" skipped="0" time="0.000665">
+        <testcase name="testDeltaMath" class="DashboardDeltaTest" classname="DashboardDeltaTest" file="/workspace/FoodBank-Manager/tests/Unit/DashboardDeltaTest.php" line="8" assertions="3" time="0.000665"/>
       </testsuite>
-      <testsuite name="DashboardDeltaTest" file="/workspace/FoodBank-Manager/tests/Unit/DashboardDeltaTest.php" tests="1" assertions="3" errors="0" warnings="0" failures="0" skipped="0" time="0.000437">
-        <testcase name="testDeltaMath" class="DashboardDeltaTest" classname="DashboardDeltaTest" file="/workspace/FoodBank-Manager/tests/Unit/DashboardDeltaTest.php" line="8" assertions="3" time="0.000437"/>
+      <testsuite name="DashboardExportControllerTest" file="/workspace/FoodBank-Manager/tests/Unit/DashboardExportControllerTest.php" tests="2" assertions="2" errors="0" warnings="0" failures="0" skipped="0" time="0.000807">
+        <testcase name="testNonceRequired" class="DashboardExportControllerTest" classname="DashboardExportControllerTest" file="/workspace/FoodBank-Manager/tests/Unit/DashboardExportControllerTest.php" line="17" assertions="1" time="0.000482"/>
+        <testcase name="testExportsCsv" class="DashboardExportControllerTest" classname="DashboardExportControllerTest" file="/workspace/FoodBank-Manager/tests/Unit/DashboardExportControllerTest.php" line="26" assertions="1" time="0.000324"/>
       </testsuite>
-      <testsuite name="DashboardExportControllerTest" file="/workspace/FoodBank-Manager/tests/Unit/DashboardExportControllerTest.php" tests="2" assertions="3" errors="0" warnings="0" failures="0" skipped="0" time="0.004216">
-        <testcase name="testNonceRequired" class="DashboardExportControllerTest" classname="DashboardExportControllerTest" file="/workspace/FoodBank-Manager/tests/Unit/DashboardExportControllerTest.php" line="16" assertions="1" time="0.001965"/>
-        <testcase name="testExportsCsv" class="DashboardExportControllerTest" classname="DashboardExportControllerTest" file="/workspace/FoodBank-Manager/tests/Unit/DashboardExportControllerTest.php" line="25" assertions="2" time="0.002250"/>
+      <testsuite name="FoodBankManagerTest\DashboardShortcodeTest" file="/workspace/FoodBank-Manager/tests/Unit/DashboardShortcodeTest.php" tests="4" assertions="8" errors="0" warnings="0" failures="0" skipped="0" time="0.001015">
+        <testcase name="testSanitizePeriod" class="FoodBankManagerTest\DashboardShortcodeTest" classname="FoodBankManagerTest.DashboardShortcodeTest" file="/workspace/FoodBank-Manager/tests/Unit/DashboardShortcodeTest.php" line="16" assertions="1" time="0.000067"/>
+        <testcase name="testSanitizeTypeAndEvent" class="FoodBankManagerTest\DashboardShortcodeTest" classname="FoodBankManagerTest.DashboardShortcodeTest" file="/workspace/FoodBank-Manager/tests/Unit/DashboardShortcodeTest.php" line="21" assertions="4" time="0.000053"/>
+        <testcase name="testUnauthorizedGated" class="FoodBankManagerTest\DashboardShortcodeTest" classname="FoodBankManagerTest.DashboardShortcodeTest" file="/workspace/FoodBank-Manager/tests/Unit/DashboardShortcodeTest.php" line="29" assertions="1" time="0.000129"/>
+        <testcase name="testSafeHtmlOutput" class="FoodBankManagerTest\DashboardShortcodeTest" classname="FoodBankManagerTest.DashboardShortcodeTest" file="/workspace/FoodBank-Manager/tests/Unit/DashboardShortcodeTest.php" line="37" assertions="2" time="0.000766"/>
       </testsuite>
-      <testsuite name="FoodBankManagerTest\DashboardShortcodeTest" file="/workspace/FoodBank-Manager/tests/Unit/DashboardShortcodeTest.php" tests="4" assertions="8" errors="0" warnings="0" failures="0" skipped="0" time="0.000948">
-        <testcase name="testSanitizePeriod" class="FoodBankManagerTest\DashboardShortcodeTest" classname="FoodBankManagerTest.DashboardShortcodeTest" file="/workspace/FoodBank-Manager/tests/Unit/DashboardShortcodeTest.php" line="16" assertions="1" time="0.000104"/>
-        <testcase name="testSanitizeTypeAndEvent" class="FoodBankManagerTest\DashboardShortcodeTest" classname="FoodBankManagerTest.DashboardShortcodeTest" file="/workspace/FoodBank-Manager/tests/Unit/DashboardShortcodeTest.php" line="21" assertions="4" time="0.000042"/>
-        <testcase name="testUnauthorizedGated" class="FoodBankManagerTest\DashboardShortcodeTest" classname="FoodBankManagerTest.DashboardShortcodeTest" file="/workspace/FoodBank-Manager/tests/Unit/DashboardShortcodeTest.php" line="29" assertions="1" time="0.000094"/>
-        <testcase name="testSafeHtmlOutput" class="FoodBankManagerTest\DashboardShortcodeTest" classname="FoodBankManagerTest.DashboardShortcodeTest" file="/workspace/FoodBank-Manager/tests/Unit/DashboardShortcodeTest.php" line="37" assertions="2" time="0.000708"/>
+      <testsuite name="EmailsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/EmailsPageTest.php" tests="11" assertions="27" errors="0" warnings="0" failures="0" skipped="0" time="0.003246">
+        <testcase name="testCapabilityRequired" class="EmailsPageTest" classname="EmailsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/EmailsPageTest.php" line="28" assertions="1" time="0.000439"/>
+        <testcase name="testListRenders" class="EmailsPageTest" classname="EmailsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/EmailsPageTest.php" line="34" assertions="3" time="0.000625"/>
+        <testcase name="testSaveMissingNonceBlocked" class="EmailsPageTest" classname="EmailsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/EmailsPageTest.php" line="43" assertions="1" time="0.000106"/>
+        <testcase name="testSaveRequiresCapability" class="EmailsPageTest" classname="EmailsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/EmailsPageTest.php" line="55" assertions="1" time="0.000061"/>
+        <testcase name="testSuccessfulSaveSanitizes" class="EmailsPageTest" classname="EmailsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/EmailsPageTest.php" line="69" assertions="6" time="0.000717"/>
+        <testcase name="testPreviewMissingNonceBlocked" class="EmailsPageTest" classname="EmailsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/EmailsPageTest.php" line="96" assertions="1" time="0.000087"/>
+        <testcase name="testPreviewRequiresCapability" class="EmailsPageTest" classname="EmailsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/EmailsPageTest.php" line="112" assertions="1" time="0.000038"/>
+        <testcase name="testPreviewSubstitutesTokens" class="EmailsPageTest" classname="EmailsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/EmailsPageTest.php" line="124" assertions="5" time="0.000645"/>
+        <testcase name="testResetMissingNonceBlocked" class="EmailsPageTest" classname="EmailsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/EmailsPageTest.php" line="149" assertions="1" time="0.000097"/>
+        <testcase name="testResetRequiresCapability" class="EmailsPageTest" classname="EmailsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/EmailsPageTest.php" line="159" assertions="1" time="0.000056"/>
+        <testcase name="testResetRestoresDefaults" class="EmailsPageTest" classname="EmailsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/EmailsPageTest.php" line="171" assertions="6" time="0.000374"/>
       </testsuite>
-      <testsuite name="EmailsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/EmailsPageTest.php" tests="11" assertions="27" errors="0" warnings="0" failures="0" skipped="0" time="0.002148">
-        <testcase name="testCapabilityRequired" class="EmailsPageTest" classname="EmailsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/EmailsPageTest.php" line="28" assertions="1" time="0.000361"/>
-        <testcase name="testListRenders" class="EmailsPageTest" classname="EmailsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/EmailsPageTest.php" line="34" assertions="3" time="0.000476"/>
-        <testcase name="testSaveMissingNonceBlocked" class="EmailsPageTest" classname="EmailsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/EmailsPageTest.php" line="43" assertions="1" time="0.000082"/>
-        <testcase name="testSaveRequiresCapability" class="EmailsPageTest" classname="EmailsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/EmailsPageTest.php" line="55" assertions="1" time="0.000047"/>
-        <testcase name="testSuccessfulSaveSanitizes" class="EmailsPageTest" classname="EmailsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/EmailsPageTest.php" line="69" assertions="6" time="0.000192"/>
-        <testcase name="testPreviewMissingNonceBlocked" class="EmailsPageTest" classname="EmailsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/EmailsPageTest.php" line="96" assertions="1" time="0.000041"/>
-        <testcase name="testPreviewRequiresCapability" class="EmailsPageTest" classname="EmailsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/EmailsPageTest.php" line="112" assertions="1" time="0.000037"/>
-        <testcase name="testPreviewSubstitutesTokens" class="EmailsPageTest" classname="EmailsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/EmailsPageTest.php" line="124" assertions="5" time="0.000554"/>
-        <testcase name="testResetMissingNonceBlocked" class="EmailsPageTest" classname="EmailsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/EmailsPageTest.php" line="149" assertions="1" time="0.000085"/>
-        <testcase name="testResetRequiresCapability" class="EmailsPageTest" classname="EmailsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/EmailsPageTest.php" line="159" assertions="1" time="0.000047"/>
-        <testcase name="testResetRestoresDefaults" class="EmailsPageTest" classname="EmailsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/EmailsPageTest.php" line="171" assertions="6" time="0.000225"/>
+      <testsuite name="BulkPdfZipTest" file="/workspace/FoodBank-Manager/tests/Unit/Exports/BulkPdfZipTest.php" tests="2" assertions="6" errors="0" warnings="0" failures="0" skipped="0" time="0.004427">
+        <testcase name="testBuildZipMasked" class="BulkPdfZipTest" classname="BulkPdfZipTest" file="/workspace/FoodBank-Manager/tests/Unit/Exports/BulkPdfZipTest.php" line="15" assertions="5" time="0.003501"/>
+        <testcase name="testUnmasked" class="BulkPdfZipTest" classname="BulkPdfZipTest" file="/workspace/FoodBank-Manager/tests/Unit/Exports/BulkPdfZipTest.php" line="36" assertions="1" time="0.000926"/>
       </testsuite>
-      <testsuite name="PdfExporterTest" file="/workspace/FoodBank-Manager/tests/Unit/Exports/PdfExporterTest.php" tests="1" assertions="3" errors="0" warnings="0" failures="0" skipped="0" time="0.000255">
-        <testcase name="testRenderEntryHandlesEngines" class="PdfExporterTest" classname="PdfExporterTest" file="/workspace/FoodBank-Manager/tests/Unit/Exports/PdfExporterTest.php" line="8" assertions="3" time="0.000255"/>
+      <testsuite name="PdfExporterTest" file="/workspace/FoodBank-Manager/tests/Unit/Exports/PdfExporterTest.php" tests="1" assertions="3" errors="0" warnings="0" failures="0" skipped="0" time="0.000332">
+        <testcase name="testRenderEntryHandlesEngines" class="PdfExporterTest" classname="PdfExporterTest" file="/workspace/FoodBank-Manager/tests/Unit/Exports/PdfExporterTest.php" line="8" assertions="3" time="0.000332"/>
       </testsuite>
-      <testsuite name="SarExporterTest" file="/workspace/FoodBank-Manager/tests/Unit/Exports/SarExporterTest.php" tests="5" assertions="17" errors="0" warnings="0" failures="0" skipped="0" time="0.003068">
-        <testcase name="testMaskedExport" class="SarExporterTest" classname="SarExporterTest" file="/workspace/FoodBank-Manager/tests/Unit/Exports/SarExporterTest.php" line="19" assertions="3" time="0.001631"/>
-        <testcase name="testUnmaskedExport" class="SarExporterTest" classname="SarExporterTest" file="/workspace/FoodBank-Manager/tests/Unit/Exports/SarExporterTest.php" line="49" assertions="1" time="0.000409"/>
-        <testcase name="testFilenameSanitized" class="SarExporterTest" classname="SarExporterTest" file="/workspace/FoodBank-Manager/tests/Unit/Exports/SarExporterTest.php" line="74" assertions="9" time="0.000572"/>
-        <testcase name="testHtmlFallback" class="SarExporterTest" classname="SarExporterTest" file="/workspace/FoodBank-Manager/tests/Unit/Exports/SarExporterTest.php" line="101" assertions="2" time="0.000179"/>
-        <testcase name="testStreamOutputsHeaders" class="SarExporterTest" classname="SarExporterTest" file="/workspace/FoodBank-Manager/tests/Unit/Exports/SarExporterTest.php" line="117" assertions="2" time="0.000276"/>
+      <testsuite name="PdfReceiptTest" file="/workspace/FoodBank-Manager/tests/Unit/Exports/PdfReceiptTest.php" tests="2" assertions="6" errors="0" warnings="0" failures="0" skipped="0" time="0.000211">
+        <testcase name="testHtmlFallbackAndMasking" class="PdfReceiptTest" classname="PdfReceiptTest" file="/workspace/FoodBank-Manager/tests/Unit/Exports/PdfReceiptTest.php" line="13" assertions="4" time="0.000098"/>
+        <testcase name="testPdfEnginePath" class="PdfReceiptTest" classname="PdfReceiptTest" file="/workspace/FoodBank-Manager/tests/Unit/Exports/PdfReceiptTest.php" line="26" assertions="2" time="0.000113"/>
       </testsuite>
-      <testsuite name="FoodBankManager\Tests\Unit\Forms\PresetsRepoTest" file="/workspace/FoodBank-Manager/tests/Unit/Forms/PresetsRepoTest.php" tests="1" assertions="4" errors="0" warnings="0" failures="0" skipped="0" time="0.000556">
-        <testcase name="testUpsertGetDelete" class="FoodBankManager\Tests\Unit\Forms\PresetsRepoTest" classname="FoodBankManager.Tests.Unit.Forms.PresetsRepoTest" file="/workspace/FoodBank-Manager/tests/Unit/Forms/PresetsRepoTest.php" line="18" assertions="4" time="0.000556"/>
+      <testsuite name="SarExporterTest" file="/workspace/FoodBank-Manager/tests/Unit/Exports/SarExporterTest.php" tests="5" assertions="17" errors="0" warnings="0" failures="0" skipped="0" time="0.003419">
+        <testcase name="testMaskedExport" class="SarExporterTest" classname="SarExporterTest" file="/workspace/FoodBank-Manager/tests/Unit/Exports/SarExporterTest.php" line="19" assertions="3" time="0.001158"/>
+        <testcase name="testUnmaskedExport" class="SarExporterTest" classname="SarExporterTest" file="/workspace/FoodBank-Manager/tests/Unit/Exports/SarExporterTest.php" line="49" assertions="1" time="0.000672"/>
+        <testcase name="testFilenameSanitized" class="SarExporterTest" classname="SarExporterTest" file="/workspace/FoodBank-Manager/tests/Unit/Exports/SarExporterTest.php" line="74" assertions="9" time="0.000912"/>
+        <testcase name="testHtmlFallback" class="SarExporterTest" classname="SarExporterTest" file="/workspace/FoodBank-Manager/tests/Unit/Exports/SarExporterTest.php" line="101" assertions="2" time="0.000205"/>
+        <testcase name="testStreamOutputsHeaders" class="SarExporterTest" classname="SarExporterTest" file="/workspace/FoodBank-Manager/tests/Unit/Exports/SarExporterTest.php" line="117" assertions="2" time="0.000472"/>
       </testsuite>
-      <testsuite name="FoodBankManager\Tests\Unit\Forms\SchemaTest" file="/workspace/FoodBank-Manager/tests/Unit/Forms/SchemaTest.php" tests="4" assertions="7" errors="0" warnings="0" failures="0" skipped="0" time="0.000177">
-        <testcase name="testNormalizeValid" class="FoodBankManager\Tests\Unit\Forms\SchemaTest" classname="FoodBankManager.Tests.Unit.Forms.SchemaTest" file="/workspace/FoodBank-Manager/tests/Unit/Forms/SchemaTest.php" line="10" assertions="3" time="0.000070"/>
-        <testcase name="testInvalidTypeThrows" class="FoodBankManager\Tests\Unit\Forms\SchemaTest" classname="FoodBankManager.Tests.Unit.Forms.SchemaTest" file="/workspace/FoodBank-Manager/tests/Unit/Forms/SchemaTest.php" line="24" assertions="1" time="0.000033"/>
-        <testcase name="testDuplicateIdThrows" class="FoodBankManager\Tests\Unit\Forms\SchemaTest" classname="FoodBankManager.Tests.Unit.Forms.SchemaTest" file="/workspace/FoodBank-Manager/tests/Unit/Forms/SchemaTest.php" line="36" assertions="1" time="0.000030"/>
-        <testcase name="testConsentAndFileFieldsNormalized" class="FoodBankManager\Tests\Unit\Forms\SchemaTest" classname="FoodBankManager.Tests.Unit.Forms.SchemaTest" file="/workspace/FoodBank-Manager/tests/Unit/Forms/SchemaTest.php" line="49" assertions="2" time="0.000044"/>
+      <testsuite name="XlsxWriterTest" file="/workspace/FoodBank-Manager/tests/Unit/Exports/XlsxWriterTest.php" tests="1" assertions="4" errors="0" warnings="0" failures="0" skipped="0" time="0.001815">
+        <testcase name="testBuildXlsx" class="XlsxWriterTest" classname="XlsxWriterTest" file="/workspace/FoodBank-Manager/tests/Unit/Exports/XlsxWriterTest.php" line="15" assertions="4" time="0.001815"/>
       </testsuite>
-      <testsuite name="FormsPresetsTest" file="/workspace/FoodBank-Manager/tests/Unit/FormsPresetsTest.php" tests="5" assertions="9" errors="0" warnings="0" failures="0" skipped="0" time="0.001093">
-        <testcase name="testResolveBuiltin" class="FormsPresetsTest" classname="FormsPresetsTest" file="/workspace/FoodBank-Manager/tests/Unit/FormsPresetsTest.php" line="48" assertions="2" time="0.000297"/>
-        <testcase name="testOptionsSanitizeCustomPresets" class="FormsPresetsTest" classname="FormsPresetsTest" file="/workspace/FoodBank-Manager/tests/Unit/FormsPresetsTest.php" line="54" assertions="4" time="0.000064"/>
-        <testcase name="testFormsPageRequiresCap" class="FormsPresetsTest" classname="FormsPresetsTest" file="/workspace/FoodBank-Manager/tests/Unit/FormsPresetsTest.php" line="68" assertions="1" time="0.000105"/>
-        <testcase name="testFormsPageListsPresets" class="FormsPresetsTest" classname="FormsPresetsTest" file="/workspace/FoodBank-Manager/tests/Unit/FormsPresetsTest.php" line="74" assertions="1" time="0.000177"/>
-        <testcase name="testShortcodePresetFallback" class="FormsPresetsTest" classname="FormsPresetsTest" file="/workspace/FoodBank-Manager/tests/Unit/FormsPresetsTest.php" line="82" assertions="1" time="0.000450"/>
+      <testsuite name="FoodBankManager\Tests\Unit\Forms\PresetsRepoTest" file="/workspace/FoodBank-Manager/tests/Unit/Forms/PresetsRepoTest.php" tests="1" assertions="4" errors="0" warnings="0" failures="0" skipped="0" time="0.000768">
+        <testcase name="testUpsertGetDelete" class="FoodBankManager\Tests\Unit\Forms\PresetsRepoTest" classname="FoodBankManager.Tests.Unit.Forms.PresetsRepoTest" file="/workspace/FoodBank-Manager/tests/Unit/Forms/PresetsRepoTest.php" line="18" assertions="4" time="0.000768"/>
       </testsuite>
-      <testsuite name="FoodBankManager\Tests\Unit\Http\DiagnosticsControllerTest" file="/workspace/FoodBank-Manager/tests/Unit/Http/DiagnosticsControllerTest.php" tests="2" assertions="2" errors="0" warnings="0" failures="0" skipped="0" time="0.000612">
-        <testcase name="testMailTestSuccess" class="FoodBankManager\Tests\Unit\Http\DiagnosticsControllerTest" classname="FoodBankManager.Tests.Unit.Http.DiagnosticsControllerTest" file="/workspace/FoodBank-Manager/tests/Unit/Http/DiagnosticsControllerTest.php" line="17" assertions="1" time="0.000549"/>
-        <testcase name="testMailTestFailure" class="FoodBankManager\Tests\Unit\Http\DiagnosticsControllerTest" classname="FoodBankManager.Tests.Unit.Http.DiagnosticsControllerTest" file="/workspace/FoodBank-Manager/tests/Unit/Http/DiagnosticsControllerTest.php" line="28" assertions="1" time="0.000063"/>
+      <testsuite name="FoodBankManager\Tests\Unit\Forms\SchemaTest" file="/workspace/FoodBank-Manager/tests/Unit/Forms/SchemaTest.php" tests="4" assertions="7" errors="0" warnings="0" failures="0" skipped="0" time="0.000296">
+        <testcase name="testNormalizeValid" class="FoodBankManager\Tests\Unit\Forms\SchemaTest" classname="FoodBankManager.Tests.Unit.Forms.SchemaTest" file="/workspace/FoodBank-Manager/tests/Unit/Forms/SchemaTest.php" line="10" assertions="3" time="0.000147"/>
+        <testcase name="testInvalidTypeThrows" class="FoodBankManager\Tests\Unit\Forms\SchemaTest" classname="FoodBankManager.Tests.Unit.Forms.SchemaTest" file="/workspace/FoodBank-Manager/tests/Unit/Forms/SchemaTest.php" line="24" assertions="1" time="0.000064"/>
+        <testcase name="testDuplicateIdThrows" class="FoodBankManager\Tests\Unit\Forms\SchemaTest" classname="FoodBankManager.Tests.Unit.Forms.SchemaTest" file="/workspace/FoodBank-Manager/tests/Unit/Forms/SchemaTest.php" line="36" assertions="1" time="0.000045"/>
+        <testcase name="testConsentAndFileFieldsNormalized" class="FoodBankManager\Tests\Unit\Forms\SchemaTest" classname="FoodBankManager.Tests.Unit.Forms.SchemaTest" file="/workspace/FoodBank-Manager/tests/Unit/Forms/SchemaTest.php" line="49" assertions="2" time="0.000040"/>
       </testsuite>
-      <testsuite name="FoodBankManager\Tests\Unit\Http\FormSubmitControllerTest" file="/workspace/FoodBank-Manager/tests/Unit/Http/FormSubmitControllerTest.php" tests="5" assertions="5" errors="0" warnings="0" failures="0" skipped="0" time="0.000979">
-        <testcase name="testHappyPath" class="FoodBankManager\Tests\Unit\Http\FormSubmitControllerTest" classname="FoodBankManager.Tests.Unit.Http.FormSubmitControllerTest" file="/workspace/FoodBank-Manager/tests/Unit/Http/FormSubmitControllerTest.php" line="30" assertions="1" time="0.000711"/>
-        <testcase name="testUnknownFieldRejected" class="FoodBankManager\Tests\Unit\Http\FormSubmitControllerTest" classname="FoodBankManager.Tests.Unit.Http.FormSubmitControllerTest" file="/workspace/FoodBank-Manager/tests/Unit/Http/FormSubmitControllerTest.php" line="36" assertions="1" time="0.000060"/>
-        <testcase name="testCaptchaFailure" class="FoodBankManager\Tests\Unit\Http\FormSubmitControllerTest" classname="FoodBankManager.Tests.Unit.Http.FormSubmitControllerTest" file="/workspace/FoodBank-Manager/tests/Unit/Http/FormSubmitControllerTest.php" line="42" assertions="1" time="0.000065"/>
-        <testcase name="testHandleRejectsInvalidNonce" class="FoodBankManager\Tests\Unit\Http\FormSubmitControllerTest" classname="FoodBankManager.Tests.Unit.Http.FormSubmitControllerTest" file="/workspace/FoodBank-Manager/tests/Unit/Http/FormSubmitControllerTest.php" line="48" assertions="1" time="0.000058"/>
-        <testcase name="testHandleRequiresCaptcha" class="FoodBankManager\Tests\Unit\Http\FormSubmitControllerTest" classname="FoodBankManager.Tests.Unit.Http.FormSubmitControllerTest" file="/workspace/FoodBank-Manager/tests/Unit/Http/FormSubmitControllerTest.php" line="63" assertions="1" time="0.000086"/>
+      <testsuite name="FormsPresetsTest" file="/workspace/FoodBank-Manager/tests/Unit/FormsPresetsTest.php" tests="5" assertions="9" errors="0" warnings="0" failures="0" skipped="0" time="0.001978">
+        <testcase name="testResolveBuiltin" class="FormsPresetsTest" classname="FormsPresetsTest" file="/workspace/FoodBank-Manager/tests/Unit/FormsPresetsTest.php" line="48" assertions="2" time="0.000559"/>
+        <testcase name="testOptionsSanitizeCustomPresets" class="FormsPresetsTest" classname="FormsPresetsTest" file="/workspace/FoodBank-Manager/tests/Unit/FormsPresetsTest.php" line="54" assertions="4" time="0.000068"/>
+        <testcase name="testFormsPageRequiresCap" class="FormsPresetsTest" classname="FormsPresetsTest" file="/workspace/FoodBank-Manager/tests/Unit/FormsPresetsTest.php" line="68" assertions="1" time="0.000143"/>
+        <testcase name="testFormsPageListsPresets" class="FormsPresetsTest" classname="FormsPresetsTest" file="/workspace/FoodBank-Manager/tests/Unit/FormsPresetsTest.php" line="74" assertions="1" time="0.000318"/>
+        <testcase name="testShortcodePresetFallback" class="FormsPresetsTest" classname="FormsPresetsTest" file="/workspace/FoodBank-Manager/tests/Unit/FormsPresetsTest.php" line="82" assertions="1" time="0.000890"/>
       </testsuite>
-      <testsuite name="InstallDuplicateDetectorTest" file="/workspace/FoodBank-Manager/tests/Unit/InstallDuplicateDetectorTest.php" tests="3" assertions="11" errors="0" warnings="0" failures="0" skipped="0" time="0.000606">
-        <testcase name="testNoticeRendersForDuplicates" class="InstallDuplicateDetectorTest" classname="InstallDuplicateDetectorTest" file="/workspace/FoodBank-Manager/tests/Unit/InstallDuplicateDetectorTest.php" line="23" assertions="1" time="0.000437"/>
-        <testcase name="testConsolidateActionDeactivatesDuplicates" class="InstallDuplicateDetectorTest" classname="InstallDuplicateDetectorTest" file="/workspace/FoodBank-Manager/tests/Unit/InstallDuplicateDetectorTest.php" line="31" assertions="6" time="0.000076"/>
-        <testcase name="testConsolidateActionNoOp" class="InstallDuplicateDetectorTest" classname="InstallDuplicateDetectorTest" file="/workspace/FoodBank-Manager/tests/Unit/InstallDuplicateDetectorTest.php" line="49" assertions="4" time="0.000094"/>
+      <testsuite name="FoodBankManager\Tests\Unit\Http\DiagnosticsControllerTest" file="/workspace/FoodBank-Manager/tests/Unit/Http/DiagnosticsControllerTest.php" tests="2" assertions="2" errors="0" warnings="0" failures="0" skipped="0" time="0.000866">
+        <testcase name="testMailTestSuccess" class="FoodBankManager\Tests\Unit\Http\DiagnosticsControllerTest" classname="FoodBankManager.Tests.Unit.Http.DiagnosticsControllerTest" file="/workspace/FoodBank-Manager/tests/Unit/Http/DiagnosticsControllerTest.php" line="17" assertions="1" time="0.000784"/>
+        <testcase name="testMailTestFailure" class="FoodBankManager\Tests\Unit\Http\DiagnosticsControllerTest" classname="FoodBankManager.Tests.Unit.Http.DiagnosticsControllerTest" file="/workspace/FoodBank-Manager/tests/Unit/Http/DiagnosticsControllerTest.php" line="28" assertions="1" time="0.000083"/>
       </testsuite>
-      <testsuite name="MenuTest" file="/workspace/FoodBank-Manager/tests/Unit/MenuTest.php" tests="1" assertions="14" errors="0" warnings="0" failures="0" skipped="0" time="0.001353">
-        <testcase name="testRegisterIdempotent" class="MenuTest" classname="MenuTest" file="/workspace/FoodBank-Manager/tests/Unit/MenuTest.php" line="7" assertions="14" time="0.001353"/>
+      <testsuite name="FoodBankManager\Tests\Unit\Http\ExportControllerTest" file="/workspace/FoodBank-Manager/tests/Unit/Http/ExportControllerTest.php" tests="4" assertions="6" errors="0" warnings="0" failures="0" skipped="0" time="0.003138">
+        <testcase name="testEntryPdf" class="FoodBankManager\Tests\Unit\Http\ExportControllerTest" classname="FoodBankManager.Tests.Unit.Http.ExportControllerTest" file="/workspace/FoodBank-Manager/tests/Unit/Http/ExportControllerTest.php" line="30" assertions="1" time="0.000640"/>
+        <testcase name="testEntryPdfDenied" class="FoodBankManager\Tests\Unit\Http\ExportControllerTest" classname="FoodBankManager.Tests.Unit.Http.ExportControllerTest" file="/workspace/FoodBank-Manager/tests/Unit/Http/ExportControllerTest.php" line="44" assertions="1" time="0.000069"/>
+        <testcase name="testEntriesZip" class="FoodBankManager\Tests\Unit\Http\ExportControllerTest" classname="FoodBankManager.Tests.Unit.Http.ExportControllerTest" file="/workspace/FoodBank-Manager/tests/Unit/Http/ExportControllerTest.php" line="56" assertions="2" time="0.001301"/>
+        <testcase name="testDashboardXlsx" class="FoodBankManager\Tests\Unit\Http\ExportControllerTest" classname="FoodBankManager.Tests.Unit.Http.ExportControllerTest" file="/workspace/FoodBank-Manager/tests/Unit/Http/ExportControllerTest.php" line="77" assertions="2" time="0.001128"/>
       </testsuite>
-      <testsuite name="MenuVisibilityTest" file="/workspace/FoodBank-Manager/tests/Unit/MenuVisibilityTest.php" tests="2" assertions="23" errors="0" warnings="0" failures="0" skipped="0" time="0.000117">
-        <testcase name="testParentMenuFallsBackToManageOptions" class="MenuVisibilityTest" classname="MenuVisibilityTest" file="/workspace/FoodBank-Manager/tests/Unit/MenuVisibilityTest.php" line="15" assertions="12" time="0.000077"/>
-        <testcase name="testParentMenuUsesFbmCapWhenPresent" class="MenuVisibilityTest" classname="MenuVisibilityTest" file="/workspace/FoodBank-Manager/tests/Unit/MenuVisibilityTest.php" line="26" assertions="11" time="0.000039"/>
+      <testsuite name="FoodBankManager\Tests\Unit\Http\FormSubmitControllerTest" file="/workspace/FoodBank-Manager/tests/Unit/Http/FormSubmitControllerTest.php" tests="5" assertions="5" errors="0" warnings="0" failures="0" skipped="0" time="0.001547">
+        <testcase name="testHappyPath" class="FoodBankManager\Tests\Unit\Http\FormSubmitControllerTest" classname="FoodBankManager.Tests.Unit.Http.FormSubmitControllerTest" file="/workspace/FoodBank-Manager/tests/Unit/Http/FormSubmitControllerTest.php" line="30" assertions="1" time="0.001000"/>
+        <testcase name="testUnknownFieldRejected" class="FoodBankManager\Tests\Unit\Http\FormSubmitControllerTest" classname="FoodBankManager.Tests.Unit.Http.FormSubmitControllerTest" file="/workspace/FoodBank-Manager/tests/Unit/Http/FormSubmitControllerTest.php" line="36" assertions="1" time="0.000076"/>
+        <testcase name="testCaptchaFailure" class="FoodBankManager\Tests\Unit\Http\FormSubmitControllerTest" classname="FoodBankManager.Tests.Unit.Http.FormSubmitControllerTest" file="/workspace/FoodBank-Manager/tests/Unit/Http/FormSubmitControllerTest.php" line="42" assertions="1" time="0.000171"/>
+        <testcase name="testHandleRejectsInvalidNonce" class="FoodBankManager\Tests\Unit\Http\FormSubmitControllerTest" classname="FoodBankManager.Tests.Unit.Http.FormSubmitControllerTest" file="/workspace/FoodBank-Manager/tests/Unit/Http/FormSubmitControllerTest.php" line="48" assertions="1" time="0.000193"/>
+        <testcase name="testHandleRequiresCaptcha" class="FoodBankManager\Tests\Unit\Http\FormSubmitControllerTest" classname="FoodBankManager.Tests.Unit.Http.FormSubmitControllerTest" file="/workspace/FoodBank-Manager/tests/Unit/Http/FormSubmitControllerTest.php" line="63" assertions="1" time="0.000108"/>
       </testsuite>
-      <testsuite name="NoticesDeDupTest" file="/workspace/FoodBank-Manager/tests/Unit/NoticesDeDupTest.php" tests="3" assertions="5" errors="0" warnings="0" failures="0" skipped="0" time="0.000175">
-        <testcase name="testRenderPrintsOncePerRequest" class="NoticesDeDupTest" classname="NoticesDeDupTest" file="/workspace/FoodBank-Manager/tests/Unit/NoticesDeDupTest.php" line="19" assertions="2" time="0.000092"/>
-        <testcase name="testRenderBailsOnNonFbmScreen" class="NoticesDeDupTest" classname="NoticesDeDupTest" file="/workspace/FoodBank-Manager/tests/Unit/NoticesDeDupTest.php" line="30" assertions="2" time="0.000037"/>
-        <testcase name="testRenderCountTracksSingleRender" class="NoticesDeDupTest" classname="NoticesDeDupTest" file="/workspace/FoodBank-Manager/tests/Unit/NoticesDeDupTest.php" line="40" assertions="1" time="0.000045"/>
+      <testsuite name="InstallDuplicateDetectorTest" file="/workspace/FoodBank-Manager/tests/Unit/InstallDuplicateDetectorTest.php" tests="3" assertions="11" errors="0" warnings="0" failures="0" skipped="0" time="0.000764">
+        <testcase name="testNoticeRendersForDuplicates" class="InstallDuplicateDetectorTest" classname="InstallDuplicateDetectorTest" file="/workspace/FoodBank-Manager/tests/Unit/InstallDuplicateDetectorTest.php" line="23" assertions="1" time="0.000524"/>
+        <testcase name="testConsolidateActionDeactivatesDuplicates" class="InstallDuplicateDetectorTest" classname="InstallDuplicateDetectorTest" file="/workspace/FoodBank-Manager/tests/Unit/InstallDuplicateDetectorTest.php" line="31" assertions="6" time="0.000171"/>
+        <testcase name="testConsolidateActionNoOp" class="InstallDuplicateDetectorTest" classname="InstallDuplicateDetectorTest" file="/workspace/FoodBank-Manager/tests/Unit/InstallDuplicateDetectorTest.php" line="49" assertions="4" time="0.000069"/>
       </testsuite>
-      <testsuite name="NoticesTest" file="/workspace/FoodBank-Manager/tests/Unit/NoticesTest.php" tests="3" assertions="6" errors="0" warnings="0" failures="0" skipped="0" time="0.000249">
-        <testcase name="testMissingKekBailsOnNonFbmScreen" class="NoticesTest" classname="NoticesTest" file="/workspace/FoodBank-Manager/tests/Unit/NoticesTest.php" line="15" assertions="2" time="0.000040"/>
-        <testcase name="testMissingKekShowsOnFbmScreen" class="NoticesTest" classname="NoticesTest" file="/workspace/FoodBank-Manager/tests/Unit/NoticesTest.php" line="26" assertions="2" time="0.000055"/>
-        <testcase name="testCapsFixNoticeShownForAdminsWithoutCaps" class="NoticesTest" classname="NoticesTest" file="/workspace/FoodBank-Manager/tests/Unit/NoticesTest.php" line="37" assertions="2" time="0.000154"/>
+      <testsuite name="MenuTest" file="/workspace/FoodBank-Manager/tests/Unit/MenuTest.php" tests="1" assertions="14" errors="0" warnings="0" failures="0" skipped="0" time="0.001487">
+        <testcase name="testRegisterIdempotent" class="MenuTest" classname="MenuTest" file="/workspace/FoodBank-Manager/tests/Unit/MenuTest.php" line="7" assertions="14" time="0.001487"/>
       </testsuite>
-      <testsuite name="OptionsTest" file="/workspace/FoodBank-Manager/tests/Unit/OptionsTest.php" tests="1" assertions="2" errors="0" warnings="0" failures="0" skipped="0" time="0.000296">
-        <testcase name="testDefaultsAndSave" class="OptionsTest" classname="OptionsTest" file="/workspace/FoodBank-Manager/tests/Unit/OptionsTest.php" line="5" assertions="2" time="0.000296"/>
+      <testsuite name="MenuVisibilityTest" file="/workspace/FoodBank-Manager/tests/Unit/MenuVisibilityTest.php" tests="2" assertions="23" errors="0" warnings="0" failures="0" skipped="0" time="0.000234">
+        <testcase name="testParentMenuFallsBackToManageOptions" class="MenuVisibilityTest" classname="MenuVisibilityTest" file="/workspace/FoodBank-Manager/tests/Unit/MenuVisibilityTest.php" line="15" assertions="12" time="0.000118"/>
+        <testcase name="testParentMenuUsesFbmCapWhenPresent" class="MenuVisibilityTest" classname="MenuVisibilityTest" file="/workspace/FoodBank-Manager/tests/Unit/MenuVisibilityTest.php" line="26" assertions="11" time="0.000116"/>
       </testsuite>
-      <testsuite name="PermissionsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/PermissionsPageTest.php" tests="3" assertions="4" errors="0" warnings="0" failures="0" skipped="0" time="0.001157">
-        <testcase name="test_import_rejects_bad_json" class="PermissionsPageTest" classname="PermissionsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/PermissionsPageTest.php" line="12" assertions="1" time="0.000995"/>
-        <testcase name="test_user_override_add_and_remove" class="PermissionsPageTest" classname="PermissionsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/PermissionsPageTest.php" line="31" assertions="2" time="0.000107"/>
-        <testcase name="test_export_json" class="PermissionsPageTest" classname="PermissionsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/PermissionsPageTest.php" line="69" assertions="1" time="0.000054">
+      <testsuite name="NoticesDeDupTest" file="/workspace/FoodBank-Manager/tests/Unit/NoticesDeDupTest.php" tests="3" assertions="5" errors="0" warnings="0" failures="0" skipped="0" time="0.000217">
+        <testcase name="testRenderPrintsOncePerRequest" class="NoticesDeDupTest" classname="NoticesDeDupTest" file="/workspace/FoodBank-Manager/tests/Unit/NoticesDeDupTest.php" line="19" assertions="2" time="0.000095"/>
+        <testcase name="testRenderBailsOnNonFbmScreen" class="NoticesDeDupTest" classname="NoticesDeDupTest" file="/workspace/FoodBank-Manager/tests/Unit/NoticesDeDupTest.php" line="30" assertions="2" time="0.000048"/>
+        <testcase name="testRenderCountTracksSingleRender" class="NoticesDeDupTest" classname="NoticesDeDupTest" file="/workspace/FoodBank-Manager/tests/Unit/NoticesDeDupTest.php" line="40" assertions="1" time="0.000074"/>
+      </testsuite>
+      <testsuite name="NoticesTest" file="/workspace/FoodBank-Manager/tests/Unit/NoticesTest.php" tests="3" assertions="6" errors="0" warnings="0" failures="0" skipped="0" time="0.000320">
+        <testcase name="testMissingKekBailsOnNonFbmScreen" class="NoticesTest" classname="NoticesTest" file="/workspace/FoodBank-Manager/tests/Unit/NoticesTest.php" line="15" assertions="2" time="0.000055"/>
+        <testcase name="testMissingKekShowsOnFbmScreen" class="NoticesTest" classname="NoticesTest" file="/workspace/FoodBank-Manager/tests/Unit/NoticesTest.php" line="26" assertions="2" time="0.000087"/>
+        <testcase name="testCapsFixNoticeShownForAdminsWithoutCaps" class="NoticesTest" classname="NoticesTest" file="/workspace/FoodBank-Manager/tests/Unit/NoticesTest.php" line="37" assertions="2" time="0.000178"/>
+      </testsuite>
+      <testsuite name="OptionsTest" file="/workspace/FoodBank-Manager/tests/Unit/OptionsTest.php" tests="1" assertions="2" errors="0" warnings="0" failures="0" skipped="0" time="0.000347">
+        <testcase name="testDefaultsAndSave" class="OptionsTest" classname="OptionsTest" file="/workspace/FoodBank-Manager/tests/Unit/OptionsTest.php" line="5" assertions="2" time="0.000347"/>
+      </testsuite>
+      <testsuite name="PermissionsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/PermissionsPageTest.php" tests="3" assertions="4" errors="0" warnings="0" failures="0" skipped="0" time="0.001376">
+        <testcase name="test_import_rejects_bad_json" class="PermissionsPageTest" classname="PermissionsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/PermissionsPageTest.php" line="12" assertions="1" time="0.001168"/>
+        <testcase name="test_user_override_add_and_remove" class="PermissionsPageTest" classname="PermissionsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/PermissionsPageTest.php" line="31" assertions="2" time="0.000124"/>
+        <testcase name="test_export_json" class="PermissionsPageTest" classname="PermissionsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/PermissionsPageTest.php" line="69" assertions="1" time="0.000084">
           <system-out>{"roles":{"administrator":[]},"overrides":[]}</system-out>
         </testcase>
       </testsuite>
-      <testsuite name="SecurityCryptoTest" file="/workspace/FoodBank-Manager/tests/Unit/SecurityCryptoTest.php" tests="3" assertions="4" errors="0" warnings="0" failures="0" skipped="0" time="0.005576">
-        <testcase name="testRoundTrip" class="SecurityCryptoTest" classname="SecurityCryptoTest" file="/workspace/FoodBank-Manager/tests/Unit/SecurityCryptoTest.php" line="20" assertions="2" time="0.003867"/>
-        <testcase name="testNonDeterministic" class="SecurityCryptoTest" classname="SecurityCryptoTest" file="/workspace/FoodBank-Manager/tests/Unit/SecurityCryptoTest.php" line="28" assertions="1" time="0.000919"/>
-        <testcase name="testTamperDetection" class="SecurityCryptoTest" classname="SecurityCryptoTest" file="/workspace/FoodBank-Manager/tests/Unit/SecurityCryptoTest.php" line="35" assertions="1" time="0.000790"/>
+      <testsuite name="SecurityCryptoTest" file="/workspace/FoodBank-Manager/tests/Unit/SecurityCryptoTest.php" tests="3" assertions="4" errors="0" warnings="0" failures="0" skipped="0" time="0.007703">
+        <testcase name="testRoundTrip" class="SecurityCryptoTest" classname="SecurityCryptoTest" file="/workspace/FoodBank-Manager/tests/Unit/SecurityCryptoTest.php" line="20" assertions="2" time="0.005801"/>
+        <testcase name="testNonDeterministic" class="SecurityCryptoTest" classname="SecurityCryptoTest" file="/workspace/FoodBank-Manager/tests/Unit/SecurityCryptoTest.php" line="28" assertions="1" time="0.001200"/>
+        <testcase name="testTamperDetection" class="SecurityCryptoTest" classname="SecurityCryptoTest" file="/workspace/FoodBank-Manager/tests/Unit/SecurityCryptoTest.php" line="35" assertions="1" time="0.000702"/>
       </testsuite>
-      <testsuite name="SettingsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/SettingsPageTest.php" tests="3" assertions="8" errors="0" warnings="0" failures="0" skipped="0" time="0.000623">
-        <testcase name="testMissingNonceBlocked" class="SettingsPageTest" classname="SettingsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/SettingsPageTest.php" line="15" assertions="1" time="0.000483"/>
-        <testcase name="testUserWithoutCapBlocked" class="SettingsPageTest" classname="SettingsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/SettingsPageTest.php" line="24" assertions="1" time="0.000045"/>
-        <testcase name="testSuccessfulSaveSanitizes" class="SettingsPageTest" classname="SettingsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/SettingsPageTest.php" line="35" assertions="6" time="0.000095"/>
+      <testsuite name="SettingsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/SettingsPageTest.php" tests="3" assertions="8" errors="0" warnings="0" failures="0" skipped="0" time="0.000842">
+        <testcase name="testMissingNonceBlocked" class="SettingsPageTest" classname="SettingsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/SettingsPageTest.php" line="15" assertions="1" time="0.000587"/>
+        <testcase name="testUserWithoutCapBlocked" class="SettingsPageTest" classname="SettingsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/SettingsPageTest.php" line="24" assertions="1" time="0.000081"/>
+        <testcase name="testSuccessfulSaveSanitizes" class="SettingsPageTest" classname="SettingsPageTest" file="/workspace/FoodBank-Manager/tests/Unit/SettingsPageTest.php" line="35" assertions="6" time="0.000174"/>
       </testsuite>
-      <testsuite name="FBM\Tests\Unit\Shortcodes\DashboardShortcodeUXTest" file="/workspace/FoodBank-Manager/tests/Unit/Shortcodes/DashboardShortcodeUXTest.php" tests="3" assertions="7" errors="0" warnings="0" failures="0" skipped="0" time="0.001591">
-        <testcase name="testLoadedStateRendersTokens" class="FBM\Tests\Unit\Shortcodes\DashboardShortcodeUXTest" classname="FBM.Tests.Unit.Shortcodes.DashboardShortcodeUXTest" file="/workspace/FoodBank-Manager/tests/Unit/Shortcodes/DashboardShortcodeUXTest.php" line="37" assertions="4" time="0.001191"/>
-        <testcase name="testEmptyStateMessage" class="FBM\Tests\Unit\Shortcodes\DashboardShortcodeUXTest" classname="FBM.Tests.Unit.Shortcodes.DashboardShortcodeUXTest" file="/workspace/FoodBank-Manager/tests/Unit/Shortcodes/DashboardShortcodeUXTest.php" line="46" assertions="1" time="0.000330"/>
-        <testcase name="testAssetsOnlyWhenShortcodePresent" class="FBM\Tests\Unit\Shortcodes\DashboardShortcodeUXTest" classname="FBM.Tests.Unit.Shortcodes.DashboardShortcodeUXTest" file="/workspace/FoodBank-Manager/tests/Unit/Shortcodes/DashboardShortcodeUXTest.php" line="52" assertions="2" time="0.000070"/>
+      <testsuite name="FBM\Tests\Unit\Shortcodes\DashboardShortcodeUXTest" file="/workspace/FoodBank-Manager/tests/Unit/Shortcodes/DashboardShortcodeUXTest.php" tests="3" assertions="7" errors="0" warnings="0" failures="0" skipped="0" time="0.002383">
+        <testcase name="testLoadedStateRendersTokens" class="FBM\Tests\Unit\Shortcodes\DashboardShortcodeUXTest" classname="FBM.Tests.Unit.Shortcodes.DashboardShortcodeUXTest" file="/workspace/FoodBank-Manager/tests/Unit/Shortcodes/DashboardShortcodeUXTest.php" line="37" assertions="4" time="0.001837"/>
+        <testcase name="testEmptyStateMessage" class="FBM\Tests\Unit\Shortcodes\DashboardShortcodeUXTest" classname="FBM.Tests.Unit.Shortcodes.DashboardShortcodeUXTest" file="/workspace/FoodBank-Manager/tests/Unit/Shortcodes/DashboardShortcodeUXTest.php" line="46" assertions="1" time="0.000454"/>
+        <testcase name="testAssetsOnlyWhenShortcodePresent" class="FBM\Tests\Unit\Shortcodes\DashboardShortcodeUXTest" classname="FBM.Tests.Unit.Shortcodes.DashboardShortcodeUXTest" file="/workspace/FoodBank-Manager/tests/Unit/Shortcodes/DashboardShortcodeUXTest.php" line="52" assertions="2" time="0.000093"/>
       </testsuite>
-      <testsuite name="FBM\Tests\Unit\Shortcodes\FormShortcodeTest" file="/workspace/FoodBank-Manager/tests/Unit/Shortcodes/FormShortcodeTest.php" tests="3" assertions="5" errors="0" warnings="0" failures="0" skipped="0" time="0.000319">
-        <testcase name="testRendersCaptchaAndFields" class="FBM\Tests\Unit\Shortcodes\FormShortcodeTest" classname="FBM.Tests.Unit.Shortcodes.FormShortcodeTest" file="/workspace/FoodBank-Manager/tests/Unit/Shortcodes/FormShortcodeTest.php" line="45" assertions="3" time="0.000144"/>
-        <testcase name="testSubmitInvalidFormDies" class="FBM\Tests\Unit\Shortcodes\FormShortcodeTest" classname="FBM.Tests.Unit.Shortcodes.FormShortcodeTest" file="/workspace/FoodBank-Manager/tests/Unit/Shortcodes/FormShortcodeTest.php" line="55" assertions="1" time="0.000100"/>
-        <testcase name="testTamperedSchemaReturnsEmpty" class="FBM\Tests\Unit\Shortcodes\FormShortcodeTest" classname="FBM.Tests.Unit.Shortcodes.FormShortcodeTest" file="/workspace/FoodBank-Manager/tests/Unit/Shortcodes/FormShortcodeTest.php" line="71" assertions="1" time="0.000075"/>
+      <testsuite name="FBM\Tests\Unit\Shortcodes\FormShortcodeTest" file="/workspace/FoodBank-Manager/tests/Unit/Shortcodes/FormShortcodeTest.php" tests="3" assertions="5" errors="0" warnings="0" failures="0" skipped="0" time="0.000472">
+        <testcase name="testRendersCaptchaAndFields" class="FBM\Tests\Unit\Shortcodes\FormShortcodeTest" classname="FBM.Tests.Unit.Shortcodes.FormShortcodeTest" file="/workspace/FoodBank-Manager/tests/Unit/Shortcodes/FormShortcodeTest.php" line="45" assertions="3" time="0.000228"/>
+        <testcase name="testSubmitInvalidFormDies" class="FBM\Tests\Unit\Shortcodes\FormShortcodeTest" classname="FBM.Tests.Unit.Shortcodes.FormShortcodeTest" file="/workspace/FoodBank-Manager/tests/Unit/Shortcodes/FormShortcodeTest.php" line="55" assertions="1" time="0.000082"/>
+        <testcase name="testTamperedSchemaReturnsEmpty" class="FBM\Tests\Unit\Shortcodes\FormShortcodeTest" classname="FBM.Tests.Unit.Shortcodes.FormShortcodeTest" file="/workspace/FoodBank-Manager/tests/Unit/Shortcodes/FormShortcodeTest.php" line="71" assertions="1" time="0.000161"/>
       </testsuite>
-      <testsuite name="TemplatesTest" file="/workspace/FoodBank-Manager/tests/Unit/TemplatesTest.php" tests="3" assertions="6" errors="0" warnings="0" failures="0" skipped="0" time="0.000082">
-        <testcase name="testDefaultsContainTemplates" class="TemplatesTest" classname="TemplatesTest" file="/workspace/FoodBank-Manager/tests/Unit/TemplatesTest.php" line="8" assertions="2" time="0.000029"/>
-        <testcase name="testRenderReplacesWhitelistedTokensOnly" class="TemplatesTest" classname="TemplatesTest" file="/workspace/FoodBank-Manager/tests/Unit/TemplatesTest.php" line="14" assertions="3" time="0.000037"/>
-        <testcase name="testUnknownTokensLeftAsIs" class="TemplatesTest" classname="TemplatesTest" file="/workspace/FoodBank-Manager/tests/Unit/TemplatesTest.php" line="31" assertions="1" time="0.000016"/>
+      <testsuite name="TemplatesTest" file="/workspace/FoodBank-Manager/tests/Unit/TemplatesTest.php" tests="3" assertions="6" errors="0" warnings="0" failures="0" skipped="0" time="0.000146">
+        <testcase name="testDefaultsContainTemplates" class="TemplatesTest" classname="TemplatesTest" file="/workspace/FoodBank-Manager/tests/Unit/TemplatesTest.php" line="8" assertions="2" time="0.000039"/>
+        <testcase name="testRenderReplacesWhitelistedTokensOnly" class="TemplatesTest" classname="TemplatesTest" file="/workspace/FoodBank-Manager/tests/Unit/TemplatesTest.php" line="14" assertions="3" time="0.000079"/>
+        <testcase name="testUnknownTokensLeftAsIs" class="TemplatesTest" classname="TemplatesTest" file="/workspace/FoodBank-Manager/tests/Unit/TemplatesTest.php" line="31" assertions="1" time="0.000029"/>
       </testsuite>
-      <testsuite name="ThemePageTest" file="/workspace/FoodBank-Manager/tests/Unit/ThemePageTest.php" tests="6" assertions="14" errors="0" warnings="0" failures="0" skipped="0" time="0.000659">
-        <testcase name="testMissingNonceBlocked" class="ThemePageTest" classname="ThemePageTest" file="/workspace/FoodBank-Manager/tests/Unit/ThemePageTest.php" line="33" assertions="1" time="0.000206"/>
-        <testcase name="testUserWithoutCapBlocked" class="ThemePageTest" classname="ThemePageTest" file="/workspace/FoodBank-Manager/tests/Unit/ThemePageTest.php" line="40" assertions="1" time="0.000038"/>
-        <testcase name="testSuccessfulSave" class="ThemePageTest" classname="ThemePageTest" file="/workspace/FoodBank-Manager/tests/Unit/ThemePageTest.php" line="49" assertions="3" time="0.000065"/>
-        <testcase name="testInvalidTokensClampToDefaults" class="ThemePageTest" classname="ThemePageTest" file="/workspace/FoodBank-Manager/tests/Unit/ThemePageTest.php" line="68" assertions="5" time="0.000254"/>
-        <testcase name="testCssVarsOutput" class="ThemePageTest" classname="ThemePageTest" file="/workspace/FoodBank-Manager/tests/Unit/ThemePageTest.php" line="84" assertions="1" time="0.000045"/>
-        <testcase name="testPreviewMarkupScoped" class="ThemePageTest" classname="ThemePageTest" file="/workspace/FoodBank-Manager/tests/Unit/ThemePageTest.php" line="98" assertions="3" time="0.000051"/>
+      <testsuite name="ThemePageTest" file="/workspace/FoodBank-Manager/tests/Unit/ThemePageTest.php" tests="6" assertions="14" errors="0" warnings="0" failures="0" skipped="0" time="0.001070">
+        <testcase name="testMissingNonceBlocked" class="ThemePageTest" classname="ThemePageTest" file="/workspace/FoodBank-Manager/tests/Unit/ThemePageTest.php" line="33" assertions="1" time="0.000285"/>
+        <testcase name="testUserWithoutCapBlocked" class="ThemePageTest" classname="ThemePageTest" file="/workspace/FoodBank-Manager/tests/Unit/ThemePageTest.php" line="40" assertions="1" time="0.000113"/>
+        <testcase name="testSuccessfulSave" class="ThemePageTest" classname="ThemePageTest" file="/workspace/FoodBank-Manager/tests/Unit/ThemePageTest.php" line="49" assertions="3" time="0.000107"/>
+        <testcase name="testInvalidTokensClampToDefaults" class="ThemePageTest" classname="ThemePageTest" file="/workspace/FoodBank-Manager/tests/Unit/ThemePageTest.php" line="68" assertions="5" time="0.000415"/>
+        <testcase name="testCssVarsOutput" class="ThemePageTest" classname="ThemePageTest" file="/workspace/FoodBank-Manager/tests/Unit/ThemePageTest.php" line="84" assertions="1" time="0.000059"/>
+        <testcase name="testPreviewMarkupScoped" class="ThemePageTest" classname="ThemePageTest" file="/workspace/FoodBank-Manager/tests/Unit/ThemePageTest.php" line="98" assertions="3" time="0.000091"/>
       </testsuite>
-      <testsuite name="TokenServiceTest" file="/workspace/FoodBank-Manager/tests/Unit/TokenServiceTest.php" tests="4" assertions="5" errors="0" warnings="0" failures="0" skipped="0" time="0.000268">
-        <testcase name="testValidToken" class="TokenServiceTest" classname="TokenServiceTest" file="/workspace/FoodBank-Manager/tests/Unit/TokenServiceTest.php" line="8" assertions="1" time="0.000164"/>
-        <testcase name="testBadTokenFails" class="TokenServiceTest" classname="TokenServiceTest" file="/workspace/FoodBank-Manager/tests/Unit/TokenServiceTest.php" line="14" assertions="1" time="0.000033"/>
-        <testcase name="testFreshnessWindow" class="TokenServiceTest" classname="TokenServiceTest" file="/workspace/FoodBank-Manager/tests/Unit/TokenServiceTest.php" line="19" assertions="2" time="0.000032"/>
-        <testcase name="testFutureToken" class="TokenServiceTest" classname="TokenServiceTest" file="/workspace/FoodBank-Manager/tests/Unit/TokenServiceTest.php" line="30" assertions="1" time="0.000038"/>
+      <testsuite name="TokenServiceTest" file="/workspace/FoodBank-Manager/tests/Unit/TokenServiceTest.php" tests="4" assertions="5" errors="0" warnings="0" failures="0" skipped="0" time="0.000529">
+        <testcase name="testValidToken" class="TokenServiceTest" classname="TokenServiceTest" file="/workspace/FoodBank-Manager/tests/Unit/TokenServiceTest.php" line="8" assertions="1" time="0.000319"/>
+        <testcase name="testBadTokenFails" class="TokenServiceTest" classname="TokenServiceTest" file="/workspace/FoodBank-Manager/tests/Unit/TokenServiceTest.php" line="14" assertions="1" time="0.000053"/>
+        <testcase name="testFreshnessWindow" class="TokenServiceTest" classname="TokenServiceTest" file="/workspace/FoodBank-Manager/tests/Unit/TokenServiceTest.php" line="19" assertions="2" time="0.000107"/>
+        <testcase name="testFutureToken" class="TokenServiceTest" classname="TokenServiceTest" file="/workspace/FoodBank-Manager/tests/Unit/TokenServiceTest.php" line="30" assertions="1" time="0.000051"/>
       </testsuite>
-      <testsuite name="WPUrlHelpersTest" file="/workspace/FoodBank-Manager/tests/Unit/WPUrlHelpersTest.php" tests="3" assertions="5" errors="0" warnings="0" failures="0" skipped="0" time="0.000105">
+      <testsuite name="WPUrlHelpersTest" file="/workspace/FoodBank-Manager/tests/Unit/WPUrlHelpersTest.php" tests="3" assertions="5" errors="0" warnings="0" failures="0" skipped="0" time="0.000107">
         <testcase name="testAddQueryArgFormsAndFragments" class="WPUrlHelpersTest" classname="WPUrlHelpersTest" file="/workspace/FoodBank-Manager/tests/Unit/WPUrlHelpersTest.php" line="7" assertions="2" time="0.000042"/>
-        <testcase name="testRemoveQueryArgPreservesFragment" class="WPUrlHelpersTest" classname="WPUrlHelpersTest" file="/workspace/FoodBank-Manager/tests/Unit/WPUrlHelpersTest.php" line="15" assertions="2" time="0.000042"/>
-        <testcase name="testNonceUrlAppendsNonce" class="WPUrlHelpersTest" classname="WPUrlHelpersTest" file="/workspace/FoodBank-Manager/tests/Unit/WPUrlHelpersTest.php" line="21" assertions="1" time="0.000021"/>
+        <testcase name="testRemoveQueryArgPreservesFragment" class="WPUrlHelpersTest" classname="WPUrlHelpersTest" file="/workspace/FoodBank-Manager/tests/Unit/WPUrlHelpersTest.php" line="15" assertions="2" time="0.000034"/>
+        <testcase name="testNonceUrlAppendsNonce" class="WPUrlHelpersTest" classname="WPUrlHelpersTest" file="/workspace/FoodBank-Manager/tests/Unit/WPUrlHelpersTest.php" line="21" assertions="1" time="0.000031"/>
       </testsuite>
     </testsuite>
   </testsuite>
