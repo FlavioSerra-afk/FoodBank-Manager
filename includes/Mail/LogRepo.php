@@ -13,6 +13,10 @@ use wpdb;
 use function absint;
 use function sanitize_text_field;
 use function sanitize_email;
+use function wp_json_encode;
+use function json_decode;
+use function is_array;
+use function time;
 
 /**
  * Access mail log entries.
@@ -112,5 +116,73 @@ class LogRepo {
 			),
 			array( '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s' )
 		);
+	}
+
+		/**
+		 * Get a log entry by ID.
+		 *
+		 * @param int $id Log ID.
+		 * @return array<string,mixed>|null
+		 */
+	public static function get_by_id( int $id ): ?array {
+			global $wpdb;
+			$id  = absint( $id );
+			$row = $wpdb->get_row(
+				$wpdb->prepare(
+					'SELECT id,to_email,subject,headers,provider_msg FROM ' . $wpdb->prefix . 'fb_mail_log WHERE id = %d',
+					$id
+				),
+				ARRAY_A
+			);
+		if ( ! $row ) {
+				return null;
+		}
+			$out  = array(
+				'id'       => (int) ( $row['id'] ?? 0 ),
+				'to_email' => sanitize_text_field( (string) ( $row['to_email'] ?? '' ) ),
+				'subject'  => sanitize_text_field( (string) ( $row['subject'] ?? '' ) ),
+				'headers'  => sanitize_text_field( (string) ( $row['headers'] ?? '' ) ),
+			);
+			$meta = json_decode( (string) ( $row['provider_msg'] ?? '' ), true );
+			if ( is_array( $meta ) ) {
+					$out['body_vars'] = $meta;
+			}
+			return $out;
+	}
+
+		/**
+		 * Append an audit log entry.
+		 *
+		 * @param array<string,mixed> $row Row data.
+		 * @return bool
+		 */
+	public static function append( array $row ): bool {
+			global $wpdb;
+			$type        = sanitize_text_field( (string) ( $row['type'] ?? '' ) );
+			$original_id = absint( $row['original_id'] ?? 0 );
+			$by          = absint( $row['by'] ?? 0 );
+			$at          = (int) ( $row['at'] ?? time() );
+			$result      = sanitize_text_field( (string) ( $row['result'] ?? '' ) );
+			$provider    = wp_json_encode(
+				array(
+					'type'        => $type,
+					'original_id' => $original_id,
+					'by'          => $by,
+					'result'      => $result,
+				)
+			);
+			return (bool) $wpdb->insert(
+				$wpdb->prefix . 'fb_mail_log',
+				array(
+					'to_email'     => '',
+					'subject'      => '',
+					'headers'      => '',
+					'body_hash'    => '',
+					'status'       => $type,
+					'provider_msg' => $provider,
+					'timestamp'    => gmdate( 'Y-m-d H:i:s', $at ),
+				),
+				array( '%s', '%s', '%s', '%s', '%s', '%s', '%s' )
+			);
 	}
 }

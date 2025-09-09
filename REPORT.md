@@ -57,3 +57,6 @@ _None — all primary gates passing._
 ## Dashboard Compare & Persistence — PASS
 - Tokens: `fbm-summary`, `fbm-count-current`, `fbm-delta`, `fbm-compare-toggle`
 - Dashboard compares current vs previous period and persists filters per user.
+
+## Email Resend — PASS
+- Admins can resend logged emails with caps/nonce checks and audit trail.

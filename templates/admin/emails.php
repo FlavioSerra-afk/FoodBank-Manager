@@ -11,11 +11,37 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 <div class="wrap fbm-admin">
 <?php \FBM\Core\Trace::mark( 'admin:emails' ); ?>
-		<h1><?php esc_html_e( 'Email Templates', 'foodbank-manager' ); ?></h1>
-		<ul>
-				<?php foreach ( $templates as $key => $tpl ) : ?>
+				<h1><?php esc_html_e( 'Email Templates', 'foodbank-manager' ); ?></h1>
+				<?php if ( ! empty( $logs ) ) : ?>
+				<h2><?php esc_html_e( 'Email Log', 'foodbank-manager' ); ?></h2>
+				<table class="widefat">
+						<thead>
+								<tr>
+										<th><?php esc_html_e( 'Subject', 'foodbank-manager' ); ?></th>
+										<th><?php esc_html_e( 'Actions', 'foodbank-manager' ); ?></th>
+								</tr>
+						</thead>
+						<tbody>
+								<?php foreach ( $logs as $row ) : ?>
+								<tr>
+										<td><?php echo esc_html( $row['subject'] ?? '' ); ?></td>
+										<td>
+												<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+														<input type="hidden" name="action" value="fbm_mail_resend" />
+														<input type="hidden" name="id" value="<?php echo esc_attr( (string) ( $row['id'] ?? 0 ) ); ?>" />
+														<?php wp_nonce_field( 'fbm_mail_resend' ); ?>
+														<button type="submit" class="button"><?php esc_html_e( 'Resend', 'foodbank-manager' ); ?></button>
+												</form>
+										</td>
+								</tr>
+								<?php endforeach; ?>
+						</tbody>
+				</table>
+				<?php endif; ?>
+				<ul>
+								<?php foreach ( $templates as $key => $tpl ) : ?>
 						<li>
-								<?php echo esc_html( ucwords( str_replace( '_', ' ', $key ) ) ); ?>
+									<?php echo esc_html( ucwords( str_replace( '_', ' ', $key ) ) ); ?>
 								<a href="<?php echo esc_url( add_query_arg( array( 'tpl' => $key ), menu_page_url( 'fbm_emails', false ) ) ); ?>">
 										<?php esc_html_e( 'Edit', 'foodbank-manager' ); ?>
 								</a>
