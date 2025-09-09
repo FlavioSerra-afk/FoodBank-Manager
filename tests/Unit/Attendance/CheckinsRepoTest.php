@@ -3,19 +3,18 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Attendance;
 
-use BaseTestCase;
 use FBM\Attendance\CheckinsRepo;
 
-final class CheckinsRepoTest extends BaseTestCase {
+final class CheckinsRepoTest extends \BaseTestCase {
     protected function setUp(): void {
         parent::setUp();
         $ref = new \ReflectionClass(CheckinsRepo::class);
         $p = $ref->getProperty('store');
         $p->setAccessible(true);
-        $p->setValue(array());
+        $p->setValue(null, array());
         $p2 = $ref->getProperty('next_id');
         $p2->setAccessible(true);
-        $p2->setValue(1);
+        $p2->setValue(null, 1);
         CheckinsRepo::record(array(
             'event_id'    => 1,
             'recipient'   => 'a@example.com',

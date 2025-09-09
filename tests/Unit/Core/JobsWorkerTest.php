@@ -3,14 +3,13 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../../Support/JobsDbStub.php';
 
-use BaseTestCase;
 use FBM\Core\Jobs\JobsRepo;
 use FBM\Core\Jobs\JobsWorker;
 use FBM\Attendance\CheckinsRepo;
 use FBM\Attendance\EventsRepo;
 use Tests\Support\JobsDbStub;
 
-final class JobsWorkerTest extends BaseTestCase {
+final class JobsWorkerTest extends \BaseTestCase {
     private JobsDbStub $db;
     private string $dir;
 

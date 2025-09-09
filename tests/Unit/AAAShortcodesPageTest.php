@@ -6,11 +6,10 @@ namespace FoodBankManager\Admin {}
 namespace {}
 
 namespace {
-use BaseTestCase;
 use FoodBankManager\Admin\ShortcodesPage;
 
 /** @backupGlobals disabled */
-final class ShortcodesPageTest extends BaseTestCase {
+final class ShortcodesPageTest extends \BaseTestCase {
     public static string $last_shortcode = '';
 
     protected function setUp(): void {

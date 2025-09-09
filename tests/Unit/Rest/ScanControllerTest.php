@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Rest;
 
-use BaseTestCase;
 use FBM\Rest\ScanController;
 use FBM\Attendance\TicketService;
 use FBM\Attendance\EventsRepo;
@@ -21,7 +20,7 @@ function fbm_scan_now($v) { // @phpstan-ignore-line
     return 1700000000;
 }
 
-final class ScanControllerTest extends BaseTestCase {
+final class ScanControllerTest extends \BaseTestCase {
     private EventsDbStub $db;
 
     protected function setUp(): void {
@@ -32,10 +31,10 @@ final class ScanControllerTest extends BaseTestCase {
         $ref = new \ReflectionClass(CheckinsRepo::class);
         $p = $ref->getProperty('store');
         $p->setAccessible(true);
-        $p->setValue(array());
+        $p->setValue(null, array());
         $p2 = $ref->getProperty('next_id');
         $p2->setAccessible(true);
-        $p2->setValue(1);
+        $p2->setValue(null, 1);
         add_filter('fbm_now', __NAMESPACE__ . '\\fbm_scan_now');
         EventsRepo::create(array(
             'title'     => 'Event',

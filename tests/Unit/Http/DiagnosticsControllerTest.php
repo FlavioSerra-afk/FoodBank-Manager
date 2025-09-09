@@ -8,7 +8,7 @@ use Tests\Support\Rbac;
 use Tests\Support\Exceptions\FbmDieException;
 use FBM\Http\DiagnosticsController;
 
-final class DiagnosticsControllerTest extends BaseTestCase {
+final class DiagnosticsControllerTest extends \BaseTestCase {
     protected function setUp(): void {
         parent::setUp();
         Rbac::grantManager();

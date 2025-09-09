@@ -5,9 +5,8 @@ require_once __DIR__ . '/../../Support/JobsDbStub.php';
 
 use Tests\Support\JobsDbStub;
 use FBM\Core\Jobs\JobsRepo;
-use BaseTestCase;
 
-final class JobsRepoTest extends BaseTestCase {
+final class JobsRepoTest extends \BaseTestCase {
     private JobsDbStub $db;
 
     protected function setUp(): void {

@@ -5,7 +5,7 @@ namespace FoodBankManagerTest {
 
 use \BaseTestCase;
 
-final class DashboardShortcodeTest extends BaseTestCase {
+final class DashboardShortcodeTest extends \BaseTestCase {
     protected function setUp(): void {
         parent::setUp();
         if (!defined('FBM_PATH')) {

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 use FoodBankManager\Admin\Menu;
 
-final class MenuVisibilityTest extends BaseTestCase {
+final class MenuVisibilityTest extends \BaseTestCase {
     protected function setUp(): void {
         parent::setUp();
         $ref = new \ReflectionClass(Menu::class);

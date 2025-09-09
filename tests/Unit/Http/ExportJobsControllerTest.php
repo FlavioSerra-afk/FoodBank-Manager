@@ -3,14 +3,13 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../../Support/JobsDbStub.php';
 
-use BaseTestCase;
 use FBM\Http\ExportJobsController;
 use FBM\Core\Jobs\JobsRepo;
 use Tests\Support\JobsDbStub;
 use Tests\Support\Rbac;
 use Tests\Support\Exceptions\FbmDieException;
 
-final class ExportJobsControllerTest extends BaseTestCase {
+final class ExportJobsControllerTest extends \BaseTestCase {
     private JobsDbStub $db;
 
     protected function setUp(): void {

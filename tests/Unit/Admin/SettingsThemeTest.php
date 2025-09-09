@@ -6,7 +6,7 @@ use FoodBankManager\Admin\SettingsPage;
 use FoodBankManager\Core\Options;
 use Tests\Support\Exceptions\FbmDieException;
 
-final class SettingsThemeTest extends BaseTestCase {
+final class SettingsThemeTest extends \BaseTestCase {
     protected function setUp(): void {
         parent::setUp();
         fbm_grant_admin();

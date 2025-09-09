@@ -1,7 +1,6 @@
 <?php
 declare(strict_types=1);
 
-use BaseTestCase;
 use FBM\Core\Retention;
 class RetentionDBStub {
     public string $prefix = 'wp_';
@@ -64,7 +63,7 @@ class RetentionDBStub {
     }
 }
 
-final class RetentionTest extends BaseTestCase {
+final class RetentionTest extends \BaseTestCase {
     /** @var mixed */
     private $orig_wpdb;
     /** @var callable */

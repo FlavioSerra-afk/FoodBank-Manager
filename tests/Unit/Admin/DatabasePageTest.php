@@ -3,11 +3,10 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Admin;
 
-use BaseTestCase;
 use FoodBankManager\Admin\DatabasePage;
 use Tests\Support\Rbac;
 
-final class DatabasePageTest extends BaseTestCase {
+final class DatabasePageTest extends \BaseTestCase {
     protected function setUp(): void {
         parent::setUp();
         if (!defined('FBM_PATH')) {

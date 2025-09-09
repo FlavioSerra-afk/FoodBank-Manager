@@ -1,7 +1,6 @@
 <?php
 declare(strict_types=1);
 
-use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use FoodBankManager\Attendance\AttendanceRepo;
 use FBM\Tests\Support\WPDBStub;

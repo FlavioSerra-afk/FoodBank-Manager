@@ -5,12 +5,11 @@ namespace Tests\Unit\Admin;
 
 require_once __DIR__ . '/../../Support/EventsDbStub.php';
 
-use BaseTestCase;
 use FBM\Admin\EventsPage;
 use Tests\Support\Rbac;
 use Tests\Support\EventsDbStub;
 
-final class EventsPageTest extends BaseTestCase {
+final class EventsPageTest extends \BaseTestCase {
     private EventsDbStub $db;
 
     protected function setUp(): void {

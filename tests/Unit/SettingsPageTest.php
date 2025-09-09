@@ -4,7 +4,7 @@ declare(strict_types=1);
 use FoodBankManager\Admin\SettingsPage;
 use FoodBankManager\Core\Options;
 
-final class SettingsPageTest extends BaseTestCase {
+final class SettingsPageTest extends \BaseTestCase {
     protected function setUp(): void {
         parent::setUp();
         fbm_grant_admin();

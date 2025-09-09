@@ -15,7 +15,7 @@ use FoodBankManager\Forms\PresetsRepo;
 use FoodBankManager\Http\FormSubmitController;
 use \BaseTestCase;
 
-final class FormShortcodeTest extends BaseTestCase {
+final class FormShortcodeTest extends \BaseTestCase {
     protected function setUp(): void {
         parent::setUp();
         fbm_seed_nonce('unit-seed');

@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 
-final class JobsPanelTest extends BaseTestCase {
+final class JobsPanelTest extends \BaseTestCase {
     public function testPanelRenders(): void {
         fbm_seed_nonce('unit');
         $jobs = array(

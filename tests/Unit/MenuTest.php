@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 use FoodBankManager\Admin\Menu;
 
-final class MenuTest extends BaseTestCase {
+final class MenuTest extends \BaseTestCase {
     public function testRegisterIdempotent(): void {
         Menu::register();
         Menu::register(); // should be idempotent

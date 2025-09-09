@@ -129,3 +129,7 @@ _None — all primary gates passing._
 - Admin Dashboard MVP: tiles (registrations; check-ins Today/Week/Month; tickets scanned 7d), 6-month sparkline, shortcuts.
 - Static/bootstrap: removed duplicate ABSPATH; deterministic nonce/time; header seam; stabilized ScanController tests.
 - QA: PHPStan 0 errors; PHPCS lanes 0/0; PHPUnit green (3× runs); packaging guards pass.
+### RC4 — Dashboard v1 (Glass)
+- Tiles present, sparkline renders, shortcuts visible; assets gated to FBM screens
+- PHPStan 0/0; PHPCS lanes 0/0; PHPUnit green (3x); packaging guard OK
+- Screenshots: /Docs/screenshots/dashboard-tiles.png, dashboard-sparkline.png (placeholders)

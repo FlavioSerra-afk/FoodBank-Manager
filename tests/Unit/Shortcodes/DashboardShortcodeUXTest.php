@@ -3,13 +3,12 @@ declare(strict_types=1);
 
 namespace FBM\Tests\Unit\Shortcodes;
 
-use BaseTestCase;
 use FoodBankManager\Core\Assets;
 use FBM\Shortcodes\Shortcodes;
 use FBM\Tests\Support\WPDBStub;
 use Tests\Support\Rbac;
 
-final class DashboardShortcodeUXTest extends BaseTestCase {
+final class DashboardShortcodeUXTest extends \BaseTestCase {
     protected function setUp(): void {
         parent::setUp();
         Rbac::grantManager();
