@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace FBM\Admin;
 
 use FBM\Attendance\EventsRepo;
+use FBM\Attendance\TicketsRepo;
 use function current_user_can;
 use function wp_safe_redirect;
 use function check_admin_referer;
@@ -86,6 +87,7 @@ final class EventsPage {
 
         $edit_id = isset($_GET['id']) ? absint($_GET['id']) : 0;
         $event   = $edit_id ? EventsRepo::get($edit_id) : null;
+        $tickets = $event ? TicketsRepo::list_for_event($edit_id) : array('rows'=>array(), 'total'=>0);
         $notice  = isset($_GET['notice']) ? sanitize_key((string)$_GET['notice']) : '';
 
         require FBM_PATH . 'templates/admin/events.php';
