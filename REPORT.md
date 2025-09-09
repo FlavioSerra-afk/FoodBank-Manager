@@ -93,7 +93,14 @@ _None — all primary gates passing._
 - Artifact: dist/foodbank-manager.zip
 - Tag: v1.4.0-rc.1
 - Suggested smoke tests: Admin pages, Shortcodes, Attendance Scan, Reports exports, Jobs panel, Form Builder, Theme presets/RTL.
- 
+
+### Release: 1.4.0-rc.2 (staging)
+- Packaging: PASS (slug + main file)
+- PHPStan: 0/0; PHPCS(lanes): 0/0
+- Unit: see build/phpunit-junit.xml (non-lane PHPCS intentionally out-of-scope)
+- Artifact: dist/foodbank-manager.zip
+- Tag: v1.4.0-rc.2
+
 ### PR hygiene
 - Removed binary assets from VCS (.mo, dist/*.zip).
 - .mo compiled during packaging; ZIP still contains translations.
