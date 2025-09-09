@@ -7,23 +7,37 @@
  * @var array<string,int|null>    $deltas_attr
  * @var string                    $updated
  * @var string                    $period_attr
- * @var array{event:string,type:string,policy_only:bool} $filters_attr
+ * @var int                       $summary_delta_attr
+ * @var array{event:string,type:string,policy_only:bool,preset:string,tags:array,compare:bool} $filters_attr
  * @var string                    $csv_url_attr
  *
  * @package FoodBankManager
  */
 
-$present    = (int) ( $counts['present'] ?? 0 );
-$households = (int) ( $counts['households'] ?? 0 );
-$no_shows   = (int) ( $counts['no_shows'] ?? 0 );
-$in         = (int) ( $counts['in_person'] ?? 0 );
-$del        = (int) ( $counts['delivery'] ?? 0 );
-$voided     = (int) ( $counts['voided'] ?? 0 );
-$has_totals = ( $present + $households + $no_shows + $in + $del + $voided ) > 0;
-$tot        = $in + $del;
-$p_del      = $tot ? round( $del / $tot * 100 ) : 0;
-$p_in       = $tot ? 100 - $p_del : 0;
+$present       = (int) ( $counts['present'] ?? 0 );
+$households    = (int) ( $counts['households'] ?? 0 );
+$no_shows      = (int) ( $counts['no_shows'] ?? 0 );
+$in            = (int) ( $counts['in_person'] ?? 0 );
+$del           = (int) ( $counts['delivery'] ?? 0 );
+$voided        = (int) ( $counts['voided'] ?? 0 );
+$has_totals    = ( $present + $households + $no_shows + $in + $del + $voided ) > 0;
+$tot           = $in + $del;
+$p_del         = $tot ? round( $del / $tot * 100 ) : 0;
+$p_in          = $tot ? 100 - $p_del : 0;
+$summary_delta = (int) ( $summary_delta_attr ?? 0 );
+$compare_on    = (bool) ( $filters_attr['compare'] ?? false );
+$toggle_params = array(
+	'compare' => $compare_on ? '0' : '1',
+);
+if ( '' !== ( $filters_attr['preset'] ?? '' ) ) {
+		$toggle_params['preset'] = $filters_attr['preset'];
+}
+if ( ! empty( $filters_attr['tags'] ?? array() ) ) {
+		$toggle_params['tags'] = $filters_attr['tags'];
+}
+$toggle_url = add_query_arg( $toggle_params );
 ?>
+<div class="fbm-admin">
 <div class="fbm-dashboard fbm-loading" aria-busy="true">
 <?php if ( current_user_can( 'manage_options' ) ) : ?>
 <div class="fbm-copy-shortcode"><code>[fbm_dashboard]</code></div>
@@ -46,16 +60,24 @@ $p_in       = $tot ? 100 - $p_del : 0;
 		<label for="fbm_policy_only"><?php esc_html_e( 'Policy only', 'foodbank-manager' ); ?></label>
 	</div>
 	<button type="submit"><?php esc_html_e( 'Apply', 'foodbank-manager' ); ?></button>
-	<a class="fbm-download" href="<?php echo esc_url( $csv_url_attr ); ?>"><?php esc_html_e( 'Download CSV', 'foodbank-manager' ); ?></a>
+		<a class="fbm-download" href="<?php echo esc_url( $csv_url_attr ); ?>"><?php esc_html_e( 'Download CSV', 'foodbank-manager' ); ?></a>
 </form>
-<div class="fbm-results-count" data-testid="fbm-summary" aria-live="polite">
-<?php
-printf(
-		/* translators: %s: result count. */
-	esc_html__( '%s results', 'foodbank-manager' ),
-	esc_html( number_format_i18n( $present ) )
-);
-?>
+<div class="fbm-summary" data-testid="fbm-summary" aria-live="polite">
+		<span class="fbm-count" data-testid="fbm-count-current"><?php echo esc_html( number_format_i18n( $present ) ); ?></span>
+		<span class="fbm-delta" data-testid="fbm-delta"><?php echo esc_html( sprintf( '%+d', $summary_delta ) ); ?></span>
+</div>
+<a class="fbm-compare-toggle" data-testid="fbm-compare-toggle" href="<?php echo esc_url( $toggle_url ); ?>">
+		<?php
+		printf(
+				/* translators: %s: toggle state. */
+			esc_html__( 'Compare: %s', 'foodbank-manager' ),
+			esc_html( $compare_on ? __( 'On', 'foodbank-manager' ) : __( 'Off', 'foodbank-manager' ) )
+		);
+		?>
+</a>
+<div class="fbm-filter-tokens" hidden>
+		<span data-testid="fbm-filter-preset"><?php echo esc_html( (string) ( $filters_attr['preset'] ?? '' ) ); ?></span>
+		<span data-testid="fbm-filter-tags"><?php echo esc_html( implode( ',', $filters_attr['tags'] ?? array() ) ); ?></span>
 </div>
 <div class="fbm-dashboard-grid">
 <?php if ( $has_totals ) : ?>
@@ -169,5 +191,6 @@ printf( esc_html__( 'Last updated %s', 'foodbank-manager' ), esc_html( $updated 
 ?>
 </span>
 <a class="fbm-refresh" href="<?php echo esc_url( add_query_arg( array() ) ); ?>"><?php esc_html_e( 'Refresh', 'foodbank-manager' ); ?></a>
+</div>
 </div>
 </div>

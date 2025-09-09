@@ -38,8 +38,8 @@ final class DashboardShortcodeUXTest extends BaseTestCase {
         $this->seedTransients(array('present' => 5), array(1,2));
         $html = \FBM\Shortcodes\DashboardShortcode::render();
         $this->assertStringContainsString('fbm-dashboard', $html);
-        $this->assertStringContainsString('results', strtolower($html));
-        $this->assertStringContainsString('Dashboard filters', $html);
+        $this->assertStringContainsString('data-testid="fbm-summary"', $html);
+        $this->assertStringContainsString('data-testid="fbm-compare-toggle"', $html);
         $this->assertStringContainsString('fbm-sparkline', $html);
     }
 
