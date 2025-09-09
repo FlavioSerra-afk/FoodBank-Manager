@@ -21,9 +21,10 @@ $settings    = Options::all();
         <?php if ( isset( $_GET['notice'] ) && 'saved' === $_GET['notice'] ) : // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- admin screen ?>
                 <div class="notice notice-success"><p><?php esc_html_e( 'Settings saved.', 'foodbank-manager' ); ?></p></div> <?php // phpcs:ignore Generic.Files.LineLength ?>
 		<?php endif; ?>
-		<h2 class="nav-tab-wrapper">
+                <h2 class="nav-tab-wrapper">
                 <a href="<?php echo esc_url( add_query_arg( 'tab', 'branding' ) ); ?>" class="nav-tab <?php echo 'branding' === $current_tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Branding', 'foodbank-manager' ); ?></a> <?php // phpcs:ignore Generic.Files.LineLength ?>
                 <a href="<?php echo esc_url( add_query_arg( 'tab', 'email' ) ); ?>" class="nav-tab <?php echo 'email' === $current_tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Email', 'foodbank-manager' ); ?></a> <?php // phpcs:ignore Generic.Files.LineLength ?>
+                <a href="<?php echo esc_url( add_query_arg( 'tab', 'appearance' ) ); ?>" class="nav-tab <?php echo 'appearance' === $current_tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Appearance', 'foodbank-manager' ); ?></a> <?php // phpcs:ignore Generic.Files.LineLength ?>
                 <a href="<?php echo esc_url( add_query_arg( 'tab', 'privacy' ) ); ?>" class="nav-tab <?php echo 'privacy' === $current_tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Privacy', 'foodbank-manager' ); ?></a> <?php // phpcs:ignore Generic.Files.LineLength ?>
                 </h2>
                 <?php if ( 'email' === $current_tab ) : ?>
@@ -46,6 +47,41 @@ $settings    = Options::all();
 				</table>
 				<?php submit_button(); ?>
 		</form>
+                <?php elseif ( 'appearance' === $current_tab ) : ?>
+                <form method="post" action="">
+                                <?php wp_nonce_field( 'fbm_theme_save', '_fbm_nonce' ); ?>
+                                <input type="hidden" name="fbm_action" value="theme_save" />
+                                <table class="form-table">
+                                                <tr>
+                                                                <th><label for="theme_preset"><?php esc_html_e( 'Theme preset', 'foodbank-manager' ); ?></label></th>
+                                                                <td>
+                                                                        <select name="theme[preset]" id="theme_preset">
+                                                                                <?php
+                                                                                $presets = array( 'system', 'light', 'dark', 'high_contrast' );
+                                                                                $cur     = $settings['theme']['preset'] ?? 'system';
+                                                                                foreach ( $presets as $p ) {
+                                                                                        printf( '<option value="%1$s" %2$s>%1$s</option>', esc_attr( $p ), selected( $cur, $p, false ) );
+                                                                                }
+                                                                                ?>
+                                                                        </select>
+                                                                </td>
+                                                </tr>
+                                                <tr>
+                                                                <th><label for="theme_rtl"><?php esc_html_e( 'RTL mode', 'foodbank-manager' ); ?></label></th>
+                                                                <td>
+                                                                        <select name="theme[rtl]" id="theme_rtl">
+                                                                                <?php
+                                                                                $rtl_cur = $settings['theme']['rtl'] ?? 'auto';
+                                                                                foreach ( array( 'auto', 'force_on', 'force_off' ) as $r ) {
+                                                                                        printf( '<option value="%1$s" %2$s>%1$s</option>', esc_attr( $r ), selected( $rtl_cur, $r, false ) );
+                                                                                }
+                                                                                ?>
+                                                                        </select>
+                                                                </td>
+                                                </tr>
+                                </table>
+                                <?php submit_button(); ?>
+                </form>
                 <?php elseif ( 'privacy' === $current_tab ) : ?>
                 <form method="post" action="">
                                 <?php wp_nonce_field( 'fbm_retention_save', '_fbm_nonce' ); ?>

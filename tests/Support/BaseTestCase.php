@@ -46,6 +46,7 @@ abstract class BaseTestCase extends TestCase {
         fbm_test_reset_globals();
         fbm_grant_viewer();
         fbm_test_set_request_nonce();
+        fbm_test_trust_nonces(true);
         if (function_exists('do_action')) {
             do_action('fbm_test_reset_caps');
         }

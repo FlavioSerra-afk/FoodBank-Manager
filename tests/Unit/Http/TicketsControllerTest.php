@@ -36,7 +36,12 @@ final class TicketsControllerTest extends BaseTestCase {
         parent::setUp();
         Rbac::grantManager();
         fbm_seed_nonce('unit');
-        $GLOBALS['wpdb'] = new class { public function prepare($sql,...$args){ return $sql; } public function get_row($sql,$output){ return array('id'=>1,'title'=>'Event','starts_at'=>'2024-01-01 00:00:00'); } };
+        $GLOBALS['wpdb'] = new class {
+            public string $prefix = 'wp_';
+            public function prepare($sql, ...$args) { return $sql; }
+            public function get_row($sql, $output) { return array('id'=>1,'title'=>'Event','starts_at'=>'2024-01-01 00:00:00'); }
+            public function insert($table, $data) { return true; }
+        };
         if (!defined('FBM_KEK_BASE64')) { define('FBM_KEK_BASE64', base64_encode(str_repeat('k',32))); }
         
         \FBM\Attendance\TicketsRepo::$rows = array();
