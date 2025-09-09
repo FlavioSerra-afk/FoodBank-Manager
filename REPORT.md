@@ -16,7 +16,7 @@ TL;DR: Unit=0/0, PHPStan=0, PHPCS(Lanes)=0/0, Packaging=PASS
 - PHP: 8.4.12
 
 ## 2) PHPUnit (Unit) — Summary
-- Tests: 154  Errors: 0  Failures: 0
+- Tests: 192  Errors: 0  Failures: 0
 ### Top failing tests
 - _None_
 
@@ -78,3 +78,7 @@ _None — all primary gates passing._
 
 ## Theme Presets & RTL — PASS
 - High-contrast preset & RTL options covered by 3 tests.
+
+## Visual Form Builder — PASS/notes
+- Admins can create, preview, and delete CPT-backed forms; shortcode renders by ID.
+- Tests: FormRepoTest, FormBuilderPageTest, FormCptIntegrationTest.

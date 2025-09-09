@@ -56,6 +56,7 @@ final class Plugin {
                \FBM\Shortcodes\Shortcodes::register();
                Options::boot();
                Retention::init();
+               \FBM\Forms\FormCpt::register();
                 add_action(
                         'init',
                         static function (): void {
