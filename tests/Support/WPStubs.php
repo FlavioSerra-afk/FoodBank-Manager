@@ -61,6 +61,7 @@ if (empty($wpdb->prefix)) {
   $wpdb->prefix = 'wp_';
 }
 
+if (!defined('ARRAY_A')) define('ARRAY_A', 'ARRAY_A');
 // Plugins API (and tracking globals)
 $GLOBALS['fbm_plugins']        = $GLOBALS['fbm_plugins']        ?? [];
 $GLOBALS['fbm_active_plugins']  = $GLOBALS['fbm_active_plugins']  ?? [];
@@ -194,6 +195,8 @@ if (!function_exists('wp_kses_post')){
   }
 }
 if (!function_exists('sanitize_text_field')){ function sanitize_text_field($s){ return trim(strip_tags((string)$s)); } }
+if (!function_exists('sanitize_textarea_field')){ function sanitize_textarea_field($s){ return trim(strip_tags((string)$s)); } }
+if (!function_exists('esc_like')){ function esc_like($s){ return addslashes((string)$s); } }
 if (!function_exists('sanitize_key')){ function sanitize_key($s){ return preg_replace('/[^a-z0-9_\-]/i','', (string)$s); } }
 if (!function_exists('sanitize_hex_color')){ function sanitize_hex_color($c){ $c=is_string($c)?trim($c):''; return preg_match('/^#(?:[0-9a-fA-F]{3}){1,2}$/',$c)?strtolower($c):''; } }
 if (!function_exists('sanitize_title')){ function sanitize_title($t){ $t=strtolower((string)$t); $t=preg_replace('/[^a-z0-9]+/','-',$t); return trim($t,'-'); } }

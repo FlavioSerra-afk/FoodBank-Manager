@@ -22,6 +22,7 @@ final class Capabilities {
         'fb_manage_diagnostics',
         'fb_manage_permissions',
         'fb_manage_theme',
+        'fbm_manage_events',
         'fb_view_sensitive',
     ];
 

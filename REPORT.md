@@ -16,7 +16,7 @@ TL;DR: Unit=0/0, PHPStan=0, PHPCS(Lanes)=0/0, Packaging=PASS
 - PHP: 8.4.12
 
 ## 2) PHPUnit (Unit) — Summary
-- Tests: 135  Errors: 0  Failures: 0
+- Tests: 154  Errors: 0  Failures: 0
 ### Top failing tests
 - _None_
 
@@ -57,6 +57,10 @@ _None — all primary gates passing._
 ## Dashboard Compare & Persistence — PASS
 - Tokens: `fbm-summary`, `fbm-count-current`, `fbm-delta`, `fbm-compare-toggle`
 - Dashboard compares current vs previous period and persists filters per user.
+
+## Attendance — Events CRUD: PASS/notes
+- Repo & admin CRUD covered by 5 tests
+- Next: QR/Scan/Manual/Reports
 
 ## Email Resend — PASS
 - Admins can resend logged emails with caps/nonce checks and audit trail.

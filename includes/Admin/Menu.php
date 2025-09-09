@@ -26,6 +26,7 @@ final class Menu {
         private const CAP_DIAGNOSTICS = 'fb_manage_diagnostics';
         private const CAP_PERMISSIONS = 'fb_manage_permissions';
         private const CAP_THEME       = 'fb_manage_theme';
+        private const CAP_EVENTS      = 'fbm_manage_events';
 
         /**
          * Canonical admin slugs.
@@ -36,6 +37,7 @@ final class Menu {
                 return array(
                         'fbm',
                         'fbm_attendance',
+                        'fbm_events',
                         'fbm_database',
                         'fbm_forms',
                         'fbm_emails',
@@ -98,6 +100,16 @@ final class Menu {
                         self::CAP_ATTENDANCE,
                         'fbm_attendance',
                         array( self::class, 'render_attendance' )
+                );
+
+
+                add_submenu_page(
+                        $parent_slug,
+                        esc_html__( 'Events', 'foodbank-manager' ),
+                        esc_html__( 'Events', 'foodbank-manager' ),
+                        self::CAP_EVENTS,
+                        'fbm_events',
+                        array( self::class, 'render_events' )
                 );
 
                 add_submenu_page(
@@ -182,13 +194,21 @@ final class Menu {
                 } );
         }
 
+
         public static function render_attendance(): void {
                 self::render_once( 'admin:attendance', static function (): void {
                         \FoodBankManager\Admin\AttendancePage::route();
                 } );
         }
 
+        public static function render_events(): void {
+                self::render_once( 'admin:events', static function (): void {
+                        \FBM\Admin\EventsPage::route();
+                } );
+        }
+
         public static function render_database(): void {
+
                 self::render_once( 'admin:database', static function (): void {
                         \FoodBankManager\Admin\DatabasePage::route();
                 } );

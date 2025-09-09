@@ -26,6 +26,7 @@ function fbm_grant_manager(): void {
         'fb_manage_diagnostics',
         'fb_manage_permissions',
         'fb_manage_theme',
+        'fbm_manage_events',
     ]);
 }
 
@@ -40,6 +41,7 @@ function fbm_grant_admin(): void {
         'fb_manage_diagnostics',
         'fb_manage_permissions',
         'fb_manage_theme',
+        'fbm_manage_events',
         'fb_view_sensitive',
         'manage_options',
     ]);
@@ -58,6 +60,7 @@ function fbm_required_cap_for_page(string $slug): string {
         'fbm_diagnostics'   => 'fb_manage_diagnostics',
         'fbm_permissions'   => 'fb_manage_permissions',
         'fbm_theme'         => 'fb_manage_theme',
+        'fbm_events'       => 'fbm_manage_events',
         'fbm_shortcodes'    => 'fb_manage_forms', // shortcodes builder is admin-only; tie to forms
     ];
     return $map[$slug] ?? 'fb_manage_dashboard';
