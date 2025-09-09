@@ -55,6 +55,7 @@ final class DashboardPageTest extends BaseTestCase {
         ob_start();
         DashboardPage::route();
         $html = (string) ob_get_clean();
+        $this->assertStringContainsString('fbm-admin', $html);
         $this->assertStringContainsString('fbm-dashboard-tile-registrations', $html);
         $this->assertStringContainsString('fbm-dashboard-tile-today', $html);
         $this->assertStringContainsString('fbm-dashboard-tile-week', $html);
@@ -62,5 +63,8 @@ final class DashboardPageTest extends BaseTestCase {
         $this->assertStringContainsString('fbm-dashboard-tile-recent', $html);
         $this->assertStringContainsString('data-testid="fbm-dashboard-sparkline"', $html);
         $this->assertStringContainsString('data-testid="fbm-dashboard-shortcuts"', $html);
+        $this->assertStringContainsString('fbm-card--glass', $html);
+        $this->assertStringContainsString('fbm-button--glass', $html);
+        $this->assertStringNotContainsString('<script', $html);
     }
 }

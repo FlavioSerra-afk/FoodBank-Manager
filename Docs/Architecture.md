@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-09 (Wave RC3 Fix Pack)
+Docs-Revision: 2025-09-09 (Wave UI/UX Glass + Dashboard First)
 # FoodBank Manager — Architecture
 
 ## Overview
@@ -10,6 +10,12 @@ A secure, privacy-first WordPress plugin for managing Food Bank applicant intake
 - Graceful optional dependencies: features should degrade cleanly if dependencies are missing.
 - Least privilege: grant only the capabilities required.
 - Isolated admin layout: `.fbm-admin` wrapper and screen-gated assets/notices ensure no overflow into wp-admin.
+
+## UI/Theme System (Glass)
+- Tokens: `--fbm-color-accent`, `--fbm-color-surface`, `--fbm-color-text`, `--fbm-color-border`, `--fbm-glass-bg`, `--fbm-glass-border`, `--fbm-glass-blur`, `--fbm-card-radius`, `--fbm-elev`.
+- Presets: Light, Dark, High-Contrast. Admin vs. front-end scopes share tokens but enqueue separately.
+- Fallbacks: when `backdrop-filter` is unsupported or `prefers-reduced-transparency` is set, glass tokens resolve to solid surfaces and blur is disabled.
+- High-Contrast preset auto-switches glass backgrounds to solid to maintain WCAG 2.2 AA.
 
 ## Directory layout (key paths)
 - `foodbank-manager.php` – bootstrap, constants: `FBM_FILE`, `FBM_PATH`, `FBM_URL`, `FBM_VERSION`.
@@ -38,6 +44,8 @@ A secure, privacy-first WordPress plugin for managing Food Bank applicant intake
 - Successful boot writes a `fbm_boot_ok` transient with the timestamp shown on the Diagnostics screen and fires `fbm_booted`.
 - `fbm_menu_registered` fires after the admin menu is registered; when either hook hasn't fired, the parent menu falls back to `manage_options` to avoid duplicates while subpages remain FBM-gated.
 - The FoodBank parent menu falls back to `manage_options` for Administrators if FBM caps are missing; subpages remain FBM-gated and Diagnostics offers a nonce-protected **Repair caps** button.
+
+Attendance Hub groups Today, Scan, Manual, and History tabs under a single page. Dashboard is the first submenu under FoodBank. Assets (CSS/JS) are emitted only on `.fbm-admin` screens or when shortcodes are present on the front end.
 - When no FBM caps are detected for an Administrator, a transient-limited, text-only notice (no global assets) prompts Diagnostics → Repair caps and can be dismissed for 24 h.
 - Admin notices display when the vendor autoloader is missing or the KEK is not defined.
 - Diagnostics surfaces notices render count via `Notices::getRenderCount()`.

@@ -19,3 +19,23 @@
 .fbm-admin .fbm-theme-preview.is-dark{background:#1f2937;color:#fff}
 .fbm-admin .fbm-theme-preview.is-dark .fbm-theme-preview__swatch{border-color:#fff}
 
+.fbm-admin .fbm-card--glass,
+.fbm-admin .fbm-button--glass,
+.fbm-admin .fbm-tile--glass{background:var(--fbm-glass-bg);border:1px solid var(--fbm-glass-border);border-radius:var(--fbm-card-radius);box-shadow:var(--fbm-elev);backdrop-filter:blur(var(--fbm-glass-blur));-webkit-backdrop-filter:blur(var(--fbm-glass-blur));color:var(--fbm-color-text)}
+.fbm-admin .fbm-button--glass{text-decoration:none;display:inline-block;padding:.5rem 1rem}
+.fbm-admin .fbm-button--glass:hover,
+.fbm-admin .fbm-button--glass:focus{color:var(--fbm-color-accent);border-color:var(--fbm-color-accent)}
+.fbm-admin .fbm-tile--glass{text-align:center;padding:1rem}
+
+@media (prefers-reduced-transparency: reduce){
+ .fbm-admin .fbm-card--glass,
+ .fbm-admin .fbm-button--glass,
+ .fbm-admin .fbm-tile--glass{backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--fbm-color-surface)}
+}
+
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+ .fbm-admin .fbm-card--glass,
+ .fbm-admin .fbm-button--glass,
+ .fbm-admin .fbm-tile--glass{background:var(--fbm-color-surface);backdrop-filter:none;-webkit-backdrop-filter:none}
+}
+

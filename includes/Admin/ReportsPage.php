@@ -31,7 +31,7 @@ final class ReportsPage {
      * Route handler.
      */
     public static function route(): void {
-        if (!current_user_can('fbm_manage_events')) {
+        if (!current_user_can('fb_manage_reports')) {
             echo '<div class="wrap fbm-admin"><p>' . esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ) . '</p></div>';
             return;
         }

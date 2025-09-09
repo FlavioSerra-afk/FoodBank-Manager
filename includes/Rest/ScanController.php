@@ -40,7 +40,7 @@ final class ScanController {
                 'methods'             => 'POST',
                 'callback'            => array($this, 'verify'),
                 'permission_callback' => function (): bool {
-                    return current_user_can('fbm_manage_events');
+                    return current_user_can('fb_manage_attendance');
                 },
                 'args'                => array(
                     'token' => array(
@@ -60,7 +60,7 @@ final class ScanController {
      */
     public function verify(WP_REST_Request $request): WP_REST_Response {
         $nonce = $request->get_header('x-wp-nonce');
-        if (!$nonce || !wp_verify_nonce($nonce, 'wp_rest') || !current_user_can('fbm_manage_events')) {
+        if (!$nonce || !wp_verify_nonce($nonce, 'wp_rest') || !current_user_can('fb_manage_attendance')) {
             return new WP_REST_Response(array('ok' => false, 'status' => 'denied'), 200);
         }
         $token = sanitize_text_field((string) $request->get_param('token'));

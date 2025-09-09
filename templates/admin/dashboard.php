@@ -11,28 +11,33 @@ $series = $series ?? array();
 ?>
 <h1><?php esc_html_e('Dashboard', 'foodbank-manager'); ?></h1>
 <div class="fbm-tiles">
-    <div class="fbm-tile" data-testid="fbm-dashboard-tile-registrations">
+    <div class="fbm-tile fbm-card--glass fbm-tile--glass" data-testid="fbm-dashboard-tile-registrations">
+        <span class="dashicons dashicons-admin-users" aria-hidden="true"></span>
         <div class="fbm-tile-value"><?php echo esc_html( number_format_i18n( $registrations_total ) ); ?></div>
         <div class="fbm-tile-label"><?php esc_html_e('Total registrations', 'foodbank-manager'); ?></div>
     </div>
-    <div class="fbm-tile" data-testid="fbm-dashboard-tile-today">
+    <div class="fbm-tile fbm-card--glass fbm-tile--glass" data-testid="fbm-dashboard-tile-today">
+        <span class="dashicons dashicons-yes" aria-hidden="true"></span>
         <div class="fbm-tile-value"><?php echo esc_html( number_format_i18n( $summary['today'] ?? 0 ) ); ?></div>
         <div class="fbm-tile-label"><?php esc_html_e('Check-ins Today', 'foodbank-manager'); ?></div>
     </div>
-    <div class="fbm-tile" data-testid="fbm-dashboard-tile-week">
+    <div class="fbm-tile fbm-card--glass fbm-tile--glass" data-testid="fbm-dashboard-tile-week">
+        <span class="dashicons dashicons-calendar-alt" aria-hidden="true"></span>
         <div class="fbm-tile-value"><?php echo esc_html( number_format_i18n( $summary['week'] ?? 0 ) ); ?></div>
         <div class="fbm-tile-label"><?php esc_html_e('Check-ins This Week', 'foodbank-manager'); ?></div>
     </div>
-    <div class="fbm-tile" data-testid="fbm-dashboard-tile-month">
+    <div class="fbm-tile fbm-card--glass fbm-tile--glass" data-testid="fbm-dashboard-tile-month">
+        <span class="dashicons dashicons-calendar" aria-hidden="true"></span>
         <div class="fbm-tile-value"><?php echo esc_html( number_format_i18n( $summary['month'] ?? 0 ) ); ?></div>
         <div class="fbm-tile-label"><?php esc_html_e('Check-ins This Month', 'foodbank-manager'); ?></div>
     </div>
-    <div class="fbm-tile" data-testid="fbm-dashboard-tile-recent">
+    <div class="fbm-tile fbm-card--glass fbm-tile--glass" data-testid="fbm-dashboard-tile-recent">
+        <span class="dashicons dashicons-tickets-alt" aria-hidden="true"></span>
         <div class="fbm-tile-value"><?php echo esc_html( number_format_i18n( $recent ) ); ?></div>
-        <div class="fbm-tile-label"><?php esc_html_e('Recent tickets scanned', 'foodbank-manager'); ?></div>
+        <div class="fbm-tile-label"><?php esc_html_e('Tickets scanned (7d)', 'foodbank-manager'); ?></div>
     </div>
 </div>
-<div class="fbm-sparkline" data-testid="fbm-dashboard-sparkline" role="img" aria-label="<?php esc_attr_e('Attendance trend last 6 months', 'foodbank-manager'); ?>">
+<div class="fbm-card--glass fbm-sparkline" data-testid="fbm-dashboard-sparkline" role="img" aria-label="<?php esc_attr_e('Attendance trend last 6 months', 'foodbank-manager'); ?>">
 <?php
     $series = array_values($series);
     if (empty($series)) { $series = array(0); }
@@ -54,9 +59,9 @@ $series = $series ?? array();
     </svg>
 </div>
 <ul class="fbm-shortcuts" data-testid="fbm-dashboard-shortcuts">
-    <li><a href="<?php echo esc_url( admin_url('post-new.php?post_type=fb_form') ); ?>"><?php esc_html_e('Create Form', 'foodbank-manager'); ?></a></li>
-    <li><a href="<?php echo esc_url( admin_url('edit.php?post_type=fb_form') ); ?>"><?php esc_html_e('Open Submissions', 'foodbank-manager'); ?></a></li>
-    <li><a href="<?php echo esc_url( admin_url('admin.php?page=fbm_scan') ); ?>"><?php esc_html_e('Start Scan', 'foodbank-manager'); ?></a></li>
-    <li><a href="<?php echo esc_url( admin_url('admin.php?page=fbm_reports') ); ?>"><?php esc_html_e('Export Reports', 'foodbank-manager'); ?></a></li>
+    <li><a class="fbm-button fbm-button--glass" href="<?php echo esc_url( admin_url('post-new.php?post_type=fb_form') ); ?>"><?php esc_html_e('Create Form', 'foodbank-manager'); ?></a></li>
+    <li><a class="fbm-button fbm-button--glass" href="<?php echo esc_url( admin_url('edit.php?post_type=fb_form') ); ?>"><?php esc_html_e('Open Submissions', 'foodbank-manager'); ?></a></li>
+    <li><a class="fbm-button fbm-button--glass" href="<?php echo esc_url( admin_url('admin.php?page=fbm_attendance&tab=scan') ); ?>"><?php esc_html_e('Start Scan', 'foodbank-manager'); ?></a></li>
+    <li><a class="fbm-button fbm-button--glass" href="<?php echo esc_url( admin_url('admin.php?page=fbm_reports') ); ?>"><?php esc_html_e('Export Reports', 'foodbank-manager'); ?></a></li>
 </ul>
 </div>

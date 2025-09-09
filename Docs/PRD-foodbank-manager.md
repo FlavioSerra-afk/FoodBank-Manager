@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-09 (Wave RC3 Fix Pack)
+Docs-Revision: 2025-09-09 (Wave UI/UX Glass + Dashboard First)
 # FoodBank Manager — Product Requirements Document (PRD)
 
 **Repo file:** `Docs/PRD-foodbank-manager.md`  
@@ -10,17 +10,34 @@ Docs-Revision: 2025-09-09 (Wave RC3 Fix Pack)
 
 **Packaging:** Release ZIP root must be `foodbank-manager/` for in-place updates. A packaging guard enforces the slug and offers one-click consolidation for duplicates.
 
-## Information Architecture (RC3)
+## Information Architecture (vNext)
 
-- Dashboard — Manager KPIs (registrations, check-ins Today/Week/Month, tickets scanned) + 6-month sparkline + shortcuts.
-- Attendance — Hub with tabs: Today, Scan, Manual, History. (Scan moved here; standalone menu removed.)
-- Submissions — Schema-aware “database” table with dynamic columns, per-user column prefs, masked detail view; exports mirror visible columns (CSV/XLSX/PDF).
-- Forms — List + Builder + Live preview (CF7-like ergonomics; shortcode helper).
+- Dashboard — Manager KPIs (registrations, check-ins Today/Week/Month, tickets scanned) + 6‑month sparkline + shortcuts.
+- Attendance — Hub with tabs: Today, Scan, Manual, History. (Scan menu deep‑links to `Attendance?tab=scan`.)
 - Reports — Period/daily summaries, compare mode, export links.
-- Emails — Templates, log, resend actions, diagnostics links.
+- Submissions (Database) — Schema-aware table with dynamic columns, per-user column prefs, masked detail view; exports mirror visible columns (CSV/XLSX/PDF).
+- Forms — List + Builder + Live preview (CF7-like ergonomics; shortcode helper).
+- Email Templates — Templates, log, resend actions, diagnostics links.
 - Settings — General, Email defaults, API/SMTP keys placeholders, Encryption KEK status, Front-end, Admin Theme (Light/Dark/High-Contrast, RTL).
+- Permissions — Role mapping and per-user overrides.
 - Diagnostics — SMTP test, Cron health, Export Jobs list, Cap repair.
-- Events (optional) — Hidden by default; toggle in Settings.
+- Design & Theme — Admin theme presets, custom CSS.
+- Shortcodes — Helper reference and examples.
+- Events (optional) — Off by default; toggle in Settings.
+
+### Dashboard (Admin) v1 — Implemented now
+- Tiles: Total registrations; Check-ins Today; Check-ins This Week; Check-ins This Month; Tickets scanned (7d).
+- Trend: 6‑month sparkline.
+- Shortcuts: Create Form, Open Submissions, Start Scan, Export Reports.
+- Security/Perf: Masked counts; ≤300ms goal; assets gated to FBM screens.
+- Tests: Deterministic time seam; tile presence; sparkline present; shortcut links render.
+
+### Design language — "Glass"
+- Glass cards & buttons: translucent surface with backdrop blur, subtle border, and soft shadow.
+- Accent: blue hover/active (use `--fbm-color-accent`).
+- Contrast: maintain AA contrast; auto-swap to solid backgrounds in High-Contrast preset; `prefers-reduced-transparency` and no `backdrop-filter` fall back to solid surfaces.
+- Tokens: `--fbm-glass-bg`, `--fbm-glass-border`, `--fbm-glass-blur`, `--fbm-card-radius`, `--fbm-elev`, `--fbm-color-accent`, etc.
+- QR tokens lifecycle: permanent by default; admin can disable/reactivate with reason; Scan shows Disabled + reason (sanitized); actions audited.
 
 ---
 
