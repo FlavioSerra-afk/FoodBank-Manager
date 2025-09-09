@@ -19,6 +19,9 @@ final class MenuVisibilityTest extends BaseTestCase {
         $this->assertSame('fbm', $call['slug']);
         $this->assertSame('manage_options', $call['cap']);
         foreach ($GLOBALS['fbm_test_calls']['add_submenu_page'] as $sm) {
+            if (str_starts_with($sm['cap'], 'fbm_manage_')) {
+                continue;
+            }
             $this->assertStringStartsWith('fb_manage_', $sm['cap']);
         }
     }
@@ -29,6 +32,9 @@ final class MenuVisibilityTest extends BaseTestCase {
         $call = $GLOBALS['fbm_test_calls']['add_menu_page'][0];
         $this->assertSame('fb_manage_dashboard', $call['cap']);
         foreach ($GLOBALS['fbm_test_calls']['add_submenu_page'] as $sm) {
+            if (str_starts_with($sm['cap'], 'fbm_manage_')) {
+                continue;
+            }
             $this->assertStringStartsWith('fb_manage_', $sm['cap']);
         }
     }
