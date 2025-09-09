@@ -10,6 +10,10 @@ declare(strict_types=1);
 namespace FoodBankManager\Admin;
 
 use FBM\Core\RenderOnce;
+use FBM\Core\Options;
+use function add_query_arg;
+use function admin_url;
+use function wp_safe_redirect;
 
 /**
  * Admin menu handler.
@@ -28,8 +32,8 @@ final class Menu {
         private const CAP_PERMISSIONS = 'fb_manage_permissions';
         private const CAP_THEME       = 'fb_manage_theme';
         private const CAP_EVENTS      = 'fbm_manage_events';
-        private const CAP_SCAN        = 'fbm_manage_events';
-        private const CAP_REPORTS     = 'fbm_manage_events';
+        private const CAP_SCAN        = 'fb_manage_attendance';
+        private const CAP_REPORTS     = 'fb_manage_reports';
 
         /**
          * Canonical admin slugs.
@@ -117,14 +121,16 @@ final class Menu {
                         array( self::class, 'render_reports' )
                 );
 
-                add_submenu_page(
-                        $parent_slug,
-                        esc_html__( 'Events', 'foodbank-manager' ),
-                        esc_html__( 'Events', 'foodbank-manager' ),
-                        self::CAP_EVENTS,
-                        'fbm_events',
-                        array( self::class, 'render_events' )
-                );
+                if ( Options::get( 'modules.events', false ) ) {
+                        add_submenu_page(
+                                $parent_slug,
+                                esc_html__( 'Events', 'foodbank-manager' ),
+                                esc_html__( 'Events', 'foodbank-manager' ),
+                                self::CAP_EVENTS,
+                                'fbm_events',
+                                array( self::class, 'render_events' )
+                        );
+                }
 
                 add_submenu_page(
                         $parent_slug,
@@ -132,7 +138,7 @@ final class Menu {
                         esc_html__( 'Scan', 'foodbank-manager' ),
                         self::CAP_SCAN,
                         'fbm_scan',
-                        array( self::class, 'render_scan' )
+                        array( self::class, 'redirect_scan' )
                 );
 
                 add_submenu_page(
@@ -245,10 +251,9 @@ final class Menu {
                 } );
         }
 
-        public static function render_scan(): void {
-                self::render_once( 'admin:scan', static function (): void {
-                        \FBM\Admin\ScanPage::route();
-                } );
+        public static function redirect_scan(): void {
+                wp_safe_redirect( add_query_arg( array( 'page' => 'fbm_attendance', 'tab' => 'scan' ), admin_url( 'admin.php' ) ) );
+                exit;
         }
 
         public static function render_database(): void {

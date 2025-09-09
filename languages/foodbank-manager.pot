@@ -1,23 +1,28 @@
+# Copyright (C) 2025 Portuguese Community Centre London
+# This file is distributed under the same license as the FoodBank Manager plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: FoodBank Manager\n"
+"Project-Id-Version: FoodBank Manager 1.4.0-rc.3\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/FoodBank-Manager\n"
-"POT-Creation-Date: 2025-09-09T21:53:42+00:00\n"
-"Language: en_GB\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2025-09-09T21:53:42+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: foodbank-manager\n"
 
 #. Plugin Name of the plugin
-#: foodbank-manager.php foodbank-manager.php:106
+#: foodbank-manager.php
+#: foodbank-manager.php:106
 msgid "FoodBank Manager"
-msgstr "FoodBank Manager"
+msgstr ""
 
 #. Description of the plugin
 #: foodbank-manager.php
-msgid ""
-"Secure forms, encrypted storage, dashboards, and attendance tracking for "
-"food banks."
+msgid "Secure forms, encrypted storage, dashboards, and attendance tracking for food banks."
 msgstr ""
 
 #. Author of the plugin
@@ -25,16 +30,15 @@ msgstr ""
 msgid "Portuguese Community Centre London"
 msgstr ""
 
-#: foodbank-manager.php:100 foodbank-manager.php:101 includes/Admin/Menu.php:88
+#: foodbank-manager.php:100
+#: foodbank-manager.php:101
+#: includes/Admin/Menu.php:88
 #: includes/Admin/Menu.php:89
-#, fuzzy
 msgid "FoodBank"
-msgstr "FoodBank Manager"
+msgstr ""
 
 #: foodbank-manager.php:107
-msgid ""
-"Plugin bootstrap has not completed yet on this request. You can still reach "
-"Diagnostics to repair capabilities or run health checks."
+msgid "Plugin bootstrap has not completed yet on this request. You can still reach Diagnostics to repair capabilities or run health checks."
 msgstr ""
 
 #: foodbank-manager.php:108
@@ -42,36 +46,51 @@ msgid "Open Diagnostics"
 msgstr ""
 
 #: foodbank-manager.php:123
-msgid ""
-"FoodBank Manager is installed but did not complete bootstrap on this request."
+msgid "FoodBank Manager is installed but did not complete bootstrap on this request."
 msgstr ""
 
-#: foodbank-manager.php:124 includes/Admin/Notices.php:142
+#: foodbank-manager.php:124
+#: includes/Admin/Notices.php:142
 msgid "Open Diagnostics → Repair caps"
 msgstr ""
 
-#: includes/Admin/AttendancePage.php:20 includes/Admin/DashboardPage.php:20
-#: includes/Admin/DatabasePage.php:34 includes/Admin/DiagnosticsPage.php:96
-#: includes/Admin/EmailsPage.php:29 includes/Admin/EntryPage.php:59
-#: includes/Admin/EventsPage.php:39 includes/Admin/FormBuilderPage.php:36
-#: includes/Admin/FormsPage.php:25 includes/Admin/GDPRPage.php:30
-#: includes/Admin/ReportsPage.php:35 includes/Admin/ScanPage.php:31
-#: includes/Admin/SettingsPage.php:27 includes/Admin/ShortcodesPage.php:24
-#: includes/Admin/ThemePage.php:23 templates/admin/forms.php:16
+#: includes/Admin/AttendancePage.php:20
+#: includes/Admin/DashboardPage.php:20
+#: includes/Admin/DatabasePage.php:34
+#: includes/Admin/DiagnosticsPage.php:96
+#: includes/Admin/EmailsPage.php:29
+#: includes/Admin/EntryPage.php:59
+#: includes/Admin/EventsPage.php:39
+#: includes/Admin/FormBuilderPage.php:36
+#: includes/Admin/FormsPage.php:25
+#: includes/Admin/GDPRPage.php:30
+#: includes/Admin/ReportsPage.php:35
+#: includes/Admin/ScanPage.php:31
+#: includes/Admin/SettingsPage.php:27
+#: includes/Admin/ShortcodesPage.php:24
+#: includes/Admin/ThemePage.php:23
+#: templates/admin/forms.php:16
 msgid "You do not have permission to access this page."
 msgstr ""
 
-#: includes/Admin/DatabasePage.php:258 includes/Admin/DatabasePage.php:284
-#: includes/Admin/EmailsPage.php:89 includes/Admin/EmailsPage.php:136
-#: includes/Admin/EmailsPage.php:166 includes/Admin/SettingsPage.php:61
-#: includes/Admin/SettingsPage.php:99 includes/Admin/SettingsPage.php:135
-#: includes/Admin/SettingsPage.php:177 includes/Admin/SettingsPage.php:204
+#: includes/Admin/DatabasePage.php:258
+#: includes/Admin/DatabasePage.php:284
+#: includes/Admin/EmailsPage.php:89
+#: includes/Admin/EmailsPage.php:136
+#: includes/Admin/EmailsPage.php:166
+#: includes/Admin/SettingsPage.php:61
+#: includes/Admin/SettingsPage.php:99
+#: includes/Admin/SettingsPage.php:135
+#: includes/Admin/SettingsPage.php:177
+#: includes/Admin/SettingsPage.php:204
 #: includes/Admin/ThemePage.php:39
 msgid "You do not have permission to perform this action."
 msgstr ""
 
-#: includes/Admin/DiagnosticsPage.php:61 includes/Admin/Notices.php:190
-#: includes/Admin/Notices.php:201 includes/Admin/Notices.php:212
+#: includes/Admin/DiagnosticsPage.php:61
+#: includes/Admin/Notices.php:190
+#: includes/Admin/Notices.php:201
+#: includes/Admin/Notices.php:212
 msgid "Insufficient permissions"
 msgstr ""
 
@@ -87,7 +106,8 @@ msgstr ""
 msgid "Retention dry-run complete."
 msgstr ""
 
-#: includes/Admin/EmailsPage.php:94 includes/Admin/EmailsPage.php:141
+#: includes/Admin/EmailsPage.php:94
+#: includes/Admin/EmailsPage.php:141
 #: includes/Admin/EmailsPage.php:171
 msgid "Invalid template."
 msgstr ""
@@ -96,7 +116,8 @@ msgstr ""
 msgid "Invalid entry ID."
 msgstr ""
 
-#: includes/Admin/EntryPage.php:84 includes/Admin/EntryPage.php:100
+#: includes/Admin/EntryPage.php:84
+#: includes/Admin/EntryPage.php:100
 msgid "Entry not found."
 msgstr ""
 
@@ -104,71 +125,90 @@ msgstr ""
 msgid "Access denied"
 msgstr ""
 
-#: includes/Admin/Menu.php:99 includes/Admin/Menu.php:100
-#: includes/Admin/PermissionsPage.php:434 templates/admin/dashboard.php:12
+#: includes/Admin/Menu.php:99
+#: includes/Admin/Menu.php:100
+#: includes/Admin/PermissionsPage.php:434
+#: templates/admin/dashboard.php:12
 msgid "Dashboard"
 msgstr ""
 
-#: includes/Admin/Menu.php:108 includes/Admin/Menu.php:109
-#: templates/admin/attendance.php:12 templates/admin/settings.php:93
+#: includes/Admin/Menu.php:108
+#: includes/Admin/Menu.php:109
+#: templates/admin/attendance.php:12
+#: templates/admin/settings.php:93
 msgid "Attendance"
 msgstr ""
 
-#: includes/Admin/Menu.php:117 includes/Admin/Menu.php:118
+#: includes/Admin/Menu.php:117
+#: includes/Admin/Menu.php:118
 #: templates/admin/reports.php:6
 msgid "Reports"
 msgstr ""
 
-#: includes/Admin/Menu.php:127 includes/Admin/Menu.php:128
+#: includes/Admin/Menu.php:127
+#: includes/Admin/Menu.php:128
 #: templates/admin/events.php:11
 msgid "Events"
 msgstr ""
 
-#: includes/Admin/Menu.php:137 includes/Admin/Menu.php:138
-#: templates/admin/scan.php:11 templates/public/attendance-manager.php:17
+#: includes/Admin/Menu.php:137
+#: includes/Admin/Menu.php:138
+#: templates/admin/scan.php:11
+#: templates/public/attendance-manager.php:17
 msgid "Scan"
 msgstr ""
 
-#: includes/Admin/Menu.php:146 includes/Admin/Menu.php:147
+#: includes/Admin/Menu.php:146
+#: includes/Admin/Menu.php:147
 #: templates/admin/database.php:19
 msgid "Database"
 msgstr ""
 
-#: includes/Admin/Menu.php:155 includes/Admin/Menu.php:156
-#: templates/admin/forms-builder.php:30 templates/admin/forms.php:21
+#: includes/Admin/Menu.php:155
+#: includes/Admin/Menu.php:156
+#: templates/admin/forms-builder.php:30
+#: templates/admin/forms.php:21
 msgid "Forms"
 msgstr ""
 
-#: includes/Admin/Menu.php:164 includes/Admin/Menu.php:165
+#: includes/Admin/Menu.php:164
+#: includes/Admin/Menu.php:165
 msgid "Forms (Builder)"
 msgstr ""
 
-#: includes/Admin/Menu.php:173 includes/Admin/Menu.php:174
+#: includes/Admin/Menu.php:173
+#: includes/Admin/Menu.php:174
 #: templates/admin/emails.php:14
 msgid "Email Templates"
 msgstr ""
 
-#: includes/Admin/Menu.php:182 includes/Admin/Menu.php:183
+#: includes/Admin/Menu.php:182
+#: includes/Admin/Menu.php:183
 #: templates/admin/settings.php:20
 msgid "Settings"
 msgstr ""
 
-#: includes/Admin/Menu.php:191 includes/Admin/Menu.php:192
+#: includes/Admin/Menu.php:191
+#: includes/Admin/Menu.php:192
 #: templates/admin/permissions.php:19
 msgid "Permissions"
 msgstr ""
 
-#: includes/Admin/Menu.php:200 includes/Admin/Menu.php:201
-#: includes/Admin/PermissionsPage.php:439 templates/admin/diagnostics.php:40
+#: includes/Admin/Menu.php:200
+#: includes/Admin/Menu.php:201
+#: includes/Admin/PermissionsPage.php:439
+#: templates/admin/diagnostics.php:40
 msgid "Diagnostics"
 msgstr ""
 
-#: includes/Admin/Menu.php:209 includes/Admin/Menu.php:210
+#: includes/Admin/Menu.php:209
+#: includes/Admin/Menu.php:210
 #: templates/admin/theme.php:35
 msgid "Design & Theme"
 msgstr ""
 
-#: includes/Admin/Menu.php:218 includes/Admin/Menu.php:219
+#: includes/Admin/Menu.php:218
+#: includes/Admin/Menu.php:219
 #: templates/admin/shortcodes.php:12
 msgid "Shortcodes"
 msgstr ""
@@ -177,11 +217,13 @@ msgstr ""
 msgid "Multiple FoodBank Manager copies detected"
 msgstr ""
 
-#: includes/Admin/Notices.php:62 templates/admin/diagnostics.php:104
+#: includes/Admin/Notices.php:62
+#: templates/admin/diagnostics.php:104
 msgid "Consolidate (deactivate & delete)"
 msgstr ""
 
-#: includes/Admin/Notices.php:65 templates/admin/diagnostics.php:109
+#: includes/Admin/Notices.php:65
+#: templates/admin/diagnostics.php:109
 msgid "Deactivate only"
 msgstr ""
 
@@ -206,9 +248,7 @@ msgid "FoodBank Manager encryption key is not configured."
 msgstr ""
 
 #: includes/Admin/Notices.php:88
-msgid ""
-"FoodBank Manager: Encryption key (FBM_KEK_BASE64) not set. Some features are "
-"degraded."
+msgid "FoodBank Manager: Encryption key (FBM_KEK_BASE64) not set. Some features are degraded."
 msgstr ""
 
 #: includes/Admin/Notices.php:93
@@ -220,9 +260,7 @@ msgid "FoodBank Manager: CAPTCHA keys are missing."
 msgstr ""
 
 #: includes/Admin/Notices.php:142
-msgid ""
-"FoodBank Manager is installed, but custom capabilities are missing for "
-"Administrators."
+msgid "FoodBank Manager is installed, but custom capabilities are missing for Administrators."
 msgstr ""
 
 #: includes/Admin/Notices.php:142
@@ -297,47 +335,66 @@ msgstr ""
 msgid "Invalid shortcode."
 msgstr ""
 
-#: includes/Admin/UsersMeta.php:35 includes/Exports/CsvExporter.php:39
-#: templates/admin/database.php:119 templates/admin/entry.php:19
+#: includes/Admin/UsersMeta.php:35
+#: includes/Exports/CsvExporter.php:39
+#: templates/admin/database.php:119
+#: templates/admin/entry.php:19
 #: templates/admin/jobs.php:14
 msgid "ID"
 msgstr ""
 
-#: includes/Admin/UsersMeta.php:36 templates/admin/database-view.php:37
+#: includes/Admin/UsersMeta.php:36
+#: templates/admin/database-view.php:37
 #: templates/admin/database.php:121
 msgid "Created"
 msgstr ""
 
-#: includes/Admin/UsersMeta.php:37 includes/Exports/CsvExporter.php:41
-#: includes/Exports/CsvExporter.php:88 templates/admin/attendance.php:74
+#: includes/Admin/UsersMeta.php:37
+#: includes/Exports/CsvExporter.php:41
+#: includes/Exports/CsvExporter.php:88
+#: templates/admin/attendance.php:74
 #: templates/admin/database.php:124
 msgid "Name"
 msgstr ""
 
-#: includes/Admin/UsersMeta.php:38 includes/Exports/CsvExporter.php:42
-#: includes/Exports/CsvExporter.php:89 templates/admin/attendance.php:75
-#: templates/admin/database.php:127 templates/admin/entry.php:31
-#: templates/admin/gdpr.php:37 templates/admin/settings.php:26
+#: includes/Admin/UsersMeta.php:38
+#: includes/Exports/CsvExporter.php:42
+#: includes/Exports/CsvExporter.php:89
+#: templates/admin/attendance.php:75
+#: templates/admin/database.php:127
+#: templates/admin/entry.php:31
+#: templates/admin/gdpr.php:37
+#: templates/admin/settings.php:26
 msgid "Email"
 msgstr ""
 
-#: includes/Admin/UsersMeta.php:39 includes/Exports/CsvExporter.php:43
-#: includes/Exports/CsvExporter.php:90 templates/admin/attendance.php:76
-#: templates/admin/database.php:130 templates/admin/entry.php:35
+#: includes/Admin/UsersMeta.php:39
+#: includes/Exports/CsvExporter.php:43
+#: includes/Exports/CsvExporter.php:90
+#: templates/admin/attendance.php:76
+#: templates/admin/database.php:130
+#: templates/admin/entry.php:35
 msgid "Postcode"
 msgstr ""
 
-#: includes/Admin/UsersMeta.php:40 includes/Exports/CsvExporter.php:44
-#: includes/Shortcodes/Entries.php:33 templates/admin/attendance.php:31
-#: templates/admin/database-view.php:41 templates/admin/database.php:65
-#: templates/admin/database.php:133 templates/admin/diagnostics.php:118
-#: templates/admin/diagnostics.php:183 templates/admin/events-tickets.php:18
-#: templates/admin/events.php:35 templates/admin/events.php:73
+#: includes/Admin/UsersMeta.php:40
+#: includes/Exports/CsvExporter.php:44
+#: includes/Shortcodes/Entries.php:33
+#: templates/admin/attendance.php:31
+#: templates/admin/database-view.php:41
+#: templates/admin/database.php:65
+#: templates/admin/database.php:133
+#: templates/admin/diagnostics.php:118
+#: templates/admin/diagnostics.php:183
+#: templates/admin/events-tickets.php:18
+#: templates/admin/events.php:35
+#: templates/admin/events.php:73
 #: templates/admin/jobs.php:17
 msgid "Status"
 msgstr ""
 
-#: includes/Admin/UsersMeta.php:41 templates/admin/database.php:136
+#: includes/Admin/UsersMeta.php:41
+#: templates/admin/database.php:136
 msgid "Has Files"
 msgstr ""
 
@@ -345,40 +402,49 @@ msgstr ""
 msgid "Created At"
 msgstr ""
 
-#: includes/Exports/CsvExporter.php:87 templates/admin/gdpr.php:42
+#: includes/Exports/CsvExporter.php:87
+#: templates/admin/gdpr.php:42
 #: templates/public/attendance-manager.php:21
 msgid "Application ID"
 msgstr ""
 
-#: includes/Exports/CsvExporter.php:91 templates/admin/attendance.php:77
+#: includes/Exports/CsvExporter.php:91
+#: templates/admin/attendance.php:77
 msgid "Last Attended"
 msgstr ""
 
-#: includes/Exports/CsvExporter.php:92 templates/admin/attendance.php:78
+#: includes/Exports/CsvExporter.php:92
+#: templates/admin/attendance.php:78
 msgid "Visits (Range)"
 msgstr ""
 
-#: includes/Exports/CsvExporter.php:93 templates/admin/attendance.php:79
+#: includes/Exports/CsvExporter.php:93
+#: templates/admin/attendance.php:79
 msgid "No-shows (Range)"
 msgstr ""
 
-#: includes/Exports/CsvExporter.php:94 templates/admin/attendance.php:80
+#: includes/Exports/CsvExporter.php:94
+#: templates/admin/attendance.php:80
 msgid "Visits (12m)"
 msgstr ""
 
-#: includes/Exports/CsvExporter.php:95 templates/admin/attendance.php:81
+#: includes/Exports/CsvExporter.php:95
+#: templates/admin/attendance.php:81
 msgid "Policy"
 msgstr ""
 
-#: includes/Exports/CsvExporter.php:98 templates/public/dashboard.php:148
+#: includes/Exports/CsvExporter.php:98
+#: templates/public/dashboard.php:148
 msgid "Voided"
 msgstr ""
 
-#: includes/Exports/CsvExporter.php:119 templates/admin/database.php:169
+#: includes/Exports/CsvExporter.php:119
+#: templates/admin/database.php:169
 msgid "Yes"
 msgstr ""
 
-#: includes/Exports/CsvExporter.php:119 templates/admin/database.php:169
+#: includes/Exports/CsvExporter.php:119
+#: templates/admin/database.php:169
 msgid "No"
 msgstr ""
 
@@ -403,7 +469,8 @@ msgstr ""
 #: includes/Http/ExportJobsController.php:36
 #: includes/Http/ExportJobsController.php:64
 #: includes/Http/ExportJobsController.php:110
-#: includes/Http/ExportJobsController.php:127 includes/Rest/Api.php:52
+#: includes/Http/ExportJobsController.php:127
+#: includes/Rest/Api.php:52
 #: includes/Rest/AttendanceController.php:165
 #: includes/Rest/AttendanceController.php:270
 #: includes/Rest/AttendanceController.php:357
@@ -418,7 +485,8 @@ msgid "Metric"
 msgstr ""
 
 #: includes/Http/DashboardExportController.php:56
-#: includes/Http/ExportController.php:116 templates/admin/diagnostics.php:137
+#: includes/Http/ExportController.php:116
+#: templates/admin/diagnostics.php:137
 msgid "Count"
 msgstr ""
 
@@ -432,9 +500,8 @@ msgid "Present"
 msgstr ""
 
 #: includes/Http/DiagnosticsController.php:73
-#, fuzzy
 msgid "FoodBank Manager test email"
-msgstr "FoodBank Manager"
+msgstr ""
 
 #: includes/Http/DiagnosticsController.php:74
 msgid "This is a test email from FoodBank Manager."
@@ -473,7 +540,8 @@ msgstr ""
 msgid "Invalid nonce."
 msgstr ""
 
-#: includes/Security/Helpers.php:16 templates/public/attendance-manager.php:76
+#: includes/Security/Helpers.php:16
+#: templates/public/attendance-manager.php:76
 #: templates/public/attendance-manager.php:86
 msgid "Error"
 msgstr ""
@@ -487,18 +555,23 @@ msgstr ""
 msgid "You do not have permission to view the dashboard."
 msgstr ""
 
-#: includes/Shortcodes/Entries.php:34 templates/admin/database.php:67
-#: templates/admin/reports.php:17 templates/admin/reports.php:25
+#: includes/Shortcodes/Entries.php:34
+#: templates/admin/database.php:67
+#: templates/admin/reports.php:17
+#: templates/admin/reports.php:25
 #: templates/public/dashboard.php:49
 msgid "All"
 msgstr ""
 
-#: includes/Shortcodes/Entries.php:35 templates/admin/database.php:69
+#: includes/Shortcodes/Entries.php:35
+#: templates/admin/database.php:69
 msgid "New"
 msgstr ""
 
-#: includes/Shortcodes/Entries.php:36 templates/admin/attendance.php:66
-#: templates/admin/database.php:98 templates/admin/events.php:27
+#: includes/Shortcodes/Entries.php:36
+#: templates/admin/attendance.php:66
+#: templates/admin/database.php:98
+#: templates/admin/events.php:27
 #: templates/admin/reports.php:30
 msgid "Filter"
 msgstr ""
@@ -507,7 +580,8 @@ msgstr ""
 msgid "Entries table placeholder."
 msgstr ""
 
-#: includes/Shortcodes/Entries.php:39 templates/admin/attendance.php:171
+#: includes/Shortcodes/Entries.php:39
+#: templates/admin/attendance.php:171
 #: templates/admin/database.php:242
 msgid "Export CSV"
 msgstr ""
@@ -526,12 +600,15 @@ msgstr ""
 msgid "Invalid form preset. Using fallback."
 msgstr ""
 
-#: includes/Shortcodes/Form.php:93 includes/Shortcodes/FormShortcode.php:75
+#: includes/Shortcodes/Form.php:93
+#: includes/Shortcodes/FormShortcode.php:75
 msgid "Submit"
 msgstr ""
 
-#: includes/Shortcodes/Form.php:119 includes/Shortcodes/Form.php:128
-#: includes/Shortcodes/Form.php:144 includes/Shortcodes/Form.php:152
+#: includes/Shortcodes/Form.php:119
+#: includes/Shortcodes/Form.php:128
+#: includes/Shortcodes/Form.php:144
+#: includes/Shortcodes/Form.php:152
 msgid "Required"
 msgstr ""
 
@@ -543,7 +620,8 @@ msgstr ""
 msgid "Override check-in recorded."
 msgstr ""
 
-#: templates/admin/attendance.php:19 templates/admin/forms.php:25
+#: templates/admin/attendance.php:19
+#: templates/admin/forms.php:25
 msgid "Preset"
 msgstr ""
 
@@ -567,18 +645,24 @@ msgstr ""
 msgid "Custom"
 msgstr ""
 
-#: templates/admin/attendance.php:28 templates/admin/database.php:58
-#: templates/admin/events.php:25 templates/admin/reports.php:9
+#: templates/admin/attendance.php:28
+#: templates/admin/database.php:58
+#: templates/admin/events.php:25
+#: templates/admin/reports.php:9
 msgid "From"
 msgstr ""
 
-#: templates/admin/attendance.php:29 templates/admin/database.php:62
-#: templates/admin/events.php:26 templates/admin/reports.php:12
+#: templates/admin/attendance.php:29
+#: templates/admin/database.php:62
+#: templates/admin/events.php:26
+#: templates/admin/reports.php:12
 msgid "To"
 msgstr ""
 
-#: templates/admin/attendance.php:30 templates/admin/diagnostics.php:179
-#: templates/admin/reports.php:15 templates/public/dashboard.php:55
+#: templates/admin/attendance.php:30
+#: templates/admin/diagnostics.php:179
+#: templates/admin/reports.php:15
+#: templates/public/dashboard.php:55
 msgid "Event"
 msgstr ""
 
@@ -586,16 +670,20 @@ msgstr ""
 msgid "No-show"
 msgstr ""
 
-#: templates/admin/attendance.php:47 templates/admin/jobs.php:15
-#: templates/public/attendance-manager.php:23 templates/public/dashboard.php:47
+#: templates/admin/attendance.php:47
+#: templates/admin/jobs.php:15
+#: templates/public/attendance-manager.php:23
+#: templates/public/dashboard.php:47
 msgid "Type"
 msgstr ""
 
-#: templates/admin/attendance.php:54 templates/public/dashboard.php:50
+#: templates/admin/attendance.php:54
+#: templates/public/dashboard.php:50
 msgid "In person"
 msgstr ""
 
-#: templates/admin/attendance.php:60 templates/public/dashboard.php:51
+#: templates/admin/attendance.php:60
+#: templates/public/dashboard.php:51
 msgid "Delivery"
 msgstr ""
 
@@ -603,7 +691,8 @@ msgstr ""
 msgid "Manager ID"
 msgstr ""
 
-#: templates/admin/attendance.php:64 templates/public/dashboard.php:60
+#: templates/admin/attendance.php:64
+#: templates/public/dashboard.php:60
 msgid "Policy only"
 msgstr ""
 
@@ -611,10 +700,14 @@ msgstr ""
 msgid "Include voided"
 msgstr ""
 
-#: templates/admin/attendance.php:82 templates/admin/database.php:138
-#: templates/admin/emails.php:21 templates/admin/events-tickets.php:18
-#: templates/admin/events.php:36 templates/admin/jobs.php:18
-#: templates/admin/permissions.php:79 templates/admin/permissions.php:125
+#: templates/admin/attendance.php:82
+#: templates/admin/database.php:138
+#: templates/admin/emails.php:21
+#: templates/admin/events-tickets.php:18
+#: templates/admin/events.php:36
+#: templates/admin/jobs.php:18
+#: templates/admin/permissions.php:79
+#: templates/admin/permissions.php:125
 msgid "Actions"
 msgstr ""
 
@@ -634,16 +727,20 @@ msgstr ""
 msgid "Show QR"
 msgstr ""
 
-#: templates/admin/attendance.php:119 templates/admin/attendance.php:190
+#: templates/admin/attendance.php:119
+#: templates/admin/attendance.php:190
 msgid "Override & Check-in"
 msgstr ""
 
-#: templates/admin/attendance.php:168 templates/admin/entry.php:49
+#: templates/admin/attendance.php:168
+#: templates/admin/entry.php:49
 msgid "Unmask"
 msgstr ""
 
-#: templates/admin/attendance.php:181 templates/admin/emails.php:94
-#: templates/admin/forms.php:51 templates/admin/shortcodes.php:35
+#: templates/admin/attendance.php:181
+#: templates/admin/emails.php:94
+#: templates/admin/forms.php:51
+#: templates/admin/shortcodes.php:35
 msgid "Copy"
 msgstr ""
 
@@ -699,7 +796,8 @@ msgstr ""
 msgid "Export Reports"
 msgstr ""
 
-#: templates/admin/database-view.php:28 templates/admin/entry.php:15
+#: templates/admin/database-view.php:28
+#: templates/admin/entry.php:15
 msgid "Entry"
 msgstr ""
 
@@ -711,7 +809,8 @@ msgstr ""
 msgid "Consent time"
 msgstr ""
 
-#: templates/admin/database-view.php:49 templates/admin/forms.php:26
+#: templates/admin/database-view.php:49
+#: templates/admin/forms.php:26
 msgid "Fields"
 msgstr ""
 
@@ -731,19 +830,25 @@ msgstr ""
 msgid "Back"
 msgstr ""
 
-#: templates/admin/database-view.php:88 templates/admin/database.php:188
+#: templates/admin/database-view.php:88
+#: templates/admin/database.php:188
 msgid "CSV"
 msgstr ""
 
-#: templates/admin/database-view.php:92 templates/admin/database.php:195
-#: templates/admin/emails.php:79 templates/admin/events-tickets.php:37
+#: templates/admin/database-view.php:92
+#: templates/admin/database.php:195
+#: templates/admin/emails.php:79
+#: templates/admin/events-tickets.php:37
 #: templates/admin/events.php:52
 msgid "Are you sure?"
 msgstr ""
 
-#: templates/admin/database-view.php:96 templates/admin/database.php:50
-#: templates/admin/database.php:199 templates/admin/events.php:52
-#: templates/admin/form-builder.php:32 templates/admin/forms-builder.php:54
+#: templates/admin/database-view.php:96
+#: templates/admin/database.php:50
+#: templates/admin/database.php:199
+#: templates/admin/events.php:52
+#: templates/admin/form-builder.php:32
+#: templates/admin/forms-builder.php:54
 #: templates/admin/settings.php:105
 msgid "Delete"
 msgstr ""
@@ -760,7 +865,8 @@ msgstr ""
 msgid "Select preset"
 msgstr ""
 
-#: templates/admin/database.php:38 templates/public/dashboard.php:62
+#: templates/admin/database.php:38
+#: templates/public/dashboard.php:62
 msgid "Apply"
 msgstr ""
 
@@ -784,8 +890,10 @@ msgstr ""
 msgid "Consent"
 msgstr ""
 
-#: templates/admin/database.php:88 templates/admin/events.php:19
-#: templates/admin/gdpr.php:47 templates/admin/permissions.php:115
+#: templates/admin/database.php:88
+#: templates/admin/events.php:19
+#: templates/admin/gdpr.php:47
+#: templates/admin/permissions.php:115
 msgid "Search"
 msgstr ""
 
@@ -864,8 +972,7 @@ msgid "Install Health"
 msgstr ""
 
 #: templates/admin/diagnostics.php:80
-msgid ""
-"Only one copy of the plugin should remain installed under foodbank-manager/."
+msgid "Only one copy of the plugin should remain installed under foodbank-manager/."
 msgstr ""
 
 #: templates/admin/diagnostics.php:81
@@ -883,7 +990,8 @@ msgstr ""
 msgid "Last consolidation: %s (deactivated %d, deleted %d)"
 msgstr ""
 
-#: templates/admin/diagnostics.php:84 templates/admin/diagnostics.php:87
+#: templates/admin/diagnostics.php:84
+#: templates/admin/diagnostics.php:87
 msgid "never"
 msgstr ""
 
@@ -940,7 +1048,8 @@ msgstr ""
 msgid "Cron Health"
 msgstr ""
 
-#: templates/admin/diagnostics.php:165 templates/admin/jobs.php:9
+#: templates/admin/diagnostics.php:165
+#: templates/admin/jobs.php:9
 #: templates/admin/settings.php:122
 msgid "Run now"
 msgstr ""
@@ -961,11 +1070,13 @@ msgstr ""
 msgid "Next run"
 msgstr ""
 
-#: templates/admin/emails.php:16 templates/admin/settings.php:94
+#: templates/admin/emails.php:16
+#: templates/admin/settings.php:94
 msgid "Email Log"
 msgstr ""
 
-#: templates/admin/emails.php:20 templates/admin/emails.php:59
+#: templates/admin/emails.php:20
+#: templates/admin/emails.php:59
 #: templates/admin/emails.php:101
 msgid "Subject"
 msgstr ""
@@ -974,7 +1085,8 @@ msgstr ""
 msgid "Resend"
 msgstr ""
 
-#: templates/admin/emails.php:46 templates/admin/events.php:47
+#: templates/admin/emails.php:46
+#: templates/admin/events.php:47
 msgid "Edit"
 msgstr ""
 
@@ -994,13 +1106,17 @@ msgstr ""
 msgid "Email HTML body."
 msgstr ""
 
-#: templates/admin/emails.php:76 templates/admin/events.php:79
-#: templates/admin/form-builder.php:26 templates/admin/forms-builder.php:48
-#: templates/admin/permissions.php:67 templates/admin/permissions.php:96
+#: templates/admin/emails.php:76
+#: templates/admin/events.php:79
+#: templates/admin/form-builder.php:26
+#: templates/admin/forms-builder.php:48
+#: templates/admin/permissions.php:67
+#: templates/admin/permissions.php:96
 msgid "Save"
 msgstr ""
 
-#: templates/admin/emails.php:84 templates/admin/permissions.php:167
+#: templates/admin/emails.php:84
+#: templates/admin/permissions.php:167
 msgid "Reset to defaults"
 msgstr ""
 
@@ -1008,8 +1124,10 @@ msgstr ""
 msgid "Tokens"
 msgstr ""
 
-#: templates/admin/emails.php:100 templates/admin/forms-builder.php:40
-#: templates/admin/gdpr.php:50 templates/admin/shortcodes.php:30
+#: templates/admin/emails.php:100
+#: templates/admin/forms-builder.php:40
+#: templates/admin/gdpr.php:50
+#: templates/admin/shortcodes.php:30
 #: templates/admin/shortcodes.php:38
 msgid "Preview"
 msgstr ""
@@ -1070,24 +1188,29 @@ msgstr ""
 msgid "All statuses"
 msgstr ""
 
-#: templates/admin/events.php:22 templates/admin/events.php:75
+#: templates/admin/events.php:22
+#: templates/admin/events.php:75
 msgid "Active"
 msgstr ""
 
-#: templates/admin/events.php:23 templates/admin/events.php:76
+#: templates/admin/events.php:23
+#: templates/admin/events.php:76
 msgid "Cancelled"
 msgstr ""
 
-#: templates/admin/events.php:32 templates/admin/events.php:67
+#: templates/admin/events.php:32
+#: templates/admin/events.php:67
 #: templates/admin/form-builder.php:19
 msgid "Title"
 msgstr ""
 
-#: templates/admin/events.php:33 templates/admin/events.php:68
+#: templates/admin/events.php:33
+#: templates/admin/events.php:68
 msgid "Starts"
 msgstr ""
 
-#: templates/admin/events.php:34 templates/admin/events.php:69
+#: templates/admin/events.php:34
+#: templates/admin/events.php:69
 msgid "Ends"
 msgstr ""
 
@@ -1127,7 +1250,8 @@ msgstr ""
 msgid "Schema JSON"
 msgstr ""
 
-#: templates/admin/forms.php:27 templates/admin/shortcodes.php:17
+#: templates/admin/forms.php:27
+#: templates/admin/shortcodes.php:17
 msgid "Shortcode"
 msgstr ""
 
@@ -1203,7 +1327,8 @@ msgstr ""
 msgid "Current Overrides"
 msgstr ""
 
-#: templates/admin/permissions.php:75 templates/admin/permissions.php:121
+#: templates/admin/permissions.php:75
+#: templates/admin/permissions.php:121
 msgid "User"
 msgstr ""
 
@@ -1227,7 +1352,8 @@ msgstr ""
 msgid "Download JSON"
 msgstr ""
 
-#: templates/admin/permissions.php:153 templates/admin/permissions.php:160
+#: templates/admin/permissions.php:153
+#: templates/admin/permissions.php:160
 msgid "Import"
 msgstr ""
 
@@ -1247,7 +1373,8 @@ msgstr ""
 msgid "QR"
 msgstr ""
 
-#: templates/admin/reports.php:27 templates/public/attendance-manager.php:16
+#: templates/admin/reports.php:27
+#: templates/public/attendance-manager.php:16
 msgid "Manual"
 msgstr ""
 
@@ -1291,7 +1418,8 @@ msgstr ""
 msgid "Verify"
 msgstr ""
 
-#: templates/admin/settings.php:22 templates/admin/theme.php:43
+#: templates/admin/settings.php:22
+#: templates/admin/theme.php:43
 msgid "Settings saved."
 msgstr ""
 

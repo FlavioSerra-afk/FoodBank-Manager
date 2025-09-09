@@ -15,7 +15,7 @@ final class MenuTest extends BaseTestCase {
         $this->assertSame('fbm', $subs[0]['slug']);
 
         $slugs = array_column($subs, 'slug');
-        foreach (['fbm','fbm_attendance','fbm_database','fbm_forms','fbm_form_builder','fbm_emails','fbm_settings','fbm_permissions','fbm_diagnostics','fbm_theme','fbm_shortcodes'] as $expected) {
+        foreach (['fbm','fbm_attendance','fbm_reports','fbm_database','fbm_forms','fbm_form_builder','fbm_emails','fbm_settings','fbm_permissions','fbm_diagnostics','fbm_theme','fbm_shortcodes'] as $expected) {
             self::assertContains($expected, $slugs);
         }
     }

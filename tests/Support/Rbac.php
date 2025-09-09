@@ -23,6 +23,7 @@ function fbm_grant_manager(): void {
         'fb_manage_forms',
         'fbm_manage_forms',
         'fb_manage_emails',
+        'fb_manage_reports',
         'fb_manage_settings',
         'fb_manage_diagnostics',
         'fb_manage_permissions',
@@ -39,6 +40,7 @@ function fbm_grant_admin(): void {
         'fb_manage_forms',
         'fbm_manage_forms',
         'fb_manage_emails',
+        'fb_manage_reports',
         'fb_manage_settings',
         'fb_manage_diagnostics',
         'fb_manage_permissions',
@@ -63,7 +65,8 @@ function fbm_required_cap_for_page(string $slug): string {
         'fbm_permissions'   => 'fb_manage_permissions',
         'fbm_theme'         => 'fb_manage_theme',
         'fbm_events'       => 'fbm_manage_events',
-        'fbm_scan'         => 'fbm_manage_events',
+        'fbm_scan'         => 'fb_manage_attendance',
+        'fbm_reports'      => 'fb_manage_reports',
         'fbm_form_builder' => 'fbm_manage_forms',
         'fbm_shortcodes'    => 'fb_manage_forms', // shortcodes builder is admin-only; tie to forms
     ];

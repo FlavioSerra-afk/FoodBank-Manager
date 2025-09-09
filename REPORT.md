@@ -2,6 +2,10 @@ TL;DR: Unit=0/0, PHPStan=0, PHPCS(Lanes)=0/0, Packaging=PASS
 
 # FoodBank Manager — Errors-First Health Report (current repo)
 
+## Wave UI/UX Glass + Dashboard First
+- Dashboard v1 with glass KPI tiles, sparkline, and shortcut buttons. *(screenshot pending)*
+- Glass design tokens with high-contrast and reduced-transparency fallbacks. *(screenshot pending)*
+
 ## RC3 Fix Pack
 - Packaging artifact restored with slug guard and main-file check
 - PHPStan ABSPATH warning eliminated

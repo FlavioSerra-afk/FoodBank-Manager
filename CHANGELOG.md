@@ -38,6 +38,10 @@
 
 ## [Unreleased]
 
+- feat(admin): Dashboard v1 with glass tiles, sparkline, and shortcuts
+- feat(ui): glass tokens + high-contrast & reduced-transparency fallbacks
+- chore(i18n): update POT/PO; compile .mo during packaging if available
+
 ## [1.3.0-alpha.1] — 2025-09-08
 
 Added: SMTP Diagnostics panel; deterministic admin CSS vars; Entry/GDPR gated render; AttendanceRepo BC shims.

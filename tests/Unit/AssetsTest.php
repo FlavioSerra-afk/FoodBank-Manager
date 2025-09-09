@@ -15,6 +15,8 @@ final class AssetsTest extends BaseTestCase {
         $this->assertStringContainsString('<style id="fbm-css-vars">', $out);
         $this->assertStringContainsString('--fbm-color-bg', $out);
         $this->assertStringContainsString('--fbm-color-fg', $out);
+        $this->assertStringContainsString('--fbm-glass-bg', $out);
+        $this->assertStringContainsString('--fbm-glass-blur', $out);
         $this->assertStringContainsString('html[dir=&quot;rtl&quot;] .fbm-admin', $out);
 
         ob_start();
