@@ -10,4 +10,7 @@ fbm_test_reset_globals();
 if (!defined('FBM_TESTS')) {
     define('FBM_TESTS', true);
 }
+if (!defined('ABSPATH')) {
+    define('ABSPATH', __DIR__ . '/..');
+}
 

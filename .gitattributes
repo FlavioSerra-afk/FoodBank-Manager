@@ -4,4 +4,5 @@
 /node_modules export-ignore
 dist/ export-ignore
 /phpcs-report.txt export-ignore
+build/ export-ignore
 *.mo binary

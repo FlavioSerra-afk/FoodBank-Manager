@@ -27,7 +27,17 @@ final class WPDBStub
         return [];
     }
 
+    public function get_row(string $sql, $output = null)
+    {
+        return null;
+    }
+
     public function get_var(string $sql): int
+    {
+        return 0;
+    }
+
+    public function query(string $sql): int
     {
         return 0;
     }

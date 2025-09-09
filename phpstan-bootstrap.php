@@ -6,11 +6,6 @@
  */
 
 declare( strict_types=1 );
-
-if ( ! defined( 'ABSPATH' ) ) {
-	define( 'ABSPATH', __DIR__ . '/' );
-}
-
 // Define plugin constants for static analysis only.
 // These do NOT affect runtime when WordPress defines real values.
 if ( ! defined( 'FBM_FILE' ) ) {

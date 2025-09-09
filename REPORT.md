@@ -2,6 +2,13 @@ TL;DR: Unit=0/0, PHPStan=0, PHPCS(Lanes)=0/0, Packaging=PASS
 
 # FoodBank Manager — Errors-First Health Report (current repo)
 
+## RC3 Fix Pack
+- Packaging artifact restored with slug guard and main-file check
+- PHPStan ABSPATH warning eliminated
+- ScanController tests made deterministic
+- Admin Dashboard MVP with sparkline & shortcuts
+- Packaging compiles .mo when msgfmt exists
+
 ## 0) Docs consulted
 - PRD-foodbank-manager.md
 - Architecture.md
@@ -104,3 +111,10 @@ _None — all primary gates passing._
 ### PR hygiene
 - Removed binary assets from VCS (.mo, dist/*.zip).
 - .mo compiled during packaging; ZIP still contains translations.
+
+### Release: 1.4.0-rc.3 (staging)
+- Packaging: PASS (slug + main file; logs in build/zip-root.txt & build/zip-main.txt)
+- PHPStan: 0/0; PHPCS(lanes): 0/0
+- Unit: ScanController deterministic; DashboardPage tests added
+- Artifact: dist/foodbank-manager.zip
+- Tag: v1.4.0-rc.3

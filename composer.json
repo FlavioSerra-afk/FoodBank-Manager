@@ -16,9 +16,9 @@
   },
   "autoload-dev": {
     "files": [
-      "phpstan-bootstrap.php",
       "tests/Support/WPStubs.php",
-      "tests/Support/Rbac.php"
+      "tests/Support/Rbac.php",
+      "phpstan-bootstrap.php"
     ]
   },
   "require-dev": {
@@ -75,5 +75,5 @@
     },
     "sort-packages": true
   },
-  "version": "1.4.0-rc.2"
+  "version": "1.4.0-rc.3"
 }

@@ -222,7 +222,7 @@ final class Menu {
 
         public static function render_dashboard(): void {
                 self::render_once( 'admin:dashboard', static function (): void {
-                        self::include_template( 'dashboard.php' );
+                        \FBM\Admin\DashboardPage::route();
                 } );
         }
 
@@ -314,19 +314,4 @@ final class Menu {
                 $cb();
         }
 
-        /**
-         * Safely include an admin template.
-         *
-         * @since 1.0.5
-         *
-         * @param string $file Template filename.
-         *
-         * @return void
-         */
-        private static function include_template( string $file ): void {
-                $path = FBM_PATH . 'templates/admin/' . $file;
-                if ( file_exists( $path ) ) {
-                        require $path; // @psalm-suppress UnresolvableInclude
-                }
-        }
 }
