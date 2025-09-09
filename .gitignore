@@ -1,7 +1,12 @@
+# build artifacts
+dist/
+build/
+languages/*.mo
+*.zip
+
 /vendor/*
 !/vendor/.gitkeep
 .phpunit.result.cache
-/dist/
 
 # Ignore common binaries
 *.png
@@ -9,6 +14,5 @@
 *.jpeg
 *.gif
 *.pdf
-*.zip
 *.exe
 .DS_Store
