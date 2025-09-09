@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-05 (v1.2.9 QA sweep)
+Docs-Revision: 2025-09-09 (Wave RC3 Fix Pack)
 # Security Policy — PCC FoodBank Manager
 
 We take security seriously. Please follow the guidelines below for reporting vulnerabilities.
@@ -27,7 +27,16 @@ We aim to acknowledge reports **within 2 working days**.
 - Admin shortcode previews enforce capability checks, nonces, attribute whitelists with `mask_sensitive=true`, and `wp_kses_post` filtering.
 - Forms presets are sanitized server-side; unknown preset IDs fall back to a minimal safe form without exposing errors to regular users.
 - Database filter presets and per-user column selections require `fb_manage_database`, use nonces, and whitelist allowed query/column keys.
-- Admin UI is wrapped in `.fbm-admin` with screen-gated CSS/notices to prevent cross-plugin CSS or markup bleed.
+ - Admin UI is wrapped in `.fbm-admin` with screen-gated CSS/notices to prevent cross-plugin CSS or markup bleed.
+
+## RC3 Guardrails
+- Default masked: all exports/detail views masked unless `fbm_view_sensitive`.
+- Mutations gated: capability + nonce on every POST/GET action that mutates.
+- SQL: prepared with strict whitelists for IN/ORDER/LIMIT.
+- Tickets: KEK-backed HMAC; base64url; replay protection.
+- Headers seam: no native `header()` in tests; use `fbm_send_headers`.
+- Packaging: slug must be `foodbank-manager/`; guard checks in CI; compiled `.mo` not tracked in VCS.
+- Stubs discipline: single WP stubs source; `FbmDieException` replaces `wp_die` in tests.
 
 ## 🔁 Coordinated Disclosure
 - We will validate, develop a fix, and prepare a security release.

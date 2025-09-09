@@ -118,3 +118,10 @@ _None — all primary gates passing._
 - Unit: ScanController deterministic; DashboardPage tests added
 - Artifact: dist/foodbank-manager.zip
 - Tag: v1.4.0-rc.3
+ 
+## RC3 Fix Pack — Summary (2025-09-09)
+
+- Packaging restored: dist/foodbank-manager.zip produced; root slug enforced; guard logs written; .mo compiled when msgfmt present.
+- Admin Dashboard MVP: tiles (registrations; check-ins Today/Week/Month; tickets scanned 7d), 6-month sparkline, shortcuts.
+- Static/bootstrap: removed duplicate ABSPATH; deterministic nonce/time; header seam; stabilized ScanController tests.
+- QA: PHPStan 0 errors; PHPCS lanes 0/0; PHPUnit green (3× runs); packaging guards pass.
