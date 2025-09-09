@@ -1,3 +1,13 @@
+## 1.4.0-rc.2 — 2025-09-09
+- i18n: textdomain loader, strings localized; sample en_GB locale
+- Background export jobs: queue + cron worker + secure downloads
+- Attendance: Tickets/QR, Scan & manual check-in, Reports & Exports
+- Visual Form Builder (CPT `fb_form`) with live preview
+- Theme presets incl. High-Contrast; RTL readiness
+- CSV/XLSX/PDF pipelines via seams; headers seam; packaging guards
+- QA: PHPStan 0/0; PHPCS (lanes) 0/0
+- Docs-Revision: 2025-09-09 (Wave RC2)
+
 ## 1.4.0-rc.1 — 2025-09-09
 - Attendance: Events CRUD, Tickets/QR, Scan & Manual check-in, Reports & Exports (CSV/XLSX/PDF, masked)
 - Email Log: Resend (audited)
