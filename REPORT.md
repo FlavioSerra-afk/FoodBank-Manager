@@ -66,5 +66,9 @@ _None — all primary gates passing._
 - Repo, service, controller covered by 3 tests
 - Next: Scan/Manual/Reports
 
+## Attendance — Scan & Manual Check-in: PASS/notes
+- Check-ins repo/service/controller covered by 4 tests
+- Manual UI renders with fallback token form
+
 ## Email Resend — PASS
 - Admins can resend logged emails with caps/nonce checks and audit trail.

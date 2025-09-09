@@ -24,6 +24,26 @@ if (defined('PHPSTAN_RUNNING') || defined('__PHPSTAN_RUNNING__')) {
         function wp_enqueue_script($handle, $src = '', array $deps = [], $ver = false, $in_footer = false) {}
         function wp_json_encode($data, $options = 0, $depth = 512) {}
         function wp_mail($to, $subject, $message, $headers = '', $attachments = array()) {}
+        class WP_REST_Request {
+            public function __construct(string $method = 'GET', string $route = '') {}
+            /** @return mixed */
+            public function get_param(string $key) {}
+            /** @return void */
+            public function set_param(string $key, $value) {}
+            /** @return string|null */
+            public function get_header(string $key) {}
+            /** @return void */
+            public function set_header(string $key, $value) {}
+            /** @return array */
+            public function get_file_params() {}
+        }
+        class WP_REST_Response {
+            /** @param array $data */
+            public function __construct(array $data = array(), int $status = 200) {}
+            /** @return array */
+            public function get_data() {}
+            public function get_status(): int {}
+        }
     }
     return;
 }
@@ -198,6 +218,27 @@ if (!function_exists('sanitize_text_field')){ function sanitize_text_field($s){ 
 if (!function_exists('sanitize_textarea_field')){ function sanitize_textarea_field($s){ return trim(strip_tags((string)$s)); } }
 if (!function_exists('esc_like')){ function esc_like($s){ return addslashes((string)$s); } }
 if (!function_exists('sanitize_key')){ function sanitize_key($s){ return preg_replace('/[^a-z0-9_\-]/i','', (string)$s); } }
+
+if (!class_exists('WP_REST_Request')) {
+  class WP_REST_Request {
+    private array $params = [];
+    private array $headers = [];
+    public function __construct(string $method = 'GET', string $route = '') {}
+    public function get_param(string $key) { return $this->params[$key] ?? null; }
+    public function set_param(string $key, $value): void { $this->params[$key] = $value; }
+    public function get_header(string $key) { return $this->headers[$key] ?? null; }
+    public function set_header(string $key, $value): void { $this->headers[$key] = $value; }
+    public function get_file_params(): array { return []; }
+  }
+}
+if (!class_exists('WP_REST_Response')) {
+  class WP_REST_Response {
+    private array $data; private int $status;
+    public function __construct(array $data = array(), int $status = 200) { $this->data = $data; $this->status = $status; }
+    public function get_data(): array { return $this->data; }
+    public function get_status(): int { return $this->status; }
+  }
+}
 if (!function_exists('sanitize_hex_color')){ function sanitize_hex_color($c){ $c=is_string($c)?trim($c):''; return preg_match('/^#(?:[0-9a-fA-F]{3}){1,2}$/',$c)?strtolower($c):''; } }
 if (!function_exists('sanitize_title')){ function sanitize_title($t){ $t=strtolower((string)$t); $t=preg_replace('/[^a-z0-9]+/','-',$t); return trim($t,'-'); } }
 if (!function_exists('selected')){ function selected($a,$b,$echo=false){ $o=($a==$b)?' selected="selected"':''; if($echo) echo $o; return $o; } }

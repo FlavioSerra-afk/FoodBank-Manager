@@ -6,8 +6,8 @@ namespace FoodBankManager\Db;
 
 class Migrations {
 
-	private const OPTION_KEY = 'fbm_db_version';
-        private const VERSION    = '2024091503';
+        private const OPTION_KEY = 'fbm_db_version';
+        private const VERSION    = '2024091504';
 
 	public function maybe_migrate(): void {
 		$current = get_option( self::OPTION_KEY );
@@ -88,7 +88,7 @@ class Migrations {
             KEY idx_target (target_type, target_id),
             KEY idx_created (created_at)
         ) $charset_collate;";
-                $sql[] = "CREATE TABLE {$wpdb->prefix}fb_events (
+        $sql[] = "CREATE TABLE {$wpdb->prefix}fb_events (
             id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
             title VARCHAR(255) NOT NULL,
             starts_at DATETIME NOT NULL,
@@ -101,6 +101,20 @@ class Migrations {
             updated_at DATETIME NOT NULL,
             KEY idx_status (status),
             KEY idx_start (starts_at)
+        ) $charset_collate;";
+        $sql[] = "CREATE TABLE {$wpdb->prefix}fb_checkins (
+            id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            event_id BIGINT UNSIGNED NOT NULL,
+            recipient VARCHAR(255) NULL,
+            token_hash VARBINARY(32) NULL,
+            method VARCHAR(16) NOT NULL,
+            note TEXT NULL,
+            `by` BIGINT UNSIGNED NULL,
+            verified_at DATETIME NOT NULL,
+            created_at DATETIME NOT NULL,
+            UNIQUE KEY uq_event_token (event_id, token_hash),
+            KEY idx_event (event_id),
+            KEY idx_verified (verified_at)
         ) $charset_collate;";
 
 
