@@ -12,7 +12,7 @@ Docs-Revision: 2025-09-09 (Wave UI/UX Glass + Dashboard First)
 
 ## Information Architecture (vNext)
 
-- Dashboard — Manager KPIs (registrations, check-ins Today/Week/Month, tickets scanned) + 6‑month sparkline + shortcuts.
+- Dashboard — 3×3 glass tile grid (In Progress — RC4).
 - Attendance — Hub with tabs: Today, Scan, Manual, History. (Scan menu deep‑links to `Attendance?tab=scan`.)
 - Reports — Period/daily summaries, compare mode, export links.
 - Submissions (Database) — Schema-aware table with dynamic columns, per-user column prefs, masked detail view; exports mirror visible columns (CSV/XLSX/PDF).
@@ -25,12 +25,10 @@ Docs-Revision: 2025-09-09 (Wave UI/UX Glass + Dashboard First)
 - Shortcodes — Helper reference and examples.
 - Events (optional) — Off by default; toggle in Settings.
 
-### Dashboard (Admin) v1 — Implemented now
-- Tiles: Total registrations; Check-ins Today; Check-ins This Week; Check-ins This Month; Tickets scanned (7d).
-- Trend: 6‑month sparkline.
-- Shortcuts: Create Form, Open Submissions, Start Scan, Export Reports.
+### Dashboard 3×3 glass layout — In Progress (RC4)
+- Tiles: Total registrations; Check-ins Today; Check-ins This Week; Check-ins This Month; Tickets scanned (7d); Active events; Forms submitted (7d); Pending export jobs; Shortcuts tile.
 - Security/Perf: Masked counts; ≤300ms goal; assets gated to FBM screens.
-- Tests: Deterministic time seam; tile presence; sparkline present; shortcut links render.
+- Tests: Tile presence, 3×3 grid, shortcut links render.
 
 ### Design language — "Glass"
 - Glass cards & buttons: translucent surface with backdrop blur, subtle border, and soft shadow.
