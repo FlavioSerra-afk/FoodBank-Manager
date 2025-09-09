@@ -14,6 +14,7 @@ final class AssetsRtlTest extends \BaseTestCase {
         Assets::print_admin_head();
         $css = ob_get_clean();
         $this->assertStringContainsString('--fbm-color-bg:#000000', $css);
+        $this->assertStringContainsString('--fbm-glass-bg:#000000', $css);
         $this->assertStringContainsString('--fbm-glass-blur:0', $css);
         $this->assertStringContainsString('html[dir=&quot;rtl&quot;] .fbm-admin', $css);
     }

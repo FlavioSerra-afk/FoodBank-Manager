@@ -103,6 +103,20 @@ final class JobsRepo {
     }
 
     /**
+     * Count pending or running jobs.
+     *
+     * @return int Number of jobs.
+     */
+    public static function pending_count(): int {
+        global $wpdb;
+        $table = self::table();
+        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+        $sql = "SELECT COUNT(*) FROM {$table} WHERE status IN ('pending','running')";
+        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+        return (int) $wpdb->get_var($sql);
+    }
+
+    /**
      * Claim the next pending job and mark running.
      *
      * @return array|null Claimed job.

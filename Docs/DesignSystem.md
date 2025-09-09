@@ -15,9 +15,10 @@ Defines visual tokens and component specs used across admin and front-end surfac
 - `--fbm-elev` — box-shadow for raised surfaces.
 
 ## Components
-- **KPI Tile** — `.fbm-tile--glass`; icon + label + masked value. Tiles are focusable; border outlines use `--fbm-color-accent`.
+- **KPI Tile** — `.fbm-tile.fbm-card--glass`; icon + label + masked value. Tiles are focusable; border outlines use `--fbm-color-accent`.
 - **Card** — `.fbm-card--glass`; translucent surface with `backdrop-filter: blur(var(--fbm-glass-blur))` and soft shadow `var(--fbm-elev)`.
 - **Button** — `.fbm-button--glass`; solid text, hover/active/focus use `--fbm-color-accent`.
+- **Dashboard tiles** — `.fbm-grid` (3×3, gap 16px). Breakpoints: 2 columns ≤1200px, 1 column ≤720px. Each `.fbm-tile` is focusable (`tabindex="0"`) and uses accent outline on focus.
 - **Tabs** — horizontal list; active tab uses accent border-bottom.
 - **Table** — responsive, masked PII by default; uses tokenised spacing.
 - **Empty State** — card with icon, short text, and primary action.
