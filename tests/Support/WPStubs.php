@@ -48,6 +48,10 @@ if (defined('PHPSTAN_RUNNING') || defined('__PHPSTAN_RUNNING__')) {
     return;
 }
 
+if (!defined('ABSPATH')) {
+    define('ABSPATH', __DIR__ . '/../../');
+}
+
 // Options
 $GLOBALS['fbm_options']    = $GLOBALS['fbm_options']    ?? [];
 $GLOBALS['fbm_transients'] = $GLOBALS['fbm_transients'] ?? [];
@@ -474,6 +478,7 @@ if (!function_exists('fbm_test_reset_globals')) {
     $GLOBALS['fbm_post_content'] = '';
     $GLOBALS['fbm_is_singular'] = false;
     $GLOBALS['fbm_test_screen_id'] = null;
+    $GLOBALS['fbm_test_nonce_secret'] = 'fbm-test';
     $_GET = $_POST = $_REQUEST = [];
     $GLOBALS['__last_redirect'] = null;
   }

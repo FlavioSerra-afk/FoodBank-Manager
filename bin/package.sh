@@ -4,9 +4,10 @@ set -euo pipefail
 SLUG="foodbank-manager"
 DIST="dist"
 WORK="$DIST/$SLUG"
+BUILD="build"
 
 rm -rf "$WORK" "$DIST/$SLUG.zip"
-mkdir -p "$WORK"
+mkdir -p "$WORK" "$BUILD"
 
 # Ensure main file exists in repository root and copy it into the package first
 if [[ ! -f "$SLUG.php" ]]; then
@@ -14,14 +15,6 @@ if [[ ! -f "$SLUG.php" ]]; then
   exit 1
 fi
 cp "$SLUG.php" "$WORK/$SLUG.php"
-
-# Compile translations if msgfmt is available (soft fail otherwise)
-if command -v msgfmt >/dev/null 2>&1; then
-  echo "[i18n] Compiling .mo files..."
-  msgfmt languages/foodbank-manager-en_GB.po -o languages/foodbank-manager-en_GB.mo || true
-else
-  echo "[i18n] msgfmt not found; skipping .mo compile (POT/PO still included)."
-fi
 
 # Copy tracked plugin files into a stable folder name
 rsync -a --delete \
@@ -31,10 +24,19 @@ rsync -a --delete \
   --exclude "vendor/bin" \
   --exclude "tests" \
   --exclude "dist" \
+  --exclude "build" \
   --exclude ".DS_Store" \
   --exclude "*.zip" \
   --exclude "$SLUG.php" \
   ./ "$WORK/"
+
+# Compile translations if msgfmt is available (soft fail otherwise)
+if command -v msgfmt >/dev/null 2>&1; then
+  echo "[i18n] Compiling .mo files..."
+  msgfmt languages/foodbank-manager-en_GB.po -o "$WORK/languages/foodbank-manager-en_GB.mo" || true
+else
+  echo "[i18n] msgfmt not found; skipping .mo compile (POT/PO still included)."
+fi
 
 # Build the ZIP with a stable top-level directory
 ( cd "$DIST" && zip -rq "$SLUG.zip" "$SLUG" )
@@ -42,6 +44,7 @@ rsync -a --delete \
 # Verify first ZIP entry is the slug directory
 set +o pipefail
 FIRST_ENTRY=$(zipinfo -1 "$DIST/$SLUG.zip" | head -n1)
+echo "$FIRST_ENTRY" > "$BUILD/zip-root.txt"
 set -o pipefail
 if [[ "$FIRST_ENTRY" != "$SLUG/" ]]; then
   echo "Error: ZIP first entry '$FIRST_ENTRY' is not '$SLUG/'" >&2
@@ -50,7 +53,7 @@ fi
 
 # Ensure main file exists inside the ZIP
 set +o pipefail
-if unzip -l "$DIST/$SLUG.zip" | grep -Fq "$SLUG/$SLUG.php"; then
+if unzip -l "$DIST/$SLUG.zip" | grep -F "$SLUG/$SLUG.php" > "$BUILD/zip-main.txt"; then
   true
 else
   echo "Error: $SLUG/$SLUG.php missing from ZIP" >&2

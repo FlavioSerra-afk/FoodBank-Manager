@@ -1,3 +1,10 @@
+## 1.4.0-rc.3 — 2025-09-09
+- fix(packaging): restore dist/foodbank-manager.zip with correct root slug and main file guard
+- fix(static): remove duplicate ABSPATH bootstrap warning in PHPStan runs
+- fix(tests): stabilize ScanController unit tests via deterministic stubs and header seam
+- feat(admin): add Dashboard MVP (manager tiles + 6-month sparkline + shortcuts)
+- chore(i18n): compile .mo in packaging when msgfmt is available; otherwise warn without failing build
+
 ## 1.4.0-rc.2 — 2025-09-09
 - i18n: textdomain loader, strings localized; sample en_GB locale
 - Background export jobs: queue + cron worker + secure downloads

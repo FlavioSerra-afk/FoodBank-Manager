@@ -50,14 +50,20 @@ final class BulkPdfZip {
         if (class_exists('\ZipArchive')) {
             $tmp = tempnam(sys_get_temp_dir(), 'fbm_zip');
             $zip = new \ZipArchive();
-            $zip->open($tmp, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
-            foreach ($files as $name => $content) {
-                $zip->addFromString($name, $content);
-            }
-            $zip->close();
-            $body = (string) file_get_contents($tmp);
-            if (file_exists($tmp)) {
-                unlink($tmp);
+            if ($zip->open($tmp, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true) {
+                foreach ($files as $name => $content) {
+                    $zip->addFromString($name, $content);
+                }
+                $zip->close();
+                $body = (string) @file_get_contents($tmp);
+                if ($body === '') {
+                    $body = self::simpleZip($files);
+                }
+                if (file_exists($tmp)) {
+                    unlink($tmp);
+                }
+            } else {
+                $body = self::simpleZip($files);
             }
         } else {
             $body = self::simpleZip($files);
