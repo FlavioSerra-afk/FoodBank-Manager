@@ -61,6 +61,7 @@ function fbm_required_cap_for_page(string $slug): string {
         'fbm_permissions'   => 'fb_manage_permissions',
         'fbm_theme'         => 'fb_manage_theme',
         'fbm_events'       => 'fbm_manage_events',
+        'fbm_scan'         => 'fbm_manage_events',
         'fbm_shortcodes'    => 'fb_manage_forms', // shortcodes builder is admin-only; tie to forms
     ];
     return $map[$slug] ?? 'fb_manage_dashboard';

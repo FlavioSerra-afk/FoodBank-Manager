@@ -27,6 +27,7 @@ final class Menu {
         private const CAP_PERMISSIONS = 'fb_manage_permissions';
         private const CAP_THEME       = 'fb_manage_theme';
         private const CAP_EVENTS      = 'fbm_manage_events';
+        private const CAP_SCAN        = 'fbm_manage_events';
 
         /**
          * Canonical admin slugs.
@@ -38,6 +39,7 @@ final class Menu {
                         'fbm',
                         'fbm_attendance',
                         'fbm_events',
+                        'fbm_scan',
                         'fbm_database',
                         'fbm_forms',
                         'fbm_emails',
@@ -110,6 +112,15 @@ final class Menu {
                         self::CAP_EVENTS,
                         'fbm_events',
                         array( self::class, 'render_events' )
+                );
+
+                add_submenu_page(
+                        $parent_slug,
+                        esc_html__( 'Scan', 'foodbank-manager' ),
+                        esc_html__( 'Scan', 'foodbank-manager' ),
+                        self::CAP_SCAN,
+                        'fbm_scan',
+                        array( self::class, 'render_scan' )
                 );
 
                 add_submenu_page(
@@ -204,6 +215,12 @@ final class Menu {
         public static function render_events(): void {
                 self::render_once( 'admin:events', static function (): void {
                         \FBM\Admin\EventsPage::route();
+                } );
+        }
+
+        public static function render_scan(): void {
+                self::render_once( 'admin:scan', static function (): void {
+                        \FBM\Admin\ScanPage::route();
                 } );
         }
 
