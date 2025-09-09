@@ -195,4 +195,5 @@ $rows       = $rows ?? array();
             <?php endforeach; ?>
         </tbody>
     </table>
+    <?php /* @psalm-suppress UnresolvableInclude */ require FBM_PATH . 'templates/admin/jobs.php'; ?>
 </div>

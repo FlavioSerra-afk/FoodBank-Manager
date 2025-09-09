@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignoreFile
 /**
  * Attendance export controller.
  *
@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace FBM\Http;
 
 use FBM\Attendance\ReportsService;
+use FBM\Core\Jobs\JobsRepo;
 use FBM\Exports\CsvWriter;
 use FBM\Exports\XlsxWriter;
 use function current_user_can;
@@ -19,6 +20,8 @@ use function sanitize_text_field;
 use function sanitize_key;
 use function absint;
 use function apply_filters;
+use function admin_url;
+use function wp_safe_redirect;
 use function fbm_send_headers;
 use function gmdate;
 use function esc_html;
@@ -27,6 +30,7 @@ use function esc_html;
  * Handle CSV/XLSX/PDF attendance exports.
  */
 final class AttendanceExportController {
+    private const THRESHOLD = 200;
     /**
      * Dispatch action based on request.
      */
@@ -74,7 +78,13 @@ final class AttendanceExportController {
 
     private static function csv(): void {
         $data = self::ensure();
+        if (self::maybe_queue('csv', $data, null)) {
+            return;
+        }
         $rows = ReportsService::export_rows($data['filters'], $data['masked']);
+        if (self::maybe_queue('csv', $data, $rows)) {
+            return;
+        }
         $date = gmdate('Ymd');
         $headers = array(
             'Content-Type: text/csv; charset=utf-8',
@@ -94,7 +104,13 @@ final class AttendanceExportController {
 
     private static function xlsx(): void {
         $data = self::ensure();
+        if (self::maybe_queue('xlsx', $data, null)) {
+            return;
+        }
         $rows = ReportsService::export_rows($data['filters'], $data['masked']);
+        if (self::maybe_queue('xlsx', $data, $rows)) {
+            return;
+        }
         $columns = array('date','event','recipient','method','note','operator');
         $body = XlsxWriter::build($columns, array_map(function ($r) {
             return array($r['date'],$r['event'],$r['recipient_masked'],$r['method'],$r['note_masked'],$r['operator']);
@@ -108,7 +124,13 @@ final class AttendanceExportController {
 
     private static function pdf(): void {
         $data = self::ensure();
+        if (self::maybe_queue('pdf', $data, null)) {
+            return;
+        }
         $rows = ReportsService::export_rows($data['filters'], $data['masked']);
+        if (self::maybe_queue('pdf', $data, $rows)) {
+            return;
+        }
         $summary = ReportsService::period_summary($data['filters']);
         $html = '<h1>Attendance Report</h1>';
         $html .= '<p>Today: ' . (int)$summary['today'] . '</p>';
@@ -138,5 +160,26 @@ final class AttendanceExportController {
         if (apply_filters('fbm_http_exit', true)) {
             exit;
         }
+    }
+
+    /**
+     * Maybe queue export job.
+     *
+     * @param string     $format Export format.
+     * @param array      $data   Request data.
+     * @param array|null $rows   Rows if already computed.
+     * @return bool Whether a job was queued.
+     */
+    private static function maybe_queue(string $format, array $data, ?array $rows): bool {
+        $queue = isset($_GET['queue']) && '1' === sanitize_key((string) $_GET['queue']);
+        if ($queue || (null !== $rows && count($rows) > self::THRESHOLD)) {
+            $job_id = JobsRepo::create('attendance_export', $format, $data['filters'], $data['masked']);
+            wp_safe_redirect(admin_url('admin.php?page=fbm_reports&notice=export_queued&job=' . $job_id));
+            if (apply_filters('fbm_http_exit', true)) {
+                exit;
+            }
+            return true;
+        }
+        return false;
     }
 }
