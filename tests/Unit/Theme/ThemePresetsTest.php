@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-use FBM\UI\ThemePresets;
+use FoodBankManager\UI\Theme;
 
 final class ThemePresetsTest extends \BaseTestCase {
-    public function test_high_contrast_tokens_differ(): void {
-        $light = ThemePresets::tokens('light');
-        $hc    = ThemePresets::tokens('high_contrast');
-        $this->assertNotSame($light['color-bg'], $hc['color-bg']);
-        $this->assertNotSame($light['color-fg'], $hc['color-fg']);
-        $this->assertArrayHasKey('focus', $hc);
+    public function test_high_contrast_disables_blur(): void {
+        $tokens = Theme::sanitize(array('admin' => array('preset' => 'high_contrast')));
+        $css    = Theme::css_vars($tokens['admin'], '.t');
+        $this->assertStringContainsString('--fbm-glass-blur:0px', $css);
+        $this->assertStringContainsString('--fbm-glass-bg:#000000', $css);
     }
 
-    public function test_css_vars_contains_tokens(): void {
-        $css = ThemePresets::css_vars('high_contrast');
-        $this->assertStringContainsString('--fbm-color-bg', $css);
-        $this->assertStringContainsString('--fbm-focus', $css);
+    public function test_default_glass_has_blur(): void {
+        $tokens = Theme::sanitize(array());
+        $css    = Theme::css_vars($tokens['admin'], '.t');
+        $this->assertStringContainsString('--fbm-glass-blur:', $css);
+        $this->assertStringNotContainsString('--fbm-glass-blur:0px', $css);
     }
 }

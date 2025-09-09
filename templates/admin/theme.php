@@ -1,7 +1,7 @@
 <?php
 // phpcs:ignoreFile
 /**
- * Theme settings template.
+ * Design & Theme settings template.
  *
  * @package FoodBankManager
  */
@@ -9,134 +9,120 @@
 if ( ! defined( 'ABSPATH' ) ) {
         exit;
 }
-$tokens = \FoodBankManager\UI\Theme::admin();
-$fonts = array(
-        'system' => array(
-                'label' => __( 'System', 'foodbank-manager' ),
-                'css'   => 'system-ui, sans-serif',
-        ),
-        'inter'  => array(
-                'label' => __( 'Inter', 'foodbank-manager' ),
-                'css'   => '"Inter", system-ui, sans-serif',
-        ),
-        'roboto' => array(
-                'label' => __( 'Roboto', 'foodbank-manager' ),
-                'css'   => '"Roboto", system-ui, sans-serif',
-        ),
-);
-$densities = array(
-        'compact'     => __( 'Compact', 'foodbank-manager' ),
-        'comfortable' => __( 'Comfortable', 'foodbank-manager' ),
-);
+
+$tab   = isset( $_GET['tab'] ) ? sanitize_key( (string) $_GET['tab'] ) : 'admin';
+$theme = isset( $theme ) ? $theme : \FoodBankManager\UI\Theme::get();
+$admin = $theme['admin'];
+$front = $theme['front'];
+$match = ! empty( $theme['match_front_to_admin'] );
 ?>
 <div class="wrap fbm-admin">
-<?php \FBM\Core\Trace::mark( 'admin:theme' ); ?>
-        <style><?php echo \FoodBankManager\UI\Theme::to_css_vars( $tokens, '.fbm-admin' ); ?></style>
         <h1><?php esc_html_e( 'Design & Theme', 'foodbank-manager' ); ?></h1>
-        <div class="fbm-theme-preview<?php echo $tokens['dark_mode'] ? ' is-dark' : ''; ?>" id="fbm-theme-preview">
-                <div class="fbm-theme-preview__swatch" id="fbm-theme-swatch"></div>
-                <span class="fbm-theme-preview__font" id="fbm-theme-font">Aa</span>
-                <span class="fbm-theme-preview__density" id="fbm-theme-density"><?php echo esc_html( $tokens['density'] ); ?></span>
-                <button type="button" class="button" id="fbm-theme-dark-toggle"><?php esc_html_e( 'Toggle dark', 'foodbank-manager' ); ?></button>
-        </div>
+        <h2 class="nav-tab-wrapper">
+                <a href="<?php echo esc_url( add_query_arg( 'tab', 'admin', menu_page_url( 'fbm_theme', false ) ) ); ?>" class="nav-tab <?php echo 'admin' === $tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Admin UI', 'foodbank-manager' ); ?></a>
+                <a href="<?php echo esc_url( add_query_arg( 'tab', 'front', menu_page_url( 'fbm_theme', false ) ) ); ?>" class="nav-tab <?php echo 'front' === $tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Front-end UI', 'foodbank-manager' ); ?></a>
+        </h2>
         <?php if ( isset( $_GET['notice'] ) && 'saved' === $_GET['notice'] ) : ?>
                 <div class="notice notice-success"><p><?php esc_html_e( 'Settings saved.', 'foodbank-manager' ); ?></p></div>
         <?php endif; ?>
         <form method="post">
                 <?php wp_nonce_field( 'fbm_theme_save' ); ?>
-                <table class="form-table" role="presentation">
-                        <tr>
-                                <th scope="row"><label for="fbm_primary_color"><?php esc_html_e( 'Primary colour', 'foodbank-manager' ); ?></label></th>
-                                <td>
-                                        <input type="text" id="fbm_primary_color" name="fbm_theme[primary_color]" value="<?php echo esc_attr( $tokens['primary_color'] ); ?>" class="regular-text" />
-                                </td>
-                        </tr>
-                        <tr>
-                                <th scope="row"><label for="fbm_density"><?php esc_html_e( 'Density', 'foodbank-manager' ); ?></label></th>
-                                <td>
-                                        <select id="fbm_density" name="fbm_theme[density]">
-                                                <?php foreach ( $densities as $val => $label ) : ?>
-                                                        <option value="<?php echo esc_attr( $val ); ?>" <?php selected( $tokens['density'], $val ); ?>><?php echo esc_html( $label ); ?></option>
-                                                <?php endforeach; ?>
-                                        </select>
-                                </td>
-                        </tr>
-                        <tr>
-                                <th scope="row"><label for="fbm_font"><?php esc_html_e( 'Font', 'foodbank-manager' ); ?></label></th>
-                                <td>
-                                        <select id="fbm_font" name="fbm_theme[font_family]">
-                                                <?php foreach ( $fonts as $val => $info ) : ?>
-                                                        <option value="<?php echo esc_attr( $val ); ?>" data-css="<?php echo esc_attr( $info['css'] ); ?>" <?php selected( $tokens['font'], $val ); ?>><?php echo esc_html( $info['label'] ); ?></option>
-                                                <?php endforeach; ?>
-                                        </select>
-                                </td>
-                        </tr>
-                        <tr>
-                                <th scope="row"><?php esc_html_e( 'Dark mode default', 'foodbank-manager' ); ?></th>
-                                <td><label><input type="checkbox" id="fbm_dark_mode" name="fbm_theme[dark_mode_default]" value="1" <?php checked( $tokens['dark_mode'] ); ?> /> <?php esc_html_e( 'Enable', 'foodbank-manager' ); ?></label></td>
-                        </tr>
-                        <tr>
-                                <th scope="row"><label for="fbm_custom_css"><?php esc_html_e( 'Custom CSS', 'foodbank-manager' ); ?></label></th>
-                                <td>
-                                        <textarea id="fbm_custom_css" name="fbm_theme[custom_css]" rows="8" class="large-text code"><?php echo esc_textarea( $theme['custom_css'] ?? '' ); ?></textarea>
-                                        <p class="description"><?php printf( esc_html__(
-                                                /* translators: %d: length of custom CSS after sanitisation in bytes */
-                                                '%d bytes after sanitisation.',
-                                                'foodbank-manager'
-                                        ), strlen( $theme['custom_css'] ?? '' ) ); ?></p>
-                                </td>
-                        </tr>
-                </table>
+                <?php if ( 'admin' === $tab ) : ?>
+                        <table class="form-table" role="presentation">
+                                <tr>
+                                        <th><?php esc_html_e( 'Mode', 'foodbank-manager' ); ?></th>
+                                        <td>
+                                                <label><input type="radio" name="fbm_theme[admin][style]" value="glass" <?php checked( $admin['style'], 'glass' ); ?> /> <?php esc_html_e( 'Glass', 'foodbank-manager' ); ?></label>
+                                                <label><input type="radio" name="fbm_theme[admin][style]" value="basic" <?php checked( $admin['style'], 'basic' ); ?> /> <?php esc_html_e( 'Basic', 'foodbank-manager' ); ?></label>
+                                        </td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Preset', 'foodbank-manager' ); ?></th>
+                                        <td>
+                                                <label><input type="radio" name="fbm_theme[admin][preset]" value="light" <?php checked( $admin['preset'], 'light' ); ?> /> <?php esc_html_e( 'Light', 'foodbank-manager' ); ?></label>
+                                                <label><input type="radio" name="fbm_theme[admin][preset]" value="dark" <?php checked( $admin['preset'], 'dark' ); ?> /> <?php esc_html_e( 'Dark', 'foodbank-manager' ); ?></label>
+                                                <label><input type="radio" name="fbm_theme[admin][preset]" value="high_contrast" <?php checked( $admin['preset'], 'high_contrast' ); ?> /> <?php esc_html_e( 'High-Contrast', 'foodbank-manager' ); ?></label>
+                                        </td>
+                                </tr>
+                                <tr>
+                                        <th><label for="fbm_admin_accent"><?php esc_html_e( 'Accent colour', 'foodbank-manager' ); ?></label></th>
+                                        <td><input type="text" id="fbm_admin_accent" name="fbm_theme[admin][accent]" value="<?php echo esc_attr( $admin['accent'] ); ?>" class="regular-text" /></td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Glass alpha', 'foodbank-manager' ); ?></th>
+                                        <td><input type="number" min="0" max="1" step="0.01" name="fbm_theme[admin][glass][alpha]" value="<?php echo esc_attr( $admin['glass']['alpha'] ); ?>" /></td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Glass blur', 'foodbank-manager' ); ?></th>
+                                        <td><input type="number" min="0" max="20" step="1" name="fbm_theme[admin][glass][blur]" value="<?php echo esc_attr( $admin['glass']['blur'] ); ?>" /> px</td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Elevation', 'foodbank-manager' ); ?></th>
+                                        <td><input type="number" min="0" max="24" step="1" name="fbm_theme[admin][glass][elev]" value="<?php echo esc_attr( $admin['glass']['elev'] ); ?>" /></td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Radius', 'foodbank-manager' ); ?></th>
+                                        <td><input type="number" min="6" max="20" step="1" name="fbm_theme[admin][glass][radius]" value="<?php echo esc_attr( $admin['glass']['radius'] ); ?>" /> px</td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Border', 'foodbank-manager' ); ?></th>
+                                        <td><input type="number" min="1" max="2" step="1" name="fbm_theme[admin][glass][border]" value="<?php echo esc_attr( $admin['glass']['border'] ); ?>" /> px</td>
+                                </tr>
+                        </table>
+                <?php else : ?>
+                        <table class="form-table" role="presentation">
+                                <tr>
+                                        <th><label><input type="checkbox" name="fbm_theme[front][enabled]" value="1" <?php checked( $front['enabled'] ); ?> /> <?php esc_html_e( 'Apply theme to front-end shortcodes/pages', 'foodbank-manager' ); ?></label></th>
+                                        <td></td>
+                                </tr>
+                                <tr>
+                                        <th><label><input type="checkbox" name="fbm_theme[match_front_to_admin]" value="1" <?php checked( $match ); ?> /> <?php esc_html_e( 'Match front-end to admin theme', 'foodbank-manager' ); ?></label></th>
+                                        <td></td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Mode', 'foodbank-manager' ); ?></th>
+                                        <td>
+                                                <label><input type="radio" name="fbm_theme[front][style]" value="glass" <?php checked( $front['style'], 'glass' ); ?> <?php echo $match ? 'disabled="disabled"' : ''; ?> /> <?php esc_html_e( 'Glass', 'foodbank-manager' ); ?></label>
+                                                <label><input type="radio" name="fbm_theme[front][style]" value="basic" <?php checked( $front['style'], 'basic' ); ?> <?php echo $match ? 'disabled="disabled"' : ''; ?> /> <?php esc_html_e( 'Basic', 'foodbank-manager' ); ?></label>
+                                        </td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Preset', 'foodbank-manager' ); ?></th>
+                                        <td>
+                                                <label><input type="radio" name="fbm_theme[front][preset]" value="light" <?php checked( $front['preset'], 'light' ); ?> <?php echo $match ? 'disabled="disabled"' : ''; ?> /> <?php esc_html_e( 'Light', 'foodbank-manager' ); ?></label>
+                                                <label><input type="radio" name="fbm_theme[front][preset]" value="dark" <?php checked( $front['preset'], 'dark' ); ?> <?php echo $match ? 'disabled="disabled"' : ''; ?> /> <?php esc_html_e( 'Dark', 'foodbank-manager' ); ?></label>
+                                                <label><input type="radio" name="fbm_theme[front][preset]" value="high_contrast" <?php checked( $front['preset'], 'high_contrast' ); ?> <?php echo $match ? 'disabled="disabled"' : ''; ?> /> <?php esc_html_e( 'High-Contrast', 'foodbank-manager' ); ?></label>
+                                        </td>
+                                </tr>
+                                <tr>
+                                        <th><label for="fbm_front_accent"><?php esc_html_e( 'Accent colour', 'foodbank-manager' ); ?></label></th>
+                                        <td><input type="text" id="fbm_front_accent" name="fbm_theme[front][accent]" value="<?php echo esc_attr( $front['accent'] ); ?>" class="regular-text" <?php echo $match ? 'disabled="disabled"' : ''; ?> /></td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Glass alpha', 'foodbank-manager' ); ?></th>
+                                        <td><input type="number" min="0" max="1" step="0.01" name="fbm_theme[front][glass][alpha]" value="<?php echo esc_attr( $front['glass']['alpha'] ); ?>" <?php echo $match ? 'disabled="disabled"' : ''; ?> /></td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Glass blur', 'foodbank-manager' ); ?></th>
+                                        <td><input type="number" min="0" max="20" step="1" name="fbm_theme[front][glass][blur]" value="<?php echo esc_attr( $front['glass']['blur'] ); ?>" <?php echo $match ? 'disabled="disabled"' : ''; ?> /> px</td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Elevation', 'foodbank-manager' ); ?></th>
+                                        <td><input type="number" min="0" max="24" step="1" name="fbm_theme[front][glass][elev]" value="<?php echo esc_attr( $front['glass']['elev'] ); ?>" <?php echo $match ? 'disabled="disabled"' : ''; ?> /></td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Radius', 'foodbank-manager' ); ?></th>
+                                        <td><input type="number" min="6" max="20" step="1" name="fbm_theme[front][glass][radius]" value="<?php echo esc_attr( $front['glass']['radius'] ); ?>" <?php echo $match ? 'disabled="disabled"' : ''; ?> /> px</td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Border', 'foodbank-manager' ); ?></th>
+                                        <td><input type="number" min="1" max="2" step="1" name="fbm_theme[front][glass][border]" value="<?php echo esc_attr( $front['glass']['border'] ); ?>" <?php echo $match ? 'disabled="disabled"' : ''; ?> /> px</td>
+                                </tr>
+                        </table>
+                <?php endif; ?>
                 <?php submit_button(); ?>
         </form>
-<script>
-( function() {
-        var root = document.querySelector( '.fbm-admin' );
-        var color = document.getElementById( 'fbm_primary_color' );
-        var swatch = document.getElementById( 'fbm-theme-swatch' );
-        var density = document.getElementById( 'fbm_density' );
-        var densityOut = document.getElementById( 'fbm-theme-density' );
-        var font = document.getElementById( 'fbm_font' );
-        var fontOut = document.getElementById( 'fbm-theme-font' );
-        var darkDefault = document.getElementById( 'fbm_dark_mode' );
-        var darkToggle = document.getElementById( 'fbm-theme-dark-toggle' );
-        var preview = document.getElementById( 'fbm-theme-preview' );
-        if ( color && root && swatch ) {
-                swatch.style.background = color.value;
-                root.style.setProperty( '--fbm-primary', color.value );
-                color.addEventListener( 'input', function() {
-                        swatch.style.background = color.value;
-                        root.style.setProperty( '--fbm-primary', color.value );
-                } );
-        }
-        if ( density && root && densityOut ) {
-                root.style.setProperty( '--fbm-density', density.value );
-                densityOut.textContent = density.value;
-                density.addEventListener( 'change', function() {
-                        root.style.setProperty( '--fbm-density', density.value );
-                        densityOut.textContent = density.value;
-                } );
-        }
-        if ( font && root && fontOut ) {
-                var applyFont = function() {
-                        var css = font.options[ font.selectedIndex ].dataset.css;
-                        root.style.setProperty( '--fbm-font', css );
-                        fontOut.style.fontFamily = css;
-                };
-                applyFont();
-                font.addEventListener( 'change', applyFont );
-        }
-        if ( darkDefault && root ) {
-                root.style.setProperty( '--fbm-dark', darkDefault.checked ? '1' : '0' );
-                darkDefault.addEventListener( 'change', function() {
-                        root.style.setProperty( '--fbm-dark', darkDefault.checked ? '1' : '0' );
-                } );
-        }
-        if ( darkToggle && preview ) {
-                darkToggle.addEventListener( 'click', function() {
-                        preview.classList.toggle( 'is-dark' );
-                } );
-        }
-} )();
-</script>
 </div>
+<?php
+// End of template.
+?>

@@ -1,18 +1,22 @@
-Docs-Revision: 2025-09-09 (Wave UI/UX Glass + Dashboard First)
+Docs-Revision: 2025-09-09 (Wave UI/UX Glass — Theme Tab)
 # FoodBank Manager — Design System
 
 Defines visual tokens and component specs used across admin and front-end surfaces.
 
 ## Tokens
-- `--fbm-color-accent` — action/hover blue.
-- `--fbm-color-surface` — base card background.
-- `--fbm-color-text` — default text colour.
-- `--fbm-color-border` — low-contrast border colour.
-- `--fbm-glass-bg` — translucent card background.
-- `--fbm-glass-border` — border colour on glass surfaces.
-- `--fbm-glass-blur` — backdrop blur radius.
-- `--fbm-card-radius` — border radius for cards and tiles.
-- `--fbm-elev` — box-shadow for raised surfaces.
+| Token | Default | Range |
+|---|---|---|
+| `--fbm-color-accent` | `#3B82F6` | `#RRGGBB` |
+| `--fbm-glass-bg` alpha | `0.10` | Light: `0.08–0.20`, Dark: `0.18–0.35` |
+| `--fbm-glass-blur` | `12px` | `0–20px` |
+| `--fbm-elev` | `8` | `0–24` |
+| `--fbm-card-radius` | `12px` | `6–20px` |
+| `--fbm-glass-border` | `1px` | `1–2px` |
+| `--fbm-color-surface` | preset | n/a |
+| `--fbm-color-text` | preset | n/a |
+| `--fbm-color-border` | preset | n/a |
+
+Focus and hover states derive from `--fbm-color-accent`; borders and outlines use the blue accent to ensure visibility.
 
 ## Components
 - **KPI Tile** — `.fbm-tile.fbm-card--glass`; icon + label + masked value. Tiles are focusable; border outlines use `--fbm-color-accent`.

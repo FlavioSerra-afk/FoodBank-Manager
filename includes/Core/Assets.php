@@ -9,21 +9,15 @@ declare(strict_types=1);
 
 namespace FoodBankManager\Core;
 
-use FoodBankManager\Core\Options;
 use FoodBankManager\Core\Screen;
 use FoodBankManager\UI\Theme;
-use FBM\UI\ThemePresets;
 use function add_action;
-use function get_user_option;
 use function get_post;
 use function has_shortcode;
 use function is_singular;
 use function wp_enqueue_style;
 use function wp_register_style;
 use function wp_add_inline_style;
-use function wp_strip_all_tags;
-use function sanitize_hex_color;
-use function sanitize_key;
 use function esc_html;
 use function wp_enqueue_script;
 use function current_user_can;
@@ -64,11 +58,16 @@ class Assets {
 				return;
 		}
 
-			Theme::enqueue_front();
+				$front = Theme::front();
+		if ( ! empty( $front['enabled'] ) ) {
+						wp_register_style( 'fbm-frontend-theme', false, array(), Plugin::VERSION );
+						wp_add_inline_style( 'fbm-frontend-theme', Theme::css_vars( $front, ':root' ) );
+						wp_enqueue_style( 'fbm-frontend-theme' );
+		}
 
 		if ( $has_dash ) {
-				wp_register_style( 'fbm-frontend-dashboard', FBM_URL . 'assets/css/frontend-dashboard.css', array(), Plugin::VERSION );
-				wp_enqueue_style( 'fbm-frontend-dashboard' );
+						wp_register_style( 'fbm-frontend-dashboard', FBM_URL . 'assets/css/frontend-dashboard.css', array(), Plugin::VERSION );
+						wp_enqueue_style( 'fbm-frontend-dashboard' );
 		}
 	}
 
@@ -82,9 +81,8 @@ class Assets {
 										return;
 		}
 										$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-						wp_register_style( 'fbm-admin', FBM_URL . 'assets/css/admin.css', array(), Plugin::VERSION );
-						wp_add_inline_style( 'fbm-admin', self::theme_css() );
-						wp_enqueue_style( 'fbm-admin' );
+												wp_register_style( 'fbm-admin', FBM_URL . 'assets/css/admin.css', array(), Plugin::VERSION );
+												wp_enqueue_style( 'fbm-admin' );
 
 		if ( $screen && 'foodbank_page_fbm_attendance' === $screen->id && current_user_can( 'fb_manage_attendance' ) ) {
 				wp_enqueue_script( 'fbm-qrcode', FBM_URL . 'assets/js/qrcode.min.js', array(), Plugin::VERSION, true );
@@ -104,76 +102,14 @@ class Assets {
 		if ( $done ) {
 				return;
 		}
-			$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-			$id     = $screen ? (string) $screen->id : '';
+						$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+						$id     = $screen ? (string) $screen->id : '';
 		if ( 'toplevel_page_fbm' !== $id && ! str_starts_with( $id, 'foodbank_page_fbm_' ) ) {
-					return;
-		}
-						$all       = Options::all();
-						$opt       = $all['theme'] ?? array();
-						$preset    = sanitize_key( (string) ( $opt['preset'] ?? 'system' ) );
-						$allowed_p = array( 'system', 'light', 'dark', 'high_contrast' );
-		if ( ! in_array( $preset, $allowed_p, true ) ) {
-				$preset = 'system';
-		}
-		if ( 'system' === $preset ) {
-				$scheme = function_exists( 'get_user_option' ) ? (string) get_user_option( 'admin_color' ) : '';
-				$preset = in_array( $scheme, array( 'midnight', 'ectoplasm', 'coffee' ), true ) ? 'dark' : 'light';
+								return;
 		}
 
-						$rtl_raw   = sanitize_key( (string) ( $opt['rtl'] ?? 'auto' ) );
-						$allowed_r = array( 'auto', 'force_on', 'force_off' );
-		if ( ! in_array( $rtl_raw, $allowed_r, true ) ) {
-				$rtl_raw = 'auto';
-		}
-						$force = null;
-		if ( 'force_on' === $rtl_raw ) {
-				$force = true;
-		} elseif ( 'force_off' === $rtl_raw ) {
-				$force = false;
-		}
-
-						$css  = ThemePresets::css_vars( $preset );
-						$css .= '.fbm-admin{direction:' . ( true === $force ? 'rtl' : 'ltr' ) . ';}';
-		if ( false !== $force ) {
-				$css .= 'html[dir="rtl"] .fbm-admin, .fbm-admin[dir="rtl"]{direction:rtl;}';
-		}
-						echo '<style id="fbm-css-vars">' . esc_html( $css ) . '</style>';
-						$done = true;
-	}
-
-		/**
-		 * Build inline theme CSS.
-		 *
-		 * @return string Sanitized CSS.
-		 */
-	private static function theme_css(): string {
-			$opt_raw = Options::get( 'theme', array() );
-			$opt     = is_array( $opt_raw ) ? $opt_raw : array();
-			$primary = sanitize_hex_color( (string) ( $opt['primary_color'] ?? '#3b82f6' ) );
-		if ( '' === $primary ) {
-				$primary = '#3b82f6';
-		}
-			$density  = sanitize_key( (string) ( $opt['density'] ?? 'comfortable' ) );
-			$font_map = array(
-				'system'    => 'system-ui, sans-serif',
-				'inter'     => '"Inter", system-ui, sans-serif',
-				'roboto'    => '"Roboto", system-ui, sans-serif',
-				'open-sans' => '"Open Sans", system-ui, sans-serif',
-			);
-			$font_key = sanitize_key( (string) ( $opt['font_family'] ?? 'system' ) );
-			$font     = $font_map[ $font_key ] ?? $font_map['system'];
-			$dark     = ! empty( $opt['dark_mode_default'] ) ? '1' : '0';
-			$css      = ':root{' .
-					'--fbm-primary:' . $primary . ';' .
-					'--fbm-density:' . $density . ';' .
-					'--fbm-font:' . $font . ';' .
-					'--fbm-dark:' . $dark . ';' .
-					'}';
-			$custom   = wp_strip_all_tags( (string) ( $opt['custom_css'] ?? '' ) );
-			if ( '' !== $custom ) {
-					$css .= "\n" . $custom;
-			}
-			return $css;
+												$css = Theme::css_vars( Theme::admin(), '.fbm-admin' );
+												echo '<style id="fbm-css-vars">' . esc_html( $css ) . '</style>';
+												$done = true;
 	}
 }

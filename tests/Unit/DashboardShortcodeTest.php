@@ -36,9 +36,7 @@ final class DashboardShortcodeTest extends \BaseTestCase {
 
     public function testSafeHtmlOutput(): void {
         \fbm_grant_caps(['fb_manage_dashboard']);
-        if (!class_exists('FoodBankManager\\UI\\Theme', false)) {
-            eval('namespace FoodBankManager\\UI; class Theme { public static function enqueue_front(): void {} }');
-        }
+        class_exists('FoodBankManager\\UI\\Theme');
         $hash = md5('today||all|0');
         $base = 'fbm_dash_1_today_' . $hash . '_';
         $GLOBALS['fbm_transients'][$base . 'series'] = array(1, 2, 3);

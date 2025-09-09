@@ -1,12 +1,6 @@
 <?php
 declare(strict_types=1);
 
-namespace FoodBankManager\UI {
-    if (!class_exists(Theme::class)) {
-        class Theme { public static function enqueue_front(): void {} }
-    }
-}
-
 namespace FBM\Tests\Unit\Shortcodes {
 
 use FBM\Shortcodes\Shortcodes;
