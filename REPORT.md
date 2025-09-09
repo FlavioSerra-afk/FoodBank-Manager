@@ -85,3 +85,12 @@ _None — all primary gates passing._
 ## Visual Form Builder — PASS/notes
 - Admins can create, preview, and delete CPT-backed forms; shortcode renders by ID.
 - Tests: FormRepoTest, FormBuilderPageTest, FormCptIntegrationTest.
+
+### Release: 1.4.0-rc.1 (staging)
+- Packaging: PASS (slug + main file)
+- PHPStan: 0/0; PHPCS(lanes): 0/0
+- Unit: Tests: 198  Errors: 0  Failures: 0
+- Artifact: dist/foodbank-manager.zip
+- Tag: v1.4.0-rc.1
+- Suggested smoke tests: Admin pages, Shortcodes, Attendance Scan, Reports exports, Jobs panel, Form Builder, Theme presets/RTL.
+

@@ -1,3 +1,13 @@
+## 1.4.0-rc.1 — 2025-09-09
+- Attendance: Events CRUD, Tickets/QR, Scan & Manual check-in, Reports & Exports (CSV/XLSX/PDF, masked)
+- Email Log: Resend (audited)
+- Visual Form Builder (CPT `fb_form`) with live preview
+- Theme: High-Contrast preset & RTL readiness
+- Background export jobs (queue + cron worker + secure downloads)
+- CSV/XLSX/PDF pipelines through seams; headers seam
+- Tests/QA: PHPStan 0/0; PHPCS (lanes) 0/0; packaging guards passing
+- Docs-Revision: 2025-09-09 (Wave: RC1)
+
 ## [1.3.0.1] — 2025-09-08
 ### Maintenance
 - Version alignment (composer.json, plugin header, Core constant) with **no runtime changes**.
