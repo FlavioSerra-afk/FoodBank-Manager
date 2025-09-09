@@ -62,5 +62,9 @@ _None — all primary gates passing._
 - Repo & admin CRUD covered by 5 tests
 - Next: QR/Scan/Manual/Reports
 
+## Attendance — Tickets/QR: PASS/notes
+- Repo, service, controller covered by 3 tests
+- Next: Scan/Manual/Reports
+
 ## Email Resend — PASS
 - Admins can resend logged emails with caps/nonce checks and audit trail.

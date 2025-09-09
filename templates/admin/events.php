@@ -78,4 +78,5 @@ if ( ! defined( 'ABSPATH' ) ) {
     </label></p>
     <p><button class="button button-primary"><?php esc_html_e( 'Save', 'foodbank-manager' ); ?></button></p>
 </form>
+<?php if ( $editing ) { require FBM_PATH . 'templates/admin/events-tickets.php'; } ?>
 </div>
