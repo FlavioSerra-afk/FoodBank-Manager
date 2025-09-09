@@ -230,7 +230,12 @@ if (!function_exists('wp_register_style')){ function wp_register_style($h,$s='')
 if (!function_exists('wp_delete_file')){ function wp_delete_file($f){ return @unlink($f); } }
 if (!function_exists('sanitize_file_name')){ function sanitize_file_name($f){ return preg_replace('/[^A-Za-z0-9\._-]/','', (string)$f); } }
 if (!function_exists('get_bloginfo')){ function get_bloginfo($show='', $filter='raw'){ if($show==='version') return '6.5.0'; return ''; } }
-if (!function_exists('get_current_user_id')){ function get_current_user_id(){ return 1; } }
+if (!function_exists('get_current_user_id')){
+  function get_current_user_id(){
+    $id = $GLOBALS['fbm_current_user'] ?? 1;
+    return $id ?: 1;
+  }
+}
 if (!function_exists('nocache_headers')){ function nocache_headers(){} }
 if (!function_exists('wp_mail')) {
     function wp_mail($to, $sub, $msg, $headers = '', $attachments = []) {

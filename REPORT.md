@@ -53,3 +53,7 @@ _None — all primary gates passing._
 - build/phpcs-lanes.json
 - build/zip-root.txt
 - build/zip-main.txt
+
+## Dashboard Compare & Persistence — PASS
+- Tokens: `fbm-summary`, `fbm-count-current`, `fbm-delta`, `fbm-compare-toggle`
+- Dashboard compares current vs previous period and persists filters per user.

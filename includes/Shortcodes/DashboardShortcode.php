@@ -10,8 +10,10 @@ declare(strict_types=1);
 namespace FBM\Shortcodes;
 
 use FoodBankManager\Attendance\AttendanceRepo;
+use FBM\Core\UserPrefs;
 use DateInterval;
 use DateTimeImmutable;
+use function apply_filters;
 use function current_time;
 use function current_user_can;
 use function esc_html__;
@@ -42,104 +44,150 @@ final class DashboardShortcode {
 				return '<div class="fbm-no-permission">' . esc_html__( 'You do not have permission to view the dashboard.', 'foodbank-manager' ) . '</div>';
 		}
 
-			$atts         = shortcode_atts(
-				array(
-					'period'      => '7d',
-					'compare'     => '1',
-					'sparkline'   => '1',
-					'event'       => '',
-					'type'        => 'all',
-					'policy_only' => '0',
-				),
-				$atts,
-				'fbm_dashboard'
-			);
-			$period       = self::sanitize_period( $atts['period'] );
-			$do_compare   = self::sanitize_flag( $atts['compare'] );
-			$do_sparkline = self::sanitize_flag( $atts['sparkline'] );
-			$get_event    = filter_input( INPUT_GET, 'fbm_event', FILTER_UNSAFE_RAW );
-			$get_type     = filter_input( INPUT_GET, 'fbm_type', FILTER_UNSAFE_RAW );
-			$get_policy   = filter_input( INPUT_GET, 'fbm_policy_only', FILTER_UNSAFE_RAW );
-			$event        = self::sanitize_event( (string) wp_unslash( null !== $get_event ? $get_event : $atts['event'] ) );
-			$type         = self::sanitize_type( (string) wp_unslash( null !== $get_type ? $get_type : $atts['type'] ) );
-			$policy_only  = self::sanitize_flag( (string) wp_unslash( null !== $get_policy ? $get_policy : $atts['policy_only'] ) );
-			$since        = self::since_from_period( $period );
+						$atts         = shortcode_atts(
+							array(
+								'period'      => '7d',
+								'compare'     => '0',
+								'sparkline'   => '1',
+								'event'       => '',
+								'type'        => 'all',
+								'policy_only' => '0',
+							),
+							$atts,
+							'fbm_dashboard'
+						);
+						$period       = self::sanitize_period( $atts['period'] );
+						$do_sparkline = self::sanitize_flag( $atts['sparkline'] );
 
-			$filters = array(
-				'since'       => $since,
-				'event'       => $event,
-				'type'        => $type,
-				'policy_only' => $policy_only,
-			);
+						$incoming  = array();
+						$get_event = filter_input( INPUT_GET, 'fbm_event', FILTER_UNSAFE_RAW );
+		if ( null !== $get_event ) {
+				$incoming['event'] = self::sanitize_event( (string) wp_unslash( $get_event ) );
+		}
+						$get_type = filter_input( INPUT_GET, 'fbm_type', FILTER_UNSAFE_RAW );
+		if ( null !== $get_type ) {
+				$incoming['type'] = self::sanitize_type( (string) wp_unslash( $get_type ) );
+		}
+						$get_policy = filter_input( INPUT_GET, 'fbm_policy_only', FILTER_UNSAFE_RAW );
+		if ( null !== $get_policy ) {
+				$incoming['policy_only'] = self::sanitize_flag( (string) wp_unslash( $get_policy ) ) ? 1 : 0;
+		}
+		if ( isset( $_GET['preset'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				$incoming['preset'] = sanitize_key( (string) wp_unslash( $_GET['preset'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.NonceVerification.Recommended
+		}
+		if ( isset( $_GET['tags'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				$incoming['tags'] = array_map( 'sanitize_key', (array) wp_unslash( $_GET['tags'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.NonceVerification.Recommended
+		}
+		if ( isset( $_GET['compare'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				$incoming['compare'] = self::sanitize_flag( (string) wp_unslash( $_GET['compare'] ) ) ? 1 : 0; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.NonceVerification.Recommended
+		}
 
-			$hash = md5( $period . '|' . (string) $event . '|' . $type . '|' . ( $policy_only ? '1' : '0' ) );
-			$user = get_current_user_id();
-			$base = 'fbm_dash_' . $user . '_' . $period . '_' . $hash . '_';
+						$user        = get_current_user_id();
+						$saved       = UserPrefs::get_dashboard_filters( $user );
+						$merged      = array_merge( $saved, $incoming );
+						$event       = self::sanitize_event( (string) ( $merged['event'] ?? $atts['event'] ) );
+						$type        = self::sanitize_type( (string) ( $merged['type'] ?? $atts['type'] ) );
+						$policy_only = isset( $merged['policy_only'] ) ? (bool) $merged['policy_only'] : self::sanitize_flag( $atts['policy_only'] );
+						$preset      = isset( $merged['preset'] ) ? sanitize_key( (string) $merged['preset'] ) : '';
+						$tags        = isset( $merged['tags'] ) && is_array( $merged['tags'] ) ? array_map( 'sanitize_key', $merged['tags'] ) : array();
+						$do_compare  = ! empty( $merged['compare'] ?? $atts['compare'] );
+						UserPrefs::set_dashboard_filters(
+							$user,
+							array(
+								'event'       => $event,
+								'type'        => $type,
+								'policy_only' => $policy_only ? 1 : 0,
+								'preset'      => $preset,
+								'tags'        => $tags,
+								'compare'     => $do_compare ? 1 : 0,
+							)
+						);
 
-			$series = get_transient( $base . 'series' );
-			if ( ! is_array( $series ) ) {
-					$series = AttendanceRepo::daily_present_counts( $since, $filters );
-					set_transient( $base . 'series', $series, 60 );
-			}
+						$since = self::since_from_period( $period );
 
-			$totals = get_transient( $base . 'totals' );
-			if ( ! is_array( $totals ) ) {
-					$totals = AttendanceRepo::period_totals( $since, $filters );
-					set_transient( $base . 'totals', $totals, 60 );
-			}
+						$filters = array(
+							'since'       => $since,
+							'event'       => $event,
+							'type'        => $type,
+							'policy_only' => $policy_only,
+						);
 
-			$deltas = array();
-			if ( $do_compare ) {
-				switch ( $period ) {
-					case 'today':
-						$prev_since = $since->sub( new DateInterval( 'P1D' ) );
-						break;
-					case '30d':
-							$prev_since = $since->sub( new DateInterval( 'P30D' ) );
-						break;
-					default:
-							$prev_since = $since->sub( new DateInterval( 'P7D' ) );
-				}
-					$prev = get_transient( $base . 'prev' );
-				if ( ! is_array( $prev ) ) {
-						$prev = AttendanceRepo::period_totals( $prev_since, $filters );
-						set_transient( $base . 'prev', $prev, 60 );
-				}
-				foreach ( $totals as $k => $v ) {
-						$deltas[ $k ] = self::delta( (int) $v, (int) ( $prev[ $k ] ?? 0 ) );
-				}
-			}
+						$hash = md5( $period . '|' . (string) $event . '|' . $type . '|' . ( $policy_only ? '1' : '0' ) );
+						$user = get_current_user_id();
+						$base = 'fbm_dash_' . $user . '_' . $period . '_' . $hash . '_';
 
-			$updated_at = current_time( 'mysql', true );
+						$series = get_transient( $base . 'series' );
+						if ( ! is_array( $series ) ) {
+								$series = AttendanceRepo::daily_present_counts( $since, $filters );
+								set_transient( $base . 'series', $series, 60 );
+						}
 
-			$csv_url = wp_nonce_url(
-				add_query_arg(
-					array(
-						'action'      => 'fbm_dash_export',
-						'period'      => $period,
-						'event'       => (string) $event,
-						'type'        => $type,
-						'policy_only' => $policy_only ? '1' : '0',
-					),
-					admin_url( 'admin-post.php' )
-				),
-				'fbm_dash_export'
-			);
+						$totals = get_transient( $base . 'totals' );
+						if ( ! is_array( $totals ) ) {
+								$totals = AttendanceRepo::period_totals( $since, $filters );
+								set_transient( $base . 'totals', $totals, 60 );
+						}
+
+						$summary_delta = 0;
+						$deltas        = array();
+						if ( $do_compare ) {
+								$now        = (int) apply_filters( 'fbm_now', time() );
+								$to_ts      = $now;
+								$from_ts    = (int) $since->getTimestamp();
+								$window     = $to_ts - $from_ts;
+								$prev_to    = $from_ts - 1;
+								$prev_from  = $prev_to - $window;
+								$prev_since = new DateTimeImmutable( '@' . $prev_from );
+								$prev_since = $prev_since->setTimezone( new \DateTimeZone( 'UTC' ) );
+								$prev       = get_transient( $base . 'prev' );
+							if ( ! is_array( $prev ) ) {
+									$prev = AttendanceRepo::period_totals( $prev_since, $filters );
+									set_transient( $base . 'prev', $prev, 60 );
+							}
+								$prev_window = array();
+							foreach ( $prev as $k => $v ) {
+									$prev_window[ $k ] = max( 0, (int) $v - (int) ( $totals[ $k ] ?? 0 ) );
+							}
+							foreach ( $totals as $k => $v ) {
+									$deltas[ $k ] = self::delta( (int) $v, (int) ( $prev_window[ $k ] ?? 0 ) );
+							}
+								$summary_delta = (int) $totals['present'] - (int) ( $prev_window['present'] ?? 0 );
+						}
+
+						$updated_at = current_time( 'mysql', true );
+
+						$csv_url = wp_nonce_url(
+							add_query_arg(
+								array(
+									'action'      => 'fbm_dash_export',
+									'period'      => $period,
+									'event'       => (string) $event,
+									'type'        => $type,
+									'policy_only' => $policy_only ? '1' : '0',
+								),
+								admin_url( 'admin-post.php' )
+							),
+							'fbm_dash_export'
+						);
 
 			ob_start();
-			$counts       = $totals; // local vars for template.
-			$series_attr  = $do_sparkline ? $series : array();
-			$deltas_attr  = $deltas;
-			$period_attr  = $period;
-			$updated      = $updated_at;
-			$filters_attr = array(
-				'event'       => $event ? (string) $event : '',
-				'type'        => $type,
-				'policy_only' => $policy_only,
-			);
-			$csv_url_attr = $csv_url;
-			include dirname( __DIR__, 2 ) . '/templates/public/dashboard.php';
-			return (string) ob_get_clean();
+						$counts             = $totals; // local vars for template.
+						$series_attr        = $do_sparkline ? $series : array();
+						$deltas_attr        = $deltas;
+						$period_attr        = $period;
+						$updated            = $updated_at;
+						$summary_delta_attr = $summary_delta;
+						$filters_attr       = array(
+							'event'       => $event ? (string) $event : '',
+							'type'        => $type,
+							'policy_only' => $policy_only,
+							'preset'      => $preset,
+							'tags'        => $tags,
+							'compare'     => $do_compare,
+						);
+						$csv_url_attr       = $csv_url;
+						include dirname( __DIR__, 2 ) . '/templates/public/dashboard.php';
+						return (string) ob_get_clean();
 	}
 
 		/**
@@ -193,8 +241,8 @@ final class DashboardShortcode {
 		 * @return DateTimeImmutable
 		 */
 	public static function since_from_period( string $period ): DateTimeImmutable {
-			$day = defined( 'DAY_IN_SECONDS' ) ? (int) DAY_IN_SECONDS : 86400;
-			$now = time();
+						$day = defined( 'DAY_IN_SECONDS' ) ? (int) DAY_IN_SECONDS : 86400;
+						$now = (int) apply_filters( 'fbm_now', time() );
 		switch ( $period ) {
 			case 'today':
 				$ts = strtotime( 'today UTC', $now );
