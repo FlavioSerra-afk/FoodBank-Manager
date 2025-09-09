@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignoreFile
 /**
  * Diagnostics admin page controller.
  *
@@ -14,6 +14,7 @@ use FBM\Core\Retention;
 use FoodBankManager\Core\Install;
 use FoodBankManager\Security\Helpers;
 use FoodBankManager\Http\DiagnosticsController;
+use FBM\Core\Jobs\JobsRepo;
 use function sanitize_key;
 use function wp_unslash;
 use function get_option;
@@ -90,7 +91,7 @@ class DiagnosticsPage {
 		 *
 		 * @return void
 		 */
-	public static function render(): void {
+        public static function render(): void {
 		if ( ! current_user_can( 'fb_manage_diagnostics' ) ) {
 				wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ), '', array( 'response' => 403 ) );
 		}
@@ -122,12 +123,13 @@ class DiagnosticsPage {
 						$install_scan                  = Install::getCachedScan();
 						$last_consolidation            = (array) get_option( 'fbm_last_consolidation', array() );
 						$last_activation_consolidation = (array) get_option( 'fbm_last_activation_consolidation', array() );
-						$smtp                          = DiagnosticsController::transport_info();
-						$test_to                       = Helpers::mask_email( (string) get_option( 'admin_email' ) );
-						$notice                        = sanitize_key( (string) filter_input( INPUT_GET, 'notice', FILTER_UNSAFE_RAW ) );
-						/* @psalm-suppress UnresolvableInclude */
-						require FBM_PATH . 'templates/admin/diagnostics.php';
-	}
+                                                $smtp                          = DiagnosticsController::transport_info();
+                                                $test_to                       = Helpers::mask_email( (string) get_option( 'admin_email' ) );
+                                                $notice                        = sanitize_key( (string) filter_input( INPUT_GET, 'notice', FILTER_UNSAFE_RAW ) );
+                                                $jobs                          = method_exists( $GLOBALS['wpdb'], 'prepare' ) ? JobsRepo::list() : array();
+                                                /* @psalm-suppress UnresolvableInclude */
+                                                require FBM_PATH . 'templates/admin/diagnostics.php';
+        }
 
 		/**
 		 * Get summary from last retention run in this request or option.

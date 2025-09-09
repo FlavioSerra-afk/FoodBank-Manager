@@ -10,6 +10,8 @@ use FoodBankManager\Auth\Roles;
 use FoodBankManager\Http\FormSubmitController;
 use FoodBankManager\Http\DashboardExportController;
 use FoodBankManager\Http\DiagnosticsController;
+use FBM\Http\ExportJobsController;
+use FBM\Core\Jobs\JobsWorker;
 use FoodBankManager\Core\Options;
 use FBM\Core\Retention;
 use FoodBankManager\Admin\ShortcodesPage;
@@ -76,8 +78,13 @@ final class Plugin {
                 add_action( 'admin_post_fbm_submit', array( FormSubmitController::class, 'handle' ) );
                 add_action( 'admin_post_fbm_dash_export', array( DashboardExportController::class, 'handle' ) );
                 add_action( 'admin_post_fbm_diag_mail_test', array( DiagnosticsController::class, 'mail_test' ) );
+                add_action( 'admin_post_fbm_export_queue', array( ExportJobsController::class, 'queue' ) );
+                add_action( 'admin_post_fbm_export_download', array( ExportJobsController::class, 'download' ) );
+                add_action( 'admin_post_fbm_export_job_run', array( ExportJobsController::class, 'run' ) );
+                add_action( 'admin_post_fbm_export_job_retry', array( ExportJobsController::class, 'retry' ) );
 
                 self::get_instance()->init();
+                JobsWorker::init();
         }
 
         /** Activate plugin. */
@@ -85,6 +92,7 @@ final class Plugin {
                 ( new Migrations() )->maybe_migrate();
                 Roles::install();
                 Retention::schedule();
+                JobsWorker::schedule();
         }
 
         /** Deactivate plugin. */

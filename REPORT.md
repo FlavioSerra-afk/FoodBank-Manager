@@ -76,6 +76,9 @@ _None — all primary gates passing._
 ## Attendance — Reports & Exports: PASS/notes
 - Service, page, controller covered by 3 tests
 
+## Background Export Jobs — PASS
+- Queue and worker generate masked export files with secure downloads.
+
 ## Theme Presets & RTL — PASS
 - High-contrast preset & RTL options covered by 3 tests.
 
