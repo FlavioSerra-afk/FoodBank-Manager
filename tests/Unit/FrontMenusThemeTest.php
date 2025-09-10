@@ -14,7 +14,7 @@ final class FrontMenusThemeTest extends \BaseTestCase {
         if (!function_exists('is_rtl')) {
             function is_rtl(): bool { return false; }
         }
-        Options::update('theme', array('apply_front_menus' => true));
+        Options::update('theme', array('apply_front_menus' => true, 'front' => array('style' => 'glass')));
         $assets = new Assets();
         $assets->register();
         $GLOBALS['fbm_styles'] = array();
@@ -24,12 +24,15 @@ final class FrontMenusThemeTest extends \BaseTestCase {
         $assets->enqueue_front_menus();
         $this->assertSame($count, count($GLOBALS['fbm_styles']));
         $classes = apply_filters('body_class', array());
-        $this->assertContains('fbm-theme--basic', $classes);
+        $this->assertContains('fbm-theme--glass', $classes);
+        $this->assertContains('fbm-preset--light', $classes);
+        $this->assertContains('fbm-menus--glass', $classes);
         $css = (string) file_get_contents(__DIR__ . '/../../assets/css/menus.css');
         $this->assertStringContainsString('current-menu-item>a', $css);
         $this->assertStringContainsString('box-shadow:0 0 0 1px', $css);
         $this->assertStringContainsString('prefers-reduced-transparency', $css);
         $this->assertStringContainsString('prefers-reduced-motion', $css);
+        $this->assertStringContainsString('-webkit-backdrop-filter', $css);
     }
 
     public function test_no_css_when_disabled(): void {

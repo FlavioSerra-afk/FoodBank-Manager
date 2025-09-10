@@ -16,8 +16,9 @@ final class AdminMenusThemeTest extends \BaseTestCase {
         }
         Options::update('theme', array('apply_admin_chrome' => true));
         $classes = Theme::admin_body_class('');
-        $this->assertStringContainsString('fbm-theme--', $classes);
-        $this->assertStringContainsString('fbm-preset--', $classes);
+        $this->assertStringContainsString('fbm-theme--glass', $classes);
+        $this->assertStringContainsString('fbm-preset--light', $classes);
+        $this->assertStringContainsString('fbm-menus--glass', $classes);
 
         $GLOBALS['fbm_styles'] = array();
         $GLOBALS['fbm_test_screen_id'] = 'plugins';
@@ -33,5 +34,6 @@ final class AdminMenusThemeTest extends \BaseTestCase {
         $this->assertStringContainsString('#wpadminbar', $css);
         $this->assertStringContainsString(':focus-visible', $css);
         $this->assertStringContainsString('forced-colors', $css);
+        $this->assertStringContainsString('-webkit-backdrop-filter', $css);
     }
 }

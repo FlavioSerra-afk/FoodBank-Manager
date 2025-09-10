@@ -30,13 +30,15 @@ class Assets {
 		 * @return void
 		 */
 	public function register(): void {
-					add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin' ), 10 );
-					add_action( 'admin_head', array( self::class, 'print_admin_head' ) );
-					add_filter( 'admin_body_class', array( Theme::class, 'admin_body_class' ) );
-					$theme = Theme::get();
+									add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin' ), 10 );
+									add_action( 'admin_head', array( self::class, 'print_admin_head' ) );
+									$theme = Theme::get();
+		if ( ! empty( $theme['apply_admin_chrome'] ) ) {
+										add_filter( 'admin_body_class', array( Theme::class, 'admin_body_class' ) );
+		}
 		if ( ! is_admin() && ! empty( $theme['apply_front_menus'] ) ) {
-			add_filter( 'body_class', array( Theme::class, 'body_class' ) );
-			add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_front_menus' ) );
+				add_filter( 'body_class', array( Theme::class, 'body_class' ) );
+				add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_front_menus' ) );
 		}
 	}
 

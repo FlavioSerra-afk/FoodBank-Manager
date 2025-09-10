@@ -23,5 +23,7 @@ final class PublicFormsThemeTest extends \BaseTestCase {
         $this->assertStringContainsString('.fbm-form', $css);
         $this->assertStringContainsString('input:focus-visible', $css);
         $this->assertStringContainsString('prefers-reduced-transparency', $css);
+        $this->assertStringContainsString('forced-colors', $css);
+        $this->assertStringContainsString('.is-invalid', $css);
     }
 }

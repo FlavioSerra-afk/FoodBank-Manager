@@ -69,6 +69,18 @@ final class FormShortcodeTest extends \BaseTestCase {
         $html = FormShortcode::render(['preset' => 'test_form']);
         $this->assertSame('', $html);
     }
+
+    public function testValidationAttributesAndLiveRegions(): void {
+        $_GET['fbm_err'] = 'email,consent';
+        $html = FormShortcode::render(['preset' => 'test_form']);
+        $this->assertStringContainsString('role="status"', $html);
+        $this->assertStringContainsString('role="alert"', $html);
+        $this->assertStringContainsString('aria-invalid="true"', $html);
+        $this->assertStringContainsString('aria-describedby="fbm_err_email"', $html);
+        $this->assertStringContainsString('id="fbm_err_email"', $html);
+        $this->assertStringContainsString('autofocus', $html);
+        unset($_GET['fbm_err']);
+    }
 }
 
 }
