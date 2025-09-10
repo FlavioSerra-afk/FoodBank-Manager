@@ -37,7 +37,7 @@ Focus and hover states derive from `--fbm-color-accent`; borders and outlines us
 - Body classes: `fbm-theme--{style}`, `fbm-preset--{preset}`, `fbm-rtl` (when RTL).
 - Wrappers: `.fbm-admin` for admin pages, `.fbm-public` for front-end blocks.
 - Tokens emitted: `--fbm-color-accent`, `--fbm-color-text`, `--fbm-color-surface`, `--fbm-color-border`, `--fbm-glass-bg`, `--fbm-glass-border`, `--fbm-glass-blur`, `--fbm-card-radius`, `--fbm-elev`.
-- Fallbacks: glass effects sit behind `@supports (backdrop-filter: blur(1px))`; a solid surface is used otherwise and `@media (forced-colors: active)` forces solid backgrounds and no blur.
+- Fallbacks: glass effects wrap blur styles in `@supports (backdrop-filter: blur(1px))` ([MDN](https://developer.mozilla.org/docs/Web/CSS/@supports)); when unsupported, surfaces fall back to solid colors. `@media (forced-colors: active)` ([MDN](https://developer.mozilla.org/docs/Web/CSS/@media/forced-colors)) and `@media (prefers-reduced-transparency: reduce)` ([MDN](https://developer.mozilla.org/docs/Web/CSS/@media/prefers-reduced-transparency)) remove blur and enforce solid colors/borders.
 
 ## Components
 - **KPI Tile** — `.fbm-tile.fbm-card--glass`; icon + label + masked value. Tiles are focusable; border outlines use `--fbm-color-accent`.

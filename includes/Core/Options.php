@@ -58,6 +58,24 @@ namespace FBM\Core {
             return self::merge(self::defaults(), $raw);
         }
 
+        /**
+         * Sanitize and persist settings via Settings API.
+         *
+         * @param array<string,mixed> $input Raw input.
+         * @return array<string,mixed>
+         */
+        public static function sanitize_all($input): array {
+            if (!is_array($input)) {
+                $input = [];
+            }
+            $raw   = self::all();
+            $raw   = array_replace_recursive($raw, $input);
+            $theme = \FoodBankManager\UI\Theme::sanitize($raw['theme'] ?? []);
+            self::update(['theme' => $theme]);
+            $raw['theme'] = $theme;
+            return $raw;
+        }
+
         /** @param array<string,mixed> $patch */
         public static function save(array $patch): bool {
             $current = self::all();

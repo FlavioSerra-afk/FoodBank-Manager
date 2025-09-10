@@ -29,62 +29,64 @@ class Assets {
 		 *
 		 * @return void
 		 */
-        public function register(): void {
-                add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin' ), 10 );
-                add_action( 'admin_head', array( self::class, 'print_admin_head' ) );
-                add_filter( 'admin_body_class', array( Theme::class, 'admin_body_class' ) );
-        }
+	public function register(): void {
+			add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin' ), 10 );
+			add_action( 'admin_head', array( self::class, 'print_admin_head' ) );
+			add_filter( 'admin_body_class', array( Theme::class, 'admin_body_class' ) );
+	}
 
 		/**
 		 * Enqueue admin assets when on plugin screens.
 		 *
 		 * @return void
 		 */
-    public function enqueue_admin(): void {
-                $screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-                $id     = $screen ? (string) $screen->id : '';
-                if ( 'toplevel_page_fbm' !== $id && ! str_starts_with( $id, 'foodbank_page_fbm_' ) ) {
-                        return;
-        }
-        wp_register_style( 'fbm-admin', FBM_URL . 'assets/css/admin.css', array(), Plugin::VERSION );
-        wp_enqueue_style( 'fbm-admin' );
+	public function enqueue_admin(): void {
+				$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+				$id     = $screen ? (string) $screen->id : '';
+		if ( 'toplevel_page_fbm' !== $id && ! str_starts_with( $id, 'foodbank_page_fbm_' ) ) {
+				return;
+		}
+		wp_register_style( 'fbm-admin', FBM_URL . 'assets/css/admin.css', array(), Plugin::VERSION );
+		wp_enqueue_style( 'fbm-admin' );
 
 		if ( $screen && 'foodbank_page_fbm_attendance' === $screen->id && current_user_can( 'fb_manage_attendance' ) ) {
 				wp_enqueue_script( 'fbm-qrcode', FBM_URL . 'assets/js/qrcode.min.js', array(), Plugin::VERSION, true );
-        }
-        if ( $screen && 'foodbank_page_fbm_form_builder' === $screen->id && current_user_can( 'fbm_manage_forms' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown
-            wp_enqueue_script( 'fbm-form-builder', FBM_URL . 'assets/js/fbm-form-builder.js', array(), Plugin::VERSION, true );
-        }
-    }
+		}
+		if ( $screen && 'foodbank_page_fbm_form_builder' === $screen->id && current_user_can( 'fbm_manage_forms' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown
+			wp_enqueue_script( 'fbm-form-builder', FBM_URL . 'assets/js/fbm-form-builder.js', array(), Plugin::VERSION, true );
+		}
+	}
 
-    /**
-     * @deprecated Legacy front-end enqueue for tests.
-     */
-    public function enqueue_front(): void {
-        $content = (string) ( $GLOBALS['fbm_post_content'] ?? '' );
-        if ( str_contains( $content, '[fbm_dashboard]' ) ) {
-            $GLOBALS['fbm_styles']['fbm-frontend-dashboard'] = true;
-        }
-    }
+		/**
+		 * Legacy front-end enqueue for tests.
+		 *
+		 * @deprecated
+		 */
+	public function enqueue_front(): void {
+		$content = (string) ( $GLOBALS['fbm_post_content'] ?? '' );
+		if ( str_contains( $content, '[fbm_dashboard]' ) ) {
+			$GLOBALS['fbm_styles']['fbm-frontend-dashboard'] = true;
+		}
+	}
 
 				/**
 				 * Print deterministic admin CSS variables.
 				 *
 				 * @return void
 				 */
-        public static function print_admin_head(): void {
-                static $done = false;
-                if ( $done ) {
-                        return;
-                }
-                $screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-                $id     = $screen ? (string) $screen->id : '';
-                if ( 'toplevel_page_fbm' !== $id && ! str_starts_with( $id, 'foodbank_page_fbm_' ) ) {
-                        return;
-                }
+	public static function print_admin_head(): void {
+			static $done = false;
+		if ( $done ) {
+				return;
+		}
+			$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+			$id     = $screen ? (string) $screen->id : '';
+		if ( 'toplevel_page_fbm' !== $id && ! str_starts_with( $id, 'foodbank_page_fbm_' ) ) {
+				return;
+		}
 
-                $css = Theme::css_vars( Theme::admin(), '.fbm-admin' ) . Theme::glass_support_css();
-                echo '<style id="fbm-css-vars">' . esc_html( $css ) . '</style>';
-                $done = true;
-        }
+			$css = Theme::css_vars( Theme::admin(), '.fbm-admin' ) . Theme::glass_support_css();
+			echo '<style id="fbm-css-vars">' . esc_html( $css ) . '</style>';
+			$done = true;
+	}
 }
