@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "style": "glass",
+  "preset": "dark",
+  "accent": "#3B82F6",
+  "glass": {"alpha": 0.2, "blur": 12, "elev": 8, "radius": 12, "border": 1}
+}

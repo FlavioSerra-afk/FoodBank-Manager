@@ -23,6 +23,9 @@ final class AssetsTest extends \BaseTestCase {
         $this->assertStringContainsString('--fbm-card-radius', $out);
         $this->assertStringContainsString('--fbm-elev', $out);
         $this->assertStringContainsString('--fbm-contrast-multiplier', $out);
+        $this->assertStringContainsString('@supports (backdrop-filter: blur(1px))', $out);
+        $this->assertStringContainsString('@media (prefers-reduced-transparency: reduce)', $out);
+        $this->assertStringContainsString('@media (forced-colors: active)', $out);
 
         ob_start();
         Assets::print_admin_head();

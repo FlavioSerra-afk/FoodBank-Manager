@@ -297,6 +297,7 @@ final class Theme {
         $targets = '.fbm-card--glass,.fbm-button--glass';
         return '@supports (backdrop-filter: blur(1px)){' . $targets . '{background:var(--fbm-glass-bg);backdrop-filter:blur(var(--fbm-glass-blur));}}'
             . '@supports not (backdrop-filter: blur(1px)){' . $targets . '{background:var(--fbm-color-surface);}}'
-            . '@media (forced-colors: active){' . $targets . '{background:var(--fbm-color-surface)!important;backdrop-filter:none!important;}}';
+            . '@media (prefers-reduced-transparency: reduce){' . $targets . '{backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--fbm-color-surface);}}'
+            . '@media (forced-colors: active){' . $targets . '{background:Canvas;border-color:CanvasText;color:CanvasText;backdrop-filter:none;-webkit-backdrop-filter:none;}}';
     }
 }

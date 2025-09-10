@@ -18,6 +18,20 @@ Defines visual tokens and component specs used across admin and front-end surfac
 
 Focus and hover states derive from `--fbm-color-accent`; borders and outlines use the blue accent to ensure visibility.
 
+## Theme JSON schema
+
+| Field | Type | Notes |
+|---|---|---|
+| `version` | int | must be `1` |
+| `style` | enum | `glass` or `basic` |
+| `preset` | enum | `light`, `dark`, `high_contrast` |
+| `accent` | string | `#RRGGBB` colour |
+| `glass.alpha` | number | `0–1` (`0.08–0.20` light, `0.18–0.35` dark) |
+| `glass.blur` | int | `0–20` px |
+| `glass.elev` | int | `0–24` |
+| `glass.radius` | int | `6–20` px |
+| `glass.border` | int | `1–2` px |
+
 ## Theme hook contract
 
 - Body classes: `fbm-theme--{style}`, `fbm-preset--{preset}`, `fbm-rtl` (when RTL).
