@@ -104,7 +104,7 @@ class ThemePage {
         }
         $json = file_get_contents( $file );
         $data = json_decode( (string) $json, true );
-        if ( ! is_array( $data ) || (int) ( $data['version'] ?? 0 ) !== 1 ) {
+        if ( ! is_array( $data ) || (int) ( $data['version'] ?? 0 ) !== 1 || ! self::validate_schema( $data ) ) {
             add_settings_error( 'fbm_theme', 'fbm_theme', __( 'Invalid theme JSON.', 'foodbank-manager' ), 'error' );
             wp_safe_redirect( add_query_arg( 'tab', $section, menu_page_url( 'fbm_theme', false ) ) );
             exit;
@@ -130,10 +130,61 @@ class ThemePage {
         $theme = Theme::get();
         $theme[ $section ] = $san[ $section ];
         if ( 'admin' === $section && ! empty( $theme['match_front_to_admin'] ) ) {
-            $enabled            = $theme['front']['enabled'];
-            $theme['front']     = array_merge( $san[ $section ], array( 'enabled' => $enabled ) );
+            $enabled        = $theme['front']['enabled'];
+            $theme['front'] = array_merge( $san[ $section ], array( 'enabled' => $enabled ) );
         }
         Options::update( 'theme', $theme );
+        return true;
+    }
+
+    /**
+     * Validate theme JSON against schema.
+     *
+     * @param array<string,mixed> $data Raw theme data.
+     * @return bool
+     */
+    private static function validate_schema( array $data ): bool {
+        $schema_file = FBM_PATH . 'themes/schema.json';
+        $schema      = json_decode( (string) file_get_contents( $schema_file ), true );
+        if ( ! is_array( $schema ) ) {
+            return false;
+        }
+        $allowed = array_keys( $schema['properties'] );
+        if ( array_diff( array_keys( $data ), $allowed ) ) {
+            return false;
+        }
+        foreach ( (array) $schema['required'] as $req ) {
+            if ( ! array_key_exists( $req, $data ) ) {
+                return false;
+            }
+        }
+        if ( ! in_array( $data['style'], (array) $schema['properties']['style']['enum'], true ) ) {
+            return false;
+        }
+        if ( ! in_array( $data['preset'], (array) $schema['properties']['preset']['enum'], true ) ) {
+            return false;
+        }
+        if ( ! is_string( $data['accent'] ?? null ) || ! preg_match( '/^#[0-9A-Fa-f]{6}$/', (string) $data['accent'] ) ) {
+            return false;
+        }
+        if ( ! is_array( $data['glass'] ?? null ) ) {
+            return false;
+        }
+        $glass        = $data['glass'];
+        $glass_schema = $schema['properties']['glass'];
+        if ( array_diff( array_keys( $glass ), array_keys( $glass_schema['properties'] ) ) ) {
+            return false;
+        }
+        foreach ( (array) $glass_schema['required'] as $req ) {
+            if ( ! array_key_exists( $req, $glass ) ) {
+                return false;
+            }
+        }
+        foreach ( array( 'alpha', 'blur', 'elev', 'radius', 'border' ) as $k ) {
+            if ( ! is_numeric( $glass[ $k ] ?? null ) ) {
+                return false;
+            }
+        }
         return true;
     }
 
