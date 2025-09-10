@@ -6,17 +6,27 @@ Defines visual tokens and component specs used across admin and front-end surfac
 ## Tokens
 | Token | Default | Range |
 |---|---|---|
-| `--fbm-color-accent` | `#3B82F6` | `#RRGGBB` |
-| `--fbm-glass-bg` alpha | `0.10` | Light: `0.08–0.20`, Dark: `0.18–0.35` |
-| `--fbm-glass-blur` | `12px` | `0–20px` |
-| `--fbm-elev` | `8` | `0–24` |
-| `--fbm-card-radius` | `12px` | `6–20px` |
-| `--fbm-glass-border` | `1px` | `1–2px` |
+| `--fbm-color-accent` | `var(--fbm-accent, #3B82F6)` | Accent colour |
+| `--fbm-shadow-rgb` | `0 0 0` | Base drop shadow colour |
+| `--fbm-glass-alpha` | `var(--fbm-alpha, 0.22)` | Surface alpha |
+| `--fbm-glass-blur` | `var(--fbm-blur, 14px)` | Blur radius |
+| `--fbm-card-radius` | `var(--fbm-radius, 20px)` | Border radius |
+| `--fbm-border-w` | `var(--fbm-border, 1px)` | Border width |
+| `--fbm-elev-shadow` | `0 8px 32px rgba(var(--fbm-shadow-rgb)/0.10)` | Elevation shadow |
+| `--fbm-inset-top` | `inset 0 1px 0 rgba(255 255 255 / 0.50)` | Top hairline |
+| `--fbm-inset-bottom` | `inset 0 -1px 0 rgba(255 255 255 / 0.10)` | Bottom hairline |
+| `--fbm-inset-glow` | `inset 0 0 20px 10px rgba(255 255 255 / 0.60)` | Inner glow |
 | `--fbm-color-surface` | preset | n/a |
 | `--fbm-color-text` | preset | n/a |
 | `--fbm-color-border` | preset | n/a |
 
 Focus and hover states derive from `--fbm-color-accent`; borders and outlines use the blue accent to ensure visibility.
+
+## Layered glass recipe
+
+- **Top hairline:** `--fbm-inset-top` adds a subtle highlight.
+- **Side gradient:** `--fbm-card--glass::after` uses `--fbm-inset-bottom` for light refraction.
+- **Inset glow:** `--fbm-inset-glow` softens edges and blends layers.
 
 ## Theme JSON schema
 
@@ -36,8 +46,8 @@ Focus and hover states derive from `--fbm-color-accent`; borders and outlines us
 
 - Body classes: `fbm-theme--{style}`, `fbm-preset--{preset}`, `fbm-rtl` (when RTL).
 - Wrappers: `.fbm-admin` for admin pages, `.fbm-public` for front-end blocks.
-- Tokens emitted: `--fbm-color-accent`, `--fbm-color-text`, `--fbm-color-surface`, `--fbm-color-border`, `--fbm-glass-bg`, `--fbm-glass-border`, `--fbm-glass-blur`, `--fbm-card-radius`, `--fbm-elev`.
-- Fallbacks: glass effects wrap blur styles in `@supports (backdrop-filter: blur(1px))` ([MDN](https://developer.mozilla.org/docs/Web/CSS/@supports)); when unsupported, surfaces fall back to solid colors. `@media (forced-colors: active)` ([MDN](https://developer.mozilla.org/docs/Web/CSS/@media/forced-colors)) and `@media (prefers-reduced-transparency: reduce)` ([MDN](https://developer.mozilla.org/docs/Web/CSS/@media/prefers-reduced-transparency)) remove blur and enforce solid colors/borders.
+- Tokens emitted: `--fbm-color-accent`, `--fbm-color-text`, `--fbm-color-surface`, `--fbm-color-border`, `--fbm-shadow-rgb`, `--fbm-glass-alpha`, `--fbm-glass-blur`, `--fbm-card-radius`, `--fbm-border-w`, `--fbm-elev-shadow`, `--fbm-inset-top`, `--fbm-inset-bottom`, `--fbm-inset-glow`.
+- Fallbacks: blur is gated by `@supports (backdrop-filter: blur(1px))` ([MDN](https://developer.mozilla.org/docs/Web/CSS/backdrop-filter)). `@media (forced-colors: active)` ([MDN](https://developer.mozilla.org/docs/Web/CSS/@media/forced-colors)) and `@media (prefers-reduced-transparency: reduce)` ([MDN](https://developer.mozilla.org/docs/Web/CSS/@media/prefers-reduced-transparency)) provide accessible fallbacks ([Chrome](https://developer.chrome.com/docs/web-platform/forced-colors/)).
 
 ## Components
 - **KPI Tile** — `.fbm-tile.fbm-card--glass`; icon + label + masked value. Tiles are focusable; border outlines use `--fbm-color-accent`.

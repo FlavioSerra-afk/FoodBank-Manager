@@ -64,7 +64,7 @@ $mail_failures_7d     = (int) ($mail_failures_7d ?? 0);
         <div class="fbm-tile-label"><?php esc_html_e('Mail failures (last 7d)', 'foodbank-manager'); ?></div>
     </div>
 </div>
-<div class="fbm-sparkline" data-testid="fbm-dashboard-sparkline">
+<div class="fbm-card--glass fbm-sparkline" data-testid="fbm-dashboard-sparkline">
     <svg width="100%" height="40" xmlns="http://www.w3.org/2000/svg"></svg>
 </div>
 <div class="fbm-shortcuts">

@@ -12,7 +12,7 @@ Docs-Revision: 2025-09-09 (Wave UI/UX Glass — Theme Tab)
 
 ## Information Architecture (vNext)
 
-- Dashboard — 3×3 glass tile grid (In Progress — RC4).
+- Dashboard UI v1.1 — glass, 3×3, shortcuts (Implemented — RC4.3).
 - Theme wiring (Admin + Front) — Done (RC4).
 - Theme JSON + Glass utilities + a11y fallbacks — Done (RC4).
 - Attendance — Hub with tabs: Today, Scan, Manual, History. (Scan menu deep‑links to `Attendance?tab=scan`.)
@@ -27,7 +27,7 @@ Docs-Revision: 2025-09-09 (Wave UI/UX Glass — Theme Tab)
 - Shortcodes — Helper reference and examples.
 - Events (optional) — Off by default; toggle in Settings.
 
-### Dashboard 3×3 glass layout — In Progress (RC4)
+### Dashboard UI v1.1 — glass, 3×3, shortcuts — Implemented (RC4.3)
 - Tiles: Total registrations; Check-ins Today; Check-ins This Week; Check-ins This Month; Tickets scanned (7d); Active events; Forms submitted (7d); Pending export jobs; Shortcuts tile.
 - Security/Perf: Masked counts; ≤300ms goal; assets gated to FBM screens.
 - Tests: Tile presence, 3×3 grid, shortcut links render.
@@ -36,7 +36,7 @@ Docs-Revision: 2025-09-09 (Wave UI/UX Glass — Theme Tab)
 - Glass cards & buttons: translucent surface with backdrop blur, subtle border, and soft shadow.
 - Accent: blue hover/active (use `--fbm-color-accent`).
 - Contrast: maintain AA contrast; auto-swap to solid backgrounds in High-Contrast preset; `prefers-reduced-transparency` and no `backdrop-filter` fall back to solid surfaces.
-- Tokens: `--fbm-glass-bg`, `--fbm-glass-border`, `--fbm-glass-blur`, `--fbm-card-radius`, `--fbm-elev`, `--fbm-color-accent`, etc.
+  - Tokens: `--fbm-glass-alpha`, `--fbm-glass-blur`, `--fbm-card-radius`, `--fbm-border-w`, `--fbm-elev-shadow`, `--fbm-color-accent`, etc.
 - QR tokens lifecycle: permanent by default; admin can disable/reactivate with reason; Scan shows Disabled + reason (sanitized); actions audited.
 
 ---
