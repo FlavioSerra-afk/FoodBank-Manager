@@ -277,7 +277,7 @@ final class Menu {
 
         public static function render_emails(): void {
                 self::render_once( 'admin:emails', static function (): void {
-                        \FoodBankManager\Admin\EmailsPage::route();
+                        \FoodBankManager\Admin\EmailTemplatesPage::route();
                 } );
         }
 
