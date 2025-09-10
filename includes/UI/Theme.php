@@ -225,40 +225,22 @@ final class Theme {
         $radius = (int) $glass['radius'];
         $border = (int) $glass['border'];
 
-        if ( $alpha > 0 ) {
-            $rgb = self::hex_to_rgb($base['surface']);
-            $glass_bg = sprintf('rgba(%d,%d,%d,%.2f)', $rgb[0], $rgb[1], $rgb[2], $alpha);
-        } else {
-            $glass_bg = $base['surface'];
-        }
-
         return array(
             '--fbm-color-accent'        => $section['accent'],
             '--fbm-color-text'          => $base['text'],
             '--fbm-color-surface'       => $base['surface'],
             '--fbm-color-border'        => $base['border'],
-            '--fbm-glass-bg'            => $glass_bg,
-            '--fbm-glass-border'        => $base['border'],
+            '--fbm-shadow-rgb'          => '0 0 0',
+            '--fbm-glass-alpha'         => sprintf('%.2f', $alpha),
             '--fbm-glass-blur'          => $blur . 'px',
             '--fbm-card-radius'         => $radius . 'px',
-            '--fbm-elev'                => (string) $elev,
+            '--fbm-border-w'            => $border . 'px',
+            '--fbm-elev-shadow'         => '0 8px 32px rgba(var(--fbm-shadow-rgb)/0.10)',
+            '--fbm-inset-top'           => 'inset 0 1px 0 rgba(255 255 255 / 0.50)',
+            '--fbm-inset-bottom'        => 'inset 0 -1px 0 rgba(255 255 255 / 0.10)',
+            '--fbm-inset-glow'          => 'inset 0 0 20px 10px rgba(255 255 255 / 0.60)',
             '--fbm-contrast-multiplier' => $base['contrast'],
         );
-    }
-
-    /**
-     * Convert a hex colour to RGB values.
-     *
-     * @param string $hex Hex colour.
-     * @return array{0:int,1:int,2:int}
-     */
-    private static function hex_to_rgb(string $hex): array {
-        $hex = ltrim($hex, '#');
-        if (3 === strlen($hex)) {
-            $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
-        }
-        $int = hexdec($hex);
-        return array(($int >> 16) & 255, ($int >> 8) & 255, $int & 255);
     }
 
     /**
@@ -295,9 +277,9 @@ final class Theme {
      */
     public static function glass_support_css(): string {
         $targets = '.fbm-card--glass,.fbm-button--glass';
-        return '@supports (backdrop-filter: blur(1px)){' . $targets . '{background:var(--fbm-glass-bg);backdrop-filter:blur(var(--fbm-glass-blur));}}'
-            . '@supports not (backdrop-filter: blur(1px)){' . $targets . '{background:var(--fbm-color-surface);}}'
-            . '@media (prefers-reduced-transparency: reduce){' . $targets . '{backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--fbm-color-surface);}}'
-            . '@media (forced-colors: active){' . $targets . '{background:Canvas;border-color:CanvasText;color:CanvasText;backdrop-filter:none;-webkit-backdrop-filter:none;}}';
+        return '@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)){' . $targets . '{backdrop-filter:blur(var(--fbm-glass-blur));-webkit-backdrop-filter:blur(var(--fbm-glass-blur));}}'
+            . '@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))){' . $targets . '{background:var(--fbm-color-surface,#fff);}}'
+            . '@media (prefers-reduced-transparency: reduce){' . $targets . '{background:var(--fbm-color-surface,#fff);}}'
+            . '@media (forced-colors: active){' . $targets . '{background:Canvas;color:CanvasText;border-color:ButtonText;box-shadow:none;}}';
     }
 }

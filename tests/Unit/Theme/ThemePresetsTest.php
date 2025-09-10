@@ -9,7 +9,7 @@ final class ThemePresetsTest extends \BaseTestCase {
         $tokens = Theme::sanitize(array('admin' => array('preset' => 'high_contrast')));
         $css    = Theme::css_vars($tokens['admin'], '.t');
         $this->assertStringContainsString('--fbm-glass-blur:0px', $css);
-        $this->assertStringContainsString('--fbm-glass-bg:#000000', $css);
+        $this->assertStringContainsString('--fbm-glass-alpha:0.00', $css);
     }
 
     public function test_default_glass_has_blur(): void {

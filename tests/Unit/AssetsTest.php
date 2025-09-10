@@ -14,16 +14,13 @@ final class AssetsTest extends \BaseTestCase {
         $out = (string) ob_get_clean();
         $this->assertStringContainsString('<style id="fbm-css-vars">', $out);
         $this->assertStringContainsString('--fbm-color-accent', $out);
-        $this->assertStringContainsString('--fbm-color-text', $out);
-        $this->assertStringContainsString('--fbm-color-border', $out);
-        $this->assertStringContainsString('--fbm-color-surface', $out);
-        $this->assertStringContainsString('--fbm-glass-bg', $out);
-        $this->assertStringContainsString('--fbm-glass-border', $out);
+        $this->assertStringContainsString('--fbm-shadow-rgb', $out);
+        $this->assertStringContainsString('--fbm-glass-alpha', $out);
         $this->assertStringContainsString('--fbm-glass-blur', $out);
         $this->assertStringContainsString('--fbm-card-radius', $out);
-        $this->assertStringContainsString('--fbm-elev', $out);
-        $this->assertStringContainsString('--fbm-contrast-multiplier', $out);
-        $this->assertStringContainsString('@supports (backdrop-filter: blur(1px))', $out);
+        $this->assertStringContainsString('--fbm-border-w', $out);
+        $this->assertStringContainsString('--fbm-inset-top', $out);
+        $this->assertStringContainsString('@supports (backdrop-filter', $out);
         $this->assertStringContainsString('@media (prefers-reduced-transparency: reduce)', $out);
         $this->assertStringContainsString('@media (forced-colors: active)', $out);
 

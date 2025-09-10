@@ -13,7 +13,7 @@ final class AssetsRtlTest extends \BaseTestCase {
         ob_start();
         Assets::print_admin_head();
         $css = ob_get_clean();
-        $this->assertStringContainsString('--fbm-glass-bg:#000000', $css);
+        $this->assertStringContainsString('--fbm-glass-alpha:0.00', $css);
         $this->assertStringContainsString('--fbm-glass-blur:0px', $css);
         $this->assertStringContainsString('@supports (backdrop-filter: blur(1px))', $css);
         $this->assertStringContainsString('@media (prefers-reduced-transparency: reduce)', $css);

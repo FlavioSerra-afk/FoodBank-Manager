@@ -1,25 +1,46 @@
 /* phpcs:ignoreFile */
 /* FBM public shortcodes */
-.fbm-public{--fbm-color-accent:#3b82f6;--fbm-color-text:#1f2937;--fbm-color-surface:#fff;--fbm-color-border:#e5e7eb;--fbm-glass-bg:rgba(255,255,255,.6);--fbm-glass-border:rgba(0,0,0,.1);--fbm-glass-blur:6px;--fbm-card-radius:12px;--fbm-elev:0 2px 8px rgba(0,0,0,.08)}
-.fbm-public .fbm-grid{display:grid;gap:16px;grid-template-columns:1fr}
-@media (min-width:768px){.fbm-public .fbm-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (min-width:1200px){.fbm-public .fbm-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-.fbm-public .fbm-card--glass,.fbm-public .fbm-button--glass{background:var(--fbm-color-surface);border:1px solid var(--fbm-color-border);border-radius:var(--fbm-card-radius);box-shadow:var(--fbm-elev);color:var(--fbm-color-text);transition:border-color .2s,box-shadow .2s,color .2s}
-@supports ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
- .fbm-public .fbm-card--glass,
- .fbm-public .fbm-button--glass{background:var(--fbm-glass-bg);border-color:var(--fbm-glass-border);backdrop-filter:blur(var(--fbm-glass-blur));-webkit-backdrop-filter:blur(var(--fbm-glass-blur))}
+.fbm-public{--fbm-color-accent:var(--fbm-accent,#3B82F6);--fbm-color-text:#1f2937;--fbm-color-surface:#fff;--fbm-color-border:#e5e7eb;--fbm-shadow-rgb:0 0 0;--fbm-glass-alpha:var(--fbm-alpha,0.22);--fbm-glass-blur:var(--fbm-blur,14px);--fbm-card-radius:var(--fbm-radius,20px);--fbm-border-w:var(--fbm-border,1px);--fbm-elev-shadow:0 8px 32px rgba(var(--fbm-shadow-rgb)/0.10);--fbm-inset-top:inset 0 1px 0 rgba(255 255 255 / 0.50);--fbm-inset-bottom:inset 0 -1px 0 rgba(255 255 255 / 0.10);--fbm-inset-glow:inset 0 0 20px 10px rgba(255 255 255 / 0.60)}
+/* Base utilities */
+.fbm-grid{display:grid;gap:16px;}
+@media (min-width:768px){.fbm-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
+@media (min-width:1200px){.fbm-grid{grid-template-columns:repeat(3,minmax(0,1fr));}}
+
+/* Glass card */
+.fbm-card--glass{position:relative;overflow:hidden;border-radius:var(--fbm-card-radius);border:var(--fbm-border-w) solid rgba(255 255 255 / 0.30);background:rgba(255 255 255,var(--fbm-glass-alpha));box-shadow:var(--fbm-elev-shadow),var(--fbm-inset-top),var(--fbm-inset-bottom),var(--fbm-inset-glow);}
+.fbm-card--glass::before,
+.fbm-card--glass::after{content:"";position:absolute;pointer-events:none;}
+.fbm-card--glass::before{top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255 255 255/.8),transparent);}
+.fbm-card--glass::after{top:0;left:0;width:1px;height:100%;background:linear-gradient(180deg,rgba(255 255 255/.8),transparent,rgba(255 255 255/.3));}
+
+/* True blur only when supported */
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)){
+  .fbm-card--glass{backdrop-filter:blur(var(--fbm-glass-blur));-webkit-backdrop-filter:blur(var(--fbm-glass-blur));}
 }
-.fbm-public .fbm-card--glass:hover,.fbm-public .fbm-card--glass:active{border-color:var(--fbm-color-accent);box-shadow:0 0 0 1px var(--fbm-color-accent),var(--fbm-elev)}
-.fbm-public .fbm-card--glass:focus,.fbm-public .fbm-button--glass:focus{outline:2px solid var(--fbm-color-accent);outline-offset:2px}
-.fbm-public .fbm-button--glass{text-decoration:none;display:inline-block;padding:.5rem 1rem;text-align:center}
-.fbm-public .fbm-button--glass:hover,.fbm-public .fbm-button--glass:active{color:var(--fbm-color-accent);border-color:var(--fbm-color-accent)}
-.fbm-public .fbm-tile{text-align:center;padding:1rem;position:relative}
-.fbm-public .fbm-delta{position:absolute;top:4px;right:4px;padding:0 .25rem;font-size:.75rem;border-radius:.25rem;background:var(--fbm-color-border);color:var(--fbm-color-text)}
-.fbm-public .fbm-delta--up{background:#e6ffea;color:#1e7e34}
-.fbm-public .fbm-delta--down{background:#ffeaea;color:#b91c1c}
-.fbm-public .fbm-skeleton{background:var(--fbm-color-border);position:relative;overflow:hidden}
-.fbm-public .fbm-skeleton::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);animation:fbm-shimmer 1.5s infinite}
+
+/* Buttons */
+.fbm-button--glass{display:inline-flex;align-items:center;justify-content:center;padding:.6rem 1rem;gap:.5rem;font-weight:600;border-radius:12px;border:var(--fbm-border-w) solid rgba(255 255 255 / .35);background:rgba(255 255 255,calc(var(--fbm-glass-alpha) + .06));box-shadow:0 2px 12px rgba(var(--fbm-shadow-rgb)/0.12),var(--fbm-inset-top);transition:transform .12s ease,box-shadow .12s ease,background-color .12s ease;}
+.fbm-button--glass:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(var(--fbm-shadow-rgb)/0.18),var(--fbm-inset-top);}
+.fbm-button--glass:focus{outline:3px solid color-mix(in oklab,var(--fbm-color-accent) 60%,white);outline-offset:2px;}
+.fbm-button--glass:active{transform:translateY(0);}
+
+/* Accessibility fallbacks */
+@media (forced-colors: active){
+  .fbm-card--glass,.fbm-button--glass{background:Canvas;color:CanvasText;border-color:ButtonText;box-shadow:none;}
+}
+@media (prefers-reduced-transparency: reduce){
+  .fbm-card--glass,.fbm-button--glass{background:var(--fbm-color-surface,#fff);}
+}
+@media (prefers-reduced-motion: reduce){
+  .fbm-button--glass{transition:none;}
+  .fbm-public .fbm-skeleton::after{animation:none}
+}
+
+.fbm-tile{text-align:center;padding:1rem;position:relative}
+.fbm-delta{position:absolute;top:4px;right:4px;padding:0 .25rem;font-size:.75rem;border-radius:.25rem;background:var(--fbm-color-border);color:var(--fbm-color-text)}
+.fbm-delta--up{background:#e6ffea;color:#1e7e34}
+.fbm-delta--down{background:#ffeaea;color:#b91c1c}
+
+.fbm-skeleton{background:var(--fbm-color-border);position:relative;overflow:hidden}
+.fbm-skeleton::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);animation:fbm-shimmer 1.5s infinite}
 @keyframes fbm-shimmer{100%{transform:translateX(100%)}}
-@media (prefers-reduced-motion: reduce){.fbm-public .fbm-skeleton::after{animation:none}}
-@media (prefers-reduced-transparency: reduce){.fbm-public .fbm-card--glass,.fbm-public .fbm-button--glass{backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--fbm-color-surface)}}
-@media (forced-colors: active){.fbm-public .fbm-card--glass,.fbm-public .fbm-button--glass{background:Canvas;border-color:CanvasText;color:CanvasText;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}}

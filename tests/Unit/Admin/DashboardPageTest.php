@@ -57,7 +57,7 @@ final class DashboardPageTest extends \BaseTestCase {
         $html = (string) ob_get_clean();
         $this->assertStringContainsString('fbm-admin', $html);
         $this->assertStringContainsString('fbm-grid', $html);
-        $this->assertSame(9, substr_count($html, 'fbm-dashboard-tile-'));
+        $this->assertSame(9, substr_count($html, 'fbm-card--glass fbm-tile'));
         $labels = array(
             'Total applications',
             'New today',
