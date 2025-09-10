@@ -2,6 +2,11 @@
 // phpcs:ignoreFile
 
 namespace FBM\Core {
+    use function add_settings_error;
+    use function wp_json_encode;
+    use function strlen;
+    use function __;
+
     class Options {
         /** @return array<string,mixed> */
         public static function defaults(): array {
@@ -70,12 +75,17 @@ namespace FBM\Core {
             if (!is_array($input)) {
                 $input = [];
             }
-            $raw   = self::all();
-            $raw   = array_replace_recursive($raw, $input);
-            $theme = \FoodBankManager\UI\Theme::sanitize($raw['theme'] ?? []);
-            self::update(['theme' => $theme]);
-            $raw['theme'] = $theme;
-            return $raw;
+            $current = self::all();
+            if (isset($input['theme']) && is_array($input['theme'])) {
+                $json = wp_json_encode($input['theme']);
+                if (is_string($json) && strlen($json) > 65536) {
+                    add_settings_error('fbm_theme', 'fbm_theme', __('Theme payload too large.', 'foodbank-manager'), 'error');
+                } else {
+                    $current['theme'] = \FoodBankManager\UI\Theme::sanitize($input['theme']);
+                }
+                unset($input['theme']);
+            }
+            return array_replace_recursive($current, $input);
         }
 
         /** @param array<string,mixed> $patch */

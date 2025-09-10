@@ -98,10 +98,14 @@ final class Theme {
 		$front_menus = filter_var( $raw['apply_front_menus'] ?? $defaults['apply_front_menus'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE );
 		$front_menus = null === $front_menus ? $defaults['apply_front_menus'] : (bool) $front_menus;
 
-		if ( $match ) {
-			$front            = array_merge( $front, $admin );
-			$front['enabled'] = $front['enabled'];
-		}
+                if ( $match ) {
+                        $front_copy = $front;
+                        unset( $front_copy['enabled'] );
+                        if ( $front_copy !== $admin ) {
+                                $front = array_merge( $front, $admin );
+                        }
+                        $front['enabled'] = $front['enabled'];
+                }
 
 		return array(
 			'admin'                => $admin,
