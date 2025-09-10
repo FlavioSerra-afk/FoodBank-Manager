@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace {
     use FoodBankManager\Admin\DiagnosticsPage;
+    use FoodBankManager\Diagnostics\RetentionRunnerInterface;
 
     if ( ! class_exists( 'DiagRetentionDBStub' ) ) {
         class DiagRetentionDBStub {
@@ -29,17 +30,25 @@ namespace {
         }
     }
 
-    if ( ! class_exists( 'DiagRetention' ) ) {
-        class DiagRetention {
-            public static function run_now(): array {
-                return array( 'applications' => array( 'deleted' => 1 ) );
+    if ( ! class_exists( 'FakeRetentionRunner' ) ) {
+        class FakeRetentionRunner implements RetentionRunnerInterface {
+            public function run( bool $dryRun = false ): array {
+                return array( 'affected' => 1, 'anonymised' => 0, 'errors' => 0, 'log_id' => null );
             }
-            public static function dry_run(): array {
-                return array( 'applications' => array( 'deleted' => 1 ) );
+        }
+    }
+
+    if ( ! class_exists( 'RetentionSummaryFilter' ) ) {
+        class RetentionSummaryFilter {
+            public function __invoke( array $summary ): array {
+                return array( 'affected' => 1, 'anonymised' => 0, 'errors' => 0, 'log_id' => null );
             }
-            public static function events(): array {
-                return array();
-            }
+        }
+    }
+
+    if ( ! function_exists( 'fbm_fake_retention_runner_provider' ) ) {
+        function fbm_fake_retention_runner_provider( $value = null ): RetentionRunnerInterface {
+            return new FakeRetentionRunner();
         }
     }
 
@@ -90,18 +99,13 @@ namespace {
     use PHPUnit\Framework\TestCase;
     use FoodBankManager\Admin\DiagnosticsPage;
 
-    /**
-     * @runTestsInSeparateProcesses
-     */
     final class DiagnosticsPageTest extends \BaseTestCase {
         /** @var array<string,int> */
         public static array $cron_next = array();
 
     protected function setUp(): void {
         parent::setUp();
-        if ( ! class_exists( '\\FBM\\Core\\Retention', false ) ) {
-            class_alias( DiagRetention::class, '\\FBM\\Core\\Retention' );
-        }
+        add_filter( 'fbm_retention_runner', 'fbm_fake_retention_runner_provider' );
         fbm_grant_manager();
         \FoodBankManager\Auth\Roles::$installed = false;
         \FoodBankManager\Auth\Roles::$ensured  = false;
@@ -115,6 +119,11 @@ namespace {
             );
         $fbm_options =& $fbm_test_options;
         update_option( 'admin_email', 'admin@example.com' );
+    }
+
+    protected function tearDown(): void {
+        remove_filter( 'fbm_retention_runner', 'fbm_fake_retention_runner_provider' );
+        parent::tearDown();
     }
 
     public function testTemplateRendersSmtpInfo(): void {
@@ -183,9 +192,7 @@ namespace {
                 '_wpnonce'   => $nonce,
             );
             $_REQUEST = $_POST;
-            $filter = static function ( array $summary ): array {
-                return array( 'applications' => array( 'deleted' => 1 ) );
-            };
+            $filter = new RetentionSummaryFilter();
             add_filter( 'fbm_retention_summary', $filter );
             ob_start();
             DiagnosticsPage::render();
@@ -193,7 +200,7 @@ namespace {
             remove_filter( 'fbm_retention_summary', $filter );
             $this->assertStringContainsString('<div class="wrap fbm-admin">', $html);
             $this->assertStringContainsString('Cron Health', $html);
-            $this->assertStringContainsString('&quot;deleted&quot;:1', $html);
+            $this->assertStringContainsString('&quot;affected&quot;:1', $html);
         }
 
         public function testRetentionDryRunOutputsSummary(): void {
@@ -212,9 +219,7 @@ namespace {
                 '_wpnonce'   => $nonce,
             );
             $_REQUEST = $_POST;
-            $filter = static function ( array $summary ): array {
-                return array( 'applications' => array( 'deleted' => 1 ) );
-            };
+            $filter = new RetentionSummaryFilter();
             add_filter( 'fbm_retention_summary', $filter );
             ob_start();
             DiagnosticsPage::render();
@@ -222,7 +227,7 @@ namespace {
             remove_filter( 'fbm_retention_summary', $filter );
             $this->assertStringContainsString('<div class="wrap fbm-admin">', $html);
             $this->assertStringContainsString('Cron Health', $html);
-            $this->assertStringContainsString('&quot;deleted&quot;:1', $html);
+            $this->assertStringContainsString('&quot;affected&quot;:1', $html);
         }
 
         public function testRepairCapsActionEnsuresCaps(): void {

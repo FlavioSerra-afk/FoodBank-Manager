@@ -1,3 +1,8 @@
+## 1.4.0-rc.6.2 — fix(diagnostics): retention runner contract
+
+- fix(diagnostics): add retention runner interface and secure admin actions
+- docs: note retention controls in diagnostics hub
+
 ## 1.4.0-rc.6.0 — fix(cs): clean up email module for PHPCS lanes
 
 - fix(cs): clean up email module for PHPCS lanes

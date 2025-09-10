@@ -10,6 +10,8 @@ declare(strict_types=1);
 namespace FoodBankManager\Admin;
 
 use FBM\Auth\Capabilities;
+use FoodBankManager\Diagnostics\RetentionRunnerInterface;
+use FoodBankManager\Diagnostics\RetentionRunner;
 use FBM\Core\Retention;
 use FoodBankManager\Core\Install;
 use FoodBankManager\Security\Helpers;
@@ -28,6 +30,7 @@ use function wp_die;
 use function esc_html__;
 use function add_settings_error;
 use function filter_input;
+use function apply_filters;
 
 /**
  * Diagnostics admin page.
@@ -38,12 +41,25 @@ class DiagnosticsPage {
 	private const ACTION_RETENTION_DRY = 'fbm_retention_dry_run';
 	private const OVERDUE_GRACE        = 300;
 
-		/**
-		 * Cached retention summary.
-		 *
-		 * @var array<string,array<string,int>>
-		 */
-	private static array $retention_summary = array();
+       /**
+        * Cached retention summary.
+        *
+        * @var array{affected:int,anonymised:int,errors:int,log_id:?string}|null
+        */
+       private static ?array $retention_summary = null;
+
+       /**
+        * Resolve retention runner.
+        *
+        * @return RetentionRunnerInterface
+        */
+       private static function retention_runner(): RetentionRunnerInterface {
+               $runner = apply_filters( 'fbm_retention_runner', null );
+               if ( ! $runner instanceof RetentionRunnerInterface ) {
+                       $runner = new RetentionRunner();
+               }
+               return $runner;
+       }
 
 		/**
 		 * Handle POST actions.
@@ -73,18 +89,24 @@ class DiagnosticsPage {
 			return;
 		}
 
-		if ( self::ACTION_RETENTION_RUN === $action ) {
-				check_admin_referer( self::ACTION_RETENTION_RUN );
-				self::$retention_summary = Retention::run_now();
-				add_settings_error( 'fbm_diagnostics', 'fbm_retention_run', __( 'Retention run executed.', 'foodbank-manager' ), 'updated' );
-			return;
-		}
+               if ( self::ACTION_RETENTION_RUN === $action ) {
+                               check_admin_referer( self::ACTION_RETENTION_RUN );
+                               if ( ! current_user_can( 'fb_manage_diagnostics' ) ) {
+                                               wp_die( esc_html__( 'Insufficient permissions', 'foodbank-manager' ) );
+                               }
+                               self::$retention_summary = self::retention_runner()->run( false );
+                               add_settings_error( 'fbm_diagnostics', 'fbm_retention_run', __( 'Retention run executed.', 'foodbank-manager' ), 'updated' );
+                       return;
+               }
 
-		if ( self::ACTION_RETENTION_DRY === $action ) {
-				check_admin_referer( self::ACTION_RETENTION_DRY );
-				self::$retention_summary = Retention::dry_run();
-				add_settings_error( 'fbm_diagnostics', 'fbm_retention_dry', __( 'Retention dry-run complete.', 'foodbank-manager' ), 'updated' );
-		}
+               if ( self::ACTION_RETENTION_DRY === $action ) {
+                               check_admin_referer( self::ACTION_RETENTION_DRY );
+                               if ( ! current_user_can( 'fb_manage_diagnostics' ) ) {
+                                               wp_die( esc_html__( 'Insufficient permissions', 'foodbank-manager' ) );
+                               }
+                               self::$retention_summary = self::retention_runner()->run( true );
+                               add_settings_error( 'fbm_diagnostics', 'fbm_retention_dry', __( 'Retention dry-run complete.', 'foodbank-manager' ), 'updated' );
+               }
 	}
 
 		/**
@@ -133,20 +155,21 @@ $jobs = method_exists( $GLOBALS['wpdb'], 'prepare' ) ? JobsRepo::list() : array(
 require FBM_PATH . 'templates/admin/diagnostics.php';
         }
 
-		/**
-		 * Get summary from last retention run in this request or option.
-		 *
-		 * @return array<string,array<string,int>>
-		 */
-	public static function retention_summary(): array {
-		if ( ! empty( self::$retention_summary ) ) {
-			return self::$retention_summary;
-		}
-			$stored  = get_option( 'fbm_retention_tick_last_summary', array() );
-			$summary = is_array( $stored ) ? $stored : array();
-			$summary = apply_filters( 'fbm_retention_summary', $summary );
-			return $summary;
-	}
+       /**
+        * Get summary from last retention run in this request or option.
+        *
+        * @return array{affected:int,anonymised:int,errors:int,log_id:?string}
+        */
+       public static function retention_summary(): array {
+               if ( null !== self::$retention_summary ) {
+                       return self::$retention_summary;
+               }
+               $stored  = get_option( 'fbm_retention_tick_last_summary', array() );
+               $summary = is_array( $stored ) ? RetentionRunner::summarize( $stored ) : array();
+               /** @var array{affected:int,anonymised:int,errors:int,log_id:?string} $summary */
+               $summary = apply_filters( 'fbm_retention_summary', $summary );
+               return $summary;
+       }
 
 		/**
 		 * Get cron event diagnostics.
