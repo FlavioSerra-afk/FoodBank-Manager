@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignoreFile
 declare(strict_types=1);
 
 namespace FoodBankManager\Admin {} // for autoload stub
@@ -7,6 +7,12 @@ namespace {
 use FoodBankManager\Admin\EmailTemplatesPage;
 use FoodBankManager\Mail\TemplateRepo;
 use Tests\Support\Rbac;
+
+if ( ! function_exists( 'wp_get_current_user' ) ) {
+    function wp_get_current_user() {
+        return (object) array( 'user_email' => 'tester@example.com' );
+    }
+}
 
 final class EmailTemplatesPageTest extends \BaseTestCase {
     protected function setUp(): void {
@@ -78,6 +84,42 @@ final class EmailTemplatesPageTest extends \BaseTestCase {
         $out = (string) ob_get_clean();
         $data = json_decode( $out, true );
         $this->assertStringContainsString( 'Test', $data['body'] );
+    }
+
+    public function testSendTestRequiresNonce(): void {
+        TemplateRepo::save( 'welcome', array( 'subject' => 'Hello', 'body' => '<p>Hi</p>' ) );
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST = array(
+            'fbm_action' => 'send_test',
+            'slug'       => 'welcome',
+            'fbm_ajax'   => '1',
+        );
+        $this->expectException( \RuntimeException::class );
+        try {
+            EmailTemplatesPage::route();
+        } finally {
+        }
+    }
+
+    public function testSendTestSendsEmail(): void {
+        TemplateRepo::save( 'welcome', array( 'subject' => 'Hi', 'body' => '<p>Body</p>' ) );
+        fbm_seed_nonce( 'unit-seed' );
+        fbm_test_set_request_nonce( 'fbm_email_templates_send_test', '_fbm_nonce' );
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_POST = array(
+            'fbm_action' => 'send_test',
+            '_fbm_nonce' => $_POST['_fbm_nonce'],
+            'slug'       => 'welcome',
+            'fbm_ajax'   => '1',
+        );
+        ob_start();
+        try {
+            EmailTemplatesPage::route();
+        } catch ( \RuntimeException $e ) {
+        }
+        ob_end_clean();
+        $mail = $GLOBALS['fbm_last_mail'];
+        $this->assertSame( array( 'tester@example.com' ), $mail[0] );
     }
 }
 }

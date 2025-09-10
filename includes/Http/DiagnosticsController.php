@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace FoodBankManager\Http;
 
 use FoodBankManager\Core\Options;
+use FoodBankManager\Mail\FailureLog;
 use function current_user_can;
 use function check_admin_referer;
 use function wp_mail;
@@ -22,6 +23,7 @@ use function esc_url_raw;
 use function sanitize_email;
 use function sanitize_text_field;
 use function sanitize_key;
+use function absint;
 use function is_email;
 use function get_option;
 use function esc_html__;
@@ -68,11 +70,14 @@ final class DiagnosticsController {
         }
         $sent = false;
         if ( is_email( $to ) ) {
+            $ct_filter = static fn(): string => 'text/html; charset=UTF-8';
+            add_filter( 'wp_mail_content_type', $ct_filter );
             $sent = wp_mail(
                 $to,
                 __( 'FoodBank Manager test email', 'foodbank-manager' ),
-                __( 'This is a test email from FoodBank Manager.', 'foodbank-manager' )
+                '<p>' . __( 'This is a test email from FoodBank Manager.', 'foodbank-manager' ) . '</p>'
             );
+            remove_filter( 'wp_mail_content_type', $ct_filter );
         }
         if ( is_email( $from_email ) ) {
             remove_filter( 'wp_mail_from', $from_filter );
@@ -81,6 +86,24 @@ final class DiagnosticsController {
             remove_filter( 'wp_mail_from_name', $name_filter );
         }
         $notice = $sent ? 'sent' : 'error';
+        $url    = add_query_arg( array( 'notice' => $notice ), menu_page_url( 'fbm_diagnostics', false ) );
+        wp_safe_redirect( esc_url_raw( $url ), 303 );
+        exit;
+    }
+
+    /**
+     * Retry a failed email send.
+     *
+     * @return void
+     */
+    public static function mail_retry(): void {
+        if ( ! current_user_can( 'fb_manage_diagnostics' ) ) {
+            wp_die( esc_html__( 'Forbidden', 'foodbank-manager' ) );
+        }
+        check_admin_referer( 'fbm_diag_mail_retry', '_fbm_nonce' );
+        $index = absint( $_POST['index'] ?? -1 );
+        $sent  = FailureLog::retry( $index );
+        $notice = $sent ? 'retried' : 'error';
         $url    = add_query_arg( array( 'notice' => $notice ), menu_page_url( 'fbm_diagnostics', false ) );
         wp_safe_redirect( esc_url_raw( $url ), 303 );
         exit;
