@@ -16,14 +16,15 @@ use FoodBankManager\Security\Helpers;
  * CSV export helpers.
  */
 class CsvExporter {
-	/**
-	 * Stream a CSV list export.
-	 *
-	 * @param array<int,array> $rows          Rows ready to export.
-	 * @param bool             $mask_sensitive Whether to mask sensitive fields.
-	 * @param string           $filename       Output filename.
-	 */
-	public static function stream_list( array $rows, bool $mask_sensitive = true, string $filename = 'fbm-entries.csv' ): void {
+        /**
+         * Stream a CSV list export.
+         *
+         * @param array<int,array<string,string>> $rows Rows ready to export.
+         * @param array<string,string>           $columns Map of column keys to labels.
+         * @param bool                           $mask_sensitive Whether to mask sensitive fields.
+         * @param string                         $filename       Output filename.
+         */
+        public static function stream_list( array $rows, array $columns, bool $mask_sensitive = true, string $filename = 'fbm-entries.csv' ): void {
                 $filename = sanitize_file_name( $filename );
                 $headers  = array(
                         'Content-Type: text/csv; charset=UTF-8',
@@ -33,22 +34,18 @@ class CsvExporter {
                 fbm_send_headers( $headers );
                 $out = fopen( 'php://output', 'wb' );
                 CsvWriter::writeBom( $out );
-
-                $keys    = array( 'id', 'created_at', 'name', 'email', 'postcode', 'status' );
-                $headers = array(
-                        __( 'ID', 'foodbank-manager' ),
-                        __( 'Created At', 'foodbank-manager' ),
-                        __( 'Name', 'foodbank-manager' ),
-                        __( 'Email', 'foodbank-manager' ),
-                        __( 'Postcode', 'foodbank-manager' ),
-                        __( 'Status', 'foodbank-manager' ),
-                );
+                $keys = array_keys( $columns );
+                $header_labels = array_values( $columns );
                 if ( ! empty( $rows ) ) {
-                        CsvWriter::put( $out, $headers, ',', '"', '\\' );
+                        CsvWriter::put( $out, $header_labels, ',', '"', '\\' );
                         foreach ( $rows as $row ) {
                                 if ( $mask_sensitive ) {
-                                        $row['email']    = Helpers::mask_email( (string) ( $row['email'] ?? '' ) );
-                                        $row['postcode'] = Helpers::mask_postcode( (string) ( $row['postcode'] ?? '' ) );
+                                        if ( isset( $row['email'] ) ) {
+                                                $row['email'] = Helpers::mask_email( (string) $row['email'] );
+                                        }
+                                        if ( isset( $row['postcode'] ) ) {
+                                                $row['postcode'] = Helpers::mask_postcode( (string) $row['postcode'] );
+                                        }
                                 }
                                 $out_row = array();
                                 foreach ( $keys as $k ) {

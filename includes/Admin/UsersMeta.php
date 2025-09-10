@@ -22,7 +22,8 @@ final class UsersMeta {
 		 * @return array<int,string>
 		 */
 	public static function allowed_db_columns(): array {
-			return array_keys( self::db_column_labels() );
+        $cols = \FoodBankManager\Database\Columns::for_admin_list( false );
+        return array_keys( $cols );
 	}
 
 		/**
@@ -31,15 +32,12 @@ final class UsersMeta {
 		 * @return array<string,string>
 		 */
 	public static function db_column_labels(): array {
-			return array(
-				'id'         => \__( 'ID', 'foodbank-manager' ),
-				'created_at' => \__( 'Created', 'foodbank-manager' ),
-				'name'       => \__( 'Name', 'foodbank-manager' ),
-				'email'      => \__( 'Email', 'foodbank-manager' ),
-				'postcode'   => \__( 'Postcode', 'foodbank-manager' ),
-				'status'     => \__( 'Status', 'foodbank-manager' ),
-				'has_files'  => \__( 'Has Files', 'foodbank-manager' ),
-			);
+        $defs = \FoodBankManager\Database\Columns::for_admin_list( false );
+        $out  = array();
+        foreach ( $defs as $key => $def ) {
+                $out[ $key ] = (string) ( $def['label'] ?? $key );
+        }
+        return $out;
 	}
 
 		/**

@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-10 (v1.4.0-rc.4.4.3 – AttendanceRepo placeholder fixes)
+Docs-Revision: 2025-09-10 (v1.4.0-rc.4.5.0 – DB UX columns)
 
 # PHPCS Ignores & Suppressed Issues Dashboard
 
@@ -8,6 +8,7 @@ This report shows which issues are currently suppressed via `phpcs:ignore` and w
 
 ### 2025-09-10
 - Unsuppressed prepared-SQL and placeholder warnings in `includes/Attendance/AttendanceRepo.php`.
+- No new ignores added for DB UX columns/export work.
 
 ## Snapshot
 

@@ -10,8 +10,9 @@ declare(strict_types=1);
 namespace FoodBankManager\Admin;
 
 use FoodBankManager\Database\ApplicationsRepo;
-use FoodBankManager\Security\Crypto;
 use FoodBankManager\Security\Helpers;
+use FoodBankManager\Database\Columns;
+use FoodBankManager\Security\Crypto;
 use WP_List_Table;
 
 // Ensure WP_List_Table is loaded when running inside WordPress.
@@ -39,10 +40,13 @@ final class DatabaseTable extends WP_List_Table {
          */
         private array $filters;
 
+
         /**
-         * Whether sensitive fields should be unmasked.
+         * Column definitions.
+         *
+         * @var array<string,array<string,mixed>>
          */
-        private bool $unmask;
+        private array $defs;
 
         /**
          * Constructor.
@@ -61,7 +65,7 @@ final class DatabaseTable extends WP_List_Table {
                 );
                 $this->filters  = $filters;
                 $this->selected = $selected;
-                $this->unmask   = $unmask;
+                $this->defs     = Columns::for_admin_list( $unmask );
         }
 
         /**
@@ -70,7 +74,10 @@ final class DatabaseTable extends WP_List_Table {
          * @return array<string,string>
          */
         public function get_columns(): array {
-                $cols = UsersMeta::db_column_labels();
+                $cols = array();
+                foreach ( $this->defs as $key => $def ) {
+                        $cols[ $key ] = (string) $def['label'];
+                }
                 $cols['actions'] = __( 'Actions', 'foodbank-manager' );
                 return $cols;
         }
@@ -81,7 +88,7 @@ final class DatabaseTable extends WP_List_Table {
          * @return array<int,string>
          */
         protected function get_hidden_columns(): array {
-                $allowed = array_keys( UsersMeta::db_column_labels() );
+                $allowed = array_keys( $this->defs );
                 $hidden  = array();
                 foreach ( $allowed as $slug ) {
                         if ( ! in_array( $slug, $this->selected, true ) ) {
@@ -97,11 +104,13 @@ final class DatabaseTable extends WP_List_Table {
          * @return array<string,array{0:string,1:bool}>
          */
         protected function get_sortable_columns(): array {
-                return array(
-                        'id'         => array( 'id', false ),
-                        'created_at' => array( 'created_at', true ),
-                        'status'     => array( 'status', false ),
-                );
+                $out = array();
+                foreach ( $this->defs as $key => $def ) {
+                        if ( isset( $def['sortable'] ) ) {
+                                $out[ $key ] = array( $def['sortable'], false );
+                        }
+                }
+                return $out;
         }
 
         /**
@@ -134,40 +143,18 @@ final class DatabaseTable extends WP_List_Table {
          * @return string
          */
         public function column_default( $item, $column ): string { // phpcs:ignore WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid
-                $data = json_decode( (string) ( $item['data_json'] ?? '' ), true );
-                if ( ! is_array( $data ) ) {
-                        $data = array();
+                if ( 'actions' === $column ) {
+                        return $this->column_actions( $item );
                 }
-                $pii = Crypto::decryptSensitive( (string) ( $item['pii_encrypted_blob'] ?? '' ) );
-
-                switch ( $column ) {
-                        case 'id':
-                                return esc_html( (string) ( $item['id'] ?? '' ) );
-                        case 'created_at':
-                                return esc_html( get_date_from_gmt( (string) ( $item['created_at'] ?? '' ) ) );
-                        case 'name':
-                                $name = trim( ( $data['first_name'] ?? '' ) . ' ' . ( $pii['last_name'] ?? '' ) );
-                                return esc_html( $name );
-                        case 'email':
-                                $email = (string) ( $pii['email'] ?? '' );
-                                if ( ! $this->unmask ) {
-                                        $email = Helpers::mask_email( $email );
-                                }
-                                return esc_html( $email );
-                        case 'postcode':
-                                $postcode = (string) ( $data['postcode'] ?? '' );
-                                if ( ! $this->unmask ) {
-                                        $postcode = Helpers::mask_postcode( $postcode );
-                                }
-                                return esc_html( $postcode );
-                        case 'status':
-                                return esc_html( (string) ( $item['status'] ?? '' ) );
-                        case 'has_files':
-                                return $item['has_files'] ? esc_html__( 'Yes', 'foodbank-manager' ) : esc_html__( 'No', 'foodbank-manager' );
-                        case 'actions':
-                                return $this->column_actions( $item );
+                if ( ! isset( $this->defs[ $column ] ) ) {
+                        return '';
                 }
-                return '';
+                $val_cb = $this->defs[ $column ]['value'];
+                $value  = '';
+                if ( is_callable( $val_cb ) ) {
+                        $value = (string) $val_cb( $item );
+                }
+                return esc_html( $value );
         }
 
         /**

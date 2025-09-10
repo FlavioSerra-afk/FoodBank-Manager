@@ -12,6 +12,7 @@ namespace FoodBankManager\Admin;
 use FoodBankManager\Database\ApplicationsRepo;
 use FoodBankManager\Exports\CsvExporter;
 use FoodBankManager\Security\Crypto;
+use FoodBankManager\Database\Columns;
 use FoodBankManager\Core\Options;
 use FoodBankManager\Admin\UsersMeta;
 
@@ -45,30 +46,40 @@ final class DatabasePage {
 			switch ( $action ) {
 				case 'export_entries':
 					check_admin_referer( 'fbm_export_entries', 'fbm_nonce' );
-					$filters = self::get_filters();
-					$id      = isset( $_POST['id'] ) ? absint( wp_unslash( $_POST['id'] ) ) : 0;
-					if ( $id ) {
-								$filters['id'] = $id;
-					}
-					$mask = ! current_user_can( 'fb_view_sensitive' );
-					self::do_export( $filters, $mask );
-					return;
-				case 'delete_entry':
+                                        $filters = self::get_filters();
+                                        $id      = isset( $_POST['id'] ) ? absint( wp_unslash( $_POST['id'] ) ) : 0;
+                                        if ( $id ) {
+                                                                $filters['id'] = $id;
+                                        }
+                                        $columns = UsersMeta::get_db_columns( get_current_user_id() );
+                                        $unmask  = false;
+                                        if ( current_user_can( 'fb_view_sensitive' ) && isset( $_POST['unmask'] ) ) {
+                                                $nonce   = isset( $_POST['_wpnonce_unmask'] ) ? sanitize_text_field( wp_unslash( $_POST['_wpnonce_unmask'] ) ) : '';
+                                                $unmask = (bool) wp_verify_nonce( $nonce, 'fbm_export_unmask' );
+                                        }
+                                        self::do_export( $filters, $columns, ! $unmask );
+                                        return;
+                                case 'delete_entry':
 					$id = isset( $_POST['id'] ) ? absint( wp_unslash( $_POST['id'] ) ) : 0;
 					check_admin_referer( 'fbm_delete_entry_' . $id, 'fbm_nonce' );
 					self::do_delete( $id );
 					return;
 				case 'export_single':
 						// Legacy single export support.
-						$id = isset( $_POST['id'] ) ? absint( wp_unslash( $_POST['id'] ) ) : 0;
-						check_admin_referer( 'fbm_export_single_' . $id, 'fbm_nonce' );
-						$filters = self::get_filters();
-					if ( $id ) {
-							$filters['id'] = $id;
-					}
-						$mask = ! current_user_can( 'fb_view_sensitive' );
-						self::do_export( $filters, $mask );
-					return;
+                                                $id = isset( $_POST['id'] ) ? absint( wp_unslash( $_POST['id'] ) ) : 0;
+                                                check_admin_referer( 'fbm_export_single_' . $id, 'fbm_nonce' );
+                                                $filters = self::get_filters();
+                                        if ( $id ) {
+                                                        $filters['id'] = $id;
+                                        }
+                                                $columns = UsersMeta::get_db_columns( get_current_user_id() );
+                                                $unmask  = false;
+                                                if ( current_user_can( 'fb_view_sensitive' ) && isset( $_POST['unmask'] ) ) {
+                                                        $nonce   = isset( $_POST['_wpnonce_unmask'] ) ? sanitize_text_field( wp_unslash( $_POST['_wpnonce_unmask'] ) ) : '';
+                                                        $unmask = (bool) wp_verify_nonce( $nonce, 'fbm_export_unmask' );
+                                                }
+                                                self::do_export( $filters, $columns, ! $unmask );
+                                        return;
 				case 'db_presets_save':
 								check_admin_referer( 'fbm_database_db_presets_save' );
 								$name = isset( $_POST['preset_name'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['preset_name'] ) ) : '';
@@ -104,8 +115,8 @@ final class DatabasePage {
 		}
 								$filters = self::get_filters( $query_vars );
 				$presets                 = Options::get_db_filter_presets();
-				$columns                 = UsersMeta::get_db_columns( get_current_user_id() );
-				self::render_list( $filters, $presets, $preset_name, $columns );
+                                $columns                 = UsersMeta::get_db_columns( get_current_user_id() );
+                                self::render_list( $filters, $presets, $preset_name, $columns );
 	}
 
 	/**
@@ -137,11 +148,13 @@ final class DatabasePage {
                         $unmask = $nonce && wp_verify_nonce( $nonce, 'fbm_db_unmask' );
                 }
 
+                $defs  = Columns::for_admin_list( $unmask );
                 $table = new DatabaseTable( $filters, $columns, $unmask );
                 $table->prepare_items();
 
                 $current_preset = $preset_name;
                 $columns        = $columns;
+                $column_defs    = $defs;
                 require FBM_PATH . 'templates/admin/database.php';
         }
 
@@ -276,58 +289,61 @@ final class DatabasePage {
 	 *
 	 * @return void
 	 */
-	private static function do_export( array $filters, bool $mask ): void {
-		if ( ! current_user_can( 'fb_manage_database' ) ) {
-			wp_die( esc_html__( 'You do not have permission to perform this action.', 'foodbank-manager' ), '', array( 'response' => 403 ) );
-		}
+        private static function do_export( array $filters, array $columns, bool $mask ): void {
+                if ( ! current_user_can( 'fb_manage_database' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- custom cap
+                        wp_die( esc_html__( 'You do not have permission to perform this action.', 'foodbank-manager' ), '', array( 'response' => 403 ) );
+                }
 
-		$rows     = array();
-		$filename = 'fbm-entries.csv';
+                $rows     = array();
+                $filename = 'fbm-entries.csv';
 
-		if ( isset( $filters['id'] ) ) {
-			$entry = ApplicationsRepo::get( (int) $filters['id'] );
-			if ( $entry ) {
-				$rows[]   = self::normalize_export_row( $entry );
-				$filename = 'fbm-entry-' . (int) $filters['id'] . '.csv';
-			}
-		} else {
-			$data = ApplicationsRepo::list( $filters );
-			foreach ( $data['rows'] as $row ) {
-				$rows[] = self::normalize_export_row( $row );
-			}
-		}
+                if ( isset( $filters['id'] ) ) {
+                        $entry = ApplicationsRepo::get( (int) $filters['id'] );
+                        if ( $entry ) {
+                                $rows[]   = $entry;
+                                $filename = 'fbm-entry-' . (int) $filters['id'] . '.csv';
+                        }
+                } else {
+                        $data = ApplicationsRepo::list( $filters );
+                        $rows = $data['rows'];
+                }
 
-		CsvExporter::stream_list( $rows, $mask, $filename );
-		exit;
-	}
+                $defs      = Columns::for_admin_list( ! $mask );
+                $sel_defs  = array();
+                foreach ( $columns as $col ) {
+                        if ( isset( $defs[ $col ] ) ) {
+                                $sel_defs[ $col ] = $defs[ $col ];
+                        }
+                }
+                $export_rows = self::build_export_rows( $rows, $sel_defs );
+                $labels      = array();
+                foreach ( $sel_defs as $k => $d ) {
+                        $labels[ $k ] = (string) $d['label'];
+                }
 
-	/**
-	 * Normalize a DB row for export.
-	 *
-	 * @since 0.1.x
-	 *
-	 * @param array<string, mixed> $row Row from repo.
-	 *
-	 * @return array<string, mixed>
-	 */
-	private static function normalize_export_row( array $row ): array {
-		$data = json_decode( (string) ( $row['data_json'] ?? '' ), true );
-		if ( ! is_array( $data ) ) {
-			$data = array();
-		}
-		$pii      = Crypto::decryptSensitive( (string) ( $row['pii_encrypted_blob'] ?? '' ) );
-		$email    = $pii['email'] ?? '';
-		$postcode = $data['postcode'] ?? '';
+                CsvExporter::stream_list( $export_rows, $labels, $mask, $filename );
+                exit;
+        }
 
-		return array(
-			'id'         => (int) ( $row['id'] ?? 0 ),
-			'created_at' => (string) ( $row['created_at'] ?? '' ),
-			'name'       => trim( ( $data['first_name'] ?? '' ) . ' ' . ( $pii['last_name'] ?? '' ) ),
-			'email'      => $email,
-			'postcode'   => $postcode,
-			'status'     => (string) ( $row['status'] ?? '' ),
-		);
-	}
+        /**
+         * Build export rows from raw DB rows and column definitions.
+         *
+         * @param array<int,array<string,mixed>> $rows Raw rows.
+         * @param array<string,array<string,mixed>> $defs Column definitions.
+         * @return array<int,array<string,string>>
+         */
+        private static function build_export_rows( array $rows, array $defs ): array {
+                $out = array();
+                foreach ( $rows as $row ) {
+                        $line = array();
+                        foreach ( $defs as $key => $def ) {
+                                $cb           = $def['value'];
+                                $line[ $key ] = is_callable( $cb ) ? (string) $cb( $row ) : '';
+                        }
+                        $out[] = $line;
+                }
+                return $out;
+        }
 
 	/**
 	 * Parse filters from the request.
