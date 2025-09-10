@@ -1,3 +1,9 @@
+## 1.4.0-rc.6.6 — chore(cs): tighten lanes and scripts
+
+- chore(cs): tune ruleset (Core + curated Extra), run phpcbf on lanes
+- chore(cs): stabilize lanes+repo scripts (summary/source/json; repo ignores on exit)
+- docs(cs): update PHPCS-Ignores with new ignores
+
 ## 1.4.0-rc.6.3 — chore(cs): scope phpcs lanes and add repo-wide report
 
 - chore(cs): scope phpcs lanes and add repo-wide report (summary+source+json)

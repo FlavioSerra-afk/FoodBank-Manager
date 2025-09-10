@@ -22,19 +22,19 @@ final class Theme {
 	/** Default accent colour. */
 	public const DEFAULT_ACCENT = '#3B82F6';
 
-        /**
-         * No-op for backwards compatibility.
-         *
-         * @deprecated
-         */
-        public static function enqueue_front(): void {}
+		/**
+		 * No-op for backwards compatibility.
+		 *
+		 * @deprecated
+		 */
+	public static function enqueue_front(): void {}
 
-        /**
-         * No-op for backwards compatibility.
-         *
-         * @deprecated
-         */
-        public static function enqueue_admin(): void {}
+		/**
+		 * No-op for backwards compatibility.
+		 *
+		 * @deprecated
+		 */
+	public static function enqueue_admin(): void {}
 
 	/**
 	 * Default theme settings.
@@ -98,14 +98,14 @@ final class Theme {
 		$front_menus = filter_var( $raw['apply_front_menus'] ?? $defaults['apply_front_menus'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE );
 		$front_menus = null === $front_menus ? $defaults['apply_front_menus'] : (bool) $front_menus;
 
-                if ( $match ) {
-                        $front_copy = $front;
-                        unset( $front_copy['enabled'] );
-                        if ( $front_copy !== $admin ) {
-                                $front = array_merge( $front, $admin );
-                        }
-                        $front['enabled'] = $front['enabled'];
-                }
+		if ( $match ) {
+				$front_copy = $front;
+				unset( $front_copy['enabled'] );
+			if ( $front_copy !== $admin ) {
+						$front = array_merge( $front, $admin );
+			}
+				$front['enabled'] = $front['enabled'];
+		}
 
 		return array(
 			'admin'                => $admin,
@@ -264,13 +264,13 @@ final class Theme {
 		);
 	}
 
-        /**
-         * Append admin body classes.
-         *
-         * @param string $classes Existing classes.
-         * @return string
-         */
-        public static function admin_body_class( string $classes ): string {
+		/**
+		 * Append admin body classes.
+		 *
+		 * @param string $classes Existing classes.
+		 * @return string
+		 */
+	public static function admin_body_class( string $classes ): string {
 		$all = self::get();
 		if ( empty( $all['apply_admin_chrome'] ) ) {
 			return $classes;
@@ -313,12 +313,12 @@ final class Theme {
 	/**
 	 * Glass fallback CSS.
 	 */
-        public static function glass_support_css(): string {
-                $targets = '.fbm-card--glass,.fbm-button--glass';
-                return '@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)){' . $targets . '{backdrop-filter:blur(var(--fbm-glass-blur));-webkit-backdrop-filter:blur(var(--fbm-glass-blur));}}' // phpcs:ignore WordPress.Files.LineLength.MaxExceeded
-                        . '@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))){' . $targets . '{background:var(--fbm-color-surface,#fff);}}' // phpcs:ignore WordPress.Files.LineLength.MaxExceeded
-                        . '@media (prefers-reduced-transparency: reduce){' . $targets . '{background:var(--fbm-color-surface,#fff);}}'
-                        . '@media (forced-colors: active){' . $targets . '{background:Canvas;color:CanvasText;border-color:ButtonText;box-shadow:none;}}'
-                        . '@media (prefers-reduced-motion: reduce){' . $targets . '{transition:none;}}';
-        }
+	public static function glass_support_css(): string {
+			$targets = '.fbm-card--glass,.fbm-button--glass';
+			return '@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)){' . $targets . '{backdrop-filter:blur(var(--fbm-glass-blur));-webkit-backdrop-filter:blur(var(--fbm-glass-blur));}}' // phpcs:ignore WordPress.Files.LineLength.MaxExceeded
+					. '@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))){' . $targets . '{background:var(--fbm-color-surface,#fff);}}' // phpcs:ignore WordPress.Files.LineLength.MaxExceeded
+					. '@media (prefers-reduced-transparency: reduce){' . $targets . '{background:var(--fbm-color-surface,#fff);}}'
+					. '@media (forced-colors: active){' . $targets . '{background:Canvas;color:CanvasText;border-color:ButtonText;box-shadow:none;}}'
+					. '@media (prefers-reduced-motion: reduce){' . $targets . '{transition:none;}}';
+	}
 }

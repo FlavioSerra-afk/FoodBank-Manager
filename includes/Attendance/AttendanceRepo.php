@@ -31,21 +31,21 @@ final class AttendanceRepo {
 	 * @param int $application_id Application ID.
 	 * @return string|null UTC datetime or null when none.
 	 */
-        public static function last_present( int $application_id ): ?string {
-                global $wpdb;
-                $application_id = absint( $application_id );
+	public static function last_present( int $application_id ): ?string {
+			global $wpdb;
+			$application_id = absint( $application_id );
 
-                $t_att = $wpdb->prefix . 'fb_attendance';
-                // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is constant.
-                $sql    = "SELECT attendance_at
+			$t_att = $wpdb->prefix . 'fb_attendance';
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is constant.
+			$sql  = "SELECT attendance_at
                         FROM {$t_att}
                         WHERE application_id = %d AND status = 'present'
                         ORDER BY attendance_at DESC
                         LIMIT 1";
-                $last   = $wpdb->get_var( $wpdb->prepare( $sql, $application_id ) );
+			$last = $wpdb->get_var( $wpdb->prepare( $sql, $application_id ) );
 
-                return $last ? $last : null;
-        }
+			return $last ? $last : null;
+	}
 
 		/**
 		 * Find attendance rows for an application.
@@ -53,27 +53,27 @@ final class AttendanceRepo {
 		 * @param int $application_id Application ID.
 		 * @return array<int,array>
 		 */
-        public static function find_by_application_id( int $application_id ): array {
-                global $wpdb;
-                $application_id = absint( $application_id );
-                $t_att          = $wpdb->prefix . 'fb_attendance';
-                // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is constant.
-                $sql            = "SELECT id, status, attendance_at, event_id, type, method
+	public static function find_by_application_id( int $application_id ): array {
+			global $wpdb;
+			$application_id = absint( $application_id );
+			$t_att          = $wpdb->prefix . 'fb_attendance';
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is constant.
+			$sql  = "SELECT id, status, attendance_at, event_id, type, method
                         FROM {$t_att} WHERE application_id = %d";
-                $rows           = $wpdb->get_results( $wpdb->prepare( $sql, $application_id ), 'ARRAY_A' );
-                $out            = array();
-                foreach ( $rows ? $rows : array() as $row ) {
-                        $out[] = array(
-                                'id'            => (int) ( $row['id'] ?? 0 ),
-                                'status'        => sanitize_key( (string) ( $row['status'] ?? '' ) ),
-				'attendance_at' => sanitize_text_field( (string) ( $row['attendance_at'] ?? '' ) ),
-				'event_id'      => (int) ( $row['event_id'] ?? 0 ),
-				'type'          => sanitize_text_field( (string) ( $row['type'] ?? '' ) ),
-				'method'        => sanitize_text_field( (string) ( $row['method'] ?? '' ) ),
-			);
+			$rows = $wpdb->get_results( $wpdb->prepare( $sql, $application_id ), 'ARRAY_A' );
+			$out  = array();
+		foreach ( $rows ? $rows : array() as $row ) {
+				$out[] = array(
+					'id'            => (int) ( $row['id'] ?? 0 ),
+					'status'        => sanitize_key( (string) ( $row['status'] ?? '' ) ),
+					'attendance_at' => sanitize_text_field( (string) ( $row['attendance_at'] ?? '' ) ),
+					'event_id'      => (int) ( $row['event_id'] ?? 0 ),
+					'type'          => sanitize_text_field( (string) ( $row['type'] ?? '' ) ),
+					'method'        => sanitize_text_field( (string) ( $row['method'] ?? '' ) ),
+				);
 		}
 
-					return $out;
+				return $out;
 	}
 
 		/**
@@ -82,20 +82,20 @@ final class AttendanceRepo {
 		 * @param array<int> $ids IDs to anonymise.
 		 * @return int Rows affected.
 		 */
-        public static function anonymise_batch( array $ids ): int {
-                global $wpdb;
-                $ids = array_values( array_filter( array_map( 'absint', $ids ) ) );
-                if ( empty( $ids ) ) {
-                        return 0;
-                }
+	public static function anonymise_batch( array $ids ): int {
+			global $wpdb;
+			$ids = array_values( array_filter( array_map( 'absint', $ids ) ) );
+		if ( empty( $ids ) ) {
+				return 0;
+		}
 
-                $t_att       = $wpdb->prefix . 'fb_attendance';
-                $placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
-                // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is constant.
-                $sql         = "UPDATE {$t_att} SET notes = NULL, source_ip = NULL, token_hash = NULL WHERE id IN ($placeholders)";
+			$t_att        = $wpdb->prefix . 'fb_attendance';
+			$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is constant.
+			$sql = "UPDATE {$t_att} SET notes = NULL, source_ip = NULL, token_hash = NULL WHERE id IN ($placeholders)";
 
-                return (int) $wpdb->query( $wpdb->prepare( $sql, $ids ) );
-        }
+			return (int) $wpdb->query( $wpdb->prepare( $sql, $ids ) );
+	}
 
 		/**
 		 * Summarize attendance across applications.
@@ -134,46 +134,46 @@ final class AttendanceRepo {
 		 *   total:int
 		 * }
 		 */
-        public static function people_summary( array $args ): array {
-			global $wpdb;
-			$self  = new self();
-			$t_att = $wpdb->prefix . 'fb_attendance';
-			$t_app = $wpdb->prefix . 'fb_applications';
+	public static function people_summary( array $args ): array {
+		global $wpdb;
+		$self  = new self();
+		$t_att = $wpdb->prefix . 'fb_attendance';
+		$t_app = $wpdb->prefix . 'fb_applications';
 
-			$range_from = sanitize_text_field( $args['range_from'] );
-			$range_to   = sanitize_text_field( $args['range_to'] );
+		$range_from = sanitize_text_field( $args['range_from'] );
+		$range_to   = sanitize_text_field( $args['range_to'] );
 		if ( 1 !== preg_match( '/^\d{4}-\d{2}-\d{2}$/', $range_from ) || 1 !== preg_match( '/^\d{4}-\d{2}-\d{2}$/', $range_to ) ) {
 				return array(
 					'rows'  => array(),
 					'total' => 0,
 				);
 		}
-			$rf = $range_from . ' 00:00:00';
-			$rt = $range_to . ' 23:59:59';
+		$rf = $range_from . ' 00:00:00';
+		$rt = $range_to . ' 23:59:59';
 
-			$policy_days    = absint( $args['policy_days'] ?? Options::get( 'attendance.policy_days' ) );
-			$include_voided = ! empty( $args['include_voided'] );
+		$policy_days    = absint( $args['policy_days'] ?? Options::get( 'attendance.policy_days' ) );
+		$include_voided = ! empty( $args['include_voided'] );
 
-			$clauses    = array( 't.attendance_at BETWEEN %s AND %s' );
-			$where_args = array( $rf, $rt );
+		$clauses    = array( 't.attendance_at BETWEEN %s AND %s' );
+		$where_args = array( $rf, $rt );
 
 		if ( ! $include_voided ) {
 				$clauses[] = 't.is_void = 0';
 		}
 
-			$form_id = absint( $args['form_id'] ?? 0 );
+		$form_id = absint( $args['form_id'] ?? 0 );
 		if ( $form_id ) {
 				$clauses[]    = 'a.form_id = %d';
 				$where_args[] = $form_id;
 		}
 
-			$event_id = absint( $args['event_id'] ?? 0 );
+		$event_id = absint( $args['event_id'] ?? 0 );
 		if ( $event_id ) {
 				$clauses[]    = 't.event_id = %d';
 				$where_args[] = $event_id;
 		}
 
-			$statuses = array_values( array_filter( array_map( 'sanitize_text_field', (array) ( $args['status'] ?? array() ) ) ) );
+		$statuses = array_values( array_filter( array_map( 'sanitize_text_field', (array) ( $args['status'] ?? array() ) ) ) );
 		if ( isset( $args['status'] ) && empty( $statuses ) ) {
 				return array(
 					'rows'  => array(),
@@ -186,7 +186,7 @@ final class AttendanceRepo {
 				$where_args   = array_merge( $where_args, $statuses );
 		}
 
-			$types = array_values( array_filter( array_map( 'sanitize_text_field', (array) ( $args['type'] ?? array() ) ) ) );
+		$types = array_values( array_filter( array_map( 'sanitize_text_field', (array) ( $args['type'] ?? array() ) ) ) );
 		if ( isset( $args['type'] ) && empty( $types ) ) {
 				return array(
 					'rows'  => array(),
@@ -199,13 +199,13 @@ final class AttendanceRepo {
 				$where_args   = array_merge( $where_args, $types );
 		}
 
-			$manager_id = absint( $args['manager_id'] ?? 0 );
+		$manager_id = absint( $args['manager_id'] ?? 0 );
 		if ( $manager_id ) {
 				$clauses[]    = 't.recorded_by_user_id = %d';
 				$where_args[] = $manager_id;
 		}
 
-			$app_ids = array_values( array_filter( array_map( 'absint', (array) ( $args['application_ids'] ?? array() ) ) ) );
+		$app_ids = array_values( array_filter( array_map( 'absint', (array) ( $args['application_ids'] ?? array() ) ) ) );
 		if ( isset( $args['application_ids'] ) && empty( $app_ids ) ) {
 				return array(
 					'rows'  => array(),
@@ -218,7 +218,7 @@ final class AttendanceRepo {
 				$where_args   = array_merge( $where_args, $app_ids );
 		}
 
-			$person_ids = array_values( array_filter( array_map( 'absint', (array) ( $args['person_ids'] ?? array() ) ) ) );
+		$person_ids = array_values( array_filter( array_map( 'absint', (array) ( $args['person_ids'] ?? array() ) ) ) );
 		if ( isset( $args['person_ids'] ) && empty( $person_ids ) ) {
 				return array(
 					'rows'  => array(),
@@ -231,27 +231,27 @@ final class AttendanceRepo {
 				$where_args   = array_merge( $where_args, $person_ids );
 		}
 
-			$where_sql = $self->fbm_sql_where( $clauses );
-			$having    = ! empty( $args['policy_only'] ) ? ' HAVING policy_breach = 1' : '';
+		$where_sql = $self->fbm_sql_where( $clauses );
+		$having    = ! empty( $args['policy_only'] ) ? ' HAVING policy_breach = 1' : '';
 
-			$order_map = array(
-				'created_at' => 'a.created_at',
-				'status'     => 'a.status',
-				'person_id'  => 'a.person_id',
-				'event_id'   => 't.event_id',
-				'last_seen'  => 'last_attended',
-			);
-			$requested = (string) ( $args['orderby'] ?? '' );
-			$order_by  = $order_map[ $requested ] ?? 'a.created_at';
-			$order     = 'ASC' === strtoupper( $args['order'] ?? '' ) ? 'ASC' : 'DESC';
-			$order_sql = " ORDER BY {$order_by} {$order}";
+		$order_map = array(
+			'created_at' => 'a.created_at',
+			'status'     => 'a.status',
+			'person_id'  => 'a.person_id',
+			'event_id'   => 't.event_id',
+			'last_seen'  => 'last_attended',
+		);
+		$requested = (string) ( $args['orderby'] ?? '' );
+		$order_by  = $order_map[ $requested ] ?? 'a.created_at';
+		$order     = 'ASC' === strtoupper( $args['order'] ?? '' ) ? 'ASC' : 'DESC';
+		$order_sql = " ORDER BY {$order_by} {$order}";
 
-			$limit     = min( 500, max( 1, absint( $args['per_page'] ?? 25 ) ) );
-			$page      = max( 1, absint( $args['page'] ?? 1 ) );
-			$offset    = max( 0, ( $page - 1 ) * $limit );
-			$limit_sql = $wpdb->prepare( ' LIMIT %d OFFSET %d', $limit, $offset );
+		$limit     = min( 500, max( 1, absint( $args['per_page'] ?? 25 ) ) );
+		$page      = max( 1, absint( $args['page'] ?? 1 ) );
+		$offset    = max( 0, ( $page - 1 ) * $limit );
+		$limit_sql = $wpdb->prepare( ' LIMIT %d OFFSET %d', $limit, $offset );
 
-			$base_sql = "
+		$base_sql = "
 SELECT
   a.id AS application_id,
   MAX(CASE WHEN t.status='present' THEN t.attendance_at END)                                                 AS last_attended,
@@ -272,13 +272,13 @@ JOIN {$t_app} a ON a.id = t.application_id
 $where_sql
 GROUP BY t.application_id{$having}";
 
-			$select_args = array( $rf, $rt, $rf, $rt, $rt, $policy_days );
-			$query_args  = array_merge( $select_args, $where_args );
-			$prepared    = call_user_func_array(
-				array( $wpdb, 'prepare' ),
-				array_merge( array( $base_sql . $order_sql . $limit_sql ), $query_args )
-			);
-		$rows            = call_user_func( array( $wpdb, 'get_results' ), $prepared, 'ARRAY_A' );
+		$select_args = array( $rf, $rt, $rf, $rt, $rt, $policy_days );
+		$query_args  = array_merge( $select_args, $where_args );
+		$prepared    = call_user_func_array(
+			array( $wpdb, 'prepare' ),
+			array_merge( array( $base_sql . $order_sql . $limit_sql ), $query_args )
+		);
+		$rows        = call_user_func( array( $wpdb, 'get_results' ), $prepared, 'ARRAY_A' );
 
 		if ( ! empty( $args['policy_only'] ) ) {
 				$count_base = "
@@ -311,24 +311,24 @@ SELECT COUNT(*) FROM (
 		);
 		$total          = (int) call_user_func( array( $wpdb, 'get_var' ), $prepared_count );
 
-			$rows = $rows ? array_values( $rows ) : array();
+		$rows = $rows ? array_values( $rows ) : array();
 
-                        return array(
-                                'rows'  => $rows,
-                                'total' => $total,
-                        );
-        }
+					return array(
+						'rows'  => $rows,
+						'total' => $total,
+					);
+	}
 
-        /**
-         * @deprecated 1.2.16 Use people_summary() instead.
-         * @codeCoverageIgnore
-         *
-         * @param array<string,mixed> $args Arguments.
-         * @return array{rows:list<array{application_id:int,last_attended:string|null,visits_range:int,noshows_range:int,visits_12m:int,policy_breach:int}>,total:int}
-         */
-        public static function peopleSummary( array $args ): array {
-                return self::people_summary( $args );
-        }
+		/**
+		 * @deprecated 1.2.16 Use people_summary() instead.
+		 * @codeCoverageIgnore
+		 *
+		 * @param array<string,mixed> $args Arguments.
+		 * @return array{rows:list<array{application_id:int,last_attended:string|null,visits_range:int,noshows_range:int,visits_12m:int,policy_breach:int}>,total:int}
+		 */
+	public static function peopleSummary( array $args ): array {
+			return self::people_summary( $args );
+	}
 
 		/**
 		 * Retrieve attendance timeline rows for an application.
@@ -381,16 +381,16 @@ SELECT COUNT(*) FROM (
 		if ( ! $include_voided ) {
 			$clauses[] = 't.is_void = 0';
 		}
-                $self      = new self();
-                $where_sql = $self->fbm_sql_where( $clauses );
+				$self      = new self();
+				$where_sql = $self->fbm_sql_where( $clauses );
                 // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table and WHERE clause are constants or prepared.
-                $sql       = "SELECT t.id, t.status, t.attendance_at, t.event_id, t.type, t.method,
+				$sql  = "SELECT t.id, t.status, t.attendance_at, t.event_id, t.type, t.method,
                        t.recorded_by_user_id, t.is_void, t.void_reason,
                        t.void_by_user_id, t.void_at
                 FROM {$t_att} t
                 {$where_sql}
                 ORDER BY t.attendance_at ASC";
-                $rows      = $wpdb->get_results( $wpdb->prepare( $sql, $args ), 'ARRAY_A' );
+				$rows = $wpdb->get_results( $wpdb->prepare( $sql, $args ), 'ARRAY_A' );
 
 		if ( empty( $rows ) ) {
 			return array();
@@ -401,15 +401,15 @@ SELECT COUNT(*) FROM (
 			return array();
 		}
 
-                $placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
-                $note_args    = $ids;
+				$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+				$note_args    = $ids;
                 // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name and placeholders are controlled.
-                $note_sql     = "SELECT attendance_id, user_id, note_text, created_at
+				$note_sql  = "SELECT attendance_id, user_id, note_text, created_at
 FROM {$t_notes}
 WHERE attendance_id IN ($placeholders)
 ORDER BY created_at ASC";
-                $note_rows    = $wpdb->get_results( $wpdb->prepare( $note_sql, $note_args ), ARRAY_A );
-                $note_rows    = $note_rows ? $note_rows : array();
+				$note_rows = $wpdb->get_results( $wpdb->prepare( $note_sql, $note_args ), ARRAY_A );
+				$note_rows = $note_rows ? $note_rows : array();
 
 		$grouped = array();
 		foreach ( $note_rows as $n ) {
@@ -663,55 +663,55 @@ ORDER BY created_at ASC";
 				return $out;
 		}
 
-			$sql       = "SELECT DATE(attendance_at) d, COUNT(*) c FROM {$t_att} WHERE status = 'present'"
+			$sql                   = "SELECT DATE(attendance_at) d, COUNT(*) c FROM {$t_att} WHERE status = 'present'"
 					. " AND attendance_at >= %s{$filter_sql} GROUP BY d";
-			$prepared  = call_user_func_array(
+			$prepared              = call_user_func_array(
 				array( $wpdb, 'prepare' ),
 				array_merge(
 					array( $sql, $since_str ),
 					$filter_args,
 				),
 			);
-			$rows      = call_user_func( array( $wpdb, 'get_results' ), $prepared );
-			$now       = new DateTimeImmutable( 'today', new \DateTimeZone( 'UTC' ) );
-			$days      = $now->diff( $since )->days;
-			$len       = $days + 1;
-			$out       = array_fill( 0, (int) $len, 0 );
-                        $since_day = strtotime( $since->format( 'Y-m-d' ) );
-                if ( is_array( $rows ) ) {
-                        foreach ( $rows as $row ) {
-                                $d   = sanitize_text_field( (string) $row->d );
-                                $idx = (int) floor( ( strtotime( $d ) - $since_day ) / 86400 );
-                                if ( $idx >= 0 && $idx < $len ) {
-                                                $out[ $idx ] = (int) $row->c;
-                                }
-                        }
-                }
-                        return $out;
-        }
+			$rows                  = call_user_func( array( $wpdb, 'get_results' ), $prepared );
+			$now                   = new DateTimeImmutable( 'today', new \DateTimeZone( 'UTC' ) );
+			$days                  = $now->diff( $since )->days;
+			$len                   = $days + 1;
+			$out                   = array_fill( 0, (int) $len, 0 );
+						$since_day = strtotime( $since->format( 'Y-m-d' ) );
+		if ( is_array( $rows ) ) {
+			foreach ( $rows as $row ) {
+						$d   = sanitize_text_field( (string) $row->d );
+						$idx = (int) floor( ( strtotime( $d ) - $since_day ) / 86400 );
+				if ( $idx >= 0 && $idx < $len ) {
+					$out[ $idx ] = (int) $row->c;
+				}
+			}
+		}
+						return $out;
+	}
 
-        /**
-         * Get daily counts since a date.
-         *
-         * @param DateTimeImmutable   $since   Start date/time (UTC).
-         * @param array<string,mixed> $filters Optional filters.
-         * @return array<int,int> One value per day (or hour for today).
-         */
-        public static function daily_counts( DateTimeImmutable $since, array $filters = array() ): array {
-                return self::daily_present_counts( $since, $filters );
-        }
+		/**
+		 * Get daily counts since a date.
+		 *
+		 * @param DateTimeImmutable   $since   Start date/time (UTC).
+		 * @param array<string,mixed> $filters Optional filters.
+		 * @return array<int,int> One value per day (or hour for today).
+		 */
+	public static function daily_counts( DateTimeImmutable $since, array $filters = array() ): array {
+			return self::daily_present_counts( $since, $filters );
+	}
 
-        /**
-         * @deprecated 1.2.16 Use daily_counts() instead.
-         * @codeCoverageIgnore
-         *
-         * @param DateTimeImmutable   $since   Start date/time (UTC).
-         * @param array<string,mixed> $filters Optional filters.
-         * @return array<int,int> One value per day (or hour for today).
-         */
-        public static function getDailyCounts( DateTimeImmutable $since, array $filters = array() ): array {
-                return self::daily_counts( $since, $filters );
-        }
+		/**
+		 * @deprecated 1.2.16 Use daily_counts() instead.
+		 * @codeCoverageIgnore
+		 *
+		 * @param DateTimeImmutable   $since   Start date/time (UTC).
+		 * @param array<string,mixed> $filters Optional filters.
+		 * @return array<int,int> One value per day (or hour for today).
+		 */
+	public static function getDailyCounts( DateTimeImmutable $since, array $filters = array() ): array {
+			return self::daily_counts( $since, $filters );
+	}
 
 				/**
 				 * Get totals for the period since a date.
@@ -720,62 +720,62 @@ ORDER BY created_at ASC";
 				 * @param array<string,mixed> $filters Optional filters.
 				 * @return array{present:int,households:int,no_shows:int,in_person:int,delivery:int,voided:int}
 				 */
-        public static function period_totals( DateTimeImmutable $since, array $filters = array() ): array {
-                                        $since_str     = sanitize_text_field( $since->format( 'Y-m-d H:i:s' ) );
-                                                        $types = self::count_by_type( $since_str, $filters );
-                                                        return array(
-                                                                'present'    => self::count_present( $since_str, $filters ),
-                                                                'households' => self::count_unique_households( $since_str, $filters ),
-                                                                'no_shows'   => self::count_no_shows( $since_str, $filters ),
-                                                                'in_person'  => (int) $types['in_person'],
-                                                                'delivery'   => (int) $types['delivery'],
-                                                                'voided'     => self::count_voided( $since_str, $filters ),
-                                                        );
-        }
+	public static function period_totals( DateTimeImmutable $since, array $filters = array() ): array {
+									$since_str             = sanitize_text_field( $since->format( 'Y-m-d H:i:s' ) );
+													$types = self::count_by_type( $since_str, $filters );
+													return array(
+														'present'    => self::count_present( $since_str, $filters ),
+														'households' => self::count_unique_households( $since_str, $filters ),
+														'no_shows'   => self::count_no_shows( $since_str, $filters ),
+														'in_person'  => (int) $types['in_person'],
+														'delivery'   => (int) $types['delivery'],
+														'voided'     => self::count_voided( $since_str, $filters ),
+													);
+	}
 
-        /**
-         * Get totals for the period since a date.
-         *
-         * @param DateTimeImmutable   $since   Start date/time (UTC).
-         * @param array<string,mixed> $filters Optional filters.
-         * @return array{present:int,households:int,no_shows:int,in_person:int,delivery:int,voided:int}
-         */
-        public static function counts( DateTimeImmutable $since, array $filters = array() ): array {
-                return self::period_totals( $since, $filters );
-        }
+		/**
+		 * Get totals for the period since a date.
+		 *
+		 * @param DateTimeImmutable   $since   Start date/time (UTC).
+		 * @param array<string,mixed> $filters Optional filters.
+		 * @return array{present:int,households:int,no_shows:int,in_person:int,delivery:int,voided:int}
+		 */
+	public static function counts( DateTimeImmutable $since, array $filters = array() ): array {
+			return self::period_totals( $since, $filters );
+	}
 
-        /**
-         * @deprecated 1.2.16 Use counts() instead.
-         * @codeCoverageIgnore
-         *
-         * @param DateTimeImmutable   $since   Start date/time (UTC).
-         * @param array<string,mixed> $filters Optional filters.
-         * @return array{present:int,households:int,no_shows:int,in_person:int,delivery:int,voided:int}
-         */
-        public static function getCounts( DateTimeImmutable $since, array $filters = array() ): array {
-                return self::counts( $since, $filters );
-        }
+		/**
+		 * @deprecated 1.2.16 Use counts() instead.
+		 * @codeCoverageIgnore
+		 *
+		 * @param DateTimeImmutable   $since   Start date/time (UTC).
+		 * @param array<string,mixed> $filters Optional filters.
+		 * @return array{present:int,households:int,no_shows:int,in_person:int,delivery:int,voided:int}
+		 */
+	public static function getCounts( DateTimeImmutable $since, array $filters = array() ): array {
+			return self::counts( $since, $filters );
+	}
 
-        /**
-         * Prepare filter SQL and arguments.
-         *
-         * @param array<string,mixed> $filters Filters.
-         * @return array{0:string,1:array}
-         */
-        public static function filters_prepared( array $filters ): array {
-                return self::build_filter_clauses( $filters );
-        }
+		/**
+		 * Prepare filter SQL and arguments.
+		 *
+		 * @param array<string,mixed> $filters Filters.
+		 * @return array{0:string,1:array}
+		 */
+	public static function filters_prepared( array $filters ): array {
+			return self::build_filter_clauses( $filters );
+	}
 
-        /**
-         * @deprecated 1.2.16 Use filters_prepared() instead.
-         * @codeCoverageIgnore
-         *
-         * @param array<string,mixed> $filters Filters.
-         * @return array{0:string,1:array}
-         */
-        public static function filtersPrepared( array $filters ): array {
-                return self::filters_prepared( $filters );
-        }
+		/**
+		 * @deprecated 1.2.16 Use filters_prepared() instead.
+		 * @codeCoverageIgnore
+		 *
+		 * @param array<string,mixed> $filters Filters.
+		 * @return array{0:string,1:array}
+		 */
+	public static function filtersPrepared( array $filters ): array {
+			return self::filters_prepared( $filters );
+	}
 
 	/**
 	 * Join WHERE clauses.
@@ -783,8 +783,8 @@ ORDER BY created_at ASC";
 	 * @param array $clauses Clauses.
 	 * @return string WHERE clause.
 	 */
-        private function fbm_sql_where( array $clauses ): string {
-			return $clauses ? 'WHERE ' . implode( ' AND ', $clauses ) : '';
+	private function fbm_sql_where( array $clauses ): string {
+		return $clauses ? 'WHERE ' . implode( ' AND ', $clauses ) : '';
 	}
 
 		/**
