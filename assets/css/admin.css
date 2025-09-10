@@ -1,6 +1,6 @@
 /* phpcs:ignoreFile */
 /* FBM admin only */
- .fbm-admin{max-width:100%;--fbm-color-accent:var(--fbm-accent,#3B82F6);--fbm-color-text:#1d2327;--fbm-color-surface:#fff;--fbm-color-border:#ccd0d4;--fbm-shadow-rgb:0 0 0;--fbm-glass-alpha:var(--fbm-alpha,0.24);--fbm-glass-blur:var(--fbm-blur,14px);--fbm-card-radius:var(--fbm-radius,20px);--fbm-border-w:var(--fbm-border,1px);--fbm-elev-shadow:0 8px 32px rgba(var(--fbm-shadow-rgb)/0.10);--fbm-inset-top:inset 0 1px 0 rgba(255 255 255 / 0.50);--fbm-inset-bottom:inset 0 -1px 0 rgba(255 255 255 / 0.10);--fbm-inset-glow:inset 0 0 20px 10px rgba(255 255 255 / 0.60)}
+.fbm-admin{max-width:100%;--fbm-color-accent:var(--fbm-accent,#3B82F6);--fbm-color-text:#1d2327;--fbm-color-surface:#fff;--fbm-color-border:#ccd0d4;--fbm-shadow-rgb:0 0 0;--fbm-glass-alpha:var(--fbm-alpha,0.24);--fbm-blur-max:12px;--fbm-glass-blur:clamp(0px,var(--fbm-blur,8px),var(--fbm-blur-max));--fbm-card-radius:var(--fbm-radius,20px);--fbm-border-w:var(--fbm-border,1px);--fbm-elev-shadow:0 8px 32px rgba(var(--fbm-shadow-rgb)/0.10);--fbm-inset-top:inset 0 1px 0 rgba(255 255 255 / 0.50);--fbm-inset-bottom:inset 0 -1px 0 rgba(255 255 255 / 0.10);--fbm-inset-glow:inset 0 0 20px 10px rgba(255 255 255 / 0.60)}
 .fbm-admin .fbm-toolbar{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
 .fbm-admin .fbm-table-wrap{overflow-x:auto}
 /* Prevent full-viewport layouts inside wp-admin */

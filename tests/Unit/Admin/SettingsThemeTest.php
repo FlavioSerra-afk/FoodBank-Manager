@@ -40,7 +40,7 @@ final class SettingsThemeTest extends \BaseTestCase {
         $this->assertSame('glass', $san['admin']['style']);
         $this->assertSame('light', $san['admin']['preset']);
         $this->assertSame('#3B82F6', $san['admin']['accent']);
-        $this->assertSame(20, $san['admin']['glass']['blur']);
+        $this->assertSame(12, $san['admin']['glass']['blur']);
         $this->assertSame(24, $san['admin']['glass']['elev']);
         $this->assertSame(6, $san['admin']['glass']['radius']);
         $this->assertSame(2, $san['admin']['glass']['border']);
