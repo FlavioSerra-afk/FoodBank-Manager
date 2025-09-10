@@ -14,6 +14,7 @@ use FBM\Core\Retention;
 use FoodBankManager\Core\Install;
 use FoodBankManager\Security\Helpers;
 use FoodBankManager\Http\DiagnosticsController;
+use FoodBankManager\Mail\FailureLog;
 use FBM\Core\Jobs\JobsRepo;
 use function sanitize_key;
 use function wp_unslash;
@@ -105,7 +106,7 @@ class DiagnosticsPage {
 			$owned                = array_filter( $caps, static fn( $c ) => current_user_can( $c ) );
 			$caps_count           = count( $owned ) . ' / ' . count( $caps );
 
-			$rows = array();
+                        $rows = array();
 			global $menu;
 		$count = 0;
 		if ( is_array( $menu ) ) {
@@ -120,15 +121,16 @@ class DiagnosticsPage {
 			$dupes      = array_filter( $counts, static fn( $c ) => $c > 1 );
 			$render_ok  = empty( $dupes );
 
-						$install_scan                  = Install::getCachedScan();
-						$last_consolidation            = (array) get_option( 'fbm_last_consolidation', array() );
-						$last_activation_consolidation = (array) get_option( 'fbm_last_activation_consolidation', array() );
-                                                $smtp                          = DiagnosticsController::transport_info();
-                                                $test_to                       = Helpers::mask_email( (string) get_option( 'admin_email' ) );
-                                                $notice                        = sanitize_key( (string) filter_input( INPUT_GET, 'notice', FILTER_UNSAFE_RAW ) );
-                                                $jobs                          = method_exists( $GLOBALS['wpdb'], 'prepare' ) ? JobsRepo::list() : array();
-                                                /* @psalm-suppress UnresolvableInclude */
-                                                require FBM_PATH . 'templates/admin/diagnostics.php';
+$install_scan = Install::getCachedScan();
+$last_consolidation = (array) get_option( 'fbm_last_consolidation', array() );
+$last_activation_consolidation = (array) get_option( 'fbm_last_activation_consolidation', array() );
+$smtp = DiagnosticsController::transport_info();
+$failures = FailureLog::recent();
+$test_to = Helpers::mask_email( (string) get_option( 'admin_email' ) );
+$notice = sanitize_key( (string) filter_input( INPUT_GET, 'notice', FILTER_UNSAFE_RAW ) );
+$jobs = method_exists( $GLOBALS['wpdb'], 'prepare' ) ? JobsRepo::list() : array();
+/* @psalm-suppress UnresolvableInclude */
+require FBM_PATH . 'templates/admin/diagnostics.php';
         }
 
 		/**

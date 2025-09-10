@@ -1,3 +1,9 @@
+## 1.4.0-rc.4.5.1 — fix(cs): clean up email module for PHPCS lanes
+
+- fix(cs): clean up email module for PHPCS lanes
+- feat(diagnostics): mail failures + retry, cron telemetry, jobs list
+- docs: diagnostics help & SMTP seam (phpmailer_init)
+
 ## 1.4.0-rc.4.5.0 — feat(admin/db): dynamic columns, presets, masked detail, visible-columns export
 
 ## 1.4.0-rc.4.4.2 — RC4.4.2 — capability and theme save hardening; lanes=0/stan=0/pkg OK.

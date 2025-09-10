@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-10 (v1.4.0-rc.4.5.0 – DB UX columns)
+Docs-Revision: 2025-09-10 (v1.4.0-rc.4.5.1 – diagnostics hub)
 
 # PHPCS Ignores & Suppressed Issues Dashboard
 

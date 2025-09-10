@@ -48,6 +48,8 @@ $rows       = $rows ?? array();
           <div class="notice notice-success"><p><?php esc_html_e( 'Test email sent.', 'foodbank-manager' ); ?></p></div>
       <?php elseif ( 'error' === $notice ) : ?>
           <div class="notice notice-error"><p><?php esc_html_e( 'Action failed.', 'foodbank-manager' ); ?></p></div>
+      <?php elseif ( 'retried' === $notice ) : ?>
+          <div class="notice notice-success"><p><?php esc_html_e( 'Email retried.', 'foodbank-manager' ); ?></p></div>
       <?php endif; ?>
     <h2><?php esc_html_e( 'Crypto', 'foodbank-manager' ); ?></h2>
     <ul>
@@ -92,6 +94,38 @@ $rows       = $rows ?? array();
         <?php wp_nonce_field( 'fbm_diag_mail_test', '_fbm_nonce' ); ?>
         <p><button type="submit" class="button"><?php esc_html_e( 'Send test email', 'foodbank-manager' ); ?></button></p>
     </form>
+    <h2><?php esc_html_e( 'Recent Mail Failures', 'foodbank-manager' ); ?></h2>
+    <?php if ( ! empty( $failures ) ) : ?>
+    <table class="widefat">
+        <thead>
+            <tr>
+                <th><?php esc_html_e( 'To', 'foodbank-manager' ); ?></th>
+                <th><?php esc_html_e( 'Subject', 'foodbank-manager' ); ?></th>
+                <th><?php esc_html_e( 'Error', 'foodbank-manager' ); ?></th>
+                <th><?php esc_html_e( 'Actions', 'foodbank-manager' ); ?></th>
+            </tr>
+        </thead>
+        <tbody>
+        <?php foreach ( $failures as $i => $f ) : ?>
+            <tr>
+                <td><?php echo esc_html( is_array( $f['to'] ) ? implode( ', ', array_map( 'sanitize_email', $f['to'] ) ) : sanitize_email( (string) $f['to'] ) ); ?></td>
+                <td><?php echo esc_html( $f['subject'] ); ?></td>
+                <td><?php echo esc_html( $f['error'] ); ?></td>
+                <td>
+                    <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+                        <input type="hidden" name="action" value="fbm_diag_mail_retry" />
+                        <input type="hidden" name="index" value="<?php echo esc_attr( (string) $i ); ?>" />
+                        <?php wp_nonce_field( 'fbm_diag_mail_retry', '_fbm_nonce' ); ?>
+                        <button type="submit" class="button"><?php esc_html_e( 'Retry', 'foodbank-manager' ); ?></button>
+                    </form>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+    <?php else : ?>
+        <p><?php esc_html_e( 'No mail failures logged.', 'foodbank-manager' ); ?></p>
+    <?php endif; ?>
     <h2><?php esc_html_e( 'Environment', 'foodbank-manager' ); ?></h2>
     <ul>
         <li><?php echo esc_html( 'PHP ' . $php_version ); ?></li>
