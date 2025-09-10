@@ -24,6 +24,7 @@ Docs-Revision: 2025-09-09 (Wave UI/UX Glass — Theme Tab)
 - Permissions — Role mapping and per-user overrides.
 - Diagnostics — SMTP test, Cron health, Export Jobs list, Cap repair.
 - Design & Theme (Admin + Front) — Implemented (RC4.1): two subtabs (Admin UI, Front-end UI) with mode matrix (Glass/Basic × Light/Dark/High-Contrast), granular tokens (accent colour, blur, elevation, radius, border, surface alpha), and a "Match front-end to admin" toggle; accessibility fallbacks: High-Contrast disables blur/transparency and `prefers-reduced-transparency` forces solid surfaces.
+- Design & Theme → Menus parity (admin + front) — Done (RC4.3.2; toggles apply_admin_chrome & apply_front_menus; a11y fallbacks).
 - Shortcodes — Helper reference and examples.
 - Events (optional) — Off by default; toggle in Settings.
 

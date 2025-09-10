@@ -40,6 +40,8 @@ namespace FBM\Core {
                         'enabled' => false,
                     ],
                     'match_front_to_admin' => false,
+                    'apply_admin_chrome'   => false,
+                    'apply_front_menus'    => false,
                 ],
                 'emails' => [
                     'from_name'    => '',

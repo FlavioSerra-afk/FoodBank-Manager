@@ -49,6 +49,14 @@ Focus and hover states derive from `--fbm-color-accent`; borders and outlines us
 - Tokens emitted: `--fbm-color-accent`, `--fbm-color-text`, `--fbm-color-surface`, `--fbm-color-border`, `--fbm-shadow-rgb`, `--fbm-glass-alpha`, `--fbm-glass-blur`, `--fbm-card-radius`, `--fbm-border-w`, `--fbm-elev-shadow`, `--fbm-inset-top`, `--fbm-inset-bottom`, `--fbm-inset-glow`.
 - Fallbacks: blur is gated by `@supports (backdrop-filter: blur(1px))` ([MDN](https://developer.mozilla.org/docs/Web/CSS/backdrop-filter)). `@media (forced-colors: active)` ([MDN](https://developer.mozilla.org/docs/Web/CSS/@media/forced-colors)), `@media (prefers-reduced-transparency: reduce)` ([MDN](https://developer.mozilla.org/docs/Web/CSS/@media/prefers-reduced-transparency)), and `@media (prefers-reduced-motion: reduce)` ([MDN](https://developer.mozilla.org/docs/Web/CSS/@media/prefers-reduced-motion)) provide accessible fallbacks ([Chrome](https://developer.chrome.com/docs/web-platform/forced-colors/)).
 
+## Menus
+
+- **Admin:** `#adminmenu`, `#adminmenuback`, `#adminmenuwrap`, `#adminmenu .wp-submenu`, `#wpadminbar`, `.ab-item`.
+- **Front-end:** `nav .menu`, `.menu-item > a`, `.current-menu-item > a`, `.current-menu-ancestor > a`; theme authors can scope with `.fbm-site-nav`.
+- Tokens: `--fbm-color-accent`, `--fbm-glass-alpha`, `--fbm-glass-blur`, `--fbm-card-radius`, `--fbm-border-w`.
+- Blur gated by `@supports (backdrop-filter: blur(2px))` ([MDN](https://developer.mozilla.org/docs/Web/CSS/backdrop-filter)).
+- Fallbacks: `@media (forced-colors: active)`, `@media (prefers-reduced-transparency: reduce)`, `@media (prefers-reduced-motion: reduce)` (see [MDN](https://developer.mozilla.org/docs/Web/CSS/@media) and [Chrome](https://developer.chrome.com/docs/web-platform/forced-colors/)).
+
 ## Components
 - **KPI Tile** — `.fbm-tile.fbm-card--glass`; icon + label + masked value. Tiles are focusable; border outlines use `--fbm-color-accent`.
 - **Card** — `.fbm-card--glass`; translucent surface with `backdrop-filter: blur(var(--fbm-glass-blur))` and soft shadow `var(--fbm-elev)`.

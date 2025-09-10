@@ -11,10 +11,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 $tab   = isset( $_GET['tab'] ) ? sanitize_key( (string) $_GET['tab'] ) : 'admin';
-$theme = isset( $theme ) ? $theme : \FoodBankManager\UI\Theme::get();
-$admin = $theme['admin'];
-$front = $theme['front'];
-$match = ! empty( $theme['match_front_to_admin'] );
+$theme               = isset( $theme ) ? $theme : \FoodBankManager\UI\Theme::get();
+$admin               = $theme['admin'];
+$front               = $theme['front'];
+$match               = ! empty( $theme['match_front_to_admin'] );
+$apply_admin_chrome  = ! empty( $theme['apply_admin_chrome'] );
+$apply_front_menus   = ! empty( $theme['apply_front_menus'] );
 ?>
 <div class="wrap fbm-admin">
         <h1><?php esc_html_e( 'Design & Theme', 'foodbank-manager' ); ?></h1>
@@ -36,6 +38,10 @@ $match = ! empty( $theme['match_front_to_admin'] );
                 <?php if ( function_exists( 'settings_fields' ) ) { settings_fields( 'fbm_theme' ); } ?>
                 <?php if ( 'admin' === $tab ) : ?>
                         <table class="form-table" role="presentation">
+                                <tr>
+                                        <th><label><input type="checkbox" name="fbm_options[theme][apply_admin_chrome]" value="1" <?php checked( $apply_admin_chrome ); ?> /> <?php esc_html_e( 'Apply theme to admin menus', 'foodbank-manager' ); ?></label></th>
+                                        <td></td>
+                                </tr>
                                 <tr>
                                         <th><?php esc_html_e( 'Mode', 'foodbank-manager' ); ?></th>
                                         <td>
@@ -80,6 +86,10 @@ $match = ! empty( $theme['match_front_to_admin'] );
                         <table class="form-table" role="presentation">
                                 <tr>
                                         <th><label><input type="checkbox" name="fbm_options[theme][front][enabled]" value="1" <?php checked( $front['enabled'] ); ?> /> <?php esc_html_e( 'Apply theme to front-end shortcodes/pages', 'foodbank-manager' ); ?></label></th>
+                                        <td></td>
+                                </tr>
+                                <tr>
+                                        <th><label><input type="checkbox" name="fbm_options[theme][apply_front_menus]" value="1" <?php checked( $apply_front_menus ); ?> /> <?php esc_html_e( 'Apply theme to site menus', 'foodbank-manager' ); ?></label></th>
                                         <td></td>
                                 </tr>
                                 <tr>
