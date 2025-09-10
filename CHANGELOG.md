@@ -1,3 +1,5 @@
+## 1.4.0-rc.4.4 — RC4.4 — Admin list-tables + Public forms glass parity; a11y focus/contrast for cells/fields; lanes=0/stan=0/pkg OK.
+
 ## 1.4.0-rc.4.3.3 — RC4.3.3 — Menu focus & contrast polish, icon states, perf cap for blur; lanes=0; stan=0; pkg OK.
 
 ## 1.4.0-rc.4.3.2 — RC4.3.2 — apply Design & Theme to admin chrome (sidebar/admin-bar) and front-end menus; a11y fallbacks; tests stable; packaging OK.

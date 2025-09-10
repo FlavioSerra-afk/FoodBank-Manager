@@ -19,7 +19,7 @@ use FoodBankManager\Core\Screen;
 
 final class Plugin {
 
-    public const VERSION = '1.4.0-rc.4.3.3';
+    public const VERSION = '1.4.0-rc.4.4';
 
         private static ?Plugin $instance = null;
         private static bool $booted = false;

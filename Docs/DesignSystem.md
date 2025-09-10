@@ -64,6 +64,30 @@ Focus and hover states derive from `--fbm-color-accent`; borders and outlines us
 - `@media (prefers-reduced-motion: reduce)` removes hover/focus transitions (see [MDN](https://developer.mozilla.org/docs/Web/CSS/@media/prefers-reduced-motion)).
 - `@media (prefers-reduced-transparency: reduce)` raises surface alpha and disables blur (see [MDN](https://developer.mozilla.org/docs/Web/CSS/@media/prefers-reduced-transparency)).
 
+## Tables & Forms
+
+- Admin list tables (`.wp-list-table`) use glass rows with sticky headers.
+- Public forms (`.fbm-form`) wrap native fields in a glass container with accent focus rings.
+
+### Focus & Contrast examples
+
+```css
+.wp-list-table .row-actions a:focus-visible,
+.fbm-form input:focus-visible {
+  outline:2px solid color-mix(in oklab,var(--fbm-color-accent) 75%, black 25%);
+  outline-offset:2px;
+}
+```
+
+### Fallback matrix
+
+| Feature | Fallback |
+| --- | --- |
+| `backdrop-filter` | Opaque surface |
+| `@media (forced-colors: active)` | System `Canvas`/`CanvasText` |
+| `@media (prefers-reduced-motion: reduce)` | Transitions removed |
+| `@media (prefers-reduced-transparency: reduce)` | Blur disabled, alpha raised |
+
 ## Components
 - **KPI Tile** — `.fbm-tile.fbm-card--glass`; icon + label + masked value. Tiles are focusable; border outlines use `--fbm-color-accent`.
 - **Card** — `.fbm-card--glass`; translucent surface with `backdrop-filter: blur(var(--fbm-glass-blur))` and soft shadow `var(--fbm-elev)`.

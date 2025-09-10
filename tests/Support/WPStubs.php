@@ -485,6 +485,7 @@ if (!function_exists('fbm_test_reset_globals')) {
     $GLOBALS['fbm_test_screen_id'] = null;
     $GLOBALS['fbm_test_nonce_secret'] = 'fbm-test';
     $_GET = $_POST = $_REQUEST = [];
+    $_SERVER['REQUEST_METHOD'] = 'GET';
     $GLOBALS['__last_redirect'] = null;
   }
 }
