@@ -18,6 +18,13 @@ Defines visual tokens and component specs used across admin and front-end surfac
 
 Focus and hover states derive from `--fbm-color-accent`; borders and outlines use the blue accent to ensure visibility.
 
+## Theme hook contract
+
+- Body classes: `fbm-theme--{style}`, `fbm-preset--{preset}`, `fbm-rtl` (when RTL).
+- Wrappers: `.fbm-admin` for admin pages, `.fbm-public` for front-end blocks.
+- Tokens emitted: `--fbm-color-accent`, `--fbm-color-text`, `--fbm-color-surface`, `--fbm-color-border`, `--fbm-glass-bg`, `--fbm-glass-border`, `--fbm-glass-blur`, `--fbm-card-radius`, `--fbm-elev`.
+- Fallbacks: glass effects sit behind `@supports (backdrop-filter: blur(1px))`; a solid surface is used otherwise and `@media (forced-colors: active)` forces solid backgrounds and no blur.
+
 ## Components
 - **KPI Tile** — `.fbm-tile.fbm-card--glass`; icon + label + masked value. Tiles are focusable; border outlines use `--fbm-color-accent`.
 - **Card** — `.fbm-card--glass`; translucent surface with `backdrop-filter: blur(var(--fbm-glass-blur))` and soft shadow `var(--fbm-elev)`.

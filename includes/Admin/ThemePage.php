@@ -11,7 +11,7 @@ namespace FoodBankManager\Admin;
 
 use FoodBankManager\Core\Options;
 use FoodBankManager\UI\Theme;
-use function add_query_arg;
+use function register_setting;
 use function sanitize_key;
 use function wp_unslash;
 
@@ -20,41 +20,40 @@ use function wp_unslash;
  */
 class ThemePage {
     /**
+     * Boot settings registration.
+     */
+    public static function boot(): void {
+        register_setting( 'fbm_theme', 'fbm_settings', array( 'sanitize_callback' => array( __CLASS__, 'sanitize' ) ) );
+    }
+
+    /**
      * Route the theme page.
      */
     public static function route(): void {
         if ( ! current_user_can( 'fb_manage_theme' ) ) {
             wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ), '', array( 'response' => 403 ) );
         }
-        $method = strtoupper( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ?? '' ) ) );
-        $tab    = sanitize_key( (string) ( $_GET['tab'] ?? 'admin' ) );
+        $tab = sanitize_key( (string) ( $_GET['tab'] ?? 'admin' ) );
         if ( ! in_array( $tab, array( 'admin', 'front' ), true ) ) {
             $tab = 'admin';
-        }
-        if ( 'POST' === $method ) {
-            self::handle_post( $tab );
         }
         $theme = Theme::get();
         require FBM_PATH . 'templates/admin/theme.php';
     }
 
     /**
-     * Handle form submission.
+     * Sanitize and persist settings via Settings API.
+     *
+     * @param array<string,mixed> $input Raw input.
+     * @return array<string,mixed>
      */
-    private static function handle_post( string $tab ): void {
-        check_admin_referer( 'fbm_theme_save' );
-        if ( ! current_user_can( 'fb_manage_theme' ) ) {
-            wp_die( esc_html__( 'You do not have permission to perform this action.', 'foodbank-manager' ) );
-        }
-        $existing = Theme::get();
-        $raw      = $existing;
-        if ( isset( $_POST['fbm_theme'] ) && is_array( $_POST['fbm_theme'] ) ) {
-            $raw = array_replace_recursive( $raw, wp_unslash( $_POST['fbm_theme'] ) );
-        }
-        $sanitized = Theme::sanitize( $raw );
-        Options::update( array( 'theme' => $sanitized ) );
-        $url = add_query_arg( array( 'notice' => 'saved', 'tab' => $tab ), menu_page_url( 'fbm_theme', false ) );
-        wp_safe_redirect( esc_url_raw( $url ) );
-        exit;
+    public static function sanitize( $input ): array {
+        $input = is_array( $input ) ? $input : array();
+        $raw   = Options::all();
+        $raw   = array_replace_recursive( $raw, $input );
+        $theme = Theme::sanitize( $raw['theme'] ?? array() );
+        Options::update( array( 'theme' => $theme ) );
+        $raw['theme'] = $theme;
+        return $raw;
     }
 }

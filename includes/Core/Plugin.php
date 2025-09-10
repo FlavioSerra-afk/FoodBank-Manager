@@ -53,6 +53,7 @@ final class Plugin {
                        if ( class_exists( \FBM\Auth\Capabilities::class ) ) {
                                \FBM\Auth\Capabilities::ensure_for_admin();
                        }
+                       \FoodBankManager\Admin\ThemePage::boot();
                }
 
                \FBM\Shortcodes\Shortcodes::register();

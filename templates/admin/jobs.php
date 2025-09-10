@@ -2,11 +2,12 @@
 if (!defined('ABSPATH')) { exit; }
 $jobs = $jobs ?? array();
 ?>
+<div class="wrap fbm-admin"><div class="fbm-section">
 <h2><?php esc_html_e('Export Jobs', 'foodbank-manager'); ?></h2>
 <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" style="margin-bottom:1em;">
     <input type="hidden" name="action" value="fbm_export_job_run" />
     <?php wp_nonce_field('fbm_export_job_run'); ?>
-    <button type="submit" class="button"><?php esc_html_e('Run now', 'foodbank-manager'); ?></button>
+    <button type="submit" class="button fbm-button--glass"><?php esc_html_e('Run now', 'foodbank-manager'); ?></button>
 </form>
 <table class="widefat">
     <thead>
@@ -27,13 +28,13 @@ $jobs = $jobs ?? array();
             <td><?php echo esc_html($j['status']); ?></td>
             <td>
                 <?php if ('done' === $j['status']) : ?>
-                    <a class="button" href="<?php echo esc_url( wp_nonce_url( admin_url('admin-post.php?action=fbm_export_download&id=' . (int)$j['id']), 'fbm_export_download_' . (int)$j['id'] ) ); ?>"><?php esc_html_e('Download', 'foodbank-manager'); ?></a>
+                    <a class="button fbm-button--glass" href="<?php echo esc_url( wp_nonce_url( admin_url('admin-post.php?action=fbm_export_download&id=' . (int)$j['id']), 'fbm_export_download_' . (int)$j['id'] ) ); ?>"><?php esc_html_e('Download', 'foodbank-manager'); ?></a>
                 <?php elseif ('failed' === $j['status']) : ?>
                     <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" style="display:inline;">
                         <input type="hidden" name="action" value="fbm_export_job_retry" />
                         <input type="hidden" name="id" value="<?php echo (int) $j['id']; ?>" />
                         <?php wp_nonce_field('fbm_export_job_retry_' . (int)$j['id']); ?>
-                        <button type="submit" class="button">Retry</button>
+                        <button type="submit" class="button fbm-button--glass">Retry</button>
                     </form>
                 <?php else : ?>
                     &mdash;
@@ -42,4 +43,5 @@ $jobs = $jobs ?? array();
         </tr>
     <?php endforeach; ?>
     </tbody>
-</table>
+ </table>
+</div></div>

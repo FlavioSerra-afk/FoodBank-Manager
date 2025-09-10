@@ -13,6 +13,7 @@ use FoodBankManager\Core\Options;
 use function filter_var;
 use function sanitize_hex_color;
 use function sanitize_key;
+use function is_rtl;
 
 /**
  * Provide sanitized design tokens for admin and front-end.
@@ -258,5 +259,44 @@ final class Theme {
         }
         $int = hexdec($hex);
         return array(($int >> 16) & 255, ($int >> 8) & 255, $int & 255);
+    }
+
+    /**
+     * Append admin body classes.
+     */
+    public static function admin_body_class(string $classes): string {
+        $admin = self::admin();
+        $classes .= ' fbm-theme--' . $admin['style'];
+        $classes .= ' fbm-preset--' . $admin['preset'];
+        if (is_rtl()) {
+            $classes .= ' fbm-rtl';
+        }
+        return $classes;
+    }
+
+    /**
+     * Append front-end body classes.
+     *
+     * @param array<int,string> $classes Classes.
+     * @return array<int,string>
+     */
+    public static function body_class(array $classes): array {
+        $front = self::front();
+        $classes[] = 'fbm-theme--' . $front['style'];
+        $classes[] = 'fbm-preset--' . $front['preset'];
+        if (is_rtl()) {
+            $classes[] = 'fbm-rtl';
+        }
+        return $classes;
+    }
+
+    /**
+     * Glass fallback CSS.
+     */
+    public static function glass_support_css(): string {
+        $targets = '.fbm-card--glass,.fbm-button--glass';
+        return '@supports (backdrop-filter: blur(1px)){' . $targets . '{background:var(--fbm-glass-bg);backdrop-filter:blur(var(--fbm-glass-blur));}}'
+            . '@supports not (backdrop-filter: blur(1px)){' . $targets . '{background:var(--fbm-color-surface);}}'
+            . '@media (forced-colors: active){' . $targets . '{background:var(--fbm-color-surface)!important;backdrop-filter:none!important;}}';
     }
 }
