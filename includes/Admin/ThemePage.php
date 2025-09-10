@@ -33,7 +33,19 @@ class ThemePage {
      * Boot settings registration.
      */
     public static function boot(): void {
-        register_setting( 'fbm_theme', 'fbm_settings', array( 'sanitize_callback' => array( __CLASS__, 'sanitize' ) ) );
+        add_action(
+            'admin_init',
+            static function (): void {
+                register_setting(
+                    'fbm_theme',
+                    'fbm_settings',
+                    array(
+                        'sanitize_callback' => '\\FBM\\Core\\Options::sanitize_all',
+                        'type'              => 'array',
+                    )
+                );
+            }
+        );
         add_action( 'admin_post_fbm_theme_export', array( __CLASS__, 'export' ) );
         add_action( 'admin_post_fbm_theme_import', array( __CLASS__, 'import' ) );
     }
@@ -51,24 +63,6 @@ class ThemePage {
         }
         $theme = Theme::get();
         require FBM_PATH . 'templates/admin/theme.php';
-    }
-
-    /**
-     * Sanitize and persist settings via Settings API.
-     *
-     * @param array<string,mixed> $input Raw input.
-     * @return array<string,mixed>
-     */
-    public static function sanitize( $input ): array {
-        if ( ! is_array( $input ) ) {
-            $input = array();
-        }
-        $raw   = Options::all();
-        $raw   = array_replace_recursive( $raw, $input );
-        $theme = Theme::sanitize( $raw['theme'] ?? array() );
-        Options::update( array( 'theme' => $theme ) );
-        $raw['theme'] = $theme;
-        return $raw;
     }
 
     /**

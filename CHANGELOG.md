@@ -1,3 +1,5 @@
+## 1.4.0-rc.4.1 — Theme JSON + CSS tokens finalized; lanes green; a11y fallbacks; no DB changes.
+
 ## v1.4.0-rc.4 — Dashboard v1 (Glass)
 - feat(admin): Dashboard v1 with glass KPI tiles (registrations, check-ins Today/Week/Month, tickets scanned 7d), 6-month sparkline, and shortcuts
 - feat(ui): glass tokens (accent/blur/elevation) with high-contrast & reduced-transparency fallbacks

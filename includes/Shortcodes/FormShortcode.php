@@ -32,24 +32,24 @@ final class FormShortcode {
 	 * @param array<string,string> $atts Attributes.
 	 * @return string
 	 */
-        public static function render( array $atts = array() ): string {
-                $front = Theme::front();
-                if ( ! empty( $front['enabled'] ) ) {
-                        wp_register_style( 'fbm-public', FBM_URL . 'assets/css/public.css', array(), Plugin::VERSION );
-                        wp_add_inline_style( 'fbm-public', Theme::css_vars( $front, '.fbm-public' ) . Theme::glass_support_css() );
-                        wp_enqueue_style( 'fbm-public' );
-                        add_filter( 'body_class', array( Theme::class, 'body_class' ) );
-                }
-                $atts = shortcode_atts(
-			array(
-				'id'     => '',
-				'preset' => '',
-			),
-			$atts,
-			'fbm_form'
-		);
-		$id   = (int) $atts['id'];
-		$slug = '';
+	public static function render( array $atts = array() ): string {
+			$front = Theme::front();
+		if ( ! empty( $front['enabled'] ) ) {
+				wp_register_style( 'fbm-public', FBM_URL . 'assets/css/public.css', array(), Plugin::VERSION );
+				wp_add_inline_style( 'fbm-public', Theme::css_vars( $front, '.fbm-public' ) . Theme::glass_support_css() );
+				wp_enqueue_style( 'fbm-public' );
+				add_filter( 'body_class', array( Theme::class, 'body_class' ) );
+		}
+			$atts = shortcode_atts(
+				array(
+					'id'     => '',
+					'preset' => '',
+				),
+				$atts,
+				'fbm_form'
+			);
+		$id       = (int) $atts['id'];
+		$slug     = '';
 		if ( $id > 0 && function_exists( 'get_post_type' ) && 'fb_form' === get_post_type( $id ) ) {
 				$form = \FBM\Forms\FormRepo::get( $id );
 			if ( ! $form ) {
@@ -71,14 +71,14 @@ final class FormShortcode {
 		} catch ( \InvalidArgumentException $e ) {
 						return '';
 		}
-				$captcha_enabled = ( $schema['meta']['captcha'] ?? false ) === true;
-                ob_start();
-                echo '<div class="fbm-public"><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
-				echo '<input type="hidden" name="action" value="fbm_submit" />';
+			$captcha_enabled = ( $schema['meta']['captcha'] ?? false ) === true;
+			ob_start();
+			echo '<div class="fbm-public"><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+			echo '<input type="hidden" name="action" value="fbm_submit" />';
 		if ( '' !== $slug ) {
 				echo '<input type="hidden" name="preset" value="' . esc_attr( $slug ) . '" />';
 		}
-				wp_nonce_field( 'fbm_submit_form', '_fbm_nonce', false );
+			wp_nonce_field( 'fbm_submit_form', '_fbm_nonce', false );
 		foreach ( $schema['fields'] as $field ) {
 			self::render_field( $field );
 		}
@@ -86,8 +86,8 @@ final class FormShortcode {
 			echo '<p><label>' . esc_html__( 'Captcha', 'foodbank-manager' ) . ' <input type="text" name="captcha" required></label></p>';
 		}
 		echo '<p><button type="submit">' . esc_html__( 'Submit', 'foodbank-manager' ) . '</button></p>';
-                echo '</form></div>';
-                return (string) ob_get_clean();
+			echo '</form></div>';
+			return (string) ob_get_clean();
 	}
 
 	/**
