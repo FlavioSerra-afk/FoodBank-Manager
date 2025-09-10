@@ -25,6 +25,11 @@ final class FrontMenusThemeTest extends \BaseTestCase {
         $this->assertSame($count, count($GLOBALS['fbm_styles']));
         $classes = apply_filters('body_class', array());
         $this->assertContains('fbm-theme--basic', $classes);
+        $css = (string) file_get_contents(__DIR__ . '/../../assets/css/menus.css');
+        $this->assertStringContainsString('current-menu-item>a', $css);
+        $this->assertStringContainsString('box-shadow:0 0 0 1px', $css);
+        $this->assertStringContainsString('prefers-reduced-transparency', $css);
+        $this->assertStringContainsString('prefers-reduced-motion', $css);
     }
 
     public function test_no_css_when_disabled(): void {

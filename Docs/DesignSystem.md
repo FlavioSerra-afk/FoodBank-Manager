@@ -57,6 +57,13 @@ Focus and hover states derive from `--fbm-color-accent`; borders and outlines us
 - Blur gated by `@supports (backdrop-filter: blur(2px))` ([MDN](https://developer.mozilla.org/docs/Web/CSS/backdrop-filter)).
 - Fallbacks: `@media (forced-colors: active)`, `@media (prefers-reduced-transparency: reduce)`, `@media (prefers-reduced-motion: reduce)` (see [MDN](https://developer.mozilla.org/docs/Web/CSS/@media) and [Chrome](https://developer.chrome.com/docs/web-platform/forced-colors/)).
 
+### Focus & Contrast
+
+- `:focus-visible` rings use `color-mix(in oklab, var(--fbm-color-accent) 75%, black 25%)` with `outline-offset:2px` (see [MDN](https://developer.mozilla.org/docs/Web/CSS/:focus-visible)).
+- `@media (forced-colors: active)` swaps to system colors and shows `outline:2px solid CanvasText` (see [MDN](https://developer.mozilla.org/docs/Web/CSS/@media/forced-colors)).
+- `@media (prefers-reduced-motion: reduce)` removes hover/focus transitions (see [MDN](https://developer.mozilla.org/docs/Web/CSS/@media/prefers-reduced-motion)).
+- `@media (prefers-reduced-transparency: reduce)` raises surface alpha and disables blur (see [MDN](https://developer.mozilla.org/docs/Web/CSS/@media/prefers-reduced-transparency)).
+
 ## Components
 - **KPI Tile** — `.fbm-tile.fbm-card--glass`; icon + label + masked value. Tiles are focusable; border outlines use `--fbm-color-accent`.
 - **Card** — `.fbm-card--glass`; translucent surface with `backdrop-filter: blur(var(--fbm-glass-blur))` and soft shadow `var(--fbm-elev)`.

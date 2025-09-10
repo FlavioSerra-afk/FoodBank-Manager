@@ -131,7 +131,7 @@ final class Theme {
         $alpha = (float)($glass_raw['alpha'] ?? $defaults['glass']['alpha']);
         $alpha = 'dark' === $preset ? self::clamp($alpha, 0.18, 0.35) : self::clamp($alpha, 0.08, 0.20);
         $blur  = (int)($glass_raw['blur'] ?? $defaults['glass']['blur']);
-        $blur  = self::clamp($blur, 0, 20);
+        $blur  = self::clamp($blur, 0, 12);
         $elev  = (int)($glass_raw['elev'] ?? $defaults['glass']['elev']);
         $elev  = self::clamp($elev, 0, 24);
         $radius = (int)($glass_raw['radius'] ?? $defaults['glass']['radius']);
@@ -240,6 +240,7 @@ final class Theme {
             '--fbm-color-border'        => $base['border'],
             '--fbm-shadow-rgb'          => '0 0 0',
             '--fbm-glass-alpha'         => sprintf('%.2f', $alpha),
+            '--fbm-blur-max'            => '12px',
             '--fbm-glass-blur'          => $blur . 'px',
             '--fbm-card-radius'         => $radius . 'px',
             '--fbm-border-w'            => $border . 'px',
