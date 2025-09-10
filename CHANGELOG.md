@@ -1,3 +1,9 @@
+## 1.4.0-rc.6.3 — chore(cs): scope phpcs lanes and add repo-wide report
+
+- chore(cs): scope phpcs lanes and add repo-wide report (summary+source+json)
+- chore(cs): ensure WPCS registered; lanes script prints output reliably
+- docs(cs): note lanes policy and repo debt
+
 ## 1.4.0-rc.6.2 — fix(diagnostics): retention runner contract
 
 - fix(diagnostics): add retention runner interface and secure admin actions

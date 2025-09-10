@@ -1,10 +1,12 @@
-Docs-Revision: 2025-09-10 (v1.4.0-rc.4.5.1 – diagnostics hub)
+Docs-Revision: 2025-09-10 (v1.4.0-rc.6.3 – PHPCS lanes & repo debt)
 
 # PHPCS Ignores & Suppressed Issues Dashboard
 
 _Generated: 2025-09-06 10:25:04Z
 
 This report shows which issues are currently suppressed via `phpcs:ignore` and what would fail if annotations were disabled.
+
+The "lanes" (includes/Core, includes/UI, includes/Attendance, templates, tests) stay at 0/0 via `composer phpcs:lanes`. A repo-wide `composer phpcs:repo` report tracks historical debt elsewhere so it can be burned down deliberately.
 
 ### 2025-09-10
 - Unsuppressed prepared-SQL and placeholder warnings in `includes/Attendance/AttendanceRepo.php`.
