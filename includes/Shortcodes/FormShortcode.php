@@ -71,23 +71,24 @@ final class FormShortcode {
 		} catch ( \InvalidArgumentException $e ) {
 						return '';
 		}
-			$captcha_enabled = ( $schema['meta']['captcha'] ?? false ) === true;
-			ob_start();
-			echo '<div class="fbm-public"><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
-			echo '<input type="hidden" name="action" value="fbm_submit" />';
+		$captcha_enabled = ( $schema['meta']['captcha'] ?? false ) === true;
+		ob_start();
+		echo '<div class="fbm-public"><form class="fbm-form fbm-card fbm-card--glass" method="post" action="' .
+		esc_url( admin_url( 'admin-post.php' ) ) . '">';
+		echo '<input type="hidden" name="action" value="fbm_submit" />';
 		if ( '' !== $slug ) {
-				echo '<input type="hidden" name="preset" value="' . esc_attr( $slug ) . '" />';
+			echo '<input type="hidden" name="preset" value="' . esc_attr( $slug ) . '" />';
 		}
-			wp_nonce_field( 'fbm_submit_form', '_fbm_nonce', false );
+		wp_nonce_field( 'fbm_submit_form', '_fbm_nonce', false );
 		foreach ( $schema['fields'] as $field ) {
 			self::render_field( $field );
 		}
 		if ( $captcha_enabled ) {
 			echo '<p><label>' . esc_html__( 'Captcha', 'foodbank-manager' ) . ' <input type="text" name="captcha" required></label></p>';
 		}
-		echo '<p><button type="submit">' . esc_html__( 'Submit', 'foodbank-manager' ) . '</button></p>';
-			echo '</form></div>';
-			return (string) ob_get_clean();
+		echo '<p><button class="fbm-button--glass" type="submit">' . esc_html__( 'Submit', 'foodbank-manager' ) . '</button></p>';
+		echo '</form></div>';
+		return (string) ob_get_clean();
 	}
 
 	/**

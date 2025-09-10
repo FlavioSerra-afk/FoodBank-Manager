@@ -56,8 +56,10 @@ class Assets {
 		if ( 'toplevel_page_fbm' !== $id && ! str_starts_with( $id, 'foodbank_page_fbm_' ) ) {
 						return;
 		}
-			wp_register_style( 'fbm-admin', FBM_URL . 'assets/css/admin.css', array(), Plugin::VERSION );
-			wp_enqueue_style( 'fbm-admin' );
+		wp_register_style( 'fbm-admin', FBM_URL . 'assets/css/admin.css', array(), Plugin::VERSION );
+		wp_enqueue_style( 'fbm-admin' );
+		wp_register_style( 'fbm-admin-tables', FBM_URL . 'assets/css/admin-tables.css', array(), Plugin::VERSION );
+		wp_enqueue_style( 'fbm-admin-tables' );
 
 		if ( $screen && 'foodbank_page_fbm_attendance' === $screen->id && current_user_can( 'fb_manage_attendance' ) ) {
 			wp_enqueue_script( 'fbm-qrcode', FBM_URL . 'assets/js/qrcode.min.js', array(), Plugin::VERSION, true );

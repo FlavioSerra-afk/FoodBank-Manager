@@ -25,6 +25,8 @@ Docs-Revision: 2025-09-09 (Wave UI/UX Glass — Theme Tab)
 - Diagnostics — SMTP test, Cron health, Export Jobs list, Cap repair.
 - Design & Theme (Admin + Front) — Implemented (RC4.1): two subtabs (Admin UI, Front-end UI) with mode matrix (Glass/Basic × Light/Dark/High-Contrast), granular tokens (accent colour, blur, elevation, radius, border, surface alpha), and a "Match front-end to admin" toggle; accessibility fallbacks: High-Contrast disables blur/transparency and `prefers-reduced-transparency` forces solid surfaces.
 - Design & Theme → Menus parity — polish complete (RC4.3.3).
+- Admin Tables — glass rows + sticky header, focus parity — Done (RC4.4).
+- Public Forms glass parity — Done (RC4.4).
 - Shortcodes — Helper reference and examples.
 - Events (optional) — Off by default; toggle in Settings.
 
