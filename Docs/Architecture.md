@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-09 (Wave RC4.4.2 — Settings validation seam)
+Docs-Revision: 2025-09-10 (Wave RC4.5.0 — DB UX columns)
 # FoodBank Manager — Architecture
 
 ## Overview
@@ -30,6 +30,7 @@ A secure, privacy-first WordPress plugin for managing Food Bank applicant intake
 - `includes/Auth/{Capabilities,Roles,CapabilitiesResolver}.php`.
 - `includes/Attendance/{AttendanceRepo,Policy,TokenService}.php`.
 - `includes/Database/ApplicationsRepo.php`.
+- `includes/Database/Columns.php` – admin list column provider; selections saved in user meta `fbm_db_columns`.
 - `includes/Exports/CsvExporter.php` and `includes/Exports/DashboardCsv.php`.
 - `includes/Mail/{Logger,Templates}.php`.
 - `includes/UI/Theme.php`, `assets/css/{theme-*.css,frontend-dashboard.css}`, `includes/Security/CssSanitizer.php`.

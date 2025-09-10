@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-09 (Wave RC4.4.2 — Theme settings validation)
+Docs-Revision: 2025-09-10 (Wave RC4.5.0 — DB UX columns)
 # FoodBank Manager — Product Requirements Document (PRD)
 
 **Repo file:** `Docs/PRD-foodbank-manager.md`  
@@ -17,7 +17,7 @@ Docs-Revision: 2025-09-09 (Wave RC4.4.2 — Theme settings validation)
 - Theme JSON + Glass utilities + a11y fallbacks — Done (RC4).
 - Attendance — Hub with tabs: Today, Scan, Manual, History. (Scan menu deep‑links to `Attendance?tab=scan`.)
 - Reports — Period/daily summaries, compare mode, export links.
-- Submissions (Database) — Schema-aware table with dynamic columns, per-user column prefs, masked detail view; exports mirror visible columns (CSV/XLSX/PDF).
+- Submissions (Database) — Schema-aware table with dynamic columns, per-user column prefs, masked detail view; exports mirror visible columns (CSV/XLSX/PDF) — Done (RC4.5.0).
 - Forms — List + Builder + Live preview (CF7-like ergonomics; shortcode helper).
 - Email Templates — Templates, log, resend actions, diagnostics links.
 - Settings — General, Email defaults, API/SMTP keys placeholders, Encryption KEK status, Front-end, Admin Theme (Light/Dark/High-Contrast, RTL).

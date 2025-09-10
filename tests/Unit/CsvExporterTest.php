@@ -14,7 +14,7 @@ final class CsvExporterTest extends TestCase {
     public function testStreamListMasksSensitiveByDefault(): void {
         $rows = array(
             array(
-                'id' => 1,
+                'id' => '1',
                 'created_at' => '2025-09-01',
                 'name' => 'John',
                 'email' => 'john@example.com',
@@ -22,8 +22,16 @@ final class CsvExporterTest extends TestCase {
                 'status' => 'new',
             ),
         );
+        $cols = array(
+            'id' => 'ID',
+            'created_at' => 'Created At',
+            'name' => 'Name',
+            'email' => 'Email',
+            'postcode' => 'Postcode',
+            'status' => 'Status',
+        );
         ob_start();
-        CsvExporter::stream_list( $rows );
+        CsvExporter::stream_list( $rows, $cols );
         $output  = ob_get_clean();
 
         $this->assertStringStartsWith( "\xEF\xBB\xBF", $output );
@@ -36,7 +44,7 @@ final class CsvExporterTest extends TestCase {
     public function testStreamListUnmaskedWhenAllowed(): void {
         $rows = array(
             array(
-                'id' => 1,
+                'id' => '1',
                 'created_at' => '2025-09-01',
                 'name' => 'John',
                 'email' => 'john@example.com',
@@ -44,7 +52,7 @@ final class CsvExporterTest extends TestCase {
                 'status' => 'new',
             ),
             array(
-                'id' => 2,
+                'id' => '2',
                 'created_at' => '2025-09-02',
                 'name' => 'Jane',
                 'email' => 'jane@example.com',
@@ -52,8 +60,16 @@ final class CsvExporterTest extends TestCase {
                 'status' => 'approved',
             ),
         );
+        $cols = array(
+            'id' => 'ID',
+            'created_at' => 'Created At',
+            'name' => 'Name',
+            'email' => 'Email',
+            'postcode' => 'Postcode',
+            'status' => 'Status',
+        );
         ob_start();
-        CsvExporter::stream_list( $rows, false );
+        CsvExporter::stream_list( $rows, $cols, false );
         $output = ob_get_clean();
         $this->assertStringStartsWith( "\xEF\xBB\xBF", $output );
         $output = preg_replace( '/^\xEF\xBB\xBF/', '', $output );
@@ -64,8 +80,9 @@ final class CsvExporterTest extends TestCase {
     }
 
     public function testStreamListEmptyRowsOutputsOnlyBom(): void {
+        $cols = array( 'id' => 'ID' );
         ob_start();
-        CsvExporter::stream_list( array() );
+        CsvExporter::stream_list( array(), $cols );
         $output = ob_get_clean();
         $this->assertSame( "\xEF\xBB\xBF", $output );
     }
