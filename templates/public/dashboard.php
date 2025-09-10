@@ -37,7 +37,7 @@ if ( ! empty( $filters_attr['tags'] ?? array() ) ) {
 }
 $toggle_url = add_query_arg( $toggle_params );
 ?>
-<div class="fbm-admin">
+<div class="fbm-public">
 <div class="fbm-dashboard fbm-loading" aria-busy="true">
 <?php if ( current_user_can( 'manage_options' ) ) : ?>
 <div class="fbm-copy-shortcode"><code>[fbm_dashboard]</code></div>
@@ -59,7 +59,7 @@ $toggle_url = add_query_arg( $toggle_params );
 		<input id="fbm_policy_only" type="checkbox" name="fbm_policy_only" value="1" <?php checked( $filters_attr['policy_only'] ); ?> />
 		<label for="fbm_policy_only"><?php esc_html_e( 'Policy only', 'foodbank-manager' ); ?></label>
 	</div>
-	<button type="submit"><?php esc_html_e( 'Apply', 'foodbank-manager' ); ?></button>
+	<button type="submit" class="fbm-button--glass"><?php esc_html_e( 'Apply', 'foodbank-manager' ); ?></button>
 		<a class="fbm-download" href="<?php echo esc_url( $csv_url_attr ); ?>"><?php esc_html_e( 'Download CSV', 'foodbank-manager' ); ?></a>
 </form>
 <div class="fbm-summary" data-testid="fbm-summary" aria-live="polite">
@@ -79,9 +79,9 @@ $toggle_url = add_query_arg( $toggle_params );
 		<span data-testid="fbm-filter-preset"><?php echo esc_html( (string) ( $filters_attr['preset'] ?? '' ) ); ?></span>
 		<span data-testid="fbm-filter-tags"><?php echo esc_html( implode( ',', $filters_attr['tags'] ?? array() ) ); ?></span>
 </div>
-<div class="fbm-dashboard-grid">
+<div class="fbm-dashboard-grid fbm-grid">
 <?php if ( $has_totals ) : ?>
-<div class="fbm-card">
+<div class="fbm-card fbm-card--glass">
 <div class="fbm-card-value"><?php echo esc_html( number_format_i18n( $present ) ); ?></div>
 <div class="fbm-card-label"><?php esc_html_e( 'Total Check-ins', 'foodbank-manager' ); ?></div>
 	<?php
@@ -92,7 +92,7 @@ $toggle_url = add_query_arg( $toggle_params );
 	<?php echo esc_html( is_int( $d ) ? sprintf( '%+d%%', $d ) : '–' ); ?>
 </div>
 </div>
-<div class="fbm-card">
+<div class="fbm-card fbm-card--glass">
 <div class="fbm-card-value"><?php echo esc_html( number_format_i18n( $households ) ); ?></div>
 <div class="fbm-card-label"><?php esc_html_e( 'Unique Households Served', 'foodbank-manager' ); ?></div>
 	<?php
@@ -103,7 +103,7 @@ $toggle_url = add_query_arg( $toggle_params );
 	<?php echo esc_html( is_int( $d ) ? sprintf( '%+d%%', $d ) : '–' ); ?>
 </div>
 </div>
-<div class="fbm-card">
+<div class="fbm-card fbm-card--glass">
 <div class="fbm-card-value"><?php echo esc_html( number_format_i18n( $no_shows ) ); ?></div>
 <div class="fbm-card-label"><?php esc_html_e( 'No-shows', 'foodbank-manager' ); ?></div>
 	<?php
@@ -119,7 +119,7 @@ $toggle_url = add_query_arg( $toggle_params );
 	$cls = is_int( $d ) ? ( $d > 0 ? ' fbm-up' : ( $d < 0 ? ' fbm-down' : '' ) ) : '';
 	?>
 	<?php if ( $tot > 0 ) : ?>
-<div class="fbm-card">
+<div class="fbm-card fbm-card--glass">
 <div class="fbm-card-value"><?php echo esc_html( $p_del ); ?>% / <?php echo esc_html( $p_in ); ?>%</div>
 <div class="fbm-card-label">
 		<?php
@@ -143,7 +143,7 @@ $toggle_url = add_query_arg( $toggle_params );
 		$d   = $deltas_attr['voided'] ?? null;
 		$cls = is_int( $d ) ? ( $d > 0 ? ' fbm-up' : ( $d < 0 ? ' fbm-down' : '' ) ) : '';
 		?>
-<div class="fbm-card">
+<div class="fbm-card fbm-card--glass">
 <div class="fbm-card-value"><?php echo esc_html( number_format_i18n( $voided ) ); ?></div>
 <div class="fbm-card-label"><?php esc_html_e( 'Voided', 'foodbank-manager' ); ?></div>
 <div class="fbm-card-delta<?php echo esc_attr( $cls ); ?>">

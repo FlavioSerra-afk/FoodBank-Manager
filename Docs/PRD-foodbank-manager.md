@@ -13,6 +13,7 @@ Docs-Revision: 2025-09-09 (Wave UI/UX Glass — Theme Tab)
 ## Information Architecture (vNext)
 
 - Dashboard — 3×3 glass tile grid (In Progress — RC4).
+- Theme wiring (Admin + Front) — Done (RC4).
 - Attendance — Hub with tabs: Today, Scan, Manual, History. (Scan menu deep‑links to `Attendance?tab=scan`.)
 - Reports — Period/daily summaries, compare mode, export links.
 - Submissions (Database) — Schema-aware table with dynamic columns, per-user column prefs, masked detail view; exports mirror visible columns (CSV/XLSX/PDF).

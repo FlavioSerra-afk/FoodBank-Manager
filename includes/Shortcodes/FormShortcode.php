@@ -11,10 +11,16 @@ namespace FBM\Shortcodes;
 
 use FoodBankManager\Forms\PresetsRepo;
 use FoodBankManager\Forms\Schema;
+use FoodBankManager\UI\Theme;
+use FoodBankManager\Core\Plugin;
 use function sanitize_key;
 use function shortcode_atts;
 use function wp_nonce_field;
 use function get_post_type;
+use function wp_register_style;
+use function wp_add_inline_style;
+use function wp_enqueue_style;
+use function add_filter;
 
 /**
  * Form shortcode.
@@ -26,8 +32,15 @@ final class FormShortcode {
 	 * @param array<string,string> $atts Attributes.
 	 * @return string
 	 */
-	public static function render( array $atts = array() ): string {
-		$atts = shortcode_atts(
+        public static function render( array $atts = array() ): string {
+                $front = Theme::front();
+                if ( ! empty( $front['enabled'] ) ) {
+                        wp_register_style( 'fbm-public', false, array(), Plugin::VERSION );
+                        wp_add_inline_style( 'fbm-public', Theme::css_vars( $front, '.fbm-public' ) . Theme::glass_support_css() );
+                        wp_enqueue_style( 'fbm-public' );
+                        add_filter( 'body_class', array( Theme::class, 'body_class' ) );
+                }
+                $atts = shortcode_atts(
 			array(
 				'id'     => '',
 				'preset' => '',
@@ -59,8 +72,8 @@ final class FormShortcode {
 						return '';
 		}
 				$captcha_enabled = ( $schema['meta']['captcha'] ?? false ) === true;
-		ob_start();
-		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+                ob_start();
+                echo '<div class="fbm-public"><form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 				echo '<input type="hidden" name="action" value="fbm_submit" />';
 		if ( '' !== $slug ) {
 				echo '<input type="hidden" name="preset" value="' . esc_attr( $slug ) . '" />';
@@ -73,8 +86,8 @@ final class FormShortcode {
 			echo '<p><label>' . esc_html__( 'Captcha', 'foodbank-manager' ) . ' <input type="text" name="captcha" required></label></p>';
 		}
 		echo '<p><button type="submit">' . esc_html__( 'Submit', 'foodbank-manager' ) . '</button></p>';
-		echo '</form>';
-		return (string) ob_get_clean();
+                echo '</form></div>';
+                return (string) ob_get_clean();
 	}
 
 	/**
