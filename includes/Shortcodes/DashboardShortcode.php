@@ -52,7 +52,7 @@ final class DashboardShortcode {
 
                 $front = Theme::front();
                 if ( ! empty( $front['enabled'] ) ) {
-                        wp_register_style( 'fbm-public', false, array(), Plugin::VERSION );
+                        wp_register_style( 'fbm-public', FBM_URL . 'assets/css/public.css', array(), Plugin::VERSION );
                         wp_add_inline_style( 'fbm-public', Theme::css_vars( $front, '.fbm-public' ) . Theme::glass_support_css() );
                         wp_enqueue_style( 'fbm-public' );
                         add_filter( 'body_class', array( Theme::class, 'body_class' ) );

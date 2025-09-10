@@ -40,7 +40,7 @@ final class DashboardCompareTest extends \BaseTestCase {
     public function testCompareShowsDelta(): void {
         $this->seedTransients();
         $html = \FBM\Shortcodes\DashboardShortcode::render( array( 'compare' => '1' ) );
-        $this->assertStringContainsString( 'fbm-admin', $html );
+        $this->assertStringContainsString( 'fbm-public', $html );
         $this->assertStringContainsString( 'data-testid="fbm-delta">+5', $html );
     }
 

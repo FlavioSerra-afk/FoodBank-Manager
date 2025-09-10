@@ -15,5 +15,8 @@ final class AssetsRtlTest extends \BaseTestCase {
         $css = ob_get_clean();
         $this->assertStringContainsString('--fbm-glass-bg:#000000', $css);
         $this->assertStringContainsString('--fbm-glass-blur:0px', $css);
+        $this->assertStringContainsString('@supports (backdrop-filter: blur(1px))', $css);
+        $this->assertStringContainsString('@media (prefers-reduced-transparency: reduce)', $css);
+        $this->assertStringContainsString('@media (forced-colors: active)', $css);
     }
 }

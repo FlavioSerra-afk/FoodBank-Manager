@@ -40,6 +40,9 @@ final class DashboardShortcodeUXTest extends \BaseTestCase {
         $this->assertStringContainsString('data-testid="fbm-summary"', $html);
         $this->assertStringContainsString('data-testid="fbm-compare-toggle"', $html);
         $this->assertStringContainsString('fbm-sparkline', $html);
+        $this->assertStringContainsString('fbm-card--glass', $html);
+        $this->assertStringContainsString('fbm-button--glass', $html);
+        $this->assertStringNotContainsString('<script', $html);
     }
 
     public function testEmptyStateMessage(): void {

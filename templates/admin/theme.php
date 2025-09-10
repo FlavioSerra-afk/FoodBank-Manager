@@ -23,8 +23,17 @@ $match = ! empty( $theme['match_front_to_admin'] );
                 <a href="<?php echo esc_url( add_query_arg( 'tab', 'front', menu_page_url( 'fbm_theme', false ) ) ); ?>" class="nav-tab <?php echo 'front' === $tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Front-end UI', 'foodbank-manager' ); ?></a>
         </h2>
         <?php settings_errors( 'fbm_theme' ); ?>
+        <div class="fbm-theme-actions">
+                <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php?action=fbm_theme_import' ) ); ?>" enctype="multipart/form-data" style="display:inline-block;margin-right:1rem">
+                        <?php if ( function_exists( 'wp_nonce_field' ) ) { wp_nonce_field( 'fbm_theme_import' ); } ?>
+                        <input type="hidden" name="section" value="<?php echo esc_attr( $tab ); ?>" />
+                        <input type="file" name="theme_json" accept="application/json" />
+                        <?php submit_button( __( 'Import', 'foodbank-manager' ), 'secondary', 'submit', false ); ?>
+                </form>
+                <a class="button" href="<?php echo esc_url( function_exists( 'wp_nonce_url' ) ? wp_nonce_url( admin_url( 'admin-post.php?action=fbm_theme_export&section=' . $tab ), 'fbm_theme_export' ) : '#' ); ?>"><?php esc_html_e( 'Export', 'foodbank-manager' ); ?></a>
+        </div>
         <form method="post" action="<?php echo esc_url( admin_url( 'options.php' ) ); ?>">
-                <?php settings_fields( 'fbm_theme' ); ?>
+                <?php if ( function_exists( 'settings_fields' ) ) { settings_fields( 'fbm_theme' ); } ?>
                 <?php if ( 'admin' === $tab ) : ?>
                         <table class="form-table" role="presentation">
                                 <tr>
