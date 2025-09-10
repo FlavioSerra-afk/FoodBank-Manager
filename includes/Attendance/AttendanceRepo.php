@@ -31,21 +31,21 @@ final class AttendanceRepo {
 	 * @param int $application_id Application ID.
 	 * @return string|null UTC datetime or null when none.
 	 */
-	public static function last_present( int $application_id ): ?string {
-			global $wpdb;
-			$application_id = absint( $application_id );
+        public static function last_present( int $application_id ): ?string {
+                global $wpdb;
+                $application_id = absint( $application_id );
 
-		$t_att    = $wpdb->prefix . 'fb_attendance';
-		$prepared = call_user_func_array(
-			array( $wpdb, 'prepare' ),
-			array(
-				"SELECT attendance_at FROM {$t_att} WHERE application_id = %d AND status = 'present' ORDER BY attendance_at DESC LIMIT 1",
-				$application_id,
-			)
-		);
-		$last     = call_user_func( array( $wpdb, 'get_var' ), $prepared );
-			return $last ? $last : null;
-	}
+                $t_att = $wpdb->prefix . 'fb_attendance';
+                // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is constant.
+                $sql    = "SELECT attendance_at
+                        FROM {$t_att}
+                        WHERE application_id = %d AND status = 'present'
+                        ORDER BY attendance_at DESC
+                        LIMIT 1";
+                $last   = $wpdb->get_var( $wpdb->prepare( $sql, $application_id ) );
+
+                return $last ? $last : null;
+        }
 
 		/**
 		 * Find attendance rows for an application.
@@ -53,18 +53,19 @@ final class AttendanceRepo {
 		 * @param int $application_id Application ID.
 		 * @return array<int,array>
 		 */
-	public static function find_by_application_id( int $application_id ): array {
-		global $wpdb;
-		$application_id = absint( $application_id );
-			$t_att      = $wpdb->prefix . 'fb_attendance';
-			$sql        = "SELECT id,status,attendance_at,event_id,type,method FROM {$t_att} WHERE application_id = %d";
-			$query      = call_user_func_array( array( $wpdb, 'prepare' ), array( $sql, $application_id ) );
-			$rows       = call_user_func( array( $wpdb, 'get_results' ), $query, 'ARRAY_A' );
-			$out        = array();
-		foreach ( $rows ? $rows : array() as $row ) {
-			$out[] = array(
-				'id'            => (int) ( $row['id'] ?? 0 ),
-				'status'        => sanitize_key( (string) ( $row['status'] ?? '' ) ),
+        public static function find_by_application_id( int $application_id ): array {
+                global $wpdb;
+                $application_id = absint( $application_id );
+                $t_att          = $wpdb->prefix . 'fb_attendance';
+                // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is constant.
+                $sql            = "SELECT id, status, attendance_at, event_id, type, method
+                        FROM {$t_att} WHERE application_id = %d";
+                $rows           = $wpdb->get_results( $wpdb->prepare( $sql, $application_id ), 'ARRAY_A' );
+                $out            = array();
+                foreach ( $rows ? $rows : array() as $row ) {
+                        $out[] = array(
+                                'id'            => (int) ( $row['id'] ?? 0 ),
+                                'status'        => sanitize_key( (string) ( $row['status'] ?? '' ) ),
 				'attendance_at' => sanitize_text_field( (string) ( $row['attendance_at'] ?? '' ) ),
 				'event_id'      => (int) ( $row['event_id'] ?? 0 ),
 				'type'          => sanitize_text_field( (string) ( $row['type'] ?? '' ) ),
@@ -81,20 +82,20 @@ final class AttendanceRepo {
 		 * @param array<int> $ids IDs to anonymise.
 		 * @return int Rows affected.
 		 */
-	public static function anonymise_batch( array $ids ): int {
-			global $wpdb;
-			$ids = array_values( array_filter( array_map( 'absint', $ids ) ) );
-		if ( empty( $ids ) ) {
-				return 0;
-		}
-				return (int) $wpdb->query(
-					$wpdb->prepare(
-						'UPDATE ' . $wpdb->prefix . 'fb_attendance SET notes=NULL,source_ip=NULL,token_hash=NULL WHERE id IN ('
-								. implode( ',', array_fill( 0, count( $ids ), '%d' ) ) . ')',
-						$ids
-					)
-				);
-	}
+        public static function anonymise_batch( array $ids ): int {
+                global $wpdb;
+                $ids = array_values( array_filter( array_map( 'absint', $ids ) ) );
+                if ( empty( $ids ) ) {
+                        return 0;
+                }
+
+                $t_att       = $wpdb->prefix . 'fb_attendance';
+                $placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+                // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is constant.
+                $sql         = "UPDATE {$t_att} SET notes = NULL, source_ip = NULL, token_hash = NULL WHERE id IN ($placeholders)";
+
+                return (int) $wpdb->query( $wpdb->prepare( $sql, $ids ) );
+        }
 
 		/**
 		 * Summarize attendance across applications.
@@ -380,19 +381,16 @@ SELECT COUNT(*) FROM (
 		if ( ! $include_voided ) {
 			$clauses[] = 't.is_void = 0';
 		}
-		$self  = new self();
-		$where = $self->fbm_sql_where( $clauses );
-
-		$sql   = "
-		SELECT t.id, t.status, t.attendance_at, t.event_id, t.type, t.method,
-		   t.recorded_by_user_id, t.is_void, t.void_reason,
-		   t.void_by_user_id, t.void_at
-		FROM {$t_att} t
-		$where
-		ORDER BY t.attendance_at ASC
-		";
-		$query = call_user_func_array( array( $wpdb, 'prepare' ), array_merge( array( $sql ), $args ) );
-		$rows  = call_user_func( array( $wpdb, 'get_results' ), $query, 'ARRAY_A' );
+                $self      = new self();
+                $where_sql = $self->fbm_sql_where( $clauses );
+                // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table and WHERE clause are constants or prepared.
+                $sql       = "SELECT t.id, t.status, t.attendance_at, t.event_id, t.type, t.method,
+                       t.recorded_by_user_id, t.is_void, t.void_reason,
+                       t.void_by_user_id, t.void_at
+                FROM {$t_att} t
+                {$where_sql}
+                ORDER BY t.attendance_at ASC";
+                $rows      = $wpdb->get_results( $wpdb->prepare( $sql, $args ), 'ARRAY_A' );
 
 		if ( empty( $rows ) ) {
 			return array();
@@ -403,20 +401,15 @@ SELECT COUNT(*) FROM (
 			return array();
 		}
 
-		$placeholders = implode( ', ', array_fill( 0, count( $ids ), '%d' ) );
-		$clauses      = array( "attendance_id IN ($placeholders)" );
-		$args         = $ids;
-		$where        = $self->fbm_sql_where( $clauses );
-
-		$sql           = "
-SELECT attendance_id, user_id, note_text, created_at
+                $placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+                $note_args    = $ids;
+                // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name and placeholders are controlled.
+                $note_sql     = "SELECT attendance_id, user_id, note_text, created_at
 FROM {$t_notes}
-$where
-ORDER BY created_at ASC
-";
-		$note_prepared = call_user_func_array( array( $wpdb, 'prepare' ), array_merge( array( $sql ), $args ) );
-		$note_rows     = call_user_func( array( $wpdb, 'get_results' ), $note_prepared, 'ARRAY_A' );
-		$note_rows     = $note_rows ? $note_rows : array();
+WHERE attendance_id IN ($placeholders)
+ORDER BY created_at ASC";
+                $note_rows    = $wpdb->get_results( $wpdb->prepare( $note_sql, $note_args ), ARRAY_A );
+                $note_rows    = $note_rows ? $note_rows : array();
 
 		$grouped = array();
 		foreach ( $note_rows as $n ) {
