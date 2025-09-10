@@ -1,3 +1,5 @@
+## 1.4.0-rc.4.2 — 3×3 Dashboard glass UI, theme JSON + tokens polished, a11y fallbacks; no DB changes.
+
 ## 1.4.0-rc.4.1 — Theme JSON + CSS tokens finalized; lanes green; a11y fallbacks; no DB changes.
 
 ## v1.4.0-rc.4 — Dashboard v1 (Glass)

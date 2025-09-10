@@ -1,26 +1,25 @@
 /* phpcs:ignoreFile */
 /* FBM public shortcodes */
-.fbm-public .fbm-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-@media (max-width:1200px){.fbm-public .fbm-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:720px){.fbm-public .fbm-grid{grid-template-columns:1fr}}
-.fbm-public .fbm-card--glass,
-.fbm-public .fbm-button--glass{background:var(--fbm-glass-bg);border:1px solid var(--fbm-glass-border);border-radius:var(--fbm-card-radius);box-shadow:var(--fbm-elev);backdrop-filter:blur(var(--fbm-glass-blur));-webkit-backdrop-filter:blur(var(--fbm-glass-blur));color:var(--fbm-color-text);transition:border-color .2s,box-shadow .2s,color .2s}
-.fbm-public .fbm-card--glass:hover,
-.fbm-public .fbm-card--glass:active{border-color:var(--fbm-color-accent);box-shadow:0 0 0 1px var(--fbm-color-accent),var(--fbm-elev)}
-.fbm-public .fbm-card--glass:focus,
-.fbm-public .fbm-button--glass:focus{outline:2px solid var(--fbm-color-accent);outline-offset:2px}
+.fbm-public{--fbm-color-accent:#3b82f6;--fbm-color-text:#1f2937;--fbm-color-surface:#fff;--fbm-color-border:#e5e7eb;--fbm-glass-bg:rgba(255,255,255,.6);--fbm-glass-border:rgba(0,0,0,.1);--fbm-glass-blur:6px;--fbm-card-radius:12px;--fbm-elev:0 2px 8px rgba(0,0,0,.08)}
+.fbm-public .fbm-grid{display:grid;gap:16px;grid-template-columns:1fr}
+@media (min-width:768px){.fbm-public .fbm-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:1200px){.fbm-public .fbm-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.fbm-public .fbm-card--glass,.fbm-public .fbm-button--glass{background:var(--fbm-color-surface);border:1px solid var(--fbm-color-border);border-radius:var(--fbm-card-radius);box-shadow:var(--fbm-elev);color:var(--fbm-color-text);transition:border-color .2s,box-shadow .2s,color .2s}
+@supports ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+ .fbm-public .fbm-card--glass,
+ .fbm-public .fbm-button--glass{background:var(--fbm-glass-bg);border-color:var(--fbm-glass-border);backdrop-filter:blur(var(--fbm-glass-blur));-webkit-backdrop-filter:blur(var(--fbm-glass-blur))}
+}
+.fbm-public .fbm-card--glass:hover,.fbm-public .fbm-card--glass:active{border-color:var(--fbm-color-accent);box-shadow:0 0 0 1px var(--fbm-color-accent),var(--fbm-elev)}
+.fbm-public .fbm-card--glass:focus,.fbm-public .fbm-button--glass:focus{outline:2px solid var(--fbm-color-accent);outline-offset:2px}
 .fbm-public .fbm-button--glass{text-decoration:none;display:inline-block;padding:.5rem 1rem;text-align:center}
-.fbm-public .fbm-button--glass:hover,
-.fbm-public .fbm-button--glass:active{color:var(--fbm-color-accent);border-color:var(--fbm-color-accent)}
-@media (prefers-reduced-transparency: reduce){
- .fbm-public .fbm-card--glass,
- .fbm-public .fbm-button--glass{backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--fbm-color-surface)}
-}
-@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
- .fbm-public .fbm-card--glass,
- .fbm-public .fbm-button--glass{background:var(--fbm-color-surface);backdrop-filter:none;-webkit-backdrop-filter:none}
-}
-@media (forced-colors: active){
- .fbm-public .fbm-card--glass,
- .fbm-public .fbm-button--glass{background:Canvas;border-color:CanvasText;color:CanvasText;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
-}
+.fbm-public .fbm-button--glass:hover,.fbm-public .fbm-button--glass:active{color:var(--fbm-color-accent);border-color:var(--fbm-color-accent)}
+.fbm-public .fbm-tile{text-align:center;padding:1rem;position:relative}
+.fbm-public .fbm-delta{position:absolute;top:4px;right:4px;padding:0 .25rem;font-size:.75rem;border-radius:.25rem;background:var(--fbm-color-border);color:var(--fbm-color-text)}
+.fbm-public .fbm-delta--up{background:#e6ffea;color:#1e7e34}
+.fbm-public .fbm-delta--down{background:#ffeaea;color:#b91c1c}
+.fbm-public .fbm-skeleton{background:var(--fbm-color-border);position:relative;overflow:hidden}
+.fbm-public .fbm-skeleton::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);animation:fbm-shimmer 1.5s infinite}
+@keyframes fbm-shimmer{100%{transform:translateX(100%)}}
+@media (prefers-reduced-motion: reduce){.fbm-public .fbm-skeleton::after{animation:none}}
+@media (prefers-reduced-transparency: reduce){.fbm-public .fbm-card--glass,.fbm-public .fbm-button--glass{backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--fbm-color-surface)}}
+@media (forced-colors: active){.fbm-public .fbm-card--glass,.fbm-public .fbm-button--glass{background:Canvas;border-color:CanvasText;color:CanvasText;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}}

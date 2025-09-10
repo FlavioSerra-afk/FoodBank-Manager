@@ -59,21 +59,22 @@ final class DashboardPageTest extends \BaseTestCase {
         $this->assertStringContainsString('fbm-grid', $html);
         $this->assertSame(9, substr_count($html, 'fbm-dashboard-tile-'));
         $labels = array(
-            'Total registrations',
-            'Check-ins Today',
-            'Check-ins This Week',
-            'Check-ins This Month',
-            'Tickets scanned (7d)',
+            'Total applications',
+            'New today',
+            'Check-ins today',
+            'Check-ins this week',
+            'Check-ins this month',
             'Active events',
-            'Forms submitted (7d)',
-            'Pending export jobs',
-            'Shortcuts',
+            'Tickets issued',
+            'Tickets revoked',
+            'Mail failures (last 7d)',
         );
         foreach ($labels as $label) {
             $this->assertStringContainsString($label, $html);
         }
         $this->assertStringContainsString('fbm-card--glass', $html);
         $this->assertStringContainsString('fbm-button--glass', $html);
+        $this->assertStringContainsString('fbm-dashboard-sparkline', $html);
         $this->assertStringNotContainsString('<script', $html);
     }
 }
