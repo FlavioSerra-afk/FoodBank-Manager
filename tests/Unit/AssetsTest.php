@@ -20,9 +20,11 @@ final class AssetsTest extends \BaseTestCase {
         $this->assertStringContainsString('--fbm-card-radius', $out);
         $this->assertStringContainsString('--fbm-border-w', $out);
         $this->assertStringContainsString('--fbm-inset-top', $out);
+        $this->assertStringContainsString('--fbm-inset-glow', $out);
         $this->assertStringContainsString('@supports (backdrop-filter', $out);
         $this->assertStringContainsString('@media (prefers-reduced-transparency: reduce)', $out);
         $this->assertStringContainsString('@media (forced-colors: active)', $out);
+        $this->assertStringContainsString('@media (prefers-reduced-motion: reduce)', $out);
 
         ob_start();
         Assets::print_admin_head();

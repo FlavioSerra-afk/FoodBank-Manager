@@ -21,7 +21,7 @@ final class ThemePageTest extends \BaseTestCase {
         ThemePage::route();
         $out = ob_get_clean();
         $this->assertStringContainsString('wrap fbm-admin', $out);
-        $this->assertStringContainsString('fbm_settings[theme][admin][style]', $out);
+        $this->assertStringContainsString('fbm_options[theme][admin][style]', $out);
         $this->assertStringNotContainsString('<script', $out);
     }
 
@@ -30,7 +30,7 @@ final class ThemePageTest extends \BaseTestCase {
         ob_start();
         ThemePage::route();
         $out = ob_get_clean();
-        $this->assertStringContainsString('fbm_settings[theme][front][enabled]', $out);
-        $this->assertStringContainsString('fbm_settings[theme][match_front_to_admin]', $out);
+        $this->assertStringContainsString('fbm_options[theme][front][enabled]', $out);
+        $this->assertStringContainsString('fbm_options[theme][match_front_to_admin]', $out);
     }
 }

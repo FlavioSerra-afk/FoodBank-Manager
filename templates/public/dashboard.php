@@ -156,7 +156,7 @@ $toggle_url = add_query_arg( $toggle_params );
 <?php endif; ?>
 </div>
 <?php if ( ! empty( $series_attr ) ) : ?>
-<div class="fbm-sparkline" role="img" aria-label="
+<div class="fbm-card fbm-card--glass fbm-sparkline" role="img" aria-label="
 	<?php
 	/* translators: %d: number of days. */
 	printf( esc_attr__( 'Daily check-ins for last %d days', 'foodbank-manager' ), count( $series_attr ) );

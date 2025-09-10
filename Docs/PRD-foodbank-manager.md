@@ -12,7 +12,7 @@ Docs-Revision: 2025-09-09 (Wave UI/UX Glass — Theme Tab)
 
 ## Information Architecture (vNext)
 
-- Dashboard UI v1.1 — glass, 3×3, shortcuts (Implemented — RC4.3).
+ - Dashboard UI v1.1 — glass, 3×3, shortcuts — Done (RC4.3.1; admin/public parity).
 - Theme wiring (Admin + Front) — Done (RC4).
 - Theme JSON + Glass utilities + a11y fallbacks — Done (RC4).
 - Attendance — Hub with tabs: Today, Scan, Manual, History. (Scan menu deep‑links to `Attendance?tab=scan`.)
@@ -27,7 +27,7 @@ Docs-Revision: 2025-09-09 (Wave UI/UX Glass — Theme Tab)
 - Shortcodes — Helper reference and examples.
 - Events (optional) — Off by default; toggle in Settings.
 
-### Dashboard UI v1.1 — glass, 3×3, shortcuts — Implemented (RC4.3)
+### Dashboard UI v1.1 — glass, 3×3, shortcuts — Done (RC4.3.1; admin/public parity delivered)
 - Tiles: Total registrations; Check-ins Today; Check-ins This Week; Check-ins This Month; Tickets scanned (7d); Active events; Forms submitted (7d); Pending export jobs; Shortcuts tile.
 - Security/Perf: Masked counts; ≤300ms goal; assets gated to FBM screens.
 - Tests: Tile presence, 3×3 grid, shortcut links render.
