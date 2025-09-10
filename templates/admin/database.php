@@ -6,8 +6,6 @@
  * @since 0.1.1
  */
 
-use FoodBankManager\Security\Helpers;
-use FoodBankManager\Security\Crypto;
 use FoodBankManager\Admin\UsersMeta;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -113,128 +111,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                 <?php endforeach; ?>
                 <button class="button" type="submit"><?php esc_html_e( 'Save Columns', 'foodbank-manager' ); ?></button>
 </form>
-<?php $col_vis = array_flip( (array) $columns ); ?>
-<table class="wp-list-table widefat fixed striped">
-<thead><tr>
-<th class="column-id"<?php echo isset( $col_vis['id'] ) ? '' : ' style="display:none"'; ?>><?php esc_html_e( 'ID', 'foodbank-manager' ); ?></th>
-<th class="column-created_at"<?php echo isset( $col_vis['created_at'] ) ? '' : ' style="display:none"'; ?>>
-		<?php esc_html_e( 'Created', 'foodbank-manager' ); ?>
-</th>
-<th class="column-name"<?php echo isset( $col_vis['name'] ) ? '' : ' style="display:none"'; ?>>
-		<?php esc_html_e( 'Name', 'foodbank-manager' ); ?>
-</th>
-<th class="column-email"<?php echo isset( $col_vis['email'] ) ? '' : ' style="display:none"'; ?>>
-		<?php esc_html_e( 'Email', 'foodbank-manager' ); ?>
-</th>
-<th class="column-postcode"<?php echo isset( $col_vis['postcode'] ) ? '' : ' style="display:none"'; ?>>
-		<?php esc_html_e( 'Postcode', 'foodbank-manager' ); ?>
-</th>
-<th class="column-status"<?php echo isset( $col_vis['status'] ) ? '' : ' style="display:none"'; ?>>
-		<?php esc_html_e( 'Status', 'foodbank-manager' ); ?>
-</th>
-<th class="column-has_files"<?php echo isset( $col_vis['has_files'] ) ? '' : ' style="display:none"'; ?>>
-		<?php esc_html_e( 'Has Files', 'foodbank-manager' ); ?>
-</th>
-<th><?php esc_html_e( 'Actions', 'foodbank-manager' ); ?></th>
-</tr></thead>
-<tbody>
-<?php if ( empty( $rows ) ) : ?>
-<tr><td colspan="8"><?php esc_html_e( 'No entries found.', 'foodbank-manager' ); ?></td></tr>
-	<?php
-else :
-	foreach ( $rows as $r ) :
-		$data = json_decode( (string) ( $r['data_json'] ?? '' ), true );
-		if ( ! is_array( $data ) ) {
-			$data = array();
-		}
-		$pii      = Crypto::decryptSensitive( (string) ( $r['pii_encrypted_blob'] ?? '' ) );
-		$name     = trim( ( $data['first_name'] ?? '' ) . ' ' . ( $pii['last_name'] ?? '' ) );
-		$email    = $pii['email'] ?? '';
-		$postcode = $data['postcode'] ?? '';
-		if ( ! $unmask ) {
-			$email    = Helpers::mask_email( $email );
-			$postcode = Helpers::mask_postcode( $postcode );
-		}
-		$created = get_date_from_gmt( (string) $r['created_at'] );
-		?>
-<tr>
-<td class="column-id"<?php echo isset( $col_vis['id'] ) ? '' : ' style="display:none"'; ?>><?php echo esc_html( (string) $r['id'] ); ?></td>
-<td class="column-created_at"<?php echo isset( $col_vis['created_at'] ) ? '' : ' style="display:none"'; ?>><?php echo esc_html( $created ); ?></td>
-<td class="column-name"<?php echo isset( $col_vis['name'] ) ? '' : ' style="display:none"'; ?>><?php echo esc_html( $name ); ?></td>
-<td class="column-email"<?php echo isset( $col_vis['email'] ) ? '' : ' style="display:none"'; ?>><?php echo esc_html( $email ); ?></td>
-<td class="column-postcode"<?php echo isset( $col_vis['postcode'] ) ? '' : ' style="display:none"'; ?>><?php echo esc_html( $postcode ); ?></td>
-<td class="column-status"<?php echo isset( $col_vis['status'] ) ? '' : ' style="display:none"'; ?>><?php echo esc_html( (string) $r['status'] ); ?></td>
-<td class="column-has_files"<?php echo isset( $col_vis['has_files'] ) ? '' : ' style="display:none"'; ?>>
-		<?php
-		echo $r['has_files'] ? esc_html__( 'Yes', 'foodbank-manager' ) : esc_html__( 'No', 'foodbank-manager' );
-		?>
-</td>
-<td>
-		<?php
-		$view_url = wp_nonce_url(
-			admin_url( 'admin.php?page=fbm_database&fbm_action=view_entry&entry_id=' . $r['id'] ),
-			'fbm_entry_view'
-		);
-		?>
-		<a href="<?php echo esc_url( $view_url ); ?>"><?php esc_html_e( 'View', 'foodbank-manager' ); ?></a>
-		<?php
-// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
-		if ( current_user_can( 'fb_manage_database' ) ) :
-			?>
-				| <form method="post" style="display:inline">
-								<input type="hidden" name="fbm_action" value="export_single" />
-								<input type="hidden" name="id" value="<?php echo esc_attr( (string) $r['id'] ); ?>" />
-							<?php wp_nonce_field( 'fbm_export_single_' . $r['id'], 'fbm_nonce' ); ?>
-								<button type="submit" class="button-link"><?php esc_html_e( 'CSV', 'foodbank-manager' ); ?></button>
-				</form>
-			<?php
-endif;
-// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
-		if ( current_user_can( 'fb_manage_database' ) ) :
-			?>
-| <form method="post" style="display:inline" onsubmit="return confirm('<?php echo esc_js( __( 'Are you sure?', 'foodbank-manager' ) ); ?>');">
-								<input type="hidden" name="fbm_action" value="delete_entry" />
-								<input type="hidden" name="id" value="<?php echo esc_attr( (string) $r['id'] ); ?>" />
-							<?php wp_nonce_field( 'fbm_delete_entry_' . $r['id'], 'fbm_nonce' ); ?>
-								<button type="submit" class="button-link"><?php esc_html_e( 'Delete', 'foodbank-manager' ); ?></button>
-				</form>
-			<?php
-endif;
-		?>
-</td>
-</tr>
-		<?php
-	endforeach;
-endif;
-?>
-</tbody>
-</table>
-<?php
-$pp          = max( 1, (int) $per_page );
-$total_pages = max( 1, (int) ceil( $total / $pp ) );
-$base_url    = remove_query_arg( 'paged' );
-?>
-<div class="tablenav">
-	<div class="tablenav-pages">
-	<?php if ( $page > 1 ) : ?>
-		<a class="prev-page" href="<?php echo esc_url( add_query_arg( 'paged', $page - 1, $base_url ) ); ?>">&laquo;</a>
-	<?php endif; ?>
-	<span class="paging-input"><?php echo esc_html( $page ) . ' / ' . esc_html( $total_pages ); ?></span>
-	<?php if ( $page < $total_pages ) : ?>
-		<a class="next-page" href="<?php echo esc_url( add_query_arg( 'paged', $page + 1, $base_url ) ); ?>">&raquo;</a>
-	<?php endif; ?>
-	</div>
-	<div class="alignleft actions">
-	<form method="get" id="fbm-perpage-form">
-			<input type="hidden" name="page" value="fbm_database" />
-		<select name="per_page" onchange="document.getElementById('fbm-perpage-form').submit();">
-		<option value="25" <?php selected( $per_page, 25 ); ?>>25</option>
-		<option value="50" <?php selected( $per_page, 50 ); ?>>50</option>
-		<option value="100" <?php selected( $per_page, 100 ); ?>>100</option>
-		</select>
-	</form>
-	</div>
-</div>
+        <?php if ( isset( $table ) ) { $table->display(); } ?>
 <?php if ( current_user_can( 'fb_manage_database' ) ) : // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability. ?>
 <form method="post">
 		<input type="hidden" name="fbm_action" value="export_entries" />
