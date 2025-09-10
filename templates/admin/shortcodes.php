@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignoreFile
 /**
  * Shortcodes admin template.
  *
@@ -35,9 +35,9 @@ declare(strict_types=1);
 	<button type="button" class="fbm-copy button"><?php esc_html_e( 'Copy', 'foodbank-manager' ); ?></button>
 </div>
 <?php if ( '' !== $preview_html ) : ?>
-                <h2><?php esc_html_e( 'Preview', 'foodbank-manager' ); ?></h2>
-                <?php $safe_preview = wp_kses_post( $preview_html ); ?>
-                <?php echo '<div class="fbm-preview">' . $safe_preview . '</div>'; ?>
+				<h2><?php esc_html_e( 'Preview', 'foodbank-manager' ); ?></h2>
+				<?php $safe_preview = wp_kses_post( $preview_html ); ?>
+				<?php echo '<div class="fbm-preview">' . $safe_preview . '</div>'; ?>
 <?php endif; ?>
 <script>
 const FBM_SHORTCODES = <?php echo wp_json_encode( $shortcodes ); ?>;

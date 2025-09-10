@@ -10,14 +10,14 @@
 <h1><?php echo esc_html__( 'Email Templates', 'foodbank-manager' ); ?></h1>
 <ul>
 <?php foreach ( $templates as $slug => $tpl ) : ?>
-    <li><a href="<?php echo esc_url( add_query_arg( 'slug', $slug ) ); ?>"><?php echo esc_html( $slug ); ?></a></li>
+	<li><a href="<?php echo esc_url( add_query_arg( 'slug', $slug ) ); ?>"><?php echo esc_html( $slug ); ?></a></li>
 <?php endforeach; ?>
 </ul>
 <?php
 if ( $current ) {
-    $tpl = $templates[ $current ] ?? array();
-    $slug = $current;
-    require FBM_PATH . 'templates/admin/email-templates-edit.php';
+	$tpl  = $templates[ $current ] ?? array();
+	$slug = $current;
+	require FBM_PATH . 'templates/admin/email-templates-edit.php';
 }
 ?>
 </div>

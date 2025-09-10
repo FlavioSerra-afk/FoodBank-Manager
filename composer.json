@@ -46,10 +46,10 @@
   },
   "scripts": {
     "lint": "find . -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l",
-    "phpcs": "php -d memory_limit=512M vendor/bin/phpcs --standard=phpcs.xml --report=summary --report-width=120",
-    "phpcs:lanes": "mkdir -p build && php -d memory_limit=512M vendor/bin/phpcs --standard=phpcs.xml --report=summary --report-full=stdout --report=json --report-file=build/phpcs-lanes.json includes/Core includes/UI includes/Attendance templates tests",
-    "phpcs:repo": "mkdir -p build && php -d memory_limit=512M vendor/bin/phpcs --standard=phpcs.xml --report=summary --report=source --report=json --report-file=build/phpcs-repo.json --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit 1 .",
-    "phpcbf": "php -d memory_limit=512M vendor/bin/phpcbf --standard=phpcs.xml",
+    "phpcs": "vendor/bin/phpcs --standard=phpcs.xml --report=summary --report-width=120",
+    "phpcs:lanes": "vendor/bin/phpcs --standard=phpcs.xml --report=summary --report-full=stdout --report=json --report-file=build/phpcs-lanes.json includes/Core includes/UI includes/Attendance templates tests",
+    "phpcs:repo": "vendor/bin/phpcs --standard=phpcs.xml --report=summary --report=source --report=json --report-file=build/phpcs-repo.json . --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit 1",
+    "phpcbf": "vendor/bin/phpcbf --standard=phpcs.xml",
     "phpstan": "phpstan analyse -c phpstan.neon --no-progress --memory-limit=1G",
     "phpstan:fast": "phpstan analyse -c phpstan.neon --no-progress --level=5 --memory-limit=1G",
     "phpstan:debug": "phpstan analyse -c phpstan.neon --debug --no-progress --memory-limit=1G",
@@ -76,5 +76,5 @@
     },
     "sort-packages": true
   },
-  "version": "1.4.0-rc.6.3"
+  "version": "1.4.0-rc.6.6"
 }

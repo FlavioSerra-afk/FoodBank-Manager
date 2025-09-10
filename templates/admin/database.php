@@ -100,31 +100,37 @@ if ( ! defined( 'ABSPATH' ) ) {
 <form method="post" class="fbm-columns" style="margin:10px 0;">
 		<input type="hidden" name="fbm_action" value="db_columns_save" />
 		<?php wp_nonce_field( 'fbm_database_db_columns_save' ); ?>
-                <?php foreach ( $column_defs as $col_id => $def ) : $label = $def['label']; ?>
-                                <label class="fbm-column-toggle">
-                                                                                                <input type="checkbox"
-                                                                                                                name="columns[]"
-                                                                                                                value="<?php echo esc_attr( $col_id ); ?>"
-                                                                                                                <?php checked( in_array( $col_id, (array) $columns, true ) ); ?>
-                                                                                                />
-                                                <?php echo esc_html( $label ); ?>
-                                </label>
-                <?php endforeach; ?>
-                <button class="button" type="submit"><?php esc_html_e( 'Save Columns', 'foodbank-manager' ); ?></button>
+				<?php
+				foreach ( $column_defs as $col_id => $def ) :
+					$label = $def['label'];
+					?>
+								<label class="fbm-column-toggle">
+																								<input type="checkbox"
+																												name="columns[]"
+																												value="<?php echo esc_attr( $col_id ); ?>"
+																												<?php checked( in_array( $col_id, (array) $columns, true ) ); ?>
+																								/>
+												<?php echo esc_html( $label ); ?>
+								</label>
+				<?php endforeach; ?>
+				<button class="button" type="submit"><?php esc_html_e( 'Save Columns', 'foodbank-manager' ); ?></button>
 </form>
-        <?php if ( isset( $table ) ) { $table->display(); } ?>
+		<?php
+		if ( isset( $table ) ) {
+			$table->display(); }
+		?>
 <?php if ( current_user_can( 'fb_manage_database' ) ) : // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability. ?>
 <form method="post">
-                <input type="hidden" name="fbm_action" value="export_entries" />
-                <?php wp_nonce_field( 'fbm_export_entries', 'fbm_nonce' ); ?>
-                <?php if ( current_user_can( 'fb_view_sensitive' ) ) : // phpcs:ignore WordPress.WP.Capabilities.Unknown ?>
-                <label>
-                        <input type="checkbox" name="unmask" value="1" />
-                        <?php esc_html_e( 'Unmask sensitive fields', 'foodbank-manager' ); ?>
-                </label>
-                <?php wp_nonce_field( 'fbm_export_unmask', '_wpnonce_unmask' ); ?>
-                <?php endif; ?>
-                <button class="button" type="submit"><?php esc_html_e( 'Export CSV', 'foodbank-manager' ); ?></button>
+				<input type="hidden" name="fbm_action" value="export_entries" />
+				<?php wp_nonce_field( 'fbm_export_entries', 'fbm_nonce' ); ?>
+				<?php if ( current_user_can( 'fb_view_sensitive' ) ) : // phpcs:ignore WordPress.WP.Capabilities.Unknown ?>
+				<label>
+						<input type="checkbox" name="unmask" value="1" />
+						<?php esc_html_e( 'Unmask sensitive fields', 'foodbank-manager' ); ?>
+				</label>
+					<?php wp_nonce_field( 'fbm_export_unmask', '_wpnonce_unmask' ); ?>
+				<?php endif; ?>
+				<button class="button" type="submit"><?php esc_html_e( 'Export CSV', 'foodbank-manager' ); ?></button>
 </form>
 <?php endif; ?>
 <script>
