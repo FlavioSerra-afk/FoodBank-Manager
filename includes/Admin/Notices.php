@@ -164,7 +164,7 @@ final class Notices {
         if (!isset($_GET['fbm_repair_caps'])) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- verified below
             return;
         }
-        if (! current_user_can('administrator')) {
+        if (! current_user_can('manage_options')) {
             return;
         }
         if (! wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['_wpnonce'] ?? '')), 'fbm_repair_caps')) {

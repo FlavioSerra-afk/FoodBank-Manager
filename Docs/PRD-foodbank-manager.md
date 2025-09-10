@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-09 (Wave UI/UX Glass — Theme Tab)
+Docs-Revision: 2025-09-09 (Wave RC4.4.2 — Theme settings validation)
 # FoodBank Manager — Product Requirements Document (PRD)
 
 **Repo file:** `Docs/PRD-foodbank-manager.md`  

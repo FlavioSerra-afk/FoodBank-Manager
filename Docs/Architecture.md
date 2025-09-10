@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-09 (Wave UI/UX Glass + Dashboard First)
+Docs-Revision: 2025-09-09 (Wave RC4.4.2 — Settings validation seam)
 # FoodBank Manager — Architecture
 
 ## Overview
@@ -20,7 +20,7 @@ A secure, privacy-first WordPress plugin for managing Food Bank applicant intake
 ## Directory layout (key paths)
 - `foodbank-manager.php` – bootstrap, constants: `FBM_FILE`, `FBM_PATH`, `FBM_URL`, `FBM_VERSION`.
 - `includes/Core/Plugin.php` (boot), `includes/Db/Migrations.php`.
-- `includes/Core/Options.php` – typed options stored in `fbm_settings`, validated against a schema (unknown keys ignored, fields limited to 1KB).
+ - `includes/Core/Options.php` – typed options stored in `fbm_settings`, validated against a schema and Settings API sanitizer with a 64 KB theme clamp (unknown keys ignored, fields limited to 1 KB).
 - `includes/Forms/Presets.php` – built-in and custom form presets with strict validation.
 - `includes/Admin/*Page.php`, `templates/admin/*`.
 - `includes/Shortcodes/{Form,AttendanceManager,Dashboard}.php`, `templates/public/*`.

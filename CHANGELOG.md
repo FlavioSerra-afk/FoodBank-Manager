@@ -1,3 +1,5 @@
+## 1.4.0-rc.4.4.2 — RC4.4.2 — capability and theme save hardening; lanes=0/stan=0/pkg OK.
+
 ## 1.4.0-rc.4.4.1 — RC4.4.1 — Forms a11y & validation UX, menu glass parity; lanes=0/stan=0/pkg OK.
 
 ## 1.4.0-rc.4.4 — RC4.4 — Admin list-tables + Public forms glass parity; a11y focus/contrast for cells/fields; lanes=0/stan=0/pkg OK.
