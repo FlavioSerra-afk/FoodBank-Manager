@@ -199,6 +199,11 @@ if (!function_exists('remove_query_arg')) {
     return $scheme.$host.$port.$path.$q.$frag;
   }
 }
+
+if (!function_exists('is_admin')) {
+  function is_admin(){ return (bool)($GLOBALS['fbm_is_admin'] ?? false); }
+}
+
 if (!function_exists('admin_url')) { function admin_url($p=''){ return 'https://example.test/wp-admin/'.ltrim($p,'/'); } }
 if (!isset($GLOBALS['fbm_current_action'])) $GLOBALS['fbm_current_action'] = 'admin_menu';
 if (!function_exists('current_action')) { function current_action(){ return $GLOBALS['fbm_current_action']; } }

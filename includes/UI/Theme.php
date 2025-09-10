@@ -84,6 +84,12 @@ final class Theme {
         $match = filter_var($raw['match_front_to_admin'] ?? $defaults['match_front_to_admin'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
         $match = (bool) ( null === $match ? $defaults['match_front_to_admin'] : $match );
 
+        $admin_chrome = filter_var($raw['apply_admin_chrome'] ?? $defaults['apply_admin_chrome'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
+        $admin_chrome = null === $admin_chrome ? $defaults['apply_admin_chrome'] : (bool) $admin_chrome;
+
+        $front_menus = filter_var($raw['apply_front_menus'] ?? $defaults['apply_front_menus'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
+        $front_menus = null === $front_menus ? $defaults['apply_front_menus'] : (bool) $front_menus;
+
         if ( $match ) {
             $front = array_merge($front, $admin);
             $front['enabled'] = $front['enabled'];
@@ -93,6 +99,8 @@ final class Theme {
             'admin'                 => $admin,
             'front'                 => $front,
             'match_front_to_admin'  => $match,
+            'apply_admin_chrome'    => $admin_chrome,
+            'apply_front_menus'     => $front_menus,
         );
     }
 
