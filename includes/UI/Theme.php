@@ -280,6 +280,7 @@ final class Theme {
         return '@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)){' . $targets . '{backdrop-filter:blur(var(--fbm-glass-blur));-webkit-backdrop-filter:blur(var(--fbm-glass-blur));}}'
             . '@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))){' . $targets . '{background:var(--fbm-color-surface,#fff);}}'
             . '@media (prefers-reduced-transparency: reduce){' . $targets . '{background:var(--fbm-color-surface,#fff);}}'
-            . '@media (forced-colors: active){' . $targets . '{background:Canvas;color:CanvasText;border-color:ButtonText;box-shadow:none;}}';
+            . '@media (forced-colors: active){' . $targets . '{background:Canvas;color:CanvasText;border-color:ButtonText;box-shadow:none;}}'
+            . '@media (prefers-reduced-motion: reduce){' . $targets . '{transition:none;}}';
     }
 }

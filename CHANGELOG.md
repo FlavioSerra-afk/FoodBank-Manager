@@ -1,3 +1,5 @@
+## 1.4.0-rc.4.3.1 — RC4.3.1 — glass fidelity (layered spec), a11y fallbacks, grid rhythm, focus rings; tests stable.
+
 ## 1.4.0-rc.4.3 — RC4.3 — real glass UI (layered cards & buttons), accessible fallbacks, dashboard 3×3 polish. No DB changes.
 
 ## 1.4.0-rc.4.2 — 3×3 Dashboard glass UI, theme JSON + tokens polished, a11y fallbacks; no DB changes.

@@ -38,10 +38,11 @@ class ThemePage {
             static function (): void {
                 register_setting(
                     'fbm_theme',
-                    'fbm_settings',
+                    'fbm_options',
                     array(
                         'sanitize_callback' => '\\FBM\\Core\\Options::sanitize_all',
                         'type'              => 'array',
+                        'capability'        => 'fb_manage_theme',
                     )
                 );
             }
