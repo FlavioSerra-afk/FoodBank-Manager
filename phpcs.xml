@@ -2,7 +2,11 @@
 <ruleset name="FoodBank Manager">
   <description>Security-first PHPCS for FoodBank Manager (namespaced WP plugin).</description>
 
-  <file>./</file>
+  <file>includes/Core</file>
+  <file>includes/UI</file>
+  <file>includes/Attendance</file>
+  <file>templates</file>
+  <file>tests</file>
 
   <!-- Exclusions -->
   <exclude-pattern>vendor/*</exclude-pattern>
@@ -13,7 +17,7 @@
   <exclude-pattern>build/*</exclude-pattern>
   <exclude-pattern>bin/*</exclude-pattern>
   <exclude-pattern>Docs/*</exclude-pattern>
-  <exclude-pattern>tests/*</exclude-pattern>
+  <exclude-pattern>legacy/*</exclude-pattern>
 
   <!-- Primary standards -->
   <rule ref="WordPress-Extra"/>

@@ -1,10 +1,13 @@
-Docs-Revision: 2025-09-06 (v1.2.12 – no new suppressions)
+Docs-Revision: 2025-09-10 (v1.4.0-rc.4.4.3 – AttendanceRepo placeholder fixes)
 
 # PHPCS Ignores & Suppressed Issues Dashboard
 
 _Generated: 2025-09-06 10:25:04Z
 
 This report shows which issues are currently suppressed via `phpcs:ignore` and what would fail if annotations were disabled.
+
+### 2025-09-10
+- Unsuppressed prepared-SQL and placeholder warnings in `includes/Attendance/AttendanceRepo.php`.
 
 ## Snapshot
 
