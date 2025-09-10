@@ -490,6 +490,19 @@ if (!function_exists('fbm_test_reset_globals')) {
   }
 }
 
+if ( ! class_exists( 'WP_List_Table', false ) ) {
+    abstract class WP_List_Table {
+        /** @var array<int,array<string,mixed>> */
+        public $items = [];
+        /** @var array{0:array,1:array,2:array} */
+        protected $_column_headers = [ [], [], [] ];
+        public function __construct( array $args = [] ) {}
+        /** @param array<string,int> $args */
+        protected function set_pagination_args( array $args ): void {}
+        public function display(): void {}
+    }
+}
+
 }
 
 namespace FoodBankManager\Admin {

@@ -127,26 +127,23 @@ final class DatabasePage {
 		 *
 		 * @return void
 		 */
-	private static function render_list( array $filters, array $presets, string $preset_name, array $columns ): void {
-			$data     = ApplicationsRepo::list( $filters );
-			$rows     = $data['rows'];
-			$total    = $data['total'];
-			$page     = $filters['page'];
-			$per_page = $filters['per_page'];
+        private static function render_list( array $filters, array $presets, string $preset_name, array $columns ): void {
+                $can_sensitive = current_user_can( 'fb_view_sensitive' );
+                $unmask        = false;
+                $query_string  = isset( $_SERVER['QUERY_STRING'] ) ? sanitize_text_field( wp_unslash( (string) $_SERVER['QUERY_STRING'] ) ) : '';
+                parse_str( $query_string, $query_vars );
+                if ( $can_sensitive && isset( $query_vars['unmask'] ) ) {
+                        $nonce  = isset( $query_vars['_wpnonce'] ) ? sanitize_text_field( $query_vars['_wpnonce'] ) : '';
+                        $unmask = $nonce && wp_verify_nonce( $nonce, 'fbm_db_unmask' );
+                }
 
-		$can_sensitive = current_user_can( 'fb_view_sensitive' );
-		$unmask        = false;
-		$query_string  = isset( $_SERVER['QUERY_STRING'] ) ? sanitize_text_field( wp_unslash( (string) $_SERVER['QUERY_STRING'] ) ) : '';
-		parse_str( $query_string, $query_vars );
-		if ( $can_sensitive && isset( $query_vars['unmask'] ) ) {
-			$nonce  = isset( $query_vars['_wpnonce'] ) ? sanitize_text_field( $query_vars['_wpnonce'] ) : '';
-			$unmask = $nonce && wp_verify_nonce( $nonce, 'fbm_db_unmask' );
-		}
+                $table = new DatabaseTable( $filters, $columns, $unmask );
+                $table->prepare_items();
 
-				$current_preset = $preset_name;
-				$columns        = $columns;
-				require FBM_PATH . 'templates/admin/database.php';
-	}
+                $current_preset = $preset_name;
+                $columns        = $columns;
+                require FBM_PATH . 'templates/admin/database.php';
+        }
 
 		/**
 		 * Save a filter preset.
