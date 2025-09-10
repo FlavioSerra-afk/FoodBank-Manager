@@ -1,4 +1,4 @@
-## 1.4.0-rc.4.5.1 — fix(cs): clean up email module for PHPCS lanes
+## 1.4.0-rc.6.0 — fix(cs): clean up email module for PHPCS lanes
 
 - fix(cs): clean up email module for PHPCS lanes
 - feat(diagnostics): mail failures + retry, cron telemetry, jobs list
