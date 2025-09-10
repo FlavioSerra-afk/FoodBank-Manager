@@ -2,6 +2,10 @@ TL;DR: Unit=0/0, PHPStan=0, PHPCS(Lanes)=0/0, Packaging=PASS
 
 # FoodBank Manager — Errors-First Health Report (current repo)
 
+## RC4.4.1
+- Forms accessibility & validation UX (aria-invalid, summaries, autocomplete)
+- Menu glass parity toggles with forced-colors and reduced-motion fallbacks
+
 ## Wave UI/UX Glass + Dashboard First
 - Dashboard v1 with glass KPI tiles, sparkline, and shortcut buttons. *(screenshot pending)*
 - Glass design tokens with high-contrast and reduced-transparency fallbacks. *(screenshot pending)*

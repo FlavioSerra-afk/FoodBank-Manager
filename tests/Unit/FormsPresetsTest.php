@@ -29,6 +29,8 @@ namespace {
 use FoodBankManager\Forms\Presets;
 use FoodBankManager\Admin\FormsPage;
 use FoodBankManager\Shortcodes\Form;
+use FBM\Shortcodes\FormShortcode;
+use FoodBankManager\Forms\PresetsRepo;
 
 final class FormsPresetsTest extends \BaseTestCase {
     protected function setUp(): void {
@@ -75,6 +77,20 @@ final class FormsPresetsTest extends \BaseTestCase {
     public function testShortcodePresetFallback(): void {
         $html = Form::render( array( 'preset' => 'nope' ) );
         $this->assertStringContainsString( 'name="name"', $html );
+    }
+
+    public function testAutocompleteTokensPresent(): void {
+        $schema = array(
+            'meta' => array('name' => 'Auto', 'slug' => 'auto_form', 'captcha' => false),
+            'fields' => array(
+                array('id' => 'first_name', 'type' => 'text', 'label' => 'First', 'required' => true),
+                array('id' => 'email', 'type' => 'email', 'label' => 'Email', 'required' => true),
+            ),
+        );
+        PresetsRepo::upsert($schema);
+        $html = FormShortcode::render(array('preset' => 'auto_form'));
+        $this->assertStringContainsString('autocomplete="given-name"', $html);
+        $this->assertStringContainsString('autocomplete="email"', $html);
     }
 }
 }
