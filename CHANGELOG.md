@@ -1,3 +1,8 @@
+## 1.4.0-rc.7.7 — feat(admin): permissions UI and auto-tag workflow
+
+- feat(admin): add Permissions Manager roles matrix, per-user overrides, reset and audit log
+- chore(ci): tag-on-merge workflow triggers release on tag push
+
 ## 1.4.0-rc.7.6 — feat(core): centralize capabilities
 
 - feat(core): add canonical capabilities list for reuse across UI and tests

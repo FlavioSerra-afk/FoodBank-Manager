@@ -20,7 +20,7 @@ use FoodBankManager\Core\Screen;
 
 final class Plugin {
 
-    public const VERSION = '1.4.0-rc.7.6';
+    public const VERSION = '1.4.0-rc.7.7';
 
         private static ?Plugin $instance = null;
         private static bool $booted = false;
@@ -55,6 +55,7 @@ final class Plugin {
                                \FBM\Auth\Capabilities::ensure_for_admin();
                        }
                        \FoodBankManager\Admin\ThemePage::boot();
+                       \FoodBankManager\Admin\PermissionsPage::boot();
                }
 
                \FBM\Shortcodes\Shortcodes::register();
