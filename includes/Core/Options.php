@@ -53,6 +53,17 @@ namespace FBM\Core {
                     'from_address' => '',
                     'reply_to'     => '',
                 ],
+                'pdf' => [
+                    'brand' => [
+                        'logo'         => 0,
+                        'org_name'     => '',
+                        'org_address'  => '',
+                        'primary_color'=> '#000000',
+                        'footer_text'  => '',
+                        'page_size'    => 'A4',
+                        'orientation'  => 'portrait',
+                    ],
+                ],
             ];
         }
 

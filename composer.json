@@ -6,7 +6,8 @@
   "require": {
     "php": "^8.1",
     "endroid/qr-code": "^4",
-    "league/csv": "^9"
+    "league/csv": "^9",
+    "mpdf/mpdf": "^8"
   },
   "autoload": {
     "psr-4": {
@@ -40,7 +41,6 @@
   },
   "suggest": {
     "woocommerce/action-scheduler": "Background jobs for exports, email retries, key rotation",
-    "dompdf/dompdf": "PDF generation for receipts/exports",
     "endroid/qr-code": "QR code generation for attendance tokens",
     "league/csv": "Robust CSV writer for exports"
   },
@@ -76,5 +76,5 @@
     },
     "sort-packages": true
   },
-  "version": "1.4.0-rc.6.7"
+  "version": "1.4.0-rc.7.0"
 }

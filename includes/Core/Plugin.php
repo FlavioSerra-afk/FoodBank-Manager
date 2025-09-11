@@ -10,6 +10,7 @@ use FoodBankManager\Auth\Roles;
 use FoodBankManager\Http\FormSubmitController;
 use FoodBankManager\Http\DashboardExportController;
 use FoodBankManager\Http\DiagnosticsController;
+use FoodBankManager\Admin\DiagnosticsPdf;
 use FBM\Http\ExportJobsController;
 use FBM\Core\Jobs\JobsWorker;
 use FoodBankManager\Core\Options;
@@ -19,7 +20,7 @@ use FoodBankManager\Core\Screen;
 
 final class Plugin {
 
-    public const VERSION = '1.4.0-rc.6.7';
+    public const VERSION = '1.4.0-rc.7.0';
 
         private static ?Plugin $instance = null;
         private static bool $booted = false;
@@ -80,6 +81,7 @@ final class Plugin {
                 add_action( 'admin_post_fbm_dash_export', array( DashboardExportController::class, 'handle' ) );
                 add_action( 'admin_post_fbm_diag_mail_test', array( DiagnosticsController::class, 'mail_test' ) );
                 add_action( 'admin_post_fbm_diag_mail_retry', array( DiagnosticsController::class, 'mail_retry' ) );
+                add_action( 'admin_post_' . DiagnosticsPdf::ACTION_PREVIEW, array( DiagnosticsPdf::class, 'preview' ) );
                 add_action( 'admin_post_fbm_export_queue', array( ExportJobsController::class, 'queue' ) );
                 add_action( 'admin_post_fbm_export_download', array( ExportJobsController::class, 'download' ) );
                 add_action( 'admin_post_fbm_export_job_run', array( ExportJobsController::class, 'run' ) );
