@@ -12,6 +12,7 @@ namespace FoodBankManager\Admin;
 use FBM\Auth\Capabilities;
 use FoodBankManager\Diagnostics\RetentionRunnerInterface;
 use FoodBankManager\Diagnostics\RetentionRunner;
+use FoodBankManager\Admin\DiagnosticsPrivacy;
 use FBM\Core\Retention;
 use FoodBankManager\Core\Install;
 use FoodBankManager\Security\Helpers;
@@ -120,6 +121,7 @@ class DiagnosticsPage {
 		}
 
 			self::handle_actions();
+                        DiagnosticsPrivacy::handle_actions();
 
 			$notices_render_count = Notices::getRenderCount();
 			$boot_ts              = (int) get_transient( 'fbm_boot_ok' );

@@ -19,7 +19,7 @@ use FoodBankManager\Core\Screen;
 
 final class Plugin {
 
-    public const VERSION = '1.4.0-rc.6.6';
+    public const VERSION = '1.4.0-rc.6.7';
 
         private static ?Plugin $instance = null;
         private static bool $booted = false;
@@ -84,6 +84,21 @@ final class Plugin {
                 add_action( 'admin_post_fbm_export_download', array( ExportJobsController::class, 'download' ) );
                 add_action( 'admin_post_fbm_export_job_run', array( ExportJobsController::class, 'run' ) );
                 add_action( 'admin_post_fbm_export_job_retry', array( ExportJobsController::class, 'retry' ) );
+                add_filter( 'wp_privacy_personal_data_exporters', static function ( array $exporters ): array {
+                    $exporters['foodbank_manager'] = array(
+                        'exporter_friendly_name' => 'FoodBank Manager',
+                        'callback'               => [\FBM\Privacy\Exporter::class, 'export'],
+                    );
+                    return $exporters;
+                } );
+                add_filter( 'wp_privacy_personal_data_erasers', static function ( array $erasers ): array {
+                    $erasers['foodbank_manager'] = array(
+                        'eraser_friendly_name' => 'FoodBank Manager',
+                        'callback'             => [\FBM\Privacy\Eraser::class, 'erase'],
+                    );
+                    return $erasers;
+                } );
+
 
                 self::get_instance()->init();
                 JobsWorker::init();
