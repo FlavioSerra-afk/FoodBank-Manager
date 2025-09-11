@@ -31,10 +31,13 @@ rsync -a --delete \
   --exclude "$SLUG.php" \
   ./ "$WORK/"
 
-# Compile translations if msgfmt is available (soft fail otherwise)
+# Compile all translations if msgfmt is available (soft fail otherwise)
 if command -v msgfmt >/dev/null 2>&1; then
   echo "[i18n] Compiling .mo files..."
-  msgfmt languages/foodbank-manager-en_GB.po -o "$WORK/languages/foodbank-manager-en_GB.mo" || true
+  for po in "$WORK"/languages/*.po "$WORK"/languages/*/*.po; do
+    [ -f "$po" ] || continue
+    msgfmt -o "${po%.po}.mo" "$po" || true
+  done
 else
   echo "[i18n] msgfmt not found; skipping .mo compile (POT/PO still included)."
 fi
