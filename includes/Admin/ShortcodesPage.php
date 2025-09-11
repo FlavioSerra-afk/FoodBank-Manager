@@ -19,12 +19,12 @@ final class ShortcodesPage {
 				 * Render the page.
 				 */
 	public static function route(): void {
-		if ( ! current_user_can( 'fb_manage_forms' ) ) {
-						wp_die(
-							esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ),
-							'',
-							array( 'response' => 403 )
-						);
+		if ( ! current_user_can( 'fbm_manage_forms' ) ) {
+					wp_die(
+						esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ),
+						'',
+						array( 'response' => 403 )
+					);
 		}
 			$shortcodes = self::discover();
 			$map        = array();
@@ -38,13 +38,13 @@ final class ShortcodesPage {
 			check_admin_referer( 'fbm_shortcodes_preview' );
 			$tag = sanitize_key( (string) ( $_POST['tag'] ?? '' ) );
 			if ( isset( $map[ $tag ] ) ) {
-				$raw_atts               = isset( $_POST['atts'] ) && is_array( $_POST['atts'] ) ? wp_unslash( $_POST['atts'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized in sanitize_atts
-				$atts                   = self::sanitize_atts( $map[ $tag ], $raw_atts );
-				$atts['mask_sensitive'] = 'true';
-				$current_tag            = $tag;
-				$current_atts           = $atts;
-                                $shortcode              = self::build_shortcode( $tag, $atts );
-                                $preview_html           = do_shortcode( $shortcode );
+				$raw_atts                     = isset( $_POST['atts'] ) && is_array( $_POST['atts'] ) ? wp_unslash( $_POST['atts'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized in sanitize_atts
+				$atts                         = self::sanitize_atts( $map[ $tag ], $raw_atts );
+				$atts['mask_sensitive']       = 'true';
+				$current_tag                  = $tag;
+				$current_atts                 = $atts;
+								$shortcode    = self::build_shortcode( $tag, $atts );
+								$preview_html = do_shortcode( $shortcode );
 			} else {
 				$preview_html = '<div class="notice notice-error"><p>' . esc_html__( 'Invalid shortcode.', 'foodbank-manager' ) . '</p></div>';
 			}
@@ -83,8 +83,8 @@ final class ShortcodesPage {
 					break;
 				case 'enum':
 									$val = sanitize_text_field( (string) $val );
-                                        if ( empty( $info['options'] ) || ! in_array( $val, (array) $info['options'], true ) ) {
-							continue 2;
+					if ( empty( $info['options'] ) || ! in_array( $val, (array) $info['options'], true ) ) {
+						continue 2;
 					}
 					break;
 				default:

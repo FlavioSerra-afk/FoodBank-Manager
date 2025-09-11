@@ -68,7 +68,7 @@ function fbm_required_cap_for_page(string $slug): string {
         'fbm_scan'         => 'fb_manage_attendance',
         'fbm_reports'      => 'fb_manage_reports',
         'fbm_form_builder' => 'fbm_manage_forms',
-        'fbm_shortcodes'    => 'fb_manage_forms', // shortcodes builder is admin-only; tie to forms
+        'fbm_shortcodes'    => 'fbm_manage_forms', // shortcodes builder is admin-only; tie to forms
     ];
     return $map[$slug] ?? 'fb_manage_dashboard';
 }
