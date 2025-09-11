@@ -10,8 +10,6 @@
       "bump-patch-for-minor-pre-major": false,
       "changelog-path": "CHANGELOG.md",
       "draft": false,
-      "prerelease": true,
-      "prerelease-type": "rc",
       "extra-files": [
         {
           "type": "json",

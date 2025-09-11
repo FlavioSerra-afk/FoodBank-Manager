@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-11 (Wave RC7.7 — Permissions Manager UI + auto-tag)
+Docs-Revision: 2025-09-11 (v1.5.0 stable release)
 # FoodBank Manager — Product Requirements Document (PRD)
 
 **Repo file:** `Docs/PRD-foodbank-manager.md`  
@@ -509,22 +509,22 @@ Error format: `{ error: { code, message } }`
 
 ## 15) Milestones & Phasing
 
-**M1 — Foundations (Infra & Security)**  
+**M1 — Foundations (Infra & Security) — Done**
 Custom tables, roles/caps, nonces, encryption scaffolding, Action Scheduler.
 
-**M2 — Forms & Submissions**
+**M2 — Forms & Submissions — Done**
 Builder, rendering, validation, files, emails, logging, default Food Bank preset, CAPTCHA, and an admin builder with live preview.
 
-**M3 — Admin & Front-End Dashboards**  
+**M3 — Admin & Front-End Dashboards — Done**
 Database list/detail, exports, viewer/manager dashboards.
 
-**M4 — Attendance**  
+**M4 — Attendance — Done**
 Events (optional), QR issuance, Scan/Manual flows, policy rules, reports.
 
-**M5 — GDPR & Diagnostics**  
+**M5 — GDPR & Diagnostics — Done**
 SAR export, retention/anonymisation, diagnostics panel, test email.
 
-**M6 — Polish**
+**M6 — Polish — Done**
 PDF templates, theming presets, PT translations, docs.
 
 ### RC3 Fix Pack — Implemented
