@@ -37,12 +37,10 @@ class ThemePage {
             'admin_init',
             static function (): void {
                 register_setting(
-                    'fbm_theme',
+                    'fbm',
                     'fbm_options',
                     array(
                         'sanitize_callback' => '\\FBM\\Core\\Options::sanitize_all',
-                        'type'              => 'array',
-                        'capability'        => 'fb_manage_theme',
                     )
                 );
             }

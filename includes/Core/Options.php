@@ -92,7 +92,19 @@ namespace FBM\Core {
                 if (is_string($json) && strlen($json) > 65536) {
                     add_settings_error('fbm_theme', 'fbm_theme', __('Theme payload too large.', 'foodbank-manager'), 'error');
                 } else {
-                    $current['theme'] = \FoodBankManager\UI\Theme::sanitize($input['theme']);
+                    $san = \FoodBankManager\UI\Theme::sanitize($input['theme']);
+                    if (!empty($san['match_front_to_admin'])) {
+                        $admin = $san['admin'];
+                        $front = $san['front'];
+                        $front_copy = $front;
+                        unset($front_copy['enabled']);
+                        if ($front_copy !== $admin) {
+                            $enabled = $front['enabled'];
+                            $san['front'] = $admin;
+                            $san['front']['enabled'] = $enabled;
+                        }
+                    }
+                    $current['theme'] = $san;
                 }
                 unset($input['theme']);
             }
@@ -162,6 +174,25 @@ namespace FBM\Core {
         /** @param mixed $value */
         public static function set(string $path, $value): bool {
             return self::update($path, $value);
+        }
+
+        /**
+         * Configuration health summary.
+         *
+         * @return array{smtp:string,api:string,kek:string}
+         */
+        public static function config_health(): array {
+            $smtp_ok = defined('FBM_SMTP_HOST') && FBM_SMTP_HOST !== ''
+                && defined('FBM_SMTP_PORT') && FBM_SMTP_PORT !== ''
+                && '' !== (string) self::get('emails.from_address', '');
+            $api_ok  = (defined('FBM_API_KEY') && FBM_API_KEY !== '')
+                || '' !== (string) self::get('api.key', '');
+            $kek_ok  = defined('FBM_KEK_BASE64') && FBM_KEK_BASE64 !== '';
+            return array(
+                'smtp' => $smtp_ok ? 'Configured' : 'Not configured',
+                'api'  => $api_ok ? 'Configured' : 'Not configured',
+                'kek'  => $kek_ok ? 'Loaded from wp-config.php' : 'Not configured',
+            );
         }
 
         /** @return array<mixed> */

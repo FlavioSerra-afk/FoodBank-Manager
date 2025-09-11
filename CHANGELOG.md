@@ -1,7 +1,7 @@
 ## 1.4.0-rc.7.7 — feat(admin): permissions UI and auto-tag workflow
+## 1.5.0
 
-- feat(admin): add Permissions Manager roles matrix, per-user overrides, reset and audit log
-- chore(ci): tag-on-merge workflow triggers release on tag push
+- Theme save fix; Diagnostics mail failures + resend; SMTP/API/KEK health; tests green; lanes=0; stan=0; packaging OK.
 
 ## [1.4.2-rc.7.7](https://github.com/FlavioSerra-afk/FoodBank-Manager/compare/1.4.1-rc.7.7...1.4.2-rc.7.7) (2025-09-11)
 
