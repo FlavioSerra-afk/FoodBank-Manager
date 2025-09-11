@@ -1,3 +1,7 @@
+## 1.4.0-rc.7.6 — feat(core): centralize capabilities
+
+- feat(core): add canonical capabilities list for reuse across UI and tests
+
 ## 1.4.0-rc.7.5 — chore(license): align GPL-2.0-or-later, i18n build, release provenance
 
 - chore(license): align project to GPL-2.0-or-later for mPDF compatibility

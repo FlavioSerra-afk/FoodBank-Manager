@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace FBM\Auth;
 
+use FBM\Core\Capabilities as CoreCaps;
+
 final class Capabilities {
     /** @var bool Ensurer flag for tests */
     public static bool $ensured = false;
@@ -12,21 +14,7 @@ final class Capabilities {
      *
      * @var string[]
      */
-    private const REQUIRED = [
-        'fb_manage_dashboard',
-        'fb_manage_attendance',
-        'fb_manage_database',
-        'fb_manage_forms',
-        'fbm_manage_forms',
-        'fb_manage_emails',
-        'fb_manage_reports',
-        'fb_manage_settings',
-        'fb_manage_diagnostics',
-        'fb_manage_permissions',
-        'fb_manage_theme',
-        'fbm_manage_events',
-        'fb_view_sensitive',
-    ];
+    private const REQUIRED = CoreCaps::ALL;
 
     /**
      * Role → caps mapping (administrator always receives all caps).
