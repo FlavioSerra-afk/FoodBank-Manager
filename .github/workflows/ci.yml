@@ -7,12 +7,23 @@ on:
 jobs:
   qa:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ['8.1', '8.2']
     steps:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2'
+          php-version: ${{ matrix.php-version }}
           tools: composer
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: |
+            vendor
+          key: ${{ runner.os }}-${{ matrix.php-version }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-${{ matrix.php-version }}-composer-
       - name: Install
         run: composer install --no-interaction --prefer-dist
       - name: Guard: no WP functions in tests
@@ -21,9 +32,18 @@ jobs:
             echo 'WP function declarations found in tests';
             exit 1;
           fi
+      - name: Lint
+        run: composer lint
+      - name: Prepare build dir
+        run: mkdir -p build
       - name: PHPCS lanes
-        run: composer phpcs:lanes
-      - name: QA
+        run: composer phpcs:lanes -- --report=json --report-file=build/phpcs-lanes.json
+      - name: PHPStan
         env:
           FBM_PHPSTAN: 1
-        run: composer qa
+        run: composer phpstan:fast && composer phpstan
+      - name: PHPUnit
+        run: vendor/bin/phpunit --testsuite Unit --testdox
+      - name: Package
+        if: matrix.php-version == '8.2'
+        run: bash bin/package.sh
