@@ -82,6 +82,9 @@ class Assets {
                                 'nonce' => wp_create_nonce( 'fbm_perms_role_toggle' ),
                         ) );
                 }
+                if ( $screen && 'foodbank_page_fbm_shortcodes' === $screen->id && current_user_can( 'fb_manage_forms' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown
+                        wp_enqueue_script( 'fbm-admin-shortcodes', FBM_URL . 'assets/js/admin-shortcodes.js', array(), Plugin::VERSION, true );
+                }
         }
 
 		/**

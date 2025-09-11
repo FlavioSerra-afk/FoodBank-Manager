@@ -20,8 +20,8 @@ final class ShortcodesHelperTest extends \BaseTestCase {
         ob_start();
         ShortcodesPage::route();
         $html = (string) ob_get_clean();
-        $this->assertStringContainsString('[fbm_form id="123" preset="basic_intake" mask_sensitive="true"]', $html);
-        $this->assertStringContainsString('[fbm_dashboard compare="true" range="last_30" preset="manager"]', $html);
+        $this->assertStringContainsString('[fbm_form id=&quot;123&quot; preset=&quot;basic_intake&quot; mask_sensitive=&quot;true&quot;]', $html);
+        $this->assertStringContainsString('[fbm_dashboard compare=&quot;true&quot; range=&quot;last_30&quot; preset=&quot;manager&quot;]', $html);
         $this->assertStringContainsString('Docs/Shortcodes.md', $html);
     }
 }
