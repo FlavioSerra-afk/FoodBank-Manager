@@ -1,0 +1,51 @@
+name: release-build
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build-zip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer
+
+      - name: Install deps
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Build plugin ZIP
+        run: |
+          bash bin/package.sh
+          test -s dist/foodbank-manager.zip
+
+      - name: Upload asset
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/foodbank-manager.zip
+
+  mark-prerelease:
+    needs: build-zip
+    runs-on: ubuntu-latest
+    if: contains(github.event.release.tag_name, '-rc.')
+    steps:
+      - name: Mark as prerelease
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const {owner, repo} = context.repo;
+            await github.rest.repos.updateRelease({
+              owner, repo,
+              release_id: context.payload.release.id,
+              prerelease: true
+            });
