@@ -13,20 +13,20 @@ declare(strict_types=1);
 <div class="fbm-shortcodes-examples">
         <h2><?php esc_html_e( 'Quick Examples', 'foodbank-manager' ); ?></h2>
         <div class="fbm-example">
-                <code>[fbm_form id="123" preset="basic_intake" mask_sensitive="true"]</code>
-                <button type="button" class="fbm-copy button" data-copy="[fbm_form id=&quot;123&quot; preset=&quot;basic_intake&quot; mask_sensitive=&quot;true&quot;]">
-                        <?php esc_html_e( 'Copy', 'foodbank-manager' ); ?>
+                <code><?php echo esc_html( '[fbm_form id="123" preset="basic_intake" mask_sensitive="true"]' ); ?></code>
+                <button type="button" class="fbm-copy button" data-snippet="[fbm_form id=&quot;123&quot; preset=&quot;basic_intake&quot; mask_sensitive=&quot;true&quot;]">
+                        <?php esc_html_e( 'Copy example', 'foodbank-manager' ); ?>
                 </button>
         </div>
         <div class="fbm-example">
-                <code>[fbm_dashboard compare="true" range="last_30" preset="manager"]</code>
-                <button type="button" class="fbm-copy button" data-copy="[fbm_dashboard compare=&quot;true&quot; range=&quot;last_30&quot; preset=&quot;manager&quot;]">
-                        <?php esc_html_e( 'Copy', 'foodbank-manager' ); ?>
+                <code><?php echo esc_html( '[fbm_dashboard compare="true" range="last_30" preset="manager"]' ); ?></code>
+                <button type="button" class="fbm-copy button" data-snippet="[fbm_dashboard compare=&quot;true&quot; range=&quot;last_30&quot; preset=&quot;manager&quot;]">
+                        <?php esc_html_e( 'Copy example', 'foodbank-manager' ); ?>
                 </button>
         </div>
         <p>
                 <a href="<?php echo esc_url( FBM_URL . 'Docs/Shortcodes.md' ); ?>" target="_blank" rel="noopener">
-                        <?php esc_html_e( 'Shortcodes documentation', 'foodbank-manager' ); ?>
+                        <?php esc_html_e( 'Read the full Shortcodes guide', 'foodbank-manager' ); ?>
                 </a>
         </p>
 </div>
@@ -55,83 +55,17 @@ declare(strict_types=1);
 	<button type="button" class="fbm-copy button"><?php esc_html_e( 'Copy', 'foodbank-manager' ); ?></button>
 </div>
 <?php if ( '' !== $preview_html ) : ?>
-				<h2><?php esc_html_e( 'Preview', 'foodbank-manager' ); ?></h2>
-				<?php $safe_preview = wp_kses_post( $preview_html ); ?>
-				<?php echo '<div class="fbm-preview">' . $safe_preview . '</div>'; ?>
+                                <h2><?php esc_html_e( 'Preview', 'foodbank-manager' ); ?></h2>
+                                <?php $safe_preview = wp_kses_post( $preview_html ); ?>
+                                <?php echo '<div class="fbm-preview">' . $safe_preview . '</div>'; ?>
 <?php endif; ?>
-<script>
-const FBM_SHORTCODES = <?php echo wp_json_encode( $shortcodes ); ?>;
-const FBM_CURRENT = {
-	tag: <?php echo $current_tag ? '"' . esc_js( $current_tag ) . '"' : 'null'; ?>,
-	atts: <?php echo wp_json_encode( $current_atts ); ?>
-};
-const form = document.getElementById('fbm-shortcodes-form');
-const select = document.getElementById('fbm-tag');
-const attrsWrap = document.getElementById('fbm-attrs');
-const outputWrap = document.getElementById('fbm-output');
-const outField = document.getElementById('fbm-shortcode-string');
-function buildAttrs(tag){
-	attrsWrap.innerHTML='';
-	const sc = FBM_SHORTCODES.find(s=>s.tag===tag);
-	if(!sc){return;}
-	Object.entries(sc.atts).forEach(([name,info])=>{
-		const p=document.createElement('p');
-		const label=document.createElement('label');
-		label.textContent=name+' ';
-		let field;
-		if(info.type==='bool'){
-			field=document.createElement('select');
-			['true','false'].forEach(v=>{const o=document.createElement('option');o.value=v;o.text=v;field.appendChild(o);});
-		}else if(info.type==='enum'){
-			field=document.createElement('select');
-			info.options.forEach(v=>{const o=document.createElement('option');o.value=v;o.text=v;field.appendChild(o);});
-		}else{
-			field=document.createElement('input');
-			field.type='text';
-		}
-		field.name='atts['+name+']';
-		const cur=FBM_CURRENT.tag===tag? (FBM_CURRENT.atts[name]||'') : info.default;
-		field.value=cur;
-		label.appendChild(field);
-		p.appendChild(label);
-		attrsWrap.appendChild(p);
-	});
+<?php
+$js  = 'window.FBM_SHORTCODES = ' . wp_json_encode( $shortcodes ) . ';';
+$js .= 'window.FBM_CURRENT = {tag:' . ( $current_tag ? '"' . esc_js( $current_tag ) . '"' : 'null' ) . ', atts:' . wp_json_encode( $current_atts ) . '};';
+if ( function_exists( 'wp_add_inline_script' ) ) {
+        wp_add_inline_script( 'fbm-admin-shortcodes', $js, 'before' );
+} else {
+        echo '<script>' . $js . '</script>';
 }
-select.addEventListener('change',function(){buildAttrs(this.value);});
-document.getElementById('fbm-generate').addEventListener('click',function(){
-	const tag=select.value;
-	if(!tag){return;}
-	const parts=[];
-	attrsWrap.querySelectorAll('[name^="atts["]').forEach(el=>{
-		const m=el.name.match(/atts\[(.*)\]/);
-		if(!m){return;}
-		const name=m[1];
-		const val=el.value.trim();
-		if(val!==''){
-			parts.push(name+'="'+val.replace(/"/g,'&quot;')+'"');
-		}
-	});
-	parts.push('mask_sensitive="true"');
-	const sc='['+tag+(parts.length?' '+parts.join(' '):'')+']';
-	outField.value=sc;
-	outputWrap.style.display='block';
-});
-form.addEventListener('submit',function(){
-	const hidden=document.createElement('input');
-	hidden.type='hidden';
-	hidden.name='atts[mask_sensitive]';
-	hidden.value='true';
-	form.appendChild(hidden);
-});
-document.addEventListener('click',function(e){
-        if(e.target.classList.contains('fbm-copy')){
-                const clip = e.target.dataset.copy ? e.target.dataset.copy : outField.value;
-                navigator.clipboard.writeText(clip);
-        }
-});
-if(FBM_CURRENT.tag){
-	select.value=FBM_CURRENT.tag;
-	buildAttrs(FBM_CURRENT.tag);
-}
-</script>
+?>
 </div>
