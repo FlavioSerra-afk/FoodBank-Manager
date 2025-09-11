@@ -51,4 +51,28 @@ final class AssetsTest extends \BaseTestCase {
         $assets->enqueue_front();
         $this->assertArrayHasKey('fbm-frontend-dashboard', $GLOBALS['fbm_styles']);
     }
+
+    public function test_shortcodes_js_gated_by_screen_and_cap(): void {
+        $assets = new Assets();
+
+        // Enqueued when on Shortcodes screen with capability.
+        $GLOBALS['fbm_scripts'] = [];
+        $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_shortcodes';
+        fbm_grant_caps(['fbm_manage_forms']);
+        $assets->enqueue_admin();
+        $this->assertArrayHasKey('fbm-admin-shortcodes', $GLOBALS['fbm_scripts']);
+
+        // Not enqueued on other screens.
+        $GLOBALS['fbm_scripts'] = [];
+        $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_forms';
+        $assets->enqueue_admin();
+        $this->assertArrayNotHasKey('fbm-admin-shortcodes', $GLOBALS['fbm_scripts']);
+
+        // Not enqueued without capability.
+        $GLOBALS['fbm_scripts'] = [];
+        $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_shortcodes';
+        fbm_grant_caps([]);
+        $assets->enqueue_admin();
+        $this->assertArrayNotHasKey('fbm-admin-shortcodes', $GLOBALS['fbm_scripts']);
+    }
 }
