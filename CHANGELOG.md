@@ -3,6 +3,16 @@
 - feat(admin): add Permissions Manager roles matrix, per-user overrides, reset and audit log
 - chore(ci): tag-on-merge workflow triggers release on tag push
 
+## [1.4.1-rc.7.7](https://github.com/FlavioSerra-afk/FoodBank-Manager/compare/1.4.0-rc.7.7...1.4.1-rc.7.7) (2025-09-11)
+
+
+### Miscellaneous Chores
+
+* **ci:** add release checksums ([7156f1b](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/7156f1b17cb18c257770d4853c1855a221ea2de5))
+* **release:** configure release-automation ([b07cbe7](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/b07cbe728ccf49bc555cc64fe876af22249be181))
+* **release:** configure release-automation ([ba2db9f](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/ba2db9fecb70ca188111d34474ac1cf5cb30a96c))
+* switch release-please to stable 1.5.0 ([526db9b](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/526db9bc3bfc83affac3568a5a9bd571cce85310))
+
 ## 1.4.0-rc.7.6 — feat(core): centralize capabilities
 
 - feat(core): add canonical capabilities list for reuse across UI and tests
@@ -369,4 +379,3 @@ Docs-Revision: 2025-09-08 (Wave U2)
 - Add GitHub Actions for CI and automated releases.
 
 ## v0.1.1 — 2025-09-01
-
