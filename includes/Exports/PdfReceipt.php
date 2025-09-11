@@ -15,6 +15,7 @@ use FoodBankManager\Core\Options;
 use function sanitize_file_name;
 use function wp_get_attachment_url;
 use function apply_filters;
+use function current_user_can;
 
 /**
  * Build single entry PDF receipts with graceful HTML fallback.
@@ -29,21 +30,44 @@ final class PdfReceipt {
      * @return array{headers:array<int,string>,body:string}
      */
     public static function build(array $entry, array $options = []): array {
-        $masked   = $options['masked'] ?? true;
-        $filename = (string)($options['filename'] ?? '');
+        $can_unmask = current_user_can( 'fb_view_sensitive' );
+        $unmask     = ! empty( $options['unmask'] ) && $can_unmask;
+        if ( array_key_exists( 'masked', $options ) ) {
+            $unmask = $options['masked'] === false && $can_unmask;
+        }
+        $masked   = ! $unmask;
+        $filename = (string) ( $options['filename'] ?? '' );
         $entryOut = $entry;
-        if ($masked !== false) {
-            if (isset($entryOut['pii']['email'])) {
-                $entryOut['pii']['email'] = Helpers::mask_email((string)$entryOut['pii']['email']);
+        if ( $masked ) {
+            if ( isset( $entryOut['pii']['email'] ) ) {
+                $entryOut['pii']['email'] = Helpers::mask_email( (string) $entryOut['pii']['email'] );
             }
-            if (isset($entryOut['pii']['postcode'])) {
-                $entryOut['pii']['postcode'] = Helpers::mask_postcode((string)$entryOut['pii']['postcode']);
+            if ( isset( $entryOut['pii']['postcode'] ) ) {
+                $entryOut['pii']['postcode'] = Helpers::mask_postcode( (string) $entryOut['pii']['postcode'] );
             }
-            if (isset($entryOut['postcode'])) {
-                $entryOut['postcode'] = Helpers::mask_postcode((string)$entryOut['postcode']);
+            if ( isset( $entryOut['pii']['phone'] ) ) {
+                $entryOut['pii']['phone'] = self::mask_tel( (string) $entryOut['pii']['phone'] );
             }
-            if (isset($entryOut['email'])) {
-                $entryOut['email'] = Helpers::mask_email((string)$entryOut['email']);
+            if ( isset( $entryOut['pii']['name'] ) ) {
+                $entryOut['pii']['name'] = self::mask_name( (string) $entryOut['pii']['name'] );
+            }
+            if ( isset( $entryOut['pii']['address'] ) ) {
+                $entryOut['pii']['address'] = self::mask_address( (string) $entryOut['pii']['address'] );
+            }
+            if ( isset( $entryOut['postcode'] ) ) {
+                $entryOut['postcode'] = Helpers::mask_postcode( (string) $entryOut['postcode'] );
+            }
+            if ( isset( $entryOut['email'] ) ) {
+                $entryOut['email'] = Helpers::mask_email( (string) $entryOut['email'] );
+            }
+            if ( isset( $entryOut['phone'] ) ) {
+                $entryOut['phone'] = self::mask_tel( (string) $entryOut['phone'] );
+            }
+            if ( isset( $entryOut['name'] ) ) {
+                $entryOut['name'] = self::mask_name( (string) $entryOut['name'] );
+            }
+            if ( isset( $entryOut['address'] ) ) {
+                $entryOut['address'] = self::mask_address( (string) $entryOut['address'] );
             }
         }
         $now = (int)apply_filters('fbm_now', time());
@@ -69,6 +93,24 @@ final class PdfReceipt {
             'Content-Type: application/pdf',
             'Content-Disposition: attachment; filename="' . sanitize_file_name( $filename . '.pdf' ) . '"',
         );
-        return array( 'headers' => $headers, 'body' => $body );
+        $out = array( 'headers' => $headers, 'body' => $body );
+        if ( ! empty( $options['return_html'] ) ) {
+            $out['html'] = $html;
+        }
+        return $out;
+    }
+
+    private static function mask_tel( string $tel ): string {
+        $len = strlen( $tel );
+        return $len <= 4 ? str_repeat( '*', $len ) : str_repeat( '*', $len - 4 ) . substr( $tel, -4 );
+    }
+
+    private static function mask_name( string $name ): string {
+        $len = strlen( $name );
+        return $len > 0 ? substr( $name, 0, 1 ) . str_repeat( '*', $len - 1 ) : '';
+    }
+
+    private static function mask_address( string $addr ): string {
+        return preg_replace( '/[^\s]/', '*', $addr );
     }
 }

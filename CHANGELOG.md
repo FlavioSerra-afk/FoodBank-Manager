@@ -1,3 +1,10 @@
+## 1.4.0-rc.7.1 — fix(pdf): stable receipts and bulk zip
+
+- fix(tests): remove closure serialization in PDF suites
+- fix(exports): default-masked receipts gated by capability
+- fix(exports): deterministic Bulk PDF ZIP with closed archive
+- fix(pdf): letterhead uses @page header/footer for stability
+
 ## 1.4.0-rc.7.0 — feat(pdf): renderer, templates and diagnostics preview
 
 - feat(pdf): mPDF-backed renderer with letterhead and receipt templates

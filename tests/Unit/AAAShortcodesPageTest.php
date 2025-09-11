@@ -8,6 +8,12 @@ namespace {}
 namespace {
 use FoodBankManager\Admin\ShortcodesPage;
 
+function fbm_test_shortcode_form(array $atts): string {
+    $id = $atts['id'] ?? '1';
+    ShortcodesPageTest::$last_shortcode = sprintf('[fbm_form id="%s" preset="basic_intake" mask_sensitive="true"]', $id);
+    return '<div>ok</div><script>alert(1)</script>';
+}
+
 /** @backupGlobals disabled */
 final class ShortcodesPageTest extends \BaseTestCase {
     public static string $last_shortcode = '';
@@ -19,11 +25,7 @@ final class ShortcodesPageTest extends \BaseTestCase {
         if (!defined('FBM_PATH')) {
             define('FBM_PATH', dirname(__DIR__, 2) . '/');
         }
-        add_shortcode('fbm_form', function (array $atts): string {
-            $id = $atts['id'] ?? '1';
-            ShortcodesPageTest::$last_shortcode = sprintf('[fbm_form id="%s" preset="basic_intake" mask_sensitive="true"]', $id);
-            return '<div>ok</div><script>alert(1)</script>';
-        });
+        add_shortcode('fbm_form', 'fbm_test_shortcode_form');
     }
 
     protected function tearDown(): void {

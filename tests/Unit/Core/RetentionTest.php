@@ -2,6 +2,10 @@
 declare(strict_types=1);
 
 use FBM\Core\Retention;
+
+function fbm_retention_map($a) {
+    return is_int($a) ? $a : (string) $a;
+}
 class RetentionDBStub {
     public string $prefix = 'wp_';
     /** @var array<int,string> */
@@ -31,9 +35,7 @@ class RetentionDBStub {
             }
         }
         $this->last_args = $flat;
-        $out = vsprintf($sql, array_map(static function ($a) {
-            return is_int($a) ? $a : (string) $a;
-        }, $flat));
+        $out = vsprintf($sql, array_map('fbm_retention_map', $flat));
         $this->last_sql = $out;
         return $out;
     }
