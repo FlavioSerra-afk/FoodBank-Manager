@@ -4,7 +4,7 @@ parameters:
   parallel:
     maximumNumberOfProcesses: 8
 
-  # Only analyze our source (exclude dist/vendor/assets/docs/tests)
+  # Only analyze our source (exclude dist/vendor/assets/docs/languages/tests)
   paths:
     - foodbank-manager.php
     - includes
@@ -15,6 +15,7 @@ parameters:
     - */assets/*
     - */Docs/*
     - */analysis/*
+    - */languages/*
     - */tests/*
     - */templates/*   # templates are view-only; optional to include later
 
