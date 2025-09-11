@@ -2,6 +2,14 @@
 
 - Shortcodes helper examples and docs.
 
+## [1.5.1-rc.1](https://github.com/FlavioSerra-afk/FoodBank-Manager/compare/1.5.0-rc.7.7...1.5.1-rc.1) (2025-09-11)
+
+
+### Miscellaneous Chores
+
+* align CI and finalize shortcodes screen ([0b7e1cc](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/0b7e1cc0f4aeb6a1f209112c4ba67e4b111b21b3))
+* release 1.5.1-rc.1 ([d64f57b](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/d64f57b8e2fe9f90f4d60116a91ddb081bd74982))
+
 ## [1.5.0-rc.7.7](https://github.com/FlavioSerra-afk/FoodBank-Manager/compare/1.4.2-rc.7.7...1.5.0-rc.7.7) (2025-09-11)
 
 
