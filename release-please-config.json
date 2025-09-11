@@ -1,0 +1,36 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "bootstrap-sha": "",
+  "include-v-in-tag": false,
+  "plugins": [],
+  "packages": {
+    ".": {
+      "release-type": "php",
+      "bump-minor-pre-major": false,
+      "bump-patch-for-minor-pre-major": false,
+      "changelog-path": "CHANGELOG.md",
+      "draft": false,
+      "prerelease": true,
+      "prerelease-type": "rc",
+      "extra-files": [
+        {
+          "type": "json",
+          "path": "composer.json",
+          "jsonpath": "$.version"
+        },
+        {
+          "type": "generic",
+          "path": "includes/Core/Plugin.php"
+        },
+        {
+          "type": "generic",
+          "path": "foodbank-manager.php"
+        },
+        {
+          "type": "generic",
+          "path": "readme.txt"
+        }
+      ]
+    }
+  }
+}
