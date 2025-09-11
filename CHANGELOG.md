@@ -3,6 +3,13 @@
 - feat(admin): add Permissions Manager roles matrix, per-user overrides, reset and audit log
 - chore(ci): tag-on-merge workflow triggers release on tag push
 
+## [1.4.2-rc.7.7](https://github.com/FlavioSerra-afk/FoodBank-Manager/compare/1.4.1-rc.7.7...1.4.2-rc.7.7) (2025-09-11)
+
+
+### Miscellaneous Chores
+
+* **release:** prepare stable v1.5.0 ([e75482f](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/e75482f075e80020684f791179458470caf8a785))
+
 ## [1.4.1-rc.7.7](https://github.com/FlavioSerra-afk/FoodBank-Manager/compare/1.4.0-rc.7.7...1.4.1-rc.7.7) (2025-09-11)
 
 
