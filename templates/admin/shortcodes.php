@@ -10,6 +10,26 @@ declare(strict_types=1);
 <div class="wrap fbm-admin">
 <?php \FBM\Core\Trace::mark( 'admin:shortcodes' ); ?>
 <h1><?php esc_html_e( 'Shortcodes', 'foodbank-manager' ); ?></h1>
+<div class="fbm-shortcodes-examples">
+        <h2><?php esc_html_e( 'Quick Examples', 'foodbank-manager' ); ?></h2>
+        <div class="fbm-example">
+                <code>[fbm_form id="123" preset="basic_intake" mask_sensitive="true"]</code>
+                <button type="button" class="fbm-copy button" data-copy="[fbm_form id=&quot;123&quot; preset=&quot;basic_intake&quot; mask_sensitive=&quot;true&quot;]">
+                        <?php esc_html_e( 'Copy', 'foodbank-manager' ); ?>
+                </button>
+        </div>
+        <div class="fbm-example">
+                <code>[fbm_dashboard compare="true" range="last_30" preset="manager"]</code>
+                <button type="button" class="fbm-copy button" data-copy="[fbm_dashboard compare=&quot;true&quot; range=&quot;last_30&quot; preset=&quot;manager&quot;]">
+                        <?php esc_html_e( 'Copy', 'foodbank-manager' ); ?>
+                </button>
+        </div>
+        <p>
+                <a href="<?php echo esc_url( FBM_URL . 'Docs/Shortcodes.md' ); ?>" target="_blank" rel="noopener">
+                        <?php esc_html_e( 'Shortcodes documentation', 'foodbank-manager' ); ?>
+                </a>
+        </p>
+</div>
 <form method="post" id="fbm-shortcodes-form">
 	<?php wp_nonce_field( 'fbm_shortcodes_preview', '_wpnonce' ); ?>
 	<input type="hidden" name="fbm_action" value="shortcode_preview" />
@@ -104,9 +124,10 @@ form.addEventListener('submit',function(){
 	form.appendChild(hidden);
 });
 document.addEventListener('click',function(e){
-	if(e.target.classList.contains('fbm-copy')){
-		navigator.clipboard.writeText(outField.value);
-	}
+        if(e.target.classList.contains('fbm-copy')){
+                const clip = e.target.dataset.copy ? e.target.dataset.copy : outField.value;
+                navigator.clipboard.writeText(clip);
+        }
 });
 if(FBM_CURRENT.tag){
 	select.value=FBM_CURRENT.tag;
