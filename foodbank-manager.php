@@ -51,6 +51,17 @@ if ( class_exists( 'FBM\\Core\\Plugin' ) && ! class_exists( 'FoodBankManager\\Co
     class_alias( 'FoodBankManager\\Core\\Plugin', 'FBM\\Core\\Plugin' );
 }
 
+add_action(
+    'init',
+    static function (): void {
+        load_plugin_textdomain(
+            'foodbank-manager',
+            false,
+            dirname( plugin_basename( __FILE__ ) ) . '/languages'
+        );
+    }
+);
+
 /** Boot watchdog flag each admin request */
 add_action(
     'plugins_loaded',

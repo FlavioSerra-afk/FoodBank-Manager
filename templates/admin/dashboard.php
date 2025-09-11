@@ -21,49 +21,49 @@ $mail_failures_7d      = (int) ( $mail_failures_7d ?? 0 );
 ?>
 <h1><?php esc_html_e( 'Dashboard', 'foodbank-manager' ); ?></h1>
 <div class="fbm-grid">
-	<div class="fbm-card--glass fbm-tile" tabindex="0" data-testid="fbm-dashboard-tile-applications-total" aria-label="<?php echo esc_attr( sprintf( __( 'Total applications: %s', 'foodbank-manager' ), number_format_i18n( $applications_total ) ) ); ?>">
+        <div class="fbm-card--glass fbm-tile" tabindex="0" data-testid="fbm-dashboard-tile-applications-total" aria-label="<?php echo esc_attr( sprintf( /* translators: %s: total applications count */ __( 'Total applications: %s', 'foodbank-manager' ), number_format_i18n( $applications_total ) ) ); ?>">
 		<span class="dashicons dashicons-admin-users" aria-hidden="true"></span>
 		<div class="fbm-tile-value"><?php echo esc_html( number_format_i18n( $applications_total ) ); ?></div>
 		<div class="fbm-tile-label"><?php esc_html_e( 'Total applications', 'foodbank-manager' ); ?></div>
 	</div>
-	<div class="fbm-card--glass fbm-tile" tabindex="0" data-testid="fbm-dashboard-tile-applications-today" aria-label="<?php echo esc_attr( sprintf( __( 'New today: %s', 'foodbank-manager' ), number_format_i18n( $applications_today ) ) ); ?>">
+        <div class="fbm-card--glass fbm-tile" tabindex="0" data-testid="fbm-dashboard-tile-applications-today" aria-label="<?php echo esc_attr( sprintf( /* translators: %s: new applications today */ __( 'New today: %s', 'foodbank-manager' ), number_format_i18n( $applications_today ) ) ); ?>">
 		<span class="dashicons dashicons-clock" aria-hidden="true"></span>
 		<div class="fbm-tile-value"><?php echo esc_html( number_format_i18n( $applications_today ) ); ?></div>
 		<div class="fbm-tile-label"><?php esc_html_e( 'New today', 'foodbank-manager' ); ?></div>
 	</div>
-	<div class="fbm-card--glass fbm-tile" tabindex="0" data-testid="fbm-dashboard-tile-checkins-today" aria-label="<?php echo esc_attr( sprintf( __( 'Check-ins today: %s', 'foodbank-manager' ), number_format_i18n( $summary['today'] ?? 0 ) ) ); ?>">
+        <div class="fbm-card--glass fbm-tile" tabindex="0" data-testid="fbm-dashboard-tile-checkins-today" aria-label="<?php echo esc_attr( sprintf( /* translators: %s: check-ins today */ __( 'Check-ins today: %s', 'foodbank-manager' ), number_format_i18n( $summary['today'] ?? 0 ) ) ); ?>">
 		<span class="dashicons dashicons-yes" aria-hidden="true"></span>
 		<div class="fbm-tile-value"><?php echo esc_html( number_format_i18n( $summary['today'] ?? 0 ) ); ?></div>
 		<div class="fbm-tile-label"><?php esc_html_e( 'Check-ins today', 'foodbank-manager' ); ?></div>
 	</div>
-	<div class="fbm-card--glass fbm-tile" tabindex="0" data-testid="fbm-dashboard-tile-checkins-week" aria-label="<?php echo esc_attr( sprintf( __( 'Check-ins this week: %s', 'foodbank-manager' ), number_format_i18n( $summary['week'] ?? 0 ) ) ); ?>">
+        <div class="fbm-card--glass fbm-tile" tabindex="0" data-testid="fbm-dashboard-tile-checkins-week" aria-label="<?php echo esc_attr( sprintf( /* translators: %s: check-ins this week */ __( 'Check-ins this week: %s', 'foodbank-manager' ), number_format_i18n( $summary['week'] ?? 0 ) ) ); ?>">
 		<span class="dashicons dashicons-calendar-alt" aria-hidden="true"></span>
 		<div class="fbm-tile-value"><?php echo esc_html( number_format_i18n( $summary['week'] ?? 0 ) ); ?></div>
 		<div class="fbm-tile-label"><?php esc_html_e( 'Check-ins this week', 'foodbank-manager' ); ?></div>
 	</div>
-	<div class="fbm-card--glass fbm-tile" tabindex="0" data-testid="fbm-dashboard-tile-checkins-month" aria-label="<?php echo esc_attr( sprintf( __( 'Check-ins this month: %s', 'foodbank-manager' ), number_format_i18n( $summary['month'] ?? 0 ) ) ); ?>">
+        <div class="fbm-card--glass fbm-tile" tabindex="0" data-testid="fbm-dashboard-tile-checkins-month" aria-label="<?php echo esc_attr( sprintf( /* translators: %s: check-ins this month */ __( 'Check-ins this month: %s', 'foodbank-manager' ), number_format_i18n( $summary['month'] ?? 0 ) ) ); ?>">
 		<span class="dashicons dashicons-calendar" aria-hidden="true"></span>
 		<div class="fbm-tile-value"><?php echo esc_html( number_format_i18n( $summary['month'] ?? 0 ) ); ?></div>
 		<div class="fbm-tile-label"><?php esc_html_e( 'Check-ins this month', 'foodbank-manager' ); ?></div>
 	</div>
-	<div class="fbm-card--glass fbm-tile" tabindex="0" data-testid="fbm-dashboard-tile-events-active" aria-label="<?php echo esc_attr( sprintf( __( 'Active events: %s', 'foodbank-manager' ), number_format_i18n( $events_active ) ) ); ?>">
+        <div class="fbm-card--glass fbm-tile" tabindex="0" data-testid="fbm-dashboard-tile-events-active" aria-label="<?php echo esc_attr( sprintf( /* translators: %s: number of active events */ __( 'Active events: %s', 'foodbank-manager' ), number_format_i18n( $events_active ) ) ); ?>">
 		<span class="dashicons dashicons-megaphone" aria-hidden="true"></span>
 		<div class="fbm-tile-value"><?php echo esc_html( number_format_i18n( $events_active ) ); ?></div>
 		<div class="fbm-tile-label"><?php esc_html_e( 'Active events', 'foodbank-manager' ); ?></div>
 	</div>
-	<div class="fbm-card--glass fbm-tile" tabindex="0" data-testid="fbm-dashboard-tile-tickets-issued" aria-label="<?php echo esc_attr( sprintf( __( 'Tickets issued: %s', 'foodbank-manager' ), number_format_i18n( $tickets_issued ) ) ); ?>">
+        <div class="fbm-card--glass fbm-tile" tabindex="0" data-testid="fbm-dashboard-tile-tickets-issued" aria-label="<?php echo esc_attr( sprintf( /* translators: %s: number of tickets issued */ __( 'Tickets issued: %s', 'foodbank-manager' ), number_format_i18n( $tickets_issued ) ) ); ?>">
 		<span class="dashicons dashicons-tickets-alt" aria-hidden="true"></span>
 		<div class="fbm-tile-value"><?php echo esc_html( number_format_i18n( $tickets_issued ) ); ?></div>
 		<div class="fbm-tile-label"><?php esc_html_e( 'Tickets issued', 'foodbank-manager' ); ?></div>
 		<span class="fbm-delta fbm-delta--neutral"><?php echo esc_html( $tickets_issued_delta ); ?></span>
 	</div>
-	<div class="fbm-card--glass fbm-tile" tabindex="0" data-testid="fbm-dashboard-tile-tickets-revoked" aria-label="<?php echo esc_attr( sprintf( __( 'Tickets revoked: %s', 'foodbank-manager' ), number_format_i18n( $tickets_revoked ) ) ); ?>">
+        <div class="fbm-card--glass fbm-tile" tabindex="0" data-testid="fbm-dashboard-tile-tickets-revoked" aria-label="<?php echo esc_attr( sprintf( /* translators: %s: number of tickets revoked */ __( 'Tickets revoked: %s', 'foodbank-manager' ), number_format_i18n( $tickets_revoked ) ) ); ?>">
 		<span class="dashicons dashicons-no-alt" aria-hidden="true"></span>
 		<div class="fbm-tile-value"><?php echo esc_html( number_format_i18n( $tickets_revoked ) ); ?></div>
 		<div class="fbm-tile-label"><?php esc_html_e( 'Tickets revoked', 'foodbank-manager' ); ?></div>
 		<span class="fbm-delta fbm-delta--neutral"><?php echo esc_html( $tickets_revoked_delta ); ?></span>
 	</div>
-	<div class="fbm-card--glass fbm-tile" tabindex="0" data-testid="fbm-dashboard-tile-mail-failures" aria-label="<?php echo esc_attr( sprintf( __( 'Mail failures (last 7d): %s', 'foodbank-manager' ), number_format_i18n( $mail_failures_7d ) ) ); ?>">
+        <div class="fbm-card--glass fbm-tile" tabindex="0" data-testid="fbm-dashboard-tile-mail-failures" aria-label="<?php echo esc_attr( sprintf( /* translators: %s: email failures in last 7 days */ __( 'Mail failures (last 7d): %s', 'foodbank-manager' ), number_format_i18n( $mail_failures_7d ) ) ); ?>">
 		<span class="dashicons dashicons-email-alt" aria-hidden="true"></span>
 		<div class="fbm-tile-value"><?php echo esc_html( number_format_i18n( $mail_failures_7d ) ); ?></div>
 		<div class="fbm-tile-label"><?php esc_html_e( 'Mail failures (last 7d)', 'foodbank-manager' ); ?></div>
