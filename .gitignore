@@ -1,7 +1,6 @@
 # build artifacts
 dist/
 build/
-languages/*.mo
 *.zip
 
 /vendor/*
@@ -16,3 +15,4 @@ languages/*.mo
 *.pdf
 *.exe
 .DS_Store
+languages/*.mo
