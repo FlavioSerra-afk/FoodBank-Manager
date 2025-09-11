@@ -216,6 +216,19 @@ if (!function_exists('wp_redirect')) { /** @return void */ function wp_redirect(
 if (!function_exists('wp_die')) { /** @return void */ function wp_die($m=''){ throw new FbmDieException((string)$m); } }
 if (!function_exists('headers_sent')) { function headers_sent(){ return false; } }
 
+if (!function_exists('header_remove')) {
+    function header_remove(?string $name = null): void {}
+}
+
+if (!function_exists('header')) {
+    /**
+     * Capture headers instead of sending them.
+     */
+    function header(string $header, bool $replace = true, int $response_code = 0): void {
+        $GLOBALS['__fbm_sent_headers'][] = $header;
+    }
+}
+
 // Basic escaping/sanitizing
 if (!function_exists('esc_attr')){ function esc_attr($s){ return htmlspecialchars((string)$s, ENT_QUOTES,'UTF-8'); } }
 if (!function_exists('esc_html')){ function esc_html($s){ return htmlspecialchars((string)$s, ENT_QUOTES,'UTF-8'); } }

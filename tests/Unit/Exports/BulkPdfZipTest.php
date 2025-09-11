@@ -24,10 +24,10 @@ namespace {
             $tmp = sys_get_temp_dir() . '/fbm_ut_' . uniqid('', true) . '.zip';
             file_put_contents($tmp, $res['body']);
             $zip = new \ZipArchive();
-            $zip->open($tmp);
+            $this->assertTrue($zip->open($tmp));
             $this->assertNotFalse($zip->locateName('receipts/entry-1.pdf'));
             $this->assertNotFalse($zip->locateName('receipts/entry-2.pdf'));
-            $zip->close();
+            $this->assertTrue($zip->close());
             unlink($tmp);
         }
 
@@ -41,9 +41,9 @@ namespace {
             $tmp = sys_get_temp_dir() . '/fbm_ut_' . uniqid('', true) . '.zip';
             file_put_contents($tmp, $res['body']);
             $zip = new \ZipArchive();
-            $zip->open($tmp);
+            $this->assertTrue($zip->open($tmp));
             $this->assertNotFalse($zip->locateName('receipts/entry-1.pdf'));
-            $zip->close();
+            $this->assertTrue($zip->close());
             unlink($tmp);
         }
     }

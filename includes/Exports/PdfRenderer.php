@@ -54,11 +54,23 @@ final class PdfRenderer {
             $_SERVER['PHP_SELF'] = '';
         }
         $mpdf = new Mpdf( $config );
-        if ( $header !== '' ) {
-            $mpdf->SetHTMLHeader( $header );
-        }
-        if ( $footer !== '' ) {
-            $mpdf->SetHTMLFooter( $footer );
+        if ( $header !== '' || $footer !== '' ) {
+            $style = '<style>@page{';
+            if ( $header !== '' ) {
+                $style .= 'header: html_fbm_header;';
+            }
+            if ( $footer !== '' ) {
+                $style .= 'footer: html_fbm_footer;';
+            }
+            $style .= '}</style>';
+            $prefix = '';
+            if ( $header !== '' ) {
+                $prefix .= '<htmlpageheader name="fbm_header">' . $header . '</htmlpageheader>';
+            }
+            if ( $footer !== '' ) {
+                $prefix .= '<htmlpagefooter name="fbm_footer">' . $footer . '</htmlpagefooter>';
+            }
+            $html = $style . $prefix . $html;
         }
         $mpdf->WriteHTML( $html );
         return (string) $mpdf->Output( '', 'S' );
