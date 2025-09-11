@@ -1,3 +1,9 @@
+## 1.4.0-rc.7.5 — chore(license): align GPL-2.0-or-later, i18n build, release provenance
+
+- chore(license): align project to GPL-2.0-or-later for mPDF compatibility
+- chore(i18n): build .mo catalogs during packaging
+- chore(release): add provenance workflow and packaging guard
+
 ## 1.4.0-rc.7.2 — fix(pdf): kill closure serialization
 
 - fix(tests): drop process isolation and closures from PDF suites

@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-17 (Wave RC4.6.7 — Privacy exporter/eraser)
+Docs-Revision: 2025-09-11 (Wave RC7.5 — License align/i18n build/release provenance)
 # FoodBank Manager — Product Requirements Document (PRD)
 
 **Repo file:** `Docs/PRD-foodbank-manager.md`  

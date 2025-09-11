@@ -2,7 +2,7 @@
   "name": "foodbank/manager",
   "description": "WordPress plugin: FoodBank Manager",
   "type": "wordpress-plugin",
-  "license": "GPL-3.0-or-later",
+  "license": "GPL-2.0-or-later",
   "require": {
     "php": "^8.1",
     "endroid/qr-code": "^4",
@@ -66,8 +66,8 @@
     "qa": "composer phpcs && composer phpstan && composer test",
     "qa:fast": "composer phpcs && composer phpstan:fast && composer test",
     "build:zip": "bash bin/package.sh",
-    "i18n:pot": "wp --allow-root i18n make-pot . languages/foodbank-manager.pot --exclude=vendor,dist,node_modules",
-    "i18n:mo": "wp --allow-root i18n make-mo languages languages",
+    "i18n:pot": "wp i18n make-pot . languages/foodbank-manager.pot --exclude=vendor,dist,node_modules",
+    "i18n:mo": "wp i18n make-mo languages languages",
     "i18n:build": [
       "@i18n:pot",
       "@i18n:mo"
@@ -80,5 +80,5 @@
     },
     "sort-packages": true
   },
-  "version": "1.4.0-rc.7.2"
+  "version": "1.4.0-rc.7.5"
 }
