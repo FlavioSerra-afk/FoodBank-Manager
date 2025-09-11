@@ -2,6 +2,18 @@
 
 - Shortcodes helper examples and docs.
 
+## [1.5.0-rc.7.7](https://github.com/FlavioSerra-afk/FoodBank-Manager/compare/1.4.2-rc.7.7...1.5.0-rc.7.7) (2025-09-11)
+
+
+### Features
+
+* add shortcodes admin script ([14cfbd6](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/14cfbd6bec28b2ad60a75e2d0d242fa995597750))
+* polish shortcodes admin ([77bfbf0](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/77bfbf0e39edacad04b034d59403cd45a700bdd3))
+* **shortcodes:** add helper examples and docs ([29e8fc5](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/29e8fc549793b960a43089e1d3323e23c72dddd4))
+* **shortcodes:** add helper examples and docs ([4f68ae0](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/4f68ae0e3a69f67a17b64e9bd48cb6c5308e2b69))
+* theme save and diagnostics enhancements ([6be2a19](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/6be2a19f1d5fbe2a7aacd75d286df7c39bc6271e))
+* theme save and diagnostics enhancements ([7e3b2b1](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/7e3b2b1fef8a3f2310ee9350c3b707ef2117f62d))
+
 ## 1.5.0
 
 - Theme save fix; Diagnostics mail failures + resend; SMTP/API/KEK health; tests green; lanes=0; stan=0; packaging OK.
