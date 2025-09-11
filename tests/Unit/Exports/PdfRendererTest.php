@@ -9,5 +9,6 @@ final class PdfRendererTest extends TestCase {
         $out = PdfRenderer::render('<p>Hello</p>');
         $this->assertNotSame('', $out);
         $this->assertStringStartsWith('%PDF', $out);
+        $this->assertStringContainsString('xref', $out);
     }
 }

@@ -44,11 +44,11 @@ final class BulkPdfZip {
             }
             $id  = isset($entry['id']) ? (int) $entry['id'] : 0;
             $ext = str_contains($ctype, 'pdf') ? '.pdf' : '.html';
-            $name = 'entry-' . $id . $ext;
+            $name = 'receipts/entry-' . $id . $ext;
             $files[$name] = $res['body'];
         }
         if (class_exists('\ZipArchive')) {
-            $tmp = tempnam(sys_get_temp_dir(), 'fbm_zip');
+            $tmp = sys_get_temp_dir() . '/fbm_zip_' . uniqid('', true) . '.zip';
             $zip = new \ZipArchive();
             if ($zip->open($tmp, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true) {
                 foreach ($files as $name => $content) {
@@ -56,11 +56,11 @@ final class BulkPdfZip {
                 }
                 $zip->close();
                 $body = (string) @file_get_contents($tmp);
-                if ($body === '') {
-                    $body = self::simpleZip($files);
-                }
                 if (file_exists($tmp)) {
                     unlink($tmp);
+                }
+                if ($body === '') {
+                    $body = self::simpleZip($files);
                 }
             } else {
                 $body = self::simpleZip($files);

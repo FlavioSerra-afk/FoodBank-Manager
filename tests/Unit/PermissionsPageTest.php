@@ -6,6 +6,8 @@ namespace {
     use FoodBankManager\Admin\UsersMeta;
     use FoodBankManager\Auth\Capabilities;
 
+    function fbm_silence_error() { return true; }
+
     final class PermissionsPageTest extends \BaseTestCase {
 
     public function test_import_rejects_bad_json(): void {
@@ -79,7 +81,7 @@ namespace {
         $page = new \FoodBankManager\Admin\PermissionsPage();
         $ref  = new \ReflectionMethod( \FoodBankManager\Admin\PermissionsPage::class, 'handle_export' );
         $ref->setAccessible(true);
-        set_error_handler(static function () { return true; });
+        set_error_handler('fbm_silence_error');
         try {
             $ref->invoke($page);
         } catch ( \RuntimeException $e ) {
