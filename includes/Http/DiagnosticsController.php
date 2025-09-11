@@ -11,6 +11,7 @@ namespace FoodBankManager\Http;
 
 use FoodBankManager\Core\Options;
 use FoodBankManager\Mail\FailureLog;
+use FBM\Mail\LogRepo;
 use function current_user_can;
 use function check_admin_referer;
 use function wp_mail;
@@ -26,6 +27,7 @@ use function sanitize_key;
 use function absint;
 use function is_email;
 use function get_option;
+use function get_current_user_id;
 use function esc_html__;
 use function __;
 use function wp_die;
@@ -104,6 +106,31 @@ final class DiagnosticsController {
         $index = absint( $_POST['index'] ?? -1 );
         $sent  = FailureLog::retry( $index );
         $notice = $sent ? 'retried' : 'error';
+        $url    = add_query_arg( array( 'notice' => $notice ), menu_page_url( 'fbm_diagnostics', false ) );
+        wp_safe_redirect( esc_url_raw( $url ), 303 );
+        exit;
+    }
+
+    /**
+     * Resend a failed email by log ID.
+     *
+     * @return void
+     */
+    public static function mail_resend(): void {
+        $id = absint( $_GET['id'] ?? 0 );
+        if ( ! current_user_can( 'fb_manage_emails' ) && ! current_user_can( 'manage_options' ) ) {
+            wp_die( esc_html__( 'Forbidden', 'foodbank-manager' ) );
+        }
+        check_admin_referer( 'fbm_mail_resend_' . $id, '_fbm_nonce' );
+        $log = LogRepo::get_by_id( $id );
+        $sent = false;
+        if ( $log ) {
+            $to      = array_filter( array_map( 'sanitize_email', explode( ',', (string) ( $log['to_email'] ?? '' ) ) ) );
+            $headers = array_filter( array_map( 'sanitize_text_field', explode( "\n", (string) ( $log['headers'] ?? '' ) ) ) );
+            $sent    = wp_mail( $to, (string) $log['subject'], '', $headers );
+            LogRepo::audit_resend( $id, $sent ? 'sent' : 'error', get_current_user_id(), '' );
+        }
+        $notice = $sent ? 'resent' : 'error';
         $url    = add_query_arg( array( 'notice' => $notice ), menu_page_url( 'fbm_diagnostics', false ) );
         wp_safe_redirect( esc_url_raw( $url ), 303 );
         exit;

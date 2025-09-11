@@ -99,12 +99,13 @@ final class Theme {
 		$front_menus = null === $front_menus ? $defaults['apply_front_menus'] : (bool) $front_menus;
 
 		if ( $match ) {
-				$front_copy = $front;
-				unset( $front_copy['enabled'] );
+			$front_copy = $front;
+			unset( $front_copy['enabled'] );
 			if ( $front_copy !== $admin ) {
-						$front = array_merge( $front, $admin );
+				$enabled          = $front['enabled'];
+				$front            = $admin;
+				$front['enabled'] = $enabled;
 			}
-				$front['enabled'] = $front['enabled'];
 		}
 
 		return array(

@@ -5,6 +5,7 @@ namespace FBM\Mail {
     class LogRepo {
         public static array $records = array();
         public static array $appended = array();
+        public static array $failures = array();
 
         public static function get_by_id(int $id): ?array {
             return self::$records[$id] ?? null;
@@ -12,6 +13,15 @@ namespace FBM\Mail {
 
         public static function find_by_application_id(int $id): array {
             return array();
+        }
+
+        public static function recent_failures(int $limit = 20): array {
+            return array_values(self::$failures);
+        }
+
+        public static function audit_resend(int $id, string $status, int $actor, string $msg): bool {
+            self::$appended[] = compact('id','status','actor','msg');
+            return true;
         }
 
         public static function append(array $row): bool {

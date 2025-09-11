@@ -89,35 +89,45 @@ $rows       = $rows ?? array();
             $test_to
         ) ); ?></li>
     </ul>
+    <h2><?php esc_html_e( 'Security & Keys', 'foodbank-manager' ); ?></h2>
+    <ul>
+        <li><?php echo esc_html( 'SMTP: ' . ( $health['smtp'] ?? '' ) ); ?></li>
+        <li><?php echo esc_html( 'API: ' . ( $health['api'] ?? '' ) ); ?></li>
+        <li><?php echo esc_html( 'KEK: ' . ( $health['kek'] ?? '' ) ); ?></li>
+    </ul>
     <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
         <input type="hidden" name="action" value="fbm_diag_mail_test" />
         <?php wp_nonce_field( 'fbm_diag_mail_test', '_fbm_nonce' ); ?>
         <p><button type="submit" class="button"><?php esc_html_e( 'Send test email', 'foodbank-manager' ); ?></button></p>
     </form>
-    <h2><?php esc_html_e( 'Recent Mail Failures', 'foodbank-manager' ); ?></h2>
+    <h2><?php esc_html_e( 'Mail Failures (Last 20)', 'foodbank-manager' ); ?></h2>
     <?php if ( ! empty( $failures ) ) : ?>
     <table class="widefat">
         <thead>
             <tr>
+                <th><?php esc_html_e( 'When', 'foodbank-manager' ); ?></th>
                 <th><?php esc_html_e( 'To', 'foodbank-manager' ); ?></th>
                 <th><?php esc_html_e( 'Subject', 'foodbank-manager' ); ?></th>
-                <th><?php esc_html_e( 'Error', 'foodbank-manager' ); ?></th>
-                <th><?php esc_html_e( 'Actions', 'foodbank-manager' ); ?></th>
+                <th><?php esc_html_e( 'Provider Message', 'foodbank-manager' ); ?></th>
+                <th><?php esc_html_e( 'Resend', 'foodbank-manager' ); ?></th>
             </tr>
         </thead>
         <tbody>
-        <?php foreach ( $failures as $i => $f ) : ?>
+        <?php foreach ( $failures as $f ) : ?>
             <tr>
-                <td><?php echo esc_html( is_array( $f['to'] ) ? implode( ', ', array_map( 'sanitize_email', $f['to'] ) ) : sanitize_email( (string) $f['to'] ) ); ?></td>
+                <td><?php echo esc_html( $f['timestamp'] ); ?></td>
+                <td><?php echo esc_html( $f['to'] ); ?></td>
                 <td><?php echo esc_html( $f['subject'] ); ?></td>
-                <td><?php echo esc_html( $f['error'] ); ?></td>
+                <td><?php echo esc_html( $f['provider_msg'] ); ?></td>
                 <td>
-                    <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-                        <input type="hidden" name="action" value="fbm_diag_mail_retry" />
-                        <input type="hidden" name="index" value="<?php echo esc_attr( (string) $i ); ?>" />
-                        <?php wp_nonce_field( 'fbm_diag_mail_retry', '_fbm_nonce' ); ?>
-                        <button type="submit" class="button"><?php esc_html_e( 'Retry', 'foodbank-manager' ); ?></button>
-                    </form>
+                    <?php
+                    $resend_url = wp_nonce_url(
+                        admin_url( 'admin-post.php?action=fbm_mail_resend&id=' . $f['id'] ),
+                        'fbm_mail_resend_' . $f['id'],
+                        '_fbm_nonce'
+                    );
+                    ?>
+                    <a href="<?php echo esc_url( $resend_url ); ?>" class="button"><?php esc_html_e( 'Resend', 'foodbank-manager' ); ?></a>
                 </td>
             </tr>
         <?php endforeach; ?>

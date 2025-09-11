@@ -28,7 +28,7 @@ class LogRepo {
 	 * @param int $application_id Application ID.
 	 * @return array<int,array>
 	 */
-	public static function find_by_application_id( int $application_id ): array {
+        public static function find_by_application_id( int $application_id ): array {
 			global $wpdb;
 				$application_id = absint( $application_id );
 				$rows           = $wpdb->get_results(
@@ -50,10 +50,37 @@ class LogRepo {
 				'status'       => sanitize_text_field( (string) ( $row['status'] ?? '' ) ),
 				'provider_msg' => sanitize_text_field( (string) ( $row['provider_msg'] ?? '' ) ),
 				'timestamp'    => sanitize_text_field( (string) ( $row['timestamp'] ?? '' ) ),
-			);
-		}
-			return $out;
-	}
+                        );
+                }
+                return $out;
+        }
+
+        /**
+         * List recent failed mails.
+         *
+         * @param int $limit Max rows.
+         * @return array<int,array{id:int,to:string,subject:string,provider_msg:string,timestamp:string}>
+         */
+        public static function recent_failures( int $limit = 20 ): array {
+                global $wpdb;
+                $limit = absint( $limit );
+                $sql   = 'SELECT id,to_email,subject,provider_msg,timestamp FROM ' . $wpdb->prefix . 'fb_mail_log WHERE status = %s ORDER BY id DESC LIMIT %d';
+                $rows  = $wpdb->get_results(
+                        $wpdb->prepare( $sql, 'failed', $limit ),
+                        ARRAY_A
+                );
+                $out = array();
+                foreach ( $rows ? $rows : array() as $row ) {
+                        $out[] = array(
+                                'id'           => (int) ( $row['id'] ?? 0 ),
+                                'to'           => sanitize_text_field( (string) ( $row['to_email'] ?? '' ) ),
+                                'subject'      => sanitize_text_field( (string) ( $row['subject'] ?? '' ) ),
+                                'provider_msg' => sanitize_text_field( (string) ( $row['provider_msg'] ?? '' ) ),
+                                'timestamp'    => sanitize_text_field( (string) ( $row['timestamp'] ?? '' ) ),
+                        );
+                }
+                return $out;
+        }
 
 		/**
 		 * Anonymise mail log entries.
@@ -124,7 +151,7 @@ class LogRepo {
 		 * @param int $id Log ID.
 		 * @return array<string,mixed>|null
 		 */
-	public static function get_by_id( int $id ): ?array {
+        public static function get_by_id( int $id ): ?array {
 			global $wpdb;
 			$id  = absint( $id );
 			$row = $wpdb->get_row(
@@ -134,21 +161,57 @@ class LogRepo {
 				),
 				ARRAY_A
 			);
-		if ( ! $row ) {
-				return null;
-		}
-			$out  = array(
-				'id'       => (int) ( $row['id'] ?? 0 ),
-				'to_email' => sanitize_text_field( (string) ( $row['to_email'] ?? '' ) ),
-				'subject'  => sanitize_text_field( (string) ( $row['subject'] ?? '' ) ),
-				'headers'  => sanitize_text_field( (string) ( $row['headers'] ?? '' ) ),
-			);
-			$meta = json_decode( (string) ( $row['provider_msg'] ?? '' ), true );
-			if ( is_array( $meta ) ) {
-					$out['body_vars'] = $meta;
-			}
-			return $out;
-	}
+                if ( ! $row ) {
+                        return null;
+                }
+                $out  = array(
+                        'id'       => (int) ( $row['id'] ?? 0 ),
+                        'to_email' => sanitize_text_field( (string) ( $row['to_email'] ?? '' ) ),
+                        'subject'  => sanitize_text_field( (string) ( $row['subject'] ?? '' ) ),
+                        'headers'  => sanitize_text_field( (string) ( $row['headers'] ?? '' ) ),
+                );
+                $meta = json_decode( (string) ( $row['provider_msg'] ?? '' ), true );
+                if ( is_array( $meta ) ) {
+                        $out['body_vars'] = $meta;
+                }
+                return $out;
+        }
+
+        /**
+         * Audit a resend attempt.
+         *
+         * @param int    $id     Original log ID.
+         * @param string $status Result status.
+         * @param int    $actor  User ID.
+         * @param string $msg    Provider message.
+         * @return bool
+         */
+        public static function audit_resend( int $id, string $status, int $actor, string $msg ): bool {
+                global $wpdb;
+                $id     = absint( $id );
+                $status = sanitize_text_field( $status );
+                $actor  = absint( $actor );
+                $msg    = sanitize_text_field( $msg );
+                $provider = wp_json_encode(
+                        array(
+                                'original_id' => $id,
+                                'by'          => $actor,
+                                'message'     => $msg,
+                        )
+                );
+                return (bool) $wpdb->insert(
+                        $wpdb->prefix . 'fb_mail_log',
+                        array(
+                                'to_email'     => '',
+                                'subject'      => '',
+                                'headers'      => '',
+                                'body_hash'    => '',
+                                'status'       => $status,
+                                'provider_msg' => $provider,
+                                'timestamp'    => gmdate( 'Y-m-d H:i:s' ),
+                        )
+                );
+        }
 
 		/**
 		 * Append an audit log entry.
