@@ -27,7 +27,29 @@ We aim to acknowledge reports **within 2 working days**.
 - Admin shortcode previews enforce capability checks, nonces, attribute whitelists with `mask_sensitive=true`, and `wp_kses_post` filtering.
 - Forms presets are sanitized server-side; unknown preset IDs fall back to a minimal safe form without exposing errors to regular users.
 - Database filter presets and per-user column selections require `fb_manage_database`, use nonces, and whitelist allowed query/column keys.
- - Admin UI is wrapped in `.fbm-admin` with screen-gated CSS/notices to prevent cross-plugin CSS or markup bleed.
+- Admin UI is wrapped in `.fbm-admin` with screen-gated CSS/notices to prevent cross-plugin CSS or markup bleed.
+
+## 🔐 Capabilities Matrix
+
+| Capability | Purpose |
+| --- | --- |
+| `fb_manage_dashboard` | View dashboard metrics |
+| `fb_manage_attendance` | Record and manage attendance |
+| `fb_manage_database` | View submissions database |
+| `fb_manage_forms` | Manage forms and templates |
+| `fbm_manage_forms` | Access form builder |
+| `fb_manage_emails` | Manage email templates and logs |
+| `fb_manage_reports` | Access reports module |
+| `fb_manage_settings` | Change plugin settings |
+| `fb_manage_diagnostics` | Diagnostics and troubleshooting |
+| `fb_manage_permissions` | Manage plugin capabilities |
+| `fb_manage_theme` | Design & theme controls |
+| `fbm_manage_events` | Manage events and tickets |
+| `fb_view_sensitive` | View sensitive data unmasked |
+
+### Requesting Access
+
+Need additional access? Contact a site Administrator or email the security team at `security@pcclondon.uk` with justification. Changes are audited.
 
 ## RC3 Guardrails
 - Default masked: all exports/detail views masked unless `fbm_view_sensitive`.

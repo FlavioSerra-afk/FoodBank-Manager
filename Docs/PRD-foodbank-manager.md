@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-11 (Wave RC7.5 — License align/i18n build/release provenance)
+Docs-Revision: 2025-09-11 (Wave RC7.7 — Permissions Manager UI + auto-tag)
 # FoodBank Manager — Product Requirements Document (PRD)
 
 **Repo file:** `Docs/PRD-foodbank-manager.md`  
@@ -21,7 +21,7 @@ Docs-Revision: 2025-09-11 (Wave RC7.5 — License align/i18n build/release prove
 - Forms — List + Builder + Live preview (CF7-like ergonomics; shortcode helper).
 - Email Templates — Templates, log, resend actions, diagnostics links.
 - Settings — General, Email defaults, API/SMTP keys placeholders, Encryption KEK status, Front-end, Admin Theme (Light/Dark/High-Contrast, RTL).
-- Permissions — Role mapping and per-user overrides.
+- Permissions — Role mapping and per-user overrides — Done (RC7.7).
 - Diagnostics — SMTP test, Cron health, Export Jobs list, Cap repair.
 - Design & Theme (Admin + Front) — Implemented (RC4.1): two subtabs (Admin UI, Front-end UI) with mode matrix (Glass/Basic × Light/Dark/High-Contrast), granular tokens (accent colour, blur, elevation, radius, border, surface alpha), and a "Match front-end to admin" toggle; accessibility fallbacks: High-Contrast disables blur/transparency and `prefers-reduced-transparency` forces solid surfaces.
 - Design & Theme → Menus parity — polish complete (RC4.3.3).

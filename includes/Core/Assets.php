@@ -17,6 +17,9 @@ use function wp_register_style;
 use function wp_add_inline_style;
 use function esc_html;
 use function wp_enqueue_script;
+use function wp_localize_script;
+use function admin_url;
+use function wp_create_nonce;
 use function current_user_can;
 use function get_current_screen;
 
@@ -72,7 +75,14 @@ class Assets {
                 if ( $screen && 'foodbank_page_fbm_diagnostics' === $screen->id && current_user_can( 'fb_manage_diagnostics' ) ) {
                         wp_enqueue_script( 'fbm-admin-diagnostics', FBM_URL . 'assets/js/admin-diagnostics.js', array(), Plugin::VERSION, true );
                 }
-	}
+                if ( $screen && 'foodbank_page_fbm_permissions' === $screen->id && current_user_can( 'fb_manage_permissions' ) ) {
+                        wp_enqueue_script( 'fbm-admin-permissions', FBM_URL . 'assets/js/admin-permissions.js', array(), Plugin::VERSION, true );
+                        wp_localize_script( 'fbm-admin-permissions', 'fbmPerms', array(
+                                'url'   => admin_url( 'admin-post.php' ),
+                                'nonce' => wp_create_nonce( 'fbm_perms_role_toggle' ),
+                        ) );
+                }
+        }
 
 		/**
 		 * Legacy front-end enqueue for tests.
