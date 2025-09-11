@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-17 (Wave RC4.6.7 — Privacy panel)
+Docs-Revision: 2025-09-11 (Wave RC7.5 — License align/i18n build/release provenance)
 # Diagnostics Hub
 
 The diagnostics hub surfaces operational information for administrators. It

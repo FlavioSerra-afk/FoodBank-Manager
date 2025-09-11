@@ -1,43 +1,69 @@
-name: Build & Upload Release ZIP
-
+name: build-test-release
 on:
-  release:
-    types: [published]
+  push:
+    tags: ['1.4.0-rc.*', '1.4.0']
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  attestations: write
+  id-token: write
 
 jobs:
-  build-zip:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v4
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
           tools: composer
-      - name: Install deps
-        run: composer install --no-interaction --prefer-dist
-      - name: QA
+
+      - name: Install deps (no dev for package)
+        run: composer install --prefer-dist --no-progress
+
+      - name: Lint / QA
         run: |
-          composer phpcs
-          composer phpstan:fast -- --memory-limit=1G
-          composer phpstan
-      - name: Package
-        run: bash bin/package.sh
-      - name: Verify package slug
+          composer lint
+          composer phpcs:lanes
+          FBM_PHPSTAN=1 composer phpstan:fast
+          FBM_PHPSTAN=1 composer phpstan
+          vendor/bin/phpunit --testsuite Unit --testdox
+
+      - name: Build i18n
+        run: composer i18n:build || true   # falls back to msgfmt in package.sh
+
+      - name: Package ZIP
         run: |
-          first=$(zipinfo -1 dist/foodbank-manager.zip | head -n1)
-          if [ "$first" != 'foodbank-manager/' ]; then
-            echo "First ZIP entry '$first' is not 'foodbank-manager/'" >&2
-            exit 1
-          fi
-          if ! zipinfo -1 dist/foodbank-manager.zip | grep -Fxq 'foodbank-manager/foodbank-manager.php'; then
-            echo "Missing foodbank-manager/foodbank-manager.php in ZIP" >&2
-            exit 1
-          fi
-      - name: Upload asset
+          bash bin/package.sh
+          test -f dist/foodbank-manager.zip
+          zipinfo -1 dist/foodbank-manager.zip | head -n1 | grep -q '^foodbank-manager/$'
+          unzip -l dist/foodbank-manager.zip | grep -F 'foodbank-manager/foodbank-manager.php'
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: foodbank-manager.zip
+          path: dist/foodbank-manager.zip
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: foodbank-manager.zip
+          path: dist
+
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: dist/foodbank-manager.zip
+          generate_release_notes: true
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: 'dist/foodbank-manager.zip'
