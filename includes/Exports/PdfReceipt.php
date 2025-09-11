@@ -10,11 +10,11 @@ declare(strict_types=1);
 namespace FBM\Exports;
 
 use FoodBankManager\Security\Helpers;
-use function esc_html;
+use FoodBankManager\Exports\PdfRenderer;
+use FoodBankManager\Core\Options;
 use function sanitize_file_name;
-use function wp_json_encode;
+use function wp_get_attachment_url;
 use function apply_filters;
-use function class_exists;
 
 /**
  * Build single entry PDF receipts with graceful HTML fallback.
@@ -51,33 +51,24 @@ final class PdfReceipt {
         if ($filename === '') {
             $filename = 'entry-' . $id . '-' . gmdate('Ymd', $now);
         }
-        $html = '<h1>Entry</h1><pre>' . esc_html(wp_json_encode($entryOut, JSON_PRETTY_PRINT)) . '</pre>';
-        if (class_exists('\\Mpdf\\Mpdf') || class_exists('\\TCPDF')) {
-            $pdf = null;
-            if (class_exists('\\Mpdf\\Mpdf')) {
-                $pdf = new \Mpdf\Mpdf();
-                $pdf->WriteHTML($html);
-                $body = (string)$pdf->Output('', 'S');
-            } else {
-                /** @phpstan-ignore-next-line */
-                $pdf = new \TCPDF();
-                /** @phpstan-ignore-next-line */
-                $pdf->AddPage();
-                /** @phpstan-ignore-next-line */
-                $pdf->writeHTML($html);
-                /** @phpstan-ignore-next-line */
-                $body = (string)$pdf->Output('', 'S');
-            }
-            $headers = array(
-                'Content-Type: application/pdf',
-                'Content-Disposition: attachment; filename="' . sanitize_file_name($filename . '.pdf') . '"',
-            );
-            return array('headers' => $headers, 'body' => $body);
-        }
+        $brand = Options::get( 'pdf.brand', array() );
+        $brand['logo_url'] = isset( $brand['logo'] ) && (int) $brand['logo'] > 0 ? (string) wp_get_attachment_url( (int) $brand['logo'] ) : '';
+        $letter = require FBM_PATH . 'templates/pdf/letterhead.php';
+        ob_start();
+        $entry = $entryOut; // for template scope
+        /* @psalm-suppress UnresolvableInclude */
+        require FBM_PATH . 'templates/pdf/receipt.php';
+        $html = (string) ob_get_clean();
+        $body = PdfRenderer::render( $html, array(
+            'paper'       => $brand['page_size'] ?? 'A4',
+            'orientation' => $brand['orientation'] ?? 'portrait',
+            'header_html' => $letter['header_html'] ?? '',
+            'footer_html' => $letter['footer_html'] ?? '',
+        ) );
         $headers = array(
-            'Content-Type: text/html; charset=utf-8',
-            'Content-Disposition: attachment; filename="' . sanitize_file_name($filename . '.html') . '"',
+            'Content-Type: application/pdf',
+            'Content-Disposition: attachment; filename="' . sanitize_file_name( $filename . '.pdf' ) . '"',
         );
-        return array('headers' => $headers, 'body' => $html);
+        return array( 'headers' => $headers, 'body' => $body );
     }
 }

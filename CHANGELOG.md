@@ -1,3 +1,8 @@
+## 1.4.0-rc.7.0 — feat(pdf): renderer, templates and diagnostics preview
+
+- feat(pdf): mPDF-backed renderer with letterhead and receipt templates
+- feat(diagnostics): PDF settings panel with preview
+
 ## 1.4.0-rc.6.7 — feat(privacy): SAR exporter/eraser and diagnostics panel
 
 - feat(privacy): register WP Privacy exporter/eraser and add Diagnostics → Privacy panel

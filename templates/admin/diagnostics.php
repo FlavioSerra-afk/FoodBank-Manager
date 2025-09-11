@@ -273,6 +273,7 @@ $rows       = $rows ?? array();
             <?php endforeach; ?>
         </tbody>
     </table>
+    <?php \FoodBankManager\Admin\DiagnosticsPdf::render_panel(); ?>
     <?php \FoodBankManager\Admin\DiagnosticsPrivacy::render_panel(); ?>
     <?php /* @psalm-suppress UnresolvableInclude */ require FBM_PATH . 'templates/admin/jobs.php'; ?>
 </div>

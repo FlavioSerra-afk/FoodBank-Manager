@@ -25,9 +25,9 @@ namespace {
             file_put_contents($tmp, $res['body']);
             $zip = new \ZipArchive();
             $zip->open($tmp);
-            $this->assertNotFalse($zip->locateName('entry-1.html'));
-            $this->assertNotFalse($zip->locateName('entry-2.html'));
-            $c = $zip->getFromName('entry-1.html');
+            $this->assertNotFalse($zip->locateName('entry-1.pdf'));
+            $this->assertNotFalse($zip->locateName('entry-2.pdf'));
+            $c = $zip->getFromName('entry-1.pdf');
             $this->assertStringContainsString('a***@example.com', (string) $c);
             $zip->close();
             unlink($tmp);
@@ -43,7 +43,7 @@ namespace {
             file_put_contents($tmp, $res['body']);
             $zip = new \ZipArchive();
             $zip->open($tmp);
-            $c = $zip->getFromName('entry-1.html');
+            $c = $zip->getFromName('entry-1.pdf');
             $this->assertStringContainsString('a@example.com', (string) $c);
             $zip->close();
             unlink($tmp);
