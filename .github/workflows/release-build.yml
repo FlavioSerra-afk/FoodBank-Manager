@@ -29,10 +29,17 @@ jobs:
           bash bin/package.sh
           test -s dist/foodbank-manager.zip
 
+      - name: Checksums
+        run: |
+          cd dist
+          sha256sum foodbank-manager.zip > SHA256SUMS.txt
+
       - name: Upload asset
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/foodbank-manager.zip
+          files: |
+            dist/foodbank-manager.zip
+            dist/SHA256SUMS.txt
 
   mark-prerelease:
     needs: build-zip
