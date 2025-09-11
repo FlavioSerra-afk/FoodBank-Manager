@@ -7,14 +7,10 @@ use FBM\Admin\EntryPage;
 use Tests\Support\Exceptions\FbmDieException;
 use Tests\Support\Rbac;
 
-/** @runTestsInSeparateProcesses */
 final class EntryPageTest extends \BaseTestCase {
     protected function setUp(): void {
         parent::setUp();
         Rbac::grantManager();
-        if (function_exists('header_remove')) {
-            header_remove();
-        }
         if (!class_exists('FoodBankManager\\Database\\ApplicationsRepo', false)) {
             require_once __DIR__ . '/../../Support/ApplicationsRepoStub.php';
         }

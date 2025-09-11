@@ -18,8 +18,8 @@ use Tests\Support\Exceptions\FbmDieException;
 use Tests\Support\Rbac;
 
 /**
- * @runTestsInSeparateProcesses
  */
+/** @runTestsInSeparateProcesses */
 final class GDPRPageTest extends \BaseTestCase {
         protected function setUp(): void {
             parent::setUp();

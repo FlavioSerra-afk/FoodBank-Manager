@@ -1,3 +1,9 @@
+## 1.4.0-rc.7.2 — fix(pdf): kill closure serialization
+
+- fix(tests): drop process isolation and closures from PDF suites
+- fix(tests): stub headers to avoid warnings in shared process
+- chore(pdf): bind headers/footers via @page for stability
+
 ## 1.4.0-rc.7.1 — fix(pdf): stable receipts and bulk zip
 
 - fix(tests): remove closure serialization in PDF suites
