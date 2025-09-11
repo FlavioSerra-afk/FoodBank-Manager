@@ -2,8 +2,12 @@ name: release-build
 
 on:
   release:
-    types: [published, released, prereleased]
+    types: [published]   # stable published releases
   workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to package (e.g., 1.5.2)'
+        required: true
 
 permissions:
   contents: write
