@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-10 (Wave RC4.5.0 — DB UX columns)
+Docs-Revision: 2025-09-17 (Wave RC4.6.7 — Privacy exporter/eraser)
 # FoodBank Manager — Product Requirements Document (PRD)
 
 **Repo file:** `Docs/PRD-foodbank-manager.md`  
@@ -268,6 +268,7 @@ Row actions: **View attendee list**, **Export roster (CSV/PDF)**, **Print-friend
 
 ### 5.8 GDPR & Privacy
 
+- Integrate with WordPress Personal Data Exporter/Eraser for SAR support.
 ### 5.9 Shortcodes
 
 | Shortcode | Attributes (default) |

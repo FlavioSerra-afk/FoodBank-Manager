@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-17 (Wave RC4.6.2 — Retention runner)
+Docs-Revision: 2025-09-17 (Wave RC4.6.7 — Privacy panel)
 # Diagnostics Hub
 
 The diagnostics hub surfaces operational information for administrators. It
@@ -18,3 +18,6 @@ The Cron Health panel exposes **Run now** and **Dry-run** controls for data
 retention. Results list total records affected and anonymised along with error
 counts. All actions are protected by nonces and the `fb_manage_diagnostics`
 capability.
+
+## Privacy panel
+The Diagnostics hub exposes a Privacy panel to preview Subject Access Request data and execute dry-run or real erasure. Actions require a nonce and the `fb_manage_diagnostics` capability.

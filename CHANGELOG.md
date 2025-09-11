@@ -1,3 +1,8 @@
+## 1.4.0-rc.6.7 — feat(privacy): SAR exporter/eraser and diagnostics panel
+
+- feat(privacy): register WP Privacy exporter/eraser and add Diagnostics → Privacy panel
+- chore(cs): raise PHPCS repo memory limit
+
 ## 1.4.0-rc.6.6 — chore(cs): tighten lanes and scripts
 
 - chore(cs): tune ruleset (Core + curated Extra), run phpcbf on lanes
