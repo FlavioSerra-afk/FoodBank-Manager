@@ -7,6 +7,27 @@
 
 ### Features
 
+* add jobs admin UI and mail replay ([8c967fd](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/8c967fd8a1f7aecb0f0d55a683ec22408be24217))
+* add jobs admin UI and mail replay ([bd0ae6a](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/bd0ae6a446d569c35b97f2a3c38f82a558eec7e4))
+* diagnostics mail test UI and telemetry polish ([948fc48](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/948fc4852fd5e5ae362327c2f4e435bfb4ff3876))
+* **diagnostics:** mail test UI, rate-limit headers, and privacy preview ([631d320](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/631d3209995ca01a7a112caf2a62dde3a2c983cd))
+
+
+### Miscellaneous Chores
+
+* align release-please to 1.8.0 ([d2f62b3](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/d2f62b35a185ad2b07fb7394da20d59e24ef64fc))
+* harden throttling and diagnostics ([f3d135d](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/f3d135d80d6733a2bce0ff966c8d4526f2ff8568))
+* **main:** release 1.8.0 ([07e3b4c](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/07e3b4c68e614f933fcc0b49619738b30a1f8306))
+* **main:** release 1.8.0 ([9c887af](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/9c887af187e516de451f7a6e58cce19633c8bd1f))
+* **main:** release 1.8.0 ([be89bfe](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/be89bfe44782868879f167c7fb325b3e77143491))
+* **main:** release 1.8.0 ([d354d6d](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/d354d6d9bc9e02819aa110fbbb64bc331b48f478))
+* **release:** align release state ([36308d5](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/36308d59239e45e239e5a7b8fc24433ed41c1ca7))
+
+## [1.8.0](https://github.com/FlavioSerra-afk/FoodBank-Manager/compare/1.8.0...1.8.0) (2025-09-12)
+
+
+### Features
+
 * diagnostics mail test UI and telemetry polish ([948fc48](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/948fc4852fd5e5ae362327c2f4e435bfb4ff3876))
 * **diagnostics:** mail test UI, rate-limit headers, and privacy preview ([631d320](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/631d3209995ca01a7a112caf2a62dde3a2c983cd))
 
