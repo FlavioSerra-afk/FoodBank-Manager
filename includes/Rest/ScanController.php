@@ -16,6 +16,7 @@ use FBM\Security\RateLimiter;
 use WP_REST_Request;
 use WP_REST_Response;
 use DomainException;
+use function fbm_send_headers;
 use function apply_filters;
 use function base64_decode;
 use function gmdate;
@@ -73,10 +74,29 @@ final class ScanController {
                 200
             );
         }
+        $limit = 0;
+        $remaining = 0;
+        $retry = 0;
         if (!current_user_can('manage_options')) {
             $ip  = isset($_SERVER['REMOTE_ADDR']) ? sanitize_key((string) $_SERVER['REMOTE_ADDR']) : '';
             $uid = get_current_user_id();
-            if (!RateLimiter::allow('scan_ip_' . $ip) || ($uid > 0 && !RateLimiter::allow('scan_user_' . (string) $uid))) {
+            $ipCheck = RateLimiter::check('scan_ip_' . $ip);
+            $limit     = $ipCheck['limit'];
+            $remaining = $ipCheck['remaining'];
+            $retry     = $ipCheck['retry_after'];
+            $allowed   = $ipCheck['allowed'];
+            if ($uid > 0) {
+                $userCheck = RateLimiter::check('scan_user_' . (string) $uid);
+                $remaining = min($remaining, $userCheck['remaining']);
+                $retry     = max($retry, $userCheck['retry_after']);
+                $allowed   = $allowed && $userCheck['allowed'];
+            }
+            fbm_send_headers(array(
+                'X-FBM-RateLimit-Limit: ' . $limit,
+                'X-FBM-RateLimit-Remaining: ' . max(0, $remaining),
+                'Retry-After: ' . $retry,
+            ));
+            if (!$allowed) {
                 return new WP_REST_Response(
                     array(
                         'checked_in' => false,
@@ -86,6 +106,12 @@ final class ScanController {
                     429
                 );
             }
+        } else {
+            fbm_send_headers(array(
+                'X-FBM-RateLimit-Limit: 0',
+                'X-FBM-RateLimit-Remaining: 0',
+                'Retry-After: 0',
+            ));
         }
         $token = sanitize_text_field((string) $request->get_param('token'));
         if ($token === '' || strlen($token) > 512) {
@@ -195,13 +221,15 @@ final class ScanController {
         if ($checkin_id > 0) {
             $checked = true;
         }
-        return new WP_REST_Response(array(
-            'ticket_id'      => (int) $checkin_id,
-            'checked_in'     => $checked,
-            'status'         => $checked ? 'checked-in' : 'not-checked',
-            'message'        => $checked ? __('Checked in', 'foodbank-manager') : __('Not checked in', 'foodbank-manager'),
-            'recipient_masked'=> self::mask($recipient),
-        ), 200);
+        return wp_send_json_success(
+            array(
+                'ticket_id'       => (int) $checkin_id,
+                'checked_in'      => $checked,
+                'status'          => $checked ? 'checked-in' : 'not-checked',
+                'message'         => $checked ? __('Checked in', 'foodbank-manager') : __('Not checked in', 'foodbank-manager'),
+                'recipient_masked'=> self::mask($recipient),
+            )
+        );
     }
 
     /**

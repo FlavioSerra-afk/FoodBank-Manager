@@ -8,6 +8,7 @@ namespace FBM\Core {
     use function __;
     use function sanitize_text_field;
     use function sanitize_email;
+    use function is_email;
 
     class Options {
         /** @return array<string,mixed> */
@@ -117,7 +118,13 @@ namespace FBM\Core {
                     $name = mb_substr($name, 0, 200);
                 }
                 $from  = sanitize_email((string)($input['emails']['from_address'] ?? ''));
+                if (!is_email($from)) {
+                    $from = '';
+                }
                 $reply = sanitize_email((string)($input['emails']['reply_to'] ?? ''));
+                if (!is_email($reply)) {
+                    $reply = '';
+                }
                 $emails['from_name']    = $name;
                 $emails['from_address'] = $from;
                 $emails['reply_to']     = $reply;

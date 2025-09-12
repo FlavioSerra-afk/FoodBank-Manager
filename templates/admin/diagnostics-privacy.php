@@ -46,12 +46,21 @@ $erasure = DiagnosticsPrivacy::erasure_summary();
     <?php wp_nonce_field( 'fbm_privacy_erase' ); ?>
     <?php submit_button( __( 'Run erasure now', 'foodbank-manager' ), 'delete', '', false ); ?>
 </form>
-<?php if ( ! empty( $preview ) ) : ?>
+<?php if ( ! empty( $preview['data'] ) ) : ?>
     <ul>
-        <?php foreach ( $preview as $group => $count ) : ?>
-            <li><?php echo esc_html( $group . ': ' . $count ); ?></li>
+        <?php foreach ( $preview['data'] as $item ) : ?>
+            <li><?php echo esc_html( $item['group_label'] . ' #' . $item['item_id'] ); ?>
+                <ul>
+                    <?php foreach ( $item['data'] as $field ) : ?>
+                        <li><?php echo esc_html( $field['name'] . ': ' . $field['value'] ); ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </li>
         <?php endforeach; ?>
     </ul>
+    <?php if ( ! $preview['done'] ) : ?>
+        <p><?php esc_html_e( 'More data available…', 'foodbank-manager' ); ?></p>
+    <?php endif; ?>
 <?php endif; ?>
 <?php if ( ! empty( $erasure ) ) : ?>
     <p><code><?php echo esc_html( wp_json_encode( $erasure ) ); ?></code></p>

@@ -11,11 +11,16 @@ namespace FoodBankManager\Http;
 
 use FoodBankManager\Core\Options;
 use FoodBankManager\Mail\FailureLog;
+use FoodBankManager\Mail\Renderer;
 use FBM\Mail\LogRepo;
 use FBM\Security\RateLimiter;
+use WP_REST_Response;
 use function current_user_can;
 use function check_admin_referer;
+use function check_ajax_referer;
 use function wp_mail;
+use function wp_send_json_error;
+use function wp_send_json_success;
 use function add_filter;
 use function remove_filter;
 use function add_query_arg;
@@ -99,6 +104,26 @@ final class DiagnosticsController {
         $url    = add_query_arg( array( 'notice' => $notice ), menu_page_url( 'fbm_diagnostics', false ) );
         wp_safe_redirect( esc_url_raw( $url ), 303 );
         exit;
+    }
+
+    /**
+     * Handle AJAX mail test.
+     */
+    public static function ajax_mail_test(): WP_REST_Response {
+        check_ajax_referer( 'fbm_mail_test' );
+        if ( ! current_user_can( 'fb_manage_diagnostics' ) ) {
+            return wp_send_json_error( array( 'message' => __( 'Forbidden', 'foodbank-manager' ) ), 403 );
+        }
+        $to = sanitize_email( (string) ( $_POST['to'] ?? '' ) );
+        if ( ! is_email( $to ) ) {
+            return wp_send_json_error( array( 'message' => __( 'Invalid email', 'foodbank-manager' ) ), 400 );
+        }
+        $tpl = array(
+            'subject' => __( 'FoodBank Manager test email', 'foodbank-manager' ),
+            'body'    => '<p>' . __( 'This is a test email from FoodBank Manager.', 'foodbank-manager' ) . '</p>',
+        );
+        $sent = Renderer::send( $tpl, array(), array( $to ) );
+        return wp_send_json_success( array( 'sent' => (bool) $sent ) );
     }
 
     /**
