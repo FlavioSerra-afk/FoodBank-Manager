@@ -34,15 +34,15 @@ final class Cron {
 	}
 
 	/** Ensure retention event is scheduled. */
-        public static function maybe_schedule_retention(): void {
-                $next = wp_next_scheduled( self::RETENTION_HOOK );
-                if ( ! $next ) {
-                        $hour = defined( 'HOUR_IN_SECONDS' ) ? HOUR_IN_SECONDS : 3600;
-                        $next = time() + $hour;
-                        wp_schedule_event( $next, 'hourly', self::RETENTION_HOOK );
-                }
-                update_option( self::RETENTION_HOOK . '_next_run', (int) $next );
-        }
+	public static function maybe_schedule_retention(): void {
+			$next = wp_next_scheduled( self::RETENTION_HOOK );
+		if ( ! $next ) {
+				$hour = defined( 'HOUR_IN_SECONDS' ) ? HOUR_IN_SECONDS : 3600;
+				$next = time() + $hour;
+				wp_schedule_event( $next, 'hourly', self::RETENTION_HOOK );
+		}
+			update_option( self::RETENTION_HOOK . '_next_run', (int) $next );
+	}
 
 	/** Cron handler for retention policies. */
 	public static function run_retention(): void {
@@ -51,13 +51,13 @@ final class Cron {
 		}
 		$ttl = ( defined( 'MINUTE_IN_SECONDS' ) ? MINUTE_IN_SECONDS : 60 ) * 5;
 		set_transient( self::LOCK_KEY, 1, $ttl );
-                try {
-                        $runner = apply_filters( 'fbm_retention_runner', new RetentionRunner() );
-                        $runner->run( false );
-                } finally {
-                        delete_transient( self::LOCK_KEY );
-                        update_option( self::RETENTION_HOOK . '_last_run', time() );
-                        update_option( self::RETENTION_HOOK . '_next_run', (int) wp_next_scheduled( self::RETENTION_HOOK ) );
-                }
-        }
+		try {
+				$runner = apply_filters( 'fbm_retention_runner', new RetentionRunner() );
+				$runner->run( false );
+		} finally {
+				delete_transient( self::LOCK_KEY );
+				update_option( self::RETENTION_HOOK . '_last_run', time() );
+				update_option( self::RETENTION_HOOK . '_next_run', (int) wp_next_scheduled( self::RETENTION_HOOK ) );
+		}
+	}
 }
