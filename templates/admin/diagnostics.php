@@ -107,6 +107,7 @@ $rows       = $rows ?? array();
     </div>
     <h2><?php esc_html_e( 'Mail Failures (Last 20)', 'foodbank-manager' ); ?></h2>
     <?php if ( ! empty( $failures ) ) : ?>
+    <?php $replay_nonce = wp_create_nonce( 'fbm_mail_replay' ); ?>
     <table class="widefat">
         <thead>
             <tr>
@@ -125,14 +126,8 @@ $rows       = $rows ?? array();
                 <td><?php echo esc_html( $f['subject'] ); ?></td>
                 <td><?php echo esc_html( $f['provider_msg'] ); ?></td>
                 <td>
-                    <?php
-                    $resend_url = wp_nonce_url(
-                        admin_url( 'admin-post.php?action=fbm_mail_resend&id=' . $f['id'] ),
-                        'fbm_mail_resend_' . $f['id'],
-                        '_fbm_nonce'
-                    );
-                    ?>
-                    <a href="<?php echo esc_url( $resend_url ); ?>" class="button"><?php esc_html_e( 'Resend', 'foodbank-manager' ); ?></a>
+                    <button type="button" class="button fbm-mail-replay" data-id="<?php echo (int) $f['id']; ?>" data-nonce="<?php echo esc_attr( $replay_nonce ); ?>"><?php esc_html_e( 'Resend', 'foodbank-manager' ); ?></button>
+                    <span class="fbm-mail-replay-result"></span>
                 </td>
             </tr>
         <?php endforeach; ?>

@@ -34,5 +34,23 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     }
+    document.querySelectorAll('.fbm-mail-replay').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            const id = btn.getAttribute('data-id') || '';
+            const nonce = btn.getAttribute('data-nonce') || '';
+            const resEl = btn.nextElementSibling;
+            fetch(ajaxurl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ action: 'fbm_mail_replay', id: id, _ajax_nonce: nonce }).toString(),
+            }).then(function (r) { return r.json(); }).then(function (data) {
+                if (resEl) {
+                    resEl.textContent = data.success ? data.data.result : 'Error';
+                }
+            }).catch(function () {
+                if (resEl) { resEl.textContent = 'Error'; }
+            });
+        });
+    });
 
 });
