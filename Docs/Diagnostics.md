@@ -21,3 +21,11 @@ capability.
 
 ## Privacy panel
 The Diagnostics hub exposes a Privacy panel to preview Subject Access Request data and execute dry-run or real erasure. Actions require a nonce and the `fb_manage_diagnostics` capability.
+
+## WP-CLI
+
+```bash
+wp fbm version
+```
+
+Returns the plugin version.
