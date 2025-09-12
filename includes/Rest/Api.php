@@ -33,7 +33,8 @@ class Api {
 				'permission_callback' => '__return_true',
 			)
 		);
-		( new AttendanceController() )->register_routes();
+                ( new AttendanceController() )->register_routes();
+                ( new \FBM\Rest\JobsController() )->register_routes();
 	}
 
 	/**

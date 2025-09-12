@@ -46,6 +46,7 @@ function fbm_grant_admin(): void {
         'fb_manage_permissions',
         'fb_manage_theme',
         'fbm_manage_events',
+        'fbm_manage_jobs',
         'fb_view_sensitive',
         'manage_options',
     ]);
@@ -65,6 +66,7 @@ function fbm_required_cap_for_page(string $slug): string {
         'fbm_permissions'   => 'fb_manage_permissions',
         'fbm_theme'         => 'fb_manage_theme',
         'fbm_events'       => 'fbm_manage_events',
+        'fbm_jobs'        => 'fbm_manage_jobs',
         'fbm_scan'         => 'fb_manage_attendance',
         'fbm_reports'      => 'fb_manage_reports',
         'fbm_form_builder' => 'fbm_manage_forms',

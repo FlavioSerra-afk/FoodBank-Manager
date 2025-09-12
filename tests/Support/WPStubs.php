@@ -60,6 +60,10 @@ $GLOBALS['fbm_posts'] = $GLOBALS['fbm_posts'] ?? [];
 $GLOBALS['fbm_post_meta'] = $GLOBALS['fbm_post_meta'] ?? [];
 $GLOBALS['fbm_registered_post_types'] = $GLOBALS['fbm_registered_post_types'] ?? [];
 $GLOBALS['fbm_wp_mail_result'] = $GLOBALS['fbm_wp_mail_result'] ?? true;
+$GLOBALS['fbm_site_options'] = $GLOBALS['fbm_site_options'] ?? [];
+$GLOBALS['fbm_is_multisite'] = $GLOBALS['fbm_is_multisite'] ?? false;
+$GLOBALS['fbm_sites'] = $GLOBALS['fbm_sites'] ?? [];
+$GLOBALS['fbm_current_blog'] = $GLOBALS['fbm_current_blog'] ?? 1;
 if (!function_exists('get_option')) {
   function get_option($name, $default=false){ return $GLOBALS['fbm_options'][$name] ?? $default; }
 }
@@ -77,6 +81,30 @@ if (!function_exists('get_transient')) {
 }
 if (!function_exists('delete_transient')) {
   function delete_transient($key){ unset($GLOBALS['fbm_transients'][$key]); return true; }
+}
+if (!function_exists('is_multisite')) {
+  function is_multisite(): bool { return (bool) ($GLOBALS['fbm_is_multisite'] ?? false); }
+}
+if (!function_exists('get_site_option')) {
+  function get_site_option($name, $default=false){ return $GLOBALS['fbm_site_options'][$name] ?? $default; }
+}
+if (!function_exists('update_site_option')) {
+  function update_site_option($name, $value){ $GLOBALS['fbm_site_options'][$name] = $value; return true; }
+}
+if (!function_exists('get_sites')) {
+  function get_sites($args=array()){ return $GLOBALS['fbm_sites'] ?? []; }
+}
+if (!function_exists('switch_to_blog')) {
+  function switch_to_blog($blog_id){
+    $GLOBALS['fbm_current_blog'] = (int) $blog_id;
+    $GLOBALS['fbm_switched_to'][] = (int) $blog_id;
+  }
+}
+if (!function_exists('restore_current_blog')) {
+  function restore_current_blog(){ $GLOBALS['fbm_current_blog'] = 1; }
+}
+if (!function_exists('is_super_admin')) {
+  function is_super_admin($user_id=null){ return current_user_can('manage_options'); }
 }
 
 // Database stub with prefix
@@ -581,6 +609,11 @@ if (!function_exists('fbm_test_reset_globals')) {
     $GLOBALS['fbm_is_singular'] = false;
     $GLOBALS['fbm_test_screen_id'] = null;
     $GLOBALS['fbm_test_nonce_secret'] = 'fbm-test';
+    $GLOBALS['fbm_site_options'] = [];
+    $GLOBALS['fbm_is_multisite'] = false;
+    $GLOBALS['fbm_sites'] = [];
+    $GLOBALS['fbm_current_blog'] = 1;
+    $GLOBALS['fbm_switched_to'] = [];
     $_GET = $_POST = $_REQUEST = [];
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $GLOBALS['__last_redirect'] = null;

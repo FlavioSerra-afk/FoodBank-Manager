@@ -45,6 +45,7 @@ We aim to acknowledge reports **within 2 working days**.
 | `fb_manage_permissions` | Manage plugin capabilities |
 | `fb_manage_theme` | Design & theme controls |
 | `fbm_manage_events` | Manage events and tickets |
+| `fbm_manage_jobs` | Manage queued jobs |
 | `fb_view_sensitive` | View sensitive data unmasked |
 
 ### Requesting Access

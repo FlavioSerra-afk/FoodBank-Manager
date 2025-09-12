@@ -29,7 +29,7 @@ final class JobsCommandTest extends \BaseTestCase {
 
     public function testRetrySuccessAndFailure(): void {
         $id = JobsRepo::create('foo', 'csv', [], false);
-        \fbm_grant_caps(['fb_manage_diagnostics']);
+        \fbm_grant_caps(['fbm_manage_jobs']);
         $io  = new FakeIO();
         $cmd = new Commands($io);
         $cmd->jobs_retry([$id], []);

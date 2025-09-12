@@ -20,11 +20,17 @@ use function apply_filters;
 use function current_user_can;
 use function delete_transient;
 use function get_transient;
+use function get_role;
+use function get_sites;
 use function is_email;
+use function is_multisite;
+use function is_super_admin;
 use function sanitize_email;
 use function set_transient;
+use function switch_to_blog;
 use function wp_privacy_anonymize_data;
 use function remove_filter;
+use function restore_current_blog;
 
 /**
  * Parent CLI command with subcommands.
@@ -71,16 +77,16 @@ final class Commands {
 	 * @param array $args       Positional arguments.
 	 * @param array $assoc_args Associative arguments.
 	 */
-	public function jobs_retry( array $args, array $assoc_args ): void {
-		if ( ! current_user_can( 'fb_manage_diagnostics' ) ) {
-			$this->io->error( 'Forbidden' );
-			return;
-		}
-		$id = absint( $args[0] ?? 0 );
-		if ( ! $id ) {
-			$this->io->error( 'Invalid ID' );
-			return;
-		}
+        public function jobs_retry( array $args, array $assoc_args ): void {
+                if ( ! current_user_can( 'fbm_manage_jobs' ) && ! ( is_multisite() && is_super_admin() ) ) {
+                        $this->io->error( 'Forbidden' );
+                        return;
+                }
+                $id = absint( $args[0] ?? 0 );
+                if ( ! $id ) {
+                        $this->io->error( 'Invalid ID' );
+                        return;
+                }
 		$job = JobsRepo::get( $id );
 		if ( ! $job ) {
 			$this->io->error( 'Job not found' );
@@ -164,5 +170,61 @@ final class Commands {
                 } else {
                         $this->io->error( 'Send failed' );
                 }
+        }
+
+        /**
+         * Diagnose and repair capabilities.
+         *
+         * @param array $args       Positional arguments.
+         * @param array $assoc_args Associative arguments.
+         */
+        public function caps_doctor( array $args, array $assoc_args ): void {
+                $missing = array();
+                if ( is_multisite() ) {
+                        foreach ( get_sites( array( 'number' => 0 ) ) as $site ) {
+                                switch_to_blog( (int) $site->blog_id );
+                                $role = get_role( 'administrator' );
+                                if ( ! $role || ! $role->has_cap( 'fbm_manage_jobs' ) ) {
+                                        $missing[] = (int) $site->blog_id;
+                                }
+                        }
+                        restore_current_blog();
+                } else {
+                        $role = get_role( 'administrator' );
+                        if ( ! $role || ! $role->has_cap( 'fbm_manage_jobs' ) ) {
+                                $missing[] = 1;
+                        }
+                }
+
+                if ( $missing && isset( $assoc_args['fix'] ) ) {
+                        if ( ! current_user_can( 'fbm_manage_jobs' ) && ! ( is_multisite() && is_super_admin() ) ) {
+                                $this->io->error( 'Forbidden' );
+                                return;
+                        }
+                        if ( is_multisite() ) {
+                                foreach ( get_sites( array( 'number' => 0 ) ) as $site ) {
+                                        switch_to_blog( (int) $site->blog_id );
+                                        $role = get_role( 'administrator' );
+                                        if ( $role && ! $role->has_cap( 'fbm_manage_jobs' ) ) {
+                                                $role->add_cap( 'fbm_manage_jobs', true );
+                                        }
+                                }
+                                restore_current_blog();
+                        } else {
+                                $role = get_role( 'administrator' );
+                                if ( $role && ! $role->has_cap( 'fbm_manage_jobs' ) ) {
+                                        $role->add_cap( 'fbm_manage_jobs', true );
+                                }
+                        }
+                        $this->io->success( 'Capability granted' );
+                        return;
+                }
+
+                if ( $missing ) {
+                        $this->io->error( 'fbm_manage_jobs missing for Administrator' );
+                        return;
+                }
+
+                $this->io->success( 'All capabilities present' );
         }
 }

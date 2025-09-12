@@ -83,6 +83,9 @@ final class JobsTable extends WP_List_Table {
      * @return array<string,string>
      */
     protected function get_bulk_actions(): array {
+        if ( ! current_user_can( 'fbm_manage_jobs' ) ) {
+            return array();
+        }
         return array(
             'retry'  => 'Retry',
             'cancel' => 'Cancel',
@@ -107,6 +110,9 @@ final class JobsTable extends WP_List_Table {
      * @return string
      */
     protected function column_cb( $item ): string { // phpcs:ignore WordPress.NamingConventions.ValidFunctionName
+        if ( ! current_user_can( 'fbm_manage_jobs' ) ) {
+            return '';
+        }
         return '<input type="checkbox" name="job[]" value="' . (int) $item['id'] . '" />';
     }
 

@@ -31,17 +31,21 @@ final class JobsPage {
      * Route and render the page.
      */
     public static function route(): void {
-        if ( ! current_user_can( 'fbm_manage_jobs' ) ) {
-            wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ), '', array( 'response' => 403 ) );
+        $can_manage = current_user_can( 'fbm_manage_jobs' );
+        if ( $can_manage ) {
+            self::handle_row_action();
         }
 
-        self::handle_row_action();
-
         $table = new JobsTable();
-        $table->process_bulk_action();
+        if ( $can_manage ) {
+            $table->process_bulk_action();
+        }
         $table->prepare_items();
 
         echo '<div class="wrap fbm-admin"><h1>' . esc_html__( 'Jobs', 'foodbank-manager' ) . '</h1>';
+        if ( ! $can_manage ) {
+            echo '<div class="notice notice-warning"><p>' . esc_html__( 'Read-only: grant fbm_manage_jobs via Diagnostics → Permissions to manage jobs.', 'foodbank-manager' ) . '</p></div>';
+        }
         echo '<form method="get">';
         echo '<input type="hidden" name="page" value="fbm_jobs" />';
         $table->search_box( esc_html__( 'Search Jobs', 'foodbank-manager' ), 'jobs' ); // @phpstan-ignore-line
