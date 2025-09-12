@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     <button type="button" class="button" id="fbm-diagnostics-copy" data-report="<?php echo esc_attr( wp_json_encode( $data ) ); ?>" data-nonce="<?php echo esc_attr( $nonce ); ?>">
         <?php esc_html_e( 'Copy report', 'foodbank-manager' ); ?>
     </button>
-    <button type="button" class="button" id="fbm-diagnostics-download" data-report="<?php echo esc_attr( wp_json_encode( $data ) ); ?>">
+    <a class="button" id="fbm-diagnostics-download" href="<?php echo esc_url( admin_url( 'admin-post.php?action=fbm_diag_report&_fbm_nonce=' . $nonce ) ); ?>">
         <?php esc_html_e( 'Download JSON', 'foodbank-manager' ); ?>
-    </button>
+    </a>
 </p>

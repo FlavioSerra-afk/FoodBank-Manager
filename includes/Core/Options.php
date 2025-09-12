@@ -120,9 +120,11 @@ namespace FBM\Core {
                 $from  = sanitize_email((string)($input['emails']['from_address'] ?? ''));
                 if (!is_email($from)) {
                     $from = '';
+                    add_settings_error('fbm_emails', 'fbm_emails_from', __('Invalid from address.', 'foodbank-manager'), 'error');
                 }
                 $reply = sanitize_email((string)($input['emails']['reply_to'] ?? ''));
                 if (!is_email($reply)) {
+                    add_settings_error('fbm_emails', 'fbm_emails_reply', __('Invalid reply-to address.', 'foodbank-manager'), 'error');
                     $reply = '';
                 }
                 $emails['from_name']    = $name;

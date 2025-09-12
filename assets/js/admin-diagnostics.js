@@ -35,19 +35,4 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    const dlBtn = document.getElementById('fbm-diagnostics-download');
-    if (dlBtn) {
-        dlBtn.addEventListener('click', function () {
-            const json = dlBtn.getAttribute('data-report') || '{}';
-            const blob = new Blob([json], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'fbm-system-report.json';
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            URL.revokeObjectURL(url);
-        });
-    }
 });
