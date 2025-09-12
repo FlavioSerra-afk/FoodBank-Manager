@@ -6,6 +6,8 @@ namespace FBM\Core {
     use function wp_json_encode;
     use function strlen;
     use function __;
+    use function sanitize_text_field;
+    use function sanitize_email;
 
     class Options {
         /** @return array<string,mixed> */
@@ -107,6 +109,20 @@ namespace FBM\Core {
                     $current['theme'] = $san;
                 }
                 unset($input['theme']);
+            }
+            if (isset($input['emails']) && is_array($input['emails'])) {
+                $emails = $current['emails'];
+                $name  = sanitize_text_field((string)($input['emails']['from_name'] ?? ''));
+                if (mb_strlen($name) > 200) {
+                    $name = mb_substr($name, 0, 200);
+                }
+                $from  = sanitize_email((string)($input['emails']['from_address'] ?? ''));
+                $reply = sanitize_email((string)($input['emails']['reply_to'] ?? ''));
+                $emails['from_name']    = $name;
+                $emails['from_address'] = $from;
+                $emails['reply_to']     = $reply;
+                $current['emails']      = $emails;
+                unset($input['emails']);
             }
             return array_replace_recursive($current, $input);
         }

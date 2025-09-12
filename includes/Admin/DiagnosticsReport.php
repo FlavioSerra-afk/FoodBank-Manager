@@ -86,7 +86,7 @@ final class DiagnosticsReport {
         $out[] = 'panels=' . implode( ',', $data['panels'] );
         $out[] = 'jobs_pending=' . $data['jobs']['pending'];
         foreach ( $data['cron'] as $row ) {
-            $out[] = 'cron=' . $row['hook'] . '@' . ( $row['last_run'] ? gmdate( 'c', $row['last_run'] ) : '-' );
+            $out[] = 'cron=' . $row['hook'] . '@' . ( $row['last_run'] ? gmdate( 'c', $row['last_run'] ) : '-' ) . '/' . ( $row['next_run'] ? gmdate( 'c', $row['next_run'] ) : '-' );
         }
         return $out;
     }

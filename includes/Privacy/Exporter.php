@@ -21,22 +21,25 @@ use function apply_filters;
 final class Exporter {
 	private const PER_PAGE = 50;
 
-	/**
-	 * Export data for a given email.
-	 *
-	 * @param string $email Email address.
-	 * @param int    $page  Page number.
-	 * @return array{data:list<array{group_id:string,group_label:string,item_id:string,data:list<array{name:string,value:string}>}>,done:bool}
-	 */
-	public static function export( string $email, int $page ): array {
-		global $wpdb;
-		$email = sanitize_email( $email );
-		$page  = max( 1, (int) $page );
-		$limit = (int) apply_filters( 'fbm_privacy_exporter_page_size', self::PER_PAGE );
-		if ( $limit <= 0 ) {
-			$limit = self::PER_PAGE;
-		}
-		$offset = ( $page - 1 ) * $limit;
+        /**
+         * Export data for a given email.
+         *
+         * @param string $email     Email address.
+         * @param int    $page      Page number.
+         * @param int    $per_page  Page size.
+         * @param bool   $masked    Mask sensitive fields.
+         * @return array{data:list<array{group_id:string,group_label:string,item_id:string,data:list<array{name:string,value:string}>}>,done:bool}
+         */
+        public static function export( string $email, int $page, int $per_page = self::PER_PAGE, bool $masked = true ): array {
+                global $wpdb;
+                $email = sanitize_email( $email );
+                $page  = max( 1, (int) $page );
+                $limit = max( 1, min( 200, (int) $per_page ) );
+                $limit = (int) apply_filters( 'fbm_privacy_exporter_page_size', $limit );
+                if ( $limit <= 0 ) {
+                        $limit = self::PER_PAGE;
+                }
+                $offset = ( $page - 1 ) * $limit;
 
 		$groups = array(
 			array(
@@ -77,26 +80,49 @@ final class Exporter {
 						'item_id'     => $item_id,
 						'data'        => array(),
 					);
-					foreach ( $row as $col => $val ) {
-						if ( 'id' === $col || 'email' === $col ) {
-							continue;
-						}
-						$item['data'][] = array(
-							'name'  => sanitize_key( (string) $col ),
-							'value' => sanitize_text_field( (string) $val ),
-						);
-					}
-					$data[] = $item;
-				}
-			}
+                                        foreach ( $row as $col => $val ) {
+                                                if ( 'id' === $col || 'email' === $col ) {
+                                                        continue;
+                                                }
+                                                $name  = sanitize_key( (string) $col );
+                                                $value = sanitize_text_field( (string) $val );
+                                                if ( $masked ) {
+                                                        $value = self::mask_value( $name, $value );
+                                                }
+                                                $item['data'][] = array(
+                                                        'name'  => $name,
+                                                        'value' => $value,
+                                                );
+                                        }
+                                        $data[] = $item;
+                                }
+                        }
 			if ( ! empty( $rows ) && count( $rows ) === $limit ) {
 				$done = false;
 			}
 		}
 
-		return array(
-			'data' => $data,
-			'done' => $done,
-		);
-	}
+                return array(
+                        'data' => $data,
+                        'done' => $done,
+                );
+        }
+
+        /**
+         * Mask a field value based on field name.
+         */
+        private static function mask_value( string $field, string $value ): string {
+                $f = strtolower( $field );
+                if ( str_contains( $f, 'email' ) || str_contains( $f, 'recipient' ) ) {
+                        $at = strpos( $value, '@' );
+                        if ( false !== $at ) {
+                                return substr( $value, 0, 1 ) . '***' . substr( $value, $at );
+                        }
+                        return substr( $value, 0, 1 ) . '***';
+                }
+                if ( str_contains( $f, 'note' ) || str_contains( $f, 'name' ) || str_contains( $f, 'phone' ) ) {
+                        return '***';
+                }
+                return $value;
+        }
 }
