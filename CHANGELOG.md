@@ -2,6 +2,13 @@
 
 - Shortcodes helper examples and docs.
 
+## [1.5.3](https://github.com/FlavioSerra-afk/FoodBank-Manager/compare/1.5.2...1.5.3) (2025-09-12)
+
+
+### Bug Fixes
+
+* **cli:** register WP-CLI version command ([847ee46](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/847ee4686d672a95d1c935a1d12a0a68bf19182f))
+
 ## [1.5.2](https://github.com/FlavioSerra-afk/FoodBank-Manager/compare/1.5.1...1.5.2) (2025-09-12)
 
 
