@@ -14,6 +14,7 @@ use FBM\CLI\VersionCommand;
 use FoodBankManager\Diagnostics\RetentionRunner;
 use FBM\Core\Jobs\JobsRepo;
 use FoodBankManager\Mail\Renderer;
+use FBM\Security\ThrottleSettings;
 use function absint;
 use function add_filter;
 use function apply_filters;
@@ -31,6 +32,7 @@ use function switch_to_blog;
 use function wp_privacy_anonymize_data;
 use function remove_filter;
 use function restore_current_blog;
+use function update_option;
 
 /**
  * Parent CLI command with subcommands.
@@ -220,11 +222,77 @@ final class Commands {
                         return;
                 }
 
-                if ( $missing ) {
-                        $this->io->error( 'fbm_manage_jobs missing for Administrator' );
-                        return;
-                }
-
-                $this->io->success( 'All capabilities present' );
+        if ( $missing ) {
+            $this->io->error( 'fbm_manage_jobs missing for Administrator' );
+            return;
         }
+
+        $this->io->success( 'All capabilities present' );
+    }
+
+    /**
+     * Show throttle settings.
+     */
+    public function throttle_show( array $args, array $assoc_args ): void {
+        if ( ! current_user_can( 'fb_manage_diagnostics' ) && ! ( is_multisite() && is_super_admin() ) ) {
+            $this->io->error( 'Forbidden' );
+            return;
+        }
+        $settings = ThrottleSettings::get();
+        $limits   = ThrottleSettings::limits();
+        $this->io->line( sprintf( 'window=%d base=%d', $settings['window_seconds'], $settings['base_limit'] ) );
+        foreach ( $limits as $role => $limit ) {
+            $this->io->line( sprintf( '%s=%s', $role, $limit ? (string) $limit : 'unlimited' ) );
+        }
+    }
+
+    /**
+     * Update throttle settings.
+     */
+    public function throttle_set( array $args, array $assoc_args ): void {
+        if ( ! current_user_can( 'fb_manage_diagnostics' ) && ! ( is_multisite() && is_super_admin() ) ) {
+            $this->io->error( 'Forbidden' );
+            return;
+        }
+        $current = ThrottleSettings::get();
+        $raw     = $current;
+        if ( isset( $assoc_args['window'] ) ) {
+            $raw['window_seconds'] = (int) $assoc_args['window'];
+        }
+        if ( isset( $assoc_args['base'] ) ) {
+            $raw['base_limit'] = (int) $assoc_args['base'];
+        }
+        if ( isset( $assoc_args['role'] ) ) {
+            $roles = (array) $assoc_args['role'];
+            foreach ( $roles as $pair ) {
+                if ( strpos( (string) $pair, ':' ) === false ) {
+                    continue;
+                }
+                list( $role, $mult ) = explode( ':', (string) $pair, 2 );
+                $raw['role_multipliers'][ $role ] = $mult;
+            }
+        }
+        $san = fbm_throttle_sanitize( $raw );
+        update_option( 'fbm_throttle', $san );
+        if ( isset( $assoc_args['window'] ) && $san['window_seconds'] !== (int) $assoc_args['window'] ) {
+            $this->io->line( 'window clamped to ' . $san['window_seconds'] );
+        }
+        if ( isset( $assoc_args['base'] ) && $san['base_limit'] !== (int) $assoc_args['base'] ) {
+            $this->io->line( 'base clamped to ' . $san['base_limit'] );
+        }
+        if ( isset( $assoc_args['role'] ) ) {
+            foreach ( (array) $assoc_args['role'] as $pair ) {
+                if ( strpos( (string) $pair, ':' ) === false ) {
+                    continue;
+                }
+                list( $role, $mult ) = explode( ':', (string) $pair, 2 );
+                $m = (float) $mult;
+                $final = $san['role_multipliers'][ $role ] ?? null;
+                if ( null !== $final && (float) $final !== $m ) {
+                    $this->io->line( $role . ' multiplier clamped to ' . $final );
+                }
+            }
+        }
+        $this->io->success( 'Throttle updated' );
+    }
 }

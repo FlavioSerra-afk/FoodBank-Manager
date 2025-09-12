@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-11 (Wave RC7.5 — License align/i18n build/release provenance)
+Docs-Revision: 2025-09-11 (v1.11.0 security & throttling)
 # Diagnostics Hub
 
 The diagnostics hub surfaces operational information for administrators. It
@@ -17,8 +17,32 @@ dashboards work across subsites. The retention cron is idempotent and safe to
 run on each site. Last and next run times for cron hooks appear in the System
 Report.
 
-Scan and test endpoints are rate limited per user and IP with a short window
-to mitigate abuse. Administrators are exempt from these limits.
+Scan and test endpoints are rate limited per user with a configurable window
+to mitigate abuse. Administrators are exempt from these limits by default.
+
+## Security & Throttling
+
+The Diagnostics hub exposes **Security & Throttling** settings to control scan
+rates.
+
+- **Window** – rolling window in seconds (clamped between 5 and 300).
+- **Base limit** – allowed scans per window before throttling (1–120).
+- **Role multipliers** – per‑role adjustment where `1.0` uses the base limit,
+  values above increase allowance, and `0` disables throttling for the role.
+
+Example CLI usage:
+
+```bash
+$ wp fbm throttle show
+window=30 base=6
+administrator=unlimited
+editor=12
+
+$ wp fbm throttle set --window=60 --base=8 --role=editor:2
+```
+
+Responses include standard `RateLimit-*` headers and `Retry-After` so clients
+can respect cooldowns.
 
 ## SMTP seam
 

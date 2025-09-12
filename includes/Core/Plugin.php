@@ -23,7 +23,7 @@ use FoodBankManager\Core\Screen;
 
 final class Plugin {
 
-    public const VERSION = '1.10.4'; // x-release-please-version
+    public const VERSION = '1.11.0'; // x-release-please-version
     private const OPTION_VERSION = 'fbm_version';
 
         private static ?Plugin $instance = null;
@@ -61,8 +61,9 @@ final class Plugin {
                        if ( class_exists( \FBM\Auth\Capabilities::class ) ) {
                                \FBM\Auth\Capabilities::ensure_for_admin();
                        }
-                       \FoodBankManager\Admin\ThemePage::boot();
-                       \FoodBankManager\Admin\PermissionsPage::boot();
+                        \FoodBankManager\Admin\ThemePage::boot();
+                        \FoodBankManager\Admin\PermissionsPage::boot();
+                        \FoodBankManager\Admin\DiagnosticsSecurity::boot();
                }
 
                \FBM\Shortcodes\Shortcodes::register();
