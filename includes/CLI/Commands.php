@@ -13,6 +13,7 @@ use FBM\CLI\IO;
 use FBM\CLI\VersionCommand;
 use FoodBankManager\Diagnostics\RetentionRunner;
 use FBM\Core\Jobs\JobsRepo;
+use FoodBankManager\Mail\Renderer;
 use function absint;
 use function add_filter;
 use function apply_filters;
@@ -147,7 +148,21 @@ final class Commands {
 	 * @param array $args       Positional arguments.
 	 * @param array $assoc_args Associative arguments.
 	 */
-	public function mail_test( array $args, array $assoc_args ): void {
-		$this->io->success( 'OK' );
-	}
+        public function mail_test( array $args, array $assoc_args ): void {
+                $to = sanitize_email( $assoc_args['to'] ?? '' );
+                if ( ! $to || ! is_email( $to ) ) {
+                        $this->io->error( 'Invalid email' );
+                        return;
+                }
+                $tpl = array(
+                        'subject' => 'FoodBank Manager mail test',
+                        'body'    => '<p>Test email from FoodBank Manager.</p>',
+                );
+                $sent = Renderer::send( $tpl, array(), array( $to ) );
+                if ( $sent ) {
+                        $this->io->success( 'Sent to ' . $to );
+                } else {
+                        $this->io->error( 'Send failed' );
+                }
+        }
 }

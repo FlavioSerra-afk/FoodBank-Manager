@@ -18,6 +18,7 @@ use function sanitize_email;
 use function sanitize_key;
 use function wp_die;
 use function wp_unslash;
+use function absint;
 
 /**
  * Controller for Diagnostics → Privacy panel.
@@ -52,7 +53,12 @@ final class DiagnosticsPrivacy {
             if ( ! current_user_can( 'fb_manage_diagnostics' ) ) {
                 wp_die( esc_html__( 'Insufficient permissions', 'foodbank-manager' ) );
             }
-            $result = \FBM\Privacy\Exporter::export( $email, 1 );
+            $page_size_raw = $_POST['page_size'] ?? null;
+            $page_size     = absint( (string) wp_unslash( (string) $page_size_raw ) );
+            if ( $page_size <= 0 ) {
+                $page_size = 1;
+            }
+            $result = \FBM\Privacy\Exporter::export( $email, 1, $page_size );
             $counts = array();
             foreach ( $result['data'] as $row ) {
                 $counts[ $row['group_id'] ] = ( $counts[ $row['group_id'] ] ?? 0 ) + 1;

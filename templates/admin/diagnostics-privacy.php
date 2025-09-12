@@ -20,6 +20,10 @@ $erasure = DiagnosticsPrivacy::erasure_summary();
         <label for="fbm-privacy-email"><?php esc_html_e( 'Email', 'foodbank-manager' ); ?></label>
         <input type="email" id="fbm-privacy-email" name="email" required />
     </p>
+    <p>
+        <label for="fbm-privacy-page"><?php esc_html_e( 'Page size', 'foodbank-manager' ); ?></label>
+        <input type="number" id="fbm-privacy-page" name="page_size" min="1" max="100" value="1" />
+    </p>
     <input type="hidden" name="fbm_privacy_action" value="fbm_privacy_preview" />
     <?php wp_nonce_field( 'fbm_privacy_preview' ); ?>
     <?php submit_button( __( 'Preview SAR', 'foodbank-manager' ), 'secondary', '', false ); ?>
@@ -43,7 +47,11 @@ $erasure = DiagnosticsPrivacy::erasure_summary();
     <?php submit_button( __( 'Run erasure now', 'foodbank-manager' ), 'delete', '', false ); ?>
 </form>
 <?php if ( ! empty( $preview ) ) : ?>
-    <p><code><?php echo esc_html( wp_json_encode( $preview ) ); ?></code></p>
+    <ul>
+        <?php foreach ( $preview as $group => $count ) : ?>
+            <li><?php echo esc_html( $group . ': ' . $count ); ?></li>
+        <?php endforeach; ?>
+    </ul>
 <?php endif; ?>
 <?php if ( ! empty( $erasure ) ) : ?>
     <p><code><?php echo esc_html( wp_json_encode( $erasure ) ); ?></code></p>

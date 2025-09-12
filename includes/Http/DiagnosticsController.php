@@ -12,6 +12,7 @@ namespace FoodBankManager\Http;
 use FoodBankManager\Core\Options;
 use FoodBankManager\Mail\FailureLog;
 use FBM\Mail\LogRepo;
+use FBM\Security\RateLimiter;
 use function current_user_can;
 use function check_admin_referer;
 use function wp_mail;
@@ -55,6 +56,13 @@ final class DiagnosticsController {
             wp_die( esc_html__( 'Forbidden', 'foodbank-manager' ) );
         }
         check_admin_referer( 'fbm_diag_mail_test', '_fbm_nonce' );
+        if ( ! current_user_can( 'manage_options' ) ) {
+            $ip  = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_key( (string) $_SERVER['REMOTE_ADDR'] ) : '';
+            $uid = get_current_user_id();
+            if ( ! RateLimiter::allow( 'mailtest_ip_' . $ip ) || ( $uid > 0 && ! RateLimiter::allow( 'mailtest_user_' . (string) $uid ) ) ) {
+                wp_die( esc_html__( 'Too many requests', 'foodbank-manager' ), '', array( 'response' => 429 ) );
+            }
+        }
         $to         = sanitize_email( (string) get_option( 'admin_email' ) );
         $from_name  = sanitize_text_field( (string) Options::get( 'emails.from_name' ) );
         $from_email = sanitize_email( (string) Options::get( 'emails.from_email' ) );
