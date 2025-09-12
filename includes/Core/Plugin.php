@@ -15,13 +15,14 @@ use FBM\Http\ExportJobsController;
 use FBM\Core\Jobs\JobsWorker;
 use FoodBankManager\Core\Options;
 use FBM\Core\Retention;
+use FoodBankManager\Core\Cron;
 use FoodBankManager\CLI\Commands;
 use FoodBankManager\Admin\ShortcodesPage;
 use FoodBankManager\Core\Screen;
 
 final class Plugin {
 
-    public const VERSION = '1.6.0'; // x-release-please-version
+    public const VERSION = '1.6.1'; // x-release-please-version
 
         private static ?Plugin $instance = null;
         private static bool $booted = false;
@@ -64,6 +65,8 @@ final class Plugin {
                \FBM\Shortcodes\Shortcodes::register();
                Options::boot();
                Retention::init();
+               Cron::init();
+               Cron::maybe_schedule_retention();
                \FBM\Forms\FormCpt::register();
                 add_action(
                         'init',
@@ -112,7 +115,7 @@ final class Plugin {
 
         private static function maybe_register_cli(): void {
                 if ( defined( 'WP_CLI' ) && \WP_CLI ) {
-                        \WP_CLI::add_command( 'fbm', Commands::class );
+                        \WP_CLI::add_command( 'fbm', new Commands( new \FBM\CLI\WpCliIO() ) );
                 }
         }
 
@@ -120,7 +123,7 @@ final class Plugin {
         public static function activate(): void {
                 ( new Migrations() )->maybe_migrate();
                 Roles::install();
-                Retention::schedule();
+                Cron::maybe_schedule_retention();
                 JobsWorker::schedule();
         }
 

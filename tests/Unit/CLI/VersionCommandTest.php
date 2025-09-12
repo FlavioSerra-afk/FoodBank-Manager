@@ -3,18 +3,10 @@ declare(strict_types=1);
 
 namespace Tests\Unit\CLI;
 
+require_once __DIR__ . '/../../Support/FakeIO.php';
+
 use FBM\CLI\VersionCommand;
-use FBM\CLI\IO;
-
-final class FakeIO implements IO {
-    public array $lines = [];
-    public array $success = [];
-    public array $errors = [];
-
-    public function line(string $message): void { $this->lines[] = $message; }
-    public function success(string $message): void { $this->success[] = $message; }
-    public function error(string $message): void { $this->errors[] = $message; }
-}
+use Tests\Support\FakeIO;
 
 final class VersionCommandTest extends \BaseTestCase {
     public function testOutputsVersion(): void {
