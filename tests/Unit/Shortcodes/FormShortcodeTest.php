@@ -65,7 +65,7 @@ final class FormShortcodeTest extends \BaseTestCase {
     public function testTamperedSchemaReturnsEmpty(): void {
         $raw = json_decode($GLOBALS['fbm_options']['fbm_form_test_form'], true);
         $raw['fields'][] = ['id' => 'hack', 'type' => 'evil', 'label' => 'Hack'];
-        $GLOBALS['fbm_options']['fbm_form_test_form'] = json_encode($raw);
+        update_option('fbm_form_test_form', json_encode($raw));
         $html = FormShortcode::render(['preset' => 'test_form']);
         $this->assertSame('', $html);
     }

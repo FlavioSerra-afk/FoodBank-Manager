@@ -48,12 +48,16 @@ final class CsvWriter {
         // normalize fields to strings without mutating data shape
         $norm = array_map(static function ($v) {
             if (is_bool($v)) {
-                return $v ? '1' : '0';
+                $v = $v ? '1' : '0';
+            } elseif (is_scalar($v) || $v === null) {
+                $v = (string) $v;
+            } else {
+                $v = json_encode($v, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             }
-            if (is_scalar($v) || $v === null) {
-                return (string) $v;
+            if ($v !== '' && preg_match('/^[=+\-@\t\r]/', $v) === 1) {
+                $v = "'" . $v;
             }
-            return json_encode($v, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            return $v;
         }, $row);
         return \fputcsv($h, $norm, $sep, $enc, $esc);
     }

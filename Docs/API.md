@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-11 (v1.11.1 patch finalize)
+Docs-Revision: 2025-09-11 (v1.11.2 patch finalize)
 # REST API (pcc-fb/v1)
 
 Base namespace: `pcc-fb/v1`. All write endpoints require `X-WP-Nonce` and capabilities.
@@ -6,7 +6,7 @@ Shortcode previews are handled via `admin-post.php` (`fbm_action=shortcode_previ
 Dashboard summary CSV downloads use `admin-post.php?action=fbm_dash_export` with a nonce and `fb_manage_dashboard` capability.
 Design & Theme options are configuration-only; no REST endpoints expose or modify them.
 Admin screens are wrapped in `.fbm-admin` with assets/notices loaded only on FoodBank Manager pages.
-On multisite, network administrators receive `fbm_manage_jobs` on activation; a migration flag prevents re-granting on upgrade.
+On multisite, network administrators receive `fbm_manage_jobs` on activation; a migration flag prevents re-granting on upgrade. Cron hooks are idempotent per site.
 
 ## API Errors
 
