@@ -5,6 +5,7 @@ namespace Tests\Unit\Admin;
 
 use FBM\Admin\JobsTable;
 use Tests\Support\JobsDbStub;
+use Tests\Support\Exceptions\FbmDieException;
 use function fbm_grant_caps;
 use function fbm_seed_nonce;
 use function fbm_nonce;
@@ -50,12 +51,14 @@ final class JobsTableTest extends \BaseTestCase {
 
     public function testBulkRetryCancel(): void {
         fbm_grant_caps( array( 'fbm_manage_jobs' ) );
+        $t = new JobsTable();
+        $t->prepare_items();
+
         $_REQUEST = array(
             'action'   => 'retry',
             '_wpnonce' => fbm_nonce( 'bulk-jobs' ),
         );
         $_POST['job'] = array( 1, 3 );
-        $t = new JobsTable();
         $t->process_bulk_action();
         $table = $GLOBALS['wpdb']->prefix . 'fbm_jobs';
         $this->assertSame( 'pending', $GLOBALS['wpdb']->tables[ $table ][1]['status'] );
@@ -67,5 +70,16 @@ final class JobsTableTest extends \BaseTestCase {
         $_POST['job'] = array( 2 );
         $t->process_bulk_action();
         $this->assertSame( 'cancelled', $GLOBALS['wpdb']->tables[ $table ][2]['status'] );
+    }
+
+    public function testBulkDeniedWithoutCap(): void {
+        $_REQUEST = array(
+            'action'   => 'retry',
+            '_wpnonce' => fbm_nonce( 'bulk-jobs' ),
+        );
+        $_POST['job'] = array( 1 );
+        $t = new JobsTable();
+        $this->expectException( FbmDieException::class );
+        $t->process_bulk_action();
     }
 }

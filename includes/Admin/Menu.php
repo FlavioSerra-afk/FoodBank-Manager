@@ -46,6 +46,7 @@ final class Menu {
                         'fbm',
                         'fbm_attendance',
                         'fbm_reports',
+                        'fbm_jobs',
                         'fbm_events',
                         'fbm_scan',
                         'fbm_database',
