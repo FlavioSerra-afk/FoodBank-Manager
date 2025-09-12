@@ -140,7 +140,7 @@ namespace FBM\Core {
         public static function save(array $patch): bool {
             $current = self::all();
             $next    = self::merge($current, $patch);
-            return update_option('fbm_options', $next);
+            return update_option('fbm_options', $next, false); // @phpstan-ignore-line
         }
 
         /**

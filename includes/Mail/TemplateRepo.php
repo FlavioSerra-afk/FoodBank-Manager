@@ -84,7 +84,7 @@ class TemplateRepo {
         $all             = self::all();
         $slug            = sanitize_key( $slug );
         $all[ $slug ]    = self::sanitize_template( $data );
-        update_option( self::OPTION, $all );
+        update_option( self::OPTION, $all, false ); // @phpstan-ignore-line
     }
 
     /**
@@ -97,7 +97,7 @@ class TemplateRepo {
         $all = self::all();
         $slug = sanitize_key( $slug );
         unset( $all[ $slug ] );
-        update_option( self::OPTION, $all );
+        update_option( self::OPTION, $all, false ); // @phpstan-ignore-line
     }
 
     /**

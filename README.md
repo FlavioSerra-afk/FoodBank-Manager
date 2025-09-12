@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-04 (Wave v1.1.4 – Final)
+Docs-Revision: 2025-09-11 (v1.11.1 patch finalize)
 # FoodBank Manager Plugin
 
 See [Docs/PRD-foodbank-manager.md](../Docs/PRD-foodbank-manager.md) for the full product requirements and specifications.
@@ -15,3 +15,22 @@ wp fbm version
 ## Jobs access
 
 The Jobs page is read-only unless a user has the `fbm_manage_jobs` capability.
+On multisite, network administrators receive this capability on activation and a
+migration flag prevents re-granting on upgrade.
+
+## API errors
+
+FoodBank Manager normalizes error responses across REST and AJAX:
+
+| Code | Meaning |
+| ---- | ------- |
+| 400 | Bad request |
+| 401 | Invalid or missing nonce |
+| 403 | Capability check failed |
+| 404 | Not found |
+| 409 | Conflict |
+| 422 | Validation failed |
+| 429 | Rate limited |
+
+Rate-limited responses include `RateLimit-Limit`, `RateLimit-Remaining`, and
+`Retry-After` headers so clients know when to retry.

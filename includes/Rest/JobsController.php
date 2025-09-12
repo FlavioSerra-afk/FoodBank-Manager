@@ -30,11 +30,12 @@ final class JobsController {
                 'callback'            => array( $this, 'index' ),
                 'permission_callback' => static fn(): bool => current_user_can( 'fbm_manage_jobs' ),
                 'args'                => array(
-                    'limit' => array(
-                        'type'              => 'integer',
-                        'default'           => 20,
-                        'sanitize_callback' => 'absint',
-                        'validate_callback' => static fn( $v ): bool => is_int( $v ) && $v > 0 && $v <= 1000,
+                    'limit' => array_merge(
+                        \FoodBankManager\Rest\ArgHelper::id( false ),
+                        array(
+                            'default'           => 20,
+                            'validate_callback' => static fn( $v ): bool => is_int( $v ) && $v > 0 && $v <= 1000,
+                        )
                     ),
                 ),
             )

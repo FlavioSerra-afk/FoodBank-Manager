@@ -49,8 +49,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</tbody>
 </table>
 <p class="fbm-export-buttons">
-	<a class="button" href="<?php echo $csv_url; ?>">CSV</a>
-	<a class="button" href="<?php echo $xlsx_url; ?>">XLSX</a>
-	<a class="button" href="<?php echo $pdf_url; ?>">PDF</a>
+        <a class="button" href="<?php echo esc_url( $csv_url ); ?>">CSV</a>
+        <a class="button" href="<?php echo esc_url( $xlsx_url ); ?>">XLSX</a>
+        <a class="button" href="<?php echo esc_url( $pdf_url ); ?>">PDF</a>
 </p>
 </div>

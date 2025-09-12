@@ -126,7 +126,7 @@ $rows       = $rows ?? array();
                 <td><?php echo esc_html( $f['subject'] ); ?></td>
                 <td><?php echo esc_html( $f['provider_msg'] ); ?></td>
                 <td>
-                    <button type="button" class="button fbm-mail-replay" data-id="<?php echo (int) $f['id']; ?>" data-nonce="<?php echo esc_attr( $replay_nonce ); ?>"><?php esc_html_e( 'Resend', 'foodbank-manager' ); ?></button>
+                    <button type="button" class="button fbm-mail-replay" data-id="<?php echo esc_attr( (string) ( $f['id'] ?? 0 ) ); ?>" data-nonce="<?php echo esc_attr( $replay_nonce ); ?>"><?php esc_html_e( 'Resend', 'foodbank-manager' ); ?></button>
                     <span class="fbm-mail-replay-result"></span>
                 </td>
             </tr>

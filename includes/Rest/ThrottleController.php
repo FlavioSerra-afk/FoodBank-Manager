@@ -113,7 +113,7 @@ final class ThrottleController {
             'role_multipliers' => $mults,
         );
         $san = fbm_throttle_sanitize( $data );
-        update_option( 'fbm_throttle', $san );
+        update_option( 'fbm_throttle', $san, false ); // @phpstan-ignore-line
         return new WP_REST_Response(
             array(
                 'settings' => $san,
