@@ -11,3 +11,7 @@ activation you can run:
 ```bash
 wp fbm version
 ```
+
+## Jobs access
+
+The Jobs page is read-only unless a user has the `fbm_manage_jobs` capability.

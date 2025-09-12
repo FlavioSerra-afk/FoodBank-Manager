@@ -5,6 +5,11 @@ The diagnostics hub surfaces operational information for administrators. It
 covers mail transport details, recent mail failures with retry, cron event
 telemetry, export job status, retention sweeps, and basic environment checks.
 
+## Jobs access
+
+The Jobs page is read-only unless a user has the `fbm_manage_jobs` capability.
+Administrators can grant it via **Diagnostics → Permissions**.
+
 Scan and test endpoints are rate limited per user and IP with a short window
 to mitigate abuse. Administrators are exempt from these limits.
 

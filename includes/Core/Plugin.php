@@ -23,7 +23,7 @@ use FoodBankManager\Core\Screen;
 
 final class Plugin {
 
-    public const VERSION = '1.10.1'; // x-release-please-version
+    public const VERSION = '1.10.2'; // x-release-please-version
     private const OPTION_VERSION = 'fbm_version';
 
         private static ?Plugin $instance = null;
@@ -130,12 +130,31 @@ final class Plugin {
                 if ( $current === self::VERSION ) {
                         return;
                 }
-                if ( \version_compare( (string) $current, '1.10.1', '<' ) ) {
-                        $role = \get_role( 'administrator' );
-                        if ( $role && ! $role->has_cap( 'fbm_manage_jobs' ) ) {
-                                $role->add_cap( 'fbm_manage_jobs', true );
+
+                if ( \version_compare( (string) $current, '1.10.2', '<' ) ) {
+                        $flag         = 'fbm_caps_migrated_2025_09';
+                        $get_flag     = \is_multisite() ? 'get_site_option' : 'get_option';
+                        $update_flag  = \is_multisite() ? 'update_site_option' : 'update_option';
+                        if ( ! $get_flag( $flag ) ) {
+                                if ( \is_multisite() ) {
+                                        foreach ( \get_sites( array( 'number' => 0 ) ) as $site ) {
+                                                \switch_to_blog( (int) $site->blog_id );
+                                                $role = \get_role( 'administrator' );
+                                                if ( $role && ! $role->has_cap( 'fbm_manage_jobs' ) ) {
+                                                        $role->add_cap( 'fbm_manage_jobs', true );
+                                                }
+                                        }
+                                        \restore_current_blog();
+                                } else {
+                                        $role = \get_role( 'administrator' );
+                                        if ( $role && ! $role->has_cap( 'fbm_manage_jobs' ) ) {
+                                                $role->add_cap( 'fbm_manage_jobs', true );
+                                        }
+                                }
+                                $update_flag( $flag, 1 );
                         }
                 }
+
                 \update_option( self::OPTION_VERSION, self::VERSION );
         }
 
