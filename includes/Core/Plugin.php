@@ -15,12 +15,14 @@ use FBM\Http\ExportJobsController;
 use FBM\Core\Jobs\JobsWorker;
 use FoodBankManager\Core\Options;
 use FBM\Core\Retention;
+use FBM\CLI\VersionCommand;
+use FBM\CLI\WpCliIO;
 use FoodBankManager\Admin\ShortcodesPage;
 use FoodBankManager\Core\Screen;
 
 final class Plugin {
 
-    public const VERSION = '1.5.2'; // x-release-please-version
+    public const VERSION = '1.5.3'; // x-release-please-version
 
         private static ?Plugin $instance = null;
         private static bool $booted = false;
@@ -103,6 +105,12 @@ final class Plugin {
                     return $erasers;
                 } );
 
+                if ( defined( 'WP_CLI' ) && WP_CLI && class_exists( '\WP_CLI' ) ) {
+                    \WP_CLI::add_command(
+                        'fbm version',
+                        [ new VersionCommand( new WpCliIO() ), '__invoke' ]
+                    );
+                }
 
                 self::get_instance()->init();
                 JobsWorker::init();
