@@ -28,6 +28,7 @@ use function sanitize_key;
 use function current_user_can;
 use function get_current_user_id;
 use function wp_verify_nonce;
+use function wp_send_json_success;
 
 /**
  * REST endpoint to verify QR tokens and record attendance.
@@ -74,6 +75,7 @@ final class ScanController {
                 200
             );
         }
+        $now_ts = (int) apply_filters('fbm_now', time());
         $limit = 0;
         $remaining = 0;
         $retry = 0;
@@ -91,13 +93,17 @@ final class ScanController {
                 $retry     = max($retry, $userCheck['retry_after']);
                 $allowed   = $allowed && $userCheck['allowed'];
             }
+            $reset = $retry > 0 ? $now_ts + $retry : $now_ts;
             fbm_send_headers(array(
+                'RateLimit-Limit: ' . $limit,
+                'RateLimit-Remaining: ' . max(0, $remaining),
+                'RateLimit-Reset: ' . $reset,
                 'X-FBM-RateLimit-Limit: ' . $limit,
                 'X-FBM-RateLimit-Remaining: ' . max(0, $remaining),
                 'Retry-After: ' . $retry,
             ));
             if (!$allowed) {
-                return new WP_REST_Response(
+                return wp_send_json_success(
                     array(
                         'checked_in' => false,
                         'status'     => 'rate-limited',
@@ -108,6 +114,9 @@ final class ScanController {
             }
         } else {
             fbm_send_headers(array(
+                'RateLimit-Limit: 0',
+                'RateLimit-Remaining: 0',
+                'RateLimit-Reset: ' . $now_ts,
                 'X-FBM-RateLimit-Limit: 0',
                 'X-FBM-RateLimit-Remaining: 0',
                 'Retry-After: 0',
@@ -173,7 +182,6 @@ final class ScanController {
         $event_id = (int) $parts[0];
         $recipient = trim((string) $parts[1]);
         $exp = (int) $parts[2];
-        $now_ts = (int) apply_filters('fbm_now', time());
         if ($now_ts > $exp) {
             return new WP_REST_Response(
                 array(
