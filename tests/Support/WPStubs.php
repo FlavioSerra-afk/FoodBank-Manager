@@ -65,22 +65,46 @@ $GLOBALS['fbm_is_multisite'] = $GLOBALS['fbm_is_multisite'] ?? false;
 $GLOBALS['fbm_sites'] = $GLOBALS['fbm_sites'] ?? [];
 $GLOBALS['fbm_current_blog'] = $GLOBALS['fbm_current_blog'] ?? 1;
 if (!function_exists('get_option')) {
-  function get_option($name, $default=false){ return $GLOBALS['fbm_options'][$name] ?? $default; }
+  function get_option($name, $default=false){
+    $blog = $GLOBALS['fbm_current_blog'] ?? 1;
+    return $GLOBALS['fbm_options'][$blog][$name] ?? ($GLOBALS['fbm_options'][$name] ?? $default);
+  }
 }
 if (!function_exists('update_option')){
-  function update_option($name, $value, $autoload = true){ $GLOBALS['fbm_options'][$name] = $value; return true; }
+  function update_option($name, $value, $autoload = true){
+    $blog = $GLOBALS['fbm_current_blog'] ?? 1;
+    $GLOBALS['fbm_options'][$blog][$name] = $value;
+    $GLOBALS['fbm_options'][$name]       = $value;
+    return true;
+  }
 }
 if (!function_exists('delete_option')){
-  function delete_option($name){ unset($GLOBALS['fbm_options'][$name]); return true; }
+  function delete_option($name){
+    $blog = $GLOBALS['fbm_current_blog'] ?? 1;
+    unset($GLOBALS['fbm_options'][$blog][$name], $GLOBALS['fbm_options'][$name]);
+    return true;
+  }
 }
 if (!function_exists('set_transient')) {
-  function set_transient($key, $value, $expiration = 0){ $GLOBALS['fbm_transients'][$key] = $value; return true; }
+  function set_transient($key, $value, $expiration = 0){
+    $blog = $GLOBALS['fbm_current_blog'] ?? 1;
+    $GLOBALS['fbm_transients'][$blog][$key] = $value;
+    $GLOBALS['fbm_transients'][$key]        = $value;
+    return true;
+  }
 }
 if (!function_exists('get_transient')) {
-  function get_transient($key){ return $GLOBALS['fbm_transients'][$key] ?? false; }
+  function get_transient($key){
+    $blog = $GLOBALS['fbm_current_blog'] ?? 1;
+    return $GLOBALS['fbm_transients'][$blog][$key] ?? ($GLOBALS['fbm_transients'][$key] ?? false);
+  }
 }
 if (!function_exists('delete_transient')) {
-  function delete_transient($key){ unset($GLOBALS['fbm_transients'][$key]); return true; }
+  function delete_transient($key){
+    $blog = $GLOBALS['fbm_current_blog'] ?? 1;
+    unset($GLOBALS['fbm_transients'][$blog][$key], $GLOBALS['fbm_transients'][$key]);
+    return true;
+  }
 }
 if (!function_exists('is_multisite')) {
   function is_multisite(): bool { return (bool) ($GLOBALS['fbm_is_multisite'] ?? false); }
@@ -90,6 +114,9 @@ if (!function_exists('get_site_option')) {
 }
 if (!function_exists('update_site_option')) {
   function update_site_option($name, $value){ $GLOBALS['fbm_site_options'][$name] = $value; return true; }
+}
+if (!function_exists('delete_site_option')) {
+  function delete_site_option($name){ unset($GLOBALS['fbm_site_options'][$name]); return true; }
 }
 if (!function_exists('get_sites')) {
   function get_sites($args=array()){ return $GLOBALS['fbm_sites'] ?? []; }
@@ -103,6 +130,11 @@ if (!function_exists('switch_to_blog')) {
 if (!function_exists('restore_current_blog')) {
   function restore_current_blog(){ $GLOBALS['fbm_current_blog'] = 1; }
 }
+if (!function_exists('is_plugin_active_for_network')) {
+  function is_plugin_active_for_network($basename){
+    return in_array($basename, (array)($GLOBALS['fbm_network_active_plugins'] ?? []), true);
+  }
+}
 if (!function_exists('is_super_admin')) {
   function is_super_admin($user_id=null){ return current_user_can('manage_options'); }
 }
@@ -115,6 +147,27 @@ if (!isset($wpdb) || !is_object($wpdb)) {
 if (empty($wpdb->prefix)) {
   $wpdb->prefix = 'wp_';
 }
+$wpdb->options   = $wpdb->options ?? 'wp_options';
+$wpdb->sitemeta  = $wpdb->sitemeta ?? 'wp_sitemeta';
+$wpdb->query = $wpdb->query ?? function (string $sql) {
+    if (preg_match("/DELETE FROM `[^`]+` WHERE option_name LIKE '([^']+)'/", $sql, $m)) {
+        $prefix = str_replace('%', '', $m[1]);
+        $blog   = $GLOBALS['fbm_current_blog'] ?? 1;
+        foreach (($GLOBALS['fbm_options'][$blog] ?? []) as $name => $_) {
+            if (strpos($name, $prefix) === 0) {
+                unset($GLOBALS['fbm_options'][$blog][$name], $GLOBALS['fbm_options'][$name]);
+            }
+        }
+    } elseif (preg_match("/DELETE FROM `[^`]+` WHERE meta_key LIKE '([^']+)'/", $sql, $m)) {
+        $prefix = str_replace('%', '', $m[1]);
+        foreach ($GLOBALS['fbm_site_options'] as $name => $_) {
+            if (strpos($name, $prefix) === 0) {
+                unset($GLOBALS['fbm_site_options'][$name]);
+            }
+        }
+    }
+    return true;
+};
 
 if (!defined('ARRAY_A')) define('ARRAY_A', 'ARRAY_A');
 // Plugins API (and tracking globals)

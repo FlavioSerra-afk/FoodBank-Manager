@@ -15,7 +15,6 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) || ! defined( 'ABSPATH' ) ) {
 try {
     global $wpdb;
 
-    // Delete known options (site + network).
     $opts = array(
         'fbm_options',
         'fbm_version',
@@ -25,44 +24,49 @@ try {
         'fbm_mail_failures',
         'fbm_throttle',
     );
+
+    $cleanup = static function () use ( $opts, $wpdb ): void {
+        foreach ( $opts as $opt ) {
+            delete_option( $opt );
+        }
+        $blog = $GLOBALS['fbm_current_blog'] ?? 1;
+        foreach ( array_keys( $GLOBALS['fbm_options'][$blog] ?? array() ) as $name ) {
+            if ( strpos( $name, 'fbm_caps_migrated_' ) === 0 || strpos( $name, 'fbm_telemetry_' ) === 0 || strpos( $name, '_transient_fbm_' ) === 0 ) {
+                delete_option( $name );
+            }
+        }
+        foreach ( array_keys( $GLOBALS['fbm_transients'][$blog] ?? array() ) as $t ) {
+            if ( strpos( $t, 'fbm_' ) === 0 ) {
+                delete_transient( $t );
+            }
+        }
+        if ( function_exists( 'wp_clear_scheduled_hook' ) ) {
+            wp_clear_scheduled_hook( 'fbm_retention_hourly' );
+            wp_clear_scheduled_hook( 'fbm_retention_tick' );
+            wp_clear_scheduled_hook( 'fbm_jobs_tick' );
+            wp_clear_scheduled_hook( 'fbm_cron_cleanup' );
+            wp_clear_scheduled_hook( 'fbm_cron_email_retry' );
+        }
+    };
+
+    if ( function_exists( 'is_multisite' ) && is_multisite() && function_exists( 'get_sites' ) && function_exists( 'switch_to_blog' ) && function_exists( 'restore_current_blog' ) && ( ! function_exists( 'is_plugin_active_for_network' ) || is_plugin_active_for_network( 'foodbank-manager/foodbank-manager.php' ) ) ) {
+        foreach ( get_sites( array( 'number' => 0 ) ) as $site ) {
+            switch_to_blog( (int) $site->blog_id );
+            $cleanup();
+        }
+        restore_current_blog();
+    } else {
+        $cleanup();
+    }
+
     foreach ( $opts as $opt ) {
-        delete_option( $opt );
         delete_site_option( $opt );
     }
 
-    // Remove migration/telemetry flags.
-    $like_flag = $wpdb->esc_like( 'fbm_caps_migrated_' ) . '%';
-    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- targeted uninstall cleanup.
-    $wpdb->query( "DELETE FROM `{$wpdb->options}` WHERE option_name LIKE '{$like_flag}'" );
-    if ( function_exists( 'is_multisite' ) && is_multisite() && isset( $wpdb->sitemeta ) ) {
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- targeted uninstall cleanup.
-        $wpdb->query( "DELETE FROM `{$wpdb->sitemeta}` WHERE meta_key LIKE '{$like_flag}'" );
-    }
-    $like_tel = $wpdb->esc_like( 'fbm_telemetry_' ) . '%';
-    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- targeted uninstall cleanup.
-    $wpdb->query( "DELETE FROM `{$wpdb->options}` WHERE option_name LIKE '{$like_tel}'" );
-    if ( function_exists( 'is_multisite' ) && is_multisite() && isset( $wpdb->sitemeta ) ) {
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- targeted uninstall cleanup.
-        $wpdb->query( "DELETE FROM `{$wpdb->sitemeta}` WHERE meta_key LIKE '{$like_tel}'" );
-    }
-
-    // Clear transients (site + network).
-    $like = $wpdb->esc_like( '_transient_fbm_' ) . '%';
-    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- targeted uninstall cleanup.
-    $wpdb->query( "DELETE FROM `{$wpdb->options}` WHERE option_name LIKE '{$like}'" );
-    if ( function_exists( 'is_multisite' ) && is_multisite() && isset( $wpdb->sitemeta ) ) {
-        $like_site = $wpdb->esc_like( '_site_transient_fbm_' ) . '%';
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- targeted uninstall cleanup.
-        $wpdb->query( "DELETE FROM `{$wpdb->sitemeta}` WHERE meta_key LIKE '{$like_site}'" );
-    }
-
-    // Unschedule cron hooks we own.
-    if ( function_exists( 'wp_clear_scheduled_hook' ) ) {
-        wp_clear_scheduled_hook( 'fbm_retention_hourly' );
-        wp_clear_scheduled_hook( 'fbm_retention_tick' );
-        wp_clear_scheduled_hook( 'fbm_jobs_tick' );
-        wp_clear_scheduled_hook( 'fbm_cron_cleanup' );
-        wp_clear_scheduled_hook( 'fbm_cron_email_retry' );
+    foreach ( array_keys( $GLOBALS['fbm_site_options'] ?? array() ) as $name ) {
+        if ( strpos( $name, 'fbm_caps_migrated_' ) === 0 || strpos( $name, 'fbm_telemetry_' ) === 0 || strpos( $name, '_site_transient_fbm_' ) === 0 ) {
+            delete_site_option( $name );
+        }
     }
 } catch ( \Throwable $e ) {
     // Silent by design.

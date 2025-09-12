@@ -1,5 +1,10 @@
-Docs-Revision: 2025-09-11 (v1.11.1 patch finalize)
+Docs-Revision: 2025-09-11 (v1.11.2 patch finalize)
 # FoodBank Manager Plugin
+
+Stable tag: 1.11.2
+Requires at least: 6.0
+Tested up to: 6.7
+Requires PHP: 8.1
 
 See [Docs/PRD-foodbank-manager.md](../Docs/PRD-foodbank-manager.md) for the full product requirements and specifications.
 
@@ -17,6 +22,10 @@ wp fbm version
 The Jobs page is read-only unless a user has the `fbm_manage_jobs` capability.
 On multisite, network administrators receive this capability on activation and a
 migration flag prevents re-granting on upgrade.
+
+## Multisite notes
+
+Network administrators receive `fbm_manage_jobs` on activation; a migration flag prevents re-granting on upgrade. Cron hooks such as retention are idempotent and safe to run per site.
 
 ## API errors
 
