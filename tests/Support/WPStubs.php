@@ -313,9 +313,70 @@ if (!function_exists('wp_mail')) {
     }
 }
 if (!function_exists('fbm_test_set_wp_mail_result')) { function fbm_test_set_wp_mail_result(bool $r): void { $GLOBALS['fbm_wp_mail_result']=$r; } }
-if (!function_exists('wp_next_scheduled')){ function wp_next_scheduled($hook){ return false; } }
-if (!function_exists('wp_get_schedule')){ function wp_get_schedule($hook){ return false; } }
-if (!function_exists('wp_get_schedules')){ function wp_get_schedules(){ return []; } }
+if (!isset($GLOBALS['fbm_cron'])) { $GLOBALS['fbm_cron'] = []; }
+if (!function_exists('_get_cron_array')) {
+  function _get_cron_array() {
+    return $GLOBALS['fbm_cron'] ?? [];
+  }
+}
+if (!function_exists('wp_next_scheduled')) {
+  function wp_next_scheduled($hook) {
+    foreach (_get_cron_array() as $ts => $events) {
+      if (isset($events[$hook])) {
+        return $ts;
+      }
+    }
+    return false;
+  }
+}
+if (!function_exists('wp_schedule_event')) {
+  function wp_schedule_event($timestamp, $recurrence, $hook, $args = array()) {
+    $cron = _get_cron_array();
+    $cron[$timestamp][$hook][] = $args;
+    $GLOBALS['fbm_cron'] = $cron;
+    return true;
+  }
+}
+if (!function_exists('wp_clear_scheduled_hook')) {
+  function wp_clear_scheduled_hook($hook) {
+    $cron = _get_cron_array();
+    foreach ($cron as $ts => $events) {
+      if (isset($events[$hook])) {
+        unset($cron[$ts][$hook]);
+        if (!$cron[$ts]) {
+          unset($cron[$ts]);
+        }
+      }
+    }
+    $GLOBALS['fbm_cron'] = $cron;
+    return true;
+  }
+}
+if (!function_exists('wp_get_schedule')) {
+  function wp_get_schedule($hook) {
+    foreach (_get_cron_array() as $ts => $events) {
+      if (isset($events[$hook])) {
+        return 'daily';
+      }
+    }
+    return false;
+  }
+}
+if (!function_exists('wp_get_schedules')) {
+  function wp_get_schedules() {
+    return array('daily' => array('interval' => 86400, 'display' => 'Daily'));
+  }
+}
+if (!function_exists('remove_all_actions')) {
+  function remove_all_actions($hook) {
+    $GLOBALS['fbm_actions'][$hook] = [];
+  }
+}
+if (!function_exists('remove_all_filters')) {
+  function remove_all_filters($hook) {
+    $GLOBALS['fbm_filters'][$hook] = [];
+  }
+}
 if (!function_exists('add_action')){ function add_action($hook, $cb, $prio=10, $args=1){ $GLOBALS['fbm_actions'][$hook][]=$cb; } }
 if (!function_exists('do_action')){ function do_action($hook, ...$args){ foreach($GLOBALS['fbm_actions'][$hook]??[] as $cb){ call_user_func_array($cb,$args); } } }
 if (!function_exists('add_filter')){ function add_filter($hook, $cb, $prio=10){ $GLOBALS['fbm_filters'][$hook][]=$cb; } }

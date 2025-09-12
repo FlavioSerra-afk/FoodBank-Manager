@@ -22,6 +22,7 @@ function fbm_scan_now($v) { // @phpstan-ignore-line
 
 final class ScanControllerTest extends \BaseTestCase {
     private EventsDbStub $db;
+    private $nowCb;
 
     protected function setUp(): void {
         parent::setUp();
@@ -35,7 +36,8 @@ final class ScanControllerTest extends \BaseTestCase {
         $p2 = $ref->getProperty('next_id');
         $p2->setAccessible(true);
         $p2->setValue(null, 1);
-        add_filter('fbm_now', __NAMESPACE__ . '\\fbm_scan_now');
+        $this->nowCb = __NAMESPACE__ . '\\fbm_scan_now';
+        add_filter('fbm_now', $this->nowCb);
         EventsRepo::create(array(
             'title'     => 'Event',
             'starts_at' => '2024-01-01 00:00:00',
@@ -43,6 +45,14 @@ final class ScanControllerTest extends \BaseTestCase {
             'status'    => 'active',
         ));
         Rbac::grantForPage('fbm_scan');
+    }
+
+    protected function tearDown(): void {
+        remove_filter('fbm_now', $this->nowCb);
+        wp_clear_scheduled_hook('fbm_retention_hourly');
+        remove_all_actions('init');
+        remove_all_actions('admin_init');
+        parent::tearDown();
     }
 
     private function req(string $token): WP_REST_Request {
@@ -57,8 +67,8 @@ final class ScanControllerTest extends \BaseTestCase {
         $token = TicketService::fromPayload(1, 'jane@example.com', 1700000060, 'abcd');
         $res = $controller->verify($this->req($token['token']));
         $data = $res->get_data();
-        $this->assertTrue($data['ok']);
-        $this->assertSame('checked_in', $data['status']);
+        $this->assertTrue($data['checked_in']);
+        $this->assertSame('checked-in', $data['status']);
         $this->assertSame('j***@example.com', $data['recipient_masked']);
         $this->assertSame(1, CheckinsRepo::list_for_event(1)['total']);
         $res2 = $controller->verify($this->req($token['token']));
@@ -69,14 +79,18 @@ final class ScanControllerTest extends \BaseTestCase {
         $controller = new ScanController();
         $token = TicketService::fromPayload(1, 'jane@example.com', 1699999990, 'abcd');
         $res = $controller->verify($this->req($token['token']));
-        $this->assertSame('expired', $res->get_data()['status']);
+        $data = $res->get_data();
+        $this->assertSame('expired', $data['status']);
+        $this->assertFalse($data['checked_in']);
         $this->assertSame(0, CheckinsRepo::list_for_event(1)['total']);
     }
 
     public function testInvalid(): void {
         $controller = new ScanController();
         $res = $controller->verify($this->req('badtoken'));
-        $this->assertSame('invalid', $res->get_data()['status']);
+        $data = $res->get_data();
+        $this->assertSame('invalid', $data['status']);
+        $this->assertFalse($data['checked_in']);
     }
 
     public function testDenied(): void {
@@ -84,6 +98,8 @@ final class ScanControllerTest extends \BaseTestCase {
         $controller = new ScanController();
         $token = TicketService::fromPayload(1, 'jane@example.com', 1700000060, 'abcd');
         $res = $controller->verify($this->req($token['token']));
-        $this->assertSame('denied', $res->get_data()['status']);
+        $data = $res->get_data();
+        $this->assertSame('denied', $data['status']);
+        $this->assertFalse($data['checked_in']);
     }
 }

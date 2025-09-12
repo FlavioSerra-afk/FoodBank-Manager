@@ -123,6 +123,9 @@ namespace {
 
     protected function tearDown(): void {
         remove_filter( 'fbm_retention_runner', 'fbm_fake_retention_runner_provider' );
+        wp_clear_scheduled_hook('fbm_retention_hourly');
+        remove_all_actions('init');
+        remove_all_actions('admin_init');
         parent::tearDown();
     }
 
