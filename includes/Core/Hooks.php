@@ -8,6 +8,7 @@ use FoodBankManager\Shortcodes\Entries;
 use FoodBankManager\Shortcodes\AttendanceManager;
 use FoodBankManager\Shortcodes\Dashboard;
 use FoodBankManager\Rest\Api;
+use FBM\Rest\ErrorHelper;
 use FoodBankManager\Mail\Logger;
 use FoodBankManager\Mail\FailureLog;
 use FoodBankManager\Admin\Notices;
@@ -18,6 +19,7 @@ class Hooks {
         public function register(): void {
                 add_action( 'init', array( $this, 'register_shortcodes' ) );
                 add_action( 'rest_api_init', array( Api::class, 'register_routes' ) );
+                ErrorHelper::register();
                 Logger::init();
                 FailureLog::init();
                 add_action( 'fbm_crypto_missing_kek', array( Notices::class, 'missing_kek' ) );

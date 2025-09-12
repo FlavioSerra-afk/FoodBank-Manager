@@ -18,7 +18,7 @@ final class DiagnosticsMailAjaxTest extends \BaseTestCase {
         $_POST['to'] = 'nope';
         $res = DiagnosticsController::ajax_mail_test();
         $this->assertFalse($res->get_data()['success']);
-        $this->assertSame(400, $res->get_status());
+        $this->assertSame(422, $res->get_status());
     }
 
     public function testValidAddress(): void {

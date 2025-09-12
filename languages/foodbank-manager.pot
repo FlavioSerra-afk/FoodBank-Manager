@@ -2,14 +2,14 @@
 # This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: FoodBank Manager 1.10.3\n"
+"Project-Id-Version: FoodBank Manager 1.10.4\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/FoodBank-Manager\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-09-12T22:08:17+00:00\n"
+"POT-Creation-Date: 2025-09-12T22:28:40+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: foodbank-manager\n"
@@ -208,30 +208,30 @@ msgstr ""
 msgid "Search Jobs"
 msgstr ""
 
-#: includes/Admin/MailReplay.php:35
+#: includes/Admin/MailReplay.php:36
 #: includes/Http/AttendanceExportController.php:58
 #: includes/Http/DashboardExportController.php:33
-#: includes/Http/DiagnosticsController.php:114
+#: includes/Http/DiagnosticsController.php:115
 #: includes/Http/ExportJobsController.php:36
 #: includes/Http/ExportJobsController.php:64
 #: includes/Http/ExportJobsController.php:110
 #: includes/Http/ExportJobsController.php:127
-#: includes/Rest/Api.php:81
-#: includes/Rest/AttendanceController.php:183
-#: includes/Rest/AttendanceController.php:288
-#: includes/Rest/AttendanceController.php:375
-#: includes/Rest/AttendanceController.php:412
-#: includes/Rest/AttendanceController.php:448
+#: includes/Rest/Api.php:80
+#: includes/Rest/AttendanceController.php:182
+#: includes/Rest/AttendanceController.php:282
+#: includes/Rest/AttendanceController.php:359
+#: includes/Rest/AttendanceController.php:391
+#: includes/Rest/AttendanceController.php:422
 msgid "Invalid nonce"
 msgstr ""
 
-#: includes/Admin/MailReplay.php:38
+#: includes/Admin/MailReplay.php:42
 #: includes/Http/AttendanceExportController.php:54
 #: includes/Http/DashboardExportController.php:29
 #: includes/Http/DiagnosticsController.php:61
-#: includes/Http/DiagnosticsController.php:117
-#: includes/Http/DiagnosticsController.php:138
-#: includes/Http/DiagnosticsController.php:157
+#: includes/Http/DiagnosticsController.php:121
+#: includes/Http/DiagnosticsController.php:147
+#: includes/Http/DiagnosticsController.php:166
 #: includes/Http/ExportController.php:51
 #: includes/Http/ExportJobsController.php:32
 #: includes/Http/ExportJobsController.php:59
@@ -239,6 +239,15 @@ msgstr ""
 #: includes/Http/ExportJobsController.php:122
 #: includes/Http/MailResendController.php:42
 msgid "Forbidden"
+msgstr ""
+
+#: includes/Admin/MailReplay.php:51
+#: includes/Http/ExportController.php:61
+msgid "Not found"
+msgstr ""
+
+#: includes/Admin/MailReplay.php:60
+msgid "Invalid data"
 msgstr ""
 
 #: includes/Admin/Menu.php:101
@@ -608,46 +617,50 @@ msgid "Too many requests"
 msgstr ""
 
 #: includes/Http/DiagnosticsController.php:92
-#: includes/Http/DiagnosticsController.php:124
+#: includes/Http/DiagnosticsController.php:133
 msgid "FoodBank Manager test email"
 msgstr ""
 
 #: includes/Http/DiagnosticsController.php:93
-#: includes/Http/DiagnosticsController.php:125
+#: includes/Http/DiagnosticsController.php:134
 msgid "This is a test email from FoodBank Manager."
 msgstr ""
 
-#: includes/Http/DiagnosticsController.php:121
+#: includes/Http/DiagnosticsController.php:128
 msgid "Invalid email"
-msgstr ""
-
-#: includes/Http/ExportController.php:61
-msgid "Not found"
 msgstr ""
 
 #: includes/Http/FormSubmitController.php:42
 msgid "Invalid form."
 msgstr ""
 
-#: includes/Rest/Api.php:100
+#: includes/Rest/Api.php:94
 msgid "Required fields missing"
 msgstr ""
 
 #. translators: %d: application ID.
-#: includes/Rest/Api.php:235
+#: includes/Rest/Api.php:227
 #, php-format
 msgid "We received your application — Ref %d"
 msgstr ""
 
 #. translators: %d: application ID.
-#: includes/Rest/Api.php:268
+#: includes/Rest/Api.php:260
 #, php-format
 msgid "New application received (Ref %d)"
 msgstr ""
 
-#: includes/Rest/AttendanceController.php:200
-#: includes/Rest/AttendanceController.php:300
+#: includes/Rest/AttendanceController.php:194
+#: includes/Rest/AttendanceController.php:289
 msgid "Invalid application reference"
+msgstr ""
+
+#: includes/Rest/AttendanceController.php:208
+msgid "Policy conflict"
+msgstr ""
+
+#: includes/Rest/AttendanceController.php:448
+msgid "Internal error"
 msgstr ""
 
 #: includes/Rest/ScanController.php:133

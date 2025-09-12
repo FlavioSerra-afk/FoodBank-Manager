@@ -12,6 +12,7 @@ namespace FoodBankManager\Rest;
 
 use WP_REST_Request;
 use WP_REST_Response;
+use WP_Error;
 use FoodBankManager\Auth\Permissions;
 use FoodBankManager\Security\Helpers;
 use FoodBankManager\Attendance\TokenService;
@@ -19,6 +20,7 @@ use FoodBankManager\Attendance\AttendanceRepo;
 use FoodBankManager\Attendance\Policy;
 use FoodBankManager\Core\Options;
 use FoodBankManager\Logging\Audit;
+use FBM\Rest\ErrorHelper;
 use wpdb;
 
 /**
@@ -175,51 +177,46 @@ class AttendanceController {
 		 */
 	public function checkin( WP_REST_Request $request ): WP_REST_Response {
 		$nonce = $request->get_header( 'x-wp-nonce' );
-		if ( ! $nonce || ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-				return new WP_REST_Response(
-					array(
-						'error' => array(
-							'code'    => 'fbm_invalid_nonce',
-							'message' => __( 'Invalid nonce', 'foodbank-manager' ),
-						),
-					),
-					403
-				);
-		}
+                if ( ! $nonce || ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+                        $err = ErrorHelper::from_wp_error(
+                                new WP_Error( 'invalid_nonce', __( 'Invalid nonce', 'foodbank-manager' ), array( 'status' => 401 ) )
+                        );
+                        return new WP_REST_Response( $err['body'], $err['status'] );
+                }
 		$application_id = (int) $request->get_param( 'application_id' );
 		$token          = (string) $request->get_param( 'token' );
 		if ( $application_id === 0 && $token !== '' ) {
 				$data           = TokenService::validate( $token );
 				$application_id = (int) ( $data['a'] ?? 0 );
 		}
-		if ( $application_id === 0 ) {
-				return new WP_REST_Response(
-					array(
-						'error' => array(
-							'code'    => 'fbm_invalid_application',
-							'message' => __( 'Invalid application reference', 'foodbank-manager' ),
-						),
-					),
-					400
-				);
-		}
+                if ( $application_id === 0 ) {
+                        $err = ErrorHelper::from_wp_error(
+                                new WP_Error( 'invalid_param', __( 'Invalid application reference', 'foodbank-manager' ), array( 'status' => 422 ) )
+                        );
+                        return new WP_REST_Response( $err['body'], $err['status'] );
+                }
 
 		$policy_days = (int) Options::get( 'attendance.policy_days' );
                 $last        = AttendanceRepo::last_present( $application_id );
 		$now         = current_time( 'mysql', true );
 		$override    = $request->get_param( 'override' );
 		$override_ok = is_array( $override ) && ! empty( $override['allowed'] );
-		if ( Policy::is_breach( $last, $policy_days, $now ) && ! $override_ok ) {
-				return new WP_REST_Response(
-					array(
-						'policy_warning' => array(
-							'rule_days'        => $policy_days,
-							'last_attended_at' => $last,
-						),
-					),
-					409
-				);
-		}
+                if ( Policy::is_breach( $last, $policy_days, $now ) && ! $override_ok ) {
+                        $err = ErrorHelper::from_wp_error(
+                                new WP_Error(
+                                        'conflict',
+                                        __( 'Policy conflict', 'foodbank-manager' ),
+                                        array(
+                                                'status'  => 409,
+                                                'details' => array(
+                                                        'rule_days'        => $policy_days,
+                                                        'last_attended_at' => $last,
+                                                ),
+                                        )
+                                )
+                        );
+                        return new WP_REST_Response( $err['body'], $err['status'] );
+                }
 
 		$event_id = (int) $request->get_param( 'event_id' );
                 $type     = Helpers::sanitize_text( (string) $request->get_param( 'type' ) );
@@ -280,29 +277,19 @@ class AttendanceController {
 		 */
 	public function noshow( WP_REST_Request $request ): WP_REST_Response {
 		$nonce = $request->get_header( 'x-wp-nonce' );
-		if ( ! $nonce || ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-				return new WP_REST_Response(
-					array(
-						'error' => array(
-							'code'    => 'fbm_invalid_nonce',
-							'message' => __( 'Invalid nonce', 'foodbank-manager' ),
-						),
-					),
-					403
-				);
-		}
+                if ( ! $nonce || ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+                        $err = ErrorHelper::from_wp_error(
+                                new WP_Error( 'invalid_nonce', __( 'Invalid nonce', 'foodbank-manager' ), array( 'status' => 401 ) )
+                        );
+                        return new WP_REST_Response( $err['body'], $err['status'] );
+                }
 		$application_id = (int) $request->get_param( 'application_id' );
-		if ( $application_id === 0 ) {
-				return new WP_REST_Response(
-					array(
-						'error' => array(
-							'code'    => 'fbm_invalid_application',
-							'message' => __( 'Invalid application reference', 'foodbank-manager' ),
-						),
-					),
-					400
-				);
-		}
+                if ( $application_id === 0 ) {
+                        $err = ErrorHelper::from_wp_error(
+                                new WP_Error( 'invalid_param', __( 'Invalid application reference', 'foodbank-manager' ), array( 'status' => 422 ) )
+                        );
+                        return new WP_REST_Response( $err['body'], $err['status'] );
+                }
 		$event_id = (int) $request->get_param( 'event_id' );
                 $type     = Helpers::sanitize_text( (string) $request->get_param( 'type' ) );
                 if ( $type === '' || ! in_array( $type, (array) Options::get( 'attendance_types' ), true ) ) {
@@ -367,17 +354,12 @@ class AttendanceController {
 		 */
 	public function void( WP_REST_Request $request ): WP_REST_Response {
 		$nonce = $request->get_header( 'x-wp-nonce' );
-		if ( ! $nonce || ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-				return new WP_REST_Response(
-					array(
-						'error' => array(
-							'code'    => 'fbm_invalid_nonce',
-							'message' => __( 'Invalid nonce', 'foodbank-manager' ),
-						),
-					),
-					403
-				);
-		}
+                if ( ! $nonce || ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+                        $err = ErrorHelper::from_wp_error(
+                                new WP_Error( 'invalid_nonce', __( 'Invalid nonce', 'foodbank-manager' ), array( 'status' => 401 ) )
+                        );
+                        return new WP_REST_Response( $err['body'], $err['status'] );
+                }
 		$attendance_id = (int) $request->get_param( 'attendance_id' );
 		$reason        = Helpers::sanitize_text( (string) $request->get_param( 'reason' ) );
 		$now           = current_time( 'mysql', true );
@@ -404,17 +386,12 @@ class AttendanceController {
 		 */
 	public function unvoid( WP_REST_Request $request ): WP_REST_Response {
 		$nonce = $request->get_header( 'x-wp-nonce' );
-		if ( ! $nonce || ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-				return new WP_REST_Response(
-					array(
-						'error' => array(
-							'code'    => 'fbm_invalid_nonce',
-							'message' => __( 'Invalid nonce', 'foodbank-manager' ),
-						),
-					),
-					403
-				);
-		}
+                if ( ! $nonce || ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+                        $err = ErrorHelper::from_wp_error(
+                                new WP_Error( 'invalid_nonce', __( 'Invalid nonce', 'foodbank-manager' ), array( 'status' => 401 ) )
+                        );
+                        return new WP_REST_Response( $err['body'], $err['status'] );
+                }
 		$attendance_id = (int) $request->get_param( 'attendance_id' );
 		$now           = current_time( 'mysql', true );
             $ok            = AttendanceRepo::set_void( $attendance_id, false, null, get_current_user_id(), $now );
@@ -440,17 +417,12 @@ class AttendanceController {
 		 */
 	public function note( WP_REST_Request $request ): WP_REST_Response {
 		$nonce = $request->get_header( 'x-wp-nonce' );
-		if ( ! $nonce || ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-				return new WP_REST_Response(
-					array(
-						'error' => array(
-							'code'    => 'fbm_invalid_nonce',
-							'message' => __( 'Invalid nonce', 'foodbank-manager' ),
-						),
-					),
-					403
-				);
-		}
+                if ( ! $nonce || ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+                        $err = ErrorHelper::from_wp_error(
+                                new WP_Error( 'invalid_nonce', __( 'Invalid nonce', 'foodbank-manager' ), array( 'status' => 401 ) )
+                        );
+                        return new WP_REST_Response( $err['body'], $err['status'] );
+                }
 		$attendance_id = (int) $request->get_param( 'attendance_id' );
 		$note          = Helpers::sanitize_text( (string) $request->get_param( 'note' ) );
 		$now           = current_time( 'mysql', true );
@@ -472,6 +444,9 @@ class AttendanceController {
 					200
 				);
 		}
-		return new WP_REST_Response( array( 'ok' => false ), 500 );
-	}
+                $err = ErrorHelper::from_wp_error(
+                        new WP_Error( 'internal', __( 'Internal error', 'foodbank-manager' ), array( 'status' => 500 ) )
+                );
+                return new WP_REST_Response( $err['body'], $err['status'] );
+        }
 }

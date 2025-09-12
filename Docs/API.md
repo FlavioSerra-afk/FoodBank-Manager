@@ -7,6 +7,58 @@ Dashboard summary CSV downloads use `admin-post.php?action=fbm_dash_export` with
 Design & Theme options are configuration-only; no REST endpoints expose or modify them.
 Admin screens are wrapped in `.fbm-admin` with assets/notices loaded only on FoodBank Manager pages.
 
+## API Errors
+
+FoodBank Manager normalizes error responses across REST and AJAX endpoints:
+
+| Status | Meaning |
+| ------ | ------- |
+| 400 | Bad request (generic argument issues) |
+| 401 | Unauthorized (invalid or missing nonce) |
+| 403 | Forbidden (capability check failed) |
+| 404 | Not found (missing resource) |
+| 409 | Conflict (state clash such as policy breach) |
+| 422 | Unprocessable (validation failed) |
+| 429 | Too many requests (rate limited) |
+
+REST errors return:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "invalid_param",
+    "message": "Required fields missing",
+    "details": null
+  }
+}
+```
+
+AJAX errors use the same `error` object. Example invalid nonce:
+
+```json
+{
+  "success": false,
+  "data": {
+    "error": {
+      "code": "invalid_nonce",
+      "message": "Invalid nonce"
+    }
+  }
+}
+```
+
+Rate limited responses include `Retry-After` and `RateLimit-*` headers:
+
+```
+HTTP/1.1 429 Too Many Requests
+Retry-After: 60
+RateLimit-Limit: 5
+RateLimit-Remaining: 0
+```
+
+Scan and other success responses keep their existing payload contract.
+
 ## HTTP Controllers
 
 ### ExportController
