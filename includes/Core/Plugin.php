@@ -16,7 +16,6 @@ use FBM\Core\Jobs\JobsWorker;
 use FoodBankManager\Core\Options;
 use FBM\Core\Retention;
 use FBM\CLI\VersionCommand;
-use FBM\CLI\WpCliIO;
 use FoodBankManager\Admin\ShortcodesPage;
 use FoodBankManager\Core\Screen;
 
@@ -50,6 +49,8 @@ final class Plugin {
                         return;
                 }
                self::$booted = true;
+
+                self::maybe_register_cli();
 
                if ( is_admin() ) {
                        \FoodBankManager\Admin\Notices::maybe_handle_caps_notice_dismiss();
@@ -105,15 +106,14 @@ final class Plugin {
                     return $erasers;
                 } );
 
-                if ( defined( 'WP_CLI' ) && WP_CLI && class_exists( '\WP_CLI' ) ) {
-                    \WP_CLI::add_command(
-                        'fbm version',
-                        [ new VersionCommand( new WpCliIO() ), '__invoke' ]
-                    );
-                }
-
                 self::get_instance()->init();
                 JobsWorker::init();
+        }
+
+        private static function maybe_register_cli(): void {
+                if ( defined( 'WP_CLI' ) && \WP_CLI && class_exists( VersionCommand::class ) ) {
+                        \WP_CLI::add_command( 'fbm version', [ new VersionCommand(), '__invoke' ] );
+                }
         }
 
         /** Activate plugin. */
