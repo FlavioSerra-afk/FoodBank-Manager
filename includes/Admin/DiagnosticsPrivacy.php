@@ -28,8 +28,8 @@ final class DiagnosticsPrivacy {
     private const ACTION_ERASE_DRY = 'fbm_privacy_erase_dry';
     private const ACTION_ERASE     = 'fbm_privacy_erase';
 
-    /** @var array<string,int> */
-    private static array $preview = array();
+    /** @var array{data:array<int,array<string,mixed>>,done:bool} */
+    private static array $preview = array( 'data' => array(), 'done' => true );
     /** @var array<string,mixed> */
     private static array $erasure = array();
 
@@ -58,12 +58,7 @@ final class DiagnosticsPrivacy {
             if ( $page_size <= 0 ) {
                 $page_size = 1;
             }
-            $result = \FBM\Privacy\Exporter::export( $email, 1, $page_size );
-            $counts = array();
-            foreach ( $result['data'] as $row ) {
-                $counts[ $row['group_id'] ] = ( $counts[ $row['group_id'] ] ?? 0 ) + 1;
-            }
-            self::$preview = $counts;
+            self::$preview = \FBM\Privacy\Exporter::export( $email, 1, $page_size );
             add_settings_error( 'fbm_diagnostics', 'fbm_privacy_preview', __( 'Preview generated.', 'foodbank-manager' ), 'updated' );
             return;
         }
@@ -93,7 +88,7 @@ final class DiagnosticsPrivacy {
     /**
      * Get last preview summary.
      *
-     * @return array<string,int>
+     * @return array{data:array<int,array<string,mixed>>,done:bool}
      */
     public static function preview_summary(): array {
         return self::$preview;

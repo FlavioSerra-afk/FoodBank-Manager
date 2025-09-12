@@ -22,7 +22,7 @@ use FoodBankManager\Core\Screen;
 
 final class Plugin {
 
-    public const VERSION = '1.8.0'; // x-release-please-version
+    public const VERSION = '1.9.0'; // x-release-please-version
 
         private static ?Plugin $instance = null;
         private static bool $booted = false;
@@ -87,6 +87,7 @@ final class Plugin {
                 add_action( 'admin_post_fbm_submit', array( FormSubmitController::class, 'handle' ) );
                 add_action( 'admin_post_fbm_dash_export', array( DashboardExportController::class, 'handle' ) );
                 add_action( 'admin_post_fbm_diag_mail_test', array( DiagnosticsController::class, 'mail_test' ) );
+                add_action( 'wp_ajax_fbm_mail_test', array( DiagnosticsController::class, 'ajax_mail_test' ) );
                 add_action( 'admin_post_fbm_diag_mail_retry', array( DiagnosticsController::class, 'mail_retry' ) );
                 add_action( 'admin_post_fbm_mail_resend', array( DiagnosticsController::class, 'mail_resend' ) );
                 add_action( 'admin_post_' . DiagnosticsPdf::ACTION_PREVIEW, array( DiagnosticsPdf::class, 'preview' ) );

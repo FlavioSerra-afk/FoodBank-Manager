@@ -28,6 +28,8 @@ final class ScanControllerTest extends \BaseTestCase {
         parent::setUp();
         $this->db = new EventsDbStub();
         $GLOBALS['wpdb'] = $this->db;
+        $GLOBALS['fbm_transients'] = array();
+        $_SERVER['REMOTE_ADDR'] = '2.2.2.2';
         fbm_test_trust_nonces(true);
         $ref = new \ReflectionClass(CheckinsRepo::class);
         $p = $ref->getProperty('store');
@@ -67,9 +69,10 @@ final class ScanControllerTest extends \BaseTestCase {
         $token = TicketService::fromPayload(1, 'jane@example.com', 1700000060, 'abcd');
         $res = $controller->verify($this->req($token['token']));
         $data = $res->get_data();
-        $this->assertTrue($data['checked_in']);
-        $this->assertSame('checked-in', $data['status']);
-        $this->assertSame('j***@example.com', $data['recipient_masked']);
+        $payload = $data['data'];
+        $this->assertTrue($payload['checked_in']);
+        $this->assertSame('checked-in', $payload['status']);
+        $this->assertSame('j***@example.com', $payload['recipient_masked']);
         $this->assertSame(1, CheckinsRepo::list_for_event(1)['total']);
         $res2 = $controller->verify($this->req($token['token']));
         $this->assertSame('replay', $res2->get_data()['status']);

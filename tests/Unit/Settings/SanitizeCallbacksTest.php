@@ -36,5 +36,18 @@ final class SanitizeCallbacksTest extends \BaseTestCase {
         ]);
         $this->assertSame(['administrator' => ['fb_manage_diagnostics']], $out);
     }
+
+    public function testOptionsEmailFieldsClampedAndValidated(): void {
+        $out = Options::sanitize_all([
+            'emails' => [
+                'from_name'    => str_repeat('x', 250),
+                'from_address' => 'invalid',
+                'reply_to'     => 'ok@example.com',
+            ],
+        ]);
+        $this->assertSame(200, mb_strlen($out['emails']['from_name']));
+        $this->assertSame('', $out['emails']['from_address']);
+        $this->assertSame('ok@example.com', $out['emails']['reply_to']);
+    }
 }
 

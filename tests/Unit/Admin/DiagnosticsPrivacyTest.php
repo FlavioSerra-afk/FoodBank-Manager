@@ -75,7 +75,8 @@ final class DiagnosticsPrivacyTest extends \BaseTestCase {
         $_REQUEST = $_POST;
         DiagnosticsPrivacy::handle_actions();
         $summary = DiagnosticsPrivacy::preview_summary();
-        $this->assertSame( array( 'fbm_submissions' => 1 ), $summary );
+        $this->assertFalse( $summary['done'] );
+        $this->assertSame( 'fbm_submissions', $summary['data'][0]['group_id'] );
     }
     public function testDryRunErasureSetsFlags(): void {
         fbm_seed_nonce( 'unit-seed' );

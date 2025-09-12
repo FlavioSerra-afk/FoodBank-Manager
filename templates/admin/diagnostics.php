@@ -95,11 +95,16 @@ $rows       = $rows ?? array();
         <li><?php echo esc_html( 'API: ' . ( $health['api'] ?? '' ) ); ?></li>
         <li><?php echo esc_html( 'KEK: ' . ( $health['kek'] ?? '' ) ); ?></li>
     </ul>
-    <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-        <input type="hidden" name="action" value="fbm_diag_mail_test" />
-        <?php wp_nonce_field( 'fbm_diag_mail_test', '_fbm_nonce' ); ?>
-        <p><button type="submit" class="button"><?php esc_html_e( 'Send test email', 'foodbank-manager' ); ?></button></p>
-    </form>
+    <div id="fbm-mailtest-panel">
+        <p>
+            <label for="fbm-mailtest-to"><?php esc_html_e( 'Email', 'foodbank-manager' ); ?></label>
+            <input type="email" id="fbm-mailtest-to" />
+            <button type="button" class="button" id="fbm-mailtest-send" data-nonce="<?php echo esc_attr( wp_create_nonce( 'fbm_mail_test' ) ); ?>">
+                <?php esc_html_e( 'Send test email', 'foodbank-manager' ); ?>
+            </button>
+        </p>
+        <p id="fbm-mailtest-result"></p>
+    </div>
     <h2><?php esc_html_e( 'Mail Failures (Last 20)', 'foodbank-manager' ); ?></h2>
     <?php if ( ! empty( $failures ) ) : ?>
     <table class="widefat">

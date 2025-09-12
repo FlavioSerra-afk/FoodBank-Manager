@@ -64,7 +64,8 @@ final class ScanPageTest extends \BaseTestCase {
         $req->set_param('token', $token['token']);
         $res  = $controller->verify($req);
         $data = $res->get_data();
-        $this->assertTrue($data['checked_in']);
-        $this->assertSame('checked-in', $data['status']);
+        $payload = $data['data'];
+        $this->assertTrue($payload['checked_in']);
+        $this->assertSame('checked-in', $payload['status']);
     }
 }
