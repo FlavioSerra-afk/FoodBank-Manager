@@ -51,4 +51,11 @@ final class DiagnosticsMailFailuresTest extends \BaseTestCase {
         $this->assertStringContainsString('notice=resent', (string) ($GLOBALS['__last_redirect'] ?? ''));
         $this->assertNotEmpty(\FBM\Mail\LogRepo::$appended);
     }
+
+    protected function tearDown(): void {
+        wp_clear_scheduled_hook('fbm_retention_hourly');
+        remove_all_actions('init');
+        remove_all_actions('admin_init');
+        parent::tearDown();
+    }
 }

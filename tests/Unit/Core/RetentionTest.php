@@ -103,6 +103,9 @@ final class RetentionTest extends \BaseTestCase {
         if (isset($this->now_cb)) {
             remove_filter('fbm_now', $this->now_cb);
         }
+        wp_clear_scheduled_hook('fbm_retention_hourly');
+        remove_all_actions('init');
+        remove_all_actions('admin_init');
         parent::tearDown();
     }
 
