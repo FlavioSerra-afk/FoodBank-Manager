@@ -25,7 +25,8 @@ The Diagnostics hub exposes a Privacy panel to preview Subject Access Request da
 ## WP-CLI
 
 ```bash
-wp fbm version
+$ wp fbm version
+Success: FoodBank Manager 1.5.3
 ```
 
-Returns the plugin version.
+Registering commands via `WP_CLI::add_command()` is the canonical method.
