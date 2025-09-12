@@ -2,6 +2,16 @@
 
 - Shortcodes helper examples and docs.
 
+## [1.7.0](https://github.com/FlavioSerra-afk/FoodBank-Manager/compare/1.6.0...1.7.0) (2025-09-12)
+
+
+### Features
+
+* add CLI parent command and diagnostics report ([29cba38](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/29cba38de37a0be021d6e2dc60b216dfe6c90d97))
+* **cli:** functional jobs and retention commands ([3ec12cc](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/3ec12cc75a6b37700dd909e2ae46a63009160e34))
+* **cli:** functional jobs and retention commands ([f179e50](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/f179e504c8fa877e055bb12eb4856d387b6eb733))
+* **cli:** scaffold parent command and diagnostics report ([7e54d11](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/7e54d11a6c5ceac0f80dee4d78afced819b1dddd))
+
 ## [1.6.0](https://github.com/FlavioSerra-afk/FoodBank-Manager/compare/1.5.3...1.6.0) (2025-09-12)
 
 
