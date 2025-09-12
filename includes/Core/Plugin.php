@@ -23,7 +23,8 @@ use FoodBankManager\Core\Screen;
 
 final class Plugin {
 
-    public const VERSION = '1.10.0'; // x-release-please-version
+    public const VERSION = '1.10.1'; // x-release-please-version
+    private const OPTION_VERSION = 'fbm_version';
 
         private static ?Plugin $instance = null;
         private static bool $booted = false;
@@ -52,6 +53,7 @@ final class Plugin {
                 }
                self::$booted = true;
 
+                self::maybe_upgrade();
                 self::maybe_register_cli();
 
                if ( is_admin() ) {
@@ -123,12 +125,27 @@ final class Plugin {
                 }
         }
 
+        private static function maybe_upgrade(): void {
+                $current = \get_option( self::OPTION_VERSION );
+                if ( $current === self::VERSION ) {
+                        return;
+                }
+                if ( \version_compare( (string) $current, '1.10.1', '<' ) ) {
+                        $role = \get_role( 'administrator' );
+                        if ( $role && ! $role->has_cap( 'fbm_manage_jobs' ) ) {
+                                $role->add_cap( 'fbm_manage_jobs', true );
+                        }
+                }
+                \update_option( self::OPTION_VERSION, self::VERSION );
+        }
+
         /** Activate plugin. */
         public static function activate(): void {
                 ( new Migrations() )->maybe_migrate();
                 Roles::install();
                 Cron::maybe_schedule_retention();
                 JobsWorker::schedule();
+                \update_option( self::OPTION_VERSION, self::VERSION );
         }
 
         /** Deactivate plugin. */
