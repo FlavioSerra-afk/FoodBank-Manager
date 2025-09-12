@@ -24,15 +24,43 @@ class Api {
 	 * Register public API routes.
 	 */
 	public static function register_routes(): void {
-		register_rest_route(
-			'pcc-fb/v1',
-			'/applications',
-			array(
-				'methods'             => 'POST',
-				'callback'            => array( self::class, 'submit_application' ),
-				'permission_callback' => '__return_true',
-			)
-		);
+                register_rest_route(
+                        'pcc-fb/v1',
+                        '/applications',
+                        array(
+                                'methods'             => 'POST',
+                                'callback'            => array( self::class, 'submit_application' ),
+                                'permission_callback' => '__return_true',
+                                'args'                => array(
+                                        'form_id'     => \FoodBankManager\Rest\ArgHelper::id( false ),
+                                        'first_name'  => array(
+                                                'type'              => 'string',
+                                                'required'          => true,
+                                                'sanitize_callback' => array( Helpers::class, 'sanitize_text' ),
+                                                'validate_callback' => static fn( $v ): bool => is_string( $v ) && $v !== '',
+                                        ),
+                                        'last_name'   => array(
+                                                'type'              => 'string',
+                                                'required'          => true,
+                                                'sanitize_callback' => array( Helpers::class, 'sanitize_text' ),
+                                                'validate_callback' => static fn( $v ): bool => is_string( $v ) && $v !== '',
+                                        ),
+                                        'email'       => \FoodBankManager\Rest\ArgHelper::email(),
+                                        'postcode'    => array(
+                                                'type'              => 'string',
+                                                'required'          => true,
+                                                'sanitize_callback' => array( Helpers::class, 'sanitize_text' ),
+                                                'validate_callback' => static fn( $v ): bool => is_string( $v ) && $v !== '',
+                                        ),
+                                        'consent'     => array(
+                                                'type'              => 'string',
+                                                'required'          => true,
+                                                'sanitize_callback' => array( Helpers::class, 'sanitize_text' ),
+                                                'validate_callback' => static fn( $v ): bool => is_string( $v ) && $v !== '',
+                                        ),
+                                ),
+                        )
+                );
                 ( new AttendanceController() )->register_routes();
                 ( new \FBM\Rest\JobsController() )->register_routes();
 	}

@@ -21,6 +21,7 @@ use function sanitize_text_field;
 use function wp_mail;
 use function wp_send_json_error;
 use function wp_send_json_success;
+use function __;
 
 /**
  * Resend failed mails via AJAX.
@@ -30,10 +31,12 @@ final class MailReplay {
      * Handle AJAX resend request.
      */
     public static function handle(): WP_REST_Response {
-        if ( ! current_user_can( 'fbm_manage_diagnostics' ) ) {
-            return wp_send_json_error( 'forbidden', 403 );
+        if ( ! check_ajax_referer( 'fbm_mail_replay', '_ajax_nonce', false ) ) {
+            return wp_send_json_error( array( 'message' => __( 'Invalid nonce', 'foodbank-manager' ) ), 403 );
         }
-        check_ajax_referer( 'fbm_mail_replay' );
+        if ( ! current_user_can( 'fb_manage_diagnostics' ) ) {
+            return wp_send_json_error( array( 'message' => __( 'Forbidden', 'foodbank-manager' ) ), 403 );
+        }
         $id   = absint( $_POST['id'] ?? 0 );
         $repo = apply_filters( 'fbm_mail_replay_repo', LogRepo::class );
         $orig = $repo::get_by_id( $id );

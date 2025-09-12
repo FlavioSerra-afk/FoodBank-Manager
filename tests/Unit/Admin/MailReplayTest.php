@@ -27,7 +27,7 @@ use function fbm_nonce;
 final class MailReplayTest extends \BaseTestCase {
     protected function setUp(): void {
         parent::setUp();
-        fbm_grant_caps( array( 'fbm_manage_diagnostics' ) );
+        fbm_grant_caps( array( 'fb_manage_diagnostics' ) );
         fbm_seed_nonce( 'unit' );
         MailLogRepo::$records = array();
         MailLogRepo::$audits = array();

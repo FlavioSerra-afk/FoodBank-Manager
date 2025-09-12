@@ -49,8 +49,10 @@ final class ScanController {
                 },
                 'args'                => array(
                     'token' => array(
-                        'type'     => 'string',
-                        'required' => true,
+                        'type'              => 'string',
+                        'required'          => true,
+                        'sanitize_callback' => 'sanitize_text_field',
+                        'validate_callback' => static fn( $v ): bool => is_string( $v ) && $v !== '' && strlen( $v ) <= 512,
                     ),
                 ),
             )

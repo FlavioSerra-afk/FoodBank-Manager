@@ -20,8 +20,9 @@ final class DiagnosticsMailTestUiTest extends \BaseTestCase {
 
     public function testNonceRequired(): void {
         fbm_test_trust_nonces(false);
-        $this->expectException(\Tests\Support\Exceptions\FbmDieException::class);
-        DiagnosticsController::ajax_mail_test();
+        $res = DiagnosticsController::ajax_mail_test();
+        $this->assertFalse($res->get_data()['success']);
+        $this->assertSame(403, $res->get_status());
     }
 
     public function testCapabilityCheck(): void {

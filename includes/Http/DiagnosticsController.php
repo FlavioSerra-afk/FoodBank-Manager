@@ -110,7 +110,9 @@ final class DiagnosticsController {
      * Handle AJAX mail test.
      */
     public static function ajax_mail_test(): WP_REST_Response {
-        check_ajax_referer( 'fbm_mail_test' );
+        if ( ! check_ajax_referer( 'fbm_mail_test', '_ajax_nonce', false ) ) {
+            return wp_send_json_error( array( 'message' => __( 'Invalid nonce', 'foodbank-manager' ) ), 403 );
+        }
         if ( ! current_user_can( 'fb_manage_diagnostics' ) ) {
             return wp_send_json_error( array( 'message' => __( 'Forbidden', 'foodbank-manager' ) ), 403 );
         }
