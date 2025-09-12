@@ -55,7 +55,7 @@ class FailureLog {
             'headers' => $mail['headers'] ?? array(),
         );
         $entries = array_slice( $entries, - self::MAX );
-        update_option( self::OPTION, $entries );
+        update_option( self::OPTION, $entries, false ); // @phpstan-ignore-line
     }
 
     /**

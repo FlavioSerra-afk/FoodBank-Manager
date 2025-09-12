@@ -273,7 +273,7 @@ final class Commands {
             }
         }
         $san = fbm_throttle_sanitize( $raw );
-        update_option( 'fbm_throttle', $san );
+        update_option( 'fbm_throttle', $san, false ); // @phpstan-ignore-line
         if ( isset( $assoc_args['window'] ) && $san['window_seconds'] !== (int) $assoc_args['window'] ) {
             $this->io->line( 'window clamped to ' . $san['window_seconds'] );
         }

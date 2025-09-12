@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-09 (Wave RC3 Fix Pack)
+Docs-Revision: 2025-09-11 (v1.11.1 patch finalize)
 # REST API (pcc-fb/v1)
 
 Base namespace: `pcc-fb/v1`. All write endpoints require `X-WP-Nonce` and capabilities.
@@ -6,6 +6,7 @@ Shortcode previews are handled via `admin-post.php` (`fbm_action=shortcode_previ
 Dashboard summary CSV downloads use `admin-post.php?action=fbm_dash_export` with a nonce and `fb_manage_dashboard` capability.
 Design & Theme options are configuration-only; no REST endpoints expose or modify them.
 Admin screens are wrapped in `.fbm-admin` with assets/notices loaded only on FoodBank Manager pages.
+On multisite, network administrators receive `fbm_manage_jobs` on activation; a migration flag prevents re-granting on upgrade.
 
 ## API Errors
 
@@ -20,6 +21,7 @@ FoodBank Manager normalizes error responses across REST and AJAX endpoints:
 | 409 | Conflict (state clash such as policy breach) |
 | 422 | Unprocessable (validation failed) |
 | 429 | Too many requests (rate limited) |
+Rate-limited responses include `RateLimit-Limit`, `RateLimit-Remaining`, and `Retry-After` headers.
 
 REST errors return:
 

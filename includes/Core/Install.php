@@ -86,7 +86,7 @@ final class Install {
                 'items'       => [],
                 'count'       => 0,
             ];
-            update_option('fbm_last_consolidation', $log);
+            update_option('fbm_last_consolidation', $log, false); // @phpstan-ignore-line
             return $log;
         }
         deactivate_plugins($items);
@@ -102,7 +102,7 @@ final class Install {
             'items'       => $items,
             'count'       => count($items),
         ];
-        update_option('fbm_last_consolidation', $log);
+        update_option('fbm_last_consolidation', $log, false); // @phpstan-ignore-line
         delete_transient(self::TRANSIENT);
         self::$scanCache = null;
         return $log;
@@ -115,7 +115,7 @@ final class Install {
             'deactivated' => (int)$result['deactivated'],
             'deleted'     => (int)$result['deleted'],
             'items'       => (array)$result['items'],
-        ]);
+        ], false); // @phpstan-ignore-line
     }
 
     // --- Legacy wrappers -------------------------------------------------

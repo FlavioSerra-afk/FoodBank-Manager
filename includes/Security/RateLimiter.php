@@ -106,7 +106,7 @@ final class RateLimiter {
         $roles    = array();
         if ( function_exists( 'wp_get_current_user' ) ) {
             $user = wp_get_current_user();
-            if ( isset( $user->roles ) && is_array( $user->roles ) ) {
+            if ( property_exists( $user, 'roles' ) && is_array( $user->roles ) ) {
                 $roles = $user->roles;
             }
         }

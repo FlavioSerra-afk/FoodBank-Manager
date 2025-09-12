@@ -537,7 +537,7 @@ final class PermissionsPage {
                         }
                         PermissionsAudit::add( 'revoke ' . $cap . ' from role ' . $role_slug );
                 }
-                update_option( 'fbm_permissions_defaults', self::sanitize_defaults( $defaults ) );
+                update_option( 'fbm_permissions_defaults', self::sanitize_defaults( $defaults ), false ); // @phpstan-ignore-line
                 wp_die( wp_json_encode( array( 'success' => true ) ) );
         }
 

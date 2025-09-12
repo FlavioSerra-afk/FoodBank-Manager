@@ -1,56 +1,70 @@
 <?php
 /**
- * FoodBank Manager – Uninstall
- * Runs when plugin is deleted from WP Admin.
- * Must be standalone (no autoloader/classes), silent, and defensive.
+ * FoodBank Manager – Uninstall cleanup.
+ *
+ * Deletes plugin options, transients, and migration/telemetry flags.
+ * Content such as custom tables or posts is left untouched.
  *
  * @package FoodBankManager
  */
 
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) || ! defined( 'ABSPATH' ) ) {
-	return;
+    return;
 }
 
 try {
-	global $wpdb;
+    global $wpdb;
 
-	// 1) Drop custom tables (IF EXISTS) – keep this list in sync with Docs/DB_SCHEMA.md.
-	$tables = array(
-		$wpdb->prefix . 'fb_applications',
-		$wpdb->prefix . 'fb_attendance',
-		$wpdb->prefix . 'fb_audit_log',
-		$wpdb->prefix . 'fb_files',
-		$wpdb->prefix . 'fb_mail_log',
-	);
+    // Delete known options (site + network).
+    $opts = array(
+        'fbm_options',
+        'fbm_version',
+        'fbm_permissions_defaults',
+        'fbm_permissions_audit',
+        'fbm_email_templates',
+        'fbm_mail_failures',
+        'fbm_throttle',
+    );
+    foreach ( $opts as $opt ) {
+        delete_option( $opt );
+        delete_site_option( $opt );
+    }
 
-	foreach ( $tables as $t ) {
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- uninstall-time schema cleanup.
-		$wpdb->query( "DROP TABLE IF EXISTS `{$t}`" ); // identifiers are controlled by us.
-	}
+    // Remove migration/telemetry flags.
+    $like_flag = $wpdb->esc_like( 'fbm_caps_migrated_' ) . '%';
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- targeted uninstall cleanup.
+    $wpdb->query( "DELETE FROM `{$wpdb->options}` WHERE option_name LIKE '{$like_flag}'" );
+    if ( function_exists( 'is_multisite' ) && is_multisite() && isset( $wpdb->sitemeta ) ) {
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- targeted uninstall cleanup.
+        $wpdb->query( "DELETE FROM `{$wpdb->sitemeta}` WHERE meta_key LIKE '{$like_flag}'" );
+    }
+    $like_tel = $wpdb->esc_like( 'fbm_telemetry_' ) . '%';
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- targeted uninstall cleanup.
+    $wpdb->query( "DELETE FROM `{$wpdb->options}` WHERE option_name LIKE '{$like_tel}'" );
+    if ( function_exists( 'is_multisite' ) && is_multisite() && isset( $wpdb->sitemeta ) ) {
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- targeted uninstall cleanup.
+        $wpdb->query( "DELETE FROM `{$wpdb->sitemeta}` WHERE meta_key LIKE '{$like_tel}'" );
+    }
 
-	// 2) Delete options (namespaced).
-	$opts = array( 'fbm_options', 'fbm_version' );
-	foreach ( $opts as $opt ) {
-		delete_option( $opt );
-				delete_site_option( $opt ); // Multisite safety.
-	}
+    // Clear transients (site + network).
+    $like = $wpdb->esc_like( '_transient_fbm_' ) . '%';
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- targeted uninstall cleanup.
+    $wpdb->query( "DELETE FROM `{$wpdb->options}` WHERE option_name LIKE '{$like}'" );
+    if ( function_exists( 'is_multisite' ) && is_multisite() && isset( $wpdb->sitemeta ) ) {
+        $like_site = $wpdb->esc_like( '_site_transient_fbm_' ) . '%';
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- targeted uninstall cleanup.
+        $wpdb->query( "DELETE FROM `{$wpdb->sitemeta}` WHERE meta_key LIKE '{$like_site}'" );
+    }
 
-	// 3) Clear transients (site + network if available).
-	$like = $wpdb->esc_like( '_transient_fbm_' ) . '%';
-    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- targeted uninstall cleanup.
-		$wpdb->query( "DELETE FROM `{$wpdb->options}` WHERE option_name LIKE '{$like}'" );
-
-	if ( function_exists( 'is_multisite' ) && is_multisite() && isset( $wpdb->sitemeta ) ) {
-		$like_site = $wpdb->esc_like( '_site_transient_fbm_' ) . '%';
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- targeted uninstall cleanup.
-		$wpdb->query( "DELETE FROM `{$wpdb->sitemeta}` WHERE meta_key LIKE '{$like_site}'" );
-	}
-
-	// 4) Unschedule cron hooks we own (keep names in sync with code).
-	if ( function_exists( 'wp_clear_scheduled_hook' ) ) {
-		wp_clear_scheduled_hook( 'fbm_cron_cleanup' );
-		wp_clear_scheduled_hook( 'fbm_cron_email_retry' );
-	}
-} catch ( \Throwable $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement -- Silent by design.
+    // Unschedule cron hooks we own.
+    if ( function_exists( 'wp_clear_scheduled_hook' ) ) {
+        wp_clear_scheduled_hook( 'fbm_retention_hourly' );
+        wp_clear_scheduled_hook( 'fbm_retention_tick' );
+        wp_clear_scheduled_hook( 'fbm_jobs_tick' );
+        wp_clear_scheduled_hook( 'fbm_cron_cleanup' );
+        wp_clear_scheduled_hook( 'fbm_cron_email_retry' );
+    }
+} catch ( \Throwable $e ) {
+    // Silent by design.
 }
 return;

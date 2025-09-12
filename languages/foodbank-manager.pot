@@ -2,14 +2,14 @@
 # This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: FoodBank Manager 1.10.4\n"
+"Project-Id-Version: FoodBank Manager 1.11.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/FoodBank-Manager\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-09-12T22:28:40+00:00\n"
+"POT-Creation-Date: 2025-09-12T23:18:47+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: foodbank-manager\n"
@@ -190,7 +190,7 @@ msgid "Entry not found."
 msgstr ""
 
 #: includes/Admin/FormsBuilderPage.php:28
-#: includes/Rest/ScanController.php:75
+#: includes/Rest/ScanController.php:72
 msgid "Access denied"
 msgstr ""
 
@@ -216,7 +216,7 @@ msgstr ""
 #: includes/Http/ExportJobsController.php:64
 #: includes/Http/ExportJobsController.php:110
 #: includes/Http/ExportJobsController.php:127
-#: includes/Rest/Api.php:80
+#: includes/Rest/Api.php:81
 #: includes/Rest/AttendanceController.php:182
 #: includes/Rest/AttendanceController.php:282
 #: includes/Rest/AttendanceController.php:359
@@ -612,7 +612,7 @@ msgid "Present"
 msgstr ""
 
 #: includes/Http/DiagnosticsController.php:68
-#: includes/Rest/ScanController.php:112
+#: includes/Rest/ScanController.php:84
 msgid "Too many requests"
 msgstr ""
 
@@ -634,18 +634,18 @@ msgstr ""
 msgid "Invalid form."
 msgstr ""
 
-#: includes/Rest/Api.php:94
+#: includes/Rest/Api.php:95
 msgid "Required fields missing"
 msgstr ""
 
 #. translators: %d: application ID.
-#: includes/Rest/Api.php:227
+#: includes/Rest/Api.php:228
 #, php-format
 msgid "We received your application — Ref %d"
 msgstr ""
 
 #. translators: %d: application ID.
-#: includes/Rest/Api.php:260
+#: includes/Rest/Api.php:261
 #, php-format
 msgid "New application received (Ref %d)"
 msgstr ""
@@ -663,31 +663,31 @@ msgstr ""
 msgid "Internal error"
 msgstr ""
 
-#: includes/Rest/ScanController.php:133
-#: includes/Rest/ScanController.php:144
-#: includes/Rest/ScanController.php:157
-#: includes/Rest/ScanController.php:168
-#: includes/Rest/ScanController.php:179
+#: includes/Rest/ScanController.php:95
+#: includes/Rest/ScanController.php:106
+#: includes/Rest/ScanController.php:119
+#: includes/Rest/ScanController.php:130
+#: includes/Rest/ScanController.php:141
 msgid "Invalid token"
 msgstr ""
 
-#: includes/Rest/ScanController.php:192
+#: includes/Rest/ScanController.php:154
 msgid "Expired token"
 msgstr ""
 
-#: includes/Rest/ScanController.php:203
+#: includes/Rest/ScanController.php:165
 msgid "Invalid event"
 msgstr ""
 
-#: includes/Rest/ScanController.php:214
+#: includes/Rest/ScanController.php:176
 msgid "Already checked in"
 msgstr ""
 
-#: includes/Rest/ScanController.php:239
+#: includes/Rest/ScanController.php:201
 msgid "Checked in"
 msgstr ""
 
-#: includes/Rest/ScanController.php:239
+#: includes/Rest/ScanController.php:201
 msgid "Not checked in"
 msgstr ""
 
@@ -699,6 +699,31 @@ msgstr ""
 #: templates/public/attendance-manager.php:76
 #: templates/public/attendance-manager.php:86
 msgid "Error"
+msgstr ""
+
+#: includes/Security/ThrottleSettings.php:68
+msgid "Invalid throttle settings"
+msgstr ""
+
+#: includes/Security/ThrottleSettings.php:75
+msgid "Window seconds out of range"
+msgstr ""
+
+#: includes/Security/ThrottleSettings.php:79
+msgid "Base limit out of range"
+msgstr ""
+
+#: includes/Security/ThrottleSettings.php:88
+msgid "Invalid role"
+msgstr ""
+
+#: includes/Security/ThrottleSettings.php:92
+msgid "Invalid multiplier"
+msgstr ""
+
+#: includes/Security/ThrottleSettings.php:97
+#: includes/Security/ThrottleSettings.php:101
+msgid "Multiplier out of range"
 msgstr ""
 
 #: includes/Shortcodes/AttendanceManager.php:31
@@ -1183,6 +1208,31 @@ msgstr ""
 msgid "Download JSON"
 msgstr ""
 
+#: templates/admin/diagnostics-security.php:15
+msgid "Security & Throttling"
+msgstr ""
+
+#: templates/admin/diagnostics-security.php:21
+msgid "Window (seconds)"
+msgstr ""
+
+#: templates/admin/diagnostics-security.php:25
+msgid "Base limit"
+msgstr ""
+
+#: templates/admin/diagnostics-security.php:29
+msgid "Role multipliers"
+msgstr ""
+
+#: templates/admin/diagnostics-security.php:31
+#: templates/admin/permissions.php:38
+msgid "Role"
+msgstr ""
+
+#: templates/admin/diagnostics-security.php:31
+msgid "Multiplier"
+msgstr ""
+
 #: templates/admin/diagnostics.php:48
 msgid "Test email sent."
 msgstr ""
@@ -1630,10 +1680,6 @@ msgstr ""
 
 #: templates/admin/permissions.php:34
 msgid "Toggle capabilities per role; changes save immediately."
-msgstr ""
-
-#: templates/admin/permissions.php:38
-msgid "Role"
 msgstr ""
 
 #: templates/admin/permissions.php:50

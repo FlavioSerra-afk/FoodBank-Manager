@@ -205,8 +205,8 @@ final class Retention {
 		}
 
 		if ( ! $dry_run ) {
-                                                update_option( self::OPT_LAST_SUMMARY, $summary );
-                                                update_option( self::OPT_LAST_RUN, $now );
+                                                update_option( self::OPT_LAST_SUMMARY, $summary, false ); // @phpstan-ignore-line
+                                                update_option( self::OPT_LAST_RUN, $now, false ); // @phpstan-ignore-line
 						$user_id = (int) get_current_user_id();
 						Audit::log( 'retention_run', 'system', 0, $user_id, $summary );
 		}

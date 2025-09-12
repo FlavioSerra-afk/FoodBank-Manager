@@ -39,7 +39,7 @@ final class PermissionsAudit {
         if (count($log) > 100) {
             $log = array_slice($log, -100);
         }
-        update_option(self::OPTION, $log);
+        update_option(self::OPTION, $log, false); // @phpstan-ignore-line
     }
 
     /**
