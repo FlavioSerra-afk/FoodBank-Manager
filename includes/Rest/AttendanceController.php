@@ -30,95 +30,113 @@ class AttendanceController {
 		 * Register attendance routes.
 		 */
 	public function register_routes(): void {
-		register_rest_route(
-			'pcc-fb/v1',
-			'/attendance/checkin',
-			array(
-				'methods'             => 'POST',
-				'callback'            => array( $this, 'checkin' ),
-				'permission_callback' => array( $this, 'check_write_permissions' ),
-				'args'                => array(
-					'application_id' => array(
-						'type'     => 'integer',
-						'required' => false,
-					),
-					'token'          => array(
-						'type'     => 'string',
-						'required' => false,
-					),
-				),
-			)
-		);
+                register_rest_route(
+                        'pcc-fb/v1',
+                        '/attendance/checkin',
+                        array(
+                                'methods'             => 'POST',
+                                'callback'            => array( $this, 'checkin' ),
+                                'permission_callback' => array( $this, 'check_write_permissions' ),
+                                'args'                => array(
+                                        'application_id' => \FoodBankManager\Rest\ArgHelper::id( false ),
+                                        'token'          => array(
+                                                'type'              => 'string',
+                                                'required'          => false,
+                                                'sanitize_callback' => 'sanitize_text_field',
+                                                'validate_callback' => static fn( $v ): bool => is_string( $v ) && $v !== '' && strlen( $v ) <= 512,
+                                        ),
+                                ),
+                        )
+                );
 
-		register_rest_route(
-			'pcc-fb/v1',
-			'/attendance/noshow',
-			array(
-				'methods'             => 'POST',
-				'callback'            => array( $this, 'noshow' ),
-				'permission_callback' => array( $this, 'check_write_permissions' ),
-				'args'                => array(
-					'application_id' => array(
-						'type'     => 'integer',
-						'required' => true,
-					),
-				),
-			)
-		);
+                register_rest_route(
+                        'pcc-fb/v1',
+                        '/attendance/noshow',
+                        array(
+                                'methods'             => 'POST',
+                                'callback'            => array( $this, 'noshow' ),
+                                'permission_callback' => array( $this, 'check_write_permissions' ),
+                                'args'                => array(
+                                        'application_id' => \FoodBankManager\Rest\ArgHelper::id(),
+                                ),
+                        )
+                );
 
-		register_rest_route(
-			'pcc-fb/v1',
-			'/attendance/timeline',
-			array(
-				'methods'             => 'GET',
-				'callback'            => array( $this, 'timeline' ),
-				'permission_callback' => array( $this, 'check_view_permissions' ),
-				'args'                => array(
-					'application_id' => array(
-						'type'     => 'integer',
-						'required' => true,
-					),
-					'from'           => array(
-						'type'     => 'string',
-						'required' => false,
-					),
-					'to'             => array(
-						'type'     => 'string',
-						'required' => false,
-					),
-				),
-			)
-		);
+                register_rest_route(
+                        'pcc-fb/v1',
+                        '/attendance/timeline',
+                        array(
+                                'methods'             => 'GET',
+                                'callback'            => array( $this, 'timeline' ),
+                                'permission_callback' => array( $this, 'check_view_permissions' ),
+                                'args'                => array(
+                                        'application_id' => \FoodBankManager\Rest\ArgHelper::id(),
+                                        'from'           => array(
+                                                'type'              => 'string',
+                                                'required'          => false,
+                                                'sanitize_callback' => 'sanitize_text_field',
+                                                'validate_callback' => static fn( $v ): bool => is_string( $v ) && strtotime( $v ) !== false,
+                                        ),
+                                        'to'             => array(
+                                                'type'              => 'string',
+                                                'required'          => false,
+                                                'sanitize_callback' => 'sanitize_text_field',
+                                                'validate_callback' => static fn( $v ): bool => is_string( $v ) && strtotime( $v ) !== false,
+                                        ),
+                                ),
+                        )
+                );
 
-		register_rest_route(
-			'pcc-fb/v1',
-			'/attendance/void',
-			array(
-				'methods'             => 'POST',
-				'callback'            => array( $this, 'void' ),
-				'permission_callback' => array( $this, 'check_admin_permissions' ),
-			)
-		);
+                register_rest_route(
+                        'pcc-fb/v1',
+                        '/attendance/void',
+                        array(
+                                'methods'             => 'POST',
+                                'callback'            => array( $this, 'void' ),
+                                'permission_callback' => array( $this, 'check_admin_permissions' ),
+                                'args'                => array(
+                                        'attendance_id' => \FoodBankManager\Rest\ArgHelper::id(),
+                                        'reason'        => array(
+                                                'type'              => 'string',
+                                                'required'          => false,
+                                                'sanitize_callback' => array( Helpers::class, 'sanitize_text' ),
+                                                'validate_callback' => static fn( $v ): bool => is_string( $v ) && strlen( $v ) <= 500,
+                                        ),
+                                ),
+                        )
+                );
 
-		register_rest_route(
-			'pcc-fb/v1',
-			'/attendance/unvoid',
-			array(
-				'methods'             => 'POST',
-				'callback'            => array( $this, 'unvoid' ),
-				'permission_callback' => array( $this, 'check_admin_permissions' ),
-			)
-		);
+                register_rest_route(
+                        'pcc-fb/v1',
+                        '/attendance/unvoid',
+                        array(
+                                'methods'             => 'POST',
+                                'callback'            => array( $this, 'unvoid' ),
+                                'permission_callback' => array( $this, 'check_admin_permissions' ),
+                                'args'                => array(
+                                        'attendance_id' => \FoodBankManager\Rest\ArgHelper::id(),
+                                ),
+                        )
+                );
 
-		register_rest_route(
-			'pcc-fb/v1',
-			'/attendance/note',
-			array(
-				'methods'             => 'POST',
-				'callback'            => array( $this, 'note' ),
-				'permission_callback' => array( $this, 'check_admin_permissions' ),
-			)
-		);
+                register_rest_route(
+                        'pcc-fb/v1',
+                        '/attendance/note',
+                        array(
+                                'methods'             => 'POST',
+                                'callback'            => array( $this, 'note' ),
+                                'permission_callback' => array( $this, 'check_admin_permissions' ),
+                                'args'                => array(
+                                        'attendance_id' => \FoodBankManager\Rest\ArgHelper::id(),
+                                        'note'          => array(
+                                                'type'              => 'string',
+                                                'required'          => true,
+                                                'sanitize_callback' => array( Helpers::class, 'sanitize_text' ),
+                                                'validate_callback' => static fn( $v ): bool => is_string( $v ) && $v !== '',
+                                        ),
+                                ),
+                        )
+                );
 	}
 
 		/**

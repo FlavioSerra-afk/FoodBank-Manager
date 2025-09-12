@@ -10,6 +10,13 @@ telemetry, export job status, retention sweeps, and basic environment checks.
 The Jobs page is read-only unless a user has the `fbm_manage_jobs` capability.
 Administrators can grant it via **Diagnostics → Permissions**.
 
+## Multisite notes
+
+`fbm_manage_jobs` is granted to network administrators on activation so job
+dashboards work across subsites. The retention cron is idempotent and safe to
+run on each site. Last and next run times for cron hooks appear in the System
+Report.
+
 Scan and test endpoints are rate limited per user and IP with a short window
 to mitigate abuse. Administrators are exempt from these limits.
 
