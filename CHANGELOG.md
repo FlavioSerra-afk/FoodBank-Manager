@@ -2,6 +2,14 @@
 
 - Shortcodes helper examples and docs.
 
+## [1.6.0](https://github.com/FlavioSerra-afk/FoodBank-Manager/compare/1.5.3...1.6.0) (2025-09-12)
+
+
+### Features
+
+* **cli:** register version command during boot ([fc7843c](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/fc7843c9903e441f46cb8131336ec2d0fe120f60))
+* **cli:** register version command during boot ([8cdab67](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/8cdab67ac56c3b6ab2c7cb474d11150150383e20))
+
 ## [1.5.3](https://github.com/FlavioSerra-afk/FoodBank-Manager/compare/1.5.2...1.5.3) (2025-09-12)
 
 
