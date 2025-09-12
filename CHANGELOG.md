@@ -2,6 +2,14 @@
 
 - Shortcodes helper examples and docs.
 
+## [1.8.0](https://github.com/FlavioSerra-afk/FoodBank-Manager/compare/1.7.0...1.8.0) (2025-09-12)
+
+
+### Features
+
+* add rate limiting, CLI mail test, and cron telemetry ([5ae4598](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/5ae459896283b00997efbd345ab6b0d5bb67dce8))
+* add rate limiting, privacy export polish, and cron telemetry ([cdd42d8](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/cdd42d881038bf63812955a3b7f524629a51debe))
+
 ## [1.7.0](https://github.com/FlavioSerra-afk/FoodBank-Manager/compare/1.6.0...1.7.0) (2025-09-12)
 
 
