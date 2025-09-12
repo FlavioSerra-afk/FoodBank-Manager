@@ -18,7 +18,7 @@ final class AjaxNonceCapTest extends \BaseTestCase {
         fbm_test_trust_nonces(false);
         $_POST = array('id' => 1); // missing nonce
         $res = MailReplay::handle();
-        $this->assertSame(403, $res->get_status());
+        $this->assertSame(401, $res->get_status());
 
         fbm_test_trust_nonces(true);
         Rbac::revokeAll();

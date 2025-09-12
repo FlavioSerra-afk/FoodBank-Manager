@@ -12,8 +12,10 @@ namespace FoodBankManager\Rest;
 
 use WP_REST_Request;
 use WP_REST_Response;
+use WP_Error;
 use FoodBankManager\Security\Helpers;
 use FoodBankManager\Security\Crypto;
+use FBM\Rest\ErrorHelper;
 
 /**
  * Core REST API endpoints.
@@ -73,17 +75,12 @@ class Api {
 	 * @return WP_REST_Response
 	 */
 	public static function submit_application( WP_REST_Request $request ): WP_REST_Response {
-		if ( ! Helpers::verify_nonce( 'wp_rest', '_wpnonce' ) ) {
-			return new WP_REST_Response(
-				array(
-					'error' => array(
-						'code'    => 'fbm_invalid_nonce',
-						'message' => __( 'Invalid nonce', 'foodbank-manager' ),
-					),
-				),
-				403
-			);
-		}
+                if ( ! Helpers::verify_nonce( 'wp_rest', '_wpnonce' ) ) {
+                        $err = ErrorHelper::from_wp_error(
+                                new WP_Error( 'invalid_nonce', __( 'Invalid nonce', 'foodbank-manager' ), array( 'status' => 401 ) )
+                        );
+                        return new WP_REST_Response( $err['body'], $err['status'] );
+                }
 
                 $form_id  = (int) $request->get_param( 'form_id' ); // @phpstan-ignore-line
                 $first    = Helpers::sanitize_text( (string) $request->get_param( 'first_name' ) ); // @phpstan-ignore-line
@@ -92,17 +89,12 @@ class Api {
                 $postcode = Helpers::sanitize_text( (string) $request->get_param( 'postcode' ) ); // @phpstan-ignore-line
                 $consent  = Helpers::sanitize_text( (string) $request->get_param( 'consent' ) ); // @phpstan-ignore-line
 
-		if ( $first === '' || $last === '' || $email === '' || $postcode === '' || $consent === '' ) {
-			return new WP_REST_Response(
-				array(
-					'error' => array(
-						'code'    => 'fbm_missing_fields',
-						'message' => __( 'Required fields missing', 'foodbank-manager' ),
-					),
-				),
-				400
-			);
-		}
+                if ( $first === '' || $last === '' || $email === '' || $postcode === '' || $consent === '' ) {
+                        $err = ErrorHelper::from_wp_error(
+                                new WP_Error( 'invalid_param', __( 'Required fields missing', 'foodbank-manager' ), array( 'status' => 422 ) )
+                        );
+                        return new WP_REST_Response( $err['body'], $err['status'] );
+                }
 
                                 $file_ids = array();
                                 $files    = $request->get_file_params(); // @phpstan-ignore-line

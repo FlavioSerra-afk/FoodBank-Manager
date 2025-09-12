@@ -111,14 +111,23 @@ final class DiagnosticsController {
      */
     public static function ajax_mail_test(): WP_REST_Response {
         if ( ! check_ajax_referer( 'fbm_mail_test', '_ajax_nonce', false ) ) {
-            return wp_send_json_error( array( 'message' => __( 'Invalid nonce', 'foodbank-manager' ) ), 403 );
+            return wp_send_json_error(
+                array( 'error' => array( 'code' => 'invalid_nonce', 'message' => __( 'Invalid nonce', 'foodbank-manager' ) ) ),
+                401
+            );
         }
         if ( ! current_user_can( 'fb_manage_diagnostics' ) ) {
-            return wp_send_json_error( array( 'message' => __( 'Forbidden', 'foodbank-manager' ) ), 403 );
+            return wp_send_json_error(
+                array( 'error' => array( 'code' => 'forbidden', 'message' => __( 'Forbidden', 'foodbank-manager' ) ) ),
+                403
+            );
         }
         $to = sanitize_email( (string) ( $_POST['to'] ?? '' ) );
         if ( ! is_email( $to ) ) {
-            return wp_send_json_error( array( 'message' => __( 'Invalid email', 'foodbank-manager' ) ), 400 );
+            return wp_send_json_error(
+                array( 'error' => array( 'code' => 'invalid_param', 'message' => __( 'Invalid email', 'foodbank-manager' ) ) ),
+                422
+            );
         }
         $tpl = array(
             'subject' => __( 'FoodBank Manager test email', 'foodbank-manager' ),

@@ -22,7 +22,7 @@ final class DiagnosticsMailTestUiTest extends \BaseTestCase {
         fbm_test_trust_nonces(false);
         $res = DiagnosticsController::ajax_mail_test();
         $this->assertFalse($res->get_data()['success']);
-        $this->assertSame(403, $res->get_status());
+        $this->assertSame(401, $res->get_status());
     }
 
     public function testCapabilityCheck(): void {
