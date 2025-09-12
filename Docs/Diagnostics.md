@@ -33,9 +33,11 @@ payload and a text summary on the clipboard.
 
 ```bash
 $ wp fbm version
-Success: FoodBank Manager 1.6.0
-$ wp fbm jobs list
+1.6.1
+$ wp fbm jobs list --limit=10
+$ wp fbm jobs retry 42
 $ wp fbm retention run --dry-run
+$ wp fbm privacy preview user@example.com
 ```
 
-Registering commands via `WP_CLI::add_command()` is the canonical method.
+Commands are registered during bootstrap with `WP_CLI::add_command()`.
