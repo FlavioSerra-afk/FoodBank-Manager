@@ -41,9 +41,9 @@ final class RateLimitHeadersTest extends \BaseTestCase {
         $c = new ScanController();
         $c->verify($this->req());
         $headers = $GLOBALS['__fbm_sent_headers'];
-        $this->assertContains('X-FBM-RateLimit-Limit: 5', $headers);
-        $this->assertContains('X-FBM-RateLimit-Remaining: 4', $headers);
-        for ($i=0;$i<4;$i++) {
+        $this->assertContains('X-FBM-RateLimit-Limit: 6', $headers);
+        $this->assertContains('X-FBM-RateLimit-Remaining: 5', $headers);
+        for ($i=0;$i<5;$i++) {
             $c->verify($this->req());
         }
         $res = $c->verify($this->req());

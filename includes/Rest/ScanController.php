@@ -16,7 +16,6 @@ use FBM\Security\RateLimiter;
 use WP_REST_Request;
 use WP_REST_Response;
 use DomainException;
-use function fbm_send_headers;
 use function apply_filters;
 use function base64_decode;
 use function gmdate;
@@ -24,9 +23,7 @@ use function hash;
 use function hash_equals;
 use function __;
 use function sanitize_text_field;
-use function sanitize_key;
 use function current_user_can;
-use function get_current_user_id;
 use function wp_verify_nonce;
 use function wp_send_json_success;
 
@@ -78,51 +75,16 @@ final class ScanController {
             );
         }
         $now_ts = (int) apply_filters('fbm_now', time());
-        $limit = 0;
-        $remaining = 0;
-        $retry = 0;
-        if (!current_user_can('manage_options')) {
-            $ip  = isset($_SERVER['REMOTE_ADDR']) ? sanitize_key((string) $_SERVER['REMOTE_ADDR']) : '';
-            $uid = get_current_user_id();
-            $ipCheck = RateLimiter::check('scan_ip_' . $ip);
-            $limit     = $ipCheck['limit'];
-            $remaining = $ipCheck['remaining'];
-            $retry     = $ipCheck['retry_after'];
-            $allowed   = $ipCheck['allowed'];
-            if ($uid > 0) {
-                $userCheck = RateLimiter::check('scan_user_' . (string) $uid);
-                $remaining = min($remaining, $userCheck['remaining']);
-                $retry     = max($retry, $userCheck['retry_after']);
-                $allowed   = $allowed && $userCheck['allowed'];
-            }
-            $reset = $retry > 0 ? $now_ts + $retry : $now_ts;
-            fbm_send_headers(array(
-                'RateLimit-Limit: ' . $limit,
-                'RateLimit-Remaining: ' . max(0, $remaining),
-                'RateLimit-Reset: ' . $reset,
-                'X-FBM-RateLimit-Limit: ' . $limit,
-                'X-FBM-RateLimit-Remaining: ' . max(0, $remaining),
-                'Retry-After: ' . $retry,
-            ));
-            if (!$allowed) {
-                return wp_send_json_success(
-                    array(
-                        'checked_in' => false,
-                        'status'     => 'rate-limited',
-                        'message'    => __('Too many requests', 'foodbank-manager'),
-                    ),
-                    429
-                );
-            }
-        } else {
-            fbm_send_headers(array(
-                'RateLimit-Limit: 0',
-                'RateLimit-Remaining: 0',
-                'RateLimit-Reset: ' . $now_ts,
-                'X-FBM-RateLimit-Limit: 0',
-                'X-FBM-RateLimit-Remaining: 0',
-                'Retry-After: 0',
-            ));
+        $rl = RateLimiter::scan();
+        if (!$rl['allowed']) {
+            return wp_send_json_success(
+                array(
+                    'checked_in' => false,
+                    'status'     => 'rate-limited',
+                    'message'    => __('Too many requests', 'foodbank-manager'),
+                ),
+                429
+            );
         }
         $token = sanitize_text_field((string) $request->get_param('token'));
         if ($token === '' || strlen($token) > 512) {

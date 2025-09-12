@@ -65,6 +65,7 @@ class Api {
                 );
                 ( new AttendanceController() )->register_routes();
                 ( new \FBM\Rest\JobsController() )->register_routes();
+                ( new \FBM\Rest\ThrottleController() )->register_routes();
 	}
 
 	/**

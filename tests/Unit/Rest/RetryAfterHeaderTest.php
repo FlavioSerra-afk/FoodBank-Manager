@@ -40,7 +40,7 @@ final class RetryAfterHeaderTest extends \BaseTestCase {
 
     public function testRetryAfterHeader(): void {
         $c = new ScanController();
-        for ($i = 0; $i < 5; $i++) {
+        for ($i = 0; $i < 6; $i++) {
             $c->verify($this->req());
         }
         $res = $c->verify($this->req());
