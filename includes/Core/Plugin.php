@@ -15,7 +15,7 @@ use FBM\Http\ExportJobsController;
 use FBM\Core\Jobs\JobsWorker;
 use FoodBankManager\Core\Options;
 use FBM\Core\Retention;
-use FBM\CLI\VersionCommand;
+use FoodBankManager\CLI\Commands;
 use FoodBankManager\Admin\ShortcodesPage;
 use FoodBankManager\Core\Screen;
 
@@ -111,8 +111,8 @@ final class Plugin {
         }
 
         private static function maybe_register_cli(): void {
-                if ( defined( 'WP_CLI' ) && \WP_CLI && class_exists( VersionCommand::class ) ) {
-                        \WP_CLI::add_command( 'fbm version', [ new VersionCommand(), '__invoke' ] );
+                if ( defined( 'WP_CLI' ) && \WP_CLI ) {
+                        \WP_CLI::add_command( 'fbm', Commands::class );
                 }
         }
 
