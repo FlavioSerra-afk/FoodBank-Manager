@@ -2,6 +2,14 @@
 
 - Shortcodes helper examples and docs.
 
+## [1.8.0](https://github.com/FlavioSerra-afk/FoodBank-Manager/compare/1.8.0...1.8.0) (2025-09-12)
+
+
+### Miscellaneous Chores
+
+* align release-please to 1.8.0 ([d2f62b3](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/d2f62b35a185ad2b07fb7394da20d59e24ef64fc))
+* **release:** align release state ([36308d5](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/36308d59239e45e239e5a7b8fc24433ed41c1ca7))
+
 ## [1.8.0](https://github.com/FlavioSerra-afk/FoodBank-Manager/compare/1.7.0...1.8.0) (2025-09-12)
 
 
