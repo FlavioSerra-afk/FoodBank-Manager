@@ -34,6 +34,7 @@ final class Menu {
         private const CAP_EVENTS      = 'fbm_manage_events';
         private const CAP_SCAN        = 'fb_manage_attendance';
         private const CAP_REPORTS     = 'fb_manage_reports';
+        private const CAP_JOBS        = 'fbm_manage_jobs';
 
         /**
          * Canonical admin slugs.
@@ -119,6 +120,15 @@ final class Menu {
                         self::CAP_REPORTS,
                         'fbm_reports',
                         array( self::class, 'render_reports' )
+                );
+
+                add_submenu_page(
+                        $parent_slug,
+                        esc_html__( 'Jobs', 'foodbank-manager' ),
+                        esc_html__( 'Jobs', 'foodbank-manager' ),
+                        self::CAP_JOBS,
+                        'fbm_jobs',
+                        array( self::class, 'render_jobs' )
                 );
 
                 if ( Options::get( 'modules.events', false ) ) {
@@ -242,6 +252,12 @@ final class Menu {
         public static function render_reports(): void {
                 self::render_once( 'admin:reports', static function (): void {
                         \FBM\Admin\ReportsPage::route();
+                } );
+        }
+
+        public static function render_jobs(): void {
+                self::render_once( 'admin:jobs', static function (): void {
+                        \FBM\Admin\JobsPage::route();
                 } );
         }
 

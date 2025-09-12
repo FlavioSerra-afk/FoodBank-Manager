@@ -184,10 +184,10 @@ final class JobsRepo {
 		$wpdb->query( $wpdb->prepare( "UPDATE {$table} SET attempts = attempts + 1 WHERE id = %d", $id ) );
 	}
 
-	/**
-	 * Retry a failed job.
-	 */
-	public static function retry( int $id ): void {
+        /**
+         * Retry a failed job.
+         */
+        public static function retry( int $id ): void {
 		global $wpdb;
 		$table = self::table();
 		$id    = absint( $id );
@@ -204,6 +204,28 @@ final class JobsRepo {
 			array( 'id' => $id ),
 			array( '%s', '%s', '%s' ),
 			array( '%d' )
-		);
-	}
+                );
+        }
+
+        /**
+         * Cancel a job.
+         */
+        public static function cancel( int $id ): void {
+                global $wpdb;
+                $table = self::table();
+                $id    = absint( $id );
+                if ( ! $id ) {
+                        return;
+                }
+                $wpdb->update(
+                        $table,
+                        array(
+                                'status'     => 'cancelled',
+                                'updated_at' => gmdate( 'Y-m-d H:i:s' ),
+                        ),
+                        array( 'id' => $id ),
+                        array( '%s', '%s' ),
+                        array( '%d' )
+                );
+        }
 }
