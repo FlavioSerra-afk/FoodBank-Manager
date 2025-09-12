@@ -22,11 +22,20 @@ capability.
 ## Privacy panel
 The Diagnostics hub exposes a Privacy panel to preview Subject Access Request data and execute dry-run or real erasure. Actions require a nonce and the `fb_manage_diagnostics` capability.
 
+## System Report
+
+Administrators can generate a system report that lists plugin, PHP and WordPress
+versions, active panels, cron event timings, recent mail failures and job queue
+counts. The report includes a **Copy report** button that places the JSON
+payload and a text summary on the clipboard.
+
 ## WP-CLI
 
 ```bash
 $ wp fbm version
-Success: FoodBank Manager 1.5.3
+Success: FoodBank Manager 1.6.0
+$ wp fbm jobs list
+$ wp fbm retention run --dry-run
 ```
 
 Registering commands via `WP_CLI::add_command()` is the canonical method.

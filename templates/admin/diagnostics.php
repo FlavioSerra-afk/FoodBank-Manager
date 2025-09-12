@@ -286,4 +286,7 @@ $rows       = $rows ?? array();
     <?php \FoodBankManager\Admin\DiagnosticsPdf::render_panel(); ?>
     <?php \FoodBankManager\Admin\DiagnosticsPrivacy::render_panel(); ?>
     <?php /* @psalm-suppress UnresolvableInclude */ require FBM_PATH . 'templates/admin/jobs.php'; ?>
+    <?php if ( current_user_can( 'fb_manage_diagnostics' ) ) : ?>
+        <?php \FoodBankManager\Admin\DiagnosticsReport::render(); ?>
+    <?php endif; ?>
 </div>
