@@ -2,6 +2,14 @@
 
 - Shortcodes helper examples and docs.
 
+## [1.5.2](https://github.com/FlavioSerra-afk/FoodBank-Manager/compare/1.5.1...1.5.2) (2025-09-12)
+
+
+### Bug Fixes
+
+* **scan:** return explicit check-in status ([335750a](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/335750a54f5a6a29ea661a688bcee1d7eeb937ca))
+* **scan:** return explicit check-in status ([81cb6cf](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/81cb6cf5aac2fed58aaee7119818b737693593dd))
+
 ## [1.5.1-rc.1](https://github.com/FlavioSerra-afk/FoodBank-Manager/compare/1.5.0-rc.7.7...1.5.1-rc.1) (2025-09-11)
 
 
