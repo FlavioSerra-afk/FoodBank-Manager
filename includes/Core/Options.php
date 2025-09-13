@@ -37,6 +37,7 @@ namespace FBM\Core {
                             'radius' => 20,
                             'border' => 1,
                         ],
+                        'aliases' => [],
                     ],
                     'front' => [
                         'style'   => 'basic',
@@ -49,6 +50,7 @@ namespace FBM\Core {
                             'radius' => 20,
                             'border' => 1,
                         ],
+                        'aliases' => [],
                         'enabled' => false,
                     ],
                     'match_front_to_admin' => false,
