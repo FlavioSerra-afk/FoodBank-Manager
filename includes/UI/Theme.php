@@ -24,8 +24,8 @@ use function __;
  * Provide sanitized design tokens for admin and front-end.
  */
 final class Theme {
-	/** Default accent colour. */
-	public const DEFAULT_ACCENT = '#3B82F6';
+        /** Default accent colour. */
+        public const DEFAULT_ACCENT = '#0B5FFF';
 
 		/**
 		 * No-op for backwards compatibility.

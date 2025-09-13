@@ -6,17 +6,17 @@ Defines visual tokens and component specs used across admin and front-end surfac
 ## Tokens
 | Token | Default | Notes |
 |---|---|---|
-| `--fbm-text` | `#1d2327` | Body text colour |
+| `--fbm-color-text` | `#1d2327` | Body text colour |
 | `--fbm-bg` | `#f0f0f1` | Admin background |
-| `--fbm-surface` | `#ffffff` | Card/background colour |
-| `--fbm-accent` | `#3B82F6` | Accent colour (radios/checkboxes use `accent-color`) |
+| `--fbm-color-surface` | `#ffffff` | Card/background colour |
+| `--fbm-color-accent` | `#0B5FFF` | Accent colour (radios/checkboxes use `accent-color`) |
 | `--fbm-font-base` | `16px` | Base font size (`14–18`) |
 | `--fbm-font-sm` | `calc(var(--fbm-font-base)*0.875)` | Small text |
 | `--fbm-font-lg` | `calc(var(--fbm-font-base)*1.125)` | Large text |
 | `--fbm-radius` | `20px` | Control/card radius |
 | `--fbm-input-height` | `38px` | Base input height |
 
-Focus outlines use `:focus-visible` and respect high contrast via `@media (forced-colors: active)`.
+Radios and checkboxes inherit `--fbm-color-accent` via CSS `accent-color`. Focus outlines use `:focus-visible` and respect high contrast via `@media (forced-colors: active)`.
 
 ## Layered glass recipe
 

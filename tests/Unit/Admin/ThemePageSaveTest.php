@@ -39,4 +39,37 @@ final class ThemePageSaveTest extends \BaseTestCase {
         $this->assertSame(Theme::defaults(), $opts);
         $this->assertNotEmpty($GLOBALS['fbm_settings_errors']);
     }
+
+    public function test_post_option_page_updates_accent(): void {
+        $_POST = array(
+            'option_page' => 'fbm_theme',
+            'fbm_theme'   => array(
+                'admin' => array(
+                    'style' => 'glass',
+                    'preset' => 'light',
+                    'accent' => '#AaBbCc',
+                    'glass' => array('alpha'=>0.2,'blur'=>8,'elev'=>4,'radius'=>10,'border'=>1),
+                ),
+            ),
+        );
+        $san = Theme::sanitize($_POST['fbm_theme']);
+        update_option('fbm_theme', $san);
+        $saved = Theme::get();
+        $this->assertSame('#AABBCC', strtoupper($saved['admin']['accent']));
+    }
+
+    public function test_template_has_option_page_field(): void {
+        if (!defined('FBM_PATH')) {
+            define('FBM_PATH', dirname(__DIR__, 3) . '/');
+        }
+        if (!function_exists('settings_fields')) {
+            function settings_fields($group): void { // @phpstan-ignore-line
+                echo '<input type="hidden" name="option_page" value="' . esc_attr($group) . '" />';
+            }
+        }
+        ob_start();
+        require FBM_PATH . 'templates/admin/theme.php';
+        $html = (string) ob_get_clean();
+        $this->assertStringContainsString('name="option_page" value="fbm_theme"', $html);
+    }
 }
