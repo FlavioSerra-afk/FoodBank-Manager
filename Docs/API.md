@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-12 (v1.11.3 patch finalize)
+Docs-Revision: 2025-09-12 (v1.11.4 patch finalize)
 # REST API (pcc-fb/v1)
 
 Base namespace: `pcc-fb/v1`. All write endpoints require `X-WP-Nonce` and capabilities.

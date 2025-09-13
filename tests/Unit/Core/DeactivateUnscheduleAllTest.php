@@ -19,8 +19,6 @@ final class DeactivateUnscheduleAllTest extends \BaseTestCase {
                 'fbm_retention_hourly' => array(array()),
                 'fbm_retention_tick' => array(array()),
                 'fbm_jobs_tick' => array(array()),
-                'fbm_cron_cleanup' => array(array()),
-                'fbm_cron_email_retry' => array(array()),
             ),
         );
         (new Plugin())->deactivate();
