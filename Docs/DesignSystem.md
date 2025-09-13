@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-09 (Wave UI/UX Glass — Theme Tab)
+Docs-Revision: 2025-09-13 (Menu tokens)
 # FoodBank Manager — Design System
 
 Defines visual tokens and component specs used across admin and front-end surfaces. Admin screens and public forms share the same token set for parity.
@@ -15,6 +15,27 @@ Defines visual tokens and component specs used across admin and front-end surfac
 | `--fbm-font-lg` | `calc(var(--fbm-font-base)*1.125)` | Large text |
 | `--fbm-radius` | `20px` | Control/card radius |
 | `--fbm-input-height` | `38px` | Base input height |
+
+### Menu tokens
+
+All menu variables are scoped to `.fbm-scope` inside the `fbm` cascade layer so they never bleed into WordPress chrome ([MDN](https://developer.mozilla.org/docs/Web/CSS/@layer)).
+
+| Token | Notes |
+|---|---|
+| `--fbm-menu-item-h` | Menu item height |
+| `--fbm-menu-item-px` | Horizontal padding |
+| `--fbm-menu-item-py` | Vertical padding |
+| `--fbm-menu-gap` | Gap between icon and label |
+| `--fbm-menu-radius` | Outer radius |
+| `--fbm-menu-icon-size` | Icon square size |
+| `--fbm-menu-icon-opacity` | Icon opacity |
+| `--fbm-menu-bg` | Menu background |
+| `--fbm-menu-color` | Menu text colour |
+| `--fbm-menu-hover-bg` | Hover background |
+| `--fbm-menu-hover-color` | Hover text colour |
+| `--fbm-menu-active-bg` | Active background |
+| `--fbm-menu-active-color` | Active text colour |
+| `--fbm-menu-divider` | Divider colour |
 
 Radios and checkboxes inherit `--fbm-color-accent` via CSS `accent-color`. Focus outlines use `:focus-visible` and respect high contrast via `@media (forced-colors: active)`.
 
@@ -126,3 +147,22 @@ Admin tokens load through `admin_enqueue_scripts` using the current screen hook/
 
 ## RTL
 Spacing and order rely on logical properties; components remain mirrorable when `.fbm-admin` has `direction: rtl`.
+
+## Control → token map
+
+| Control (UI) | Token (scoped variable) | Primary selectors (inside `.fbm-scope`) | Notes |
+|---|---|---|---|
+| Preset (Light/Dark/HC) | `--fbm-bg`, `--fbm-surface`, `--fbm-text`, `--fbm-accent` | `.fbm-app`, `.fbm-card`, `.fbm-panel`, `.fbm-table` | Presets update core colours |
+| Accent colour | `--fbm-accent` | `.fbm-btn--primary`, `.fbm-link`, `input[type=radio]`, `input[type=checkbox]` | Radios/checkboxes tinted via `accent-color` |
+| Base size | `--fbm-base` | `html .fbm-scope` | `font-size: var(--fbm-base)`; components scale with `em`/`rem` |
+| Input height | `--fbm-input-h` | `.fbm-input`, `.fbm-select` | Consistent control heights |
+| Radius | `--fbm-radius` | `.fbm-card`, `.fbm-btn`, `.fbm-input`, `.fbm-menu`, `.fbm-tabs` | Unified rounding |
+| Glass alpha/blur/elevation | `--fbm-elev`, `--fbm-blur`, `--fbm-alpha` | `.fbm-card.is-glass` | Optional visual style |
+| Menu: item height | `--fbm-menu-item-h` | `.fbm-menu__item` | AIW parity |
+| Menu: paddings X/Y | `--fbm-menu-item-px`, `--fbm-menu-item-py` | `.fbm-menu__item` | AIW parity |
+| Menu: icon size | `--fbm-menu-icon-size` | `.fbm-menu__icon` | AIW parity |
+| Menu: active bg/color | `--fbm-menu-active-bg`, `--fbm-menu-active-color` | `.fbm-menu__item[aria-current="page"], .fbm-menu__item.is-active` | AIW parity |
+| Menu: hover bg/color | `--fbm-menu-hover-bg`, `--fbm-menu-hover-color` | `.fbm-menu__item:hover` | AIW parity |
+| Menu: divider | `--fbm-menu-divider` | `.fbm-menu__divider` | AIW parity |
+| Focus ring | – | `:where(.fbm-scope) :focus-visible` | Visible ring for keyboard users |
+| HC fallbacks | – | `@media (forced-colors: active)` | Avoid translucency; respect system colours |
