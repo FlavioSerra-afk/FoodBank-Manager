@@ -1,3 +1,7 @@
+## 1.11.7
+
+- fix: Settings API wiring for Design & Theme with tokenized variables and accessibility tweaks.
+
 ## 1.5.1-rc.1
 
 - Shortcodes helper examples and docs.

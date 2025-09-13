@@ -14,12 +14,16 @@ use FoodBankManager\UI\Theme;
 use function add_action;
 use function add_settings_error;
 use function __;
+use function esc_html__;
 use function check_admin_referer;
 use function current_user_can;
 use function menu_page_url;
 use function nocache_headers;
 use function register_setting;
 use function sanitize_key;
+use function add_option;
+use function get_option;
+use function get_current_screen;
 use function wp_die;
 use function wp_json_encode;
 use function wp_safe_redirect;
@@ -43,6 +47,36 @@ class ThemePage {
                         'sanitize_callback' => '\\FBM\\Core\\Options::sanitize_all',
                     )
                 );
+                register_setting(
+                    'fbm_theme',
+                    'fbm_theme',
+                    array(
+                        'sanitize_callback' => '\\FoodBankManager\\UI\\Theme::sanitize',
+                        'default'          => \FoodBankManager\UI\Theme::defaults(),
+                        'type'             => 'array',
+                    )
+                );
+                if ( null === get_option( 'fbm_theme', null ) ) {
+                    add_option( 'fbm_theme', \FoodBankManager\UI\Theme::defaults(), '', false );
+                }
+            }
+        );
+        add_action(
+            'load-foodbank_page_fbm_theme',
+            static function (): void {
+                $screen = get_current_screen();
+                if ( $screen ) {
+                    $screen->add_help_tab(
+                        array(
+                            'id'      => 'fbm-theme-help',
+                            'title'   => __( 'Guide', 'foodbank-manager' ),
+                            'content' => '<p>' . sprintf(
+                                esc_html__( 'See the %s for token details.', 'foodbank-manager' ),
+                                '<a href="https://github.com/organization/Docs/DesignSystem.md" target="_blank">' . esc_html__( 'Design System guide', 'foodbank-manager' ) . '</a>'
+                            ) . '</p>',
+                        )
+                    );
+                }
             }
         );
         add_action( 'admin_post_fbm_theme_export', array( __CLASS__, 'export' ) );

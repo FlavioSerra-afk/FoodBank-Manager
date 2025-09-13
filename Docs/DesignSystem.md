@@ -1,26 +1,22 @@
 Docs-Revision: 2025-09-09 (Wave UI/UX Glass — Theme Tab)
 # FoodBank Manager — Design System
 
-Defines visual tokens and component specs used across admin and front-end surfaces.
+Defines visual tokens and component specs used across admin and front-end surfaces. Admin screens and public forms share the same token set for parity.
 
 ## Tokens
-| Token | Default | Range |
+| Token | Default | Notes |
 |---|---|---|
-| `--fbm-color-accent` | `var(--fbm-accent, #3B82F6)` | Accent colour |
-| `--fbm-shadow-rgb` | `0 0 0` | Base drop shadow colour |
-| `--fbm-glass-alpha` | `var(--fbm-alpha, 0.24)` | Surface alpha |
-| `--fbm-glass-blur` | `var(--fbm-blur, 14px)` | Blur radius |
-| `--fbm-card-radius` | `var(--fbm-radius, 20px)` | Border radius |
-| `--fbm-border-w` | `var(--fbm-border, 1px)` | Border width |
-| `--fbm-elev-shadow` | `0 8px 32px rgba(var(--fbm-shadow-rgb)/0.10)` | Elevation shadow |
-| `--fbm-inset-top` | `inset 0 1px 0 rgba(255 255 255 / 0.50)` | Top hairline |
-| `--fbm-inset-bottom` | `inset 0 -1px 0 rgba(255 255 255 / 0.10)` | Bottom hairline |
-| `--fbm-inset-glow` | `inset 0 0 20px 10px rgba(255 255 255 / 0.60)` | Inner glow |
-| `--fbm-color-surface` | preset | n/a |
-| `--fbm-color-text` | preset | n/a |
-| `--fbm-color-border` | preset | n/a |
+| `--fbm-text` | `#1d2327` | Body text colour |
+| `--fbm-bg` | `#f0f0f1` | Admin background |
+| `--fbm-surface` | `#ffffff` | Card/background colour |
+| `--fbm-accent` | `#3B82F6` | Accent colour (radios/checkboxes use `accent-color`) |
+| `--fbm-font-base` | `16px` | Base font size (`14–18`) |
+| `--fbm-font-sm` | `calc(var(--fbm-font-base)*0.875)` | Small text |
+| `--fbm-font-lg` | `calc(var(--fbm-font-base)*1.125)` | Large text |
+| `--fbm-radius` | `20px` | Control/card radius |
+| `--fbm-input-height` | `38px` | Base input height |
 
-Focus and hover states derive from `--fbm-color-accent`; borders and outlines use the blue accent to ensure visibility.
+Focus outlines use `:focus-visible` and respect high contrast via `@media (forced-colors: active)`.
 
 ## Layered glass recipe
 

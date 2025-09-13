@@ -2,14 +2,14 @@
 # This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: FoodBank Manager 1.11.5\n"
+"Project-Id-Version: FoodBank Manager 1.11.7\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/FoodBank-Manager\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-09-13T00:29:37+00:00\n"
+"POT-Creation-Date: 2025-09-13T10:29:52+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: foodbank-manager\n"
@@ -69,9 +69,9 @@ msgstr ""
 #: includes/Admin/ScanPage.php:31
 #: includes/Admin/SettingsPage.php:27
 #: includes/Admin/ShortcodesPage.php:24
-#: includes/Admin/ThemePage.php:57
-#: includes/Admin/ThemePage.php:72
 #: includes/Admin/ThemePage.php:91
+#: includes/Admin/ThemePage.php:106
+#: includes/Admin/ThemePage.php:125
 #: templates/admin/forms.php:16
 msgid "You do not have permission to access this page."
 msgstr ""
@@ -462,27 +462,41 @@ msgstr ""
 msgid "Invalid shortcode."
 msgstr ""
 
-#: includes/Admin/ThemePage.php:100
+#: includes/Admin/ThemePage.php:72
+msgid "Guide"
+msgstr ""
+
+#: includes/Admin/ThemePage.php:74
+#, php-format
+msgid "See the %s for token details."
+msgstr ""
+
+#: includes/Admin/ThemePage.php:75
+msgid "Design System guide"
+msgstr ""
+
+#: includes/Admin/ThemePage.php:134
 msgid "Invalid file."
 msgstr ""
 
-#: includes/Admin/ThemePage.php:107
+#: includes/Admin/ThemePage.php:141
 msgid "Invalid theme JSON."
 msgstr ""
 
-#: includes/Admin/ThemePage.php:112
+#: includes/Admin/ThemePage.php:146
 msgid "Theme imported."
 msgstr ""
 
-#: includes/Core/Options.php:96
+#: includes/Core/Options.php:101
+#: includes/UI/Theme.php:92
 msgid "Theme payload too large."
 msgstr ""
 
-#: includes/Core/Options.php:123
+#: includes/Core/Options.php:118
 msgid "Invalid from address."
 msgstr ""
 
-#: includes/Core/Options.php:127
+#: includes/Core/Options.php:122
 msgid "Invalid reply-to address."
 msgstr ""
 

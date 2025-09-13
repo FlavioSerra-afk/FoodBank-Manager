@@ -32,10 +32,9 @@ class Assets {
 		 *
 		 * @return void
 		 */
-	public function register(): void {
-									add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin' ), 10 );
-									add_action( 'admin_head', array( self::class, 'print_admin_head' ) );
-									$theme = Theme::get();
+        public function register(): void {
+                                                                        add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin' ), 10 );
+                                                                        $theme = Theme::get();
 		if ( ! empty( $theme['apply_admin_chrome'] ) ) {
 										add_filter( 'admin_body_class', array( Theme::class, 'admin_body_class' ) );
 		}
@@ -61,8 +60,9 @@ class Assets {
 		if ( 'toplevel_page_fbm' !== $id && ! str_starts_with( $id, 'foodbank_page_fbm_' ) ) {
 						return;
 		}
-		wp_register_style( 'fbm-admin', FBM_URL . 'assets/css/admin.css', array(), Plugin::VERSION );
-		wp_enqueue_style( 'fbm-admin' );
+                wp_register_style( 'fbm-admin', FBM_URL . 'assets/css/admin.css', array(), Plugin::VERSION );
+                wp_enqueue_style( 'fbm-admin' );
+                wp_add_inline_style( 'fbm-admin', Theme::css_vars( Theme::admin(), ':root' ) . Theme::glass_support_css() );
 		wp_register_style( 'fbm-admin-tables', FBM_URL . 'assets/css/admin-tables.css', array(), Plugin::VERSION );
 		wp_enqueue_style( 'fbm-admin-tables' );
 
@@ -111,24 +111,8 @@ class Assets {
 				wp_enqueue_style( 'fbm-menus' );
 	}
 
-				/**
-				 * Print deterministic admin CSS variables.
-				 *
-				 * @return void
-				 */
-	public static function print_admin_head(): void {
-			static $done = false;
-		if ( $done ) {
-				return;
-		}
-			$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-			$id     = $screen ? (string) $screen->id : '';
-		if ( 'toplevel_page_fbm' !== $id && ! str_starts_with( $id, 'foodbank_page_fbm_' ) ) {
-				return;
-		}
-
-			$css = Theme::css_vars( Theme::admin(), '.fbm-admin' ) . Theme::glass_support_css();
-			echo '<style id="fbm-css-vars">' . esc_html( $css ) . '</style>';
-			$done = true;
-	}
+        /**
+         * Legacy helper removed.
+         */
+        public static function print_admin_head(): void {}
 }

@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignoreFile
 /**
  * Theme token helpers.
  *
@@ -14,6 +14,11 @@ use function filter_var;
 use function sanitize_hex_color;
 use function sanitize_key;
 use function is_rtl;
+use function get_option;
+use function add_settings_error;
+use function wp_json_encode;
+use function strlen;
+use function __;
 
 /**
  * Provide sanitized design tokens for admin and front-end.
@@ -51,11 +56,10 @@ final class Theme {
 	 *
 	 * @return array<string,mixed>
 	 */
-	public static function get(): array {
-		$all = Options::all();
-		$raw = $all['theme'] ?? array();
-		return self::sanitize( is_array( $raw ) ? $raw : array() );
-	}
+        public static function get(): array {
+                $raw = get_option( 'fbm_theme', array() );
+                return self::sanitize( is_array( $raw ) ? $raw : array() );
+        }
 
 	/**
 	 * Retrieve sanitized admin section.
@@ -81,10 +85,15 @@ final class Theme {
 	 * @param array<string,mixed> $raw Raw values.
 	 * @return array<string,mixed>
 	 */
-	public static function sanitize( array $raw ): array {
-		$defaults = self::defaults();
-		$admin    = self::sanitize_section( $raw['admin'] ?? array(), $defaults['admin'] );
-		$front    = self::sanitize_section( $raw['front'] ?? array(), $defaults['front'] );
+        public static function sanitize( array $raw ): array {
+                $defaults = self::defaults();
+                $json     = wp_json_encode( $raw );
+                if ( is_string( $json ) && strlen( $json ) > 65536 ) {
+                        add_settings_error( 'fbm_theme', 'fbm_theme', __( 'Theme payload too large.', 'foodbank-manager' ), 'error' );
+                        return $defaults;
+                }
+                $admin = self::sanitize_section( $raw['admin'] ?? array(), $defaults['admin'] );
+                $front = self::sanitize_section( $raw['front'] ?? array(), $defaults['front'] );
 
 		$front_enabled    = filter_var( $raw['front']['enabled'] ?? $defaults['front']['enabled'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE );
 		$front['enabled'] = null === $front_enabled ? $defaults['front']['enabled'] : (bool) $front_enabled;

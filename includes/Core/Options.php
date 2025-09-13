@@ -76,6 +76,11 @@ namespace FBM\Core {
             if (!is_array($raw)) {
                 $raw = [];
             }
+            $theme = get_option('fbm_theme', self::defaults()['theme']);
+            if (!is_array($theme)) {
+                $theme = self::defaults()['theme'];
+            }
+            $raw['theme'] = $theme;
             return self::merge(self::defaults(), $raw);
         }
 
@@ -96,17 +101,7 @@ namespace FBM\Core {
                     add_settings_error('fbm_theme', 'fbm_theme', __('Theme payload too large.', 'foodbank-manager'), 'error');
                 } else {
                     $san = \FoodBankManager\UI\Theme::sanitize($input['theme']);
-                    if (!empty($san['match_front_to_admin'])) {
-                        $admin = $san['admin'];
-                        $front = $san['front'];
-                        $front_copy = $front;
-                        unset($front_copy['enabled']);
-                        if ($front_copy !== $admin) {
-                            $enabled = $front['enabled'];
-                            $san['front'] = $admin;
-                            $san['front']['enabled'] = $enabled;
-                        }
-                    }
+                    update_option('fbm_theme', $san, false);
                     $current['theme'] = $san;
                 }
                 unset($input['theme']);
@@ -139,7 +134,13 @@ namespace FBM\Core {
         /** @param array<string,mixed> $patch */
         public static function save(array $patch): bool {
             $current = self::all();
-            $next    = self::merge($current, $patch);
+            if (isset($patch['theme'])) {
+                update_option('fbm_theme', $patch['theme'], false);
+                $current['theme'] = $patch['theme'];
+                unset($patch['theme']);
+            }
+            $next = self::merge($current, $patch);
+            unset($next['theme']);
             return update_option('fbm_options', $next, false); // @phpstan-ignore-line
         }
 
