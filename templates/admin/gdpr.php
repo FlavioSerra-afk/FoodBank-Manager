@@ -30,6 +30,7 @@ if ( $app_id > 0 && ! empty( $results ) ) {
     $counts['emails']     = count( \FBM\Mail\LogRepo::find_by_application_id( $app_id ) );
 }
 ?>
+<?php echo '<div id="fbm-ui" class="fbm-scope fbm-app">'; ?>
 <div class="wrap fbm-admin">
     <h1><?php esc_html_e( 'GDPR Export', 'foodbank-manager' ); ?></h1>
     <form method="get" action="">
@@ -78,3 +79,4 @@ if ( $app_id > 0 && ! empty( $results ) ) {
         </form>
     <?php endif; ?>
 </div>
+<?php echo '</div>'; ?>

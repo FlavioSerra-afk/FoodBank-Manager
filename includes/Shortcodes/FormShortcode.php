@@ -39,7 +39,7 @@ final class FormShortcode {
         $front         = $theme['front'];
                 if ( ! empty( $front['enabled'] ) ) {
         wp_enqueue_style( 'fbm-public', plugins_url( 'assets/css/public.css', FBM_FILE ), array(), Plugin::VERSION ); // @phpstan-ignore-line
-                                               wp_add_inline_style( 'fbm-public', Theme::css_variables() );
+                                               wp_add_inline_style( 'fbm-public', Theme::css_variables_scoped() );
                         }
 			$atts = shortcode_atts(
 				array(

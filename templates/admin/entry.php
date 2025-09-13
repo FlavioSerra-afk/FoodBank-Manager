@@ -8,9 +8,10 @@
 use FoodBankManager\Security\Helpers;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit;
+		exit;
 }
 ?>
+<?php echo '<div id="fbm-ui" class="fbm-scope fbm-app">'; ?>
 <div class="wrap fbm-admin">
 	<h1><?php esc_html_e( 'Entry', 'foodbank-manager' ); ?></h1>
 	<table class="widefat striped">
@@ -50,5 +51,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</form>
 	<?php endif; ?>
 	<h2 style="margin-top:2em;"><?php esc_html_e( 'History', 'foodbank-manager' ); ?></h2>
-	<p><?php esc_html_e( 'No history available.', 'foodbank-manager' ); ?></p>
+		<p><?php esc_html_e( 'No history available.', 'foodbank-manager' ); ?></p>
 </div>
+<?php echo '</div>'; ?>

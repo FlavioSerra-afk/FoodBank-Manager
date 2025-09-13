@@ -12,6 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $settings = $settings ?? \FBM\Security\ThrottleSettings::get();
 $roles    = $roles ?? get_editable_roles();
 ?>
+<?php echo '<div id="fbm-ui" class="fbm-scope fbm-app">'; ?>
 <h2><?php esc_html_e( 'Security & Throttling', 'foodbank-manager' ); ?></h2>
 <?php settings_errors( 'fbm_security' ); ?>
 <form method="post" action="<?php echo esc_url( admin_url( 'options.php' ) ); ?>">
@@ -40,4 +41,5 @@ $roles    = $roles ?? get_editable_roles();
     </table>
     <?php submit_button(); ?>
 </form>
+<?php echo '</div>'; ?>
 

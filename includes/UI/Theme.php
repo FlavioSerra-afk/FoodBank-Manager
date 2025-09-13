@@ -230,10 +230,17 @@ final class Theme {
         }
 
         /**
-         * CSS variables for admin theme.
+         * Scoped CSS variables for admin theme.
+         */
+        public static function css_variables_scoped(): string {
+                return '@layer fbm {' . self::css_vars( self::admin(), '.fbm-scope' ) . self::glass_support_css() . '}';
+        }
+
+        /**
+         * @deprecated Use css_variables_scoped().
          */
         public static function css_variables(): string {
-                return self::css_vars( self::admin(), '.fbm-scope' ) . self::glass_support_css();
+                return self::css_variables_scoped();
         }
 
 	/**

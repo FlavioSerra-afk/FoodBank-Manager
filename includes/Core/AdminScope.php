@@ -40,4 +40,9 @@ final class AdminScope {
         return $slug && in_array( $slug, self::SLUGS, true );
     }
 
+    /** Alias for is_fbm_admin() */
+    public static function is_fbm_admin_request(): bool {
+        return self::is_fbm_admin();
+    }
+
 }

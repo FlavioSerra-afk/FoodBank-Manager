@@ -1,3 +1,11 @@
+## [2.0.8] — 2025-09-13
+### Fixed
+- Fully scoped theming to FBM pages/shortcodes via `.fbm-scope` and cascade `@layer`.
+- Corrected enqueue order (admin_enqueue_scripts → wp_add_inline_style on enqueued handle).
+- Prevented admin chrome bleed with CI “No-Bleed” selector tests.
+### UX
+- Kept “Apply theme to FBM interface” label & helper text.
+
 ## [2.0.7] — 2025-09-13
 ### Fixed
 - Scoped all theme tokens and styles to `.fbm-scope`, preventing bleed into the WP admin chrome.

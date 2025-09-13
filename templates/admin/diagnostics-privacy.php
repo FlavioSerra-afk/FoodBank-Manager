@@ -14,6 +14,7 @@ use FoodBankManager\Admin\DiagnosticsPrivacy;
 $preview = DiagnosticsPrivacy::preview_summary();
 $erasure = DiagnosticsPrivacy::erasure_summary();
 ?>
+<?php echo '<div id="fbm-ui" class="fbm-scope fbm-app">'; ?>
 <h2><?php esc_html_e( 'Privacy', 'foodbank-manager' ); ?></h2>
 <form method="post" action="">
     <p>
@@ -65,3 +66,4 @@ $erasure = DiagnosticsPrivacy::erasure_summary();
 <?php if ( ! empty( $erasure ) ) : ?>
     <p><code><?php echo esc_html( wp_json_encode( $erasure ) ); ?></code></p>
 <?php endif; ?>
+<?php echo '</div>'; ?>

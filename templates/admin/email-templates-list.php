@@ -6,6 +6,7 @@
  * @var string                            $current
  */
 ?>
+<?php echo '<div id="fbm-ui" class="fbm-scope fbm-app">'; ?>
 <div class="wrap fbm-admin">
 <h1><?php echo esc_html__( 'Email Templates', 'foodbank-manager' ); ?></h1>
 <ul>
@@ -21,3 +22,4 @@ if ( $current ) {
 }
 ?>
 </div>
+<?php echo '</div>'; ?>

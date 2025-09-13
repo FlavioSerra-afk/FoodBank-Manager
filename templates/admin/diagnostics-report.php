@@ -9,6 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 ?>
+<?php echo '<div id="fbm-ui" class="fbm-scope fbm-app">'; ?>
 <h2><?php esc_html_e( 'System Report', 'foodbank-manager' ); ?></h2>
 <pre id="fbm-diagnostics-report"><?php echo esc_html( implode( "\n", $lines ?? array() ) ); ?></pre>
 <p>
@@ -19,3 +20,4 @@ if ( ! defined( 'ABSPATH' ) ) {
         <?php esc_html_e( 'Download JSON', 'foodbank-manager' ); ?>
     </a>
 </p>
+<?php echo '</div>'; ?>
