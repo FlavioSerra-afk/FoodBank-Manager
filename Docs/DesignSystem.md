@@ -18,6 +18,9 @@ Defines visual tokens and component specs used across admin and front-end surfac
 
 Radios and checkboxes inherit `--fbm-color-accent` via CSS `accent-color`. Focus outlines use `:focus-visible` and respect high contrast via `@media (forced-colors: active)`.
 
+## Admin scoping
+Admin tokens load through `admin_enqueue_scripts` using the current screen hook/id. When “Apply theme to admin menus” is enabled, variables only inject on FBM pages. [WordPress Developer Resources](https://developer.wordpress.org/reference/hooks/admin_enqueue_scripts/)
+
 ## Component Map
 
 | Component | Tokens |

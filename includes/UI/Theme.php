@@ -219,14 +219,21 @@ final class Theme {
 	 * @param string              $selector CSS selector.
 	 * @return string
 	 */
-	public static function css_vars( array $section, string $selector ): string {
-		$tokens = self::section_to_css( $section );
-		$css    = '';
-		foreach ( $tokens as $key => $val ) {
-			$css .= $key . ':' . $val . ';';
-		}
-		return $selector . '{' . $css . '}';
-	}
+        public static function css_vars( array $section, string $selector ): string {
+                $tokens = self::section_to_css( $section );
+                $css    = '';
+                foreach ( $tokens as $key => $val ) {
+                        $css .= $key . ':' . $val . ';';
+                }
+                return $selector . '{' . $css . '}';
+        }
+
+        /**
+         * CSS variables for admin theme.
+         */
+        public static function css_variables(): string {
+                return self::css_vars( self::admin(), ':root' ) . self::glass_support_css();
+        }
 
 	/**
 	 * Build CSS tokens for a section.
