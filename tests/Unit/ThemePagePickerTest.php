@@ -16,13 +16,13 @@ final class ThemePagePickerTest extends \BaseTestCase {
         $_GET['page'] = 'fbm_theme';
         $GLOBALS['fbm_styles'] = [];
         $GLOBALS['fbm_scripts'] = [];
-        do_action('admin_enqueue_scripts', 'fbm_theme');
+        do_action('admin_enqueue_scripts', 'foodbank_page_fbm_theme');
         $this->assertArrayHasKey('wp-color-picker', $GLOBALS['fbm_styles']);
         $this->assertArrayHasKey('fbm-theme-admin', $GLOBALS['fbm_scripts']);
         $_GET['page'] = 'fbm_settings';
         $GLOBALS['fbm_styles'] = [];
         $GLOBALS['fbm_scripts'] = [];
-        do_action('admin_enqueue_scripts', 'fbm_settings');
+        do_action('admin_enqueue_scripts', 'foodbank_page_fbm_settings');
         $this->assertArrayNotHasKey('wp-color-picker', $GLOBALS['fbm_styles']);
         $this->assertArrayNotHasKey('fbm-theme-admin', $GLOBALS['fbm_scripts']);
     }

@@ -20,6 +20,6 @@ final class NoBleedSelectorsTest extends \PHPUnit\Framework\TestCase {
     public function test_inline_vars_scoped(): void {
         $vars = Theme::css_variables_scoped();
         $this->assertStringNotContainsString(':root', $vars);
-        $this->assertStringNotContainsString('body', $vars);
+        $this->assertSame(0, preg_match('/(?<!-)\bbody\b/', $vars));
     }
 }

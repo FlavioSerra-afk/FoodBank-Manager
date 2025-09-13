@@ -8,6 +8,10 @@ Requires PHP: 8.1
 
 See [Docs/PRD-foodbank-manager.md](../Docs/PRD-foodbank-manager.md) for the full product requirements and specifications.
 
+## Theme & Design
+
+Theme & Design only affects FoodBank Manager pages and shortcodes; WordPress admin chrome remains unchanged.
+
 ## CLI
 
 FoodBank Manager exposes a parent command via `WP_CLI::add_command()`. After

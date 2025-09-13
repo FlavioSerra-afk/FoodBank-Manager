@@ -15,7 +15,7 @@ final class AdminScopeWhitelistTest extends \BaseTestCase {
             $_GET['page'] = $slug;
             $GLOBALS['fbm_styles'] = [];
             $GLOBALS['fbm_inline_styles'] = [];
-            do_action('admin_enqueue_scripts', $slug);
+            do_action('admin_enqueue_scripts', 'foodbank_page_' . $slug);
             $this->assertArrayHasKey('fbm-admin', $GLOBALS['fbm_styles'], $slug);
             $this->assertArrayHasKey('fbm-admin', $GLOBALS['fbm_inline_styles'], $slug);
         }

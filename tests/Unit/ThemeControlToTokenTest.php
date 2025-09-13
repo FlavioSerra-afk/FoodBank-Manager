@@ -14,5 +14,9 @@ final class ThemeControlToTokenTest extends \BaseTestCase {
         $css = Theme::css_variables_scoped();
         $this->assertStringContainsString('.fbm-scope', $css);
         $this->assertStringContainsString('--fbm-menu-item-h:52px', $css);
+        $this->assertStringContainsString('--fbm-input-bg', $css);
+        $this->assertStringContainsString('--fbm-card-bg', $css);
+        $this->assertStringContainsString('--fbm-table-header-bg', $css);
+        $this->assertStringContainsString('--fbm-note-info', $css);
     }
 }

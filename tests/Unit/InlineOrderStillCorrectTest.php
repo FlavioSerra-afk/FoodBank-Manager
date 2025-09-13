@@ -14,7 +14,7 @@ final class InlineOrderStillCorrectTest extends \BaseTestCase {
         $_GET['page'] = 'fbm';
         $GLOBALS['fbm_styles'] = [];
         $GLOBALS['fbm_inline_styles'] = [];
-        do_action('admin_enqueue_scripts', 'toplevel_page_fbm');
+        do_action('admin_enqueue_scripts', 'foodbank_page_fbm_theme');
         $this->assertArrayHasKey('fbm-admin', $GLOBALS['fbm_styles']);
         $this->assertArrayHasKey('fbm-admin', $GLOBALS['fbm_inline_styles']);
         $this->assertStringContainsString('.fbm-scope{', $GLOBALS['fbm_inline_styles']['fbm-admin']);

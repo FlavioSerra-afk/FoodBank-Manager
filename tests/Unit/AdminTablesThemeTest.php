@@ -15,10 +15,10 @@ final class AdminTablesThemeTest extends \BaseTestCase {
         $assets->register();
         $GLOBALS['fbm_styles'] = array();
         $_GET['page'] = 'fbm_reports';
-        do_action('admin_enqueue_scripts', 'foodbank-manager_page_fbm_reports');
+        do_action('admin_enqueue_scripts', 'foodbank_page_fbm_reports');
         $this->assertArrayHasKey('fbm-admin-tables', $GLOBALS['fbm_styles']);
         $count = count($GLOBALS['fbm_styles']);
-        do_action('admin_enqueue_scripts', 'foodbank-manager_page_fbm_reports');
+        do_action('admin_enqueue_scripts', 'foodbank_page_fbm_reports');
         $this->assertSame($count, count($GLOBALS['fbm_styles']));
         $css = (string) file_get_contents(__DIR__ . '/../../assets/css/admin-tables.css');
         $this->assertStringContainsString(':focus-visible', $css);

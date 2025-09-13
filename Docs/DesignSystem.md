@@ -4,6 +4,8 @@ Docs-Revision: 2025-09-13 (Menu tokens)
 Defines visual tokens and component specs used across admin and front-end surfaces. Admin screens and public forms share the same token set for parity.
 
 ## Tokens
+Variables are container-scoped under .fbm-scope and emitted in the fbm cascade layer to avoid global bleed.
+
 | Token | Default | Notes |
 |---|---|---|
 | `--fbm-color-text` | `#1d2327` | Body text colour |
@@ -55,6 +57,17 @@ Admin tokens load through `admin_enqueue_scripts` using the current screen hook/
 | Tabs | `--fbm-tab-active-fg`, `--fbm-tab-active-border`, `--fbm-tab-inactive-fg` |
 | Table | `--fbm-table-header-bg`, `--fbm-table-header-fg`, `--fbm-table-row-hover-bg` |
 | Icon | `--fbm-icon-color`, `--fbm-icon-muted` |
+
+## Control → Token → Selector
+
+| Group | Tokens | Selectors |
+|---|---|---|
+| Core | `--fbm-bg`, `--fbm-surface`, `--fbm-text`, `--fbm-accent`, `--fbm-base`, `--fbm-radius`, `--fbm-input-h` | `.fbm-scope` |
+| Typography | `--fbm-h1`–`--fbm-h6`, `--fbm-body`, `--fbm-small` | `.fbm-scope h1…h6`, `.fbm-scope .fbm-text`, `.fbm-scope .fbm-help` |
+| Forms | `--fbm-input-bg`, `--fbm-input-border`, `--fbm-input-focus`, `--fbm-input-placeholder` | `.fbm-scope .fbm-input`, `.fbm-scope .fbm-select`, `.fbm-scope input` |
+| Menus | `--fbm-menu-item-h`, `--fbm-menu-item-px`, `--fbm-menu-item-py`, `--fbm-menu-gap`, `--fbm-menu-icon-size`, `--fbm-menu-icon-opacity`, `--fbm-menu-hover-bg`, `--fbm-menu-active-bg`, `--fbm-menu-divider` | `.fbm-scope .fbm-menu` |
+| Tables & Cards | `--fbm-card-bg`, `--fbm-card-border`, `--fbm-card-shadow`, `--fbm-table-row-gap`, `--fbm-table-head-bg`, `--fbm-table-row-hover` | `.fbm-scope .fbm-card`, `.fbm-scope .fbm-table` |
+| Notices | `--fbm-note-info`, `--fbm-note-success`, `--fbm-note-warn`, `--fbm-note-error` | `.fbm-scope .fbm-notice--info`, `.fbm-scope .fbm-notice--success`, `.fbm-scope .fbm-notice--warn`, `.fbm-scope .fbm-notice--error` |
 
 ## Layered glass recipe
 
