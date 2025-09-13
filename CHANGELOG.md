@@ -1,3 +1,11 @@
+## [2.1.0] — 2025-09-13
+### Added
+- Implemented Menu design tokens (icon size/opacity, paddings, item height, states, divider) and wired all Theme controls to FBM tags.
+### Fixed
+- Inline variables are attached to the enqueued handle on the canonical admin hook; tokens affect FBM screens/shortcodes only.
+### A11y
+- Kept :focus-visible rings and forced-colors fallbacks; radios/checkboxes use accent-color.
+
 ## [2.0.9] — 2025-09-13
 ### Added
 - AIW-style Menu tokens (icon size/opacity, paddings, item height, active/hover colors, divider, radius), scoped to `.fbm-scope`.

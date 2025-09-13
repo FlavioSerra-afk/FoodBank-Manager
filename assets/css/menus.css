@@ -1,78 +1,27 @@
 /* phpcs:ignoreFile */
 /* FBM menus */
 @layer fbm {
-  .fbm-scope{--fbm-focus-ring:color-mix(in oklab,var(--fbm-color-accent) 75%,black 25%);--fbm-menu-icon-opacity:.85;--fbm-blur-max:12px}
-  .fbm-scope.fbm-preset--dark{--fbm-menu-icon-opacity:.9}
-  .fbm-scope #adminmenu,
-  .fbm-scope #adminmenu .wp-submenu,
-  .fbm-scope #adminmenuback,
-  .fbm-scope #adminmenuwrap,
-  .fbm-scope #wpadminbar,
-  .fbm-scope nav .menu,
-  .fbm-scope .fbm-site-nav{background:rgba(255 255 255/var(--fbm-glass-alpha));border:var(--fbm-border-w) solid rgba(255 255 255/.35);border-radius:var(--fbm-card-radius)}
-  .fbm-scope #wpadminbar .ab-item,
-  .fbm-scope #adminmenu a,
-  .fbm-scope nav .menu-item>a,
-  .fbm-scope .fbm-site-nav .menu-item>a{color:inherit;display:block;padding:.25rem .5rem;border-radius:calc(var(--fbm-card-radius) - 4px)}
-  .fbm-scope #wpadminbar .ab-item:hover,
-  .fbm-scope #wpadminbar .ab-item:focus-visible,
-  .fbm-scope #adminmenu .wp-submenu a:hover{background:color-mix(in oklab,var(--fbm-color-accent) 20%,transparent)}
-  .fbm-scope #adminmenu .current a,
-  .fbm-scope nav .current-menu-item>a,
-  .fbm-scope nav .current-menu-ancestor>a,
-  .fbm-scope .fbm-site-nav .current-menu-item>a,
-  .fbm-scope .fbm-site-nav .current-menu-ancestor>a{background:var(--fbm-color-surface,#fff);box-shadow:0 0 0 1px var(--fbm-color-accent) inset}
-  .fbm-scope #wpadminbar .ab-item:focus-visible,
-  .fbm-scope #adminmenu a:focus-visible,
-  .fbm-scope nav .menu-item>a:focus-visible,
-  .fbm-scope .fbm-site-nav .menu-item>a:focus-visible{outline:2px solid var(--fbm-focus-ring);outline-offset:2px}
-  .fbm-scope #adminmenu .wp-menu-image:before,
-  .fbm-scope #wpadminbar .ab-icon:before,
-  .fbm-scope nav .menu-item>a .menu-icon,
-  .fbm-scope .fbm-site-nav .menu-item>a .menu-icon{opacity:var(--fbm-menu-icon-opacity)}
-  @supports (backdrop-filter: blur(2px)) or (-webkit-backdrop-filter: blur(2px)){
-    .fbm-scope #adminmenu,
-    .fbm-scope #adminmenu .wp-submenu,
-    .fbm-scope #adminmenuback,
-    .fbm-scope #adminmenuwrap,
-    .fbm-scope #wpadminbar,
-    .fbm-scope nav .menu,
-    .fbm-scope .fbm-site-nav{backdrop-filter:blur(min(var(--fbm-glass-blur),var(--fbm-blur-max)));-webkit-backdrop-filter:blur(min(var(--fbm-glass-blur),var(--fbm-blur-max)))}
+  .fbm-scope .fbm-menu{
+    background:var(--fbm-menu-bg); color:var(--fbm-menu-color);
+    border-radius:var(--fbm-menu-radius);
+    display:flex; flex-direction:column; gap:8px;
   }
-  @media (forced-colors: active){
-    .fbm-scope #adminmenu,
-    .fbm-scope #adminmenu .wp-submenu,
-    .fbm-scope #adminmenuback,
-    .fbm-scope #adminmenuwrap,
-    .fbm-scope #wpadminbar,
-    .fbm-scope nav .menu,
-    .fbm-scope .fbm-site-nav{background:Canvas;color:CanvasText;border-color:ButtonText;box-shadow:none}
-    .fbm-scope nav .current-menu-item>a,
-    .fbm-scope nav .current-menu-ancestor>a,
-    .fbm-scope .fbm-site-nav .current-menu-item>a,
-    .fbm-scope .fbm-site-nav .current-menu-ancestor>a{background:CanvasText;color:Canvas;box-shadow:none}
-    .fbm-scope #wpadminbar .ab-item:focus-visible,
-    .fbm-scope #adminmenu a:focus-visible,
-    .fbm-scope nav .menu-item>a:focus-visible,
-    .fbm-scope .fbm-site-nav .menu-item>a:focus-visible{outline:2px solid CanvasText;outline-offset:2px}
-    .fbm-scope #adminmenu .wp-menu-image:before,
-    .fbm-scope #wpadminbar .ab-icon:before,
-    .fbm-scope nav .menu-item>a .menu-icon,
-    .fbm-scope .fbm-site-nav .menu-item>a .menu-icon{opacity:1;mask:none;-webkit-mask:none}
+  .fbm-scope .fbm-menu__item{
+    display:flex; align-items:center; gap:var(--fbm-menu-gap);
+    min-height:var(--fbm-menu-item-h);
+    padding:var(--fbm-menu-item-py) var(--fbm-menu-item-px);
+    border-radius:calc(var(--fbm-menu-radius) - 2px);
   }
-  @media (prefers-reduced-transparency: reduce){
-    .fbm-scope #adminmenu,
-    .fbm-scope #adminmenu .wp-submenu,
-    .fbm-scope #adminmenuback,
-    .fbm-scope #adminmenuwrap,
-    .fbm-scope #wpadminbar,
-    .fbm-scope nav .menu,
-    .fbm-scope .fbm-site-nav{background:color-mix(in oklab,var(--fbm-color-surface,#fff) 95%,transparent);backdrop-filter:none;-webkit-backdrop-filter:none}
+  .fbm-scope .fbm-menu__item:hover{
+    background:var(--fbm-menu-hover-bg); color:var(--fbm-menu-hover-color);
   }
-  @media (prefers-reduced-motion: reduce){
-    .fbm-scope #wpadminbar .ab-item,
-    .fbm-scope #adminmenu a,
-    .fbm-scope nav .menu-item>a,
-    .fbm-scope .fbm-site-nav .menu-item>a{transition:none}
+  .fbm-scope .fbm-menu__item[aria-current="page"],
+  .fbm-scope .fbm-menu__item.is-active{
+    background:var(--fbm-menu-active-bg); color:var(--fbm-menu-active-color);
   }
+  .fbm-scope .fbm-menu__icon{
+    inline-size:var(--fbm-menu-icon-size); block-size:var(--fbm-menu-icon-size);
+    opacity:var(--fbm-menu-icon-opacity); flex:0 0 auto;
+  }
+  .fbm-scope .fbm-menu__divider{ height:1px; background:var(--fbm-menu-divider); }
 }

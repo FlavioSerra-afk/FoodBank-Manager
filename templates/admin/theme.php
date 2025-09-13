@@ -14,6 +14,7 @@ $tab   = isset( $_GET['tab'] ) ? sanitize_key( (string) $_GET['tab'] ) : 'admin'
 $theme               = isset( $theme ) ? $theme : \FoodBankManager\UI\Theme::get();
 $admin               = $theme['admin'];
 $front               = $theme['front'];
+$menu                = $theme['menu'];
 $match               = ! empty( $theme['match_front_to_admin'] );
 $apply_admin  = ! empty( $theme['apply_admin'] ?? $theme['apply_admin_chrome'] );
 $apply_front_menus   = ! empty( $theme['apply_front_menus'] );
@@ -90,6 +91,55 @@ $apply_front_menus   = ! empty( $theme['apply_front_menus'] );
                                 <tr>
                                         <th><?php esc_html_e( 'Link colour', 'foodbank-manager' ); ?></th>
                                         <td><input type="text" name="fbm_theme[admin][aliases][link_fg]" value="<?php echo esc_attr( $admin['aliases']['link_fg'] ?? '' ); ?>" class="regular-text fbm-color" data-default-color="<?php echo esc_attr( $admin['accent'] ); ?>" /></td>
+                                </tr>
+                                <tr><th colspan="2"><h2><?php esc_html_e( 'Menu', 'foodbank-manager' ); ?></h2></th></tr>
+                                <tr>
+                                        <th><label for="fbm_menu_item_height"><?php esc_html_e( 'Item height', 'foodbank-manager' ); ?></label></th>
+                                        <td><input type="range" min="40" max="64" step="1" id="fbm_menu_item_height" name="fbm_theme[menu][item_height]" value="<?php echo esc_attr( $menu['item_height'] ); ?>" /></td>
+                                </tr>
+                                <tr>
+                                        <th><label for="fbm_menu_item_px"><?php esc_html_e( 'Padding X', 'foodbank-manager' ); ?></label></th>
+                                        <td><input type="range" min="8" max="24" step="1" id="fbm_menu_item_px" name="fbm_theme[menu][item_px]" value="<?php echo esc_attr( $menu['item_px'] ); ?>" /></td>
+                                </tr>
+                                <tr>
+                                        <th><label for="fbm_menu_item_py"><?php esc_html_e( 'Padding Y', 'foodbank-manager' ); ?></label></th>
+                                        <td><input type="range" min="6" max="16" step="1" id="fbm_menu_item_py" name="fbm_theme[menu][item_py]" value="<?php echo esc_attr( $menu['item_py'] ); ?>" /></td>
+                                </tr>
+                                <tr>
+                                        <th><label for="fbm_menu_icon_size"><?php esc_html_e( 'Icon size', 'foodbank-manager' ); ?></label></th>
+                                        <td><input type="range" min="16" max="24" step="1" id="fbm_menu_icon_size" name="fbm_theme[menu][icon_size]" value="<?php echo esc_attr( $menu['icon_size'] ); ?>" /></td>
+                                </tr>
+                                <tr>
+                                        <th><label for="fbm_menu_icon_opacity"><?php esc_html_e( 'Icon opacity', 'foodbank-manager' ); ?></label></th>
+                                        <td><input type="range" min="0.6" max="1" step="0.01" id="fbm_menu_icon_opacity" name="fbm_theme[menu][icon_opacity]" value="<?php echo esc_attr( $menu['icon_opacity'] ); ?>" /></td>
+                                </tr>
+                                <tr>
+                                        <th><label for="fbm_menu_gap"><?php esc_html_e( 'Gap', 'foodbank-manager' ); ?></label></th>
+                                        <td><input type="number" min="8" max="16" step="1" id="fbm_menu_gap" name="fbm_theme[menu][gap]" value="<?php echo esc_attr( $menu['gap'] ); ?>" /></td>
+                                </tr>
+                                <tr>
+                                        <th><label for="fbm_menu_radius"><?php esc_html_e( 'Radius', 'foodbank-manager' ); ?></label></th>
+                                        <td><input type="number" min="8" max="16" step="1" id="fbm_menu_radius" name="fbm_theme[menu][radius]" value="<?php echo esc_attr( $menu['radius'] ); ?>" /></td>
+                                </tr>
+                                <tr>
+                                        <th><label for="fbm_menu_hover_bg"><?php esc_html_e( 'Hover background', 'foodbank-manager' ); ?></label></th>
+                                        <td><input type="text" id="fbm_menu_hover_bg" name="fbm_theme[menu][hover_bg]" value="<?php echo esc_attr( $menu['hover_bg'] ); ?>" class="regular-text fbm-color" /></td>
+                                </tr>
+                                <tr>
+                                        <th><label for="fbm_menu_hover_color"><?php esc_html_e( 'Hover colour', 'foodbank-manager' ); ?></label></th>
+                                        <td><input type="text" id="fbm_menu_hover_color" name="fbm_theme[menu][hover_color]" value="<?php echo esc_attr( $menu['hover_color'] ); ?>" class="regular-text fbm-color" /></td>
+                                </tr>
+                                <tr>
+                                        <th><label for="fbm_menu_active_bg"><?php esc_html_e( 'Active background', 'foodbank-manager' ); ?></label></th>
+                                        <td><input type="text" id="fbm_menu_active_bg" name="fbm_theme[menu][active_bg]" value="<?php echo esc_attr( $menu['active_bg'] ); ?>" class="regular-text fbm-color" /></td>
+                                </tr>
+                                <tr>
+                                        <th><label for="fbm_menu_active_color"><?php esc_html_e( 'Active colour', 'foodbank-manager' ); ?></label></th>
+                                        <td><input type="text" id="fbm_menu_active_color" name="fbm_theme[menu][active_color]" value="<?php echo esc_attr( $menu['active_color'] ); ?>" class="regular-text fbm-color" /></td>
+                                </tr>
+                                <tr>
+                                        <th><label for="fbm_menu_divider"><?php esc_html_e( 'Divider', 'foodbank-manager' ); ?></label></th>
+                                        <td><input type="text" id="fbm_menu_divider" name="fbm_theme[menu][divider]" value="<?php echo esc_attr( $menu['divider'] ); ?>" class="regular-text fbm-color" /></td>
                                 </tr>
                         </table>
                 <?php else : ?>

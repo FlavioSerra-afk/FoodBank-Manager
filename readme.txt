@@ -3,9 +3,9 @@ Contributors: portuguese-community-centre-london
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.1
-Version: 2.0.9
+Version: 2.1.0
 x-release-please-start-version
-Stable tag: 2.0.9
+Stable tag: 2.1.0
 x-release-please-end
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html

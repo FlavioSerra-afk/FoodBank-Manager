@@ -6,7 +6,7 @@ if (!defined('FBM_URL')) {
     define('FBM_URL', '');
 }
 
-final class InlineOrderTest extends \BaseTestCase {
+final class InlineOrderStillCorrectTest extends \BaseTestCase {
     public function test_inline_vars_attach_after_enqueue(): void {
         Options::update('theme', array('apply_admin' => true));
         $assets = new Assets();

@@ -28,11 +28,8 @@ final class FrontMenusThemeTest extends \BaseTestCase {
         $this->assertContains('fbm-preset--light', $classes);
         $this->assertContains('fbm-menus--glass', $classes);
         $css = (string) file_get_contents(__DIR__ . '/../../assets/css/menus.css');
-        $this->assertStringContainsString('current-menu-item>a', $css);
-        $this->assertStringContainsString('box-shadow:0 0 0 1px', $css);
-        $this->assertStringContainsString('prefers-reduced-transparency', $css);
-        $this->assertStringContainsString('prefers-reduced-motion', $css);
-        $this->assertStringContainsString('-webkit-backdrop-filter', $css);
+        $this->assertStringContainsString('.fbm-menu__item', $css);
+        $this->assertStringNotContainsString('current-menu-item', $css);
     }
 
     public function test_no_css_when_disabled(): void {

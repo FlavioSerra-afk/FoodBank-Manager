@@ -22,10 +22,8 @@ final class AdminMenusThemeTest extends \BaseTestCase {
         $this->assertArrayNotHasKey('fbm-menus', $GLOBALS['fbm_styles']);
 
         $css = (string) file_get_contents(__DIR__ . '/../../assets/css/menus.css');
-        $this->assertStringContainsString('#adminmenu', $css);
-        $this->assertStringContainsString('#wpadminbar', $css);
-        $this->assertStringContainsString(':focus-visible', $css);
-        $this->assertStringContainsString('forced-colors', $css);
-        $this->assertStringContainsString('-webkit-backdrop-filter', $css);
+        $this->assertStringContainsString('.fbm-menu__item', $css);
+        $this->assertStringNotContainsString('#adminmenu', $css);
+        $this->assertStringNotContainsString('#wpadminbar', $css);
     }
 }

@@ -21,6 +21,17 @@ $tickets_revoked_delta = (int) ( $tickets_revoked_delta ?? 0 );
 $mail_failures_7d      = (int) ( $mail_failures_7d ?? 0 );
 ?>
 <h1><?php esc_html_e( 'Dashboard', 'foodbank-manager' ); ?></h1>
+<nav class="fbm-menu" aria-label="FBM">
+  <a class="fbm-menu__item is-active" href="#">
+    <svg class="fbm-menu__icon" aria-hidden="true"></svg>
+    <span class="fbm-menu__label"><?php esc_html_e( 'Dashboard', 'foodbank-manager' ); ?></span>
+  </a>
+  <a class="fbm-menu__item" href="#">
+    <svg class="fbm-menu__icon" aria-hidden="true"></svg>
+    <span class="fbm-menu__label"><?php esc_html_e( 'Reports', 'foodbank-manager' ); ?></span>
+  </a>
+  <div class="fbm-menu__divider" role="separator"></div>
+</nav>
 <div class="fbm-dashboard">
         <div class="fbm-card--glass fbm-tile" tabindex="0" data-testid="fbm-dashboard-tile-applications-total" aria-label="<?php echo esc_attr( sprintf( /* translators: %s: total applications count */ __( 'Total applications: %s', 'foodbank-manager' ), number_format_i18n( $applications_total ) ) ); ?>">
 		<span class="dashicons dashicons-admin-users" aria-hidden="true"></span>

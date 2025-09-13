@@ -1,14 +1,16 @@
 /* phpcs:ignoreFile */
 /* FBM admin only */
 @layer fbm {
-  .fbm-scope{max-width:100%}
-  .fbm-scope :focus-visible{outline:2px solid var(--fbm-color-accent);outline-offset:2px}
-  .fbm-scope input[type=radio],.fbm-scope input[type=checkbox]{color:var(--fbm-color-accent);accent-color:var(--fbm-color-accent)}
-  @media (forced-colors: active){.fbm-scope :focus-visible{outline:2px solid CanvasText}.fbm-scope input[type=radio],.fbm-scope input[type=checkbox]{color:ButtonText;accent-color:ButtonText}}
+  .fbm-scope{max-width:100%;font-size:var(--fbm-base)}
+  .fbm-scope :focus-visible{outline:2px solid var(--fbm-accent);outline-offset:2px}
+  .fbm-scope input[type=radio],.fbm-scope input[type=checkbox]{color:var(--fbm-accent);accent-color:var(--fbm-accent)}
+  @media (forced-colors: active){.fbm-scope :focus-visible{outline:2px solid CanvasText}.fbm-scope input[type=radio],.fbm-scope input[type=checkbox]{color:ButtonText;accent-color:ButtonText}.fbm-scope *{backdrop-filter:none!important}}
   .fbm-scope .fbm-dashboard{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:stretch}
   @media (max-width:1024px){.fbm-scope .fbm-dashboard{grid-template-columns:repeat(2,minmax(0,1fr))}}
   @media (max-width:640px){.fbm-scope .fbm-dashboard{grid-template-columns:1fr}}
   .fbm-scope .fbm-card{background:var(--fbm-surface);color:var(--fbm-text);border-radius:var(--fbm-radius)}
+  .fbm-scope .fbm-btn,.fbm-scope .fbm-input,.fbm-scope .fbm-select,.fbm-scope .fbm-tabs{border-radius:var(--fbm-radius)}
+  .fbm-scope .fbm-input,.fbm-scope .fbm-select{min-height:var(--fbm-input-h)}
   .fbm-scope .fbm-toolbar{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
   .fbm-scope .fbm-table-wrap{overflow-x:auto}
   .fbm-scope [style*="width:100vw"],.fbm-scope .fbm-fullbleed{width:auto!important;margin:0!important}
