@@ -24,9 +24,16 @@ final class AllRoutesPermissionsTest extends \BaseTestCase {
         Api::register_routes();
         $scan = new ScanController();
         $scan->register();
-        foreach ($GLOBALS['__fbm_rest'] as $route) {
-            $this->assertArrayHasKey('permission_callback', $route);
+        foreach ($GLOBALS['__fbm_rest'] as $path => $route) {
+            $this->assertArrayHasKey('permission_callback', $route, $path . ' missing permission_callback');
             $this->assertNotEmpty($route['permission_callback']);
+            $this->assertArrayHasKey('args', $route, $path . ' missing args');
+            foreach ($route['args'] as $arg) {
+                $this->assertTrue(
+                    isset($arg['sanitize_callback']) || isset($arg['validate_callback']),
+                    $path . ' arg missing sanitize/validate'
+                );
+            }
         }
     }
 }
