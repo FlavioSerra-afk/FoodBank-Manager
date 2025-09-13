@@ -12,6 +12,7 @@ namespace FoodBankManager\Shortcodes;
 
 use FoodBankManager\Attendance\AttendanceRepo;
 use FoodBankManager\UI\Theme;
+use FoodBankManager\Core\Plugin;
 use DateInterval;
 use DateTimeImmutable;
 use function current_time;
@@ -24,6 +25,8 @@ use function sanitize_text_field;
 use function set_transient;
 use function shortcode_atts;
 use function wp_enqueue_style;
+use function wp_add_inline_style;
+use function add_filter;
 use function admin_url;
 use function add_query_arg;
 use function wp_nonce_url;
@@ -43,7 +46,9 @@ if ( ! current_user_can( 'fb_manage_dashboard' ) ) { // phpcs:ignore WordPress.W
 return '<div class="fbm-no-permission">' . esc_html__( 'You do not have permission to view the dashboard.', 'foodbank-manager' ) . '</div>';
 }
 
-Theme::enqueue_front();
+wp_enqueue_style( 'fbm-public', FBM_URL . 'assets/css/public.css' );
+wp_add_inline_style( 'fbm-public', Theme::css_variables() );
+add_filter( 'body_class', array( Theme::class, 'body_class' ) );
 wp_enqueue_style( 'fbm-frontend-dashboard' );
 
         $atts     = shortcode_atts(

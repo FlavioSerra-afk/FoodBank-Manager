@@ -1,3 +1,10 @@
+## [2.0.3] — 2025-09-13
+### Fixed
+- Theming now applies strictly to FBM admin slugs (fbm, fbm_attendance, … fbm_shortcodes) and to frontend dashboard shortcodes.
+- Removed ambiguity from screen-based gating; inline variables reliably attach to enqueued handles.
+### Dev
+- Introduced AdminScope with explicit slug whitelist and admin body class tagging.
+
 ## [2.0.2] — 2025-09-13
 ### Fixed
 - “Apply theme to admin menus” now correctly themes all FBM admin pages by tightening screen detection and enqueue order.
