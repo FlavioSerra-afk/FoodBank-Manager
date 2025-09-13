@@ -7,6 +7,7 @@ use FoodBankManager\Admin\AttendancePage;
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; }
 ?>
+<?php echo '<div id="fbm-ui" class="fbm-scope fbm-app">'; ?>
 <div class="wrap fbm-admin">
 <?php \FBM\Core\Trace::mark( 'admin:attendance' ); ?>
 <h1><?php esc_html_e( 'Attendance', 'foodbank-manager' ); ?></h1>
@@ -288,3 +289,4 @@ endif;
 })();
 </script>
 </div>
+<?php echo '</div>'; ?>

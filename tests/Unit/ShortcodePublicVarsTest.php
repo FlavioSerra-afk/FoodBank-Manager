@@ -1,6 +1,5 @@
 <?php
 use FBM\Shortcodes\DashboardShortcode;
-use function fbm_grant_caps;
 
 if (!defined('FBM_URL')) {
     define('FBM_URL', '');
@@ -19,5 +18,6 @@ final class ShortcodePublicVarsTest extends \BaseTestCase {
         DashboardShortcode::render();
         $this->assertArrayHasKey('fbm-public', $GLOBALS['fbm_styles']);
         $this->assertArrayHasKey('fbm-public', $GLOBALS['fbm_inline_styles']);
+        $this->assertStringContainsString('.fbm-scope{', $GLOBALS['fbm_inline_styles']['fbm-public']);
     }
 }

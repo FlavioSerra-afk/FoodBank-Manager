@@ -35,6 +35,7 @@ $screen     = function_exists( 'get_current_screen' ) ? get_current_screen() : n
 $gating_ok  = \FoodBankManager\Core\Screen::is_fbm_screen();
 $rows       = $rows ?? array();
 ?>
+<?php echo '<div id="fbm-ui" class="fbm-scope fbm-app">'; ?>
 <div class="wrap fbm-admin">
 <?php \FBM\Core\Trace::mark( 'admin:diagnostics' ); ?>
     <h1><?php esc_html_e( 'Diagnostics', 'foodbank-manager' ); ?></h1>
@@ -291,3 +292,4 @@ $rows       = $rows ?? array();
         <?php \FoodBankManager\Admin\DiagnosticsReport::render(); ?>
     <?php endif; ?>
 </div>
+<?php echo '</div>'; ?>

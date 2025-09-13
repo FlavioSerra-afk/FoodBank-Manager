@@ -9,9 +9,7 @@ final class AssetsRtlTest extends \BaseTestCase {
         if (!function_exists('is_rtl')) {
             function is_rtl(): bool { return true; }
         }
-        \FoodBankManager\Core\Options::update('theme', array('apply_admin_chrome' => true, 'apply_front_menus' => true));
-        $admin = Theme::admin_body_class('');
-        $this->assertStringContainsString('fbm-rtl', $admin);
+        \FoodBankManager\Core\Options::update('theme', array('apply_admin' => true, 'apply_front_menus' => true));
         $front = Theme::body_class(array());
         $this->assertContains('fbm-rtl', $front);
     }

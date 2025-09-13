@@ -11,6 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 exit;
 }
 ?>
+<?php echo '<div class="fbm-scope fbm-app">'; ?>
 <div class="fbm-attendance-manager fbm-card">
                 <div class="fbm-tabs">
                 <button type="button" data-tab="manual" class="fbm-btn fbm-btn--primary active"><?php echo esc_html__( 'Manual', 'foodbank-manager' ); ?></button>
@@ -101,3 +102,4 @@ exit;
         });
 })();
 </script>
+<?php echo '</div>'; ?>

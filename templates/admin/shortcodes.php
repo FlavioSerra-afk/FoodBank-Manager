@@ -7,6 +7,7 @@
 
 declare(strict_types=1);
 ?>
+<?php echo '<div id="fbm-ui" class="fbm-scope fbm-app">'; ?>
 <div class="wrap fbm-admin">
 <?php \FBM\Core\Trace::mark( 'admin:shortcodes' ); ?>
 <h1><?php esc_html_e( 'Shortcodes', 'foodbank-manager' ); ?></h1>
@@ -69,3 +70,4 @@ if ( function_exists( 'wp_add_inline_script' ) ) {
 }
 ?>
 </div>
+<?php echo '</div>'; ?>

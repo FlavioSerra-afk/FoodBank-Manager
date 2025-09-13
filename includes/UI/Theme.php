@@ -101,8 +101,8 @@ final class Theme {
 		$match = filter_var( $raw['match_front_to_admin'] ?? $defaults['match_front_to_admin'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE );
 		$match = (bool) ( null === $match ? $defaults['match_front_to_admin'] : $match );
 
-		$admin_chrome = filter_var( $raw['apply_admin_chrome'] ?? $defaults['apply_admin_chrome'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE );
-		$admin_chrome = null === $admin_chrome ? $defaults['apply_admin_chrome'] : (bool) $admin_chrome;
+                $admin_chrome = filter_var( $raw['apply_admin'] ?? ( $raw['apply_admin_chrome'] ?? $defaults['apply_admin'] ), FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE );
+                $admin_chrome = null === $admin_chrome ? $defaults['apply_admin'] : (bool) $admin_chrome;
 
 		$front_menus = filter_var( $raw['apply_front_menus'] ?? $defaults['apply_front_menus'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE );
 		$front_menus = null === $front_menus ? $defaults['apply_front_menus'] : (bool) $front_menus;
@@ -121,8 +121,9 @@ final class Theme {
 			'admin'                => $admin,
 			'front'                => $front,
 			'match_front_to_admin' => $match,
-			'apply_admin_chrome'   => $admin_chrome,
-			'apply_front_menus'    => $front_menus,
+                        'apply_admin'          => $admin_chrome,
+                        'apply_admin_chrome'   => $admin_chrome,
+                        'apply_front_menus'    => $front_menus,
 		);
 	}
 
@@ -232,7 +233,7 @@ final class Theme {
          * CSS variables for admin theme.
          */
         public static function css_variables(): string {
-                return self::css_vars( self::admin(), ':root' ) . self::glass_support_css();
+                return self::css_vars( self::admin(), '.fbm-scope' ) . self::glass_support_css();
         }
 
 	/**
@@ -330,33 +331,10 @@ final class Theme {
                 );
         }
 
-		/**
-		 * Append admin body classes.
-		 *
-		 * @param string $classes Existing classes.
-		 * @return string
-		 */
-	public static function admin_body_class( string $classes ): string {
-		$all = self::get();
-		if ( empty( $all['apply_admin_chrome'] ) ) {
-			return $classes;
-		}
-		$admin    = $all['admin'];
-		$classes .= ' fbm-theme--' . $admin['style'];
-		$classes .= ' fbm-preset--' . $admin['preset'];
-		if ( 'glass' === $admin['style'] ) {
-			$classes .= ' fbm-menus--glass';
-		}
-		if ( is_rtl() ) {
-			$classes .= ' fbm-rtl';
-		}
-		return $classes;
-	}
-
-	/**
-	 * Append front-end body classes.
-	 *
-	 * @param array<int,string> $classes Classes.
+        /**
+         * Append front-end body classes.
+         *
+         * @param array<int,string> $classes Classes.
 	 * @return array<int,string>
 	 */
 	public static function body_class( array $classes ): array {
@@ -380,11 +358,11 @@ final class Theme {
 	 * Glass fallback CSS.
 	 */
 	public static function glass_support_css(): string {
-			$targets = '.fbm-card--glass,.fbm-button--glass';
-			return '@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)){' . $targets . '{backdrop-filter:blur(var(--fbm-glass-blur));-webkit-backdrop-filter:blur(var(--fbm-glass-blur));}}' // phpcs:ignore WordPress.Files.LineLength.MaxExceeded
-					. '@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))){' . $targets . '{background:var(--fbm-color-surface,#fff);}}' // phpcs:ignore WordPress.Files.LineLength.MaxExceeded
-					. '@media (prefers-reduced-transparency: reduce){' . $targets . '{background:var(--fbm-color-surface,#fff);}}'
-					. '@media (forced-colors: active){' . $targets . '{background:Canvas;color:CanvasText;border-color:ButtonText;box-shadow:none;}}'
-					. '@media (prefers-reduced-motion: reduce){' . $targets . '{transition:none;}}';
+                        $targets = '.fbm-scope .fbm-card--glass,.fbm-scope .fbm-button--glass';
+                        return '@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)){' . $targets . '{backdrop-filter:blur(var(--fbm-glass-blur));-webkit-backdrop-filter:blur(var(--fbm-glass-blur));}}' // phpcs:ignore WordPress.Files.LineLength.MaxExceeded
+                                        . '@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))){' . $targets . '{background:var(--fbm-color-surface,#fff);}}' // phpcs:ignore WordPress.Files.LineLength.MaxExceeded
+                                        . '@media (prefers-reduced-transparency: reduce){' . $targets . '{background:var(--fbm-color-surface,#fff);}}'
+                                        . '@media (forced-colors: active){' . $targets . '{background:Canvas;color:CanvasText;border-color:ButtonText;box-shadow:none;}}'
+                                        . '@media (prefers-reduced-motion: reduce){' . $targets . '{transition:none;}}';
 	}
 }

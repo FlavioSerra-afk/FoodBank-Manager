@@ -9,7 +9,7 @@ if (!defined('FBM_URL')) {
 
 final class ThemePagePickerTest extends \BaseTestCase {
     public function test_color_picker_only_on_theme_page(): void {
-        Options::update('theme', array('apply_admin_chrome' => true));
+        Options::update('theme', array('apply_admin' => true));
         ThemePage::boot();
         $assets = new Assets();
         $assets->register();

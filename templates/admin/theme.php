@@ -15,9 +15,10 @@ $theme               = isset( $theme ) ? $theme : \FoodBankManager\UI\Theme::get
 $admin               = $theme['admin'];
 $front               = $theme['front'];
 $match               = ! empty( $theme['match_front_to_admin'] );
-$apply_admin_chrome  = ! empty( $theme['apply_admin_chrome'] );
+$apply_admin  = ! empty( $theme['apply_admin'] ?? $theme['apply_admin_chrome'] );
 $apply_front_menus   = ! empty( $theme['apply_front_menus'] );
 ?>
+<?php echo '<div id="fbm-ui" class="fbm-scope fbm-app">'; ?>
 <div class="wrap fbm-admin">
         <h1><?php esc_html_e( 'Design & Theme', 'foodbank-manager' ); ?></h1>
         <h2 class="nav-tab-wrapper">
@@ -40,8 +41,8 @@ $apply_front_menus   = ! empty( $theme['apply_front_menus'] );
                 <?php if ( 'admin' === $tab ) : ?>
                         <table class="form-table" role="presentation">
                                 <tr>
-                                        <th><label><input type="checkbox" name="fbm_theme[apply_admin_chrome]" value="1" <?php checked( $apply_admin_chrome ); ?> /> <?php esc_html_e( 'Apply theme to admin menus', 'foodbank-manager' ); ?></label></th>
-                                        <td></td>
+<th><label><input type="checkbox" name="fbm_theme[apply_admin]" value="1" <?php checked( $apply_admin ); ?> /> <?php esc_html_e( 'Apply theme to FBM interface', 'foodbank-manager' ); ?></label></th>
+                                        <td><p class="description"><?php esc_html_e( 'Affects only FoodBank Manager pages/tabs; will not change the WordPress sidebar or other plugins.', 'foodbank-manager' ); ?></p></td>
                                 </tr>
                                 <tr>
                                         <th><?php esc_html_e( 'Mode', 'foodbank-manager' ); ?></th>
@@ -160,3 +161,4 @@ $apply_front_menus   = ! empty( $theme['apply_front_menus'] );
 <?php
 // End of template.
 ?>
+<?php echo '</div>'; ?>

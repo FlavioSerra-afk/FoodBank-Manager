@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 use FoodBankManager\Core\Assets;
 use FoodBankManager\Core\Options;
-use FoodBankManager\UI\Theme;
 
 if (!defined('FBM_URL')) {
     define('FBM_URL', '');
@@ -14,12 +13,7 @@ final class AdminMenusThemeTest extends \BaseTestCase {
         if (!function_exists('is_rtl')) {
             function is_rtl(): bool { return false; }
         }
-        Options::update('theme', array('apply_admin_chrome' => true));
-        $classes = Theme::admin_body_class('');
-        $this->assertStringContainsString('fbm-theme--glass', $classes);
-        $this->assertStringContainsString('fbm-preset--light', $classes);
-        $this->assertStringContainsString('fbm-menus--glass', $classes);
-
+        Options::update('theme', array('apply_admin' => true));
         $assets = new Assets();
         $assets->register();
         $GLOBALS['fbm_styles'] = array();

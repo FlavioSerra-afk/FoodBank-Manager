@@ -36,7 +36,6 @@ class Assets {
     public function register(): void {
         add_action('admin_enqueue_scripts', [$this, 'enqueue_admin'], 10);
         add_action('admin_enqueue_scripts', [$this, 'enqueue_theme_page'], 10);
-        add_filter('admin_body_class', ['\\FBM\\Core\\AdminScope', 'body_class']);
         if (defined('FBM_DEBUG_THEME') && FBM_DEBUG_THEME) {
             add_action('admin_notices', [self::class, 'debug_notice']);
         }
@@ -63,7 +62,6 @@ class Assets {
 
         wp_register_style('fbm-menus', plugins_url('assets/css/menus.css', FBM_FILE), [], Plugin::VERSION);
         wp_enqueue_style('fbm-menus');
-        add_filter('admin_body_class', [Theme::class, 'admin_body_class']);
 
         wp_register_style('fbm-admin-tables', plugins_url('assets/css/admin-tables.css', FBM_FILE), [], Plugin::VERSION);
         wp_enqueue_style('fbm-admin-tables');

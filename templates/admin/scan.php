@@ -7,6 +7,7 @@
 
 declare(strict_types=1);
 ?>
+<?php echo '<div id="fbm-ui" class="fbm-scope fbm-app">'; ?>
 <div class="wrap fbm-admin">
 	<h1><?php echo esc_html__( 'Scan', 'foodbank-manager' ); ?></h1>
 	<form method="post">
@@ -20,3 +21,4 @@ declare(strict_types=1);
 	<div data-testid="fbm-scan-status"><?php echo esc_html( $status ?? '' ); ?></div>
 	<div data-testid="fbm-scan-recipient"><?php echo esc_html( $recipient ?? '' ); ?></div>
 </div>
+<?php echo '</div>'; ?>

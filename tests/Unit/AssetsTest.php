@@ -9,7 +9,7 @@ if (!defined('FBM_URL')) {
 
 final class AssetsTest extends \BaseTestCase {
     public function test_admin_css_vars_only_on_fbm_screens(): void {
-        Options::update('theme', array('apply_admin_chrome' => true));
+        Options::update('theme', array('apply_admin' => true));
         $assets = new Assets();
         $assets->register();
         $GLOBALS['fbm_styles'] = [];
@@ -18,6 +18,7 @@ final class AssetsTest extends \BaseTestCase {
         do_action('admin_enqueue_scripts', 'foodbank-manager_page_fbm_database');
         $this->assertArrayHasKey('fbm-admin', $GLOBALS['fbm_inline_styles']);
         $css = $GLOBALS['fbm_inline_styles']['fbm-admin'];
+        $this->assertStringContainsString('.fbm-scope{', $css);
         $this->assertStringContainsString('--fbm-color-accent', $css);
         $this->assertStringContainsString('--fbm-glass-alpha', $css);
         $this->assertStringContainsString('--fbm-card-radius', $css);
@@ -43,7 +44,7 @@ final class AssetsTest extends \BaseTestCase {
     }
 
     public function test_shortcodes_js_gated_by_screen_and_cap(): void {
-        Options::update('theme', array('apply_admin_chrome' => true));
+        Options::update('theme', array('apply_admin' => true));
         $assets = new Assets();
         $assets->register();
 
@@ -72,7 +73,7 @@ final class AssetsTest extends \BaseTestCase {
     }
 
     public function test_diagnostics_js_gated_by_screen_and_cap(): void {
-        Options::update('theme', array('apply_admin_chrome' => true));
+        Options::update('theme', array('apply_admin' => true));
         $assets = new Assets();
         $assets->register();
 
@@ -98,7 +99,7 @@ final class AssetsTest extends \BaseTestCase {
     }
 
     public function test_permissions_js_gated_by_screen_and_cap(): void {
-        Options::update('theme', array('apply_admin_chrome' => true));
+        Options::update('theme', array('apply_admin' => true));
         $assets = new Assets();
         $assets->register();
 

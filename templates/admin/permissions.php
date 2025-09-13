@@ -14,6 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 $perms_base = menu_page_url( 'fbm_permissions', false );
 ?>
+<?php echo '<div id="fbm-ui" class="fbm-scope fbm-app">'; ?>
 <div class="wrap fbm-admin">
 <?php \FBM\Core\Trace::mark( 'admin:permissions' ); ?>
         <h1><?php \esc_html_e( 'Permissions', 'foodbank-manager' ); ?></h1>
@@ -181,3 +182,4 @@ class="nav-tab <?php echo esc_attr( $tab === 'reset' ? 'nav-tab-active' : '' ); 
 <p><?php \esc_html_e( 'No audit entries.', 'foodbank-manager' ); ?></p>
 <?php endif; ?>
 </div>
+<?php echo '</div>'; ?>

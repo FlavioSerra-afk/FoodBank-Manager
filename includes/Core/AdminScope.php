@@ -40,11 +40,4 @@ final class AdminScope {
         return $slug && in_array( $slug, self::SLUGS, true );
     }
 
-    /** Adds scoping class for CSS targeting (string, not array) */
-    public static function body_class( string $classes ): string {
-        if ( self::is_fbm_admin() ) {
-            $classes .= ' fbm-themed ';
-        }
-        return $classes;
-    }
 }
