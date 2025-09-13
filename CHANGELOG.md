@@ -1,3 +1,7 @@
+## [2.1.5] — 2025-09-13
+### Fixed
+- Theme & Design controls now apply instantly in preview and across FBM UI; corrected enqueue order & scope; hardened Settings API wiring.
+
 ## [2.1.3] — 2025-09-13
 ### Added
 - Typography settings (H1–H6, body, small, link/muted colors) with live preview and FBM-scoped selectors.
