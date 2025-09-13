@@ -48,7 +48,7 @@ if (defined('PHPSTAN_RUNNING') || defined('__PHPSTAN_RUNNING__')) {
     return;
 }
 
-if (!defined('ABSPATH')) {
+if (!defined('ABSPATH') && getenv('FBM_SKIP_ABSPATH') !== '1') {
     define('ABSPATH', __DIR__ . '/../../');
 }
 
@@ -90,6 +90,7 @@ if (!function_exists('set_transient')) {
     $blog = $GLOBALS['fbm_current_blog'] ?? 1;
     $GLOBALS['fbm_transients'][$blog][$key] = $value;
     $GLOBALS['fbm_transients'][$key]        = $value;
+    update_option('_transient_timeout_' . $key, time() + (int) $expiration);
     return true;
   }
 }
@@ -103,6 +104,7 @@ if (!function_exists('delete_transient')) {
   function delete_transient($key){
     $blog = $GLOBALS['fbm_current_blog'] ?? 1;
     unset($GLOBALS['fbm_transients'][$blog][$key], $GLOBALS['fbm_transients'][$key]);
+    delete_option('_transient_timeout_' . $key);
     return true;
   }
 }
@@ -398,6 +400,7 @@ if (!function_exists('current_time')){ function current_time($t, $gmt=false){ re
 if (!function_exists('wp_date')){ function wp_date($f, $ts = null, $tz = null){ $ts = $ts ?? time(); if($tz instanceof \DateTimeZone){ $d = new \DateTime('@'.$ts); $d->setTimezone($tz); return $d->format($f); } return date($f,$ts); } }
 if (!function_exists('wp_enqueue_style')){ function wp_enqueue_style($h,$s=''){ $GLOBALS['fbm_styles'][$h]=$s; } }
 if (!function_exists('wp_enqueue_script')){ function wp_enqueue_script($h,$s=''){ $GLOBALS['fbm_scripts'][$h]=$s; } }
+if (!function_exists('wp_localize_script')){ function wp_localize_script($h,$o,$l){ $GLOBALS['fbm_localized'][$h]=$l; return true; } }
 if (!function_exists('wp_add_inline_style')){ function wp_add_inline_style($h,$c){ $GLOBALS['fbm_inline_styles'][$h]=$c; } }
 if (!function_exists('wp_register_style')){ function wp_register_style($h,$s=''){ $GLOBALS['fbm_styles'][$h]=$s; } }
 if (!function_exists('wp_delete_file')){ function wp_delete_file($f){ return @unlink($f); } }

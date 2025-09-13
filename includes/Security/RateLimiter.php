@@ -74,7 +74,6 @@ final class RateLimiter {
                     'RateLimit-Reset: ' . $reset,
                     'X-FBM-RateLimit-Limit: ' . $limit,
                     'X-FBM-RateLimit-Remaining: ' . $remaining,
-                    'Retry-After: ' . $retry,
                 )
             );
         }
@@ -124,7 +123,6 @@ final class RateLimiter {
                     'RateLimit-Reset: ' . $now,
                     'X-FBM-RateLimit-Limit: 0',
                     'X-FBM-RateLimit-Remaining: 0',
-                    'Retry-After: 0',
                 )
             );
             return array(

@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-11 (v1.11.2 patch finalize)
+Docs-Revision: 2025-09-12 (v1.11.3 patch finalize)
 # Diagnostics Hub
 
 The diagnostics hub surfaces operational information for administrators. It
@@ -21,8 +21,8 @@ Scan and test endpoints are rate limited per user with a configurable window
 to mitigate abuse. Administrators are exempt from these limits by default.
 
 Rate-limited responses include standard `RateLimit-*` headers
-(`RateLimit-Limit`, `RateLimit-Remaining`) and `Retry-After` so clients can
-respect cooldowns.
+(`RateLimit-Limit`, `RateLimit-Remaining`, `RateLimit-Reset`) and `Retry-After`
+so clients can respect cooldowns.
 
 ## Security & Throttling
 

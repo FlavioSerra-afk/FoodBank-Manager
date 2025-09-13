@@ -75,4 +75,46 @@ final class AssetsTest extends \BaseTestCase {
         $assets->enqueue_admin();
         $this->assertArrayNotHasKey('fbm-admin-shortcodes', $GLOBALS['fbm_scripts']);
     }
+
+    public function test_diagnostics_js_gated_by_screen_and_cap(): void {
+        $assets = new Assets();
+
+        $GLOBALS['fbm_scripts'] = [];
+        $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_diagnostics';
+        fbm_grant_caps(['fb_manage_diagnostics']);
+        $assets->enqueue_admin();
+        $this->assertArrayHasKey('fbm-admin-diagnostics', $GLOBALS['fbm_scripts']);
+
+        $GLOBALS['fbm_scripts'] = [];
+        $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_forms';
+        $assets->enqueue_admin();
+        $this->assertArrayNotHasKey('fbm-admin-diagnostics', $GLOBALS['fbm_scripts']);
+
+        $GLOBALS['fbm_scripts'] = [];
+        $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_diagnostics';
+        fbm_grant_caps([]);
+        $assets->enqueue_admin();
+        $this->assertArrayNotHasKey('fbm-admin-diagnostics', $GLOBALS['fbm_scripts']);
+    }
+
+    public function test_permissions_js_gated_by_screen_and_cap(): void {
+        $assets = new Assets();
+
+        $GLOBALS['fbm_scripts'] = [];
+        $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_permissions';
+        fbm_grant_caps(['fb_manage_permissions']);
+        $assets->enqueue_admin();
+        $this->assertArrayHasKey('fbm-admin-permissions', $GLOBALS['fbm_scripts']);
+
+        $GLOBALS['fbm_scripts'] = [];
+        $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_forms';
+        $assets->enqueue_admin();
+        $this->assertArrayNotHasKey('fbm-admin-permissions', $GLOBALS['fbm_scripts']);
+
+        $GLOBALS['fbm_scripts'] = [];
+        $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_permissions';
+        fbm_grant_caps([]);
+        $assets->enqueue_admin();
+        $this->assertArrayNotHasKey('fbm-admin-permissions', $GLOBALS['fbm_scripts']);
+    }
 }

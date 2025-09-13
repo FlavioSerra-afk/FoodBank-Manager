@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-11 (v1.11.2 patch finalize)
+Docs-Revision: 2025-09-12 (v1.11.3 patch finalize)
 # REST API (pcc-fb/v1)
 
 Base namespace: `pcc-fb/v1`. All write endpoints require `X-WP-Nonce` and capabilities.
@@ -21,7 +21,7 @@ FoodBank Manager normalizes error responses across REST and AJAX endpoints:
 | 409 | Conflict (state clash such as policy breach) |
 | 422 | Unprocessable (validation failed) |
 | 429 | Too many requests (rate limited) |
-Rate-limited responses include `RateLimit-Limit`, `RateLimit-Remaining`, and `Retry-After` headers.
+Rate-limited responses include `RateLimit-Limit`, `RateLimit-Remaining`, and `RateLimit-Reset` headers; `Retry-After` appears on 429 responses.
 
 REST errors return:
 
@@ -50,13 +50,14 @@ AJAX errors use the same `error` object. Example invalid nonce:
 }
 ```
 
-Rate limited responses include `Retry-After` and `RateLimit-*` headers:
+Rate limited responses include `RateLimit-Limit`, `RateLimit-Remaining`, `RateLimit-Reset`, and `Retry-After` headers:
 
 ```
 HTTP/1.1 429 Too Many Requests
 Retry-After: 60
 RateLimit-Limit: 5
 RateLimit-Remaining: 0
+RateLimit-Reset: 1710000000
 ```
 
 Scan and other success responses keep their existing payload contract.

@@ -23,7 +23,7 @@ use FoodBankManager\Core\Screen;
 
 final class Plugin {
 
-    public const VERSION = '1.11.2'; // x-release-please-version
+    public const VERSION = '1.11.3'; // x-release-please-version
     private const OPTION_VERSION = 'fbm_version';
 
         private static ?Plugin $instance = null;
@@ -171,11 +171,19 @@ final class Plugin {
         /** Deactivate plugin. */
         public function deactivate(): void {
                 if ( function_exists( 'wp_clear_scheduled_hook' ) ) {
-                        wp_clear_scheduled_hook( \FoodBankManager\Core\Cron::RETENTION_HOOK );
-                        wp_clear_scheduled_hook( \FBM\Core\Retention::EVENT );
-                        wp_clear_scheduled_hook( \FBM\Core\Jobs\JobsWorker::EVENT );
-                        wp_clear_scheduled_hook( 'fbm_cron_cleanup' );
-                        wp_clear_scheduled_hook( 'fbm_cron_email_retry' );
+                        $hooks = array(
+                                \FoodBankManager\Core\Cron::RETENTION_HOOK,
+                                \FBM\Core\Retention::EVENT,
+                                \FBM\Core\Jobs\JobsWorker::EVENT,
+                                'fbm_retention_hourly',
+                                'fbm_retention_tick',
+                                'fbm_jobs_tick',
+                                'fbm_cron_cleanup',
+                                'fbm_cron_email_retry',
+                        );
+                        foreach ( array_unique( $hooks ) as $hook ) {
+                                wp_clear_scheduled_hook( $hook );
+                        }
                 }
         }
 }
