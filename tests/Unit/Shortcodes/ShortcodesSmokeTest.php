@@ -12,7 +12,8 @@ final class ShortcodesSmokeTest extends \BaseTestCase {
         if ( ! defined( 'FBM_PATH' ) ) {
             define( 'FBM_PATH', dirname( __DIR__, 3 ) . '/' );
         }
-        $GLOBALS['fbm_options'] = array( 'fbm_options' => array( 'theme' => array( 'front' => array( 'enabled' => true ) ) ) );
+        $GLOBALS['fbm_options'] = array();
+        update_option( 'fbm_theme', array( 'front' => array( 'enabled' => true ) ) );
         $schema = array(
             'meta'   => array( 'name' => 'Smoke', 'slug' => 'smoke_form', 'captcha' => false ),
             'fields' => array(
