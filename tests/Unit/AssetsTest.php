@@ -15,7 +15,7 @@ final class AssetsTest extends \BaseTestCase {
         $GLOBALS['fbm_styles'] = [];
         $GLOBALS['fbm_inline_styles'] = [];
         $_GET['page'] = 'fbm_database';
-        do_action('admin_enqueue_scripts', 'foodbank-manager_page_fbm_database');
+        do_action('admin_enqueue_scripts', 'foodbank_page_fbm_database');
         $this->assertArrayHasKey('fbm-admin', $GLOBALS['fbm_inline_styles']);
         $css = $GLOBALS['fbm_inline_styles']['fbm-admin'];
         $this->assertStringContainsString('.fbm-scope{', $css);
@@ -53,14 +53,14 @@ final class AssetsTest extends \BaseTestCase {
         $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_shortcodes';
         fbm_grant_caps(['fbm_manage_forms']);
         $_GET['page'] = 'fbm_shortcodes';
-        do_action('admin_enqueue_scripts', 'foodbank-manager_page_fbm_shortcodes');
+        do_action('admin_enqueue_scripts', 'foodbank_page_fbm_shortcodes');
         $this->assertArrayHasKey('fbm-admin-shortcodes', $GLOBALS['fbm_scripts']);
 
         // Not enqueued on other screens.
         $GLOBALS['fbm_scripts'] = [];
         $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_forms';
         $_GET['page'] = 'fbm_forms';
-        do_action('admin_enqueue_scripts', 'foodbank-manager_page_fbm_forms');
+        do_action('admin_enqueue_scripts', 'foodbank_page_fbm_forms');
         $this->assertArrayNotHasKey('fbm-admin-shortcodes', $GLOBALS['fbm_scripts']);
 
         // Not enqueued without capability.
@@ -68,7 +68,7 @@ final class AssetsTest extends \BaseTestCase {
         $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_shortcodes';
         fbm_grant_caps([]);
         $_GET['page'] = 'fbm_shortcodes';
-        do_action('admin_enqueue_scripts', 'foodbank-manager_page_fbm_shortcodes');
+        do_action('admin_enqueue_scripts', 'foodbank_page_fbm_shortcodes');
         $this->assertArrayNotHasKey('fbm-admin-shortcodes', $GLOBALS['fbm_scripts']);
     }
 
@@ -81,20 +81,20 @@ final class AssetsTest extends \BaseTestCase {
         $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_diagnostics';
         fbm_grant_caps(['fb_manage_diagnostics']);
         $_GET['page'] = 'fbm_diagnostics';
-        do_action('admin_enqueue_scripts', 'foodbank-manager_page_fbm_diagnostics');
+        do_action('admin_enqueue_scripts', 'foodbank_page_fbm_diagnostics');
         $this->assertArrayHasKey('fbm-admin-diagnostics', $GLOBALS['fbm_scripts']);
 
         $GLOBALS['fbm_scripts'] = [];
         $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_forms';
         $_GET['page'] = 'fbm_forms';
-        do_action('admin_enqueue_scripts', 'foodbank-manager_page_fbm_forms');
+        do_action('admin_enqueue_scripts', 'foodbank_page_fbm_forms');
         $this->assertArrayNotHasKey('fbm-admin-diagnostics', $GLOBALS['fbm_scripts']);
 
         $GLOBALS['fbm_scripts'] = [];
         $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_diagnostics';
         fbm_grant_caps([]);
         $_GET['page'] = 'fbm_diagnostics';
-        do_action('admin_enqueue_scripts', 'foodbank-manager_page_fbm_diagnostics');
+        do_action('admin_enqueue_scripts', 'foodbank_page_fbm_diagnostics');
         $this->assertArrayNotHasKey('fbm-admin-diagnostics', $GLOBALS['fbm_scripts']);
     }
 
@@ -107,20 +107,20 @@ final class AssetsTest extends \BaseTestCase {
         $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_permissions';
         fbm_grant_caps(['fb_manage_permissions']);
         $_GET['page'] = 'fbm_permissions';
-        do_action('admin_enqueue_scripts', 'foodbank-manager_page_fbm_permissions');
+        do_action('admin_enqueue_scripts', 'foodbank_page_fbm_permissions');
         $this->assertArrayHasKey('fbm-admin-permissions', $GLOBALS['fbm_scripts']);
 
         $GLOBALS['fbm_scripts'] = [];
         $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_forms';
         $_GET['page'] = 'fbm_forms';
-        do_action('admin_enqueue_scripts', 'foodbank-manager_page_fbm_forms');
+        do_action('admin_enqueue_scripts', 'foodbank_page_fbm_forms');
         $this->assertArrayNotHasKey('fbm-admin-permissions', $GLOBALS['fbm_scripts']);
 
         $GLOBALS['fbm_scripts'] = [];
         $GLOBALS['fbm_test_screen_id'] = 'foodbank_page_fbm_permissions';
         fbm_grant_caps([]);
         $_GET['page'] = 'fbm_permissions';
-        do_action('admin_enqueue_scripts', 'foodbank-manager_page_fbm_permissions');
+        do_action('admin_enqueue_scripts', 'foodbank_page_fbm_permissions');
         $this->assertArrayNotHasKey('fbm-admin-permissions', $GLOBALS['fbm_scripts']);
     }
 }

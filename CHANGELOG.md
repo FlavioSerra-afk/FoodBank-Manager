@@ -1,3 +1,12 @@
+## [2.1.1] — 2025-09-13
+### Added
+- Two-pane Theme & Design with live preview using real FBM markup.
+- New token groups: Typography, Forms, Tables & Cards, Notices.
+### Improved
+- Admin asset order and screen scoping; variables emitted under  fbm and .fbm-scope.
+### A11y
+- Kept :focus-visible outlines and accent-color for form controls.
+
 ## [2.1.0] — 2025-09-13
 ### Added
 - Implemented Menu design tokens (icon size/opacity, paddings, item height, states, divider) and wired all Theme controls to FBM tags.
