@@ -1,3 +1,11 @@
+## [2.0.7] — 2025-09-13
+### Fixed
+- Scoped all theme tokens and styles to `.fbm-scope`, preventing bleed into the WP admin chrome.
+- Refactored enqueues to `admin_enqueue_scripts` with correct inline-style order.
+- Restored dashboard 3×3 grid under the scoped container with responsive breakpoints.
+### UX
+- Renamed “Apply theme to admin menus” → “Apply theme to FBM interface” to reflect actual behavior.
+
 ## [2.0.6] — 2025-09-13
 ### Fixed
 - Resolved activation “Critical Error” in release ZIP by moving test autoloaders to autoload-dev and building with --no-dev + optimized autoloader.

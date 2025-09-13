@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		exit;
 }
 ?>
+<?php echo '<div id="fbm-ui" class="fbm-scope fbm-app">'; ?>
 <div class="wrap fbm-admin">
 <?php \FBM\Core\Trace::mark( 'admin:database' ); ?>
 <h1><?php esc_html_e( 'Database', 'foodbank-manager' ); ?></h1>
@@ -145,3 +146,4 @@ document.querySelectorAll('.fbm-column-toggle input[type="checkbox"]').forEach(f
 });
 </script>
 </div>
+<?php echo '</div>'; ?>

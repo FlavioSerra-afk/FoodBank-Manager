@@ -26,6 +26,7 @@ final class ShortcodesSmokeTest extends \BaseTestCase {
     public function test_wrapper_enqueues_css(): void {
         $GLOBALS['fbm_styles'] = array();
         $html                  = FormShortcode::render( array( 'preset' => 'smoke_form' ) );
+        $this->assertStringContainsString( 'fbm-scope', $html );
         $this->assertStringContainsString( 'fbm-public', $html );
         $this->assertArrayHasKey( 'fbm-public', $GLOBALS['fbm_styles'] );
     }

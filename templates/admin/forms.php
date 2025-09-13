@@ -16,6 +16,7 @@ if ( ! current_user_can( 'fb_manage_forms' ) ) {
 				wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ), '', array( 'response' => 403 ) );
 }
 ?>
+<?php echo '<div id="fbm-ui" class="fbm-scope fbm-app">'; ?>
 <div class="wrap fbm-admin">
 <?php \FBM\Core\Trace::mark( 'admin:forms' ); ?>
 				<h1><?php \esc_html_e( 'Forms', 'foodbank-manager' ); ?></h1>
@@ -67,3 +68,4 @@ btn.textContent = '<?php echo esc_js( __( 'Copied', 'foodbank-manager' ) ); ?>';
 });
 </script>
 </div>
+<?php echo '</div>'; ?>

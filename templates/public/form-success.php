@@ -9,6 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 ?>
+<?php echo '<div class="fbm-scope fbm-app">'; ?>
 <div class="fbm-public">
 		<div class="fbm-status" role="status" aria-live="polite" aria-atomic="true"></div>
 		<div class="fbm-errors" role="alert"></div>
@@ -23,3 +24,4 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<?php endif; ?>
 		</div>
 </div>
+<?php echo '</div>'; ?>

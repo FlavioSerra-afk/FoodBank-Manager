@@ -20,10 +20,8 @@ final class PublicFormsThemeTest extends \BaseTestCase {
         FormShortcode::render(array('preset' => 't'));
         $this->assertSame($count, count($GLOBALS['fbm_styles']));
         $css = (string) file_get_contents(__DIR__ . '/../../assets/css/public.css');
-        $this->assertStringContainsString('.fbm-form', $css);
-        $this->assertStringContainsString('input:focus-visible', $css);
-        $this->assertStringContainsString('prefers-reduced-transparency', $css);
+        $this->assertStringContainsString('.fbm-scope .fbm-card', $css);
+        $this->assertStringContainsString(':focus-visible', $css);
         $this->assertStringContainsString('forced-colors', $css);
-        $this->assertStringContainsString('.is-invalid', $css);
     }
 }

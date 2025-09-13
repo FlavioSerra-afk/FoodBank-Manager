@@ -40,10 +40,7 @@ final class FormShortcode {
                 if ( ! empty( $front['enabled'] ) ) {
         wp_enqueue_style( 'fbm-public', plugins_url( 'assets/css/public.css', FBM_FILE ), array(), Plugin::VERSION ); // @phpstan-ignore-line
                                                wp_add_inline_style( 'fbm-public', Theme::css_variables() );
-                        if ( ! empty( $theme['apply_front_menus'] ) ) {
-                                add_filter( 'body_class', array( Theme::class, 'body_class' ) );
                         }
-                }
 			$atts = shortcode_atts(
 				array(
 					'id'     => '',
@@ -82,10 +79,10 @@ final class FormShortcode {
 				$errors = array_map( 'sanitize_key', $raw );
 		}
 			$first_error = $errors[0] ?? '';
-			$classes     = 'fbm-public fbm-theme--' . $front['style'] . ' fbm-preset--' . $front['preset'];
-		if ( ! empty( $theme['apply_front_menus'] ) && 'glass' === $front['style'] ) {
-				$classes .= ' fbm-menus--glass';
-		}
+                        $classes     = 'fbm-scope fbm-app fbm-public fbm-theme--' . $front['style'] . ' fbm-preset--' . $front['preset'];
+                if ( ! empty( $theme['apply_front_menus'] ) && 'glass' === $front['style'] ) {
+                                $classes .= ' fbm-menus--glass';
+                }
 			ob_start();
 			echo '<div class="' . esc_attr( $classes ) . '">';
 			echo '<div class="fbm-status" role="status" aria-live="polite" aria-atomic="true"></div>';

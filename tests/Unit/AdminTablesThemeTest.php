@@ -10,7 +10,7 @@ if (!defined('FBM_URL')) {
 
 final class AdminTablesThemeTest extends \BaseTestCase {
     public function test_tables_css_once_and_has_fallbacks(): void {
-        Options::update('theme', array('apply_admin_chrome' => true));
+        Options::update('theme', array('apply_admin' => true));
         $assets = new Assets();
         $assets->register();
         $GLOBALS['fbm_styles'] = array();

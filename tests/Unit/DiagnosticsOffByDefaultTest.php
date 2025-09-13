@@ -8,7 +8,7 @@ if (!defined('FBM_URL')) {
 
 final class DiagnosticsOffByDefaultTest extends \BaseTestCase {
     public function test_debug_notice_off_by_default(): void {
-        Options::update('theme', array('apply_admin_chrome' => true));
+        Options::update('theme', array('apply_admin' => true));
         $assets = new Assets();
         $assets->register();
         $_GET['page'] = 'fbm';
@@ -23,7 +23,7 @@ final class DiagnosticsOffByDefaultTest extends \BaseTestCase {
         if (!defined('FBM_DEBUG_THEME')) {
             define('FBM_DEBUG_THEME', true);
         }
-        Options::update('theme', array('apply_admin_chrome' => true));
+        Options::update('theme', array('apply_admin' => true));
         $assets = new Assets();
         $assets->register();
         $_GET['page'] = 'fbm';

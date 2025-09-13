@@ -2,6 +2,7 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; }
 ?>
+<?php echo '<div id="fbm-ui" class="fbm-scope fbm-app">'; ?>
 <div class="wrap fbm-admin">
 <?php \FBM\Core\Trace::mark( 'admin:dashboard' ); ?>
 <?php
@@ -79,3 +80,4 @@ $mail_failures_7d      = (int) ( $mail_failures_7d ?? 0 );
 	<a class="fbm-button--glass" href="<?php echo esc_url( admin_url( 'post-new.php?post_type=fb_form' ) ); ?>"><?php esc_html_e( 'New form', 'foodbank-manager' ); ?></a>
 </div>
 </div>
+<?php echo '</div>'; ?>

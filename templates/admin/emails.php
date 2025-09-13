@@ -9,6 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		exit;
 }
 ?>
+<?php echo '<div id="fbm-ui" class="fbm-scope fbm-app">'; ?>
 <div class="wrap fbm-admin">
 <?php \FBM\Core\Trace::mark( 'admin:emails' ); ?>
 				<h1><?php esc_html_e( 'Email Templates', 'foodbank-manager' ); ?></h1>
@@ -131,3 +132,4 @@ if ( ! defined( 'ABSPATH' ) ) {
 				</script>
 		<?php endif; ?>
 </div>
+<?php echo '</div>'; ?>

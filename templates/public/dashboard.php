@@ -37,6 +37,7 @@ if ( ! empty( $filters_attr['tags'] ?? array() ) ) {
 }
 $toggle_url = add_query_arg( $toggle_params );
 ?>
+<?php echo '<div class="fbm-scope fbm-app">'; ?>
 <div class="fbm-public">
 <div class="fbm-dashboard-wrap fbm-loading" aria-busy="true">
 <?php if ( current_user_can( 'manage_options' ) ) : ?>
@@ -195,3 +196,4 @@ printf( esc_html__( 'Last updated %s', 'foodbank-manager' ), esc_html( $updated 
 </div>
 </div>
 </div>
+<?php echo '</div>'; ?>

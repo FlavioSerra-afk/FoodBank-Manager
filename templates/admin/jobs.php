@@ -2,6 +2,7 @@
 if (!defined('ABSPATH')) { exit; }
 $jobs = $jobs ?? array();
 ?>
+<?php echo '<div id="fbm-ui" class="fbm-scope fbm-app">'; ?>
 <div class="wrap fbm-admin"><div class="fbm-section">
 <h2><?php esc_html_e('Export Jobs', 'foodbank-manager'); ?></h2>
 <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" style="margin-bottom:1em;">
@@ -45,3 +46,4 @@ $jobs = $jobs ?? array();
     </tbody>
  </table>
 </div></div>
+<?php echo '</div>'; ?>

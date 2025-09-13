@@ -2,6 +2,7 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; }
 ?>
+<?php echo '<div id="fbm-ui" class="fbm-scope fbm-app">'; ?>
 <div class="wrap fbm-admin">
 <?php \FBM\Core\Trace::mark( 'admin:reports' ); ?>
 <h1><?php esc_html_e( 'Reports', 'foodbank-manager' ); ?></h1>
@@ -54,3 +55,4 @@ if ( ! defined( 'ABSPATH' ) ) {
         <a class="button" href="<?php echo esc_url( $pdf_url ); ?>">PDF</a>
 </p>
 </div>
+<?php echo '</div>'; ?>

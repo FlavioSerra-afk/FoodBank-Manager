@@ -15,6 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $current_tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'branding'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only
 $settings    = Options::all();
 ?>
+<?php echo '<div id="fbm-ui" class="fbm-scope fbm-app">'; ?>
 <div class="wrap fbm-admin">
 <?php \FBM\Core\Trace::mark( 'admin:settings' ); ?>
                 <h1><?php esc_html_e( 'Settings', 'foodbank-manager' ); ?></h1>
@@ -152,3 +153,4 @@ $settings    = Options::all();
 		</form>
                 <?php endif; ?>
 </div>
+<?php echo '</div>'; ?>
