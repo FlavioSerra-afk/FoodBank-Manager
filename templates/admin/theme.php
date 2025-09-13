@@ -34,8 +34,9 @@ $apply_front_menus   = ! empty( $theme['apply_front_menus'] );
                 </form>
                 <a class="button" href="<?php echo esc_url( function_exists( 'wp_nonce_url' ) ? wp_nonce_url( admin_url( 'admin-post.php?action=fbm_theme_export&section=' . $tab ), 'fbm_theme_export' ) : '#' ); ?>"><?php esc_html_e( 'Export', 'foodbank-manager' ); ?></a>
         </div>
-        <form method="post" action="<?php echo esc_url( admin_url( 'options.php' ) ); ?>">
+        <form method="post" action="options.php">
                 <?php if ( function_exists( 'settings_fields' ) ) { settings_fields( 'fbm_theme' ); } ?>
+                <?php if ( function_exists( 'do_settings_sections' ) ) { do_settings_sections( 'fbm_theme' ); } ?>
                 <?php if ( 'admin' === $tab ) : ?>
                         <table class="form-table" role="presentation">
                                 <tr>
@@ -59,7 +60,7 @@ $apply_front_menus   = ! empty( $theme['apply_front_menus'] );
                                 </tr>
                                 <tr>
                                         <th><label for="fbm_admin_accent"><?php esc_html_e( 'Accent colour', 'foodbank-manager' ); ?></label></th>
-                                        <td><input type="text" id="fbm_admin_accent" name="fbm_theme[admin][accent]" value="<?php echo esc_attr( $admin['accent'] ); ?>" class="regular-text" /></td>
+                                        <td><input type="text" id="fbm_admin_accent" name="fbm_theme[admin][accent]" value="<?php echo esc_attr( $admin['accent'] ); ?>" class="regular-text fbm-color" data-default-color="<?php echo esc_attr( \FoodBankManager\UI\Theme::DEFAULT_ACCENT ); ?>" /></td>
                                 </tr>
                                 <tr>
                                         <th><?php esc_html_e( 'Glass alpha', 'foodbank-manager' ); ?></th>
@@ -113,7 +114,7 @@ $apply_front_menus   = ! empty( $theme['apply_front_menus'] );
                                 </tr>
                                 <tr>
                                         <th><label for="fbm_front_accent"><?php esc_html_e( 'Accent colour', 'foodbank-manager' ); ?></label></th>
-                                        <td><input type="text" id="fbm_front_accent" name="fbm_theme[front][accent]" value="<?php echo esc_attr( $front['accent'] ); ?>" class="regular-text" <?php echo $match ? 'disabled="disabled"' : ''; ?> /></td>
+                                        <td><input type="text" id="fbm_front_accent" name="fbm_theme[front][accent]" value="<?php echo esc_attr( $front['accent'] ); ?>" class="regular-text fbm-color" data-default-color="<?php echo esc_attr( \FoodBankManager\UI\Theme::DEFAULT_ACCENT ); ?>" <?php echo $match ? 'disabled="disabled"' : ''; ?> /></td>
                                 </tr>
                                 <tr>
                                         <th><?php esc_html_e( 'Glass alpha', 'foodbank-manager' ); ?></th>

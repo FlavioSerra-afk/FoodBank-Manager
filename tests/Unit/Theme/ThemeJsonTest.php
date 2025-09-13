@@ -17,7 +17,7 @@ final class ThemeJsonTest extends \BaseTestCase {
         $admin = $san['admin'];
         $this->assertSame($data['style'], $admin['style']);
         $this->assertSame($data['preset'], $admin['preset']);
-        $this->assertSame('#3B82F6', strtoupper($admin['accent']));
+        $this->assertSame('#0B5FFF', strtoupper($admin['accent']));
         if ('high_contrast' === $data['preset'] || 'basic' === $data['style']) {
             $this->assertSame(0.0, $admin['glass']['alpha']);
             $this->assertSame(0, $admin['glass']['blur']);

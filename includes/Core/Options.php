@@ -2,7 +2,11 @@
 // phpcs:ignoreFile
 
 namespace FBM\Core {
+    use function add_action;
+    use function add_option;
     use function add_settings_error;
+    use function get_option;
+    use function register_setting;
     use function wp_json_encode;
     use function strlen;
     use function __;
@@ -25,7 +29,7 @@ namespace FBM\Core {
                     'admin' => [
                         'style'  => 'glass',
                         'preset' => 'light',
-                        'accent' => '#3B82F6',
+                        'accent' => '#0B5FFF',
                         'glass'  => [
                             'alpha'  => 0.24,
                             'blur'   => 14,
@@ -37,7 +41,7 @@ namespace FBM\Core {
                     'front' => [
                         'style'   => 'basic',
                         'preset'  => 'light',
-                        'accent'  => '#3B82F6',
+                        'accent'  => '#0B5FFF',
                         'glass'   => [
                             'alpha'  => 0.24,
                             'blur'   => 14,
@@ -175,7 +179,33 @@ namespace FBM\Core {
             return $all[$section][$key] ?? $default;
         }
 
-        public static function boot(): void {}
+        public static function boot(): void {
+            add_action(
+                'admin_init',
+                static function (): void {
+                    register_setting(
+                        'fbm',
+                        'fbm_options',
+                        array(
+                            'sanitize_callback' => '\\FBM\\Core\\Options::sanitize_all',
+                        )
+                    );
+                    register_setting(
+                        'fbm_theme',
+                        'fbm_theme',
+                        array(
+                            'type'              => 'array',
+                            'sanitize_callback' => '\\FoodBankManager\\UI\\Theme::sanitize',
+                            'default'           => \FoodBankManager\UI\Theme::defaults(),
+                            'show_in_rest'      => false,
+                        )
+                    );
+                    if ( null === get_option( 'fbm_theme', null ) ) {
+                        add_option( 'fbm_theme', \FoodBankManager\UI\Theme::defaults(), '', false );
+                    }
+                }
+            );
+        }
 
         /**
          * @param array<string,mixed>|string $section

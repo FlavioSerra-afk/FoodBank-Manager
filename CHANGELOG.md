@@ -1,3 +1,12 @@
+## 2.0.0 — Fix & Repair
+### Fixed
+- Design & Theme settings reliably save via proper Settings API registration.
+### Added
+- Native WordPress Color Picker for theme colors.
+- Tokenized UI applied to FBM admin and public forms (with `accent-color`, focus-visible, forced-colors).
+### Dev
+- Scoped admin assets loading; strict sanitizer and payload bounds.
+
 ## 1.11.7
 
 - fix: Settings API wiring for Design & Theme with tokenized variables and accessibility tweaks.

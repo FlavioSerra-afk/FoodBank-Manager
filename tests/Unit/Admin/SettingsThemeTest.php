@@ -39,7 +39,7 @@ final class SettingsThemeTest extends \BaseTestCase {
         $san = Theme::sanitize($raw);
         $this->assertSame('glass', $san['admin']['style']);
         $this->assertSame('light', $san['admin']['preset']);
-        $this->assertSame('#3B82F6', $san['admin']['accent']);
+        $this->assertSame('#0B5FFF', $san['admin']['accent']);
         $this->assertSame(12, $san['admin']['glass']['blur']);
         $this->assertSame(24, $san['admin']['glass']['elev']);
         $this->assertSame(6, $san['admin']['glass']['radius']);
