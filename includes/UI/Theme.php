@@ -47,10 +47,10 @@ final class Theme {
 	 *
 	 * @return array<string,mixed>
 	 */
-	public static function defaults(): array {
-		$defaults = Options::defaults();
-		return $defaults['theme'];
-	}
+        public static function defaults(): array {
+                $defaults = Options::defaults();
+                return $defaults['theme'];
+        }
 
 	/**
 	 * Retrieve sanitized theme settings.
@@ -96,6 +96,8 @@ final class Theme {
                 $admin = self::sanitize_section( $raw['admin'] ?? array(), $defaults['admin'] );
                 $front = self::sanitize_section( $raw['front'] ?? array(), $defaults['front'] );
                 $menu  = self::sanitize_menu( $raw['menu'] ?? array(), $defaults['menu'] );
+                $typography = self::sanitize_typography( $raw['typography'] ?? array(), $defaults['typography'] );
+                $tabs       = self::sanitize_tabs( $raw['tabs'] ?? array(), $defaults['tabs'] );
 
 		$front_enabled    = filter_var( $raw['front']['enabled'] ?? $defaults['front']['enabled'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE );
 		$front['enabled'] = null === $front_enabled ? $defaults['front']['enabled'] : (bool) $front_enabled;
@@ -127,8 +129,10 @@ final class Theme {
                         'apply_admin_chrome'   => $admin_chrome,
                         'apply_front_menus'    => $front_menus,
                         'menu'                 => $menu,
+                        'typography'           => $typography,
+                        'tabs'                 => $tabs,
                 );
-	}
+        }
 
 	/**
 	 * Sanitize one section (admin/front).
@@ -232,6 +236,77 @@ final class Theme {
         }
 
         /**
+         * Sanitize typography settings.
+         *
+         * @param array<string,mixed> $raw Raw values.
+         * @param array<string,mixed> $defaults Defaults.
+         * @return array<string,mixed>
+         */
+        private static function sanitize_typography( array $raw, array $defaults ): array {
+                $out = array();
+                foreach ( array( 'h1','h2','h3','h4','h5','h6','body','small' ) as $tag ) {
+                        $src = is_array( $raw[ $tag ] ?? null ) ? $raw[ $tag ] : array();
+                        $def = $defaults[ $tag ];
+                        $item = array();
+                        $item['size']   = self::clamp( absint( $src['size'] ?? $def['size'] ), 10, 64 );
+                        $item['lh']     = self::clamp( (float) ( $src['lh'] ?? $def['lh'] ), 1.0, 2.2 );
+                        if ( isset( $def['weight'] ) ) {
+                                $item['weight'] = self::clamp( absint( $src['weight'] ?? $def['weight'] ), 100, 900 );
+                        }
+                        if ( isset( $def['track'] ) ) {
+                                $item['track'] = self::clamp( (float) ( $src['track'] ?? $def['track'] ), -1.0, 2.0 );
+                        }
+                        $out[ $tag ] = $item;
+                }
+
+                $colors = is_array( $raw['color'] ?? null ) ? $raw['color'] : array();
+                $out['color'] = array(
+                        'text'     => sanitize_hex_color( (string) ( $colors['text'] ?? $defaults['color']['text'] ) ) ?: $defaults['color']['text'],
+                        'headings' => sanitize_hex_color( (string) ( $colors['headings'] ?? $defaults['color']['headings'] ) ) ?: $defaults['color']['headings'],
+                        'muted'    => sanitize_hex_color( (string) ( $colors['muted'] ?? $defaults['color']['muted'] ) ) ?: $defaults['color']['muted'],
+                );
+
+                $link = is_array( $raw['link'] ?? null ) ? $raw['link'] : array();
+                $out['link'] = array(
+                        'normal'  => sanitize_hex_color( (string) ( $link['normal'] ?? $defaults['link']['normal'] ) ) ?: $defaults['link']['normal'],
+                        'hover'   => sanitize_hex_color( (string) ( $link['hover'] ?? $defaults['link']['hover'] ) ) ?: $defaults['link']['hover'],
+                        'active'  => sanitize_hex_color( (string) ( $link['active'] ?? $defaults['link']['active'] ) ) ?: $defaults['link']['active'],
+                        'visited' => sanitize_hex_color( (string) ( $link['visited'] ?? $defaults['link']['visited'] ) ) ?: $defaults['link']['visited'],
+                );
+
+                return $out;
+        }
+
+        /**
+         * Sanitize tabs settings.
+         *
+         * @param array<string,mixed> $raw Raw values.
+         * @param array<string,mixed> $defaults Defaults.
+         * @return array<string,mixed>
+         */
+        private static function sanitize_tabs( array $raw, array $defaults ): array {
+                $out = array();
+                $out['height'] = self::clamp( absint( $raw['height'] ?? $defaults['height'] ), 0, 32 );
+                $out['px']     = self::clamp( absint( $raw['px'] ?? $defaults['px'] ), 0, 32 );
+                $out['py']     = self::clamp( absint( $raw['py'] ?? $defaults['py'] ), 0, 32 );
+                $out['gap']    = self::clamp( absint( $raw['gap'] ?? $defaults['gap'] ), 0, 32 );
+                $out['radius'] = self::clamp( absint( $raw['radius'] ?? $defaults['radius'] ), 0, 32 );
+
+                $out['color']        = sanitize_hex_color( (string) ( $raw['color'] ?? $defaults['color'] ) ) ?: $defaults['color'];
+                $out['hover_color']  = sanitize_hex_color( (string) ( $raw['hover_color'] ?? $defaults['hover_color'] ) ) ?: $defaults['hover_color'];
+                $out['active_color'] = sanitize_hex_color( (string) ( $raw['active_color'] ?? $defaults['active_color'] ) ) ?: $defaults['active_color'];
+                $out['hover_bg']     = sanitize_hex_color( (string) ( $raw['hover_bg'] ?? $defaults['hover_bg'] ) ) ?: $defaults['hover_bg'];
+                $out['active_bg']    = sanitize_hex_color( (string) ( $raw['active_bg'] ?? $defaults['active_bg'] ) ) ?: $defaults['active_bg'];
+
+                $out['indicator_h']      = self::clamp( absint( $raw['indicator_h'] ?? $defaults['indicator_h'] ), 1, 6 );
+                $out['indicator_offset'] = self::clamp( absint( $raw['indicator_offset'] ?? $defaults['indicator_offset'] ), 0, 8 );
+                $ind_color               = sanitize_hex_color( (string) ( $raw['indicator_color'] ?? '' ) );
+                $out['indicator_color']  = '' === $ind_color ? null : $ind_color;
+
+                return $out;
+        }
+
+        /**
          * Build CSS variables for menu tokens.
          *
          * @param array<string,mixed> $menu Menu settings.
@@ -253,6 +328,62 @@ final class Theme {
                         '--fbm-menu-active-bg'    => $menu['active_bg'],
                         '--fbm-menu-active-color' => $menu['active_color'],
                         '--fbm-menu-divider'      => $menu['divider'],
+                );
+        }
+
+        /**
+         * Build CSS variables for typography tokens.
+         *
+         * @param array<string,mixed> $typo Typography settings.
+         * @return array<string,string>
+         */
+        private static function typography_tokens( array $typo ): array {
+                $out = array(
+                        '--fbm-body'       => $typo['body']['size'] . 'px',
+                        '--fbm-body-lh'    => (string) $typo['body']['lh'],
+                        '--fbm-body-w'     => isset( $typo['body']['weight'] ) ? (string) $typo['body']['weight'] : '400',
+                        '--fbm-body-trk'   => ( $typo['body']['track'] ?? 0 ) . 'px',
+                        '--fbm-small'      => $typo['small']['size'] . 'px',
+                        '--fbm-small-lh'   => (string) $typo['small']['lh'],
+                        '--fbm-color-text'     => $typo['color']['text'],
+                        '--fbm-color-headings' => $typo['color']['headings'],
+                        '--fbm-color-muted'    => $typo['color']['muted'],
+                        '--fbm-link'           => $typo['link']['normal'],
+                        '--fbm-link-hover'     => $typo['link']['hover'],
+                        '--fbm-link-active'    => $typo['link']['active'],
+                        '--fbm-link-visited'   => $typo['link']['visited'],
+                );
+                foreach ( array( 'h1','h2','h3','h4','h5','h6' ) as $tag ) {
+                        $item = $typo[ $tag ];
+                        $out[ '--fbm-' . $tag ]       = $item['size'] . 'px';
+                        $out[ '--fbm-' . $tag . '-lh' ] = (string) $item['lh'];
+                        $out[ '--fbm-' . $tag . '-w' ]  = (string) $item['weight'];
+                        $out[ '--fbm-' . $tag . '-trk' ] = ( $item['track'] ?? 0 ) . 'px';
+                }
+                return $out;
+        }
+
+        /**
+         * Build CSS variables for tabs tokens.
+         *
+         * @param array<string,mixed> $tabs Tabs settings.
+         * @return array<string,string>
+         */
+        private static function tabs_tokens( array $tabs ): array {
+                return array(
+                        '--fbm-tabs-h'               => $tabs['height'] . 'px',
+                        '--fbm-tabs-px'              => $tabs['px'] . 'px',
+                        '--fbm-tabs-py'              => $tabs['py'] . 'px',
+                        '--fbm-tabs-gap'             => $tabs['gap'] . 'px',
+                        '--fbm-tabs-radius'          => $tabs['radius'] . 'px',
+                        '--fbm-tabs-color'           => $tabs['color'],
+                        '--fbm-tabs-hover-color'     => $tabs['hover_color'],
+                        '--fbm-tabs-active-color'    => $tabs['active_color'],
+                        '--fbm-tabs-hover-bg'        => $tabs['hover_bg'],
+                        '--fbm-tabs-active-bg'       => $tabs['active_bg'],
+                        '--fbm-tabs-indicator-h'     => $tabs['indicator_h'] . 'px',
+                        '--fbm-tabs-indicator-offset'=> $tabs['indicator_offset'] . 'px',
+                        '--fbm-tabs-indicator-color' => $tabs['indicator_color'] ?? 'var(--fbm-accent)',
                 );
         }
 
@@ -294,13 +425,40 @@ final class Theme {
          * Scoped CSS variables for admin theme.
          */
         public static function css_variables_scoped(): string {
+                $theme = self::get();
                 $tokens = self::section_to_css( self::admin() );
-                $menu   = self::menu_tokens( self::get()['menu'] ?? array() );
+                $menu   = self::menu_tokens( $theme['menu'] ?? array() );
+                $typo   = self::typography_tokens( $theme['typography'] ?? array() );
+                $tabs   = self::tabs_tokens( $theme['tabs'] ?? array() );
                 $css    = '';
-                foreach ( array_merge( $tokens, $menu ) as $key => $val ) {
+                foreach ( array_merge( $tokens, $menu, $typo, $tabs ) as $key => $val ) {
                         $css .= $key . ':' . $val . ';';
                 }
-                return '@layer fbm {.fbm-scope{' . $css . '}' . self::glass_support_css() . '}';
+
+                $selectors  = '.fbm-scope{color:var(--fbm-color-text);font: var(--fbm-body-w) var(--fbm-body)/var(--fbm-body-lh) system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;letter-spacing:var(--fbm-body-trk,0);}';
+                $selectors .= '.fbm-scope h1{font-size:var(--fbm-h1);line-height:var(--fbm-h1-lh);font-weight:var(--fbm-h1-w);letter-spacing:var(--fbm-h1-trk,0);color:var(--fbm-color-headings);}';
+                $selectors .= '.fbm-scope h2{font-size:var(--fbm-h2);line-height:var(--fbm-h2-lh);font-weight:var(--fbm-h2-w);letter-spacing:var(--fbm-h2-trk,0);color:var(--fbm-color-headings);}';
+                $selectors .= '.fbm-scope h3{font-size:var(--fbm-h3);line-height:var(--fbm-h3-lh);font-weight:var(--fbm-h3-w);letter-spacing:var(--fbm-h3-trk,0);color:var(--fbm-color-headings);}';
+                $selectors .= '.fbm-scope h4{font-size:var(--fbm-h4);line-height:var(--fbm-h4-lh);font-weight:var(--fbm-h4-w);letter-spacing:var(--fbm-h4-trk,0);color:var(--fbm-color-headings);}';
+                $selectors .= '.fbm-scope h5{font-size:var(--fbm-h5);line-height:var(--fbm-h5-lh);font-weight:var(--fbm-h5-w);letter-spacing:var(--fbm-h5-trk,0);color:var(--fbm-color-headings);}';
+                $selectors .= '.fbm-scope h6{font-size:var(--fbm-h6);line-height:var(--fbm-h6-lh);font-weight:var(--fbm-h6-w);letter-spacing:var(--fbm-h6-trk,0);color:var(--fbm-color-headings);}';
+                $selectors .= '.fbm-scope small{font-size:var(--fbm-small);line-height:var(--fbm-small-lh);}';
+                $selectors .= '.fbm-scope .fbm-text--muted{color:var(--fbm-color-muted);}';
+                $selectors .= '.fbm-scope a{color:var(--fbm-link);}';
+                $selectors .= '.fbm-scope a:hover{color:var(--fbm-link-hover);}';
+                $selectors .= '.fbm-scope a:active{color:var(--fbm-link-active);}';
+                $selectors .= '.fbm-scope a:visited{color:var(--fbm-link-visited);}';
+
+                $selectors .= '.fbm-scope .fbm-tabs{}';
+                $selectors .= '.fbm-scope .fbm-tablist[role="tablist"]{display:flex;gap:var(--fbm-tabs-gap);}';
+                $selectors .= '.fbm-scope [role="tab"]{min-height:var(--fbm-tabs-h);padding:var(--fbm-tabs-py) var(--fbm-tabs-px);border-radius:var(--fbm-tabs-radius);color:var(--fbm-tabs-color);position:relative;}';
+                $selectors .= '.fbm-scope [role="tab"]:hover{color:var(--fbm-tabs-hover-color);background:var(--fbm-tabs-hover-bg);}';
+                $selectors .= '.fbm-scope [role="tab"][aria-selected="true"]{color:var(--fbm-tabs-active-color);background:var(--fbm-tabs-active-bg);}';
+                $selectors .= '.fbm-scope [role="tab"][aria-selected="true"]::after{content:"";position:absolute;left:var(--fbm-tabs-px);right:var(--fbm-tabs-px);height:var(--fbm-tabs-indicator-h);bottom:var(--fbm-tabs-indicator-offset);background:var(--fbm-tabs-indicator-color);border-radius:999px;}';
+                $selectors .= '.fbm-scope [role="tab"]:focus-visible{outline:2px solid var(--fbm-accent);outline-offset:2px;}';
+                $selectors .= '.fbm-scope [role="tabpanel"]{padding-block:12px;}';
+
+                return '@layer fbm {.fbm-scope{' . $css . '}' . $selectors . self::glass_support_css() . '}';
         }
 
         /**

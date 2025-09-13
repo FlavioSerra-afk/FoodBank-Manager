@@ -1,3 +1,12 @@
+## [2.1.3] — 2025-09-13
+### Added
+- Typography settings (H1–H6, body, small, link/muted colors) with live preview and FBM-scoped selectors.
+- Tabs design tokens (size, padding, radius, gap, indicator, states) wired to ARIA-compliant tab markup.
+### Fixed
+- Variables emitted only under `.fbm-scope` in `@layer fbm`; no bleed into wp-admin chrome.
+### A11y
+- :focus-visible outlines maintained for tabs; radios/checkboxes keep accent-color.
+
 ## [2.1.2] — 2025-09-13
 ### Added
 - Full Typography token set (H1–H6, body, small, text/link/muted colors) with live preview.

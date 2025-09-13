@@ -41,6 +41,47 @@ All menu variables are scoped to `.fbm-scope` inside the `fbm` cascade layer so 
 
 Radios and checkboxes inherit `--fbm-color-accent` via CSS `accent-color`. Focus outlines use `:focus-visible` and respect high contrast via `@media (forced-colors: active)`.
 
+### Typography tokens
+
+| Token | Notes |
+|---|---|
+| `--fbm-h1`–`--fbm-h6`, `--fbm-h1-lh`–`--fbm-h6-lh`, `--fbm-h1-w`–`--fbm-h6-w`, `--fbm-h1-trk`–`--fbm-h6-trk` | Heading metrics |
+| `--fbm-body`, `--fbm-body-lh`, `--fbm-body-w`, `--fbm-body-trk` | Body text |
+| `--fbm-small`, `--fbm-small-lh` | Small text |
+| `--fbm-color-text`, `--fbm-color-headings`, `--fbm-color-muted` | Text colours |
+| `--fbm-link`, `--fbm-link-hover`, `--fbm-link-active`, `--fbm-link-visited` | Link states |
+
+```html
+<div class="fbm-scope">
+  <h1>Heading</h1>
+  <p>Body <small>Small</small> <a href="#">Link</a></p>
+</div>
+```
+
+### Tabs tokens
+
+| Token | Notes |
+|---|---|
+| `--fbm-tabs-h` | Tab height |
+| `--fbm-tabs-px`, `--fbm-tabs-py` | Tab paddings |
+| `--fbm-tabs-gap` | Gap between tabs |
+| `--fbm-tabs-radius` | Corner radius |
+| `--fbm-tabs-color`, `--fbm-tabs-hover-color`, `--fbm-tabs-active-color` | Text colours |
+| `--fbm-tabs-hover-bg`, `--fbm-tabs-active-bg` | Background states |
+| `--fbm-tabs-indicator-h`, `--fbm-tabs-indicator-offset`, `--fbm-tabs-indicator-color` | Active indicator |
+
+```html
+<div class="fbm-scope">
+  <div class="fbm-tablist" role="tablist">
+    <button role="tab" aria-selected="true">One</button>
+    <button role="tab">Two</button>
+    <button role="tab">Three</button>
+  </div>
+</div>
+```
+
+Theme & Design tokens apply only within `.fbm-scope` and are emitted inside the `fbm` cascade layer, preventing bleed into other wp-admin chrome or plugins ([MDN](https://developer.mozilla.org/docs/Web/CSS/@layer)).
+
 ## Admin scoping
 Admin tokens load through `admin_enqueue_scripts` using the current screen hook/id. When “Apply theme to admin menus” is enabled, variables only inject on FBM pages. [WordPress Developer Resources](https://developer.wordpress.org/reference/hooks/admin_enqueue_scripts/)
 
