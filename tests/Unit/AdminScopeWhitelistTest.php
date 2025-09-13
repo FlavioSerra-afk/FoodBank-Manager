@@ -11,7 +11,7 @@ final class AdminScopeWhitelistTest extends \BaseTestCase {
         Options::update('theme', array('apply_admin_chrome' => true));
         $assets = new Assets();
         $assets->register();
-        foreach ( \FBM\Core\AdminScope::FBM_PAGE_SLUGS as $slug ) {
+        foreach ( \FBM\Core\AdminScope::SLUGS as $slug ) {
             $_GET['page'] = $slug;
             $GLOBALS['fbm_styles'] = [];
             $GLOBALS['fbm_inline_styles'] = [];

@@ -1,3 +1,12 @@
+## [2.0.6] — 2025-09-13
+### Fixed
+- Resolved activation “Critical Error” in release ZIP by moving test autoloaders to autoload-dev and building with --no-dev + optimized autoloader.
+- Theming now reliably loads only on FBM admin pages via whitelist & correct admin enqueue flow; inline tokens attach to an enqueued handle.
+- Restored Dashboard 3×3 grid with responsive collapse.
+### Dev
+- Added AdminScope helper & optional diagnostics for hook/screen/slug.
+- Hardened packaging script to produce production-safe vendor autoload.
+
 ## [2.0.5] — 2025-09-13
 ### Fixed
 - Theming now attaches only to FBM admin pages by slug whitelist and the correct admin enqueue hook.

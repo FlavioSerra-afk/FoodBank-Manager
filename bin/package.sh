@@ -31,6 +31,10 @@ rsync -a --delete \
   --exclude "$SLUG.php" \
   ./ "$WORK/"
 
+# Production install without dev dependencies
+rm -rf "$WORK/vendor"
+( cd "$WORK" && composer install --no-dev --optimize-autoloader && composer dump-autoload --optimize --classmap-authoritative )
+
 # Compile all translations if msgfmt is available (soft fail otherwise)
 if command -v msgfmt >/dev/null 2>&1; then
   echo "[i18n] Compiling .mo files..."
