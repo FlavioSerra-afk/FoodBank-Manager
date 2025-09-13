@@ -38,7 +38,7 @@ if ( ! empty( $filters_attr['tags'] ?? array() ) ) {
 $toggle_url = add_query_arg( $toggle_params );
 ?>
 <div class="fbm-public">
-<div class="fbm-dashboard fbm-loading" aria-busy="true">
+<div class="fbm-dashboard-wrap fbm-loading" aria-busy="true">
 <?php if ( current_user_can( 'manage_options' ) ) : ?>
 <div class="fbm-copy-shortcode"><code>[fbm_dashboard]</code></div>
 <?php endif; ?>
@@ -79,7 +79,7 @@ $toggle_url = add_query_arg( $toggle_params );
 		<span data-testid="fbm-filter-preset"><?php echo esc_html( (string) ( $filters_attr['preset'] ?? '' ) ); ?></span>
 		<span data-testid="fbm-filter-tags"><?php echo esc_html( implode( ',', $filters_attr['tags'] ?? array() ) ); ?></span>
 </div>
-<div class="fbm-dashboard-grid fbm-grid">
+<div class="fbm-dashboard">
 <?php if ( $has_totals ) : ?>
 <div class="fbm-card fbm-card--glass">
 <div class="fbm-card-value"><?php echo esc_html( number_format_i18n( $present ) ); ?></div>
@@ -191,6 +191,7 @@ printf( esc_html__( 'Last updated %s', 'foodbank-manager' ), esc_html( $updated 
 ?>
 </span>
 <a class="fbm-refresh" href="<?php echo esc_url( add_query_arg( array() ) ); ?>"><?php esc_html_e( 'Refresh', 'foodbank-manager' ); ?></a>
+</div>
 </div>
 </div>
 </div>

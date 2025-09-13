@@ -4,12 +4,12 @@
  * Description: Secure forms, encrypted storage, dashboards, and attendance tracking for food banks.
  * Author: Portuguese Community Centre London
  * x-release-please-start-version
-* Version: 2.0.3
+* Version: 2.0.4
  * x-release-please-end
  * Requires at least: 6.0
  * Tested up to: 6.7
  * Requires PHP: 8.1
-* Stable tag: 2.0.3
+* Stable tag: 2.0.4
  * Text Domain: foodbank-manager
  * Domain Path: /languages
  * License: GPL-2.0-or-later
@@ -25,6 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 define( 'FBM_FILE', __FILE__ );
+define( 'FBM_PLUGIN_FILE', FBM_FILE );
 define( 'FBM_PATH', plugin_dir_path( __FILE__ ) );
 define( 'FBM_URL', plugin_dir_url( __FILE__ ) );
 

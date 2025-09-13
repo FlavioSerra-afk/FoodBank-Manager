@@ -39,18 +39,19 @@ class ThemePage {
     public static function boot(): void {
         add_action(
             'admin_enqueue_scripts',
-            static function ( string $hook ): void {
-                if ( \FBM\Core\AdminScope::is_fbm_page_request() && ( $_GET['page'] ?? '' ) === 'fbm_theme' ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-                        wp_enqueue_style( 'wp-color-picker' );
-                        wp_enqueue_script( 'wp-color-picker' );
-                        wp_enqueue_script( 'fbm-theme-admin', FBM_URL . 'assets/js/theme-admin.js', array( 'wp-color-picker', 'jquery' ), Plugin::VERSION, true );
+            static function (): void {
+                if ( ! \FBM\Core\AdminScope::is_fbm_page_request() || ( $_GET['page'] ?? '' ) !== 'fbm_theme' ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+                        return;
                 }
+                wp_enqueue_style( 'wp-color-picker' );
+                wp_enqueue_script( 'wp-color-picker' );
+                wp_enqueue_script( 'fbm-theme-admin', plugins_url( 'assets/js/theme-admin.js', FBM_FILE ), array( 'wp-color-picker', 'jquery' ), Plugin::VERSION, true );
             }
         );
         add_action(
             'load-foodbank_page_fbm_theme',
             static function (): void {
-                $screen = get_current_screen();
+                $screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
                 if ( $screen ) {
                     $content = sprintf(
                         /* translators: %s: link to design system guide. */

@@ -12,7 +12,7 @@ namespace FBM\Core;
 use function sanitize_key;
 
 final class AdminScope {
-	/** Exact slugs we theme under admin.php?page= */
+	/** Exact slugs allowed to receive theming under admin.php?page= */
 	public const FBM_PAGE_SLUGS = array(
 		'fbm',
 		'fbm_attendance',
@@ -29,7 +29,7 @@ final class AdminScope {
 		'fbm_shortcodes',
 	);
 
-	/** True when current admin request is one of our explicit FBM pages */
+	/** True if current admin request is one of our slugs */
 	public static function is_fbm_page_request(): bool {
 		if ( empty( $_GET['page'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			return false;
@@ -38,7 +38,7 @@ final class AdminScope {
 		return in_array( $page, self::FBM_PAGE_SLUGS, true );
 	}
 
-	/** Helper: returns 'fbm-themed ' or original */
+	/** Append a scoping class on whitelisted screens */
 	public static function add_body_class( string $classes ): string {
 		if ( self::is_fbm_page_request() ) {
 			$classes .= ' fbm-themed ';

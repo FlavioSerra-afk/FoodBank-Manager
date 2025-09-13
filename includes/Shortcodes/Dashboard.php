@@ -46,8 +46,8 @@ if ( ! current_user_can( 'fb_manage_dashboard' ) ) { // phpcs:ignore WordPress.W
 return '<div class="fbm-no-permission">' . esc_html__( 'You do not have permission to view the dashboard.', 'foodbank-manager' ) . '</div>';
 }
 
-wp_enqueue_style( 'fbm-public', FBM_URL . 'assets/css/public.css' );
-wp_add_inline_style( 'fbm-public', Theme::css_variables() );
+wp_enqueue_style( 'fbm-public', plugins_url( 'assets/css/public.css', FBM_FILE ), array(), Plugin::VERSION ); // @phpstan-ignore-line
+ wp_add_inline_style( 'fbm-public', Theme::css_variables() );
 add_filter( 'body_class', array( Theme::class, 'body_class' ) );
 wp_enqueue_style( 'fbm-frontend-dashboard' );
 
