@@ -1,4 +1,4 @@
-Docs-Revision: 2025-09-12 (v1.11.4 patch finalize)
+Docs-Revision: 2025-09-12 (v1.11.5 patch finalize)
 # Diagnostics Hub
 
 The diagnostics hub surfaces operational information for administrators. It
