@@ -34,6 +34,7 @@ final class ThrottleController {
                 'permission_callback' => function (): bool {
                     return current_user_can( 'fb_manage_diagnostics' );
                 },
+                'args'                => array(),
             )
         );
         register_rest_route(
