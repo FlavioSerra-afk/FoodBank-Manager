@@ -39,13 +39,13 @@ class ThemePage {
     public static function boot(): void {
         add_action(
             'admin_enqueue_scripts',
-            static function (): void {
-                $screen = get_current_screen();
-                if ( $screen && 'foodbank_page_fbm_theme' === $screen->id ) {
-                    wp_enqueue_style( 'wp-color-picker' );
-                    wp_enqueue_script( 'wp-color-picker' );
-                    wp_enqueue_script( 'fbm-theme-admin', FBM_URL . 'assets/js/theme-admin.js', array( 'wp-color-picker' ), Plugin::VERSION, true );
+            static function ( string $hook ): void {
+                if ( ! \FBM\Core\Assets::is_fbm_screen( $hook ) || ( strpos( $hook, 'fbm_theme' ) === false && strpos( $hook, 'fbm_settings' ) === false ) ) {
+                        return;
                 }
+                wp_enqueue_style( 'wp-color-picker' );
+                wp_enqueue_script( 'wp-color-picker' );
+                wp_enqueue_script( 'fbm-theme-admin', FBM_URL . 'assets/js/theme-admin.js', array( 'wp-color-picker' ), Plugin::VERSION, true );
             }
         );
         add_action(

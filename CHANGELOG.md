@@ -1,3 +1,9 @@
+## [2.0.2] — 2025-09-13
+### Fixed
+- “Apply theme to admin menus” now correctly themes all FBM admin pages by tightening screen detection and enqueue order.
+### Dev
+- Centralized screen gating helper; ensured inline tokens attach to an enqueued handle; added tests for hook
+
 ## [2.0.1] — 2025-09-13
 ### Added
 - Token-driven scaffolding for all core UI elements (inputs, nav, informational, containers, icons), wired to Design & Theme.

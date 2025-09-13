@@ -20,14 +20,17 @@ final class AdminMenusThemeTest extends \BaseTestCase {
         $this->assertStringContainsString('fbm-preset--light', $classes);
         $this->assertStringContainsString('fbm-menus--glass', $classes);
 
-        $GLOBALS['fbm_styles'] = array();
-        $GLOBALS['fbm_test_screen_id'] = 'plugins';
         $assets = new Assets();
-        $assets->enqueue_admin();
+        $assets->register();
+        $GLOBALS['fbm_styles'] = array();
+        do_action('admin_enqueue_scripts', 'foodbank-manager_page_fbm_reports');
         $this->assertArrayHasKey('fbm-menus', $GLOBALS['fbm_styles']);
         $count = count($GLOBALS['fbm_styles']);
-        $assets->enqueue_admin();
+        do_action('admin_enqueue_scripts', 'foodbank-manager_page_fbm_reports');
         $this->assertSame($count, count($GLOBALS['fbm_styles']));
+        $GLOBALS['fbm_styles'] = array();
+        do_action('admin_enqueue_scripts', 'plugins.php');
+        $this->assertArrayNotHasKey('fbm-menus', $GLOBALS['fbm_styles']);
 
         $css = (string) file_get_contents(__DIR__ . '/../../assets/css/menus.css');
         $this->assertStringContainsString('#adminmenu', $css);
