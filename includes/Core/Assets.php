@@ -22,109 +22,144 @@ use function wp_create_nonce;
 use function current_user_can;
 use function get_current_screen;
 use function get_option;
+use function esc_html;
 
 /**
  * Manages script and style loading.
  */
 class Assets {
-		/**
-		 * Register hooks.
-		 *
-		 * @return void
-		 */
-        public function register(): void {
-                add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin' ), 10 );
-                add_filter( 'admin_body_class', array( '\FBM\Core\AdminScope', 'add_body_class' ) );
-                $theme = Theme::get();
-                if ( ! is_admin() && ! empty( $theme['apply_front_menus'] ) ) {
-                        add_filter( 'body_class', array( Theme::class, 'body_class' ) );
-                        add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_front_menus' ) );
-                }
+    /**
+     * Register hooks.
+     *
+     * @return void
+     */
+    public function register(): void {
+        add_action('admin_enqueue_scripts', [$this, 'enqueue_admin'], 10);
+        add_action('admin_enqueue_scripts', [$this, 'enqueue_theme_page'], 10);
+        add_filter('admin_body_class', ['\\FBM\\Core\\AdminScope', 'add_admin_body_class']);
+        if (defined('FBM_DEBUG_THEME') && FBM_DEBUG_THEME) {
+            add_action('admin_notices', [self::class, 'debug_notice']);
+        }
+        $theme = Theme::get();
+        if (!is_admin() && !empty($theme['apply_front_menus'])) {
+            add_filter('body_class', [Theme::class, 'body_class']);
+            add_action('wp_enqueue_scripts', [$this, 'enqueue_front_menus']);
+        }
+    }
+
+    /**
+     * Enqueue admin assets when on plugin screens.
+     */
+    public function enqueue_admin(string $hook_suffix = ''): void {
+        $opt   = get_option('fbm_theme', Theme::defaults());
+        $apply = $opt['apply_admin'] ?? ($opt['apply_admin_chrome'] ?? false);
+        if (empty($apply)) {
+            return;
+        }
+        if (!\FBM\Core\AdminScope::is_fbm_admin_request()) {
+            return;
         }
 
-		/**
-		 * Enqueue admin assets when on plugin screens.
-		 *
-		 * @return void
-		 */
-        public function enqueue_admin( string $hook = '' ): void {
-                $opt = get_option( 'fbm_theme', Theme::defaults() );
-                if ( empty( $opt['apply_admin_chrome'] ) ) {
-                        return;
-                }
-                if ( ! \FBM\Core\AdminScope::is_fbm_page_request() ) {
-                        return;
-                }
+        wp_register_style('fbm-admin', plugins_url('assets/css/admin.css', FBM_FILE), [], Plugin::VERSION);
+        wp_enqueue_style('fbm-admin');
+        wp_add_inline_style('fbm-admin', Theme::css_variables());
 
-                wp_register_style( 'fbm-admin', plugins_url( 'assets/css/admin.css', FBM_FILE ), array(), Plugin::VERSION );
-                wp_enqueue_style( 'fbm-admin' );
-                wp_add_inline_style( 'fbm-admin', Theme::css_variables() );
+        wp_register_style('fbm-menus', plugins_url('assets/css/menus.css', FBM_FILE), [], Plugin::VERSION);
+        wp_enqueue_style('fbm-menus');
+        add_filter('admin_body_class', [Theme::class, 'admin_body_class']);
 
-                wp_register_style( 'fbm-menus', plugins_url( 'assets/css/menus.css', FBM_FILE ), array(), Plugin::VERSION );
-                wp_enqueue_style( 'fbm-menus' );
-                add_filter( 'admin_body_class', array( Theme::class, 'admin_body_class' ) );
+        wp_register_style('fbm-admin-tables', plugins_url('assets/css/admin-tables.css', FBM_FILE), [], Plugin::VERSION);
+        wp_enqueue_style('fbm-admin-tables');
 
-                wp_register_style( 'fbm-admin-tables', plugins_url( 'assets/css/admin-tables.css', FBM_FILE ), array(), Plugin::VERSION );
-                wp_enqueue_style( 'fbm-admin-tables' );
+        $screen = function_exists('get_current_screen') ? get_current_screen() : null;
 
-                $screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+        if ($screen && 'foodbank_page_fbm_attendance' === $screen->id && current_user_can('fb_manage_attendance')) {
+            wp_enqueue_script('fbm-qrcode', plugins_url('assets/js/qrcode.min.js', FBM_FILE), [], Plugin::VERSION, true);
+        }
+        if ($screen && 'foodbank_page_fbm_form_builder' === $screen->id && current_user_can('fbm_manage_forms')) { // phpcs:ignore WordPress.WP.Capabilities.Unknown
+            wp_enqueue_script('fbm-form-builder', plugins_url('assets/js/fbm-form-builder.js', FBM_FILE), [], Plugin::VERSION, true);
+        }
+        if ($screen && 'foodbank_page_fbm_diagnostics' === $screen->id && current_user_can('fb_manage_diagnostics')) {
+            wp_enqueue_script('fbm-admin-diagnostics', plugins_url('assets/js/admin-diagnostics.js', FBM_FILE), [], Plugin::VERSION, true);
+        }
+        if ($screen && 'foodbank_page_fbm_permissions' === $screen->id && current_user_can('fb_manage_permissions')) {
+            wp_enqueue_script('fbm-admin-permissions', plugins_url('assets/js/admin-permissions.js', FBM_FILE), [], Plugin::VERSION, true);
+            wp_localize_script('fbm-admin-permissions', 'fbmPerms', [
+                'url'   => admin_url('admin-post.php'),
+                'nonce' => wp_create_nonce('fbm_perms_role_toggle'),
+            ]);
+        }
+        if ($screen && 'foodbank_page_fbm_shortcodes' === $screen->id && current_user_can('fbm_manage_forms')) { // phpcs:ignore WordPress.WP.Capabilities.Unknown
+            wp_enqueue_script('fbm-admin-shortcodes', plugins_url('assets/js/admin-shortcodes.js', FBM_FILE), [], Plugin::VERSION, true);
+        }
+    }
 
-                if ( $screen && 'foodbank_page_fbm_attendance' === $screen->id && current_user_can( 'fb_manage_attendance' ) ) {
-                        wp_enqueue_script( 'fbm-qrcode', plugins_url( 'assets/js/qrcode.min.js', FBM_FILE ), array(), Plugin::VERSION, true );
-                }
-                if ( $screen && 'foodbank_page_fbm_form_builder' === $screen->id && current_user_can( 'fbm_manage_forms' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown
-                        wp_enqueue_script( 'fbm-form-builder', plugins_url( 'assets/js/fbm-form-builder.js', FBM_FILE ), array(), Plugin::VERSION, true );
-                }
-                if ( $screen && 'foodbank_page_fbm_diagnostics' === $screen->id && current_user_can( 'fb_manage_diagnostics' ) ) {
-                        wp_enqueue_script( 'fbm-admin-diagnostics', plugins_url( 'assets/js/admin-diagnostics.js', FBM_FILE ), array(), Plugin::VERSION, true );
-                }
-                if ( $screen && 'foodbank_page_fbm_permissions' === $screen->id && current_user_can( 'fb_manage_permissions' ) ) {
-                        wp_enqueue_script( 'fbm-admin-permissions', plugins_url( 'assets/js/admin-permissions.js', FBM_FILE ), array(), Plugin::VERSION, true );
-                        wp_localize_script( 'fbm-admin-permissions', 'fbmPerms', array(
-                                'url'   => admin_url( 'admin-post.php' ),
-                                'nonce' => wp_create_nonce( 'fbm_perms_role_toggle' ),
-                        ) );
-                }
-               if ( $screen && 'foodbank_page_fbm_shortcodes' === $screen->id && current_user_can( 'fbm_manage_forms' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown
-                       wp_enqueue_script( 'fbm-admin-shortcodes', plugins_url( 'assets/js/admin-shortcodes.js', FBM_FILE ), array(), Plugin::VERSION, true );
-               }
-       }
+    /**
+     * Theme page specific assets.
+     */
+    public function enqueue_theme_page(): void {
+        if (\FBM\Core\AdminScope::current_page_slug() !== 'fbm_theme') {
+            return;
+        }
+        wp_enqueue_style('wp-color-picker');
+        wp_enqueue_script('wp-color-picker');
+        wp_enqueue_script('fbm-theme-admin', plugins_url('assets/js/theme-admin.js', FBM_FILE), ['wp-color-picker', 'jquery'], Plugin::VERSION, true);
+    }
 
-		/**
-		 * Legacy front-end enqueue for tests.
-		 *
-		 * @deprecated
-		 */
-	public function enqueue_front(): void {
-			$content = (string) ( $GLOBALS['fbm_post_content'] ?? '' );
-		if ( str_contains( $content, '[fbm_dashboard]' ) ) {
-				$GLOBALS['fbm_styles']['fbm-frontend-dashboard'] = true;
-		}
-	}
+    /**
+     * Optional debug overlay.
+     */
+    public static function debug_notice(): void {
+        if (!\FBM\Core\AdminScope::is_fbm_admin_request()) {
+            return;
+        }
+        $screenId = (function_exists('get_current_screen') && get_current_screen()) ? get_current_screen()->id : '(unavailable)';
+        $enq      = !empty($GLOBALS['fbm_styles']['fbm-admin']) ? 'yes' : 'no';
+        $inline   = !empty($GLOBALS['fbm_inline_styles']['fbm-admin']) ? 'yes' : 'no';
+        echo '<div class="notice notice-info"><p><strong>FBM Theme Debug</strong><br>' .
+            'hook_suffix: ' . esc_html($GLOBALS['hook_suffix'] ?? '(none)') . '<br>' .
+            'screen->id: ' . esc_html($screenId) . '<br>' .
+            'page: ' . esc_html(\FBM\Core\AdminScope::current_page_slug()) . '<br>' .
+            'fbm-admin enqueued: ' . esc_html($enq) . '<br>' .
+            'inline vars: ' . esc_html($inline) .
+            '</p></div>';
+    }
 
-		/**
-		 * Enqueue front-end menu styles when enabled.
-		 */
-	public function enqueue_front_menus(): void {
-			$theme = Theme::get();
-		if ( empty( $theme['apply_front_menus'] ) ) {
-				return;
-		}
-                                wp_register_style( 'fbm-menus', plugins_url( 'assets/css/menus.css', FBM_FILE ), array(), Plugin::VERSION );
-                                wp_enqueue_style( 'fbm-menus' );
-	}
+    /**
+     * Legacy front-end enqueue for tests.
+     *
+     * @deprecated
+     */
+    public function enqueue_front(): void {
+        $content = (string) ($GLOBALS['fbm_post_content'] ?? '');
+        if (str_contains($content, '[fbm_dashboard]')) {
+            $GLOBALS['fbm_styles']['fbm-frontend-dashboard'] = true;
+        }
+    }
 
-        /**
-         * Legacy helper removed.
-         */
-        public static function print_admin_head(): void {}
+    /**
+     * Enqueue front-end menu styles when enabled.
+     */
+    public function enqueue_front_menus(): void {
+        $theme = Theme::get();
+        if (empty($theme['apply_front_menus'])) {
+            return;
+        }
+        wp_register_style('fbm-menus', plugins_url('assets/css/menus.css', FBM_FILE), [], Plugin::VERSION);
+        wp_enqueue_style('fbm-menus');
+    }
+
+    /**
+     * Legacy helper removed.
+     */
+    public static function print_admin_head(): void {}
 }
 
 namespace FBM\Core;
 
 final class Assets {
-    /** @deprecated Use AdminScope::is_fbm_page_request(). */
-    public static function is_fbm_screen( ?string $hook = null ): bool { // phpcs:ignore Squiz.Commenting.FunctionComment.WrongStyle
-        return AdminScope::is_fbm_page_request();
+    /** @deprecated Use AdminScope::is_fbm_admin_request(). */
+    public static function is_fbm_screen(?string $hook = null): bool { // phpcs:ignore Squiz.Commenting.FunctionComment.WrongStyle
+        return AdminScope::is_fbm_admin_request();
     }
 }
