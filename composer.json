@@ -13,14 +13,20 @@
     "psr-4": {
       "FBM\\": "includes/",
       "FoodBankManager\\": "includes/"
-    }
+    },
+    "exclude-from-classmap": [
+      "tests/"
+    ]
   },
   "autoload-dev": {
     "files": [
       "tests/Support/WPStubs.php",
       "tests/Support/Rbac.php",
       "phpstan-bootstrap.php"
-    ]
+    ],
+    "psr-4": {
+      "FBM\\Tests\\": "tests/"
+    }
   },
   "require-dev": {
     "cebe/markdown": "^1.2",
@@ -78,7 +84,8 @@
       "dealerdirect/phpcodesniffer-composer-installer": true,
       "phpstan/extension-installer": true
     },
-    "sort-packages": true
+    "sort-packages": true,
+    "optimize-autoloader": true
   },
-  "version": "2.0.5"
+  "version": "2.0.6"
 }

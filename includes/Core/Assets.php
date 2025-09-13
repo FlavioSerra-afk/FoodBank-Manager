@@ -36,7 +36,7 @@ class Assets {
     public function register(): void {
         add_action('admin_enqueue_scripts', [$this, 'enqueue_admin'], 10);
         add_action('admin_enqueue_scripts', [$this, 'enqueue_theme_page'], 10);
-        add_filter('admin_body_class', ['\\FBM\\Core\\AdminScope', 'add_admin_body_class']);
+        add_filter('admin_body_class', ['\\FBM\\Core\\AdminScope', 'body_class']);
         if (defined('FBM_DEBUG_THEME') && FBM_DEBUG_THEME) {
             add_action('admin_notices', [self::class, 'debug_notice']);
         }
@@ -53,10 +53,7 @@ class Assets {
     public function enqueue_admin(string $hook_suffix = ''): void {
         $opt   = get_option('fbm_theme', Theme::defaults());
         $apply = $opt['apply_admin'] ?? ($opt['apply_admin_chrome'] ?? false);
-        if (empty($apply)) {
-            return;
-        }
-        if (!\FBM\Core\AdminScope::is_fbm_admin_request()) {
+        if (empty($apply) || !\FBM\Core\AdminScope::is_fbm_admin()) {
             return;
         }
 
@@ -98,7 +95,7 @@ class Assets {
      * Theme page specific assets.
      */
     public function enqueue_theme_page(): void {
-        if (\FBM\Core\AdminScope::current_page_slug() !== 'fbm_theme') {
+        if (\FBM\Core\AdminScope::slug() !== 'fbm_theme') {
             return;
         }
         wp_enqueue_style('wp-color-picker');
@@ -110,7 +107,7 @@ class Assets {
      * Optional debug overlay.
      */
     public static function debug_notice(): void {
-        if (!\FBM\Core\AdminScope::is_fbm_admin_request()) {
+        if (!\FBM\Core\AdminScope::is_fbm_admin()) {
             return;
         }
         $screenId = (function_exists('get_current_screen') && get_current_screen()) ? get_current_screen()->id : '(unavailable)';
@@ -119,7 +116,7 @@ class Assets {
         echo '<div class="notice notice-info"><p><strong>FBM Theme Debug</strong><br>' .
             'hook_suffix: ' . esc_html($GLOBALS['hook_suffix'] ?? '(none)') . '<br>' .
             'screen->id: ' . esc_html($screenId) . '<br>' .
-            'page: ' . esc_html(\FBM\Core\AdminScope::current_page_slug()) . '<br>' .
+            'page: ' . esc_html(\FBM\Core\AdminScope::slug()) . '<br>' .
             'fbm-admin enqueued: ' . esc_html($enq) . '<br>' .
             'inline vars: ' . esc_html($inline) .
             '</p></div>';
@@ -158,8 +155,8 @@ class Assets {
 namespace FBM\Core;
 
 final class Assets {
-    /** @deprecated Use AdminScope::is_fbm_admin_request(). */
+    /** @deprecated Use AdminScope::is_fbm_admin(). */
     public static function is_fbm_screen(?string $hook = null): bool { // phpcs:ignore Squiz.Commenting.FunctionComment.WrongStyle
-        return AdminScope::is_fbm_admin_request();
+        return AdminScope::is_fbm_admin();
     }
 }
