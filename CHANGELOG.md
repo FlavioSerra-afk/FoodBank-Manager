@@ -7,6 +7,61 @@
 - Added AdminScope helper & optional diagnostics for hook/screen/slug.
 - Hardened packaging script to produce production-safe vendor autoload.
 
+## [1.8.0](https://github.com/FlavioSerra-afk/FoodBank-Manager/compare/1.8.0...1.8.0) (2025-09-13)
+
+
+### Features
+
+* add jobs admin UI and mail replay ([8c967fd](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/8c967fd8a1f7aecb0f0d55a683ec22408be24217))
+* add jobs admin UI and mail replay ([bd0ae6a](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/bd0ae6a446d569c35b97f2a3c38f82a558eec7e4))
+* add jobs capability and version bump ([359d9c8](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/359d9c89ff5c97929ac0533a5c01c4740167fb45))
+* diagnostics mail test UI and telemetry polish ([948fc48](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/948fc4852fd5e5ae362327c2f4e435bfb4ff3876))
+* **diagnostics:** mail test UI, rate-limit headers, and privacy preview ([631d320](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/631d3209995ca01a7a112caf2a62dde3a2c983cd))
+* **jobs:** add manage jobs capability ([34e2022](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/34e2022bad0b6cb198f20ba13e7159fcb48e506b))
+* **jobs:** enforce capability checks and add caps doctor ([f606029](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/f60602901b50dbcffed0b454e3400b0dff88150c))
+* **jobs:** enforce capability checks and add caps doctor ([d39e617](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/d39e6174da237ce6a1369fe1349379d327bafbb1))
+* **security:** per-role scan throttle and admin settings ([af558d3](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/af558d3e4d42f5095a579be98ffa3f7b3d269f6a))
+* **security:** per-role scan throttles and admin settings ([c9f495e](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/c9f495e947318cbaef9a9088e19c65d2c6c184be))
+* **theme:** map ui components to tokens and svg icons ([6b73852](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/6b7385220a14057113ff4f4ff92bc308e42cbeb0))
+* **theme:** token-driven components and icon system ([6b90e6d](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/6b90e6d6ad1cb079d439b3cdb9db604091b8bac2))
+
+
+### Bug Fixes
+
+* **admin:** scope theming and restore dashboard grid ([7b369a8](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/7b369a85611bd46b1077411eae1cd68b39848dfd))
+* **core:** finalize v1.11.3 with quiet i18n and header parity ([f7b96fc](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/f7b96fc564bc4450d9491dafd749c522eee7fda2))
+* production autoload and FBM admin theming ([6891131](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/6891131ac13fa9ad7b2b41cf53fba1cebe33f751))
+* **rest:** enforce arg validation and nonce checks ([05233c1](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/05233c1a67c8087d8b740b6e1621c20bdd00f674))
+* **rest:** normalize error contract ([060d39b](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/060d39ba1d63d0f79a2ea22b8139053a7be737a7))
+* **rest:** normalize error contract ([9b567cb](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/9b567cb2e61a4d6705074341e91cab0818dd0ae3))
+* scope theming and restore dashboard grid ([95403ba](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/95403ba594cfaa150c2af2ccb77b3681b6f4d9c8))
+* **theme:** apply admin theme across FBM pages ([78317ce](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/78317cec906f7aa7b0cfb504dfe9dbb7283997fd))
+* **theme:** register fbm_theme option with color picker ([7c8880c](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/7c8880cee15d28ce49e94c907862dd33e1339995))
+* **theme:** register option and add color picker ([f93712b](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/f93712b61efb420dbbb608111c04ab622db27d80))
+* **theme:** register settings API and tokenized variables ([8fb5df3](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/8fb5df3be4b6b217c761d328c4217f793aeb2b50))
+* **uninstall:** multisite cleanup and csv export hardening ([d8c811c](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/d8c811cf9ba969b780cbfba9b51a00798c9a2ada))
+
+
+### Miscellaneous Chores
+
+* align release-please to 1.8.0 ([d2f62b3](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/d2f62b35a185ad2b07fb7394da20d59e24ef64fc))
+* finalize 1.11.2 release ([38a53ae](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/38a53ae62a37039303c2b198c0bfa74926f0815c))
+* harden throttling and diagnostics ([f3d135d](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/f3d135d80d6733a2bce0ff966c8d4526f2ff8568))
+* **main:** release 1.8.0 ([07e3b4c](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/07e3b4c68e614f933fcc0b49619738b30a1f8306))
+* **main:** release 1.8.0 ([9c887af](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/9c887af187e516de451f7a6e58cce19633c8bd1f))
+* **main:** release 1.8.0 ([be89bfe](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/be89bfe44782868879f167c7fb325b3e77143491))
+* **main:** release 1.8.0 ([d354d6d](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/d354d6d9bc9e02819aa110fbbb64bc331b48f478))
+* **release:** align release state ([36308d5](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/36308d59239e45e239e5a7b8fc24433ed41c1ca7))
+* **release:** finalize 1.11.4 ([2b6e066](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/2b6e06626a9b79b15dbb5748e447dc1386af449d))
+* **release:** finalize 1.11.4 ([f2da99b](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/f2da99b8fcbb8495417cc1e8d1ef37273fbd2d4e))
+* **release:** prep v1.11.5 ([59134c5](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/59134c53f751c64762c4dafe248e50cdb6752ecd))
+* **release:** prep v1.11.5 ([69eaa16](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/69eaa16a5a615899dac2c27ce9f4093ab9eff47c))
+* **release:** prepare 1.11.6 ([82eaacd](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/82eaacd5d9e850611548f86d1855399b9abd03dd))
+* **release:** prepare 1.11.6 ([f27c0d0](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/f27c0d025d47a3b79c7ff093d57f11d38da84d89))
+* **release:** prepare v1.11.1 ([13e3deb](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/13e3deb768c5d41a57c964b1276841074d2876a3))
+* **release:** prepare v1.11.1 ([8a2589f](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/8a2589fb11bb670f564fc90eee1a0a21a4624e78))
+* **release:** v1.11.3 ([6a72f11](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/6a72f112cde9374114e9cb3fe17654ebea088b1f))
+
 ## [2.0.5] — 2025-09-13
 ### Fixed
 - Theming now attaches only to FBM admin pages by slug whitelist and the correct admin enqueue hook.
