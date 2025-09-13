@@ -1,3 +1,11 @@
+## [2.0.9] — 2025-09-13
+### Added
+- AIW-style Menu tokens (icon size/opacity, paddings, item height, active/hover colors, divider, radius), scoped to `.fbm-scope`.
+### Fixed
+- Every Theme control now maps to explicit tokens and selectors inside FBM UI; no changes to WordPress admin chrome.
+### Dev
+- Extended NoBleedSelectorsTest and added ThemeControlToTokenTest & InlineOrderStillCorrectTest.
+
 ## [2.0.8] — 2025-09-13
 ### Fixed
 - Fully scoped theming to FBM pages/shortcodes via `.fbm-scope` and cascade `@layer`.
