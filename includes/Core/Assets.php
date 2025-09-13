@@ -55,7 +55,7 @@ class Assets {
             return;
         }
         $opt = get_option('fbm_theme', Theme::defaults());
-        if (empty($opt['apply_admin'])) {
+        if ('foodbank_page_fbm_theme' !== $hook_suffix && empty($opt['apply_admin'])) {
             return;
         }
 
