@@ -44,8 +44,6 @@ try {
             wp_clear_scheduled_hook( 'fbm_retention_hourly' );
             wp_clear_scheduled_hook( 'fbm_retention_tick' );
             wp_clear_scheduled_hook( 'fbm_jobs_tick' );
-            wp_clear_scheduled_hook( 'fbm_cron_cleanup' );
-            wp_clear_scheduled_hook( 'fbm_cron_email_retry' );
         }
     };
 

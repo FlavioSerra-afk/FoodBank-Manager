@@ -152,18 +152,14 @@ namespace {
             }
             $now            = time();
             self::$cron_next = array(
-                'fbm_retention_tick'   => $now - 400,
-                'fbm_cron_cleanup'     => $now + 100,
-                'fbm_cron_email_retry' => $now + 100,
+                'fbm_retention_tick' => $now - 400,
+                'fbm_jobs_tick'      => $now + 100,
             );
             global $fbm_options;
             $fbm_options['fbm_retention_tick_last_run'] = 123;
             $fbm_options['cron'] = array(
                 $now - 400 => array( 'fbm_retention_tick' => array() ),
-               $now + 100 => array(
-                    'fbm_cron_cleanup'     => array(),
-                    'fbm_cron_email_retry' => array(),
-                ),
+                $now + 100 => array( 'fbm_jobs_tick' => array() ),
             );
             if ( ! defined( 'ABSPATH' ) ) {
                 define( 'ABSPATH', __DIR__ );

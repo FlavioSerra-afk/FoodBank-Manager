@@ -1,7 +1,7 @@
-Docs-Revision: 2025-09-12 (v1.11.3 patch finalize)
+Docs-Revision: 2025-09-12 (v1.11.4 patch finalize)
 # FoodBank Manager Plugin
 
-Stable tag: 1.11.3
+Stable tag: 1.11.4
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.1
@@ -42,6 +42,13 @@ FoodBank Manager normalizes error responses across REST and AJAX (see [Docs/API.
 | 429 | Rate limited |
 
 Rate-limited responses include `RateLimit-Limit`, `RateLimit-Remaining`, and `RateLimit-Reset` headers; 429 responses also send `Retry-After` so clients know when to retry.
+
+## Support & Troubleshooting
+
+- **Logs & debug**: PHP errors are recorded in `wp-content/debug.log`. Mail activity appears under Diagnostics → Mail Log.
+- **System report**: Diagnostics → Report offers a "Copy report" button for a JSON system report.
+- **Cron runs**: Diagnostics → Cron Health lists plugin cron hooks with last and next run times.
+- See [Docs/API.md](../Docs/API.md) for the error contract and [Docs/Diagnostics.md](../Docs/Diagnostics.md) for rate-limit and multisite notes.
 
 ## Manual release steps
 

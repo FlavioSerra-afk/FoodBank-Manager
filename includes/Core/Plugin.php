@@ -23,7 +23,7 @@ use FoodBankManager\Core\Screen;
 
 final class Plugin {
 
-    public const VERSION = '1.11.3'; // x-release-please-version
+    public const VERSION = '1.11.4'; // x-release-please-version
     private const OPTION_VERSION = 'fbm_version';
 
         private static ?Plugin $instance = null;
@@ -178,8 +178,6 @@ final class Plugin {
                                 'fbm_retention_hourly',
                                 'fbm_retention_tick',
                                 'fbm_jobs_tick',
-                                'fbm_cron_cleanup',
-                                'fbm_cron_email_retry',
                         );
                         foreach ( array_unique( $hooks ) as $hook ) {
                                 wp_clear_scheduled_hook( $hook );
