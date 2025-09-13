@@ -3,9 +3,9 @@ Contributors: portuguese-community-centre-london
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.1
-Version: 1.11.4
+Version: 1.11.5
 x-release-please-start-version
-Stable tag: 1.11.4
+Stable tag: 1.11.5
 x-release-please-end
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -27,6 +27,12 @@ It stores data in encrypted tables, enforces least-privilege access, and offers 
 
 == Multisite ==
 Network administrators receive `fbm_manage_jobs` on activation; a migration flag prevents re-granting on upgrade. Cron hooks such as retention are idempotent and safe per site.
+
+== Support & Troubleshooting ==
+* **Logs & debug**: PHP errors are recorded in `wp-content/debug.log`. Mail activity appears under Diagnostics → Mail Log.
+* **System report**: Diagnostics → Report offers a "Copy report" button for a JSON system report.
+* **Cron runs**: Diagnostics → Cron Health lists plugin cron hooks with last and next run times.
+* See [Docs/API.md](Docs/API.md) for the error contract and [Docs/Diagnostics.md](Docs/Diagnostics.md) for rate-limit and multisite notes.
 
 == Upgrade Notice ==
 = 1.5.0 =

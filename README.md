@@ -1,7 +1,7 @@
-Docs-Revision: 2025-09-12 (v1.11.4 patch finalize)
+Docs-Revision: 2025-09-12 (v1.11.5 patch finalize)
 # FoodBank Manager Plugin
 
-Stable tag: 1.11.4
+Stable tag: 1.11.5
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.1
