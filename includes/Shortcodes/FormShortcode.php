@@ -35,15 +35,15 @@ final class FormShortcode {
 	 * @return string
 	 */
 	public static function render( array $atts = array() ): string {
-					$theme = Theme::get();
-			$front         = $theme['front'];
-		if ( ! empty( $front['enabled'] ) ) {
-wp_enqueue_style( 'fbm-public', plugins_url( 'assets/css/public.css', FBM_FILE ), array(), Plugin::VERSION ); // @phpstan-ignore-line
-                                               wp_add_inline_style( 'fbm-public', Theme::css_vars( $front, '.fbm-public' ) . Theme::glass_support_css() );
-			if ( ! empty( $theme['apply_front_menus'] ) ) {
-				add_filter( 'body_class', array( Theme::class, 'body_class' ) );
-			}
-		}
+        $theme = Theme::get();
+        $front         = $theme['front'];
+                if ( ! empty( $front['enabled'] ) ) {
+        wp_enqueue_style( 'fbm-public', plugins_url( 'assets/css/public.css', FBM_FILE ), array(), Plugin::VERSION ); // @phpstan-ignore-line
+                                               wp_add_inline_style( 'fbm-public', Theme::css_variables() );
+                        if ( ! empty( $theme['apply_front_menus'] ) ) {
+                                add_filter( 'body_class', array( Theme::class, 'body_class' ) );
+                        }
+                }
 			$atts = shortcode_atts(
 				array(
 					'id'     => '',

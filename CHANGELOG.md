@@ -1,3 +1,11 @@
+## [2.0.5] — 2025-09-13
+### Fixed
+- Theming now attaches only to FBM admin pages by slug whitelist and the correct admin enqueue hook.
+- Inline token CSS reliably prints by attaching to an already enqueued handle.
+- Dashboard restored to 3×3 grid at desktop with responsive fallbacks.
+### Dev
+- Added AdminScope helper + optional FBM_DEBUG_THEME diagnostics overlay (hook, screen id, page slug).
+
 ## [2.0.4] — 2025-09-13
 ### Fixed
 - Scoped theming to explicit FBM admin pages via slug whitelist and body class; corrected enqueue order so token CSS always prints.
