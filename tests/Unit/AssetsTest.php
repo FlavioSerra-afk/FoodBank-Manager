@@ -29,6 +29,18 @@ final class AssetsTest extends \BaseTestCase {
         $this->assertArrayNotHasKey('fbm-admin', $GLOBALS['fbm_inline_styles']);
     }
 
+    public function test_theme_page_enqueues_css_even_without_apply_admin(): void {
+        Options::update('theme', array('apply_admin' => false));
+        $assets = new Assets();
+        $assets->register();
+        $GLOBALS['fbm_styles'] = [];
+        $GLOBALS['fbm_inline_styles'] = [];
+        $_GET['page'] = 'fbm_theme';
+        do_action('admin_enqueue_scripts', 'foodbank_page_fbm_theme');
+        $this->assertArrayHasKey('fbm-admin', $GLOBALS['fbm_styles']);
+        $this->assertArrayHasKey('fbm-admin', $GLOBALS['fbm_inline_styles']);
+    }
+
     public function test_frontend_dashboard_css_gated_by_shortcode(): void {
         $assets = new Assets();
         $GLOBALS['fbm_is_singular'] = true;
