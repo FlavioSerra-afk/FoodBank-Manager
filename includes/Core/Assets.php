@@ -50,18 +50,14 @@ class Assets {
      * Enqueue admin assets when on plugin screens.
      */
     public function enqueue_admin(string $hook_suffix = ''): void {
-        $opt   = get_option('fbm_theme', Theme::defaults());
-        $apply = $opt['apply_admin'] ?? ($opt['apply_admin_chrome'] ?? false);
-        if (empty($apply) || !\FBM\Core\AdminScope::is_fbm_admin()) {
+        $opt = get_option('fbm_theme', Theme::defaults());
+        if (empty($opt['apply_admin']) || !\FBM\Core\AdminScope::is_fbm_admin_request()) {
             return;
         }
 
         wp_register_style('fbm-admin', plugins_url('assets/css/admin.css', FBM_FILE), [], Plugin::VERSION);
         wp_enqueue_style('fbm-admin');
-        wp_add_inline_style('fbm-admin', Theme::css_variables());
-
-        wp_register_style('fbm-menus', plugins_url('assets/css/menus.css', FBM_FILE), [], Plugin::VERSION);
-        wp_enqueue_style('fbm-menus');
+        wp_add_inline_style('fbm-admin', Theme::css_variables_scoped());
 
         wp_register_style('fbm-admin-tables', plugins_url('assets/css/admin-tables.css', FBM_FILE), [], Plugin::VERSION);
         wp_enqueue_style('fbm-admin-tables');

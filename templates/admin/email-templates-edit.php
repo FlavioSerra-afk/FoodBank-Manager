@@ -4,8 +4,9 @@
  *
  * @var string $slug
  * @var array<string,mixed> $tpl
- */
+*/
 ?>
+<?php echo '<div id="fbm-ui" class="fbm-scope fbm-app">'; ?>
 <form method="post">
 	<input type="hidden" name="fbm_action" value="save">
 	<input type="hidden" name="slug" value="<?php echo esc_attr( $slug ); ?>">
@@ -18,5 +19,6 @@
 		<label><?php esc_html_e( 'Body', 'foodbank-manager' ); ?><br>
 		<textarea name="body" rows="10" cols="50" class="large-text code"><?php echo esc_textarea( $tpl['body'] ?? '' ); ?></textarea></label>
 	</p>
-	<p><button type="submit" class="button button-primary"><?php esc_html_e( 'Save', 'foodbank-manager' ); ?></button></p>
+		<p><button type="submit" class="button button-primary"><?php esc_html_e( 'Save', 'foodbank-manager' ); ?></button></p>
 </form>
+<?php echo '</div>'; ?>

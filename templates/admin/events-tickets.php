@@ -4,6 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 ?>
+<?php echo '<div id="fbm-ui" class="fbm-scope fbm-app">'; ?>
 <div class="wrap fbm-admin"><div class="fbm-section fbm-tickets">
 <h2><?php esc_html_e( 'Tickets', 'foodbank-manager' ); ?></h2>
 <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
@@ -47,3 +48,4 @@ if ( ! defined( 'ABSPATH' ) ) {
 </table>
 <?php endif; ?>
 </div></div>
+<?php echo '</div>'; ?>

@@ -6,6 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 ?>
+<?php echo '<div id="fbm-ui" class="fbm-scope fbm-app">'; ?>
 <div class="wrap fbm-admin">
 <?php \FBM\Core\Trace::mark( 'admin:events' ); ?>
 <h1><?php esc_html_e( 'Events', 'foodbank-manager' ); ?></h1>
@@ -80,3 +81,4 @@ if ( ! defined( 'ABSPATH' ) ) {
 </form>
 <?php if ( $editing ) { require FBM_PATH . 'templates/admin/events-tickets.php'; } ?>
 </div>
+<?php echo '</div>'; ?>

@@ -2,14 +2,14 @@
 # This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: FoodBank Manager 2.0.7\n"
+"Project-Id-Version: FoodBank Manager 2.0.8\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/FoodBank-Manager\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-09-13T14:38:18+00:00\n"
+"POT-Creation-Date: 2025-09-13T15:34:48+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: foodbank-manager\n"
@@ -92,8 +92,8 @@ msgstr ""
 #: includes/Admin/DatabaseTable.php:81
 #: templates/admin/attendance.php:83
 #: templates/admin/emails.php:22
-#: templates/admin/events-tickets.php:18
-#: templates/admin/events.php:36
+#: templates/admin/events-tickets.php:19
+#: templates/admin/events.php:37
 #: templates/admin/jobs.php:20
 #: templates/admin/permissions.php:75
 #: templates/admin/permissions.php:121
@@ -105,24 +105,24 @@ msgid "View"
 msgstr ""
 
 #: includes/Admin/DatabaseTable.php:181
-#: templates/admin/database-view.php:88
+#: templates/admin/database-view.php:89
 msgid "CSV"
 msgstr ""
 
 #: includes/Admin/DatabaseTable.php:185
-#: templates/admin/database-view.php:92
+#: templates/admin/database-view.php:93
 #: templates/admin/emails.php:80
-#: templates/admin/events-tickets.php:37
-#: templates/admin/events.php:52
+#: templates/admin/events-tickets.php:38
+#: templates/admin/events.php:53
 msgid "Are you sure?"
 msgstr ""
 
 #: includes/Admin/DatabaseTable.php:189
-#: templates/admin/database-view.php:96
+#: templates/admin/database-view.php:97
 #: templates/admin/database.php:50
-#: templates/admin/events.php:52
-#: templates/admin/form-builder.php:32
-#: templates/admin/forms-builder.php:54
+#: templates/admin/events.php:53
+#: templates/admin/form-builder.php:33
+#: templates/admin/forms-builder.php:55
 #: templates/admin/settings.php:106
 msgid "Delete"
 msgstr ""
@@ -272,7 +272,7 @@ msgstr ""
 
 #: includes/Admin/Menu.php:138
 #: includes/Admin/Menu.php:139
-#: templates/admin/events.php:11
+#: templates/admin/events.php:12
 msgid "Events"
 msgstr ""
 
@@ -291,7 +291,7 @@ msgstr ""
 
 #: includes/Admin/Menu.php:166
 #: includes/Admin/Menu.php:167
-#: templates/admin/forms-builder.php:30
+#: templates/admin/forms-builder.php:31
 #: templates/admin/forms.php:22
 msgid "Forms"
 msgstr ""
@@ -303,7 +303,7 @@ msgstr ""
 
 #: includes/Admin/Menu.php:184
 #: includes/Admin/Menu.php:185
-#: templates/admin/email-templates-list.php:10
+#: templates/admin/email-templates-list.php:11
 #: templates/admin/emails.php:15
 msgid "Email Templates"
 msgstr ""
@@ -502,13 +502,13 @@ msgid "Invalid reply-to address."
 msgstr ""
 
 #: includes/Database/Columns.php:33
-#: templates/admin/entry.php:19
+#: templates/admin/entry.php:20
 #: templates/admin/jobs.php:16
 msgid "ID"
 msgstr ""
 
 #: includes/Database/Columns.php:38
-#: templates/admin/database-view.php:37
+#: templates/admin/database-view.php:38
 msgid "Created"
 msgstr ""
 
@@ -521,12 +521,12 @@ msgstr ""
 #: includes/Database/Columns.php:56
 #: includes/Exports/CsvExporter.php:86
 #: templates/admin/attendance.php:76
-#: templates/admin/diagnostics-privacy.php:20
-#: templates/admin/diagnostics-privacy.php:33
-#: templates/admin/diagnostics-privacy.php:42
+#: templates/admin/diagnostics-privacy.php:21
+#: templates/admin/diagnostics-privacy.php:34
+#: templates/admin/diagnostics-privacy.php:43
 #: templates/admin/diagnostics.php:101
-#: templates/admin/entry.php:31
-#: templates/admin/gdpr.php:37
+#: templates/admin/entry.php:32
+#: templates/admin/gdpr.php:38
 #: templates/admin/settings.php:27
 msgid "Email"
 msgstr ""
@@ -534,20 +534,20 @@ msgstr ""
 #: includes/Database/Columns.php:67
 #: includes/Exports/CsvExporter.php:87
 #: templates/admin/attendance.php:77
-#: templates/admin/entry.php:35
+#: templates/admin/entry.php:36
 msgid "Postcode"
 msgstr ""
 
 #: includes/Database/Columns.php:78
 #: includes/Shortcodes/Entries.php:33
 #: templates/admin/attendance.php:32
-#: templates/admin/database-view.php:41
+#: templates/admin/database-view.php:42
 #: templates/admin/database.php:65
 #: templates/admin/diagnostics.php:207
 #: templates/admin/diagnostics.php:272
-#: templates/admin/events-tickets.php:18
-#: templates/admin/events.php:35
-#: templates/admin/events.php:73
+#: templates/admin/events-tickets.php:19
+#: templates/admin/events.php:36
+#: templates/admin/events.php:74
 #: templates/admin/jobs.php:19
 msgid "Status"
 msgstr ""
@@ -567,7 +567,7 @@ msgid "No"
 msgstr ""
 
 #: includes/Exports/CsvExporter.php:84
-#: templates/admin/gdpr.php:42
+#: templates/admin/gdpr.php:43
 #: templates/public/attendance-manager.php:22
 msgid "Application ID"
 msgstr ""
@@ -766,7 +766,7 @@ msgstr ""
 #: includes/Shortcodes/Entries.php:36
 #: templates/admin/attendance.php:67
 #: templates/admin/database.php:98
-#: templates/admin/events.php:27
+#: templates/admin/events.php:28
 #: templates/admin/reports.php:32
 msgid "Filter"
 msgstr ""
@@ -849,7 +849,7 @@ msgstr ""
 
 #: templates/admin/attendance.php:29
 #: templates/admin/database.php:58
-#: templates/admin/events.php:25
+#: templates/admin/events.php:26
 #: templates/admin/reports.php:11
 msgid "From"
 msgstr ""
@@ -857,7 +857,7 @@ msgstr ""
 #: templates/admin/attendance.php:30
 #: templates/admin/database.php:62
 #: templates/admin/diagnostics.php:116
-#: templates/admin/events.php:26
+#: templates/admin/events.php:27
 #: templates/admin/reports.php:14
 msgid "To"
 msgstr ""
@@ -925,7 +925,7 @@ msgid "Override & Check-in"
 msgstr ""
 
 #: templates/admin/attendance.php:169
-#: templates/admin/entry.php:49
+#: templates/admin/entry.php:50
 msgid "Unmask"
 msgstr ""
 
@@ -1054,37 +1054,37 @@ msgstr ""
 msgid "New form"
 msgstr ""
 
-#: templates/admin/database-view.php:28
-#: templates/admin/entry.php:15
+#: templates/admin/database-view.php:29
+#: templates/admin/entry.php:16
 msgid "Entry"
 msgstr ""
 
-#: templates/admin/database-view.php:32
+#: templates/admin/database-view.php:33
 msgid "Back to list"
 msgstr ""
 
-#: templates/admin/database-view.php:45
+#: templates/admin/database-view.php:46
 msgid "Consent time"
 msgstr ""
 
-#: templates/admin/database-view.php:49
+#: templates/admin/database-view.php:50
 #: templates/admin/forms.php:27
 msgid "Fields"
 msgstr ""
 
-#: templates/admin/database-view.php:59
+#: templates/admin/database-view.php:60
 msgid "Sensitive"
 msgstr ""
 
-#: templates/admin/database-view.php:69
+#: templates/admin/database-view.php:70
 msgid "Sensitive fields are masked."
 msgstr ""
 
-#: templates/admin/database-view.php:72
+#: templates/admin/database-view.php:73
 msgid "Files"
 msgstr ""
 
-#: templates/admin/database-view.php:81
+#: templates/admin/database-view.php:82
 msgid "Back"
 msgstr ""
 
@@ -1126,8 +1126,8 @@ msgid "Consent"
 msgstr ""
 
 #: templates/admin/database.php:88
-#: templates/admin/events.php:19
-#: templates/admin/gdpr.php:47
+#: templates/admin/events.php:20
+#: templates/admin/gdpr.php:48
 #: templates/admin/permissions.php:111
 msgid "Search"
 msgstr ""
@@ -1141,110 +1141,110 @@ msgstr ""
 msgid "Save Columns"
 msgstr ""
 
-#: templates/admin/diagnostics-pdf.php:17
+#: templates/admin/diagnostics-pdf.php:18
 msgid "PDF"
 msgstr ""
 
-#: templates/admin/diagnostics-pdf.php:21
+#: templates/admin/diagnostics-pdf.php:22
 msgid "Logo ID"
 msgstr ""
 
-#: templates/admin/diagnostics-pdf.php:25
+#: templates/admin/diagnostics-pdf.php:26
 msgid "Organisation Name"
 msgstr ""
 
-#: templates/admin/diagnostics-pdf.php:29
+#: templates/admin/diagnostics-pdf.php:30
 msgid "Address"
 msgstr ""
 
-#: templates/admin/diagnostics-pdf.php:33
+#: templates/admin/diagnostics-pdf.php:34
 msgid "Primary Color"
 msgstr ""
 
-#: templates/admin/diagnostics-pdf.php:37
+#: templates/admin/diagnostics-pdf.php:38
 msgid "Footer Text"
 msgstr ""
 
-#: templates/admin/diagnostics-pdf.php:41
+#: templates/admin/diagnostics-pdf.php:42
 msgid "Page Size"
 msgstr ""
 
-#: templates/admin/diagnostics-pdf.php:45
+#: templates/admin/diagnostics-pdf.php:46
 msgid "Orientation"
 msgstr ""
 
-#: templates/admin/diagnostics-pdf.php:47
+#: templates/admin/diagnostics-pdf.php:48
 msgid "Portrait"
 msgstr ""
 
-#: templates/admin/diagnostics-pdf.php:48
+#: templates/admin/diagnostics-pdf.php:49
 msgid "Landscape"
 msgstr ""
 
-#: templates/admin/diagnostics-pdf.php:52
+#: templates/admin/diagnostics-pdf.php:53
 msgid "Preview PDF"
 msgstr ""
 
-#: templates/admin/diagnostics-privacy.php:17
+#: templates/admin/diagnostics-privacy.php:18
 #: templates/admin/settings.php:29
 msgid "Privacy"
 msgstr ""
 
-#: templates/admin/diagnostics-privacy.php:24
+#: templates/admin/diagnostics-privacy.php:25
 msgid "Page size"
 msgstr ""
 
-#: templates/admin/diagnostics-privacy.php:29
+#: templates/admin/diagnostics-privacy.php:30
 msgid "Preview SAR"
 msgstr ""
 
-#: templates/admin/diagnostics-privacy.php:38
+#: templates/admin/diagnostics-privacy.php:39
 msgid "Run erasure (dry-run)"
 msgstr ""
 
-#: templates/admin/diagnostics-privacy.php:47
+#: templates/admin/diagnostics-privacy.php:48
 msgid "Run erasure now"
 msgstr ""
 
-#: templates/admin/diagnostics-privacy.php:62
+#: templates/admin/diagnostics-privacy.php:63
 msgid "More data available…"
 msgstr ""
 
-#: templates/admin/diagnostics-report.php:12
+#: templates/admin/diagnostics-report.php:13
 msgid "System Report"
 msgstr ""
 
-#: templates/admin/diagnostics-report.php:16
+#: templates/admin/diagnostics-report.php:17
 msgid "Copy report"
 msgstr ""
 
-#: templates/admin/diagnostics-report.php:19
+#: templates/admin/diagnostics-report.php:20
 #: templates/admin/permissions.php:147
 msgid "Download JSON"
 msgstr ""
 
-#: templates/admin/diagnostics-security.php:15
+#: templates/admin/diagnostics-security.php:16
 msgid "Security & Throttling"
 msgstr ""
 
-#: templates/admin/diagnostics-security.php:21
+#: templates/admin/diagnostics-security.php:22
 msgid "Window (seconds)"
 msgstr ""
 
-#: templates/admin/diagnostics-security.php:25
+#: templates/admin/diagnostics-security.php:26
 msgid "Base limit"
 msgstr ""
 
-#: templates/admin/diagnostics-security.php:29
+#: templates/admin/diagnostics-security.php:30
 msgid "Role multipliers"
 msgstr ""
 
-#: templates/admin/diagnostics-security.php:31
+#: templates/admin/diagnostics-security.php:32
 #: templates/admin/permissions.php:39
 msgid "Role"
 msgstr ""
 
-#: templates/admin/diagnostics-security.php:31
+#: templates/admin/diagnostics-security.php:32
 msgid "Multiplier"
 msgstr ""
 
@@ -1321,7 +1321,7 @@ msgid "When"
 msgstr ""
 
 #: templates/admin/diagnostics.php:117
-#: templates/admin/email-templates-edit.php:14
+#: templates/admin/email-templates-edit.php:15
 #: templates/admin/emails.php:21
 #: templates/admin/emails.php:60
 #: templates/admin/emails.php:102
@@ -1453,16 +1453,16 @@ msgstr ""
 msgid "Next run"
 msgstr ""
 
-#: templates/admin/email-templates-edit.php:18
+#: templates/admin/email-templates-edit.php:19
 #: templates/admin/emails.php:67
 msgid "Body"
 msgstr ""
 
-#: templates/admin/email-templates-edit.php:21
+#: templates/admin/email-templates-edit.php:22
 #: templates/admin/emails.php:77
-#: templates/admin/events.php:79
-#: templates/admin/form-builder.php:26
-#: templates/admin/forms-builder.php:48
+#: templates/admin/events.php:80
+#: templates/admin/form-builder.php:27
+#: templates/admin/forms-builder.php:49
 #: templates/admin/permissions.php:92
 msgid "Save"
 msgstr ""
@@ -1473,7 +1473,7 @@ msgid "Email Log"
 msgstr ""
 
 #: templates/admin/emails.php:47
-#: templates/admin/events.php:47
+#: templates/admin/events.php:48
 msgid "Edit"
 msgstr ""
 
@@ -1499,128 +1499,128 @@ msgid "Tokens"
 msgstr ""
 
 #: templates/admin/emails.php:101
-#: templates/admin/forms-builder.php:40
-#: templates/admin/gdpr.php:50
+#: templates/admin/forms-builder.php:41
+#: templates/admin/gdpr.php:51
 #: templates/admin/shortcodes.php:51
 #: templates/admin/shortcodes.php:59
 msgid "Preview"
 msgstr ""
 
-#: templates/admin/entry.php:23
+#: templates/admin/entry.php:24
 msgid "First Name"
 msgstr ""
 
-#: templates/admin/entry.php:27
+#: templates/admin/entry.php:28
 msgid "Last Name"
 msgstr ""
 
-#: templates/admin/entry.php:43
+#: templates/admin/entry.php:44
 msgid "Export PDF"
 msgstr ""
 
-#: templates/admin/entry.php:52
+#: templates/admin/entry.php:53
 msgid "History"
 msgstr ""
 
-#: templates/admin/entry.php:53
+#: templates/admin/entry.php:54
 msgid "No history available."
 msgstr ""
 
-#: templates/admin/events-tickets.php:8
+#: templates/admin/events-tickets.php:9
 msgid "Tickets"
 msgstr ""
 
-#: templates/admin/events-tickets.php:14
+#: templates/admin/events-tickets.php:15
 msgid "Issue"
 msgstr ""
 
-#: templates/admin/events-tickets.php:18
+#: templates/admin/events-tickets.php:19
 msgid "Recipient"
 msgstr ""
 
-#: templates/admin/events-tickets.php:29
+#: templates/admin/events-tickets.php:30
 msgid "Send"
 msgstr ""
 
-#: templates/admin/events-tickets.php:35
+#: templates/admin/events-tickets.php:36
 msgid "Regenerate"
 msgstr ""
 
-#: templates/admin/events-tickets.php:41
+#: templates/admin/events-tickets.php:42
 msgid "Revoke"
 msgstr ""
 
-#: templates/admin/events.php:13
+#: templates/admin/events.php:14
 msgid "Event saved."
 msgstr ""
 
-#: templates/admin/events.php:15
+#: templates/admin/events.php:16
 msgid "Event deleted."
 msgstr ""
 
-#: templates/admin/events.php:21
-msgid "All statuses"
-msgstr ""
-
 #: templates/admin/events.php:22
-#: templates/admin/events.php:75
-msgid "Active"
+msgid "All statuses"
 msgstr ""
 
 #: templates/admin/events.php:23
 #: templates/admin/events.php:76
-msgid "Cancelled"
+msgid "Active"
 msgstr ""
 
-#: templates/admin/events.php:32
-#: templates/admin/events.php:67
-#: templates/admin/form-builder.php:19
-msgid "Title"
+#: templates/admin/events.php:24
+#: templates/admin/events.php:77
+msgid "Cancelled"
 msgstr ""
 
 #: templates/admin/events.php:33
 #: templates/admin/events.php:68
-msgid "Starts"
+#: templates/admin/form-builder.php:20
+msgid "Title"
 msgstr ""
 
 #: templates/admin/events.php:34
 #: templates/admin/events.php:69
+msgid "Starts"
+msgstr ""
+
+#: templates/admin/events.php:35
+#: templates/admin/events.php:70
 msgid "Ends"
 msgstr ""
 
-#: templates/admin/events.php:60
+#: templates/admin/events.php:61
 msgid "Edit Event"
 msgstr ""
 
-#: templates/admin/events.php:60
+#: templates/admin/events.php:61
 msgid "Add Event"
 msgstr ""
 
-#: templates/admin/events.php:70
+#: templates/admin/events.php:71
 msgid "Location"
 msgstr ""
 
-#: templates/admin/events.php:71
+#: templates/admin/events.php:72
 msgid "Capacity"
 msgstr ""
 
-#: templates/admin/events.php:72
+#: templates/admin/events.php:73
 msgid "Notes"
 msgstr ""
 
-#: templates/admin/form-builder.php:14
+#: templates/admin/form-builder.php:15
 msgid "Form Builder"
 msgstr ""
 
-#: templates/admin/form-builder.php:25
+#: templates/admin/form-builder.php:26
 msgid "Mask sensitive fields"
 msgstr ""
 
-#: templates/admin/form-builder.php:50
+#: templates/admin/form-builder.php:51
 msgid "New Form"
 msgstr ""
 
-#: templates/admin/forms-builder.php:46
+#: templates/admin/forms-builder.php:47
 msgid "Schema JSON"
 msgstr ""
 
@@ -1633,35 +1633,35 @@ msgstr ""
 msgid "Copied"
 msgstr ""
 
-#: templates/admin/gdpr.php:34
+#: templates/admin/gdpr.php:35
 msgid "GDPR Export"
 msgstr ""
 
 #. translators: %d: applications count
-#: templates/admin/gdpr.php:54
+#: templates/admin/gdpr.php:55
 #, php-format
 msgid "Applications: %d"
 msgstr ""
 
 #. translators: %d: attachments count
-#: templates/admin/gdpr.php:59
+#: templates/admin/gdpr.php:60
 #, php-format
 msgid "Attachments: %d"
 msgstr ""
 
 #. translators: %d: attendance records count
-#: templates/admin/gdpr.php:64
+#: templates/admin/gdpr.php:65
 #, php-format
 msgid "Attendance: %d"
 msgstr ""
 
 #. translators: %d: email logs count
-#: templates/admin/gdpr.php:69
+#: templates/admin/gdpr.php:70
 #, php-format
 msgid "Email logs: %d"
 msgstr ""
 
-#: templates/admin/gdpr.php:77
+#: templates/admin/gdpr.php:78
 msgid "Export SAR"
 msgstr ""
 

@@ -1,9 +1,25 @@
 /* FBM admin list tables */
-:root{--fbm-focus-ring:color-mix(in oklab,var(--fbm-color-accent) 75%,black 25%);--fbm-blur-max:12px;}
-.fbm-admin .wp-list-table thead th{position:sticky;top:0;background:rgba(255 255 255/ calc(var(--fbm-glass-alpha) + .04));z-index:1;}
-.fbm-admin .wp-list-table tbody tr{background:rgba(255 255 255/var(--fbm-glass-alpha));}
-.fbm-admin .row-actions a:focus-visible,.fbm-admin .tablenav-pages a:focus-visible,.fbm-admin .tablenav-pages input:focus-visible{outline:2px solid var(--fbm-focus-ring);outline-offset:2px;}
-@supports (backdrop-filter:blur(2px)){.fbm-admin .wp-list-table thead th,.fbm-admin .wp-list-table tbody tr{backdrop-filter:blur(min(var(--fbm-glass-blur),var(--fbm-blur-max)));-webkit-backdrop-filter:blur(min(var(--fbm-glass-blur),var(--fbm-blur-max)));}}
-@media (forced-colors:active){.fbm-admin .wp-list-table thead th,.fbm-admin .wp-list-table tbody tr{background:Canvas;color:CanvasText;border-color:ButtonText;box-shadow:none;} .fbm-admin .row-actions a:focus-visible,.fbm-admin .tablenav-pages a:focus-visible,.fbm-admin .tablenav-pages input:focus-visible{outline:2px solid CanvasText;}}
-@media (prefers-reduced-transparency:reduce){.fbm-admin .wp-list-table thead th,.fbm-admin .wp-list-table tbody tr{background:color-mix(in oklab,var(--fbm-color-surface,#fff) 95%,transparent);backdrop-filter:none;-webkit-backdrop-filter:none;}}
-@media (prefers-reduced-motion:reduce){.fbm-admin .wp-list-table *{transition:none;}}
+@layer fbm {
+  .fbm-scope{--fbm-focus-ring:color-mix(in oklab,var(--fbm-color-accent) 75%,black 25%);--fbm-blur-max:12px}
+  .fbm-scope .fbm-admin .wp-list-table thead th{position:sticky;top:0;background:rgba(255 255 255/ calc(var(--fbm-glass-alpha) + .04));z-index:1}
+  .fbm-scope .fbm-admin .wp-list-table tbody tr{background:rgba(255 255 255/var(--fbm-glass-alpha))}
+  .fbm-scope .fbm-admin .row-actions a:focus-visible,
+  .fbm-scope .fbm-admin .tablenav-pages a:focus-visible,
+  .fbm-scope .fbm-admin .tablenav-pages input:focus-visible{outline:2px solid var(--fbm-focus-ring);outline-offset:2px}
+  @supports (backdrop-filter:blur(2px)){
+    .fbm-scope .fbm-admin .wp-list-table thead th,
+    .fbm-scope .fbm-admin .wp-list-table tbody tr{backdrop-filter:blur(min(var(--fbm-glass-blur),var(--fbm-blur-max)));-webkit-backdrop-filter:blur(min(var(--fbm-glass-blur),var(--fbm-blur-max)))}
+  }
+  @media (forced-colors:active){
+    .fbm-scope .fbm-admin .wp-list-table thead th,
+    .fbm-scope .fbm-admin .wp-list-table tbody tr{background:Canvas;color:CanvasText;border-color:ButtonText;box-shadow:none}
+    .fbm-scope .fbm-admin .row-actions a:focus-visible,
+    .fbm-scope .fbm-admin .tablenav-pages a:focus-visible,
+    .fbm-scope .fbm-admin .tablenav-pages input:focus-visible{outline:2px solid CanvasText}
+  }
+  @media (prefers-reduced-transparency:reduce){
+    .fbm-scope .fbm-admin .wp-list-table thead th,
+    .fbm-scope .fbm-admin .wp-list-table tbody tr{background:color-mix(in oklab,var(--fbm-color-surface,#fff) 95%,transparent);backdrop-filter:none;-webkit-backdrop-filter:none}
+  }
+  @media (prefers-reduced-motion:reduce){.fbm-scope .fbm-admin .wp-list-table *{transition:none}}
+}

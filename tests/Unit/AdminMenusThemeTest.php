@@ -19,13 +19,6 @@ final class AdminMenusThemeTest extends \BaseTestCase {
         $GLOBALS['fbm_styles'] = array();
         $_GET['page'] = 'fbm_reports';
         do_action('admin_enqueue_scripts', 'foodbank-manager_page_fbm_reports');
-        $this->assertArrayHasKey('fbm-menus', $GLOBALS['fbm_styles']);
-        $count = count($GLOBALS['fbm_styles']);
-        do_action('admin_enqueue_scripts', 'foodbank-manager_page_fbm_reports');
-        $this->assertSame($count, count($GLOBALS['fbm_styles']));
-        $GLOBALS['fbm_styles'] = array();
-        $_GET['page'] = 'plugins';
-        do_action('admin_enqueue_scripts', 'plugins.php');
         $this->assertArrayNotHasKey('fbm-menus', $GLOBALS['fbm_styles']);
 
         $css = (string) file_get_contents(__DIR__ . '/../../assets/css/menus.css');

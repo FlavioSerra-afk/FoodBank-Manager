@@ -14,14 +14,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 $data = json_decode( (string) ( $entry['data_json'] ?? '' ), true );
 if ( ! is_array( $data ) ) {
-	$data = array();
+		$data = array();
 }
 $pii = Crypto::decryptSensitive( (string) ( $entry['pii_encrypted_blob'] ?? '' ) );
 if ( ! $can_sensitive ) {
-	$pii['email']     = Helpers::mask_email( $pii['email'] ?? '' );
-	$data['postcode'] = Helpers::mask_postcode( $data['postcode'] ?? '' );
+		$pii['email']     = Helpers::mask_email( $pii['email'] ?? '' );
+		$data['postcode'] = Helpers::mask_postcode( $data['postcode'] ?? '' );
 }
 ?>
+<?php echo '<div id="fbm-ui" class="fbm-scope fbm-app">'; ?>
 <div class="wrap fbm-admin">
 <?php \FBM\Core\Trace::mark( 'admin:database_view' ); ?>
 <h1>
@@ -98,3 +99,4 @@ if ( ! $can_sensitive ) {
 <?php endif; ?>
 </p>
 </div>
+<?php echo '</div>'; ?>

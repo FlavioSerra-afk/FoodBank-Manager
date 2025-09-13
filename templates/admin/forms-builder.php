@@ -24,8 +24,9 @@
  * Delete nonce.
  *
  * @var string $nonce_delete Delete nonce.
- */
+*/
 ?>
+<?php echo '<div id="fbm-ui" class="fbm-scope fbm-app">'; ?>
 <div class="wrap fbm-admin">
 	<h1><?php esc_html_e( 'Forms', 'foodbank-manager' ); ?></h1>
 	<div class="fbm-forms-list">
@@ -47,11 +48,12 @@
 				<textarea name="schema" rows="10" cols="80"><?php echo esc_textarea( wp_json_encode( $current ) ); ?></textarea></label></p>
 				<p><button type="submit" class="button button-primary"><?php esc_html_e( 'Save', 'foodbank-manager' ); ?></button></p>
 		</form>
-		<form method="post" onsubmit="return confirm('Are you sure?');">
-				<input type="hidden" name="fbm_action" value="delete" />
-				<input type="hidden" name="slug" value="<?php echo esc_attr( $current['meta']['slug'] ?? '' ); ?>" />
-				<input type="hidden" name="_wpnonce" value="<?php echo esc_attr( $nonce_delete ); ?>" />
-				<p><button type="submit" class="button button-secondary"><?php esc_html_e( 'Delete', 'foodbank-manager' ); ?></button></p>
-		</form>
-		<?php endif; ?>
+				<form method="post" onsubmit="return confirm('Are you sure?');">
+								<input type="hidden" name="fbm_action" value="delete" />
+								<input type="hidden" name="slug" value="<?php echo esc_attr( $current['meta']['slug'] ?? '' ); ?>" />
+								<input type="hidden" name="_wpnonce" value="<?php echo esc_attr( $nonce_delete ); ?>" />
+								<p><button type="submit" class="button button-secondary"><?php esc_html_e( 'Delete', 'foodbank-manager' ); ?></button></p>
+				</form>
+				<?php endif; ?>
 </div>
+<?php echo '</div>'; ?>

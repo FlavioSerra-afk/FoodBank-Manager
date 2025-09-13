@@ -10,6 +10,7 @@
 declare(strict_types=1);
 
 ?>
+<?php echo '<div id="fbm-ui" class="fbm-scope fbm-app">'; ?>
 <div class="wrap fbm-admin">
 <h1><?php esc_html_e( 'Form Builder', 'foodbank-manager' ); ?></h1>
 <?php if ( $current ) : ?>
@@ -67,3 +68,4 @@ declare(strict_types=1);
 </ul>
 <?php endif; ?>
 </div>
+<?php echo '</div>'; ?>

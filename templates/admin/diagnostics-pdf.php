@@ -14,6 +14,7 @@ use FoodBankManager\Admin\DiagnosticsPdf;
 $brand = $brand ?? array();
 $action = admin_url( 'admin-post.php' );
 ?>
+<?php echo '<div id="fbm-ui" class="fbm-scope fbm-app">'; ?>
 <h2><?php esc_html_e( 'PDF', 'foodbank-manager' ); ?></h2>
 <form method="post" action="<?php echo esc_url( $action ); ?>">
     <input type="hidden" name="action" value="<?php echo esc_attr( DiagnosticsPdf::ACTION_PREVIEW ); ?>" />
@@ -51,3 +52,4 @@ $action = admin_url( 'admin-post.php' );
     <?php wp_nonce_field( DiagnosticsPdf::ACTION_PREVIEW ); ?>
     <?php submit_button( __( 'Preview PDF', 'foodbank-manager' ), 'secondary', '', false ); ?>
 </form>
+<?php echo '</div>'; ?>
