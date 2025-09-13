@@ -40,12 +40,11 @@ class ThemePage {
         add_action(
             'admin_enqueue_scripts',
             static function ( string $hook ): void {
-                if ( ! \FBM\Core\Assets::is_fbm_screen( $hook ) || ( strpos( $hook, 'fbm_theme' ) === false && strpos( $hook, 'fbm_settings' ) === false ) ) {
-                        return;
+                if ( \FBM\Core\AdminScope::is_fbm_page_request() && ( $_GET['page'] ?? '' ) === 'fbm_theme' ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+                        wp_enqueue_style( 'wp-color-picker' );
+                        wp_enqueue_script( 'wp-color-picker' );
+                        wp_enqueue_script( 'fbm-theme-admin', FBM_URL . 'assets/js/theme-admin.js', array( 'wp-color-picker', 'jquery' ), Plugin::VERSION, true );
                 }
-                wp_enqueue_style( 'wp-color-picker' );
-                wp_enqueue_script( 'wp-color-picker' );
-                wp_enqueue_script( 'fbm-theme-admin', FBM_URL . 'assets/js/theme-admin.js', array( 'wp-color-picker' ), Plugin::VERSION, true );
             }
         );
         add_action(

@@ -11,6 +11,9 @@ final class DashboardShortcodeTest extends \BaseTestCase {
         if (!defined('FBM_PATH')) {
             define('FBM_PATH', dirname(__DIR__, 2) . '/');
         }
+        if (!defined('FBM_URL')) {
+            define('FBM_URL', '');
+        }
     }
 
     public function testSanitizePeriod(): void {

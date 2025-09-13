@@ -15,13 +15,13 @@ use function add_filter;
 use function wp_enqueue_style;
 use function wp_register_style;
 use function wp_add_inline_style;
-use function esc_html;
 use function wp_enqueue_script;
 use function wp_localize_script;
 use function admin_url;
 use function wp_create_nonce;
 use function current_user_can;
 use function get_current_screen;
+use function get_option;
 
 /**
  * Manages script and style loading.
@@ -34,6 +34,7 @@ class Assets {
 		 */
         public function register(): void {
                 add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin' ), 10 );
+                add_filter( 'admin_body_class', array( '\\FBM\\Core\\AdminScope', 'add_body_class' ) );
                 $theme = Theme::get();
                 if ( ! is_admin() && ! empty( $theme['apply_front_menus'] ) ) {
                         add_filter( 'body_class', array( Theme::class, 'body_class' ) );
@@ -47,20 +48,21 @@ class Assets {
 		 * @return void
 		 */
         public function enqueue_admin( string $hook = '' ): void {
-                if ( ! \FBM\Core\Assets::is_fbm_screen( $hook ) ) {
+                $opt = get_option( 'fbm_theme', Theme::defaults() );
+                if ( empty( $opt['apply_admin_chrome'] ) ) {
+                        return;
+                }
+                if ( ! \FBM\Core\AdminScope::is_fbm_page_request() ) {
                         return;
                 }
 
                 wp_register_style( 'fbm-admin', FBM_URL . 'assets/css/admin.css', array(), Plugin::VERSION );
                 wp_enqueue_style( 'fbm-admin' );
+                wp_add_inline_style( 'fbm-admin', Theme::css_variables() );
 
-                $theme = Theme::get();
-                if ( ! empty( $theme['apply_admin_chrome'] ) ) {
-                        wp_add_inline_style( 'fbm-admin', Theme::css_variables() );
-                        wp_register_style( 'fbm-menus', FBM_URL . 'assets/css/menus.css', array(), Plugin::VERSION );
-                        wp_enqueue_style( 'fbm-menus' );
-                        add_filter( 'admin_body_class', array( Theme::class, 'admin_body_class' ) );
-                }
+                wp_register_style( 'fbm-menus', FBM_URL . 'assets/css/menus.css', array(), Plugin::VERSION );
+                wp_enqueue_style( 'fbm-menus' );
+                add_filter( 'admin_body_class', array( Theme::class, 'admin_body_class' ) );
 
                 wp_register_style( 'fbm-admin-tables', FBM_URL . 'assets/css/admin-tables.css', array(), Plugin::VERSION );
                 wp_enqueue_style( 'fbm-admin-tables' );
@@ -120,27 +122,9 @@ class Assets {
 
 namespace FBM\Core;
 
-use function get_current_screen;
-use function sanitize_key;
-
 final class Assets {
-    /** Return true if current admin page is one of our FBM screens. */
-    public static function is_fbm_screen( ?string $hook = null ): bool {
-        if ( $hook && ( strpos( $hook, 'foodbank-manager' ) !== false || strpos( $hook, 'fbm_' ) !== false || strpos( $hook, 'toplevel_page_fbm' ) === 0 ) ) {
-            return true;
-        }
-
-        if ( function_exists( 'get_current_screen' ) ) {
-            $screen = get_current_screen();
-            if ( $screen && ( strpos( $screen->id, 'foodbank-manager' ) !== false || strpos( $screen->id, 'fbm_' ) !== false || strpos( $screen->id, 'toplevel_page_fbm' ) === 0 ) ) {
-                return true;
-            }
-        }
-
-        if ( ! empty( $_GET['page'] ) && strpos( sanitize_key( (string) $_GET['page'] ), 'fbm_' ) === 0 ) {
-            return true;
-        }
-
-        return false;
+    /** @deprecated Use AdminScope::is_fbm_page_request(). */
+    public static function is_fbm_screen( ?string $hook = null ): bool { // phpcs:ignore Squiz.Commenting.FunctionComment.WrongStyle
+        return AdminScope::is_fbm_page_request();
     }
 }
