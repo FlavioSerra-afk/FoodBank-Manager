@@ -1,3 +1,12 @@
+## [2.0.1] — 2025-09-13
+### Added
+- Token-driven scaffolding for all core UI elements (inputs, nav, informational, containers, icons), wired to Design & Theme.
+- SVG icon system (currentColor) with ARIA-friendly rendering.
+### Improved
+- Accessible defaults: visible :focus-visible, `@media (forced-colors: active)` fallbacks, `accent-color` for form controls.
+### Dev
+- Extended token schema with component aliases; docs updated with component map and a11y notes.
+
 ## 2.0.0 — Fix & Repair
 ### Fixed
 - Design & Theme settings reliably save via proper Settings API registration.

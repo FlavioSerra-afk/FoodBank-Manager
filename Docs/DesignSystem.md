@@ -18,6 +18,20 @@ Defines visual tokens and component specs used across admin and front-end surfac
 
 Radios and checkboxes inherit `--fbm-color-accent` via CSS `accent-color`. Focus outlines use `:focus-visible` and respect high contrast via `@media (forced-colors: active)`.
 
+## Component Map
+
+| Component | Tokens |
+|---|---|
+| Button | `--fbm-button-bg`, `--fbm-button-fg`, `--fbm-button-border`, `--fbm-button-hover-bg`, `--fbm-button-hover-fg` |
+| Link | `--fbm-link-fg`, `--fbm-link-hover-fg`, `--fbm-link-visited-fg`, `--fbm-link-underline` |
+| Input | `--fbm-input-bg`, `--fbm-input-fg`, `--fbm-input-border`, `--fbm-input-placeholder`, `--fbm-input-focus-border` |
+| Card | `--fbm-card-bg`, `--fbm-card-fg`, `--fbm-card-border`, `--fbm-card-shadow` |
+| Alert | `--fbm-alert-info-bg`, `--fbm-alert-info-fg`, `--fbm-alert-info-border` |
+| Tooltip | `--fbm-tooltip-bg`, `--fbm-tooltip-fg` |
+| Tabs | `--fbm-tab-active-fg`, `--fbm-tab-active-border`, `--fbm-tab-inactive-fg` |
+| Table | `--fbm-table-header-bg`, `--fbm-table-header-fg`, `--fbm-table-row-hover-bg` |
+| Icon | `--fbm-icon-color`, `--fbm-icon-muted` |
+
 ## Layered glass recipe
 
 - **Top hairline:** `--fbm-inset-top` adds a subtle highlight.
@@ -44,6 +58,13 @@ Radios and checkboxes inherit `--fbm-color-accent` via CSS `accent-color`. Focus
 - Wrappers: `.fbm-admin` for admin pages, `.fbm-public` for front-end blocks.
 - Tokens emitted: `--fbm-color-accent`, `--fbm-color-text`, `--fbm-color-surface`, `--fbm-color-border`, `--fbm-shadow-rgb`, `--fbm-glass-alpha`, `--fbm-glass-blur`, `--fbm-card-radius`, `--fbm-border-w`, `--fbm-elev-shadow`, `--fbm-inset-top`, `--fbm-inset-bottom`, `--fbm-inset-glow`.
 - Fallbacks: blur is gated by `@supports (backdrop-filter: blur(1px))` ([MDN](https://developer.mozilla.org/docs/Web/CSS/backdrop-filter)). `@media (forced-colors: active)` ([MDN](https://developer.mozilla.org/docs/Web/CSS/@media/forced-colors)), `@media (prefers-reduced-transparency: reduce)` ([MDN](https://developer.mozilla.org/docs/Web/CSS/@media/prefers-reduced-transparency)), and `@media (prefers-reduced-motion: reduce)` ([MDN](https://developer.mozilla.org/docs/Web/CSS/@media/prefers-reduced-motion)) provide accessible fallbacks ([Chrome](https://developer.chrome.com/docs/web-platform/forced-colors/)).
+
+### Accessibility
+
+- `:focus-visible` is used for keyboard focus indicators ([MDN](https://developer.mozilla.org/docs/Web/CSS/:focus-visible)).
+- Modern form controls adopt the accent colour via `accent-color` ([MDN](https://developer.mozilla.org/docs/Web/CSS/accent-color)).
+- High contrast modes are supported with `@media (forced-colors: active)` ([MDN](https://developer.mozilla.org/docs/Web/CSS/@media/forced-colors)).
+- Follow [WAI-ARIA Authoring Practices](https://www.w3.org/WAI/ARIA/apg/) for interactive widgets.
 
 ## Menus
 

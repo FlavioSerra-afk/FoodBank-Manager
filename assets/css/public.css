@@ -68,3 +68,22 @@
 .fbm-skeleton{background:var(--fbm-color-border);position:relative;overflow:hidden}
 .fbm-skeleton::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);animation:fbm-shimmer 1.5s infinite}
 @keyframes fbm-shimmer{100%{transform:translateX(100%)}}
+
+/* Token-driven scaffolding */
+.fbm-btn{background:var(--fbm-button-bg);color:var(--fbm-button-fg);border:1px solid var(--fbm-button-border);border-radius:var(--fbm-control-radius);padding:.5rem 1rem}
+.fbm-btn.is-secondary{background:transparent;color:var(--fbm-button-bg);border-color:var(--fbm-button-border)}
+.fbm-link{color:var(--fbm-link-fg);text-decoration:var(--fbm-link-underline,underline)}
+.fbm-link:hover{color:var(--fbm-link-hover-fg)}
+.fbm-link:visited{color:var(--fbm-link-visited-fg)}
+.fbm-input,.fbm-select,.fbm-textarea{background:var(--fbm-input-bg);color:var(--fbm-input-fg);border:1px solid var(--fbm-input-border);border-radius:var(--fbm-control-radius);height:var(--fbm-input-height)}
+.fbm-input::placeholder{color:var(--fbm-input-placeholder)}
+.fbm-input:focus-visible,.fbm-select:focus-visible,.fbm-textarea:focus-visible{border-color:var(--fbm-input-focus-border);outline:2px solid var(--fbm-input-focus-border);outline-offset:2px}
+.fbm-input[type=checkbox],.fbm-input[type=radio]{accent-color:var(--fbm-control-accent,var(--fbm-accent))}
+.fbm-alert{padding:1rem;border:1px solid var(--fbm-alert-info-border);background:var(--fbm-alert-info-bg);color:var(--fbm-alert-info-fg)}
+.fbm-card{background:var(--fbm-card-bg);color:var(--fbm-card-fg);border:1px solid var(--fbm-card-border);box-shadow:var(--fbm-card-shadow);padding:1rem;border-radius:var(--fbm-control-radius)}
+.fbm-tooltip{background:var(--fbm-tooltip-bg);color:var(--fbm-tooltip-fg);padding:.25rem .5rem;border-radius:4px;font-size:.875rem}
+.fbm-tabs[role=tablist]{display:flex;gap:1rem;border-bottom:1px solid var(--fbm-color-border)}
+.fbm-tabs [role=tab]{padding:.5rem 0;border-bottom:2px solid transparent;color:var(--fbm-tab-inactive-fg)}
+.fbm-tabs [role=tab].is-active{color:var(--fbm-tab-active-fg);border-color:var(--fbm-tab-active-border)}
+.fbm-focusable:focus-visible{outline:2px solid var(--fbm-accent);outline-offset:2px}
+@media (forced-colors: active){.fbm-focusable{outline:1px solid CanvasText}.fbm-alert{border-color:CanvasText}}

@@ -149,7 +149,16 @@ final class Theme {
 			$accent = self::DEFAULT_ACCENT;
 		}
 
-		$glass_raw = is_array( $raw['glass'] ?? null ) ? $raw['glass'] : array();
+                $glass_raw = is_array( $raw['glass'] ?? null ) ? $raw['glass'] : array();
+                $aliases   = array();
+                if ( is_array( $raw['aliases'] ?? null ) ) {
+                        foreach ( $raw['aliases'] as $k => $v ) {
+                                $val = sanitize_hex_color( (string) $v );
+                                if ( '' !== $val ) {
+                                        $aliases[ sanitize_key( (string) $k ) ] = $val;
+                                }
+                        }
+                }
 		$alpha     = (float) ( $glass_raw['alpha'] ?? $defaults['glass']['alpha'] );
 		$alpha     = 'dark' === $preset ? self::clamp( $alpha, 0.18, 0.35 ) : self::clamp( $alpha, 0.08, 0.20 );
 		$blur      = (int) ( $glass_raw['blur'] ?? $defaults['glass']['blur'] );
@@ -170,19 +179,20 @@ final class Theme {
 			$blur  = 0;
 		}
 
-		return array(
-			'style'  => $style,
-			'preset' => $preset,
-			'accent' => $accent,
-			'glass'  => array(
-				'alpha'  => $alpha,
-				'blur'   => $blur,
-				'elev'   => $elev,
-				'radius' => $radius,
-				'border' => $border,
-			),
-		);
-	}
+                return array(
+                        'style'   => $style,
+                        'preset'  => $preset,
+                        'accent'  => $accent,
+                        'glass'   => array(
+                                'alpha'  => $alpha,
+                                'blur'   => $blur,
+                                'elev'   => $elev,
+                                'radius' => $radius,
+                                'border' => $border,
+                        ),
+                        'aliases' => $aliases,
+                );
+        }
 
 	/**
 	 * Clamp a numeric value.
@@ -248,31 +258,70 @@ final class Theme {
 		$preset     = $section['preset'];
 		$base       = $preset_map[ $preset ] ?? $preset_map['light'];
 
-		$glass  = $section['glass'];
-		$alpha  = (float) $glass['alpha'];
-		$blur   = (int) $glass['blur'];
-		$elev   = (int) $glass['elev'];
-		$radius = (int) $glass['radius'];
-		$border = (int) $glass['border'];
+                $glass   = $section['glass'];
+                $alpha   = (float) $glass['alpha'];
+                $blur    = (int) $glass['blur'];
+                $elev    = (int) $glass['elev'];
+                $radius  = (int) $glass['radius'];
+                $border  = (int) $glass['border'];
+                $aliases = is_array( $section['aliases'] ?? null ) ? $section['aliases'] : array();
 
-		return array(
-			'--fbm-color-accent'        => $section['accent'],
-			'--fbm-color-text'          => $base['text'],
-			'--fbm-color-surface'       => $base['surface'],
-			'--fbm-color-border'        => $base['border'],
-			'--fbm-shadow-rgb'          => '0 0 0',
-			'--fbm-glass-alpha'         => sprintf( '%.2f', $alpha ),
-			'--fbm-blur-max'            => '12px',
-			'--fbm-glass-blur'          => $blur . 'px',
-			'--fbm-card-radius'         => $radius . 'px',
-			'--fbm-border-w'            => $border . 'px',
-			'--fbm-elev-shadow'         => '0 8px 32px rgba(var(--fbm-shadow-rgb)/0.10)',
-			'--fbm-inset-top'           => 'inset 0 1px 0 rgba(255 255 255 / 0.50)',
-			'--fbm-inset-bottom'        => 'inset 0 -1px 0 rgba(255 255 255 / 0.10)',
-			'--fbm-inset-glow'          => 'inset 0 0 20px 10px rgba(255 255 255 / 0.60)',
-			'--fbm-contrast-multiplier' => $base['contrast'],
-		);
-	}
+                return array(
+                        '--fbm-color-accent'        => $section['accent'],
+                        '--fbm-color-text'          => $base['text'],
+                        '--fbm-color-surface'       => $base['surface'],
+                        '--fbm-color-border'        => $base['border'],
+                        '--fbm-accent'              => $section['accent'],
+                        '--fbm-text'                => $base['text'],
+                        '--fbm-bg'                  => $base['surface'],
+                        '--fbm-surface'             => $base['surface'],
+                        '--fbm-shadow-rgb'          => '0 0 0',
+                        '--fbm-glass-alpha'         => sprintf( '%.2f', $alpha ),
+                        '--fbm-blur-max'            => '12px',
+                        '--fbm-glass-blur'          => $blur . 'px',
+                        '--fbm-card-radius'         => $radius . 'px',
+                        '--fbm-border-w'            => $border . 'px',
+                        '--fbm-control-radius'      => $radius . 'px',
+                        '--fbm-input-height'        => '38px',
+                        '--fbm-elev-shadow'         => '0 8px 32px rgba(var(--fbm-shadow-rgb)/0.10)',
+                        '--fbm-inset-top'           => 'inset 0 1px 0 rgba(255 255 255 / 0.50)',
+                        '--fbm-inset-bottom'        => 'inset 0 -1px 0 rgba(255 255 255 / 0.10)',
+                        '--fbm-inset-glow'          => 'inset 0 0 20px 10px rgba(255 255 255 / 0.60)',
+                        '--fbm-contrast-multiplier' => $base['contrast'],
+                        '--fbm-button-bg'           => $aliases['button_bg'] ?? 'var(--fbm-accent)',
+                        '--fbm-button-fg'           => $aliases['button_fg'] ?? '#ffffff',
+                        '--fbm-button-border'       => $aliases['button_border'] ?? 'var(--fbm-accent)',
+                        '--fbm-button-hover-bg'     => $aliases['button_hover_bg'] ?? 'color-mix(in srgb, var(--fbm-accent) 90%, black 10%)',
+                        '--fbm-button-hover-fg'     => $aliases['button_hover_fg'] ?? '#ffffff',
+                        '--fbm-link-fg'             => $aliases['link_fg'] ?? 'var(--fbm-accent)',
+                        '--fbm-link-hover-fg'       => $aliases['link_hover_fg'] ?? 'color-mix(in srgb, var(--fbm-accent) 90%, black 10%)',
+                        '--fbm-link-visited-fg'     => $aliases['link_visited_fg'] ?? 'var(--fbm-accent)',
+                        '--fbm-link-underline'      => $aliases['link_underline'] ?? 'underline',
+                        '--fbm-input-bg'            => $aliases['input_bg'] ?? 'var(--fbm-surface)',
+                        '--fbm-input-fg'            => $aliases['input_fg'] ?? 'var(--fbm-text)',
+                        '--fbm-input-border'        => $aliases['input_border'] ?? 'var(--fbm-color-border)',
+                        '--fbm-input-placeholder'   => $aliases['input_placeholder'] ?? 'var(--fbm-color-border)',
+                        '--fbm-input-focus-border'  => $aliases['input_focus_border'] ?? 'var(--fbm-accent)',
+                        '--fbm-control-accent'      => $aliases['control_accent'] ?? 'var(--fbm-accent)',
+                        '--fbm-alert-info-bg'       => $aliases['alert_info_bg'] ?? 'color-mix(in srgb,var(--fbm-accent) 10%, var(--fbm-surface))',
+                        '--fbm-alert-info-fg'       => $aliases['alert_info_fg'] ?? 'var(--fbm-text)',
+                        '--fbm-alert-info-border'   => $aliases['alert_info_border'] ?? 'var(--fbm-accent)',
+                        '--fbm-card-bg'             => $aliases['card_bg'] ?? 'var(--fbm-surface)',
+                        '--fbm-card-fg'             => $aliases['card_fg'] ?? 'var(--fbm-text)',
+                        '--fbm-card-border'         => $aliases['card_border'] ?? 'var(--fbm-color-border)',
+                        '--fbm-card-shadow'         => $aliases['card_shadow'] ?? 'var(--fbm-elev-shadow)',
+                        '--fbm-tooltip-bg'          => $aliases['tooltip_bg'] ?? 'var(--fbm-text)',
+                        '--fbm-tooltip-fg'          => $aliases['tooltip_fg'] ?? 'var(--fbm-surface)',
+                        '--fbm-tab-active-fg'       => $aliases['tab_active_fg'] ?? 'var(--fbm-text)',
+                        '--fbm-tab-active-border'   => $aliases['tab_active_border'] ?? 'var(--fbm-accent)',
+                        '--fbm-tab-inactive-fg'     => $aliases['tab_inactive_fg'] ?? 'var(--fbm-color-border)',
+                        '--fbm-table-header-bg'     => $aliases['table_header_bg'] ?? 'var(--fbm-color-border)',
+                        '--fbm-table-header-fg'     => $aliases['table_header_fg'] ?? 'var(--fbm-text)',
+                        '--fbm-table-row-hover-bg'  => $aliases['table_row_hover_bg'] ?? 'color-mix(in srgb,var(--fbm-accent) 5%, var(--fbm-surface))',
+                        '--fbm-icon-color'          => $aliases['icon_color'] ?? 'currentColor',
+                        '--fbm-icon-muted'          => $aliases['icon_muted'] ?? 'var(--fbm-color-border)',
+                );
+        }
 
 		/**
 		 * Append admin body classes.

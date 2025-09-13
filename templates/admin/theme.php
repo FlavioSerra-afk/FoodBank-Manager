@@ -82,6 +82,14 @@ $apply_front_menus   = ! empty( $theme['apply_front_menus'] );
                                         <th><?php esc_html_e( 'Border', 'foodbank-manager' ); ?></th>
                                         <td><input type="number" min="1" max="2" step="1" name="fbm_theme[admin][glass][border]" value="<?php echo esc_attr( $admin['glass']['border'] ); ?>" /> px</td>
                                 </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Button background', 'foodbank-manager' ); ?></th>
+                                        <td><input type="text" name="fbm_theme[admin][aliases][button_bg]" value="<?php echo esc_attr( $admin['aliases']['button_bg'] ?? '' ); ?>" class="regular-text fbm-color" data-default-color="<?php echo esc_attr( $admin['accent'] ); ?>" /></td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Link colour', 'foodbank-manager' ); ?></th>
+                                        <td><input type="text" name="fbm_theme[admin][aliases][link_fg]" value="<?php echo esc_attr( $admin['aliases']['link_fg'] ?? '' ); ?>" class="regular-text fbm-color" data-default-color="<?php echo esc_attr( $admin['accent'] ); ?>" /></td>
+                                </tr>
                         </table>
                 <?php else : ?>
                         <table class="form-table" role="presentation">
@@ -135,6 +143,14 @@ $apply_front_menus   = ! empty( $theme['apply_front_menus'] );
                                 <tr>
                                         <th><?php esc_html_e( 'Border', 'foodbank-manager' ); ?></th>
                                         <td><input type="number" min="1" max="2" step="1" name="fbm_theme[front][glass][border]" value="<?php echo esc_attr( $front['glass']['border'] ); ?>" <?php echo $match ? 'disabled="disabled"' : ''; ?> /> px</td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Button background', 'foodbank-manager' ); ?></th>
+                                        <td><input type="text" name="fbm_theme[front][aliases][button_bg]" value="<?php echo esc_attr( $front['aliases']['button_bg'] ?? '' ); ?>" class="regular-text fbm-color" data-default-color="<?php echo esc_attr( $front['accent'] ); ?>" <?php echo $match ? 'disabled="disabled"' : ''; ?> /></td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Link colour', 'foodbank-manager' ); ?></th>
+                                        <td><input type="text" name="fbm_theme[front][aliases][link_fg]" value="<?php echo esc_attr( $front['aliases']['link_fg'] ?? '' ); ?>" class="regular-text fbm-color" data-default-color="<?php echo esc_attr( $front['accent'] ); ?>" <?php echo $match ? 'disabled="disabled"' : ''; ?> /></td>
                                 </tr>
                         </table>
                 <?php endif; ?>
