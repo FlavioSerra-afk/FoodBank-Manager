@@ -23,7 +23,7 @@ use FoodBankManager\Core\Screen;
 
 final class Plugin {
 
-    public const VERSION = '2.1.1'; // x-release-please-version
+    public const VERSION = '2.1.2'; // x-release-please-version
     private const OPTION_VERSION = 'fbm_version';
 
         private static ?Plugin $instance = null;

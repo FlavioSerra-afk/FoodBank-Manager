@@ -1,3 +1,12 @@
+## [2.1.2] — 2025-09-13
+### Added
+- Full Typography token set (H1–H6, body, small, text/link/muted colors) with live preview.
+- Tokenized Tabs controls (size, paddings, radius, gap, indicator, states) wired to FBM tab components.
+### Improved
+- Scoped variables under @layer fbm and .fbm-scope; admin assets attached via canonical hook suffix with correct inline order.
+### A11y
+- Tabs follow WAI-ARIA APG with :focus-visible outlines; radios/checkboxes keep accent-color.
+
 ## [2.1.1] — 2025-09-13
 ### Added
 - Two-pane Theme & Design with live preview using real FBM markup.
