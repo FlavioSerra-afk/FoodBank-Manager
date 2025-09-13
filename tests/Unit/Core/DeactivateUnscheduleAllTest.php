@@ -8,7 +8,7 @@ use FBM\Core\Jobs\JobsWorker;
 use FBM\Core\Retention;
 use FoodBankManager\Core\Cron;
 
-final class DeactivationCronTest extends \BaseTestCase {
+final class DeactivateUnscheduleAllTest extends \BaseTestCase {
     public function testUnschedulesAllHooks(): void {
         $now = time() + 100;
         $GLOBALS['fbm_cron'] = array(
@@ -16,6 +16,9 @@ final class DeactivationCronTest extends \BaseTestCase {
                 Cron::RETENTION_HOOK => array(array()),
                 Retention::EVENT => array(array()),
                 JobsWorker::EVENT => array(array()),
+                'fbm_retention_hourly' => array(array()),
+                'fbm_retention_tick' => array(array()),
+                'fbm_jobs_tick' => array(array()),
                 'fbm_cron_cleanup' => array(array()),
                 'fbm_cron_email_retry' => array(array()),
             ),

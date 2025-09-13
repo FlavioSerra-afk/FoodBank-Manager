@@ -1,7 +1,7 @@
-Docs-Revision: 2025-09-11 (v1.11.2 patch finalize)
+Docs-Revision: 2025-09-12 (v1.11.3 patch finalize)
 # FoodBank Manager Plugin
 
-Stable tag: 1.11.2
+Stable tag: 1.11.3
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.1
@@ -25,11 +25,11 @@ migration flag prevents re-granting on upgrade.
 
 ## Multisite notes
 
-Network administrators receive `fbm_manage_jobs` on activation; a migration flag prevents re-granting on upgrade. Cron hooks such as retention are idempotent and safe to run per site.
+Network administrators receive `fbm_manage_jobs` on activation; a migration flag prevents re-granting on upgrade. Cron hooks such as retention are idempotent and safe to run per site. See [Docs/Diagnostics.md](../Docs/Diagnostics.md) for rate-limit and multisite notes.
 
 ## API errors
 
-FoodBank Manager normalizes error responses across REST and AJAX:
+FoodBank Manager normalizes error responses across REST and AJAX (see [Docs/API.md](../Docs/API.md) for a detailed cheat-sheet):
 
 | Code | Meaning |
 | ---- | ------- |
@@ -41,5 +41,11 @@ FoodBank Manager normalizes error responses across REST and AJAX:
 | 422 | Validation failed |
 | 429 | Rate limited |
 
-Rate-limited responses include `RateLimit-Limit`, `RateLimit-Remaining`, and
-`Retry-After` headers so clients know when to retry.
+Rate-limited responses include `RateLimit-Limit`, `RateLimit-Remaining`, and `RateLimit-Reset` headers; 429 responses also send `Retry-After` so clients know when to retry.
+
+## Manual release steps
+
+1. `composer i18n:build -- --allow-root`
+2. `bash bin/package.sh`
+3. `sha256sum dist/foodbank-manager.zip > SHA256SUMS`
+4. Upload the ZIP and publish the release after verifying the checksum.

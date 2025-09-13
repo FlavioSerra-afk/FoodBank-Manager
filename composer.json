@@ -66,8 +66,8 @@
     "qa": "composer phpcs && composer phpstan && composer test",
     "qa:fast": "composer phpcs && composer phpstan:fast && composer test",
     "build:zip": "bash bin/package.sh",
-    "i18n:pot": "wp i18n make-pot . languages/foodbank-manager.pot --exclude=vendor,dist,node_modules",
-    "i18n:mo": "wp i18n make-mo languages languages",
+    "i18n:pot": "FBM_SKIP_ABSPATH=1 WP_CLI_ALLOW_ROOT=1 wp i18n make-pot . languages/foodbank-manager.pot --skip-plugins --skip-themes --exclude=vendor,dist,node_modules",
+    "i18n:mo": "FBM_SKIP_ABSPATH=1 WP_CLI_ALLOW_ROOT=1 wp i18n make-mo languages languages --skip-plugins --skip-themes",
     "i18n:build": [
       "@i18n:pot",
       "@i18n:mo"
@@ -80,5 +80,5 @@
     },
     "sort-packages": true
   },
-  "version": "1.11.2"
+  "version": "1.11.3"
 }
