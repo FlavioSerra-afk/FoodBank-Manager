@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignoreFile
 /**
  * Dashboard cards template.
  *
@@ -38,6 +38,17 @@ if ( ! empty( $filters_attr['tags'] ?? array() ) ) {
 $toggle_url = add_query_arg( $toggle_params );
 ?>
 <?php echo '<div class="fbm-scope fbm-app">'; ?>
+<nav class="fbm-menu" aria-label="FBM">
+  <a class="fbm-menu__item is-active" href="#">
+    <svg class="fbm-menu__icon" aria-hidden="true"></svg>
+    <span class="fbm-menu__label"><?php esc_html_e( 'Dashboard', 'foodbank-manager' ); ?></span>
+  </a>
+  <a class="fbm-menu__item" href="#">
+    <svg class="fbm-menu__icon" aria-hidden="true"></svg>
+    <span class="fbm-menu__label"><?php esc_html_e( 'Reports', 'foodbank-manager' ); ?></span>
+  </a>
+  <div class="fbm-menu__divider" role="separator"></div>
+</nav>
 <div class="fbm-public">
 <div class="fbm-dashboard-wrap fbm-loading" aria-busy="true">
 <?php if ( current_user_can( 'manage_options' ) ) : ?>

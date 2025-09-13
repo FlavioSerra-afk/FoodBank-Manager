@@ -14,6 +14,7 @@ use function filter_var;
 use function sanitize_hex_color;
 use function sanitize_key;
 use function is_rtl;
+use function absint;
 use function get_option;
 use function add_settings_error;
 use function wp_json_encode;
@@ -94,6 +95,7 @@ final class Theme {
                 }
                 $admin = self::sanitize_section( $raw['admin'] ?? array(), $defaults['admin'] );
                 $front = self::sanitize_section( $raw['front'] ?? array(), $defaults['front'] );
+                $menu  = self::sanitize_menu( $raw['menu'] ?? array(), $defaults['menu'] );
 
 		$front_enabled    = filter_var( $raw['front']['enabled'] ?? $defaults['front']['enabled'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE );
 		$front['enabled'] = null === $front_enabled ? $defaults['front']['enabled'] : (bool) $front_enabled;
@@ -117,14 +119,15 @@ final class Theme {
 			}
 		}
 
-		return array(
-			'admin'                => $admin,
-			'front'                => $front,
-			'match_front_to_admin' => $match,
+                return array(
+                        'admin'                => $admin,
+                        'front'                => $front,
+                        'match_front_to_admin' => $match,
                         'apply_admin'          => $admin_chrome,
                         'apply_admin_chrome'   => $admin_chrome,
                         'apply_front_menus'    => $front_menus,
-		);
+                        'menu'                 => $menu,
+                );
 	}
 
 	/**
@@ -134,7 +137,7 @@ final class Theme {
 	 * @param array<string,mixed> $defaults Defaults.
 	 * @return array<string,mixed>
 	 */
-	private static function sanitize_section( array $raw, array $defaults ): array {
+        private static function sanitize_section( array $raw, array $defaults ): array {
 		$style = sanitize_key( (string) ( $raw['style'] ?? $defaults['style'] ) );
 		if ( ! in_array( $style, array( 'glass', 'basic' ), true ) ) {
 			$style = $defaults['style'];
@@ -195,6 +198,64 @@ final class Theme {
                 );
         }
 
+        /**
+         * Sanitize menu settings.
+         *
+         * @param array<string,mixed> $raw Raw values.
+         * @param array<string,mixed> $defaults Defaults.
+         * @return array<string,mixed>
+         */
+        private static function sanitize_menu( array $raw, array $defaults ): array {
+                $out = array();
+                $out['item_height']  = self::clamp( absint( $raw['item_height'] ?? $defaults['item_height'] ), 40, 64 );
+                $out['item_px']      = self::clamp( absint( $raw['item_px'] ?? $defaults['item_px'] ), 8, 24 );
+                $out['item_py']      = self::clamp( absint( $raw['item_py'] ?? $defaults['item_py'] ), 6, 16 );
+                $out['gap']          = self::clamp( absint( $raw['gap'] ?? $defaults['gap'] ), 8, 16 );
+                $out['radius']       = self::clamp( absint( $raw['radius'] ?? $defaults['radius'] ), 8, 16 );
+                $out['icon_size']    = self::clamp( absint( $raw['icon_size'] ?? $defaults['icon_size'] ), 16, 24 );
+                $opacity             = (float) ( $raw['icon_opacity'] ?? $defaults['icon_opacity'] );
+                if ( $opacity < 0.6 ) {
+                        $opacity = 0.6;
+                } elseif ( $opacity > 1.0 ) {
+                        $opacity = 1.0;
+                }
+                $out['icon_opacity'] = $opacity;
+                $out['bg']           = sanitize_hex_color( (string) ( $raw['bg'] ?? $defaults['bg'] ) ) ?: $defaults['bg'];
+                $out['color']        = sanitize_hex_color( (string) ( $raw['color'] ?? $defaults['color'] ) ) ?: $defaults['color'];
+                $out['hover_bg']     = sanitize_hex_color( (string) ( $raw['hover_bg'] ?? $defaults['hover_bg'] ) ) ?: $defaults['hover_bg'];
+                $out['hover_color']  = sanitize_hex_color( (string) ( $raw['hover_color'] ?? $defaults['hover_color'] ) ) ?: $defaults['hover_color'];
+                $out['active_bg']    = sanitize_hex_color( (string) ( $raw['active_bg'] ?? $defaults['active_bg'] ) ) ?: $defaults['active_bg'];
+                $out['active_color'] = sanitize_hex_color( (string) ( $raw['active_color'] ?? $defaults['active_color'] ) ) ?: $defaults['active_color'];
+                $divider             = (string) ( $raw['divider'] ?? $defaults['divider'] );
+                $out['divider']      = '' === $divider ? $defaults['divider'] : $divider;
+                return $out;
+        }
+
+        /**
+         * Build CSS variables for menu tokens.
+         *
+         * @param array<string,mixed> $menu Menu settings.
+         * @return array<string,string>
+         */
+        private static function menu_tokens( array $menu ): array {
+                return array(
+                        '--fbm-menu-item-h'       => $menu['item_height'] . 'px',
+                        '--fbm-menu-item-px'      => $menu['item_px'] . 'px',
+                        '--fbm-menu-item-py'      => $menu['item_py'] . 'px',
+                        '--fbm-menu-gap'          => $menu['gap'] . 'px',
+                        '--fbm-menu-radius'       => $menu['radius'] . 'px',
+                        '--fbm-menu-icon-size'    => $menu['icon_size'] . 'px',
+                        '--fbm-menu-icon-opacity' => (string) $menu['icon_opacity'],
+                        '--fbm-menu-bg'           => $menu['bg'],
+                        '--fbm-menu-color'        => $menu['color'],
+                        '--fbm-menu-hover-bg'     => $menu['hover_bg'],
+                        '--fbm-menu-hover-color'  => $menu['hover_color'],
+                        '--fbm-menu-active-bg'    => $menu['active_bg'],
+                        '--fbm-menu-active-color' => $menu['active_color'],
+                        '--fbm-menu-divider'      => $menu['divider'],
+                );
+        }
+
 	/**
 	 * Clamp a numeric value.
 	 *
@@ -233,7 +294,13 @@ final class Theme {
          * Scoped CSS variables for admin theme.
          */
         public static function css_variables_scoped(): string {
-                return '@layer fbm {' . self::css_vars( self::admin(), '.fbm-scope' ) . self::glass_support_css() . '}';
+                $tokens = self::section_to_css( self::admin() );
+                $menu   = self::menu_tokens( self::get()['menu'] ?? array() );
+                $css    = '';
+                foreach ( array_merge( $tokens, $menu ) as $key => $val ) {
+                        $css .= $key . ':' . $val . ';';
+                }
+                return '@layer fbm {.fbm-scope{' . $css . '}' . self::glass_support_css() . '}';
         }
 
         /**
@@ -291,6 +358,9 @@ final class Theme {
                         '--fbm-bg'                  => $base['surface'],
                         '--fbm-surface'             => $base['surface'],
                         '--fbm-shadow-rgb'          => '0 0 0',
+                        '--fbm-base'                => '16px',
+                        '--fbm-input-h'             => '38px',
+                        '--fbm-radius'              => $radius . 'px',
                         '--fbm-glass-alpha'         => sprintf( '%.2f', $alpha ),
                         '--fbm-blur-max'            => '12px',
                         '--fbm-glass-blur'          => $blur . 'px',

@@ -5,7 +5,7 @@ if (!defined('FBM_URL')) {
     define('FBM_URL', '');
 }
 
-final class ShortcodePublicVarsTest extends \BaseTestCase {
+final class FrontendParityTest extends \BaseTestCase {
     public function test_dashboard_shortcode_enqueues_public_css_and_vars(): void {
         fbm_grant_caps(['fb_manage_dashboard']);
         $hash = md5('7d||all|0');
