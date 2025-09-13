@@ -5,7 +5,7 @@ use FoodBankManager\UI\Theme;
 
 final class NoBleedSelectorsTest extends \PHPUnit\Framework\TestCase {
     public function test_css_files_scoped(): void {
-        $pattern = '/(^|,)\s*(html|body|#wpwrap|#adminmenu|#adminmenuwrap|#screen-meta|#wpbody|#wpcontent|#wpfooter|\.wrap|a|button|input|select|textarea|\.notice)\b/';
+        $pattern = '/(^|,)\s*(html|body|#wpwrap|#adminmenu|#adminmenuwrap|#screen-meta|#wpbody|#wpcontent|#wpfooter|\\.wrap|a|button|input|select|textarea|\\.notice|h1|h2|h3|h4|h5|h6)\b/';
         foreach (glob(__DIR__ . '/../../assets/css/*.css') as $file) {
             $lines = file($file, FILE_IGNORE_NEW_LINES);
             foreach ($lines as $line) {

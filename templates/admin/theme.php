@@ -145,6 +145,117 @@ $apply_front_menus   = ! empty( $theme['apply_front_menus'] );
                                         <th><label for="fbm_menu_divider"><?php esc_html_e( 'Divider', 'foodbank-manager' ); ?></label></th>
                                         <td><input data-token="--fbm-menu-divider" data-default="<?php echo esc_attr( $menu['divider'] ); ?>" type="text" id="fbm_menu_divider" name="fbm_theme[menu][divider]" value="<?php echo esc_attr( $menu['divider'] ); ?>" class="regular-text fbm-color" /></td>
                                 </tr>
+                                <?php $typo = $theme['typography']; ?>
+                                <tr><th colspan="2"><strong><?php esc_html_e( 'Typography', 'foodbank-manager' ); ?></strong></th></tr>
+                                <?php foreach ( array( 'h1','h2','h3','h4','h5','h6' ) as $tag ) : ?>
+                                <tr>
+                                        <th><?php echo esc_html( strtoupper( $tag ) ); ?></th>
+                                        <td>
+                                                <input data-token="--fbm-<?php echo $tag; ?>" data-unit="px" type="number" min="10" max="64" name="fbm_theme[typography][<?php echo $tag; ?>][size]" value="<?php echo esc_attr( $typo[ $tag ]['size'] ); ?>" />
+                                                <input data-token="--fbm-<?php echo $tag; ?>-lh" type="number" step="0.01" min="1" max="2.2" name="fbm_theme[typography][<?php echo $tag; ?>][lh]" value="<?php echo esc_attr( $typo[ $tag ]['lh'] ); ?>" />
+                                                <input data-token="--fbm-<?php echo $tag; ?>-w" type="number" step="100" min="100" max="900" name="fbm_theme[typography][<?php echo $tag; ?>][weight]" value="<?php echo esc_attr( $typo[ $tag ]['weight'] ); ?>" />
+                                                <input data-token="--fbm-<?php echo $tag; ?>-trk" type="number" step="0.01" min="-1" max="2" name="fbm_theme[typography][<?php echo $tag; ?>][track]" value="<?php echo esc_attr( $typo[ $tag ]['track'] ); ?>" />
+                                        </td>
+                                </tr>
+                                <?php endforeach; ?>
+                                <tr>
+                                        <th><?php esc_html_e( 'Body', 'foodbank-manager' ); ?></th>
+                                        <td>
+                                                <input data-token="--fbm-body" data-unit="px" type="number" min="10" max="64" name="fbm_theme[typography][body][size]" value="<?php echo esc_attr( $typo['body']['size'] ); ?>" />
+                                                <input data-token="--fbm-body-lh" type="number" step="0.01" min="1" max="2.2" name="fbm_theme[typography][body][lh]" value="<?php echo esc_attr( $typo['body']['lh'] ); ?>" />
+                                                <input data-token="--fbm-body-w" type="number" step="100" min="100" max="900" name="fbm_theme[typography][body][weight]" value="<?php echo esc_attr( $typo['body']['weight'] ); ?>" />
+                                                <input data-token="--fbm-body-trk" type="number" step="0.01" min="-1" max="2" name="fbm_theme[typography][body][track]" value="<?php echo esc_attr( $typo['body']['track'] ); ?>" />
+                                        </td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Small', 'foodbank-manager' ); ?></th>
+                                        <td>
+                                                <input data-token="--fbm-small" data-unit="px" type="number" min="10" max="64" name="fbm_theme[typography][small][size]" value="<?php echo esc_attr( $typo['small']['size'] ); ?>" />
+                                                <input data-token="--fbm-small-lh" type="number" step="0.01" min="1" max="2.2" name="fbm_theme[typography][small][lh]" value="<?php echo esc_attr( $typo['small']['lh'] ); ?>" />
+                                        </td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Text colour', 'foodbank-manager' ); ?></th>
+                                        <td><input data-token="--fbm-color-text" data-default="<?php echo esc_attr( $typo['color']['text'] ); ?>" type="text" name="fbm_theme[typography][color][text]" value="<?php echo esc_attr( $typo['color']['text'] ); ?>" class="regular-text fbm-color" /></td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Headings colour', 'foodbank-manager' ); ?></th>
+                                        <td><input data-token="--fbm-color-headings" data-default="<?php echo esc_attr( $typo['color']['headings'] ); ?>" type="text" name="fbm_theme[typography][color][headings]" value="<?php echo esc_attr( $typo['color']['headings'] ); ?>" class="regular-text fbm-color" /></td>
+                                </tr>
+                <tr>
+                                        <th><?php esc_html_e( 'Muted colour', 'foodbank-manager' ); ?></th>
+                                        <td><input data-token="--fbm-color-muted" data-default="<?php echo esc_attr( $typo['color']['muted'] ); ?>" type="text" name="fbm_theme[typography][color][muted]" value="<?php echo esc_attr( $typo['color']['muted'] ); ?>" class="regular-text fbm-color" /></td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Link colour', 'foodbank-manager' ); ?></th>
+                                        <td><input data-token="--fbm-link" data-default="<?php echo esc_attr( $typo['link']['normal'] ); ?>" type="text" name="fbm_theme[typography][link][normal]" value="<?php echo esc_attr( $typo['link']['normal'] ); ?>" class="regular-text fbm-color" /></td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Link hover', 'foodbank-manager' ); ?></th>
+                                        <td><input data-token="--fbm-link-hover" data-default="<?php echo esc_attr( $typo['link']['hover'] ); ?>" type="text" name="fbm_theme[typography][link][hover]" value="<?php echo esc_attr( $typo['link']['hover'] ); ?>" class="regular-text fbm-color" /></td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Link active', 'foodbank-manager' ); ?></th>
+                                        <td><input data-token="--fbm-link-active" data-default="<?php echo esc_attr( $typo['link']['active'] ); ?>" type="text" name="fbm_theme[typography][link][active]" value="<?php echo esc_attr( $typo['link']['active'] ); ?>" class="regular-text fbm-color" /></td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Link visited', 'foodbank-manager' ); ?></th>
+                                        <td><input data-token="--fbm-link-visited" data-default="<?php echo esc_attr( $typo['link']['visited'] ); ?>" type="text" name="fbm_theme[typography][link][visited]" value="<?php echo esc_attr( $typo['link']['visited'] ); ?>" class="regular-text fbm-color" /></td>
+                                </tr>
+                                <?php $tabs = $theme['tabs']; ?>
+                                <tr><th colspan="2"><strong><?php esc_html_e( 'Tabs', 'foodbank-manager' ); ?></strong></th></tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Height', 'foodbank-manager' ); ?></th>
+                                        <td><input data-token="--fbm-tabs-h" data-unit="px" type="number" min="0" max="32" name="fbm_theme[tabs][height]" value="<?php echo esc_attr( $tabs['height'] ); ?>" /></td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Horizontal padding', 'foodbank-manager' ); ?></th>
+                                        <td><input data-token="--fbm-tabs-px" data-unit="px" type="number" min="0" max="32" name="fbm_theme[tabs][px]" value="<?php echo esc_attr( $tabs['px'] ); ?>" /></td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Vertical padding', 'foodbank-manager' ); ?></th>
+                                        <td><input data-token="--fbm-tabs-py" data-unit="px" type="number" min="0" max="32" name="fbm_theme[tabs][py]" value="<?php echo esc_attr( $tabs['py'] ); ?>" /></td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Gap', 'foodbank-manager' ); ?></th>
+                                        <td><input data-token="--fbm-tabs-gap" data-unit="px" type="number" min="0" max="32" name="fbm_theme[tabs][gap]" value="<?php echo esc_attr( $tabs['gap'] ); ?>" /></td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Radius', 'foodbank-manager' ); ?></th>
+                                        <td><input data-token="--fbm-tabs-radius" data-unit="px" type="number" min="0" max="32" name="fbm_theme[tabs][radius]" value="<?php echo esc_attr( $tabs['radius'] ); ?>" /></td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Text colour', 'foodbank-manager' ); ?></th>
+                                        <td><input data-token="--fbm-tabs-color" data-default="<?php echo esc_attr( $tabs['color'] ); ?>" type="text" name="fbm_theme[tabs][color]" value="<?php echo esc_attr( $tabs['color'] ); ?>" class="regular-text fbm-color" /></td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Hover colour', 'foodbank-manager' ); ?></th>
+                                        <td><input data-token="--fbm-tabs-hover-color" data-default="<?php echo esc_attr( $tabs['hover_color'] ); ?>" type="text" name="fbm_theme[tabs][hover_color]" value="<?php echo esc_attr( $tabs['hover_color'] ); ?>" class="regular-text fbm-color" /></td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Active colour', 'foodbank-manager' ); ?></th>
+                                        <td><input data-token="--fbm-tabs-active-color" data-default="<?php echo esc_attr( $tabs['active_color'] ); ?>" type="text" name="fbm_theme[tabs][active_color]" value="<?php echo esc_attr( $tabs['active_color'] ); ?>" class="regular-text fbm-color" /></td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Hover background', 'foodbank-manager' ); ?></th>
+                                        <td><input data-token="--fbm-tabs-hover-bg" data-default="<?php echo esc_attr( $tabs['hover_bg'] ); ?>" type="text" name="fbm_theme[tabs][hover_bg]" value="<?php echo esc_attr( $tabs['hover_bg'] ); ?>" class="regular-text fbm-color" /></td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Active background', 'foodbank-manager' ); ?></th>
+                                        <td><input data-token="--fbm-tabs-active-bg" data-default="<?php echo esc_attr( $tabs['active_bg'] ); ?>" type="text" name="fbm_theme[tabs][active_bg]" value="<?php echo esc_attr( $tabs['active_bg'] ); ?>" class="regular-text fbm-color" /></td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Indicator height', 'foodbank-manager' ); ?></th>
+                                        <td><input data-token="--fbm-tabs-indicator-h" data-unit="px" type="number" min="1" max="6" name="fbm_theme[tabs][indicator_h]" value="<?php echo esc_attr( $tabs['indicator_h'] ); ?>" /></td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Indicator offset', 'foodbank-manager' ); ?></th>
+                                        <td><input data-token="--fbm-tabs-indicator-offset" data-unit="px" type="number" min="0" max="8" name="fbm_theme[tabs][indicator_offset]" value="<?php echo esc_attr( $tabs['indicator_offset'] ); ?>" /></td>
+                                </tr>
+                                <tr>
+                                        <th><?php esc_html_e( 'Indicator colour', 'foodbank-manager' ); ?></th>
+                                        <td><input data-token="--fbm-tabs-indicator-color" data-default="<?php echo esc_attr( $tabs['indicator_color'] ); ?>" type="text" name="fbm_theme[tabs][indicator_color]" value="<?php echo esc_attr( $tabs['indicator_color'] ); ?>" class="regular-text fbm-color" /></td>
+                                </tr>
                         </table>
                 <?php else : ?>
                         <table class="form-table" role="presentation">
