@@ -34,7 +34,7 @@ class Assets {
 		 */
         public function register(): void {
                 add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin' ), 10 );
-                add_filter( 'admin_body_class', array( '\\FBM\\Core\\AdminScope', 'add_body_class' ) );
+                add_filter( 'admin_body_class', array( '\FBM\Core\AdminScope', 'add_body_class' ) );
                 $theme = Theme::get();
                 if ( ! is_admin() && ! empty( $theme['apply_front_menus'] ) ) {
                         add_filter( 'body_class', array( Theme::class, 'body_class' ) );
@@ -56,37 +56,37 @@ class Assets {
                         return;
                 }
 
-                wp_register_style( 'fbm-admin', FBM_URL . 'assets/css/admin.css', array(), Plugin::VERSION );
+                wp_register_style( 'fbm-admin', plugins_url( 'assets/css/admin.css', FBM_FILE ), array(), Plugin::VERSION );
                 wp_enqueue_style( 'fbm-admin' );
                 wp_add_inline_style( 'fbm-admin', Theme::css_variables() );
 
-                wp_register_style( 'fbm-menus', FBM_URL . 'assets/css/menus.css', array(), Plugin::VERSION );
+                wp_register_style( 'fbm-menus', plugins_url( 'assets/css/menus.css', FBM_FILE ), array(), Plugin::VERSION );
                 wp_enqueue_style( 'fbm-menus' );
                 add_filter( 'admin_body_class', array( Theme::class, 'admin_body_class' ) );
 
-                wp_register_style( 'fbm-admin-tables', FBM_URL . 'assets/css/admin-tables.css', array(), Plugin::VERSION );
+                wp_register_style( 'fbm-admin-tables', plugins_url( 'assets/css/admin-tables.css', FBM_FILE ), array(), Plugin::VERSION );
                 wp_enqueue_style( 'fbm-admin-tables' );
 
                 $screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
 
                 if ( $screen && 'foodbank_page_fbm_attendance' === $screen->id && current_user_can( 'fb_manage_attendance' ) ) {
-                        wp_enqueue_script( 'fbm-qrcode', FBM_URL . 'assets/js/qrcode.min.js', array(), Plugin::VERSION, true );
+                        wp_enqueue_script( 'fbm-qrcode', plugins_url( 'assets/js/qrcode.min.js', FBM_FILE ), array(), Plugin::VERSION, true );
                 }
                 if ( $screen && 'foodbank_page_fbm_form_builder' === $screen->id && current_user_can( 'fbm_manage_forms' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown
-                        wp_enqueue_script( 'fbm-form-builder', FBM_URL . 'assets/js/fbm-form-builder.js', array(), Plugin::VERSION, true );
+                        wp_enqueue_script( 'fbm-form-builder', plugins_url( 'assets/js/fbm-form-builder.js', FBM_FILE ), array(), Plugin::VERSION, true );
                 }
                 if ( $screen && 'foodbank_page_fbm_diagnostics' === $screen->id && current_user_can( 'fb_manage_diagnostics' ) ) {
-                        wp_enqueue_script( 'fbm-admin-diagnostics', FBM_URL . 'assets/js/admin-diagnostics.js', array(), Plugin::VERSION, true );
+                        wp_enqueue_script( 'fbm-admin-diagnostics', plugins_url( 'assets/js/admin-diagnostics.js', FBM_FILE ), array(), Plugin::VERSION, true );
                 }
                 if ( $screen && 'foodbank_page_fbm_permissions' === $screen->id && current_user_can( 'fb_manage_permissions' ) ) {
-                        wp_enqueue_script( 'fbm-admin-permissions', FBM_URL . 'assets/js/admin-permissions.js', array(), Plugin::VERSION, true );
+                        wp_enqueue_script( 'fbm-admin-permissions', plugins_url( 'assets/js/admin-permissions.js', FBM_FILE ), array(), Plugin::VERSION, true );
                         wp_localize_script( 'fbm-admin-permissions', 'fbmPerms', array(
                                 'url'   => admin_url( 'admin-post.php' ),
                                 'nonce' => wp_create_nonce( 'fbm_perms_role_toggle' ),
                         ) );
                 }
                if ( $screen && 'foodbank_page_fbm_shortcodes' === $screen->id && current_user_can( 'fbm_manage_forms' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown
-                       wp_enqueue_script( 'fbm-admin-shortcodes', FBM_URL . 'assets/js/admin-shortcodes.js', array(), Plugin::VERSION, true );
+                       wp_enqueue_script( 'fbm-admin-shortcodes', plugins_url( 'assets/js/admin-shortcodes.js', FBM_FILE ), array(), Plugin::VERSION, true );
                }
        }
 
@@ -110,8 +110,8 @@ class Assets {
 		if ( empty( $theme['apply_front_menus'] ) ) {
 				return;
 		}
-				wp_register_style( 'fbm-menus', FBM_URL . 'assets/css/menus.css', array(), Plugin::VERSION );
-				wp_enqueue_style( 'fbm-menus' );
+                                wp_register_style( 'fbm-menus', plugins_url( 'assets/css/menus.css', FBM_FILE ), array(), Plugin::VERSION );
+                                wp_enqueue_style( 'fbm-menus' );
 	}
 
         /**

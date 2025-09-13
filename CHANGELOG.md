@@ -1,3 +1,10 @@
+## [2.0.4] — 2025-09-13
+### Fixed
+- Scoped theming to explicit FBM admin pages via slug whitelist and body class; corrected enqueue order so token CSS always prints.
+- Restored Dashboard 3×3 grid with responsive fallbacks.
+### Dev
+- Centralized AdminScope; guarded get_current_screen timing; reinforced inline-style attachment to enqueued handles.
+
 ## [2.0.3] — 2025-09-13
 ### Fixed
 - Theming now applies strictly to FBM admin slugs (fbm, fbm_attendance, … fbm_shortcodes) and to frontend dashboard shortcodes.

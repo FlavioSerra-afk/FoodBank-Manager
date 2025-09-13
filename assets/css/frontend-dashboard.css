@@ -1,11 +1,4 @@
-.fbm-dashboard {
-font-family: var(--fbm-font);
-}
-.fbm-dashboard .fbm-dashboard-grid {
-display: grid;
-gap: 1rem;
-grid-template-columns: repeat(auto-fit,minmax(160px,1fr));
-}
+.fbm-dashboard{font-family:var(--fbm-font)}
 .fbm-dashboard .fbm-card {
 background: #fff;
 border-radius: var(--fbm-radius);

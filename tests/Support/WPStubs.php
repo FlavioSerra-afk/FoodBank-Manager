@@ -7,6 +7,13 @@ if (defined('FBM_WPSTUBS_LOADED')) {
 }
 define('FBM_WPSTUBS_LOADED', true);
 
+if (!defined('FBM_FILE')) {
+    define('FBM_FILE', __FILE__);
+}
+if (!defined('FBM_PLUGIN_FILE')) {
+    define('FBM_PLUGIN_FILE', FBM_FILE);
+}
+
 use Tests\Support\Exceptions\FbmDieException;
 
 // When running static analysis, load the official WordPress stubs instead of
@@ -304,7 +311,7 @@ if (!function_exists('admin_url')) { function admin_url($p=''){ return 'https://
 if (!isset($GLOBALS['fbm_current_action'])) $GLOBALS['fbm_current_action'] = 'admin_menu';
 if (!function_exists('current_action')) { function current_action(){ return $GLOBALS['fbm_current_action']; } }
 if (!function_exists('menu_page_url')) { function menu_page_url(string $slug, bool $echo=true){ $u='admin.php?page='.$slug; if($echo) echo $u; return $u; } }
-if (!function_exists('plugins_url')) { function plugins_url($p=''){ return 'https://example.test/wp-content/plugins/'.ltrim($p,'/'); } }
+if (!function_exists('plugins_url')) { function plugins_url($p='', $plugin=''){ return 'https://example.test/wp-content/plugins/'.ltrim($p,'/'); } }
 if (!function_exists('site_url')) { function site_url($p='', $scheme = null){ return 'https://example.test/'.ltrim($p,'/'); } }
 if (!function_exists('wp_nonce_url')) { function wp_nonce_url($u,$a=-1,$n='_wpnonce'){ return add_query_arg([$n=>wp_create_nonce($a)],$u); } }
 if (!function_exists('wp_safe_redirect')) { /** @return void */ function wp_safe_redirect($u, $status = 302){ $GLOBALS['__last_redirect']=(string)$u; throw new FbmDieException('redirect'); } }
@@ -398,7 +405,7 @@ $GLOBALS['fbm_scripts'] = $GLOBALS['fbm_scripts'] ?? [];
 $GLOBALS['fbm_inline_styles'] = $GLOBALS['fbm_inline_styles'] ?? [];
 if (!function_exists('current_time')){ function current_time($t, $gmt=false){ return date('Y-m-d H:i:s'); } }
 if (!function_exists('wp_date')){ function wp_date($f, $ts = null, $tz = null){ $ts = $ts ?? time(); if($tz instanceof \DateTimeZone){ $d = new \DateTime('@'.$ts); $d->setTimezone($tz); return $d->format($f); } return date($f,$ts); } }
-if (!function_exists('wp_enqueue_style')){ function wp_enqueue_style($h,$s=''){ $GLOBALS['fbm_styles'][$h]=$s; } }
+if (!function_exists('wp_enqueue_style')){ function wp_enqueue_style($h, $s='', $deps=array(), $ver=false){ $GLOBALS['fbm_styles'][$h]=$s; } }
 if (!function_exists('wp_enqueue_script')){ function wp_enqueue_script($h,$s=''){ $GLOBALS['fbm_scripts'][$h]=$s; } }
 if (!function_exists('wp_localize_script')){ function wp_localize_script($h,$o,$l){ $GLOBALS['fbm_localized'][$h]=$l; return true; } }
 if (!function_exists('wp_add_inline_style')){ function wp_add_inline_style($h,$c){ $GLOBALS['fbm_inline_styles'][$h]=$c; } }
