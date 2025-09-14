@@ -3,9 +3,9 @@ Contributors: portuguese-community-centre-london
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.1
-Version: 2.2.2
+Version: 2.2.3
 x-release-please-start-version
-Stable tag: 1.9.1
+Stable tag: 2.2.3
 x-release-please-end
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -39,6 +39,10 @@ Network administrators receive `fbm_manage_jobs` on activation; a migration flag
 First stable cut with readme polish and release checksums.
 
 == Changelog ==
+= 2.2.3 =
+* release sync
+* header test hardening
+* vertical tabs polish
 = 2.2.2 =
 * New two-pane Theme page with accordion controls & style-book preview
 * Live CSS variable preview + JSON Import/Export/Defaults

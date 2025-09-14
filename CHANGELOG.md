@@ -1,3 +1,11 @@
+## [2.2.3] — 2025-09-16
+### Fixed
+- release sync
+### Tests
+- header test hardening
+### Improved
+- vertical tabs polish
+
 ## [2.2.2] — 2025-09-15
 ### Added
 - New two-pane Theme page with accordion controls & style-book preview

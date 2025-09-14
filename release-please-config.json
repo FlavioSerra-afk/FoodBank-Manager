@@ -12,18 +12,33 @@
           "jsonpath": "$.version"
         },
         {
-          "type": "generic",
-          "path": "includes/Core/Plugin.php"
+          "type": "regex",
+          "path": "includes/Core/Plugin.php",
+          "pattern": "(FBM_VER\\s*=\\s*[\"'])(\\d+\\.\\d+\\.\\d+)([\"'];?)",
+          "replacement": "$1${version}$3"
         },
         {
-          "type": "generic",
-          "path": "foodbank-manager.php"
+          "type": "regex",
+          "path": "includes/Core/Plugin.php",
+          "pattern": "(define\\(\\s*[\"']FBM_VER[\"']\\s*,\\s*[\"'])(\\d+\\.\\d+\\.\\d+)([\"']\\s*\\))",
+          "replacement": "$1${version}$3"
         },
         {
-          "type": "generic",
-          "path": "readme.txt"
+          "type": "regex",
+          "path": "foodbank-manager.php",
+          "pattern": "^(\\s*\\*\\s*Version:\\s*)(\\d+\\.\\d+\\.\\d+)$",
+          "replacement": "$1${version}",
+          "flags": "m"
+        },
+        {
+          "type": "regex",
+          "path": "readme.txt",
+          "pattern": "^(Stable tag:\\s*)(\\d+\\.\\d+\\.\\d+)$",
+          "replacement": "$1${version}",
+          "flags": "m"
         }
       ]
     }
   }
 }
+
