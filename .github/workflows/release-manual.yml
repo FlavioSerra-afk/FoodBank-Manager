@@ -1,0 +1,18 @@
+name: Manual Build (Package Only)
+on:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+      - run: composer install --no-interaction --no-progress
+      - run: bash bin/package.sh
+      - name: Upload dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: foodbank-manager-dist
+          path: dist/*.zip

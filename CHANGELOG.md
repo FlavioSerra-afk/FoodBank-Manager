@@ -1,5 +1,6 @@
 ## 2.2.6 — 2025-09-14
 - Bump version
+- Switch to manual release flow
 
 ## 2.2.5 — 2025-09-14
 - Fix release-please to manifest mode (stop `chore(main): 1.8.0` PRs).

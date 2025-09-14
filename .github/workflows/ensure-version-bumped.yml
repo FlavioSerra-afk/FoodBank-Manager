@@ -29,7 +29,6 @@ jobs:
           BASE=$(git merge-base origin/${{ github.base_ref }} HEAD)
 
           need=( \
-            ".release-please-manifest.json" \
             "composer.json" \
             "foodbank-manager.php" \
             "readme.txt" \

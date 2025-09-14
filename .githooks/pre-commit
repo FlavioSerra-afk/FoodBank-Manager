@@ -8,7 +8,6 @@ fi
 
 # Require these files to be staged too (bump artifacts)
 req=(
-  ".release-please-manifest.json"
   "composer.json"
   "foodbank-manager.php"
   "readme.txt"
