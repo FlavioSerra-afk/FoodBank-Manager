@@ -1,3 +1,7 @@
+## [2.2.0] — 2025-09-13
+### Improved
+- Live preview now writes `<style data-fbm-preview>` under `@layer fbm` and `.fbm-scope`, updating as controls change.
+
 ## [2.1.6] — 2025-09-13
 ### Fixed
 - Theme & Design controls now apply instantly in preview and across FBM UI; corrected enqueue order & scope; hardened Settings API wiring.

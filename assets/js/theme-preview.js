@@ -1,14 +1,14 @@
 (function($){
-    const styleId = 'fbm-preview-vars';
+    const styleSelector = 'style[data-fbm-preview]';
     function render(tokens){
         let css = '';
         Object.keys(tokens).forEach(key=>{
             css += key + ':' + tokens[key] + ';';
         });
-        const cssText = '@layer fbm {.fbm-preview.fbm-scope{' + css + '}}';
-        let $style = $('#'+styleId);
+        const cssText = '@layer fbm {.fbm-scope{' + css + '}}';
+        let $style = $(styleSelector);
         if(!$style.length){
-            $style = $('<style/>',{id:styleId}).appendTo(document.head);
+            $style = $('<style>',{'data-fbm-preview':''}).appendTo(document.head);
         }
         $style.text(cssText);
     }
@@ -24,7 +24,7 @@
     let timer;
     $('.fbm-theme-controls').on('input change','[data-token]',function(){
         clearTimeout(timer);
-        timer = setTimeout(gather,175);
+        timer = setTimeout(gather,125);
     });
     $('.fbm-reset-all').on('click',function(){
         $('.fbm-theme-controls [data-token]').each(function(){
