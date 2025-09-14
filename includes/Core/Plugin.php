@@ -19,201 +19,198 @@ use FoodBankManager\CLI\Commands;
 use FoodBankManager\Admin\ShortcodesPage;
 use FoodBankManager\Core\Screen;
 
-if (!defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /**
  * Core plugin constants and helpers.
  */
-final class Plugin
-{
-    /** Plugin semantic version (syncs with header & composer). */
-    public $12.2.7$2
+final class Plugin {
 
-    /** Plugin slug / directory name. */
-    public const SLUG = 'foodbank-manager';
+				/** Plugin semantic version (syncs with header & composer). */
+	public const FBM_VER = '2.2.8';
 
-    /** Public accessor for tests and other namespaces. */
-    public static function version(): string
-    {
-        return self::FBM_VER;
-    }
+	/** Plugin slug / directory name. */
+	public const SLUG = 'foodbank-manager';
 
-    public const VERSION = self::FBM_VER;
-    private const OPTION_VERSION = 'fbm_version';
+	/** Public accessor for tests and other namespaces. */
+	public static function version(): string {
+		return self::FBM_VER;
+	}
 
-    private static ?Plugin $instance = null;
-    private static bool $booted = false;
+	public const VERSION         = self::FBM_VER;
+	private const OPTION_VERSION = 'fbm_version';
 
-    /**
-     * Get singleton instance.
-     */
-    public static function get_instance(): self
-    {
-        return self::$instance ??= new self();
-    }
+	private static ?Plugin $instance = null;
+	private static bool $booted      = false;
 
-    /**
-     * Register hooks and assets.
-     */
-    public function init(): void
-    {
-        (new Hooks())->register();
-        (new Assets())->register();
-    }
+	/**
+	 * Get singleton instance.
+	 */
+	public static function get_instance(): self {
+		return self::$instance ??= new self();
+	}
 
-    /**
-     * Boot the plugin.
-     */
-    public static function boot(): void
-    {
-        if (self::$booted) {
-            return;
-        }
-        self::$booted = true;
+	/**
+	 * Register hooks and assets.
+	 */
+	public function init(): void {
+		( new Hooks() )->register();
+		( new Assets() )->register();
+	}
 
-        self::maybe_upgrade();
-        self::maybe_register_cli();
+	/**
+	 * Boot the plugin.
+	 */
+	public static function boot(): void {
+		if ( self::$booted ) {
+			return;
+		}
+		self::$booted = true;
 
-        if (is_admin()) {
-            \FoodBankManager\Admin\Notices::maybe_handle_caps_notice_dismiss();
-            if (class_exists(\FBM\Auth\Capabilities::class)) {
-                \FBM\Auth\Capabilities::ensure_for_admin();
-            }
-            \FoodBankManager\Admin\ThemePage::boot();
-            \FoodBankManager\Admin\PermissionsPage::boot();
-            \FoodBankManager\Admin\DiagnosticsSecurity::boot();
-        }
+		self::maybe_upgrade();
+		self::maybe_register_cli();
 
-        \FBM\Shortcodes\Shortcodes::register();
-        Options::boot();
-        Retention::init();
-        Cron::init();
-        Cron::maybe_schedule_retention();
-        \FBM\Forms\FormCpt::register();
-        add_action(
-            'init',
-            static function (): void {
-                load_plugin_textdomain('foodbank-manager', false, dirname(plugin_basename(\FBM_FILE)) . '/languages');
-            }
-        );
+		if ( is_admin() ) {
+			\FoodBankManager\Admin\Notices::maybe_handle_caps_notice_dismiss();
+			if ( class_exists( \FBM\Auth\Capabilities::class ) ) {
+				\FBM\Auth\Capabilities::ensure_for_admin();
+			}
+			\FoodBankManager\Admin\ThemePage::boot();
+			\FoodBankManager\Admin\PermissionsPage::boot();
+			\FoodBankManager\Admin\DiagnosticsSecurity::boot();
+		}
 
-        \FoodBankManager\Auth\CapabilitiesResolver::boot();
+		\FBM\Shortcodes\Shortcodes::register();
+		Options::boot();
+		Retention::init();
+		Cron::init();
+		Cron::maybe_schedule_retention();
+		\FBM\Forms\FormCpt::register();
+		add_action(
+			'init',
+			static function (): void {
+				load_plugin_textdomain( 'foodbank-manager', false, dirname( plugin_basename( \FBM_FILE ) ) . '/languages' );
+			}
+		);
 
-        if (is_admin()) {
-            \FoodBankManager\Admin\Notices::boot();
-            add_action('admin_menu', [\FoodBankManager\Admin\Menu::class, 'register'], 9);
-            // Theme CSS enqueued via Core\Assets.
-        }
+		\FoodBankManager\Auth\CapabilitiesResolver::boot();
 
-        add_action('admin_post_nopriv_fbm_submit', [FormSubmitController::class, 'handle']);
-        add_action('admin_post_fbm_submit', [FormSubmitController::class, 'handle']);
-        add_action('admin_post_fbm_dash_export', [DashboardExportController::class, 'handle']);
-        add_action('admin_post_fbm_diag_mail_test', [DiagnosticsController::class, 'mail_test']);
-        add_action('wp_ajax_fbm_mail_test', [DiagnosticsController::class, 'ajax_mail_test']); // @phpstan-ignore-line
-        add_action('wp_ajax_fbm_mail_replay', [\FBM\Admin\MailReplay::class, 'handle']); // @phpstan-ignore-line
-        add_action('admin_post_fbm_diag_mail_retry', [DiagnosticsController::class, 'mail_retry']);
-        add_action('admin_post_fbm_mail_resend', [DiagnosticsController::class, 'mail_resend']);
-        add_action('admin_post_' . DiagnosticsPdf::ACTION_PREVIEW, [DiagnosticsPdf::class, 'preview']);
-        add_action('admin_post_' . DiagnosticsReport::ACTION, [DiagnosticsReport::class, 'download']);
-        add_action('admin_post_fbm_export_queue', [ExportJobsController::class, 'queue']);
-        add_action('admin_post_fbm_export_download', [ExportJobsController::class, 'download']);
-        add_action('admin_post_fbm_export_job_run', [ExportJobsController::class, 'run']);
-        add_action('admin_post_fbm_export_job_retry', [ExportJobsController::class, 'retry']);
-        add_filter('wp_privacy_personal_data_exporters', static function (array $exporters): array {
-            $exporters['foodbank_manager'] = array(
-                'exporter_friendly_name' => 'FoodBank Manager',
-                'callback'               => [\FBM\Privacy\Exporter::class, 'export'],
-            );
-            return $exporters;
-        });
-        add_filter('wp_privacy_personal_data_erasers', static function (array $erasers): array {
-            $erasers['foodbank_manager'] = array(
-                'eraser_friendly_name' => 'FoodBank Manager',
-                'callback'             => [\FBM\Privacy\Eraser::class, 'erase'],
-            );
-            return $erasers;
-        });
+		if ( is_admin() ) {
+			\FoodBankManager\Admin\Notices::boot();
+			add_action( 'admin_menu', array( \FoodBankManager\Admin\Menu::class, 'register' ), 9 );
+			// Theme CSS enqueued via Core\Assets.
+		}
 
-        self::get_instance()->init();
-        JobsWorker::init();
-    }
+		add_action( 'admin_post_nopriv_fbm_submit', array( FormSubmitController::class, 'handle' ) );
+		add_action( 'admin_post_fbm_submit', array( FormSubmitController::class, 'handle' ) );
+		add_action( 'admin_post_fbm_dash_export', array( DashboardExportController::class, 'handle' ) );
+		add_action( 'admin_post_fbm_diag_mail_test', array( DiagnosticsController::class, 'mail_test' ) );
+		add_action( 'wp_ajax_fbm_mail_test', array( DiagnosticsController::class, 'ajax_mail_test' ) ); // @phpstan-ignore-line
+		add_action( 'wp_ajax_fbm_mail_replay', array( \FBM\Admin\MailReplay::class, 'handle' ) ); // @phpstan-ignore-line
+		add_action( 'admin_post_fbm_diag_mail_retry', array( DiagnosticsController::class, 'mail_retry' ) );
+		add_action( 'admin_post_fbm_mail_resend', array( DiagnosticsController::class, 'mail_resend' ) );
+		add_action( 'admin_post_' . DiagnosticsPdf::ACTION_PREVIEW, array( DiagnosticsPdf::class, 'preview' ) );
+		add_action( 'admin_post_' . DiagnosticsReport::ACTION, array( DiagnosticsReport::class, 'download' ) );
+		add_action( 'admin_post_fbm_export_queue', array( ExportJobsController::class, 'queue' ) );
+		add_action( 'admin_post_fbm_export_download', array( ExportJobsController::class, 'download' ) );
+		add_action( 'admin_post_fbm_export_job_run', array( ExportJobsController::class, 'run' ) );
+		add_action( 'admin_post_fbm_export_job_retry', array( ExportJobsController::class, 'retry' ) );
+		add_filter(
+			'wp_privacy_personal_data_exporters',
+			static function ( array $exporters ): array {
+				$exporters['foodbank_manager'] = array(
+					'exporter_friendly_name' => 'FoodBank Manager',
+					'callback'               => array( \FBM\Privacy\Exporter::class, 'export' ),
+				);
+				return $exporters;
+			}
+		);
+		add_filter(
+			'wp_privacy_personal_data_erasers',
+			static function ( array $erasers ): array {
+				$erasers['foodbank_manager'] = array(
+					'eraser_friendly_name' => 'FoodBank Manager',
+					'callback'             => array( \FBM\Privacy\Eraser::class, 'erase' ),
+				);
+				return $erasers;
+			}
+		);
 
-    private static function maybe_register_cli(): void
-    {
-        if (defined('WP_CLI') && \WP_CLI) {
-            \WP_CLI::add_command('fbm', new Commands(new \FBM\CLI\WpCliIO()));
-        }
-    }
+		self::get_instance()->init();
+		JobsWorker::init();
+	}
 
-    private static function maybe_upgrade(): void
-    {
-        $current = \get_option(self::OPTION_VERSION);
-        if ($current === self::VERSION) {
-            return;
-        }
+	private static function maybe_register_cli(): void {
+		if ( defined( 'WP_CLI' ) && \WP_CLI ) {
+			\WP_CLI::add_command( 'fbm', new Commands( new \FBM\CLI\WpCliIO() ) );
+		}
+	}
 
-        if (\version_compare((string) $current, '1.10.2', '<')) {
-            $flag        = 'fbm_caps_migrated_2025_09';
-            $get_flag    = \is_multisite() ? 'get_site_option' : 'get_option';
-            $update_flag = \is_multisite() ? 'update_site_option' : 'update_option';
-            if (!$get_flag($flag)) {
-                if (\is_multisite()) {
-                    foreach (\get_sites(['number' => 0]) as $site) {
-                        \switch_to_blog((int) $site->blog_id);
-                        $role = \get_role('administrator');
-                        if ($role && !$role->has_cap('fbm_manage_jobs')) {
-                            $role->add_cap('fbm_manage_jobs', true);
-                        }
-                    }
-                    \restore_current_blog();
-                } else {
-                    $role = \get_role('administrator');
-                    if ($role && !$role->has_cap('fbm_manage_jobs')) {
-                        $role->add_cap('fbm_manage_jobs', true);
-                    }
-                }
-                $update_flag($flag, 1);
-            }
-        }
+	private static function maybe_upgrade(): void {
+		$current = \get_option( self::OPTION_VERSION );
+		if ( $current === self::VERSION ) {
+			return;
+		}
 
-        \update_option(self::OPTION_VERSION, self::VERSION);
-    }
+		if ( \version_compare( (string) $current, '1.10.2', '<' ) ) {
+			$flag        = 'fbm_caps_migrated_2025_09';
+			$get_flag    = \is_multisite() ? 'get_site_option' : 'get_option';
+			$update_flag = \is_multisite() ? 'update_site_option' : 'update_option';
+			if ( ! $get_flag( $flag ) ) {
+				if ( \is_multisite() ) {
+					foreach ( \get_sites( array( 'number' => 0 ) ) as $site ) {
+						\switch_to_blog( (int) $site->blog_id );
+						$role = \get_role( 'administrator' );
+						if ( $role && ! $role->has_cap( 'fbm_manage_jobs' ) ) {
+							$role->add_cap( 'fbm_manage_jobs', true );
+						}
+					}
+					\restore_current_blog();
+				} else {
+					$role = \get_role( 'administrator' );
+					if ( $role && ! $role->has_cap( 'fbm_manage_jobs' ) ) {
+						$role->add_cap( 'fbm_manage_jobs', true );
+					}
+				}
+				$update_flag( $flag, 1 );
+			}
+		}
 
-    /** Activate plugin. */
-    public static function activate(): void
-    {
-        (new Migrations())->maybe_migrate();
-        Roles::install();
-        Cron::maybe_schedule_retention();
-        JobsWorker::schedule();
-        \update_option(self::OPTION_VERSION, self::VERSION);
-    }
+		\update_option( self::OPTION_VERSION, self::VERSION );
+	}
 
-    /** Deactivate plugin. */
-    public function deactivate(): void
-    {
-        if (function_exists('wp_clear_scheduled_hook')) {
-            $hooks = array(
-                \FoodBankManager\Core\Cron::RETENTION_HOOK,
-                \FBM\Core\Retention::EVENT,
-                \FBM\Core\Jobs\JobsWorker::EVENT,
-                'fbm_retention_hourly',
-                'fbm_retention_tick',
-                'fbm_jobs_tick',
-            );
-            foreach (array_unique($hooks) as $hook) {
-                wp_clear_scheduled_hook($hook);
-            }
-        }
-    }
+	/** Activate plugin. */
+	public static function activate(): void {
+		( new Migrations() )->maybe_migrate();
+		Roles::install();
+		Cron::maybe_schedule_retention();
+		JobsWorker::schedule();
+		\update_option( self::OPTION_VERSION, self::VERSION );
+	}
+
+	/** Deactivate plugin. */
+	public function deactivate(): void {
+		if ( function_exists( 'wp_clear_scheduled_hook' ) ) {
+			$hooks = array(
+				\FoodBankManager\Core\Cron::RETENTION_HOOK,
+				\FBM\Core\Retention::EVENT,
+				\FBM\Core\Jobs\JobsWorker::EVENT,
+				'fbm_retention_hourly',
+				'fbm_retention_tick',
+				'fbm_jobs_tick',
+			);
+			foreach ( array_unique( $hooks ) as $hook ) {
+				wp_clear_scheduled_hook( $hook );
+			}
+		}
+	}
 }
 
 /**
  * Global define for consumers that expect FBM_VER in the global space.
  */
-if (!defined('FBM_VER')) {
-    \define('FBM_VER', \FoodBankManager\Core\Plugin::FBM_VER);
+if ( ! defined( 'FBM_VER' ) ) {
+	\define( 'FBM_VER', \FoodBankManager\Core\Plugin::FBM_VER );
 }
-

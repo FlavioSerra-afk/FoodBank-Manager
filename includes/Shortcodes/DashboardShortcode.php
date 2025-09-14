@@ -52,10 +52,10 @@ final class DashboardShortcode {
 					. '</div>';
 		}
 
-                wp_enqueue_style( 'fbm-public', plugins_url( 'assets/css/public.css', FBM_FILE ), array(), Plugin::VERSION ); // @phpstan-ignore-line
-                                                wp_add_inline_style( 'fbm-public', Theme::css_variables_scoped() );
-                                                wp_register_style( 'fbm-frontend-dashboard', plugins_url( 'assets/css/frontend-dashboard.css', FBM_FILE ), array(), Plugin::VERSION );
-                                                wp_enqueue_style( 'fbm-frontend-dashboard' );
+				wp_enqueue_style( 'fbm-public', plugins_url( 'assets/css/public.css', FBM_FILE ), array(), Plugin::VERSION ); // @phpstan-ignore-line
+												wp_add_inline_style( 'fbm-public', Theme::css_variables_scoped() );
+												wp_register_style( 'fbm-frontend-dashboard', plugins_url( 'assets/css/frontend-dashboard.css', FBM_FILE ), array(), Plugin::VERSION );
+												wp_enqueue_style( 'fbm-frontend-dashboard' );
 
 					$atts         = shortcode_atts(
 						array(

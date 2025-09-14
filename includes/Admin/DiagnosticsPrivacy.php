@@ -24,82 +24,85 @@ use function absint;
  * Controller for Diagnostics → Privacy panel.
  */
 final class DiagnosticsPrivacy {
-    private const ACTION_PREVIEW   = 'fbm_privacy_preview';
-    private const ACTION_ERASE_DRY = 'fbm_privacy_erase_dry';
-    private const ACTION_ERASE     = 'fbm_privacy_erase';
+	private const ACTION_PREVIEW   = 'fbm_privacy_preview';
+	private const ACTION_ERASE_DRY = 'fbm_privacy_erase_dry';
+	private const ACTION_ERASE     = 'fbm_privacy_erase';
 
-    /** @var array{data:array<int,array<string,mixed>>,done:bool} */
-    private static array $preview = array( 'data' => array(), 'done' => true );
-    /** @var array<string,mixed> */
-    private static array $erasure = array();
+	/** @var array{data:array<int,array<string,mixed>>,done:bool} */
+	private static array $preview = array(
+		'data' => array(),
+		'done' => true,
+	);
+	/** @var array<string,mixed> */
+	private static array $erasure = array();
 
-    /**
-     * Handle panel actions.
-     */
-    public static function handle_actions(): void {
-        $action_raw = $_POST['fbm_privacy_action'] ?? null;
-        if ( null === $action_raw ) {
-            return;
-        }
-        $action = sanitize_key( (string) wp_unslash( $action_raw ) );
-        $email_raw = $_POST['email'] ?? null;
-        $email = sanitize_email( (string) wp_unslash( (string) $email_raw ) );
-        if ( '' === $email ) {
-            return;
-        }
+	/**
+	 * Handle panel actions.
+	 */
+	public static function handle_actions(): void {
+		$action_raw = $_POST['fbm_privacy_action'] ?? null;
+		if ( null === $action_raw ) {
+			return;
+		}
+		$action    = sanitize_key( (string) wp_unslash( $action_raw ) );
+		$email_raw = $_POST['email'] ?? null;
+		$email     = sanitize_email( (string) wp_unslash( (string) $email_raw ) );
+		if ( '' === $email ) {
+			return;
+		}
 
-        if ( self::ACTION_PREVIEW === $action ) {
-            check_admin_referer( self::ACTION_PREVIEW );
-            if ( ! current_user_can( 'fb_manage_diagnostics' ) ) {
-                wp_die( esc_html__( 'Insufficient permissions', 'foodbank-manager' ) );
-            }
-            $page_size_raw = $_POST['page_size'] ?? null;
-            $page_size     = absint( (string) wp_unslash( (string) $page_size_raw ) );
-            if ( $page_size <= 0 ) {
-                $page_size = 1;
-            }
-            self::$preview = \FBM\Privacy\Exporter::export( $email, 1, $page_size );
-            add_settings_error( 'fbm_diagnostics', 'fbm_privacy_preview', __( 'Preview generated.', 'foodbank-manager' ), 'updated' );
-            return;
-        }
+		if ( self::ACTION_PREVIEW === $action ) {
+			check_admin_referer( self::ACTION_PREVIEW );
+			if ( ! current_user_can( 'fb_manage_diagnostics' ) ) {
+				wp_die( esc_html__( 'Insufficient permissions', 'foodbank-manager' ) );
+			}
+			$page_size_raw = $_POST['page_size'] ?? null;
+			$page_size     = absint( (string) wp_unslash( (string) $page_size_raw ) );
+			if ( $page_size <= 0 ) {
+				$page_size = 1;
+			}
+			self::$preview = \FBM\Privacy\Exporter::export( $email, 1, $page_size );
+			add_settings_error( 'fbm_diagnostics', 'fbm_privacy_preview', __( 'Preview generated.', 'foodbank-manager' ), 'updated' );
+			return;
+		}
 
-        if ( self::ACTION_ERASE_DRY === $action || self::ACTION_ERASE === $action ) {
-            $nonce_action = self::ACTION_ERASE_DRY === $action ? self::ACTION_ERASE_DRY : self::ACTION_ERASE;
-            check_admin_referer( $nonce_action );
-            if ( ! current_user_can( 'fb_manage_diagnostics' ) ) {
-                wp_die( esc_html__( 'Insufficient permissions', 'foodbank-manager' ) );
-            }
-            $dry           = self::ACTION_ERASE_DRY === $action;
-            $result        = \FBM\Privacy\Eraser::run( $email, 1, $dry );
-            self::$erasure = $result;
-            $msg           = $dry ? __( 'Dry-run complete.', 'foodbank-manager' ) : __( 'Erasure complete.', 'foodbank-manager' );
-            add_settings_error( 'fbm_diagnostics', 'fbm_privacy_erase', $msg, 'updated' );
-        }
-    }
+		if ( self::ACTION_ERASE_DRY === $action || self::ACTION_ERASE === $action ) {
+			$nonce_action = self::ACTION_ERASE_DRY === $action ? self::ACTION_ERASE_DRY : self::ACTION_ERASE;
+			check_admin_referer( $nonce_action );
+			if ( ! current_user_can( 'fb_manage_diagnostics' ) ) {
+				wp_die( esc_html__( 'Insufficient permissions', 'foodbank-manager' ) );
+			}
+			$dry           = self::ACTION_ERASE_DRY === $action;
+			$result        = \FBM\Privacy\Eraser::run( $email, 1, $dry );
+			self::$erasure = $result;
+			$msg           = $dry ? __( 'Dry-run complete.', 'foodbank-manager' ) : __( 'Erasure complete.', 'foodbank-manager' );
+			add_settings_error( 'fbm_diagnostics', 'fbm_privacy_erase', $msg, 'updated' );
+		}
+	}
 
-    /**
-     * Render panel template.
-     */
-    public static function render_panel(): void {
-        /* @psalm-suppress UnresolvableInclude */
-        require FBM_PATH . 'templates/admin/diagnostics-privacy.php';
-    }
+	/**
+	 * Render panel template.
+	 */
+	public static function render_panel(): void {
+		/* @psalm-suppress UnresolvableInclude */
+		require FBM_PATH . 'templates/admin/diagnostics-privacy.php';
+	}
 
-    /**
-     * Get last preview summary.
-     *
-     * @return array{data:array<int,array<string,mixed>>,done:bool}
-     */
-    public static function preview_summary(): array {
-        return self::$preview;
-    }
+	/**
+	 * Get last preview summary.
+	 *
+	 * @return array{data:array<int,array<string,mixed>>,done:bool}
+	 */
+	public static function preview_summary(): array {
+		return self::$preview;
+	}
 
-    /**
-     * Get last erasure summary.
-     *
-     * @return array<string,mixed>
-     */
-    public static function erasure_summary(): array {
-        return self::$erasure;
-    }
+	/**
+	 * Get last erasure summary.
+	 *
+	 * @return array<string,mixed>
+	 */
+	public static function erasure_summary(): array {
+		return self::$erasure;
+	}
 }

@@ -10,8 +10,10 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-$opts   = get_option( 'fbm_theme', [] );
-$groups = fbm_theme_groups();
+$stored   = get_option( 'fbm_theme', [] );
+$defaults = function_exists( 'fbm_theme_defaults' ) ? fbm_theme_defaults() : [];
+$opts     = is_array( $stored ) ? array_replace_recursive( $defaults, $stored ) : $defaults;
+$groups   = fbm_theme_groups();
 ?>
 <div class="wrap fbm-theme">
   <h1><?php esc_html_e( 'FBM Theme', 'foodbank-manager' ); ?></h1>

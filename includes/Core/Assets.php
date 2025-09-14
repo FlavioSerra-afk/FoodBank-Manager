@@ -105,12 +105,15 @@ class Assets {
 /* Two-pane grid: LEFT 260px | RIGHT 1fr */
 .fbm-grid--vtabs{ display:grid; grid-template-columns: 260px minmax(0,1fr); gap:16px; align-items:start; }
 
-/* RIGHT itself: fields | preview side-by-side */
-.fbm-right{ display:grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap:16px; align-items:start; }
-@media (max-width:1280px){ .fbm-right{ grid-template-columns: 1fr; } }
+/* Right panel lays out: fields | preview */
+.fbm-right{ display:grid; grid-template-columns:minmax(0,1fr) minmax(520px,1fr); gap:16px; align-items:start; }
+.fbm-right .fbm-preview{ min-width:520px; }
+@media (max-width:1280px){
+  .fbm-right{ grid-template-columns:1fr; }
+  .fbm-right .fbm-preview{ min-width:0; }
+}
 
 .fbm-right-fields{ min-width:0; }
-.fbm-preview{ min-width:0; }
 
 /* Keep non-FBM admin notices from pushing layout around on this page only */
 .wrap.fbm-theme .notice, .wrap.fbm-theme .update-nag{ display:none !important; }

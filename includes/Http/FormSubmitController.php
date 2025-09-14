@@ -136,9 +136,7 @@ final class FormSubmitController {
 				$allowed[]   = $id;
 		}
 		foreach ( $post as $key => $v ) {
-			if (
-						! in_array( (string) $key, (array) $allowed, true )
-						&& ! in_array( (string) $key, array( '_fbm_nonce', 'preset', 'action', 'captcha' ), true )
+			if ( ! in_array( (string) $key, (array) $allowed, true ) && ! in_array( (string) $key, array( '_fbm_nonce', 'preset', 'action', 'captcha' ), true )
 				) {
 						throw new \RuntimeException( 'unknown' );
 			}

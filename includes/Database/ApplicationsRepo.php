@@ -70,9 +70,7 @@ class ApplicationsRepo {
 				$params[] = $args['date_to'];
 			}
 			if ( isset( $args['has_file'] ) ) {
-				$where .= $args['has_file'] ?
-				' AND EXISTS (SELECT 1 FROM ' . $wpdb->prefix . 'fb_files f WHERE f.application_id = a.id)' :
-				' AND NOT EXISTS (SELECT 1 FROM ' . $wpdb->prefix . 'fb_files f WHERE f.application_id = a.id)';
+				$where .= $args['has_file'] ? ' AND EXISTS (SELECT 1 FROM ' . $wpdb->prefix . 'fb_files f WHERE f.application_id = a.id)' : ' AND NOT EXISTS (SELECT 1 FROM ' . $wpdb->prefix . 'fb_files f WHERE f.application_id = a.id)';
 			}
 			if ( isset( $args['consent'] ) ) {
 				$where .= $args['consent'] ? ' AND a.consent_timestamp IS NOT NULL' : ' AND a.consent_timestamp IS NULL';

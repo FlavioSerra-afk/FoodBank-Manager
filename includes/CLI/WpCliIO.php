@@ -12,21 +12,21 @@ namespace FBM\CLI;
 use WP_CLI;
 
 final class WpCliIO implements IO {
-    public function line(string $message): void {
-        if (class_exists(WP_CLI::class)) {
-            WP_CLI::line($message);
-        }
-    }
+	public function line( string $message ): void {
+		if ( class_exists( WP_CLI::class ) ) {
+			WP_CLI::line( $message );
+		}
+	}
 
-    public function success(string $message): void {
-        if (class_exists(WP_CLI::class)) {
-            WP_CLI::success($message);
-        }
-    }
+	public function success( string $message ): void {
+		if ( class_exists( WP_CLI::class ) ) {
+			WP_CLI::success( $message );
+		}
+	}
 
-    public function error(string $message): void {
-        if (class_exists(WP_CLI::class)) {
-            WP_CLI::error($message);
-        }
-    }
+	public function error( string $message ): void {
+		if ( class_exists( WP_CLI::class ) ) {
+			WP_CLI::error( $message );
+		}
+	}
 }

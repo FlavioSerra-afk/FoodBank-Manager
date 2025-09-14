@@ -64,7 +64,7 @@ final class PresetsRepo {
 		$normalized = Schema::normalize( $schema );
 		$slug       = $normalized['meta']['slug'];
 		$key        = 'fbm_form_' . $slug;
-                update_option( $key, wp_json_encode( $normalized ), false ); // @phpstan-ignore-line
+				update_option( $key, wp_json_encode( $normalized ), false ); // @phpstan-ignore-line
 		$index                  = self::list();
 		$timestamp              = time();
 				$index_filtered = array_filter(
@@ -78,7 +78,7 @@ final class PresetsRepo {
 			'slug'       => $slug,
 			'updated_at' => $timestamp,
 		);
-                update_option( self::INDEX_KEY, $index_filtered, false ); // @phpstan-ignore-line
+				update_option( self::INDEX_KEY, $index_filtered, false ); // @phpstan-ignore-line
 		return $timestamp;
 	}
 
@@ -98,11 +98,11 @@ final class PresetsRepo {
 						return is_array( $item ) && $item['slug'] !== $slug;
 			}
 		);
-                update_option( self::INDEX_KEY, $index, false ); // @phpstan-ignore-line
+				update_option( self::INDEX_KEY, $index, false ); // @phpstan-ignore-line
 		if ( function_exists( 'delete_option' ) ) {
 			return delete_option( $key );
 		}
-                update_option( $key, null, false ); // @phpstan-ignore-line
+				update_option( $key, null, false ); // @phpstan-ignore-line
 		return true;
 	}
 }

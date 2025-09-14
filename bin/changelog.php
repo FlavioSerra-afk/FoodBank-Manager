@@ -22,9 +22,7 @@ try {
 	$lastTag = ''; }
 
 $range  = $lastTag ? "$lastTag..HEAD" : '';
-$logCmd = $range
-	? "git log $range --pretty=format:%s"
-	: 'git log --pretty=format:%s';
+$logCmd = $range ? "git log $range --pretty=format:%s" : 'git log --pretty=format:%s';
 $lines  = explode( "\n", run( $logCmd ) );
 
 $groups = array(
