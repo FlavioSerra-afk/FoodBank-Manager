@@ -100,7 +100,9 @@ class Assets {
         if (!$screen || 'foodbank_page_fbm_theme' !== $screen->id) {
             return;
         }
-        // Assets to be enqueued in a later revision.
+        $css = '.fbm-grid{display:grid;grid-template-columns:340px 1fr;gap:24px;margin-top:16px}' .
+            '.fbm-preview{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:24px}';
+        wp_add_inline_style('fbm-admin', $css);
     }
 
     /**
