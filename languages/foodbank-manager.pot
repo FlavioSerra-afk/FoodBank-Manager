@@ -2,14 +2,14 @@
 # This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: FoodBank Manager 2.0.8\n"
+"Project-Id-Version: FoodBank Manager 2.2.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/FoodBank-Manager\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-09-13T15:34:48+00:00\n"
+"POT-Creation-Date: 2025-09-14T12:19:50+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: foodbank-manager\n"
@@ -254,6 +254,8 @@ msgstr ""
 #: includes/Admin/Menu.php:102
 #: includes/Admin/PermissionsPage.php:551
 #: templates/admin/dashboard.php:23
+#: templates/admin/dashboard.php:27
+#: templates/public/dashboard.php:44
 msgid "Dashboard"
 msgstr ""
 
@@ -266,7 +268,9 @@ msgstr ""
 
 #: includes/Admin/Menu.php:119
 #: includes/Admin/Menu.php:120
+#: templates/admin/dashboard.php:31
 #: templates/admin/reports.php:8
+#: templates/public/dashboard.php:48
 msgid "Reports"
 msgstr ""
 
@@ -329,7 +333,7 @@ msgstr ""
 
 #: includes/Admin/Menu.php:220
 #: includes/Admin/Menu.php:221
-#: templates/admin/theme.php:23
+#: templates/admin/theme.php:25
 msgid "Design & Theme"
 msgstr ""
 
@@ -488,16 +492,16 @@ msgstr ""
 msgid "Theme imported."
 msgstr ""
 
-#: includes/Core/Options.php:108
-#: includes/UI/Theme.php:92
+#: includes/Core/Options.php:142
+#: includes/UI/Theme.php:93
 msgid "Theme payload too large."
 msgstr ""
 
-#: includes/Core/Options.php:125
+#: includes/Core/Options.php:159
 msgid "Invalid from address."
 msgstr ""
 
-#: includes/Core/Options.php:129
+#: includes/Core/Options.php:163
 msgid "Invalid reply-to address."
 msgstr ""
 
@@ -598,7 +602,7 @@ msgid "Policy"
 msgstr ""
 
 #: includes/Exports/CsvExporter.php:95
-#: templates/public/dashboard.php:149
+#: templates/public/dashboard.php:160
 msgid "Voided"
 msgstr ""
 
@@ -754,7 +758,7 @@ msgstr ""
 #: templates/admin/database.php:67
 #: templates/admin/reports.php:19
 #: templates/admin/reports.php:27
-#: templates/public/dashboard.php:50
+#: templates/public/dashboard.php:61
 msgid "All"
 msgstr ""
 
@@ -822,8 +826,8 @@ msgstr ""
 
 #: templates/admin/attendance.php:20
 #: templates/admin/forms.php:26
-#: templates/admin/theme.php:55
-#: templates/admin/theme.php:117
+#: templates/admin/theme.php:60
+#: templates/admin/theme.php:282
 msgid "Preset"
 msgstr ""
 
@@ -865,7 +869,7 @@ msgstr ""
 #: templates/admin/attendance.php:31
 #: templates/admin/diagnostics.php:268
 #: templates/admin/reports.php:17
-#: templates/public/dashboard.php:56
+#: templates/public/dashboard.php:67
 msgid "Event"
 msgstr ""
 
@@ -876,17 +880,17 @@ msgstr ""
 #: templates/admin/attendance.php:48
 #: templates/admin/jobs.php:17
 #: templates/public/attendance-manager.php:24
-#: templates/public/dashboard.php:48
+#: templates/public/dashboard.php:59
 msgid "Type"
 msgstr ""
 
 #: templates/admin/attendance.php:55
-#: templates/public/dashboard.php:51
+#: templates/public/dashboard.php:62
 msgid "In person"
 msgstr ""
 
 #: templates/admin/attendance.php:61
-#: templates/public/dashboard.php:52
+#: templates/public/dashboard.php:63
 msgid "Delivery"
 msgstr ""
 
@@ -895,7 +899,7 @@ msgid "Manager ID"
 msgstr ""
 
 #: templates/admin/attendance.php:65
-#: templates/public/dashboard.php:61
+#: templates/public/dashboard.php:72
 msgid "Policy only"
 msgstr ""
 
@@ -949,108 +953,108 @@ msgid "Reason"
 msgstr ""
 
 #. translators: %s: total applications count
-#: templates/admin/dashboard.php:25
+#: templates/admin/dashboard.php:36
 #, php-format
 msgid "Total applications: %s"
 msgstr ""
 
-#: templates/admin/dashboard.php:28
+#: templates/admin/dashboard.php:39
 msgid "Total applications"
 msgstr ""
 
 #. translators: %s: new applications today
-#: templates/admin/dashboard.php:30
+#: templates/admin/dashboard.php:41
 #, php-format
 msgid "New today: %s"
 msgstr ""
 
-#: templates/admin/dashboard.php:33
+#: templates/admin/dashboard.php:44
 msgid "New today"
 msgstr ""
 
 #. translators: %s: check-ins today
-#: templates/admin/dashboard.php:35
+#: templates/admin/dashboard.php:46
 #, php-format
 msgid "Check-ins today: %s"
 msgstr ""
 
-#: templates/admin/dashboard.php:38
+#: templates/admin/dashboard.php:49
 msgid "Check-ins today"
 msgstr ""
 
 #. translators: %s: check-ins this week
-#: templates/admin/dashboard.php:40
+#: templates/admin/dashboard.php:51
 #, php-format
 msgid "Check-ins this week: %s"
 msgstr ""
 
-#: templates/admin/dashboard.php:43
+#: templates/admin/dashboard.php:54
 msgid "Check-ins this week"
 msgstr ""
 
 #. translators: %s: check-ins this month
-#: templates/admin/dashboard.php:45
+#: templates/admin/dashboard.php:56
 #, php-format
 msgid "Check-ins this month: %s"
 msgstr ""
 
-#: templates/admin/dashboard.php:48
+#: templates/admin/dashboard.php:59
 msgid "Check-ins this month"
 msgstr ""
 
 #. translators: %s: number of active events
-#: templates/admin/dashboard.php:50
+#: templates/admin/dashboard.php:61
 #, php-format
 msgid "Active events: %s"
 msgstr ""
 
-#: templates/admin/dashboard.php:53
+#: templates/admin/dashboard.php:64
 msgid "Active events"
 msgstr ""
 
 #. translators: %s: number of tickets issued
-#: templates/admin/dashboard.php:55
+#: templates/admin/dashboard.php:66
 #, php-format
 msgid "Tickets issued: %s"
 msgstr ""
 
-#: templates/admin/dashboard.php:58
+#: templates/admin/dashboard.php:69
 msgid "Tickets issued"
 msgstr ""
 
 #. translators: %s: number of tickets revoked
-#: templates/admin/dashboard.php:61
+#: templates/admin/dashboard.php:72
 #, php-format
 msgid "Tickets revoked: %s"
 msgstr ""
 
-#: templates/admin/dashboard.php:64
+#: templates/admin/dashboard.php:75
 msgid "Tickets revoked"
 msgstr ""
 
 #. translators: %s: email failures in last 7 days
-#: templates/admin/dashboard.php:67
+#: templates/admin/dashboard.php:78
 #, php-format
 msgid "Mail failures (last 7d): %s"
 msgstr ""
 
-#: templates/admin/dashboard.php:70
+#: templates/admin/dashboard.php:81
 msgid "Mail failures (last 7d)"
 msgstr ""
 
-#: templates/admin/dashboard.php:77
+#: templates/admin/dashboard.php:88
 msgid "Scan now"
 msgstr ""
 
-#: templates/admin/dashboard.php:78
+#: templates/admin/dashboard.php:89
 msgid "Issue tickets"
 msgstr ""
 
-#: templates/admin/dashboard.php:79
+#: templates/admin/dashboard.php:90
 msgid "Export attendance"
 msgstr ""
 
-#: templates/admin/dashboard.php:80
+#: templates/admin/dashboard.php:91
 msgid "New form"
 msgstr ""
 
@@ -1101,7 +1105,7 @@ msgid "Select preset"
 msgstr ""
 
 #: templates/admin/database.php:38
-#: templates/public/dashboard.php:63
+#: templates/public/dashboard.php:74
 msgid "Apply"
 msgstr ""
 
@@ -1455,6 +1459,7 @@ msgstr ""
 
 #: templates/admin/email-templates-edit.php:19
 #: templates/admin/emails.php:67
+#: templates/admin/theme.php:162
 msgid "Body"
 msgstr ""
 
@@ -1728,13 +1733,13 @@ msgid "Add"
 msgstr ""
 
 #: templates/admin/permissions.php:143
-#: templates/admin/theme.php:36
+#: templates/admin/theme.php:40
 msgid "Export"
 msgstr ""
 
 #: templates/admin/permissions.php:149
 #: templates/admin/permissions.php:156
-#: templates/admin/theme.php:34
+#: templates/admin/theme.php:38
 msgid "Import"
 msgstr ""
 
@@ -1896,101 +1901,222 @@ msgstr ""
 msgid "Generate"
 msgstr ""
 
-#: templates/admin/theme.php:25
+#: templates/admin/theme.php:27
 msgid "Admin UI"
 msgstr ""
 
-#: templates/admin/theme.php:26
+#: templates/admin/theme.php:28
 msgid "Front-end UI"
 msgstr ""
 
-#: templates/admin/theme.php:44
+#: templates/admin/theme.php:41
+msgid "Restore defaults"
+msgstr ""
+
+#: templates/admin/theme.php:49
 msgid "Apply theme to FBM interface"
 msgstr ""
 
-#: templates/admin/theme.php:45
+#: templates/admin/theme.php:50
 msgid "Affects only FoodBank Manager pages/tabs; will not change the WordPress sidebar or other plugins."
 msgstr ""
 
-#: templates/admin/theme.php:48
-#: templates/admin/theme.php:110
+#: templates/admin/theme.php:53
+#: templates/admin/theme.php:275
 msgid "Mode"
 msgstr ""
 
-#: templates/admin/theme.php:50
-#: templates/admin/theme.php:112
+#: templates/admin/theme.php:55
+#: templates/admin/theme.php:277
 msgid "Glass"
 msgstr ""
 
-#: templates/admin/theme.php:51
-#: templates/admin/theme.php:113
+#: templates/admin/theme.php:56
+#: templates/admin/theme.php:278
 msgid "Basic"
 msgstr ""
 
-#: templates/admin/theme.php:57
-#: templates/admin/theme.php:119
+#: templates/admin/theme.php:62
+#: templates/admin/theme.php:284
 msgid "Light"
 msgstr ""
 
-#: templates/admin/theme.php:58
-#: templates/admin/theme.php:120
+#: templates/admin/theme.php:63
+#: templates/admin/theme.php:285
 msgid "Dark"
 msgstr ""
 
-#: templates/admin/theme.php:59
-#: templates/admin/theme.php:121
+#: templates/admin/theme.php:64
+#: templates/admin/theme.php:286
 msgid "High-Contrast"
 msgstr ""
 
-#: templates/admin/theme.php:63
-#: templates/admin/theme.php:125
+#: templates/admin/theme.php:68
+#: templates/admin/theme.php:290
 msgid "Accent colour"
 msgstr ""
 
-#: templates/admin/theme.php:67
-#: templates/admin/theme.php:129
+#: templates/admin/theme.php:72
+#: templates/admin/theme.php:294
 msgid "Glass alpha"
 msgstr ""
 
-#: templates/admin/theme.php:71
-#: templates/admin/theme.php:133
+#: templates/admin/theme.php:76
+#: templates/admin/theme.php:298
 msgid "Glass blur"
 msgstr ""
 
-#: templates/admin/theme.php:75
-#: templates/admin/theme.php:137
+#: templates/admin/theme.php:80
+#: templates/admin/theme.php:302
 msgid "Elevation"
 msgstr ""
 
-#: templates/admin/theme.php:79
-#: templates/admin/theme.php:141
+#: templates/admin/theme.php:84
+#: templates/admin/theme.php:125
+#: templates/admin/theme.php:224
+#: templates/admin/theme.php:306
 msgid "Radius"
 msgstr ""
 
-#: templates/admin/theme.php:83
-#: templates/admin/theme.php:145
+#: templates/admin/theme.php:88
+#: templates/admin/theme.php:310
 msgid "Border"
 msgstr ""
 
-#: templates/admin/theme.php:87
-#: templates/admin/theme.php:149
+#: templates/admin/theme.php:92
+#: templates/admin/theme.php:314
 msgid "Button background"
 msgstr ""
 
-#: templates/admin/theme.php:91
-#: templates/admin/theme.php:153
+#: templates/admin/theme.php:96
+#: templates/admin/theme.php:190
+#: templates/admin/theme.php:318
 msgid "Link colour"
 msgstr ""
 
-#: templates/admin/theme.php:98
+#: templates/admin/theme.php:99
+msgid "Menu"
+msgstr ""
+
+#: templates/admin/theme.php:101
+msgid "Item height"
+msgstr ""
+
+#: templates/admin/theme.php:105
+msgid "Padding X"
+msgstr ""
+
+#: templates/admin/theme.php:109
+msgid "Padding Y"
+msgstr ""
+
+#: templates/admin/theme.php:113
+msgid "Icon size"
+msgstr ""
+
+#: templates/admin/theme.php:117
+msgid "Icon opacity"
+msgstr ""
+
+#: templates/admin/theme.php:121
+#: templates/admin/theme.php:220
+msgid "Gap"
+msgstr ""
+
+#: templates/admin/theme.php:129
+#: templates/admin/theme.php:240
+msgid "Hover background"
+msgstr ""
+
+#: templates/admin/theme.php:133
+#: templates/admin/theme.php:232
+msgid "Hover colour"
+msgstr ""
+
+#: templates/admin/theme.php:137
+#: templates/admin/theme.php:244
+msgid "Active background"
+msgstr ""
+
+#: templates/admin/theme.php:141
+#: templates/admin/theme.php:236
+msgid "Active colour"
+msgstr ""
+
+#: templates/admin/theme.php:145
+msgid "Divider"
+msgstr ""
+
+#: templates/admin/theme.php:149
+msgid "Typography"
+msgstr ""
+
+#: templates/admin/theme.php:171
+msgid "Small"
+msgstr ""
+
+#: templates/admin/theme.php:178
+#: templates/admin/theme.php:228
+msgid "Text colour"
+msgstr ""
+
+#: templates/admin/theme.php:182
+msgid "Headings colour"
+msgstr ""
+
+#: templates/admin/theme.php:186
+msgid "Muted colour"
+msgstr ""
+
+#: templates/admin/theme.php:194
+msgid "Link hover"
+msgstr ""
+
+#: templates/admin/theme.php:198
+msgid "Link active"
+msgstr ""
+
+#: templates/admin/theme.php:202
+msgid "Link visited"
+msgstr ""
+
+#: templates/admin/theme.php:206
+msgid "Tabs"
+msgstr ""
+
+#: templates/admin/theme.php:208
+msgid "Height"
+msgstr ""
+
+#: templates/admin/theme.php:212
+msgid "Horizontal padding"
+msgstr ""
+
+#: templates/admin/theme.php:216
+msgid "Vertical padding"
+msgstr ""
+
+#: templates/admin/theme.php:248
+msgid "Indicator height"
+msgstr ""
+
+#: templates/admin/theme.php:252
+msgid "Indicator offset"
+msgstr ""
+
+#: templates/admin/theme.php:256
+msgid "Indicator colour"
+msgstr ""
+
+#: templates/admin/theme.php:263
 msgid "Apply theme to front-end shortcodes/pages"
 msgstr ""
 
-#: templates/admin/theme.php:102
+#: templates/admin/theme.php:267
 msgid "Apply theme to site menus"
 msgstr ""
 
-#: templates/admin/theme.php:106
+#: templates/admin/theme.php:271
 msgid "Match front-end to admin theme"
 msgstr ""
 
@@ -2087,71 +2213,71 @@ msgstr ""
 msgid "No-show recorded"
 msgstr ""
 
-#: templates/public/dashboard.php:46
+#: templates/public/dashboard.php:57
 msgid "Dashboard filters"
 msgstr ""
 
-#: templates/public/dashboard.php:64
+#: templates/public/dashboard.php:75
 msgid "Download CSV"
 msgstr ""
 
 #. translators: %s: toggle state.
-#: templates/public/dashboard.php:74
+#: templates/public/dashboard.php:85
 #, php-format
 msgid "Compare: %s"
 msgstr ""
 
-#: templates/public/dashboard.php:75
+#: templates/public/dashboard.php:86
 msgid "On"
 msgstr ""
 
-#: templates/public/dashboard.php:75
+#: templates/public/dashboard.php:86
 msgid "Off"
 msgstr ""
 
-#: templates/public/dashboard.php:87
+#: templates/public/dashboard.php:98
 msgid "Total Check-ins"
 msgstr ""
 
-#: templates/public/dashboard.php:98
+#: templates/public/dashboard.php:109
 msgid "Unique Households Served"
 msgstr ""
 
-#: templates/public/dashboard.php:109
+#: templates/public/dashboard.php:120
 msgid "No-shows"
 msgstr ""
 
 #. translators: 1: number of deliveries, 2: number of in-person check-ins.
-#: templates/public/dashboard.php:129
+#: templates/public/dashboard.php:140
 #, php-format
 msgid "%1$s deliveries / %2$s in-person"
 msgstr ""
 
-#: templates/public/dashboard.php:140
+#: templates/public/dashboard.php:151
 msgid "No data by type."
 msgstr ""
 
-#: templates/public/dashboard.php:156
+#: templates/public/dashboard.php:167
 msgid "No data for selected filters."
 msgstr ""
 
 #. translators: %d: number of days.
-#: templates/public/dashboard.php:163
+#: templates/public/dashboard.php:174
 #, php-format
 msgid "Daily check-ins for last %d days"
 msgstr ""
 
-#: templates/public/dashboard.php:185
+#: templates/public/dashboard.php:196
 msgid "No trend data."
 msgstr ""
 
 #. translators: %s: last updated time.
-#: templates/public/dashboard.php:191
+#: templates/public/dashboard.php:202
 #, php-format
 msgid "Last updated %s"
 msgstr ""
 
-#: templates/public/dashboard.php:194
+#: templates/public/dashboard.php:205
 msgid "Refresh"
 msgstr ""
 

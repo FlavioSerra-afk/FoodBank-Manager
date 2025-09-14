@@ -1,3 +1,9 @@
+## [2.2.1] — 2025-09-13
+### Improved
+- Theme preview script now uses debounced vanilla JS and updates a single `<style data-fbm-preview>` scoped to `@layer fbm` and `.fbm-scope` for live token changes.
+### Tests
+- Added coverage to ensure preview updates reuse the same style element.
+
 ## [2.2.0] — 2025-09-13
 ### Improved
 - Live preview now writes `<style data-fbm-preview>` under `@layer fbm` and `.fbm-scope`, updating as controls change.

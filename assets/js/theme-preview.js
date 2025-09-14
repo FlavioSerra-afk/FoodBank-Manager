@@ -1,41 +1,51 @@
-(function($){
+(()=>{
     const styleSelector = 'style[data-fbm-preview]';
+    const scopeSelector = '.fbm-scope';
+
     function render(tokens){
-        let css = '';
-        Object.keys(tokens).forEach(key=>{
-            css += key + ':' + tokens[key] + ';';
-        });
-        const cssText = '@layer fbm {.fbm-scope{' + css + '}}';
-        let $style = $(styleSelector);
-        if(!$style.length){
-            $style = $('<style>',{'data-fbm-preview':''}).appendTo(document.head);
+        const declarations = Object.entries(tokens).map(([k,v])=>`${k}:${v};`).join('');
+        const cssText = `@layer fbm { ${scopeSelector} { ${declarations} } }`;
+        let style = document.querySelector(styleSelector);
+        if(!style){
+            style = document.createElement('style');
+            style.dataset.fbmPreview = '';
+            document.head.appendChild(style);
         }
-        $style.text(cssText);
+        style.textContent = cssText;
     }
+
     function gather(){
         const tokens = {};
-        $('.fbm-theme-controls [data-token]').each(function(){
-            const $el = $(this);
-            const unit = $el.data('unit') || '';
-            tokens[$el.data('token')] = $el.val() + unit;
+        document.querySelectorAll('.fbm-theme-controls [data-token]').forEach(el=>{
+            const unit = el.dataset.unit || '';
+            tokens[el.dataset.token] = el.value + unit;
         });
         render(tokens);
     }
-    let timer;
-    $('.fbm-theme-controls').on('input change','[data-token]',function(){
-        clearTimeout(timer);
-        timer = setTimeout(gather,125);
-    });
-    $('.fbm-reset-all').on('click',function(){
-        $('.fbm-theme-controls [data-token]').each(function(){
-            const $el = $(this);
-            const def = $el.data('default');
-            if (def !== undefined) {
-                $el.val(def);
-            }
+
+    const debounce = (fn,delay)=>{
+        let timer;return (...args)=>{clearTimeout(timer);timer=setTimeout(()=>fn(...args),delay);};
+    };
+    const onInput = debounce(gather,125);
+
+    const controls = document.querySelector('.fbm-theme-controls');
+    if(controls){
+        controls.addEventListener('input',e=>{ if(e.target && e.target.dataset && e.target.dataset.token !== undefined){ onInput(); } });
+        controls.addEventListener('change',e=>{ if(e.target && e.target.dataset && e.target.dataset.token !== undefined){ onInput(); } });
+    }
+
+    document.querySelectorAll('.fbm-reset-all').forEach(btn=>{
+        btn.addEventListener('click',()=>{
+            document.querySelectorAll('.fbm-theme-controls [data-token]').forEach(el=>{
+                const def = el.dataset.default;
+                if(def !== undefined){ el.value = def; }
+            });
+            gather();
         });
-        gather();
     });
-    $(gather);
-    window.FBMPreview = {render};
-})(jQuery);
+
+    if(document.readyState !== 'loading'){ gather(); }
+    else{ document.addEventListener('DOMContentLoaded', gather); }
+
+    window.FBMPreview = { render };
+})();

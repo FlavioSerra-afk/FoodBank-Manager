@@ -3,6 +3,9 @@ Docs-Revision: 2025-09-13 (Menu tokens)
 
 Defines visual tokens and component specs used across admin and front-end surfaces. Admin screens and public forms share the same token set for parity.
 
+## Preview catalog
+The Theme & Design screen renders a live component catalog beside the controls. All markup lives inside `.fbm-scope` with ARIA-correct tabs (`role="tablist"`, `role="tab"`, `role="tabpanel"`). JavaScript writes a single `<style data-fbm-preview>` inside `@layer fbm` so changes are scoped and reflected instantly without reloading.
+
 ## Tokens
 Variables are container-scoped under .fbm-scope and emitted in the fbm cascade layer to avoid global bleed.
 
