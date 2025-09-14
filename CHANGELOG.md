@@ -4,6 +4,18 @@
 ### Tests
 - Added coverage to ensure preview updates reuse the same style element.
 
+## [1.9.0](https://github.com/FlavioSerra-afk/FoodBank-Manager/compare/1.8.0...1.9.0) (2025-09-14)
+
+
+### Features
+
+* add live theme preview tools ([eed7d09](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/eed7d09ee2f85aa246df7ed4fb5cd47bc62899f5))
+* add live theme preview tools ([e6af184](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/e6af184a082604ed26e5edeff1f6f901d43e7cfb))
+* add theme token schema and controls ([a333277](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/a33327718cae67f670c3ad1146c769dd131f7189))
+* add theme token schema and controls ([2566b7e](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/2566b7eab52ed34df9a394aa03a7638cfbb096f2))
+* **theme:** add preview CSS variables ([8ddee7d](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/8ddee7def38ce0a6bf3f734701b27ecdb90fb876))
+* **theme:** add preview CSS variables ([c70a169](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/c70a169446615b659306aea5fccf326a8b9995e3))
+
 ## [1.8.0](https://github.com/FlavioSerra-afk/FoodBank-Manager/compare/1.8.0...1.8.0) (2025-09-14)
 
 
