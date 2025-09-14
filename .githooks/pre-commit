@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Only enforce when code paths are staged
+if ! git diff --cached --name-only | grep -E '^(includes/|templates/|assets/|bin/|foodbank-manager.php|composer.json|readme.txt)' >/dev/null; then
+  exit 0
+fi
+
+# Require these files to be staged too (bump artifacts)
+req=(
+  ".release-please-manifest.json"
+  "composer.json"
+  "foodbank-manager.php"
+  "readme.txt"
+  "CHANGELOG.md"
+  "includes/Core/Plugin.php"
+)
+
+missing=()
+for f in "${req[@]}"; do
+  git diff --cached --name-only | grep -qx "$f" || missing+=("$f")
+
+done
+
+if [ ${#missing[@]} -gt 0 ]; then
+  echo "✖ Version bump required. Run one of:"
+  echo "   composer ver:bump         # patch"
+  echo "   composer ver:bump:minor"
+  echo "   composer ver:bump:major"
+  echo "Missing staged files: ${missing[*]}"
+  exit 1
+fi

@@ -1,0 +1,50 @@
+name: Ensure version bump
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  bump-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Find changed paths
+        run: |
+          BASE=$(git merge-base origin/${{ github.base_ref }} HEAD)
+          git diff --name-only "$BASE"...HEAD > /tmp/changed.txt
+          cat /tmp/changed.txt
+      - name: Detect code-affecting changes
+        id: code_changed
+        run: |
+          # Paths that should trigger a bump if modified
+          GREP='^(includes/|templates/|assets/|bin/|foodbank-manager.php|composer.json|readme.txt)'
+          if grep -E "$GREP" /tmp/changed.txt; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Ensure bump present when code changed
+        if: steps.code_changed.outputs.changed == 'true'
+        run: |
+          BASE=$(git merge-base origin/${{ github.base_ref }} HEAD)
+
+          need=( \
+            ".release-please-manifest.json" \
+            "composer.json" \
+            "foodbank-manager.php" \
+            "readme.txt" \
+            "CHANGELOG.md" \
+            "includes/Core/Plugin.php" \
+          )
+
+          missing=()
+          for f in "${need[@]}"; do
+            if ! git diff --name-only "$BASE"...HEAD | grep -qx "$f"; then
+              missing+=("$f")
+            fi
+          done
+
+          if [ ${#missing[@]} -gt 0 ]; then
+            echo "::error::Version bump required. Please run 'composer ver:bump' (patch/minor/major). Missing updates: ${missing[*]}"
+            exit 1
+          fi
