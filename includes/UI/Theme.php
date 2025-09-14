@@ -1034,7 +1034,7 @@ namespace {
      * @param array<string,mixed>  $def Field definition.
      * @param mixed                $val Current value.
      */
-    function fbm_field( string $key, array $def, $val ): void {
+    function fbm_field( string $key, array $def, mixed $val ): void {
         $id   = 'fbm_theme_' . $key;
         $name = 'fbm_theme[' . $key . ']';
         $ctrl = $def['control'] ?? 'text';
@@ -1088,6 +1088,33 @@ namespace {
             }
             echo '</div></details>';
         }
+    }
+
+    /**
+     * Build CSS variables for preview scope.
+     *
+     * @param array<string,mixed> $o Option values.
+     */
+    function fbm_css_variables_preview( array $o ): string {
+        $schema = fbm_theme_schema();
+        $o      = fbm_theme_sanitize( $o );
+        $css    = '';
+
+        foreach ( $schema as $key => $spec ) {
+            $val = $o[ $key ] ?? ( $spec['default'] ?? '' );
+            if ( is_array( $val ) ) {
+                continue;
+            }
+            $css .= '--fbm-' . str_replace( '_', '-', $key ) . ':' . $val . ';';
+        }
+
+        $out = ':root.fbm-scope{' . $css . '}';
+
+        if ( ( $o['style'] ?? ( $schema['style']['default'] ?? '' ) ) === 'glass' ) {
+            $out .= '.fbm-card{backdrop-filter:blur(var(--fbm-glass-blur));-webkit-backdrop-filter:blur(var(--fbm-glass-blur));background:color-mix(in srgb,var(--fbm-card-bg) calc(var(--fbm-glass-alpha)*100%),transparent);background:rgba(255,255,255,var(--fbm-glass-alpha));}';
+        }
+
+        return $out;
     }
 
     /**
