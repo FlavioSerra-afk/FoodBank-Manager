@@ -20,7 +20,7 @@ $groups = fbm_theme_groups();
     <?php settings_fields( 'fbm_theme' ); ?>
     <div class="fbm-grid fbm-grid--vtabs">
       <!-- LEFT: vertical tab buttons -->
-      <aside class="fbm-controls">
+      <aside class="fbm-controls" role="tablist" aria-label="<?php esc_attr_e( 'Theme Sections', 'foodbank-manager' ); ?>">
         <?php fbm_render_theme_vertical_nav( $groups ); ?>
         <?php submit_button( __( 'Save Theme', 'foodbank-manager' ), 'primary' ); ?>
         <div class="fbm-utils">

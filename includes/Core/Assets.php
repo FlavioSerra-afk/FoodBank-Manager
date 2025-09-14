@@ -102,11 +102,18 @@ class Assets {
         }
         $css = '.fbm-grid{margin-top:16px}';
         $css .= <<<CSS
-/* ---------- Layout ---------- */
+/* Two-pane grid: LEFT 260px | RIGHT 1fr */
 .fbm-grid--vtabs{ display:grid; grid-template-columns: 260px minmax(0,1fr); gap:16px; align-items:start; }
+
+/* RIGHT itself: fields | preview side-by-side */
 .fbm-right{ display:grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap:16px; align-items:start; }
-@media (max-width:1280px){ .fbm-right{ grid-template-columns:1fr; } }
-.fbm-right-fields, .fbm-preview { min-width:0; }
+@media (max-width:1280px){ .fbm-right{ grid-template-columns: 1fr; } }
+
+.fbm-right-fields{ min-width:0; }
+.fbm-preview{ min-width:0; }
+
+/* Keep non-FBM admin notices from pushing layout around on this page only */
+.wrap.fbm-theme .notice, .wrap.fbm-theme .update-nag{ display:none !important; }
 
 /* ---------- Vertical tabs (left) ---------- */
 .fbm-vtabs { display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }

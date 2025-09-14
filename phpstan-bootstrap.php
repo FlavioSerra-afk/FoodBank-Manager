@@ -17,6 +17,6 @@ if ( ! defined( 'FBM_PATH' ) ) {
 if ( ! defined( 'FBM_URL' ) ) {
 	define( 'FBM_URL', 'https://example.invalid/wp-content/plugins/foodbank-manager/' );
 }
-if ( ! defined( 'FBM_VERSION' ) ) {
-	define( 'FBM_VERSION', '0.0.0-dev' );
+if ( ! defined( 'FBM_VER' ) ) {
+        define( 'FBM_VER', '0.0.0-dev' );
 }

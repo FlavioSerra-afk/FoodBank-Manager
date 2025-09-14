@@ -88,23 +88,49 @@ final class Theme {
          * @param mixed $raw Raw values.
          * @return array<string,mixed>
          */
-        public static function sanitize($raw): array {
-                $raw = is_array($raw) ? $raw : array();
-                $json = wp_json_encode($raw);
-                if (is_string($json) && strlen($json) > 65536) {
-                        add_settings_error('fbm_theme', 'fbm_theme', __('Theme payload too large.', 'foodbank-manager'), 'error');
-                        return self::defaults();
+        public static function sanitize($raw): array
+        {
+                // Normalize input
+                $in = is_array($raw) ? $raw : [];
+
+                // Reject oversized payloads (basic flood guard)
+                if (count($in, COUNT_RECURSIVE) > 2000) {
+                        return []; // or return existing get_option('fbm_theme', [])
                 }
-                if ($raw === array()) {
-                        return self::sanitize_full($raw);
-                }
-                $keys = array('admin','front','menu','typography','tabs','match_front_to_admin','apply_admin','apply_admin_chrome','apply_front_menus');
-                foreach ($keys as $k) {
-                        if (array_key_exists($k, $raw)) {
-                                return self::sanitize_full($raw);
+
+                $schema = fbm_theme_schema();
+                $out = [];
+
+                foreach ($schema as $key => $def) {
+                        $type = $def['control'] ?? 'text';
+                        $val  = $in[$key] ?? ($def['default'] ?? null);
+
+                        switch ($type) {
+                                case 'number':
+                                        $num = is_numeric($val) ? (float)$val : (float)($def['default'] ?? 0);
+                                        if (isset($def['min'])) $num = max((float)$def['min'], $num);
+                                        if (isset($def['max'])) $num = min((float)$def['max'], $num);
+                                        $out[$key] = $num;
+                                        break;
+
+                                case 'radio':
+                                        $allowed = isset($def['choices']) && is_array($def['choices']) ? array_keys($def['choices']) : (array)($def['allowed'] ?? []);
+                                        $out[$key] = in_array($val, $allowed, true) ? $val : ($def['default'] ?? (reset($allowed) ?: ''));
+                                        break;
+
+                                case 'color':
+                                        $s = is_string($val) ? $val : '';
+                                        $hex = sanitize_hex_color($s);
+                                        $out[$key] = $hex ?: ($def['default'] ?? '');
+                                        break;
+
+                                default: // text
+                                        $s = is_scalar($val) ? (string)$val : '';
+                                        $out[$key] = wp_strip_all_tags($s);
                         }
                 }
-                return self::sanitize_tokens($raw);
+
+                return $out;
         }
 
         private static function sanitize_full(array $raw): array {
@@ -155,42 +181,6 @@ final class Theme {
                 );
         }
 
-        private static function sanitize_tokens(array $in): array {
-                $schema = fbm_theme_schema();
-                $out    = array();
-
-                foreach ($schema as $key => $def) {
-                        $val  = $in[$key] ?? ($def['default'] ?? null);
-                        $type = $def['control'] ?? 'text';
-
-                        if ($type === 'number') {
-                                if (!is_numeric($val)) {
-                                        $val = $def['default'] ?? 0;
-                                }
-                                $val = (float) $val;
-                                if (isset($def['min'])) {
-                                        $val = max((float) $def['min'], $val);
-                                }
-                                if (isset($def['max'])) {
-                                        $val = min((float) $def['max'], $val);
-                                }
-                        } elseif ($type === 'radio') {
-                                $allowed = isset($def['choices']) && is_array($def['choices'])
-                                        ? array_keys($def['choices'])
-                                        : (array) ($def['allowed'] ?? array());
-                                if (!in_array($val, $allowed, true)) {
-                                        $val = $def['default'] ?? (reset($allowed) ?: '');
-                                }
-                        } else {
-                                $val = is_scalar($val) ? (string) $val : '';
-                                $val = wp_strip_all_tags($val);
-                        }
-
-                        $out[$key] = $val;
-                }
-
-                return $out;
-        }
 
 	/**
 	 * Sanitize one section (admin/front).
@@ -1177,7 +1167,7 @@ namespace {
             $sel   = $first ? 'true' : 'false';
             $tabi  = $first ? '0' : '-1';
             printf(
-                '<button class="fbm-vtab" role="tab" id="fbm-tab-%1$s" aria-controls="fbm-panel-%1$s" aria-selected="%2$s" tabindex="%3$s">%4$s</button>',
+                '<button type="button" class="fbm-vtab" role="tab" id="fbm-tab-%1$s" aria-controls="fbm-panel-%1$s" aria-selected="%2$s" tabindex="%3$s">%4$s</button>',
                 esc_attr( $gid ),
                 $sel,
                 $tabi,
