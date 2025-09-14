@@ -20,6 +20,7 @@ use function add_settings_error;
 use function wp_json_encode;
 use function strlen;
 use function __;
+use function array_key_first;
 
 /**
  * Provide sanitized design tokens for admin and front-end.
@@ -1011,19 +1012,40 @@ namespace {
     }
 
     /**
-     * Field groups.
+     * Field groups keyed by slug.
      *
-     * @return array<string,array<int,string>>
+     * @return array<string,array{title:string,fields:array<int,string>}> Groups.
      */
     function fbm_theme_groups(): array {
         return array(
-            'Core'              => array( 'style', 'preset', 'accent', 'glass_alpha', 'glass_blur', 'glass_elev', 'glass_radius', 'glass_border' ),
-            'Menu'              => array( 'menu_item_height', 'menu_item_px', 'menu_item_py', 'menu_gap', 'menu_radius', 'menu_icon_size', 'menu_icon_opacity', 'menu_bg', 'menu_color', 'menu_hover_bg', 'menu_hover_color', 'menu_active_bg', 'menu_active_color', 'menu_divider' ),
-            'Typography'        => array( 'h1_size', 'h1_lh', 'h1_weight', 'h1_track', 'h2_size', 'h2_lh', 'h2_weight', 'h2_track', 'h3_size', 'h3_lh', 'h3_weight', 'h3_track', 'h4_size', 'h4_lh', 'h4_weight', 'h4_track', 'h5_size', 'h5_lh', 'h5_weight', 'h5_track', 'h6_size', 'h6_lh', 'h6_weight', 'h6_track', 'body_size', 'body_lh', 'body_weight', 'body_track', 'small_size', 'small_lh', 'color_text', 'color_headings', 'color_muted', 'link_normal', 'link_hover', 'link_active', 'link_visited' ),
-            'Forms'             => array( 'button_bg', 'button_fg', 'button_border', 'button_hover_bg', 'button_hover_fg', 'link_fg', 'link_hover_fg', 'link_visited_fg', 'link_underline', 'input_bg', 'input_fg', 'input_border', 'input_placeholder', 'input_focus_border', 'control_accent' ),
-            'Cards & Tables'    => array( 'card_bg', 'card_fg', 'card_border', 'card_shadow', 'tooltip_bg', 'tooltip_fg', 'table_header_bg', 'table_header_fg', 'table_row_hover_bg', 'table_row_gap' ),
-            'Notices & Alerts'  => array( 'alert_info_bg', 'alert_info_fg', 'alert_info_border', 'note_info', 'note_success', 'note_warn', 'note_error' ),
-            'Tabs'              => array( 'tabs_height', 'tabs_px', 'tabs_py', 'tabs_gap', 'tabs_radius', 'tabs_color', 'tabs_hover_color', 'tabs_active_color', 'tabs_hover_bg', 'tabs_active_bg', 'tabs_indicator_h', 'tabs_indicator_offset', 'tabs_indicator_color', 'tab_active_fg', 'tab_active_border', 'tab_inactive_fg' ),
+            'core' => array(
+                'title'  => 'Core',
+                'fields' => array( 'style', 'preset', 'accent', 'glass_alpha', 'glass_blur', 'glass_elev', 'glass_radius', 'glass_border' ),
+            ),
+            'menu' => array(
+                'title'  => 'Menu',
+                'fields' => array( 'menu_item_height', 'menu_item_px', 'menu_item_py', 'menu_gap', 'menu_radius', 'menu_icon_size', 'menu_icon_opacity', 'menu_bg', 'menu_color', 'menu_hover_bg', 'menu_hover_color', 'menu_active_bg', 'menu_active_color', 'menu_divider' ),
+            ),
+            'typography' => array(
+                'title'  => 'Typography',
+                'fields' => array( 'h1_size', 'h1_lh', 'h1_weight', 'h1_track', 'h2_size', 'h2_lh', 'h2_weight', 'h2_track', 'h3_size', 'h3_lh', 'h3_weight', 'h3_track', 'h4_size', 'h4_lh', 'h4_weight', 'h4_track', 'h5_size', 'h5_lh', 'h5_weight', 'h5_track', 'h6_size', 'h6_lh', 'h6_weight', 'h6_track', 'body_size', 'body_lh', 'body_weight', 'body_track', 'small_size', 'small_lh', 'color_text', 'color_headings', 'color_muted', 'link_normal', 'link_hover', 'link_active', 'link_visited' ),
+            ),
+            'forms' => array(
+                'title'  => 'Forms',
+                'fields' => array( 'button_bg', 'button_fg', 'button_border', 'button_hover_bg', 'button_hover_fg', 'link_fg', 'link_hover_fg', 'link_visited_fg', 'link_underline', 'input_bg', 'input_fg', 'input_border', 'input_placeholder', 'input_focus_border', 'control_accent' ),
+            ),
+            'cards' => array(
+                'title'  => 'Cards & Tables',
+                'fields' => array( 'card_bg', 'card_fg', 'card_border', 'card_shadow', 'tooltip_bg', 'tooltip_fg', 'table_header_bg', 'table_header_fg', 'table_row_hover_bg', 'table_row_gap' ),
+            ),
+            'alerts' => array(
+                'title'  => 'Notices & Alerts',
+                'fields' => array( 'alert_info_bg', 'alert_info_fg', 'alert_info_border', 'note_info', 'note_success', 'note_warn', 'note_error' ),
+            ),
+            'tabs' => array(
+                'title'  => 'Tabs',
+                'fields' => array( 'tabs_height', 'tabs_px', 'tabs_py', 'tabs_gap', 'tabs_radius', 'tabs_color', 'tabs_hover_color', 'tabs_active_color', 'tabs_hover_bg', 'tabs_active_bg', 'tabs_indicator_h', 'tabs_indicator_offset', 'tabs_indicator_color', 'tab_active_fg', 'tab_active_border', 'tab_inactive_fg' ),
+            ),
         );
     }
 
@@ -1073,9 +1095,9 @@ namespace {
      */
     function fbm_render_theme_controls( array $opts ): void {
         $schema = fbm_theme_schema();
-        foreach ( fbm_theme_groups() as $label => $fields ) {
-            echo '<details><summary>' . esc_html( $label ) . '</summary><div class="fbm-group">';
-            foreach ( $fields as $field ) {
+        foreach ( fbm_theme_groups() as $g ) {
+            echo '<details><summary>' . esc_html( $g['title'] ) . '</summary><div class="fbm-group">';
+            foreach ( $g['fields'] as $field ) {
                 if ( ! isset( $schema[ $field ] ) ) {
                     continue;
                 }
@@ -1087,6 +1109,45 @@ namespace {
                 echo '</div>';
             }
             echo '</div></details>';
+        }
+    }
+
+    function fbm_render_theme_vertical_nav( array $groups ): void {
+        echo '<nav class="fbm-vtabs" role="tablist" aria-orientation="vertical">';
+        $first = true;
+        foreach ( $groups as $gid => $g ) {
+            $label = esc_html( $g['title'] );
+            $sel   = $first ? 'true' : 'false';
+            $tabi  = $first ? '0' : '-1';
+            printf(
+                '<button class="fbm-vtab" role="tab" id="fbm-tab-%1$s" aria-controls="fbm-panel-%1$s" aria-selected="%2$s" tabindex="%3$s">%4$s</button>',
+                esc_attr( $gid ),
+                $sel,
+                $tabi,
+                $label
+            );
+            $first = false;
+        }
+        echo '</nav>';
+    }
+
+    function fbm_render_all_group_panels( array $opts ): void {
+        $schema = fbm_theme_schema();
+        $groups = fbm_theme_groups();
+        foreach ( $groups as $gid => $g ) {
+            $hidden = $gid === array_key_first( $groups ) ? '' : ' hidden';
+            printf( '<section id="fbm-panel-%1$s" class="fbm-group-panel"%2$s role="tabpanel" aria-labelledby="fbm-tab-%1$s">', esc_attr( $gid ), $hidden );
+            echo '<div class="fbm-panel-inner">';
+            echo '<h3 class="fbm-panel-title">' . esc_html( $g['title'] ) . '</h3>';
+            echo '<div class="fbm-group-grid">';
+            foreach ( $g['fields'] as $key ) {
+                $def = $schema[ $key ] ?? null;
+                if ( ! $def ) {
+                    continue;
+                }
+                fbm_field( $key, $def, $opts[ $key ] ?? ( $def['default'] ?? '' ) );
+            }
+            echo '</div></div></section>';
         }
     }
 
