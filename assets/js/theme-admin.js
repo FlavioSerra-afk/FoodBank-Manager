@@ -1,3 +1,35 @@
+(function(){
+  // Vertical tabs → swap visible panel
+  const tablist=document.querySelector('.fbm-vtabs');
+  if(tablist){
+    const tabs=Array.from(tablist.querySelectorAll('.fbm-vtab[role="tab"]'));
+    const panels=tabs.map(t=>document.getElementById(t.getAttribute('aria-controls'))).filter(Boolean);
+
+    function select(idx){
+      tabs.forEach((t,i)=>{
+        const sel=i===idx;
+        t.setAttribute('aria-selected',sel?'true':'false');
+        t.tabIndex=sel?0:-1;
+      });
+      panels.forEach((p,i)=>{if(p)p.hidden=i!==idx;});
+    }
+
+    tablist.addEventListener('click',e=>{
+      const i=tabs.indexOf(e.target.closest('.fbm-vtab'));
+      if(i>=0)select(i);
+    });
+    tablist.addEventListener('keydown',e=>{
+      const current=tabs.findIndex(t=>t.getAttribute('aria-selected')==='true');
+      if(e.key==='ArrowUp'||e.key==='ArrowLeft'){e.preventDefault();select((current-1+tabs.length)%tabs.length);tabs[(current-1+tabs.length)%tabs.length].focus();}
+      if(e.key==='ArrowDown'||e.key==='ArrowRight'){e.preventDefault();select((current+1)%tabs.length);tabs[(current+1)%tabs.length].focus();}
+      if(e.key==='Home'){e.preventDefault();select(0);tabs[0].focus();}
+      if(e.key==='End'){e.preventDefault();select(tabs.length-1);tabs[tabs.length-1].focus();}
+    });
+
+    select(Math.max(0,tabs.findIndex(t=>t.getAttribute('aria-selected')==='true')));
+  }
+})();
+
 (()=>{
   const form=document.getElementById('fbm-theme-form');
   const preview=document.getElementById('fbm-preview-vars');
@@ -25,7 +57,7 @@
   form.addEventListener('input',render);
   form.addEventListener('change',render);
 
-  const exportBtn=document.querySelector('.fbm-export');
+  const exportBtn=document.getElementById('fbm-export-btn');
   exportBtn?.addEventListener('click',()=>{
     const data=Object.assign({version:1},serialize());
     const blob=new Blob([JSON.stringify(data)],{type:'application/json'});
@@ -39,8 +71,8 @@
     setTimeout(()=>URL.revokeObjectURL(url),1000);
   });
 
-  const fileInput=document.querySelector('.fbm-utils-file');
-  document.querySelector('.fbm-import')?.addEventListener('click',()=>{fileInput?.click();});
+  const fileInput=document.getElementById('fbm-import-file');
+  document.getElementById('fbm-import-btn')?.addEventListener('click',()=>{fileInput?.click();});
   fileInput?.addEventListener('change',()=>{
     const file=fileInput.files[0];
     if(!file){return;}
@@ -65,7 +97,7 @@
     fileInput.value='';
   });
 
-  document.querySelector('.fbm-defaults')?.addEventListener('click',()=>{
+  document.getElementById('fbm-defaults-btn')?.addEventListener('click',()=>{
     fetch(fbmTheme.ajaxUrl,{
       method:'POST',
       headers:{'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8'},

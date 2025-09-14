@@ -100,8 +100,44 @@ class Assets {
         if (!$screen || 'foodbank_page_fbm_theme' !== $screen->id) {
             return;
         }
-        $css = '.fbm-grid{display:grid;grid-template-columns:340px 1fr;gap:24px;margin-top:16px}' .
-            '.fbm-preview{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:24px}';
+        $css = '.fbm-grid{display:grid;gap:24px;margin-top:16px}';
+        $css .= <<<CSS
+/* ---------- Vertical tabs (left) ---------- */
+.fbm-grid--vtabs{ grid-template-columns: 260px minmax(0,1fr); }
+.fbm-vtabs { display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }
+.fbm-vtab {
+  display:flex; align-items:center; width:100%;
+  height:38px; padding:0 12px; border-radius:10px; border:1px solid #e6e7ea;
+  background:#fff; color:#111827; font-weight:600; text-align:left; cursor:pointer;
+  box-shadow: 0 1px 0 rgba(22,27,29,.02);
+}
+.fbm-vtab[aria-selected="true"]{
+  background:#f0f5ff; border-color:#c7d2fe; color:#1f2937;
+  box-shadow: 0 0 0 2px rgba(59,130,246,.15) inset;
+}
+.fbm-vtab:hover{ background:#f8fafc; }
+
+/* ---------- Right side: group panel + preview ---------- */
+.fbm-right{ display:grid; grid-template-rows: auto 1fr; gap:16px; }
+.fbm-group-panel{ border:1px solid #e6e7ea; border-radius:12px; background:#fff; }
+.fbm-panel-inner{ padding:14px; }
+.fbm-panel-title{ margin:0 0 8px; font-size:14px; text-transform:uppercase; letter-spacing:.02em; color:#374151; }
+.fbm-group-grid{ display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:12px 16px; }
+@media (max-width:1200px){ .fbm-group-grid{ grid-template-columns:1fr; } }
+
+.fbm-preview{ background:#fff; border:1px solid #e6e7ea; border-radius: 12px; overflow:hidden; box-shadow: 0 1px 0 rgba(22,27,29,.02), 0 8px 24px rgba(22,27,29,.06); }
+.fbm-preview__bar{ display:flex; align-items:center; justify-content:space-between; padding:10px 14px; border-bottom:1px solid #eef0f2; background:#fafbfc; }
+.fbm-catalog{ padding:18px; background:
+  linear-gradient(90deg, #f7f8fa 20px, transparent 1px) center/21px 21px,
+  linear-gradient(#f7f8fa 20px, transparent 1px) center/21px 21px; }
+.fbm-catalog > .fbm-scope{ background:#fff; border:1px solid #eef0f2; border-radius:10px; padding:18px; }
+
+/* Field tweaks for compact two-column */
+.fbm-field{ display:grid; gap:6px; }
+.fbm-field > label{ font-weight:600; color:#111827; }
+.fbm-field input[type="number"]{ max-width:140px; }
+.fbm-field input[type="color"]{ inline-size:48px; block-size:32px; padding:0; border-radius:6px; }
+CSS;
         wp_add_inline_style('fbm-admin', $css);
 
         wp_enqueue_script('fbm-theme-admin', plugins_url('assets/js/theme-admin.js', FBM_FILE), ['jquery'], Plugin::VERSION, true);
