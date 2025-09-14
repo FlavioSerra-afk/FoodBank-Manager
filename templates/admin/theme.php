@@ -18,6 +18,7 @@ $opts = get_option( 'fbm_theme', [] );
         <aside class="fbm-controls">
             <form method="post" action="options.php" id="fbm-theme-form">
                 <?php if ( function_exists( 'settings_fields' ) ) { settings_fields( 'fbm_theme' ); } ?>
+                <?php fbm_render_theme_controls( $opts ); ?>
                 <?php if ( function_exists( 'submit_button' ) ) { submit_button( __( 'Save Theme', 'foodbank-manager' ) ); } ?>
             </form>
             <div class="fbm-utilities">

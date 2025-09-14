@@ -653,7 +653,441 @@ namespace {
      * @return array<string,array<string,mixed>>
      */
     function fbm_theme_schema(): array {
-        return array();
+        $defaults = \FoodBankManager\UI\Theme::defaults();
+
+        $schema = array(
+            // Core tokens.
+            'style'       => array(
+                'type'    => 'string',
+                'default' => $defaults['admin']['style'],
+                'control' => 'radio',
+                'options' => array(
+                    'glass' => 'Glass',
+                    'basic' => 'Basic',
+                ),
+            ),
+            'preset'      => array(
+                'type'    => 'string',
+                'default' => $defaults['admin']['preset'],
+                'control' => 'radio',
+                'options' => array(
+                    'light'         => 'Light',
+                    'dark'          => 'Dark',
+                    'high_contrast' => 'High Contrast',
+                ),
+            ),
+            'accent'      => array(
+                'type'    => 'string',
+                'default' => $defaults['admin']['accent'],
+                'control' => 'color',
+            ),
+            'glass_alpha' => array(
+                'type'    => 'number',
+                'default' => $defaults['admin']['glass']['alpha'],
+                'control' => 'number',
+                'min'     => 0,
+                'max'     => 1,
+                'step'    => 0.01,
+            ),
+            'glass_blur'  => array(
+                'type'    => 'number',
+                'default' => $defaults['admin']['glass']['blur'],
+                'control' => 'number',
+                'min'     => 0,
+                'max'     => 20,
+                'step'    => 1,
+            ),
+            'glass_elev'  => array(
+                'type'    => 'number',
+                'default' => $defaults['admin']['glass']['elev'],
+                'control' => 'number',
+                'min'     => 0,
+                'max'     => 24,
+                'step'    => 1,
+            ),
+            'glass_radius' => array(
+                'type'    => 'number',
+                'default' => $defaults['admin']['glass']['radius'],
+                'control' => 'number',
+                'min'     => 0,
+                'max'     => 40,
+                'step'    => 1,
+            ),
+            'glass_border' => array(
+                'type'    => 'number',
+                'default' => $defaults['admin']['glass']['border'],
+                'control' => 'number',
+                'min'     => 0,
+                'max'     => 4,
+                'step'    => 1,
+            ),
+
+            // Menu tokens.
+            'menu_item_height'   => array(
+                'type'    => 'number',
+                'default' => $defaults['menu']['item_height'],
+                'control' => 'number',
+                'min'     => 40,
+                'max'     => 64,
+                'step'    => 1,
+            ),
+            'menu_item_px'       => array(
+                'type'    => 'number',
+                'default' => $defaults['menu']['item_px'],
+                'control' => 'number',
+                'min'     => 8,
+                'max'     => 24,
+                'step'    => 1,
+            ),
+            'menu_item_py'       => array(
+                'type'    => 'number',
+                'default' => $defaults['menu']['item_py'],
+                'control' => 'number',
+                'min'     => 6,
+                'max'     => 16,
+                'step'    => 1,
+            ),
+            'menu_gap'           => array(
+                'type'    => 'number',
+                'default' => $defaults['menu']['gap'],
+                'control' => 'number',
+                'min'     => 8,
+                'max'     => 16,
+                'step'    => 1,
+            ),
+            'menu_radius'        => array(
+                'type'    => 'number',
+                'default' => $defaults['menu']['radius'],
+                'control' => 'number',
+                'min'     => 8,
+                'max'     => 16,
+                'step'    => 1,
+            ),
+            'menu_icon_size'     => array(
+                'type'    => 'number',
+                'default' => $defaults['menu']['icon_size'],
+                'control' => 'number',
+                'min'     => 16,
+                'max'     => 24,
+                'step'    => 1,
+            ),
+            'menu_icon_opacity'  => array(
+                'type'    => 'number',
+                'default' => $defaults['menu']['icon_opacity'],
+                'control' => 'number',
+                'min'     => 0.6,
+                'max'     => 1,
+                'step'    => 0.05,
+            ),
+            'menu_bg'            => array(
+                'type'    => 'string',
+                'default' => $defaults['menu']['bg'],
+                'control' => 'color',
+            ),
+            'menu_color'         => array(
+                'type'    => 'string',
+                'default' => $defaults['menu']['color'],
+                'control' => 'color',
+            ),
+            'menu_hover_bg'      => array(
+                'type'    => 'string',
+                'default' => $defaults['menu']['hover_bg'],
+                'control' => 'color',
+            ),
+            'menu_hover_color'   => array(
+                'type'    => 'string',
+                'default' => $defaults['menu']['hover_color'],
+                'control' => 'color',
+            ),
+            'menu_active_bg'     => array(
+                'type'    => 'string',
+                'default' => $defaults['menu']['active_bg'],
+                'control' => 'color',
+            ),
+            'menu_active_color'  => array(
+                'type'    => 'string',
+                'default' => $defaults['menu']['active_color'],
+                'control' => 'color',
+            ),
+            'menu_divider'       => array(
+                'type'    => 'string',
+                'default' => $defaults['menu']['divider'],
+                'control' => 'text',
+            ),
+        );
+
+        // Typography tokens.
+        $typo = $defaults['typography'];
+        $tags = array( 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' );
+        foreach ( $tags as $tag ) {
+            $schema[ $tag . '_size' ] = array(
+                'type'    => 'number',
+                'default' => $typo[ $tag ]['size'],
+                'control' => 'number',
+                'min'     => 10,
+                'max'     => 64,
+                'step'    => 1,
+            );
+            $schema[ $tag . '_lh' ]   = array(
+                'type'    => 'number',
+                'default' => $typo[ $tag ]['lh'],
+                'control' => 'number',
+                'min'     => 1,
+                'max'     => 2.5,
+                'step'    => 0.05,
+            );
+            $schema[ $tag . '_weight' ] = array(
+                'type'    => 'number',
+                'default' => $typo[ $tag ]['weight'],
+                'control' => 'number',
+                'min'     => 100,
+                'max'     => 900,
+                'step'    => 100,
+            );
+            $schema[ $tag . '_track' ]  = array(
+                'type'    => 'number',
+                'default' => $typo[ $tag ]['track'],
+                'control' => 'number',
+                'min'     => -1,
+                'max'     => 2,
+                'step'    => 0.1,
+            );
+        }
+
+        $schema['body_size']  = array(
+            'type'    => 'number',
+            'default' => $typo['body']['size'],
+            'control' => 'number',
+            'min'     => 10,
+            'max'     => 64,
+            'step'    => 1,
+        );
+        $schema['body_lh']    = array(
+            'type'    => 'number',
+            'default' => $typo['body']['lh'],
+            'control' => 'number',
+            'min'     => 1,
+            'max'     => 2.5,
+            'step'    => 0.05,
+        );
+        $schema['body_weight'] = array(
+            'type'    => 'number',
+            'default' => $typo['body']['weight'],
+            'control' => 'number',
+            'min'     => 100,
+            'max'     => 900,
+            'step'    => 100,
+        );
+        $schema['body_track']  = array(
+            'type'    => 'number',
+            'default' => $typo['body']['track'],
+            'control' => 'number',
+            'min'     => -1,
+            'max'     => 2,
+            'step'    => 0.1,
+        );
+        $schema['small_size'] = array(
+            'type'    => 'number',
+            'default' => $typo['small']['size'],
+            'control' => 'number',
+            'min'     => 10,
+            'max'     => 64,
+            'step'    => 1,
+        );
+        $schema['small_lh']   = array(
+            'type'    => 'number',
+            'default' => $typo['small']['lh'],
+            'control' => 'number',
+            'min'     => 1,
+            'max'     => 2.5,
+            'step'    => 0.05,
+        );
+
+        // Typography colors.
+        $schema['color_text']     = array(
+            'type'    => 'string',
+            'default' => $typo['color']['text'],
+            'control' => 'color',
+        );
+        $schema['color_headings'] = array(
+            'type'    => 'string',
+            'default' => $typo['color']['headings'],
+            'control' => 'color',
+        );
+        $schema['color_muted']    = array(
+            'type'    => 'string',
+            'default' => $typo['color']['muted'],
+            'control' => 'color',
+        );
+        $schema['link_normal']    = array(
+            'type'    => 'string',
+            'default' => $typo['link']['normal'],
+            'control' => 'color',
+        );
+        $schema['link_hover']     = array(
+            'type'    => 'string',
+            'default' => $typo['link']['hover'],
+            'control' => 'color',
+        );
+        $schema['link_active']    = array(
+            'type'    => 'string',
+            'default' => $typo['link']['active'],
+            'control' => 'color',
+        );
+        $schema['link_visited']   = array(
+            'type'    => 'string',
+            'default' => $typo['link']['visited'],
+            'control' => 'color',
+        );
+
+        // Forms tokens (aliases, defaults empty for overrides).
+        $schema += array(
+            'button_bg'         => array( 'type' => 'string', 'default' => '', 'control' => 'color' ),
+        );
+        $schema += array(
+            'button_fg'         => array( 'type' => 'string', 'default' => '', 'control' => 'color' ),
+            'button_border'     => array( 'type' => 'string', 'default' => '', 'control' => 'color' ),
+            'button_hover_bg'   => array( 'type' => 'string', 'default' => '', 'control' => 'color' ),
+            'button_hover_fg'   => array( 'type' => 'string', 'default' => '', 'control' => 'color' ),
+            'link_fg'           => array( 'type' => 'string', 'default' => '', 'control' => 'color' ),
+            'link_hover_fg'     => array( 'type' => 'string', 'default' => '', 'control' => 'color' ),
+            'link_visited_fg'   => array( 'type' => 'string', 'default' => '', 'control' => 'color' ),
+            'link_underline'    => array( 'type' => 'string', 'default' => '', 'control' => 'text' ),
+            'input_bg'          => array( 'type' => 'string', 'default' => '', 'control' => 'color' ),
+            'input_fg'          => array( 'type' => 'string', 'default' => '', 'control' => 'color' ),
+            'input_border'      => array( 'type' => 'string', 'default' => '', 'control' => 'color' ),
+            'input_placeholder' => array( 'type' => 'string', 'default' => '', 'control' => 'color' ),
+            'input_focus_border'=> array( 'type' => 'string', 'default' => '', 'control' => 'color' ),
+            'control_accent'    => array( 'type' => 'string', 'default' => '', 'control' => 'color' ),
+        );
+
+        // Cards & Tables tokens.
+        $schema += array(
+            'card_bg'           => array( 'type' => 'string', 'default' => '', 'control' => 'color' ),
+            'card_fg'           => array( 'type' => 'string', 'default' => '', 'control' => 'color' ),
+            'card_border'       => array( 'type' => 'string', 'default' => '', 'control' => 'color' ),
+            'card_shadow'       => array( 'type' => 'string', 'default' => '', 'control' => 'text' ),
+            'tooltip_bg'        => array( 'type' => 'string', 'default' => '', 'control' => 'color' ),
+            'tooltip_fg'        => array( 'type' => 'string', 'default' => '', 'control' => 'color' ),
+            'table_header_bg'   => array( 'type' => 'string', 'default' => '', 'control' => 'color' ),
+            'table_header_fg'   => array( 'type' => 'string', 'default' => '', 'control' => 'color' ),
+            'table_row_hover_bg'=> array( 'type' => 'string', 'default' => '', 'control' => 'color' ),
+            'table_row_gap'     => array( 'type' => 'string', 'default' => '2px', 'control' => 'text' ),
+        );
+
+        // Notices & Alerts tokens.
+        $schema += array(
+            'alert_info_bg'     => array( 'type' => 'string', 'default' => '', 'control' => 'color' ),
+            'alert_info_fg'     => array( 'type' => 'string', 'default' => '', 'control' => 'color' ),
+            'alert_info_border' => array( 'type' => 'string', 'default' => '', 'control' => 'color' ),
+            'note_info'         => array( 'type' => 'string', 'default' => '', 'control' => 'color' ),
+            'note_success'      => array( 'type' => 'string', 'default' => '', 'control' => 'color' ),
+            'note_warn'         => array( 'type' => 'string', 'default' => '', 'control' => 'color' ),
+            'note_error'        => array( 'type' => 'string', 'default' => '', 'control' => 'color' ),
+        );
+
+        // Tabs tokens.
+        $tabs = $defaults['tabs'];
+        $schema += array(
+            'tabs_height'          => array( 'type' => 'number', 'default' => $tabs['height'], 'control' => 'number', 'min' => 0, 'max' => 64, 'step' => 1 ),
+            'tabs_px'              => array( 'type' => 'number', 'default' => $tabs['px'], 'control' => 'number', 'min' => 0, 'max' => 64, 'step' => 1 ),
+            'tabs_py'              => array( 'type' => 'number', 'default' => $tabs['py'], 'control' => 'number', 'min' => 0, 'max' => 64, 'step' => 1 ),
+            'tabs_gap'             => array( 'type' => 'number', 'default' => $tabs['gap'], 'control' => 'number', 'min' => 0, 'max' => 64, 'step' => 1 ),
+            'tabs_radius'          => array( 'type' => 'number', 'default' => $tabs['radius'], 'control' => 'number', 'min' => 0, 'max' => 64, 'step' => 1 ),
+            'tabs_color'           => array( 'type' => 'string', 'default' => $tabs['color'], 'control' => 'color' ),
+            'tabs_hover_color'     => array( 'type' => 'string', 'default' => $tabs['hover_color'], 'control' => 'color' ),
+            'tabs_active_color'    => array( 'type' => 'string', 'default' => $tabs['active_color'], 'control' => 'color' ),
+            'tabs_hover_bg'        => array( 'type' => 'string', 'default' => $tabs['hover_bg'], 'control' => 'color' ),
+            'tabs_active_bg'       => array( 'type' => 'string', 'default' => $tabs['active_bg'], 'control' => 'color' ),
+            'tabs_indicator_h'     => array( 'type' => 'number', 'default' => $tabs['indicator_h'], 'control' => 'number', 'min' => 1, 'max' => 6, 'step' => 1 ),
+            'tabs_indicator_offset'=> array( 'type' => 'number', 'default' => $tabs['indicator_offset'], 'control' => 'number', 'min' => 0, 'max' => 8, 'step' => 1 ),
+            'tabs_indicator_color' => array( 'type' => 'string', 'default' => $tabs['indicator_color'] ?? '', 'control' => 'color' ),
+            'tab_active_fg'        => array( 'type' => 'string', 'default' => '', 'control' => 'color' ),
+            'tab_active_border'    => array( 'type' => 'string', 'default' => '', 'control' => 'color' ),
+            'tab_inactive_fg'      => array( 'type' => 'string', 'default' => '', 'control' => 'color' ),
+        );
+
+        return $schema;
+    }
+
+    /**
+     * Field groups.
+     *
+     * @return array<string,array<int,string>>
+     */
+    function fbm_theme_groups(): array {
+        return array(
+            'Core'              => array( 'style', 'preset', 'accent', 'glass_alpha', 'glass_blur', 'glass_elev', 'glass_radius', 'glass_border' ),
+            'Menu'              => array( 'menu_item_height', 'menu_item_px', 'menu_item_py', 'menu_gap', 'menu_radius', 'menu_icon_size', 'menu_icon_opacity', 'menu_bg', 'menu_color', 'menu_hover_bg', 'menu_hover_color', 'menu_active_bg', 'menu_active_color', 'menu_divider' ),
+            'Typography'        => array( 'h1_size', 'h1_lh', 'h1_weight', 'h1_track', 'h2_size', 'h2_lh', 'h2_weight', 'h2_track', 'h3_size', 'h3_lh', 'h3_weight', 'h3_track', 'h4_size', 'h4_lh', 'h4_weight', 'h4_track', 'h5_size', 'h5_lh', 'h5_weight', 'h5_track', 'h6_size', 'h6_lh', 'h6_weight', 'h6_track', 'body_size', 'body_lh', 'body_weight', 'body_track', 'small_size', 'small_lh', 'color_text', 'color_headings', 'color_muted', 'link_normal', 'link_hover', 'link_active', 'link_visited' ),
+            'Forms'             => array( 'button_bg', 'button_fg', 'button_border', 'button_hover_bg', 'button_hover_fg', 'link_fg', 'link_hover_fg', 'link_visited_fg', 'link_underline', 'input_bg', 'input_fg', 'input_border', 'input_placeholder', 'input_focus_border', 'control_accent' ),
+            'Cards & Tables'    => array( 'card_bg', 'card_fg', 'card_border', 'card_shadow', 'tooltip_bg', 'tooltip_fg', 'table_header_bg', 'table_header_fg', 'table_row_hover_bg', 'table_row_gap' ),
+            'Notices & Alerts'  => array( 'alert_info_bg', 'alert_info_fg', 'alert_info_border', 'note_info', 'note_success', 'note_warn', 'note_error' ),
+            'Tabs'              => array( 'tabs_height', 'tabs_px', 'tabs_py', 'tabs_gap', 'tabs_radius', 'tabs_color', 'tabs_hover_color', 'tabs_active_color', 'tabs_hover_bg', 'tabs_active_bg', 'tabs_indicator_h', 'tabs_indicator_offset', 'tabs_indicator_color', 'tab_active_fg', 'tab_active_border', 'tab_inactive_fg' ),
+        );
+    }
+
+    /**
+     * Render a single field.
+     *
+     * @param string               $key Field key.
+     * @param array<string,mixed>  $def Field definition.
+     * @param mixed                $val Current value.
+     */
+    function fbm_field( string $key, array $def, $val ): void {
+        $id   = 'fbm_theme_' . $key;
+        $name = 'fbm_theme[' . $key . ']';
+        $ctrl = $def['control'] ?? 'text';
+
+        if ( 'radio' === $ctrl && isset( $def['options'] ) && is_array( $def['options'] ) ) {
+            foreach ( $def['options'] as $opt_val => $label ) {
+                $opt_id = $id . '_' . $opt_val;
+                echo '<label for="' . esc_attr( $opt_id ) . '"><input type="radio" id="' . esc_attr( $opt_id ) . '" name="' . esc_attr( $name ) . '" value="' . esc_attr( (string) $opt_val ) . '"' . checked( $val, $opt_val, false ) . ' /> ' . esc_html( (string) $label ) . '</label> ';
+            }
+            return;
+        }
+
+        if ( 'number' === $ctrl ) {
+            $attrs = '';
+            foreach ( array( 'min', 'max', 'step' ) as $attr ) {
+                if ( isset( $def[ $attr ] ) ) {
+                    $attrs .= ' ' . $attr . '="' . esc_attr( (string) $def[ $attr ] ) . '"';
+                }
+            }
+            echo '<input type="number" id="' . esc_attr( $id ) . '" name="' . esc_attr( $name ) . '" value="' . esc_attr( (string) $val ) . '"' . $attrs . ' />';
+            return;
+        }
+
+        if ( 'color' === $ctrl ) {
+            echo '<input type="color" id="' . esc_attr( $id ) . '" name="' . esc_attr( $name ) . '" value="' . esc_attr( (string) $val ) . '" />';
+            return;
+        }
+
+        echo '<input type="text" id="' . esc_attr( $id ) . '" name="' . esc_attr( $name ) . '" value="' . esc_attr( (string) $val ) . '" />';
+    }
+
+    /**
+     * Render grouped theme controls as accordion sections.
+     *
+     * @param array<string,mixed> $opts Current option values.
+     */
+    function fbm_render_theme_controls( array $opts ): void {
+        $schema = fbm_theme_schema();
+        foreach ( fbm_theme_groups() as $label => $fields ) {
+            echo '<details><summary>' . esc_html( $label ) . '</summary><div class="fbm-group">';
+            foreach ( $fields as $field ) {
+                if ( ! isset( $schema[ $field ] ) ) {
+                    continue;
+                }
+                $def = $schema[ $field ];
+                $val = $opts[ $field ] ?? $def['default'];
+                echo '<div class="fbm-field">';
+                echo '<label for="fbm_theme_' . esc_attr( $field ) . '">' . esc_html( ucwords( str_replace( '_', ' ', $field ) ) ) . '</label>';
+                fbm_field( $field, $def, $val );
+                echo '</div>';
+            }
+            echo '</div></details>';
+        }
     }
 
     /**
