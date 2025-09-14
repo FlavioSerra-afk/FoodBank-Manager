@@ -20,39 +20,38 @@ use function register_rest_route;
  * REST endpoints for job queue.
  */
 final class JobsController {
-    /** Register routes. */
-    public function register_routes(): void {
-        register_rest_route(
-            'fbm/v1',
-            '/jobs',
-            array(
-                'methods'             => 'GET',
-                'callback'            => array( $this, 'index' ),
-                'permission_callback' => static fn(): bool => current_user_can( 'fbm_manage_jobs' ),
-                'args'                => array(
-                    'limit' => array_merge(
-                        \FoodBankManager\Rest\ArgHelper::id( false ),
-                        array(
-                            'default'           => 20,
-                            'validate_callback' => static fn( $v ): bool => is_int( $v ) && $v > 0 && $v <= 1000,
-                        )
-                    ),
-                ),
-            )
-        );
-    }
+	/** Register routes. */
+	public function register_routes(): void {
+		register_rest_route(
+			'fbm/v1',
+			'/jobs',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'index' ),
+				'permission_callback' => static fn(): bool => current_user_can( 'fbm_manage_jobs' ),
+				'args'                => array(
+					'limit' => array_merge(
+						\FoodBankManager\Rest\ArgHelper::id( false ),
+						array(
+							'default'           => 20,
+							'validate_callback' => static fn( $v ): bool => is_int( $v ) && $v > 0 && $v <= 1000,
+						)
+					),
+				),
+			)
+		);
+	}
 
-/**
- * List jobs.
- *
- * @param WP_REST_Request $request Request.
- *
- * @return WP_REST_Response
- */
-    public function index( WP_REST_Request $request ): WP_REST_Response {
-        $limit = absint( $request->get_param( 'limit' ) );
-        $jobs  = JobsRepo::list( array( 'limit' => $limit ) );
-        return new WP_REST_Response( array( 'jobs' => $jobs ), 200 );
-    }
+	/**
+	 * List jobs.
+	 *
+	 * @param WP_REST_Request $request Request.
+	 *
+	 * @return WP_REST_Response
+	 */
+	public function index( WP_REST_Request $request ): WP_REST_Response {
+		$limit = absint( $request->get_param( 'limit' ) );
+		$jobs  = JobsRepo::list( array( 'limit' => $limit ) );
+		return new WP_REST_Response( array( 'jobs' => $jobs ), 200 );
+	}
 }
-

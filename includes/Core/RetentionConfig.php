@@ -52,9 +52,7 @@ final class RetentionConfig {
 				$out = array();
 				foreach ( $sections as $out_key => $section ) {
 						$days            = isset( $section['days'] ) ? max( 0, (int) $section['days'] ) : 0;
-						$policy          = isset( $section['policy'] ) && in_array( $section['policy'], array( 'delete', 'anonymise' ), true )
-								? $section['policy']
-								: 'delete';
+						$policy          = isset( $section['policy'] ) && in_array( $section['policy'], array( 'delete', 'anonymise' ), true ) ? $section['policy'] : 'delete';
 						$out[ $out_key ] = array(
 							'days'   => $days,
 							'policy' => $policy,

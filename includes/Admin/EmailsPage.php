@@ -171,13 +171,9 @@ final class EmailsPage {
 					wp_die( esc_html__( 'Invalid template.', 'foodbank-manager' ) );
 		}
 
-				$subject   = isset( $_POST['subject'] )
-				? sanitize_text_field( wp_unslash( (string) $_POST['subject'] ) )
-				: ( $templates[ $tpl ]['subject'] ?? '' );
+				$subject   = isset( $_POST['subject'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['subject'] ) ) : ( $templates[ $tpl ]['subject'] ?? '' );
 				$subject   = trim( $subject );
-				$body_html = isset( $_POST['body_html'] )
-				? wp_kses_post( wp_unslash( (string) $_POST['body_html'] ) )
-				: ( $templates[ $tpl ]['body_html'] ?? '' );
+				$body_html = isset( $_POST['body_html'] ) ? wp_kses_post( wp_unslash( (string) $_POST['body_html'] ) ) : ( $templates[ $tpl ]['body_html'] ?? '' );
 				$body_html = trim( $body_html );
 
 				$vars = array(

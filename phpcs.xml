@@ -34,6 +34,16 @@
     <severity>0</severity>
   </rule>
 
+  <!-- Enforce WordPress spacing rules that we can auto-fix -->
+  <rule ref="WordPress.WhiteSpace.ControlStructureSpacing"/>
+
+  <rule ref="WordPress.WhiteSpace.OperatorSpacing">
+    <properties>
+      <!-- disallow missing space before/after operators -->
+      <property name="ignoreNewlines" value="false"/>
+    </properties>
+  </rule>
+
   <!-- (Enable only if tests block green)
   <rule ref="Generic.Files.LineLength">
     <type>warning</type>

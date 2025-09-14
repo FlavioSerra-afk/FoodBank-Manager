@@ -28,25 +28,25 @@ use function sanitize_key;
  * Permissions admin page.
  */
 final class PermissionsPage {
-        /**
-         * Register hooks.
-         */
-        public static function boot(): void {
-                add_action( 'admin_post_fbm_perms_role_toggle', array( __CLASS__, 'handle_role_toggle' ) );
-                add_action(
-                        'admin_init',
-                        static function (): void {
-                                register_setting(
-                                        'fbm',
-                                        'fbm_permissions_defaults',
-                                        array(
-                                                'sanitize_callback' => array( __CLASS__, 'sanitize_defaults' ),
-                                                'type'              => 'array',
-                                        )
-                                );
-                        }
-                );
-        }
+		/**
+		 * Register hooks.
+		 */
+	public static function boot(): void {
+			add_action( 'admin_post_fbm_perms_role_toggle', array( __CLASS__, 'handle_role_toggle' ) );
+			add_action(
+				'admin_init',
+				static function (): void {
+							register_setting(
+								'fbm',
+								'fbm_permissions_defaults',
+								array(
+									'sanitize_callback' => array( __CLASS__, 'sanitize_defaults' ),
+									'type'              => 'array',
+								)
+							);
+				}
+			);
+	}
 	/**
 	 * Route handler wrapper.
 	 */
@@ -116,17 +116,17 @@ final class PermissionsPage {
 			);
 		}
 
-                $roles      = get_editable_roles();
-                $caps       = $this->known_caps();
-                $cap_labels = $this->cap_labels();
-                $role_caps  = array();
-                foreach ( $roles as $r => $_data ) {
-                        $obj = get_role( $r );
-                        foreach ( $caps as $cap ) {
-                                $role_caps[ $r ][ $cap ] = $obj ? $obj->has_cap( $cap ) : false;
-                        }
-                }
-                $search     = isset( $_GET['user_search'] ) ? sanitize_text_field( wp_unslash( (string) $_GET['user_search'] ) ) : '';
+				$roles      = get_editable_roles();
+				$caps       = $this->known_caps();
+				$cap_labels = $this->cap_labels();
+				$role_caps  = array();
+		foreach ( $roles as $r => $_data ) {
+				$obj = get_role( $r );
+			foreach ( $caps as $cap ) {
+						$role_caps[ $r ][ $cap ] = $obj ? $obj->has_cap( $cap ) : false;
+			}
+		}
+				$search = isset( $_GET['user_search'] ) ? sanitize_text_field( wp_unslash( (string) $_GET['user_search'] ) ) : '';
 
 				$override_users = array();
 		if ( 'users' === $tab ) {
@@ -148,9 +148,9 @@ final class PermissionsPage {
 			}
 		}
 
-                $audit = PermissionsAudit::all();
-                require \FBM_PATH . 'templates/admin/permissions.php';
-        }
+				$audit = PermissionsAudit::all();
+				require \FBM_PATH . 'templates/admin/permissions.php';
+	}
 
 	/**
 	 * Handle role capability updates.
@@ -344,36 +344,36 @@ final class PermissionsPage {
 	/**
 	 * Handle reset to defaults.
 	 */
-        private function handle_reset(): void {
-                $defaults = get_option( 'fbm_permissions_defaults', array() );
-                $roles    = get_editable_roles();
-                foreach ( $roles as $slug => $_data ) {
-                        $role = get_role( $slug );
-                        if ( ! $role ) {
-                                continue;
-                        }
-                        foreach ( $this->known_caps() as $cap ) {
-                                $role->remove_cap( $cap );
-                        }
-                        foreach ( (array) ( $defaults[ $slug ] ?? array() ) as $cap ) {
-                                $role->add_cap( $cap );
-                        }
-                }
-                $users = get_users( array( 'fields' => 'ID' ) );
-                foreach ( $users as $u ) {
-                        $uid  = is_object( $u ) ? (int) $u->ID : (int) $u;
-                        $user = get_user_by( 'ID', $uid );
-                        if ( $user && method_exists( $user, 'remove_cap' ) ) {
-                                foreach ( $this->known_caps() as $cap ) {
-                                        $user->remove_cap( $cap );
-                                }
-                        }
-                        delete_user_meta( $uid, 'fbm_user_caps' );
-                }
-                Roles::ensure_admin_caps();
-                PermissionsAudit::add( 'reset permissions' );
-                $this->redirect_with_notice( 'reset' );
-        }
+	private function handle_reset(): void {
+			$defaults = get_option( 'fbm_permissions_defaults', array() );
+			$roles    = get_editable_roles();
+		foreach ( $roles as $slug => $_data ) {
+				$role = get_role( $slug );
+			if ( ! $role ) {
+				continue;
+			}
+			foreach ( $this->known_caps() as $cap ) {
+					$role->remove_cap( $cap );
+			}
+			foreach ( (array) ( $defaults[ $slug ] ?? array() ) as $cap ) {
+					$role->add_cap( $cap );
+			}
+		}
+			$users = get_users( array( 'fields' => 'ID' ) );
+		foreach ( $users as $u ) {
+				$uid  = is_object( $u ) ? (int) $u->ID : (int) $u;
+				$user = get_user_by( 'ID', $uid );
+			if ( $user && method_exists( $user, 'remove_cap' ) ) {
+				foreach ( $this->known_caps() as $cap ) {
+					$user->remove_cap( $cap );
+				}
+			}
+				delete_user_meta( $uid, 'fbm_user_caps' );
+		}
+			Roles::ensure_admin_caps();
+			PermissionsAudit::add( 'reset permissions' );
+			$this->redirect_with_notice( 'reset' );
+	}
 
 		/**
 		 * Add or update a per-user override.
@@ -385,25 +385,25 @@ final class PermissionsPage {
 		if ( $user_id <= 0 ) {
 				$this->redirect_with_notice( 'invalid_payload', 'error' );
 		}
-                        $caps  = array_map( 'sanitize_key', $caps_raw );
-                        $clean = array();
-                        $known = $this->known_caps();
-                        $user  = get_user_by( 'ID', $user_id );
-                        if ( ! $user ) {
-                                $this->redirect_with_notice( 'invalid_payload', 'error' );
-                        }
-                foreach ( $known as $cap ) {
-                        if ( in_array( $cap, $caps, true ) ) {
-                                $clean[] = $cap;
-                                $user->add_cap( $cap );
-                        } else {
-                                $user->remove_cap( $cap );
-                        }
-                }
-                        UsersMeta::set_user_caps( $user_id, $clean );
-                        PermissionsAudit::add( 'user override ' . $user_id );
-                        $this->redirect_with_notice( 'updated' );
-        }
+						$caps  = array_map( 'sanitize_key', $caps_raw );
+						$clean = array();
+						$known = $this->known_caps();
+						$user  = get_user_by( 'ID', $user_id );
+		if ( ! $user ) {
+				$this->redirect_with_notice( 'invalid_payload', 'error' );
+		}
+		foreach ( $known as $cap ) {
+			if ( in_array( $cap, $caps, true ) ) {
+						$clean[] = $cap;
+						$user->add_cap( $cap );
+			} else {
+							$user->remove_cap( $cap );
+			}
+		}
+						UsersMeta::set_user_caps( $user_id, $clean );
+						PermissionsAudit::add( 'user override ' . $user_id );
+						$this->redirect_with_notice( 'updated' );
+	}
 
 		/**
 		 * Remove per-user override.
@@ -414,16 +414,16 @@ final class PermissionsPage {
 		if ( $user_id <= 0 ) {
 				$this->redirect_with_notice( 'invalid_payload', 'error' );
 		}
-                        $user = get_user_by( 'ID', $user_id );
-                        if ( $user ) {
-                                foreach ( $this->known_caps() as $cap ) {
-                                        $user->remove_cap( $cap );
-                                }
-                        }
-                        UsersMeta::set_user_caps( $user_id, array() );
-                        PermissionsAudit::add( 'user override removed ' . $user_id );
-                        $this->redirect_with_notice( 'updated' );
-        }
+						$user = get_user_by( 'ID', $user_id );
+		if ( $user ) {
+			foreach ( $this->known_caps() as $cap ) {
+								$user->remove_cap( $cap );
+			}
+		}
+						UsersMeta::set_user_caps( $user_id, array() );
+						PermissionsAudit::add( 'user override removed ' . $user_id );
+						$this->redirect_with_notice( 'updated' );
+	}
 
 	/**
 	 * Known capabilities list.
@@ -469,9 +469,9 @@ final class PermissionsPage {
 	 * @param array<string,string> $args Extra args.
 	 * @return void
 	 */
-        private function redirect_with_notice( string $code, string $type = 'success', array $args = array() ): void {
-			$base = menu_page_url( 'fbm_permissions', false );
-		$args     = array_merge(
+	private function redirect_with_notice( string $code, string $type = 'success', array $args = array() ): void {
+		$base = menu_page_url( 'fbm_permissions', false );
+		$args = array_merge(
 			array(
 				'notice' => $code,
 				'type'   => $type,
@@ -480,66 +480,66 @@ final class PermissionsPage {
 		);
 		wp_safe_redirect( add_query_arg( array_map( 'rawurlencode', $args ), $base ), 303 );
 		exit;
-        }
+	}
 
-        /**
-         * Sanitize defaults option.
-         *
-         * @param mixed $value Raw value.
-         * @return array<string,array<int,string>>
-         */
-        public static function sanitize_defaults( $value ): array {
-                $out   = array();
-                $roles = get_editable_roles();
-                $known = Capabilities::all();
-                if ( is_array( $value ) ) {
-                        foreach ( $value as $role => $caps ) {
-                                $role = sanitize_key( (string) $role );
-                                if ( ! isset( $roles[ $role ] ) || ! is_array( $caps ) ) {
-                                        continue;
-                                }
-                                foreach ( $caps as $cap ) {
-                                        $cap = sanitize_key( (string) $cap );
-                                        if ( in_array( $cap, $known, true ) ) {
-                                                $out[ $role ][] = $cap;
-                                        }
-                                }
-                        }
-                }
-                return $out;
-        }
+		/**
+		 * Sanitize defaults option.
+		 *
+		 * @param mixed $value Raw value.
+		 * @return array<string,array<int,string>>
+		 */
+	public static function sanitize_defaults( $value ): array {
+			$out   = array();
+			$roles = get_editable_roles();
+			$known = Capabilities::all();
+		if ( is_array( $value ) ) {
+			foreach ( $value as $role => $caps ) {
+				$role = sanitize_key( (string) $role );
+				if ( ! isset( $roles[ $role ] ) || ! is_array( $caps ) ) {
+						continue;
+				}
+				foreach ( $caps as $cap ) {
+						$cap = sanitize_key( (string) $cap );
+					if ( in_array( $cap, $known, true ) ) {
+								$out[ $role ][] = $cap;
+					}
+				}
+			}
+		}
+			return $out;
+	}
 
-        /**
-         * Handle role capability toggle via AJAX.
-         */
-        public static function handle_role_toggle(): void {
-                if ( ! current_user_can( 'fb_manage_permissions' ) ) {
-                        wp_die( esc_html__( 'Sorry, you are not allowed to access this page.', 'foodbank-manager' ), 403 );
-                }
-                check_admin_referer( 'fbm_perms_role_toggle' );
-                $role_slug = isset( $_POST['role'] ) ? sanitize_key( wp_unslash( (string) $_POST['role'] ) ) : '';
-                $cap       = isset( $_POST['cap'] ) ? sanitize_key( wp_unslash( (string) $_POST['cap'] ) ) : '';
-                $grant     = ! empty( $_POST['grant'] );
-                $known     = Capabilities::all();
-                $role      = get_role( $role_slug );
-                if ( ! $role || ! in_array( $cap, $known, true ) ) {
-                        wp_die( wp_json_encode( array( 'success' => false ) ) );
-                }
-                $defaults = get_option( 'fbm_permissions_defaults', array() );
-                if ( $grant ) {
-                        $role->add_cap( $cap );
-                        $defaults[ $role_slug ][] = $cap;
-                        PermissionsAudit::add( 'grant ' . $cap . ' to role ' . $role_slug );
-                } else {
-                        $role->remove_cap( $cap );
-                        if ( isset( $defaults[ $role_slug ] ) ) {
-                                $defaults[ $role_slug ] = array_values( array_diff( $defaults[ $role_slug ], array( $cap ) ) );
-                        }
-                        PermissionsAudit::add( 'revoke ' . $cap . ' from role ' . $role_slug );
-                }
-                update_option( 'fbm_permissions_defaults', self::sanitize_defaults( $defaults ), false ); // @phpstan-ignore-line
-                wp_die( wp_json_encode( array( 'success' => true ) ) );
-        }
+		/**
+		 * Handle role capability toggle via AJAX.
+		 */
+	public static function handle_role_toggle(): void {
+		if ( ! current_user_can( 'fb_manage_permissions' ) ) {
+				wp_die( esc_html__( 'Sorry, you are not allowed to access this page.', 'foodbank-manager' ), 403 );
+		}
+			check_admin_referer( 'fbm_perms_role_toggle' );
+			$role_slug = isset( $_POST['role'] ) ? sanitize_key( wp_unslash( (string) $_POST['role'] ) ) : '';
+			$cap       = isset( $_POST['cap'] ) ? sanitize_key( wp_unslash( (string) $_POST['cap'] ) ) : '';
+			$grant     = ! empty( $_POST['grant'] );
+			$known     = Capabilities::all();
+			$role      = get_role( $role_slug );
+		if ( ! $role || ! in_array( $cap, $known, true ) ) {
+				wp_die( wp_json_encode( array( 'success' => false ) ) );
+		}
+			$defaults = get_option( 'fbm_permissions_defaults', array() );
+		if ( $grant ) {
+				$role->add_cap( $cap );
+				$defaults[ $role_slug ][] = $cap;
+				PermissionsAudit::add( 'grant ' . $cap . ' to role ' . $role_slug );
+		} else {
+				$role->remove_cap( $cap );
+			if ( isset( $defaults[ $role_slug ] ) ) {
+					$defaults[ $role_slug ] = array_values( array_diff( $defaults[ $role_slug ], array( $cap ) ) );
+			}
+				PermissionsAudit::add( 'revoke ' . $cap . ' from role ' . $role_slug );
+		}
+			update_option( 'fbm_permissions_defaults', self::sanitize_defaults( $defaults ), false ); // @phpstan-ignore-line
+			wp_die( wp_json_encode( array( 'success' => true ) ) );
+	}
 
 	/**
 	 * Capability labels.

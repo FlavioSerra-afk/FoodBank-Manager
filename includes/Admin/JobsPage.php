@@ -27,52 +27,58 @@ use function wp_unslash;
  * Render jobs admin page.
  */
 final class JobsPage {
-    /**
-     * Route and render the page.
-     */
-    public static function route(): void {
-        $can_manage = current_user_can( 'fbm_manage_jobs' );
-        if ( $can_manage ) {
-            self::handle_row_action();
-        }
+	/**
+	 * Route and render the page.
+	 */
+	public static function route(): void {
+		$can_manage = current_user_can( 'fbm_manage_jobs' );
+		if ( $can_manage ) {
+			self::handle_row_action();
+		}
 
-        $table = new JobsTable();
-        if ( $can_manage ) {
-            $table->process_bulk_action();
-        }
-        $table->prepare_items();
+		$table = new JobsTable();
+		if ( $can_manage ) {
+			$table->process_bulk_action();
+		}
+		$table->prepare_items();
 
-        echo '<div class="wrap fbm-admin"><h1>' . esc_html__( 'Jobs', 'foodbank-manager' ) . '</h1>';
-        if ( ! $can_manage ) {
-            echo '<div class="notice notice-warning"><p>' . esc_html__( 'Read-only: grant fbm_manage_jobs via Diagnostics → Permissions to manage jobs.', 'foodbank-manager' ) . '</p></div>';
-        }
-        echo '<form method="get">';
-        echo '<input type="hidden" name="page" value="fbm_jobs" />';
-        $table->search_box( esc_html__( 'Search Jobs', 'foodbank-manager' ), 'jobs' ); // @phpstan-ignore-line
-        $table->display();
-        echo '</form></div>';
-    }
+		echo '<div class="wrap fbm-admin"><h1>' . esc_html__( 'Jobs', 'foodbank-manager' ) . '</h1>';
+		if ( ! $can_manage ) {
+			echo '<div class="notice notice-warning"><p>' . esc_html__( 'Read-only: grant fbm_manage_jobs via Diagnostics → Permissions to manage jobs.', 'foodbank-manager' ) . '</p></div>';
+		}
+		echo '<form method="get">';
+		echo '<input type="hidden" name="page" value="fbm_jobs" />';
+		$table->search_box( esc_html__( 'Search Jobs', 'foodbank-manager' ), 'jobs' ); // @phpstan-ignore-line
+		$table->display();
+		echo '</form></div>';
+	}
 
-    /**
-     * Handle row retry/cancel actions.
-     */
-    private static function handle_row_action(): void {
-        $action = isset( $_GET['action'] ) ? sanitize_key( wp_unslash( (string) $_GET['action'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-        $id     = absint( $_GET['job'] ?? 0 ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-        if ( ! $action || ! $id || ! in_array( $action, array( 'retry', 'cancel' ), true ) ) {
-            return;
-        }
-        check_admin_referer( 'fbm_job_action_' . $id );
-        if ( ! current_user_can( 'fbm_manage_jobs' ) ) {
-            wp_die( esc_html__( 'Insufficient permissions', 'foodbank-manager' ) );
-        }
-        if ( 'retry' === $action ) {
-            JobsRepo::retry( $id );
-        } else {
-            JobsRepo::cancel( $id );
-        }
-        $url = add_query_arg( array( 'page' => 'fbm_jobs', 'notice' => 'done' ), admin_url( 'admin.php' ) );
-        wp_safe_redirect( esc_url_raw( $url ) );
-        exit;
-    }
+	/**
+	 * Handle row retry/cancel actions.
+	 */
+	private static function handle_row_action(): void {
+		$action = isset( $_GET['action'] ) ? sanitize_key( wp_unslash( (string) $_GET['action'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$id     = absint( $_GET['job'] ?? 0 ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! $action || ! $id || ! in_array( $action, array( 'retry', 'cancel' ), true ) ) {
+			return;
+		}
+		check_admin_referer( 'fbm_job_action_' . $id );
+		if ( ! current_user_can( 'fbm_manage_jobs' ) ) {
+			wp_die( esc_html__( 'Insufficient permissions', 'foodbank-manager' ) );
+		}
+		if ( 'retry' === $action ) {
+			JobsRepo::retry( $id );
+		} else {
+			JobsRepo::cancel( $id );
+		}
+		$url = add_query_arg(
+			array(
+				'page'   => 'fbm_jobs',
+				'notice' => 'done',
+			),
+			admin_url( 'admin.php' )
+		);
+		wp_safe_redirect( esc_url_raw( $url ) );
+		exit;
+	}
 }

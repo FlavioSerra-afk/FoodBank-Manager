@@ -29,32 +29,32 @@ class SarExporter {
 		 */
 	public static function stream( array $subject, bool $masked, string $base_name ): void {
 			$base_name = sanitize_file_name( $base_name );
-                if ( class_exists( \ZipArchive::class ) ) {
-                                $zip      = self::build_zip( $subject, $masked );
-                                $filename = $base_name . '.zip';
-                        $headers = array(
-                                'Content-Type: application/zip',
-                                'Content-Disposition: attachment; filename="' . $filename . '"',
-                        );
-                        fbm_send_headers( $headers );
-			$handle = fopen( $zip, 'rb' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
-			if ( $handle ) {
-				while ( ! feof( $handle ) ) {
-					echo fread( $handle, 8192 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.WP.AlternativeFunctions.file_system_operations_fread
+		if ( class_exists( \ZipArchive::class ) ) {
+						$zip      = self::build_zip( $subject, $masked );
+						$filename = $base_name . '.zip';
+				$headers          = array(
+					'Content-Type: application/zip',
+					'Content-Disposition: attachment; filename="' . $filename . '"',
+				);
+				fbm_send_headers( $headers );
+				$handle = fopen( $zip, 'rb' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
+				if ( $handle ) {
+					while ( ! feof( $handle ) ) {
+						echo fread( $handle, 8192 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.WP.AlternativeFunctions.file_system_operations_fread
+					}
+					fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 				}
-				fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
-			}
-			if ( file_exists( $zip ) ) {
-				wp_delete_file( $zip );
-			}
-			if ( is_dir( dirname( $zip ) ) ) {
-				rmdir( dirname( $zip ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_rmdir
-			}
+				if ( file_exists( $zip ) ) {
+					wp_delete_file( $zip );
+				}
+				if ( is_dir( dirname( $zip ) ) ) {
+					rmdir( dirname( $zip ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_rmdir
+				}
 		} else {
-                        fbm_send_headers( array( 'Content-Type: text/html; charset=utf-8' ) );
-                                                echo self::render_html( $subject, $masked ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-                }
-        }
+						fbm_send_headers( array( 'Content-Type: text/html; charset=utf-8' ) );
+												echo self::render_html( $subject, $masked ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		}
+	}
 
 		/**
 		 * Build a SAR ZIP from provided data.

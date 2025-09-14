@@ -46,40 +46,40 @@ final class DatabasePage {
 			switch ( $action ) {
 				case 'export_entries':
 					check_admin_referer( 'fbm_export_entries', 'fbm_nonce' );
-                                        $filters = self::get_filters();
-                                        $id      = isset( $_POST['id'] ) ? absint( wp_unslash( $_POST['id'] ) ) : 0;
-                                        if ( $id ) {
-                                                                $filters['id'] = $id;
-                                        }
-                                        $columns = UsersMeta::get_db_columns( get_current_user_id() );
-                                        $unmask  = false;
-                                        if ( current_user_can( 'fb_view_sensitive' ) && isset( $_POST['unmask'] ) ) {
-                                                $nonce   = isset( $_POST['_wpnonce_unmask'] ) ? sanitize_text_field( wp_unslash( $_POST['_wpnonce_unmask'] ) ) : '';
-                                                $unmask = (bool) wp_verify_nonce( $nonce, 'fbm_export_unmask' );
-                                        }
-                                        self::do_export( $filters, $columns, ! $unmask );
-                                        return;
-                                case 'delete_entry':
+										$filters = self::get_filters();
+										$id      = isset( $_POST['id'] ) ? absint( wp_unslash( $_POST['id'] ) ) : 0;
+					if ( $id ) {
+											$filters['id'] = $id;
+					}
+										$columns = UsersMeta::get_db_columns( get_current_user_id() );
+										$unmask  = false;
+					if ( current_user_can( 'fb_view_sensitive' ) && isset( $_POST['unmask'] ) ) {
+							$nonce  = isset( $_POST['_wpnonce_unmask'] ) ? sanitize_text_field( wp_unslash( $_POST['_wpnonce_unmask'] ) ) : '';
+							$unmask = (bool) wp_verify_nonce( $nonce, 'fbm_export_unmask' );
+					}
+										self::do_export( $filters, $columns, ! $unmask );
+					return;
+				case 'delete_entry':
 					$id = isset( $_POST['id'] ) ? absint( wp_unslash( $_POST['id'] ) ) : 0;
 					check_admin_referer( 'fbm_delete_entry_' . $id, 'fbm_nonce' );
 					self::do_delete( $id );
 					return;
 				case 'export_single':
 						// Legacy single export support.
-                                                $id = isset( $_POST['id'] ) ? absint( wp_unslash( $_POST['id'] ) ) : 0;
-                                                check_admin_referer( 'fbm_export_single_' . $id, 'fbm_nonce' );
-                                                $filters = self::get_filters();
-                                        if ( $id ) {
-                                                        $filters['id'] = $id;
-                                        }
-                                                $columns = UsersMeta::get_db_columns( get_current_user_id() );
-                                                $unmask  = false;
-                                                if ( current_user_can( 'fb_view_sensitive' ) && isset( $_POST['unmask'] ) ) {
-                                                        $nonce   = isset( $_POST['_wpnonce_unmask'] ) ? sanitize_text_field( wp_unslash( $_POST['_wpnonce_unmask'] ) ) : '';
-                                                        $unmask = (bool) wp_verify_nonce( $nonce, 'fbm_export_unmask' );
-                                                }
-                                                self::do_export( $filters, $columns, ! $unmask );
-                                        return;
+												$id = isset( $_POST['id'] ) ? absint( wp_unslash( $_POST['id'] ) ) : 0;
+												check_admin_referer( 'fbm_export_single_' . $id, 'fbm_nonce' );
+												$filters = self::get_filters();
+					if ( $id ) {
+									$filters['id'] = $id;
+					}
+												$columns = UsersMeta::get_db_columns( get_current_user_id() );
+												$unmask  = false;
+					if ( current_user_can( 'fb_view_sensitive' ) && isset( $_POST['unmask'] ) ) {
+							$nonce  = isset( $_POST['_wpnonce_unmask'] ) ? sanitize_text_field( wp_unslash( $_POST['_wpnonce_unmask'] ) ) : '';
+							$unmask = (bool) wp_verify_nonce( $nonce, 'fbm_export_unmask' );
+					}
+												self::do_export( $filters, $columns, ! $unmask );
+					return;
 				case 'db_presets_save':
 								check_admin_referer( 'fbm_database_db_presets_save' );
 								$name = isset( $_POST['preset_name'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['preset_name'] ) ) : '';
@@ -115,8 +115,8 @@ final class DatabasePage {
 		}
 								$filters = self::get_filters( $query_vars );
 				$presets                 = Options::get_db_filter_presets();
-                                $columns                 = UsersMeta::get_db_columns( get_current_user_id() );
-                                self::render_list( $filters, $presets, $preset_name, $columns );
+								$columns = UsersMeta::get_db_columns( get_current_user_id() );
+								self::render_list( $filters, $presets, $preset_name, $columns );
 	}
 
 	/**
@@ -138,25 +138,25 @@ final class DatabasePage {
 		 *
 		 * @return void
 		 */
-        private static function render_list( array $filters, array $presets, string $preset_name, array $columns ): void {
-                $can_sensitive = current_user_can( 'fb_view_sensitive' );
-                $unmask        = false;
-                $query_string  = isset( $_SERVER['QUERY_STRING'] ) ? sanitize_text_field( wp_unslash( (string) $_SERVER['QUERY_STRING'] ) ) : '';
-                parse_str( $query_string, $query_vars );
-                if ( $can_sensitive && isset( $query_vars['unmask'] ) ) {
-                        $nonce  = isset( $query_vars['_wpnonce'] ) ? sanitize_text_field( $query_vars['_wpnonce'] ) : '';
-                        $unmask = $nonce && wp_verify_nonce( $nonce, 'fbm_db_unmask' );
-                }
+	private static function render_list( array $filters, array $presets, string $preset_name, array $columns ): void {
+			$can_sensitive = current_user_can( 'fb_view_sensitive' );
+			$unmask        = false;
+			$query_string  = isset( $_SERVER['QUERY_STRING'] ) ? sanitize_text_field( wp_unslash( (string) $_SERVER['QUERY_STRING'] ) ) : '';
+			parse_str( $query_string, $query_vars );
+		if ( $can_sensitive && isset( $query_vars['unmask'] ) ) {
+				$nonce  = isset( $query_vars['_wpnonce'] ) ? sanitize_text_field( $query_vars['_wpnonce'] ) : '';
+				$unmask = $nonce && wp_verify_nonce( $nonce, 'fbm_db_unmask' );
+		}
 
-                $defs  = Columns::for_admin_list( $unmask );
-                $table = new DatabaseTable( $filters, $columns, $unmask );
-                $table->prepare_items();
+			$defs  = Columns::for_admin_list( $unmask );
+			$table = new DatabaseTable( $filters, $columns, $unmask );
+			$table->prepare_items();
 
-                $current_preset = $preset_name;
-                $columns        = $columns;
-                $column_defs    = $defs;
-                require FBM_PATH . 'templates/admin/database.php';
-        }
+			$current_preset = $preset_name;
+			$columns        = $columns;
+			$column_defs    = $defs;
+			require FBM_PATH . 'templates/admin/database.php';
+	}
 
 		/**
 		 * Save a filter preset.
@@ -289,61 +289,61 @@ final class DatabasePage {
 	 *
 	 * @return void
 	 */
-        private static function do_export( array $filters, array $columns, bool $mask ): void {
-                if ( ! current_user_can( 'fb_manage_database' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- custom cap
-                        wp_die( esc_html__( 'You do not have permission to perform this action.', 'foodbank-manager' ), '', array( 'response' => 403 ) );
-                }
+	private static function do_export( array $filters, array $columns, bool $mask ): void {
+		if ( ! current_user_can( 'fb_manage_database' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- custom cap
+				wp_die( esc_html__( 'You do not have permission to perform this action.', 'foodbank-manager' ), '', array( 'response' => 403 ) );
+		}
 
-                $rows     = array();
-                $filename = 'fbm-entries.csv';
+			$rows     = array();
+			$filename = 'fbm-entries.csv';
 
-                if ( isset( $filters['id'] ) ) {
-                        $entry = ApplicationsRepo::get( (int) $filters['id'] );
-                        if ( $entry ) {
-                                $rows[]   = $entry;
-                                $filename = 'fbm-entry-' . (int) $filters['id'] . '.csv';
-                        }
-                } else {
-                        $data = ApplicationsRepo::list( $filters );
-                        $rows = $data['rows'];
-                }
+		if ( isset( $filters['id'] ) ) {
+				$entry = ApplicationsRepo::get( (int) $filters['id'] );
+			if ( $entry ) {
+					$rows[]   = $entry;
+					$filename = 'fbm-entry-' . (int) $filters['id'] . '.csv';
+			}
+		} else {
+				$data = ApplicationsRepo::list( $filters );
+				$rows = $data['rows'];
+		}
 
-                $defs      = Columns::for_admin_list( ! $mask );
-                $sel_defs  = array();
-                foreach ( $columns as $col ) {
-                        if ( isset( $defs[ $col ] ) ) {
-                                $sel_defs[ $col ] = $defs[ $col ];
-                        }
-                }
-                $export_rows = self::build_export_rows( $rows, $sel_defs );
-                $labels      = array();
-                foreach ( $sel_defs as $k => $d ) {
-                        $labels[ $k ] = (string) $d['label'];
-                }
+			$defs     = Columns::for_admin_list( ! $mask );
+			$sel_defs = array();
+		foreach ( $columns as $col ) {
+			if ( isset( $defs[ $col ] ) ) {
+					$sel_defs[ $col ] = $defs[ $col ];
+			}
+		}
+			$export_rows = self::build_export_rows( $rows, $sel_defs );
+			$labels      = array();
+		foreach ( $sel_defs as $k => $d ) {
+				$labels[ $k ] = (string) $d['label'];
+		}
 
-                CsvExporter::stream_list( $export_rows, $labels, $mask, $filename );
-                exit;
-        }
+			CsvExporter::stream_list( $export_rows, $labels, $mask, $filename );
+			exit;
+	}
 
-        /**
-         * Build export rows from raw DB rows and column definitions.
-         *
-         * @param array<int,array<string,mixed>> $rows Raw rows.
-         * @param array<string,array<string,mixed>> $defs Column definitions.
-         * @return array<int,array<string,string>>
-         */
-        private static function build_export_rows( array $rows, array $defs ): array {
-                $out = array();
-                foreach ( $rows as $row ) {
-                        $line = array();
-                        foreach ( $defs as $key => $def ) {
-                                $cb           = $def['value'];
-                                $line[ $key ] = is_callable( $cb ) ? (string) $cb( $row ) : '';
-                        }
-                        $out[] = $line;
-                }
-                return $out;
-        }
+		/**
+		 * Build export rows from raw DB rows and column definitions.
+		 *
+		 * @param array<int,array<string,mixed>> $rows Raw rows.
+		 * @param array<string,array<string,mixed>> $defs Column definitions.
+		 * @return array<int,array<string,string>>
+		 */
+	private static function build_export_rows( array $rows, array $defs ): array {
+			$out = array();
+		foreach ( $rows as $row ) {
+				$line = array();
+			foreach ( $defs as $key => $def ) {
+				$cb           = $def['value'];
+				$line[ $key ] = is_callable( $cb ) ? (string) $cb( $row ) : '';
+			}
+				$out[] = $line;
+		}
+			return $out;
+	}
 
 	/**
 	 * Parse filters from the request.

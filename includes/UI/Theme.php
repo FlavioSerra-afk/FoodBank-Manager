@@ -88,18 +88,19 @@ final class Theme {
          * @param mixed $raw Raw values.
          * @return array<string,mixed>
          */
-        public static function sanitize($raw): array
-        {
+    public static function sanitize($raw): array
+    {
                 // Normalize input
                 $in = is_array($raw) ? $raw : [];
 
                 // Reject oversized payloads (basic flood guard)
                 if (count($in, COUNT_RECURSIVE) > 2000) {
-                        return []; // or return existing get_option('fbm_theme', [])
+                        // Flood guard; fall back to safe defaults
+                        return function_exists('fbm_theme_defaults') ? fbm_theme_defaults() : [];
                 }
 
                 $schema = fbm_theme_schema();
-                $out = [];
+                $out    = [];
 
                 foreach ($schema as $key => $def) {
                         $type = $def['control'] ?? 'text';
@@ -107,30 +108,40 @@ final class Theme {
 
                         switch ($type) {
                                 case 'number':
-                                        $num = is_numeric($val) ? (float)$val : (float)($def['default'] ?? 0);
-                                        if (isset($def['min'])) $num = max((float)$def['min'], $num);
-                                        if (isset($def['max'])) $num = min((float)$def['max'], $num);
+                                        $num = is_numeric($val) ? (float) $val : (float) ($def['default'] ?? 0);
+                                        if (isset($def['min'])) {
+                                                $num = max((float) $def['min'], $num);
+                                        }
+                                        if (isset($def['max'])) {
+                                                $num = min((float) $def['max'], $num);
+                                        }
                                         $out[$key] = $num;
                                         break;
 
                                 case 'radio':
-                                        $allowed = isset($def['choices']) && is_array($def['choices']) ? array_keys($def['choices']) : (array)($def['allowed'] ?? []);
-                                        $out[$key] = in_array($val, $allowed, true) ? $val : ($def['default'] ?? (reset($allowed) ?: ''));
+                                        $allowed = isset($def['choices']) && is_array($def['choices'])
+                                                ? array_keys($def['choices'])
+                                                : (array) ($def['allowed'] ?? []);
+                                        $out[$key] = in_array($val, $allowed, true)
+                                                ? $val
+                                                : ($def['default'] ?? (reset($allowed) ?: ''));
                                         break;
 
                                 case 'color':
-                                        $s = is_string($val) ? $val : '';
+                                        $s   = is_string($val) ? $val : '';
                                         $hex = sanitize_hex_color($s);
                                         $out[$key] = $hex ?: ($def['default'] ?? '');
                                         break;
 
                                 default: // text
-                                        $s = is_scalar($val) ? (string)$val : '';
+                                        $s        = is_scalar($val) ? (string) $val : '';
                                         $out[$key] = wp_strip_all_tags($s);
                         }
                 }
 
-                return $out;
+                // Final merge: ensure group keys exist (admin/menu/forms/tabs/etc.)
+                $defaults = function_exists('fbm_theme_defaults') ? fbm_theme_defaults() : [];
+                return array_replace_recursive($defaults, $out);
         }
 
         private static function sanitize_full(array $raw): array {
@@ -1204,9 +1215,11 @@ namespace {
      * @param array<string,mixed> $o Option values.
      */
     function fbm_css_variables_preview( array $o ): string {
-        $schema = fbm_theme_schema();
-        $o      = \FoodBankManager\UI\Theme::sanitize( $o );
-        $css    = '';
+        $defaults = function_exists( 'fbm_theme_defaults' ) ? fbm_theme_defaults() : [];
+        $o        = array_replace_recursive( $defaults, $o );
+        $schema   = fbm_theme_schema();
+        $o        = \FoodBankManager\UI\Theme::sanitize( $o );
+        $css      = '';
 
         foreach ( $schema as $key => $spec ) {
             $val = $o[ $key ] ?? ( $spec['default'] ?? '' );

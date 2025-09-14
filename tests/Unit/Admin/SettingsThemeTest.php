@@ -4,6 +4,11 @@ declare(strict_types=1);
 use FoodBankManager\UI\Theme;
 
 final class SettingsThemeTest extends \BaseTestCase {
+    protected function setUp(): void {
+        parent::setUp();
+        update_option( 'fbm_theme', function_exists( 'fbm_theme_defaults' ) ? fbm_theme_defaults() : [] );
+    }
+
     public function test_valid_values_emit_tokens(): void {
         $raw = array(
             'admin' => array(

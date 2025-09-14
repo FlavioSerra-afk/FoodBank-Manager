@@ -12,19 +12,19 @@ namespace FBM\CLI;
 use FoodBankManager\Core\Plugin;
 
 final class VersionCommand {
-    private IO $io;
+	private IO $io;
 
-    public function __construct(?IO $io = null) {
-        $this->io = $io ?? new WpCliIO();
-    }
+	public function __construct( ?IO $io = null ) {
+		$this->io = $io ?? new WpCliIO();
+	}
 
-    /**
-     * Invoke the command.
-     *
-     * @param array $args Positional arguments.
-     * @param array $assoc_args Associative arguments.
-     */
-    public function __invoke(array $args, array $assoc_args): void {
-        $this->io->line(Plugin::VERSION);
-    }
+	/**
+	 * Invoke the command.
+	 *
+	 * @param array $args Positional arguments.
+	 * @param array $assoc_args Associative arguments.
+	 */
+	public function __invoke( array $args, array $assoc_args ): void {
+		$this->io->line( Plugin::VERSION );
+	}
 }

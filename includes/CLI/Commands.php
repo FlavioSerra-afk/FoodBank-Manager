@@ -79,23 +79,23 @@ final class Commands {
 	 * @param array $args       Positional arguments.
 	 * @param array $assoc_args Associative arguments.
 	 */
-        public function jobs_retry( array $args, array $assoc_args ): void {
-                if ( ! current_user_can( 'fbm_manage_jobs' ) && ! ( is_multisite() && is_super_admin() ) ) {
-                        $this->io->error( 'Forbidden' );
-                        return;
-                }
-                $id = absint( $args[0] ?? 0 );
-                if ( ! $id ) {
-                        $this->io->error( 'Invalid ID' );
-                        return;
-                }
-		$job = JobsRepo::get( $id );
+	public function jobs_retry( array $args, array $assoc_args ): void {
+		if ( ! current_user_can( 'fbm_manage_jobs' ) && ! ( is_multisite() && is_super_admin() ) ) {
+				$this->io->error( 'Forbidden' );
+				return;
+		}
+			$id = absint( $args[0] ?? 0 );
+		if ( ! $id ) {
+				$this->io->error( 'Invalid ID' );
+				return;
+		}
+			$job = JobsRepo::get( $id );
 		if ( ! $job ) {
 			$this->io->error( 'Job not found' );
 			return;
 		}
-		JobsRepo::retry( $id );
-		$this->io->success( 'Job retried' );
+			JobsRepo::retry( $id );
+			$this->io->success( 'Job retried' );
 	}
 
 	public function retention_run( array $args, array $assoc_args ): void {
@@ -156,143 +156,143 @@ final class Commands {
 	 * @param array $args       Positional arguments.
 	 * @param array $assoc_args Associative arguments.
 	 */
-        public function mail_test( array $args, array $assoc_args ): void {
-                $to = sanitize_email( $assoc_args['to'] ?? '' );
-                if ( ! $to || ! is_email( $to ) ) {
-                        $this->io->error( 'Invalid email' );
-                        return;
-                }
-                $tpl = array(
-                        'subject' => 'FoodBank Manager mail test',
-                        'body'    => '<p>Test email from FoodBank Manager.</p>',
-                );
-                $sent = Renderer::send( $tpl, array(), array( $to ) );
-                if ( $sent ) {
-                        $this->io->success( 'Sent to ' . $to );
-                } else {
-                        $this->io->error( 'Send failed' );
-                }
-        }
+	public function mail_test( array $args, array $assoc_args ): void {
+			$to = sanitize_email( $assoc_args['to'] ?? '' );
+		if ( ! $to || ! is_email( $to ) ) {
+				$this->io->error( 'Invalid email' );
+				return;
+		}
+			$tpl  = array(
+				'subject' => 'FoodBank Manager mail test',
+				'body'    => '<p>Test email from FoodBank Manager.</p>',
+			);
+			$sent = Renderer::send( $tpl, array(), array( $to ) );
+			if ( $sent ) {
+					$this->io->success( 'Sent to ' . $to );
+			} else {
+					$this->io->error( 'Send failed' );
+			}
+	}
 
-        /**
-         * Diagnose and repair capabilities.
-         *
-         * @param array $args       Positional arguments.
-         * @param array $assoc_args Associative arguments.
-         */
-        public function caps_doctor( array $args, array $assoc_args ): void {
-                $missing = array();
-                if ( is_multisite() ) {
-                        foreach ( get_sites( array( 'number' => 0 ) ) as $site ) {
-                                switch_to_blog( (int) $site->blog_id );
-                                $role = get_role( 'administrator' );
-                                if ( ! $role || ! $role->has_cap( 'fbm_manage_jobs' ) ) {
-                                        $missing[] = (int) $site->blog_id;
-                                }
-                        }
-                        restore_current_blog();
-                } else {
-                        $role = get_role( 'administrator' );
-                        if ( ! $role || ! $role->has_cap( 'fbm_manage_jobs' ) ) {
-                                $missing[] = 1;
-                        }
-                }
+		/**
+		 * Diagnose and repair capabilities.
+		 *
+		 * @param array $args       Positional arguments.
+		 * @param array $assoc_args Associative arguments.
+		 */
+	public function caps_doctor( array $args, array $assoc_args ): void {
+			$missing = array();
+		if ( is_multisite() ) {
+			foreach ( get_sites( array( 'number' => 0 ) ) as $site ) {
+				switch_to_blog( (int) $site->blog_id );
+				$role = get_role( 'administrator' );
+				if ( ! $role || ! $role->has_cap( 'fbm_manage_jobs' ) ) {
+						$missing[] = (int) $site->blog_id;
+				}
+			}
+				restore_current_blog();
+		} else {
+				$role = get_role( 'administrator' );
+			if ( ! $role || ! $role->has_cap( 'fbm_manage_jobs' ) ) {
+					$missing[] = 1;
+			}
+		}
 
-                if ( $missing && isset( $assoc_args['fix'] ) ) {
-                        if ( ! current_user_can( 'fbm_manage_jobs' ) && ! ( is_multisite() && is_super_admin() ) ) {
-                                $this->io->error( 'Forbidden' );
-                                return;
-                        }
-                        if ( is_multisite() ) {
-                                foreach ( get_sites( array( 'number' => 0 ) ) as $site ) {
-                                        switch_to_blog( (int) $site->blog_id );
-                                        $role = get_role( 'administrator' );
-                                        if ( $role && ! $role->has_cap( 'fbm_manage_jobs' ) ) {
-                                                $role->add_cap( 'fbm_manage_jobs', true );
-                                        }
-                                }
-                                restore_current_blog();
-                        } else {
-                                $role = get_role( 'administrator' );
-                                if ( $role && ! $role->has_cap( 'fbm_manage_jobs' ) ) {
-                                        $role->add_cap( 'fbm_manage_jobs', true );
-                                }
-                        }
-                        $this->io->success( 'Capability granted' );
-                        return;
-                }
+		if ( $missing && isset( $assoc_args['fix'] ) ) {
+			if ( ! current_user_can( 'fbm_manage_jobs' ) && ! ( is_multisite() && is_super_admin() ) ) {
+					$this->io->error( 'Forbidden' );
+					return;
+			}
+			if ( is_multisite() ) {
+				foreach ( get_sites( array( 'number' => 0 ) ) as $site ) {
+						switch_to_blog( (int) $site->blog_id );
+						$role = get_role( 'administrator' );
+					if ( $role && ! $role->has_cap( 'fbm_manage_jobs' ) ) {
+						$role->add_cap( 'fbm_manage_jobs', true );
+					}
+				}
+					restore_current_blog();
+			} else {
+					$role = get_role( 'administrator' );
+				if ( $role && ! $role->has_cap( 'fbm_manage_jobs' ) ) {
+						$role->add_cap( 'fbm_manage_jobs', true );
+				}
+			}
+				$this->io->success( 'Capability granted' );
+				return;
+		}
 
-        if ( $missing ) {
-            $this->io->error( 'fbm_manage_jobs missing for Administrator' );
-            return;
-        }
+		if ( $missing ) {
+			$this->io->error( 'fbm_manage_jobs missing for Administrator' );
+			return;
+		}
 
-        $this->io->success( 'All capabilities present' );
-    }
+			$this->io->success( 'All capabilities present' );
+	}
 
-    /**
-     * Show throttle settings.
-     */
-    public function throttle_show( array $args, array $assoc_args ): void {
-        if ( ! current_user_can( 'fb_manage_diagnostics' ) && ! ( is_multisite() && is_super_admin() ) ) {
-            $this->io->error( 'Forbidden' );
-            return;
-        }
-        $settings = ThrottleSettings::get();
-        $limits   = ThrottleSettings::limits();
-        $this->io->line( sprintf( 'window=%d base=%d', $settings['window_seconds'], $settings['base_limit'] ) );
-        foreach ( $limits as $role => $limit ) {
-            $this->io->line( sprintf( '%s=%s', $role, $limit ? (string) $limit : 'unlimited' ) );
-        }
-    }
+	/**
+	 * Show throttle settings.
+	 */
+	public function throttle_show( array $args, array $assoc_args ): void {
+		if ( ! current_user_can( 'fb_manage_diagnostics' ) && ! ( is_multisite() && is_super_admin() ) ) {
+			$this->io->error( 'Forbidden' );
+			return;
+		}
+		$settings = ThrottleSettings::get();
+		$limits   = ThrottleSettings::limits();
+		$this->io->line( sprintf( 'window=%d base=%d', $settings['window_seconds'], $settings['base_limit'] ) );
+		foreach ( $limits as $role => $limit ) {
+			$this->io->line( sprintf( '%s=%s', $role, $limit ? (string) $limit : 'unlimited' ) );
+		}
+	}
 
-    /**
-     * Update throttle settings.
-     */
-    public function throttle_set( array $args, array $assoc_args ): void {
-        if ( ! current_user_can( 'fb_manage_diagnostics' ) && ! ( is_multisite() && is_super_admin() ) ) {
-            $this->io->error( 'Forbidden' );
-            return;
-        }
-        $current = ThrottleSettings::get();
-        $raw     = $current;
-        if ( isset( $assoc_args['window'] ) ) {
-            $raw['window_seconds'] = (int) $assoc_args['window'];
-        }
-        if ( isset( $assoc_args['base'] ) ) {
-            $raw['base_limit'] = (int) $assoc_args['base'];
-        }
-        if ( isset( $assoc_args['role'] ) ) {
-            $roles = (array) $assoc_args['role'];
-            foreach ( $roles as $pair ) {
-                if ( strpos( (string) $pair, ':' ) === false ) {
-                    continue;
-                }
-                list( $role, $mult ) = explode( ':', (string) $pair, 2 );
-                $raw['role_multipliers'][ $role ] = $mult;
-            }
-        }
-        $san = fbm_throttle_sanitize( $raw );
-        update_option( 'fbm_throttle', $san, false ); // @phpstan-ignore-line
-        if ( isset( $assoc_args['window'] ) && $san['window_seconds'] !== (int) $assoc_args['window'] ) {
-            $this->io->line( 'window clamped to ' . $san['window_seconds'] );
-        }
-        if ( isset( $assoc_args['base'] ) && $san['base_limit'] !== (int) $assoc_args['base'] ) {
-            $this->io->line( 'base clamped to ' . $san['base_limit'] );
-        }
-        if ( isset( $assoc_args['role'] ) ) {
-            foreach ( (array) $assoc_args['role'] as $pair ) {
-                if ( strpos( (string) $pair, ':' ) === false ) {
-                    continue;
-                }
-                list( $role, $mult ) = explode( ':', (string) $pair, 2 );
-                $m = (float) $mult;
-                $final = $san['role_multipliers'][ $role ] ?? null;
-                if ( null !== $final && (float) $final !== $m ) {
-                    $this->io->line( $role . ' multiplier clamped to ' . $final );
-                }
-            }
-        }
-        $this->io->success( 'Throttle updated' );
-    }
+	/**
+	 * Update throttle settings.
+	 */
+	public function throttle_set( array $args, array $assoc_args ): void {
+		if ( ! current_user_can( 'fb_manage_diagnostics' ) && ! ( is_multisite() && is_super_admin() ) ) {
+			$this->io->error( 'Forbidden' );
+			return;
+		}
+		$current = ThrottleSettings::get();
+		$raw     = $current;
+		if ( isset( $assoc_args['window'] ) ) {
+			$raw['window_seconds'] = (int) $assoc_args['window'];
+		}
+		if ( isset( $assoc_args['base'] ) ) {
+			$raw['base_limit'] = (int) $assoc_args['base'];
+		}
+		if ( isset( $assoc_args['role'] ) ) {
+			$roles = (array) $assoc_args['role'];
+			foreach ( $roles as $pair ) {
+				if ( strpos( (string) $pair, ':' ) === false ) {
+					continue;
+				}
+				list( $role, $mult )              = explode( ':', (string) $pair, 2 );
+				$raw['role_multipliers'][ $role ] = $mult;
+			}
+		}
+		$san = fbm_throttle_sanitize( $raw );
+		update_option( 'fbm_throttle', $san, false ); // @phpstan-ignore-line
+		if ( isset( $assoc_args['window'] ) && $san['window_seconds'] !== (int) $assoc_args['window'] ) {
+			$this->io->line( 'window clamped to ' . $san['window_seconds'] );
+		}
+		if ( isset( $assoc_args['base'] ) && $san['base_limit'] !== (int) $assoc_args['base'] ) {
+			$this->io->line( 'base clamped to ' . $san['base_limit'] );
+		}
+		if ( isset( $assoc_args['role'] ) ) {
+			foreach ( (array) $assoc_args['role'] as $pair ) {
+				if ( strpos( (string) $pair, ':' ) === false ) {
+					continue;
+				}
+				list( $role, $mult ) = explode( ':', (string) $pair, 2 );
+				$m                   = (float) $mult;
+				$final               = $san['role_multipliers'][ $role ] ?? null;
+				if ( null !== $final && (float) $final !== $m ) {
+					$this->io->line( $role . ' multiplier clamped to ' . $final );
+				}
+			}
+		}
+		$this->io->success( 'Throttle updated' );
+	}
 }

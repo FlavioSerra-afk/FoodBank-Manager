@@ -52,16 +52,16 @@ class GDPRPage {
 	/**
 	 * Render template.
 	 */
-        public static function render(): void {
-                if ( ! current_user_can( 'fb_manage_diagnostics' ) ) {
-                        echo '<div class="wrap fbm-admin">'
-                                . '<div class="fbm-notice fbm-notice--error">You do not have permission to access this page.</div>'
-                                . '</div>';
-                        return;
-                }
-                /* @psalm-suppress UnresolvableInclude */
-                require FBM_PATH . 'templates/admin/gdpr.php';
-        }
+	public static function render(): void {
+		if ( ! current_user_can( 'fb_manage_diagnostics' ) ) {
+				echo '<div class="wrap fbm-admin">'
+						. '<div class="fbm-notice fbm-notice--error">You do not have permission to access this page.</div>'
+						. '</div>';
+				return;
+		}
+			/* @psalm-suppress UnresolvableInclude */
+			require FBM_PATH . 'templates/admin/gdpr.php';
+	}
 
 	/**
 	 * Gather data for export.
