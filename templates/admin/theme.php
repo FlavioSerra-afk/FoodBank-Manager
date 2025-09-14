@@ -10,9 +10,9 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-$stored   = get_option( 'fbm_theme', [] );
-$defaults = function_exists( 'fbm_theme_defaults' ) ? fbm_theme_defaults() : [];
-$opts     = is_array( $stored ) ? array_replace_recursive( $defaults, $stored ) : $defaults;
+$stored   = \get_option( 'fbm_theme', [] );
+$defaults = \FoodBankManager\UI\Theme::defaults();
+$opts     = \is_array( $stored ) ? \array_replace_recursive( $defaults, $stored ) : $defaults;
 $groups   = fbm_theme_groups();
 ?>
 <div class="wrap fbm-theme">

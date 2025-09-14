@@ -3,7 +3,7 @@
  * Plugin Name: FoodBank Manager
  * Description: Secure forms, encrypted storage, dashboards, and attendance tracking for food banks.
  * Author: Portuguese Community Centre London
-$12.2.9
+ * Version: 2.2.9
  * Requires at least: 6.0
  * Tested up to: 6.7
  * Requires PHP: 8.1
@@ -70,15 +70,12 @@ add_action(
 add_action(
     'plugins_loaded',
     static function (): void {
-        if ( class_exists( '\FBM\Core\Plugin' ) ) {
-            \FBM\Core\Plugin::boot();
-            set_transient( 'fbm_boot_ok', time(), defined( 'MINUTE_IN_SECONDS' ) ? MINUTE_IN_SECONDS : 60 );
-            do_action( 'fbm_booted' );
-        }
+        \FoodBankManager\Core\Plugin::boot();
+        set_transient( 'fbm_boot_ok', time(), defined( 'MINUTE_IN_SECONDS' ) ? MINUTE_IN_SECONDS : 60 );
+        do_action( 'fbm_booted' );
     },
     0
 );
-
 add_action('admin_menu', static function () {
     // Only admins or FBM dashboard managers can ever see the parent
     if (!current_user_can('manage_options') && !current_user_can('fb_manage_dashboard')) {
