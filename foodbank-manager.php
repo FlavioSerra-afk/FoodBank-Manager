@@ -4,7 +4,7 @@
  * Description: Secure forms, encrypted storage, dashboards, and attendance tracking for food banks.
  * Author: Portuguese Community Centre London
  * x-release-please-start-version
- * Version: 2.2.4
+$12.2.5
  * x-release-please-end
  * Requires at least: 6.0
  * Tested up to: 6.7
