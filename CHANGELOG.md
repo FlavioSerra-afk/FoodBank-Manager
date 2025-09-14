@@ -1,5 +1,9 @@
 ## 2.2.5 — 2025-09-14
-- Bump version
+- Fix release-please to manifest mode (stop `chore(main): 1.8.0` PRs).
+- Repair Plugin.php parse error; centralize FBM_VER and global define.
+- Harden sanitize (null/flat/nested, clamp, payload limit).
+- Vertical tabs: non-submitting buttons + right-pane preview grid.
+- CI: PHP 8.2; bump enforcement on PRs; composer scripts namespaced.
 
 ## 2.2.4 — 2025-09-14
 - Bump version

@@ -5,14 +5,14 @@ namespace Tests\Unit\Meta;
 
 final class PluginHeaderConsistencyTest extends \BaseTestCase {
     public function testVersionsAreConsistent(): void {
-        $core     = defined('FBM_VER') ? FBM_VER : $this->readVersionFromPluginHeader();
-        $header   = $this->readVersionFromPluginHeader();   // foodbank-manager.php header
-        $stable   = $this->readStableTagFromReadme();       // readme.txt Stable tag
-        $composer = $this->readComposerVersion();           // composer.json version
+        $truth   = \defined('FBM_VER') ? FBM_VER : \FoodBankManager\Core\Plugin::FBM_VER;
+        $header  = $this->readVersionFromPluginHeader();   // foodbank-manager.php header
+        $stable  = $this->readStableTagFromReadme();       // readme.txt Stable tag
+        $composer= $this->readComposerVersion();           // composer.json version
 
-        $this->assertSame($core, $header,   'Header version mismatch');
-        $this->assertSame($core, $stable,   'Readme stable tag mismatch');
-        $this->assertSame($core, $composer, 'Composer version mismatch');
+        $this->assertSame($truth, $header,   'Header version mismatch');
+        $this->assertSame($truth, $stable,   'Readme stable tag mismatch');
+        $this->assertSame($truth, $composer, 'Composer version mismatch');
     }
 
     private function readVersionFromPluginHeader(): string {

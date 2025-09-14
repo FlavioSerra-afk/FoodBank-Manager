@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $php_version    = PHP_VERSION;
 $wp_version     = get_bloginfo( 'version' );
-$fbm_version    = defined( 'FBM_VERSION' ) ? FBM_VERSION : 'dev';
+$fbm_version    = defined('FBM_VER') ? FBM_VER : \FoodBankManager\Core\Plugin::FBM_VER;
 $sodium         = extension_loaded( 'sodium' ) ? 'native' : ( class_exists( '\\ParagonIE_Sodium_Compat' ) ? 'polyfill' : 'missing' );
 $kek_defined    = defined( 'FBM_KEK_BASE64' ) && FBM_KEK_BASE64 !== '';
 $notice         = $notice ?? '';

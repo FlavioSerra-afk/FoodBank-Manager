@@ -3,13 +3,10 @@
  * Plugin Name: FoodBank Manager
  * Description: Secure forms, encrypted storage, dashboards, and attendance tracking for food banks.
  * Author: Portuguese Community Centre London
- * x-release-please-start-version
-$12.2.5
- * x-release-please-end
+ * Version: 2.2.5
  * Requires at least: 6.0
  * Tested up to: 6.7
  * Requires PHP: 8.1
- * Stable tag: 2.2.4
  * Text Domain: foodbank-manager
  * Domain Path: /languages
  * License: GPL-2.0-or-later

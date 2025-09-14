@@ -5,6 +5,7 @@
     ".": {
       "release-type": "php",
       "changelog-path": "CHANGELOG.md",
+      "bump-minor-pre-major": true,
       "extra-files": [
         { "type": "json",    "path": "composer.json",          "jsonpath": "$.version" },
         { "type": "generic", "path": "includes/Core/Plugin.php" },
