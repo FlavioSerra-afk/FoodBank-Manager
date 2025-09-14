@@ -1,3 +1,6 @@
+## 2.2.4 — 2025-09-14
+- Bump version
+
 ## [2.2.3] — 2025-09-16
 ### Added
 - Vertical tabs UI with preview polish

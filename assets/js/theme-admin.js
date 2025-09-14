@@ -15,7 +15,11 @@
     }
 
     tablist.addEventListener('click',e=>{
-      const i=tabs.indexOf(e.target.closest('.fbm-vtab'));
+      const btn=e.target.closest('.fbm-vtab');
+      if(!btn) return;
+      e.preventDefault();
+      if(btn.type!=='button') btn.type='button';
+      const i=tabs.indexOf(btn);
       if(i>=0)select(i);
     });
     tablist.addEventListener('keydown',e=>{

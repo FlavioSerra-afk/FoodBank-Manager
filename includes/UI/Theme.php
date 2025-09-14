@@ -21,6 +21,7 @@ use function wp_json_encode;
 use function strlen;
 use function __;
 use function array_key_first;
+use function wp_strip_all_tags;
 
 /**
  * Provide sanitized design tokens for admin and front-end.
@@ -60,7 +61,7 @@ final class Theme {
 	 */
         public static function get(): array {
                 $raw = get_option( 'fbm_theme', array() );
-                return self::sanitize( is_array( $raw ) ? $raw : array() );
+                return self::sanitize_full( is_array( $raw ) ? $raw : array() );
         }
 
 	/**
@@ -81,46 +82,65 @@ final class Theme {
 		return self::get()['front'];
 	}
 
-	/**
-	 * Sanitize raw theme settings.
-	 *
-	 * @param array<string,mixed> $raw Raw values.
-	 * @return array<string,mixed>
-	 */
-        public static function sanitize( array $raw ): array {
+        /**
+         * Sanitize raw theme settings.
+         *
+         * @param mixed $raw Raw values.
+         * @return array<string,mixed>
+         */
+        public static function sanitize($raw): array {
+                $raw = is_array($raw) ? $raw : array();
+                $json = wp_json_encode($raw);
+                if (is_string($json) && strlen($json) > 65536) {
+                        add_settings_error('fbm_theme', 'fbm_theme', __('Theme payload too large.', 'foodbank-manager'), 'error');
+                        return self::defaults();
+                }
+                if ($raw === array()) {
+                        return self::sanitize_full($raw);
+                }
+                $keys = array('admin','front','menu','typography','tabs','match_front_to_admin','apply_admin','apply_admin_chrome','apply_front_menus');
+                foreach ($keys as $k) {
+                        if (array_key_exists($k, $raw)) {
+                                return self::sanitize_full($raw);
+                        }
+                }
+                return self::sanitize_tokens($raw);
+        }
+
+        private static function sanitize_full(array $raw): array {
                 $defaults = self::defaults();
-                $json     = wp_json_encode( $raw );
-                if ( is_string( $json ) && strlen( $json ) > 65536 ) {
-                        add_settings_error( 'fbm_theme', 'fbm_theme', __( 'Theme payload too large.', 'foodbank-manager' ), 'error' );
+                $json     = wp_json_encode($raw);
+                if (is_string($json) && strlen($json) > 65536) {
+                        add_settings_error('fbm_theme', 'fbm_theme', __('Theme payload too large.', 'foodbank-manager'), 'error');
                         return $defaults;
                 }
-                $admin = self::sanitize_section( $raw['admin'] ?? array(), $defaults['admin'] );
-                $front = self::sanitize_section( $raw['front'] ?? array(), $defaults['front'] );
-                $menu  = self::sanitize_menu( $raw['menu'] ?? array(), $defaults['menu'] );
-                $typography = self::sanitize_typography( $raw['typography'] ?? array(), $defaults['typography'] );
-                $tabs       = self::sanitize_tabs( $raw['tabs'] ?? array(), $defaults['tabs'] );
+                $admin = self::sanitize_section($raw['admin'] ?? array(), $defaults['admin']);
+                $front = self::sanitize_section($raw['front'] ?? array(), $defaults['front']);
+                $menu  = self::sanitize_menu($raw['menu'] ?? array(), $defaults['menu']);
+                $typography = self::sanitize_typography($raw['typography'] ?? array(), $defaults['typography']);
+                $tabs       = self::sanitize_tabs($raw['tabs'] ?? array(), $defaults['tabs']);
 
-		$front_enabled    = filter_var( $raw['front']['enabled'] ?? $defaults['front']['enabled'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE );
-		$front['enabled'] = null === $front_enabled ? $defaults['front']['enabled'] : (bool) $front_enabled;
+                $front_enabled    = filter_var($raw['front']['enabled'] ?? $defaults['front']['enabled'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
+                $front['enabled'] = null === $front_enabled ? $defaults['front']['enabled'] : (bool) $front_enabled;
 
-		$match = filter_var( $raw['match_front_to_admin'] ?? $defaults['match_front_to_admin'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE );
-		$match = (bool) ( null === $match ? $defaults['match_front_to_admin'] : $match );
+                $match = filter_var($raw['match_front_to_admin'] ?? $defaults['match_front_to_admin'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
+                $match = (bool) (null === $match ? $defaults['match_front_to_admin'] : $match);
 
-                $admin_chrome = filter_var( $raw['apply_admin'] ?? ( $raw['apply_admin_chrome'] ?? $defaults['apply_admin'] ), FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE );
+                $admin_chrome = filter_var($raw['apply_admin'] ?? ($raw['apply_admin_chrome'] ?? $defaults['apply_admin']), FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
                 $admin_chrome = null === $admin_chrome ? $defaults['apply_admin'] : (bool) $admin_chrome;
 
-		$front_menus = filter_var( $raw['apply_front_menus'] ?? $defaults['apply_front_menus'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE );
-		$front_menus = null === $front_menus ? $defaults['apply_front_menus'] : (bool) $front_menus;
+                $front_menus = filter_var($raw['apply_front_menus'] ?? $defaults['apply_front_menus'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
+                $front_menus = null === $front_menus ? $defaults['apply_front_menus'] : (bool) $front_menus;
 
-		if ( $match ) {
-			$front_copy = $front;
-			unset( $front_copy['enabled'] );
-			if ( $front_copy !== $admin ) {
-				$enabled          = $front['enabled'];
-				$front            = $admin;
-				$front['enabled'] = $enabled;
-			}
-		}
+                if ($match) {
+                        $front_copy = $front;
+                        unset($front_copy['enabled']);
+                        if ($front_copy !== $admin) {
+                                $enabled          = $front['enabled'];
+                                $front            = $admin;
+                                $front['enabled'] = $enabled;
+                        }
+                }
 
                 return array(
                         'admin'                => $admin,
@@ -133,6 +153,43 @@ final class Theme {
                         'typography'           => $typography,
                         'tabs'                 => $tabs,
                 );
+        }
+
+        private static function sanitize_tokens(array $in): array {
+                $schema = fbm_theme_schema();
+                $out    = array();
+
+                foreach ($schema as $key => $def) {
+                        $val  = $in[$key] ?? ($def['default'] ?? null);
+                        $type = $def['control'] ?? 'text';
+
+                        if ($type === 'number') {
+                                if (!is_numeric($val)) {
+                                        $val = $def['default'] ?? 0;
+                                }
+                                $val = (float) $val;
+                                if (isset($def['min'])) {
+                                        $val = max((float) $def['min'], $val);
+                                }
+                                if (isset($def['max'])) {
+                                        $val = min((float) $def['max'], $val);
+                                }
+                        } elseif ($type === 'radio') {
+                                $allowed = isset($def['choices']) && is_array($def['choices'])
+                                        ? array_keys($def['choices'])
+                                        : (array) ($def['allowed'] ?? array());
+                                if (!in_array($val, $allowed, true)) {
+                                        $val = $def['default'] ?? (reset($allowed) ?: '');
+                                }
+                        } else {
+                                $val = is_scalar($val) ? (string) $val : '';
+                                $val = wp_strip_all_tags($val);
+                        }
+
+                        $out[$key] = $val;
+                }
+
+                return $out;
         }
 
 	/**
@@ -642,7 +699,7 @@ namespace {
                 array(
                     'type'              => 'array',
                     'default'           => array(),
-                    'sanitize_callback' => 'fbm_theme_sanitize',
+                    'sanitize_callback' => [ \FoodBankManager\UI\Theme::class, 'sanitize' ],
                 )
             );
         }
@@ -1158,7 +1215,7 @@ namespace {
      */
     function fbm_css_variables_preview( array $o ): string {
         $schema = fbm_theme_schema();
-        $o      = fbm_theme_sanitize( $o );
+        $o      = \FoodBankManager\UI\Theme::sanitize( $o );
         $css    = '';
 
         foreach ( $schema as $key => $spec ) {
@@ -1184,37 +1241,6 @@ namespace {
      * @param array<string,mixed> $in Raw input.
      * @return array<string,mixed>
      */
-    function fbm_theme_sanitize( array $in ): array {
-        $schema = fbm_theme_schema();
-        $out    = array();
-
-        foreach ( $schema as $key => $spec ) {
-            $default = $spec['default'] ?? null;
-            $val     = $in[ $key ] ?? $default;
-
-            $type = $spec['type'] ?? 'string';
-            if ( 'number' === $type ) {
-                if ( is_numeric( $val ) ) {
-                    $val = $val + 0;
-                    if ( isset( $spec['min'] ) && $val < $spec['min'] ) {
-                        $val = $spec['min'];
-                    }
-                    if ( isset( $spec['max'] ) && $val > $spec['max'] ) {
-                        $val = $spec['max'];
-                    }
-                    $val = is_int( $default ) ? (int) $val : (float) $val;
-                } else {
-                    $val = $default;
-                }
-            } elseif ( 'string' === $type ) {
-                $val = wp_strip_all_tags( (string) $val );
-            }
-
-            $out[ $key ] = $val;
-        }
-
-        return $out;
-    }
 }
 
 namespace FoodBankManager\UI {

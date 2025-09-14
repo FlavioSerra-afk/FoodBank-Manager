@@ -1,0 +1,29 @@
+name: Bump patch on merge
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - "includes/**"
+      - "templates/**"
+      - "assets/**"
+      - "foodbank-manager.php"
+      - "composer.json"
+      - "readme.txt"
+permissions:
+  contents: write
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with: { php-version: '8.1' }
+      - run: composer install --no-interaction --no-progress
+      - name: Bump patch
+        run: |
+          composer bump
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore(version): auto-bump patch [skip ci]" || echo "No changes"
+          git push
