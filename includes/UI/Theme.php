@@ -424,9 +424,9 @@ final class Theme {
         /**
          * Scoped CSS variables for admin theme.
          */
-        public static function css_variables_scoped(): string {
-                $theme = self::get();
-                $tokens = self::section_to_css( self::admin() );
+        public static function css_variables_scoped( ?array $opts = null ): string {
+                $theme  = $opts ?? self::get();
+                $tokens = self::section_to_css( $theme['admin'] ?? self::admin() );
                 $menu   = self::menu_tokens( $theme['menu'] ?? array() );
                 $typo   = self::typography_tokens( $theme['typography'] ?? array() );
                 $tabs   = self::tabs_tokens( $theme['tabs'] ?? array() );
@@ -466,6 +466,19 @@ final class Theme {
          */
         public static function css_variables(): string {
                 return self::css_variables_scoped();
+        }
+
+        /**
+         * Build CSS variables block for live preview values.
+         *
+         * @param array<string,string> $vars Token map.
+         */
+        public static function css_variables_preview( array $vars ): string {
+                $css = '';
+                foreach ( $vars as $k => $v ) {
+                        $css .= $k . ':' . $v . ';';
+                }
+                return '@layer fbm {.fbm-scope{' . $css . '}}';
         }
 
 	/**

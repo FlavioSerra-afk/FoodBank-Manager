@@ -4,6 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 ?>
+<div class="fbm-scope">
 <h1>Heading 1</h1>
 <h2>Heading 2</h2>
 <h3>Heading 3</h3>
@@ -44,4 +45,5 @@ if ( ! defined( 'ABSPATH' ) ) {
     <div id="p1" role="tabpanel" aria-labelledby="t1">Panel 1</div>
     <div id="p2" role="tabpanel" aria-labelledby="t2" hidden>Panel 2</div>
     <div id="p3" role="tabpanel" aria-labelledby="t3" hidden>Panel 3</div>
+</div>
 </div>
