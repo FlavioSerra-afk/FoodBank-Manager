@@ -29,7 +29,7 @@ $opts = get_option( 'fbm_theme', [] );
             </div>
         </aside>
         <main class="fbm-preview">
-            <style id="fbm-preview-vars"></style>
+            <style id="fbm-preview-vars"><?php echo fbm_css_variables_preview( $opts ); ?></style>
         </main>
     </div>
 </div>
