@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace FoodBankManager\UI;
+namespace FoodBankManager\UI {
 
 use FoodBankManager\Core\Options;
 use function filter_var;
@@ -618,12 +618,79 @@ final class Theme {
 	/**
 	 * Glass fallback CSS.
 	 */
-	public static function glass_support_css(): string {
+public static function glass_support_css(): string {
                         $targets = '.fbm-scope .fbm-card--glass,.fbm-scope .fbm-button--glass';
                         return '@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)){' . $targets . '{backdrop-filter:blur(var(--fbm-glass-blur));-webkit-backdrop-filter:blur(var(--fbm-glass-blur));}}' // phpcs:ignore WordPress.Files.LineLength.MaxExceeded
                                         . '@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))){' . $targets . '{background:var(--fbm-color-surface,#fff);}}' // phpcs:ignore WordPress.Files.LineLength.MaxExceeded
                                         . '@media (prefers-reduced-transparency: reduce){' . $targets . '{background:var(--fbm-color-surface,#fff);}}'
                                         . '@media (forced-colors: active){' . $targets . '{background:Canvas;color:CanvasText;border-color:ButtonText;box-shadow:none;}}'
                                         . '@media (prefers-reduced-motion: reduce){' . $targets . '{transition:none;}}';
-	}
+        }
+}
+
+}
+
+namespace {
+
+    add_action(
+        'admin_init',
+        static function (): void {
+            register_setting(
+                'fbm_theme',
+                'fbm_theme',
+                array(
+                    'type'              => 'array',
+                    'default'           => array(),
+                    'sanitize_callback' => 'fbm_theme_sanitize',
+                )
+            );
+        }
+    );
+
+    /**
+     * Schema for theme settings.
+     *
+     * @return array<string,array<string,mixed>>
+     */
+    function fbm_theme_schema(): array {
+        return array();
+    }
+
+    /**
+     * Sanitize theme settings based on schema.
+     *
+     * @param array<string,mixed> $in Raw input.
+     * @return array<string,mixed>
+     */
+    function fbm_theme_sanitize( array $in ): array {
+        $schema = fbm_theme_schema();
+        $out    = array();
+
+        foreach ( $schema as $key => $spec ) {
+            $default = $spec['default'] ?? null;
+            $val     = $in[ $key ] ?? $default;
+
+            $type = $spec['type'] ?? 'string';
+            if ( 'number' === $type ) {
+                if ( is_numeric( $val ) ) {
+                    $val = $val + 0;
+                    if ( isset( $spec['min'] ) && $val < $spec['min'] ) {
+                        $val = $spec['min'];
+                    }
+                    if ( isset( $spec['max'] ) && $val > $spec['max'] ) {
+                        $val = $spec['max'];
+                    }
+                    $val = is_int( $default ) ? (int) $val : (float) $val;
+                } else {
+                    $val = $default;
+                }
+            } elseif ( 'string' === $type ) {
+                $val = wp_strip_all_tags( (string) $val );
+            }
+
+            $out[ $key ] = $val;
+        }
+
+        return $out;
+    }
 }
