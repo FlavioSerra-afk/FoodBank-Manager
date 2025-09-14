@@ -1,10 +1,14 @@
 ## [2.2.3] — 2025-09-16
+### Added
+- Vertical tabs UI with preview polish
+- Live CSS preview with Import/Export/Defaults
 ### Fixed
-- release sync
+- Settings sanitize and clamp
+- Asset gating to Theme screen
 ### Tests
-- header test hardening
-### Improved
-- vertical tabs polish
+- Version test hardened
+### Misc
+- Release-please manifest/config synced
 
 ## [2.2.2] — 2025-09-15
 ### Added
