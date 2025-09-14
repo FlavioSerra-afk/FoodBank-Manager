@@ -51,7 +51,9 @@ class Assets {
      */
     public function enqueue_admin(string $hook_suffix = ''): void {
         $GLOBALS['hook_suffix'] = $hook_suffix;
-        if (strpos($hook_suffix, 'foodbank_page_fbm') !== 0) {
+        $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+        $id     = $screen ? $screen->id : $hook_suffix;
+        if (strpos((string) $id, 'foodbank_page_fbm') !== 0) {
             return;
         }
         $opt = get_option('fbm_theme', Theme::defaults());
@@ -94,7 +96,9 @@ class Assets {
      */
     public function enqueue_theme_page(string $hook_suffix = ''): void {
         $GLOBALS['hook_suffix'] = $hook_suffix;
-        if ('foodbank_page_fbm_theme' !== $hook_suffix) {
+        $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+        $id     = $screen ? $screen->id : $hook_suffix;
+        if ('foodbank_page_fbm_theme' !== $id) {
             return;
         }
         wp_enqueue_style('wp-color-picker');

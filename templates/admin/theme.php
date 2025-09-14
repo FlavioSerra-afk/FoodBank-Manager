@@ -324,7 +324,7 @@ $apply_front_menus   = ! empty( $theme['apply_front_menus'] );
         </form>
     </div>
     <div class="fbm-theme-preview-wrap">
-        <div class="fbm-scope fbm-app fbm-preview" data-fbm-preview>
+        <div class="fbm-app fbm-preview" data-fbm-preview>
             <?php include FBM_PATH . 'templates/admin/_preview.php'; ?>
         </div>
     </div>
