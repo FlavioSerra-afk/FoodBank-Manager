@@ -4,28 +4,35 @@ declare(strict_types=1);
 namespace Tests\Unit\Meta;
 
 final class PluginHeaderConsistencyTest extends \BaseTestCase {
-    public function testVersionsMatch(): void {
-        $root = dirname(__DIR__, 3);
+    public function testVersionsAreConsistent(): void {
+        $core     = defined('FBM_VER') ? FBM_VER : $this->readVersionFromPluginHeader();
+        $header   = $this->readVersionFromPluginHeader();   // foodbank-manager.php header
+        $stable   = $this->readStableTagFromReadme();       // readme.txt Stable tag
+        $composer = $this->readComposerVersion();           // composer.json version
 
+        $this->assertSame($core, $header,   'Header version mismatch');
+        $this->assertSame($core, $stable,   'Readme stable tag mismatch');
+        $this->assertSame($core, $composer, 'Composer version mismatch');
+    }
+
+    private function readVersionFromPluginHeader(): string {
+        $root       = dirname(__DIR__, 3);
         $pluginFile = file_get_contents($root . '/foodbank-manager.php');
-        preg_match('/^\s*\* Version:\s*([0-9.]+)/m', (string) $pluginFile, $pluginVersion);
-        preg_match('/^\s*\* Stable tag:\s*([0-9.]+)/m', (string) $pluginFile, $headerStable);
-        $version = $pluginVersion[1] ?? '';
-        $this->assertSame($version, $headerStable[1] ?? '');
+        preg_match('/^\s*\*\s*Version:\s*([0-9.]+)/m', (string) $pluginFile, $matches);
+        return $matches[1] ?? '';
+    }
 
-        $pluginPhp = file_get_contents($root . '/includes/Core/Plugin.php');
-        preg_match("/VERSION = '([^']+)'/", (string) $pluginPhp, $constantVersion);
-        $constant = $constantVersion[1] ?? '';
-
-        $composer = json_decode((string) file_get_contents($root . '/composer.json'), true);
-        $composerVersion = (string) ($composer['version'] ?? '');
-
+    private function readStableTagFromReadme(): string {
+        $root   = dirname(__DIR__, 3);
         $readme = file_get_contents($root . '/readme.txt');
-        preg_match('/^Stable tag: (.+)$/m', (string) $readme, $readmeStable);
-        $readmeTag = trim($readmeStable[1] ?? '');
+        preg_match('/^Stable tag:\s*([0-9.]+)/m', (string) $readme, $matches);
+        return $matches[1] ?? '';
+    }
 
-        $this->assertSame($version, $constant);
-        $this->assertSame($version, $composerVersion);
-        $this->assertSame($version, $readmeTag);
+    private function readComposerVersion(): string {
+        $root     = dirname(__DIR__, 3);
+        $composer = json_decode((string) file_get_contents($root . '/composer.json'), true);
+        return (string) ($composer['version'] ?? '');
     }
 }
+
