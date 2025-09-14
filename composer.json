@@ -4,7 +4,7 @@
     "type": "wordpress-plugin",
     "license": "GPL-2.0-or-later",
     "require": {
-        "php": "^8.1",
+        "php": "^8.1 || ^8.2",
         "endroid/qr-code": "^4",
         "league/csv": "^9",
         "mpdf/mpdf": "^8"
@@ -62,10 +62,10 @@
         "phpstan:fast": "phpstan analyse -c phpstan.neon --no-progress --level=5 --memory-limit=1G",
         "phpstan:debug": "phpstan analyse -c phpstan.neon --debug --no-progress --memory-limit=1G",
         "test": "phpunit",
-        "bump": "php bin/bump-version.php patch",
-        "bump:patch": "php bin/bump-version.php patch",
-        "bump:minor": "php bin/bump-version.php minor",
-        "bump:major": "php bin/bump-version.php major",
+        "ver:bump": "php bin/bump-version.php patch",
+        "ver:bump:patch": "php bin/bump-version.php patch",
+        "ver:bump:minor": "php bin/bump-version.php minor",
+        "ver:bump:major": "php bin/bump-version.php major",
         "release:patch": "php bin/bump-version.php patch && php bin/changelog.php",
         "release:minor": "php bin/bump-version.php minor && php bin/changelog.php",
         "release:major": "php bin/bump-version.php major && php bin/changelog.php",
