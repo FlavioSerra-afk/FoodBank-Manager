@@ -6,39 +6,11 @@
       "release-type": "php",
       "changelog-path": "CHANGELOG.md",
       "extra-files": [
-        {
-          "type": "json",
-          "path": "composer.json",
-          "jsonpath": "$.version"
-        },
-        {
-          "type": "regex",
-          "path": "includes/Core/Plugin.php",
-          "pattern": "(FBM_VER\\s*=\\s*[\"'])(\\d+\\.\\d+\\.\\d+)([\"'];?)",
-          "replacement": "$1${version}$3"
-        },
-        {
-          "type": "regex",
-          "path": "includes/Core/Plugin.php",
-          "pattern": "(define\\(\\s*[\"']FBM_VER[\"']\\s*,\\s*[\"'])(\\d+\\.\\d+\\.\\d+)([\"']\\s*\\))",
-          "replacement": "$1${version}$3"
-        },
-        {
-          "type": "regex",
-          "path": "foodbank-manager.php",
-          "pattern": "^(\\s*\\*\\s*Version:\\s*)(\\d+\\.\\d+\\.\\d+)$",
-          "replacement": "$1${version}",
-          "flags": "m"
-        },
-        {
-          "type": "regex",
-          "path": "readme.txt",
-          "pattern": "^(Stable tag:\\s*)(\\d+\\.\\d+\\.\\d+)$",
-          "replacement": "$1${version}",
-          "flags": "m"
-        }
+        { "type": "json",    "path": "composer.json",          "jsonpath": "$.version" },
+        { "type": "generic", "path": "includes/Core/Plugin.php" },
+        { "type": "generic", "path": "foodbank-manager.php" },
+        { "type": "generic", "path": "readme.txt" }
       ]
     }
   }
 }
-
