@@ -29,7 +29,7 @@ if (!defined('ABSPATH')) {
 final class Plugin
 {
     /** Plugin semantic version (syncs with header & composer). */
-    public const FBM_VER = '2.2.6';
+    public $12.2.7$2
 
     /** Plugin slug / directory name. */
     public const SLUG = 'foodbank-manager';

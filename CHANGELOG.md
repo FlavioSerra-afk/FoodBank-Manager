@@ -1,3 +1,6 @@
+## 2.2.7 — 2025-09-14
+- Bump version
+
 ## 2.2.6 — 2025-09-14
 - Bump version
 - Switch to manual release flow
