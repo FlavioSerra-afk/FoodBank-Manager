@@ -1,15 +1,14 @@
 (function($){
     const styleId = 'fbm-preview-vars';
-    const $preview = $('[data-fbm-preview]');
     function render(tokens){
         let css = '';
         Object.keys(tokens).forEach(key=>{
             css += key + ':' + tokens[key] + ';';
         });
         const cssText = '@layer fbm {.fbm-preview.fbm-scope{' + css + '}}';
-        let $style = $preview.find('#'+styleId);
+        let $style = $('#'+styleId);
         if(!$style.length){
-            $style = $('<style/>',{id:styleId}).appendTo($preview);
+            $style = $('<style/>',{id:styleId}).appendTo(document.head);
         }
         $style.text(cssText);
     }
