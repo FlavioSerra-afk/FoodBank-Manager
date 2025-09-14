@@ -62,14 +62,9 @@ final class ThemePageSaveTest extends \BaseTestCase {
         if (!defined('FBM_PATH')) {
             define('FBM_PATH', dirname(__DIR__, 3) . '/');
         }
-        if (!function_exists('settings_fields')) {
-            function settings_fields($group): void { // @phpstan-ignore-line
-                echo '<input type="hidden" name="option_page" value="' . esc_attr($group) . '" />';
-            }
-        }
         ob_start();
         require FBM_PATH . 'templates/admin/theme.php';
         $html = (string) ob_get_clean();
-        $this->assertStringContainsString('name="option_page" value="fbm_theme"', $html);
+        $this->assertStringNotContainsString('name="option_page"', $html);
     }
 }

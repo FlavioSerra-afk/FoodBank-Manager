@@ -100,10 +100,15 @@ class Assets {
         if (!$screen || 'foodbank_page_fbm_theme' !== $screen->id) {
             return;
         }
-        $css = '.fbm-grid{display:grid;gap:24px;margin-top:16px}';
+        $css = '.fbm-grid{margin-top:16px}';
         $css .= <<<CSS
+/* ---------- Layout ---------- */
+.fbm-grid--vtabs{ display:grid; grid-template-columns: 260px minmax(0,1fr); gap:16px; align-items:start; }
+.fbm-right{ display:grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap:16px; align-items:start; }
+@media (max-width:1280px){ .fbm-right{ grid-template-columns:1fr; } }
+.fbm-right-fields, .fbm-preview { min-width:0; }
+
 /* ---------- Vertical tabs (left) ---------- */
-.fbm-grid--vtabs{ grid-template-columns: 260px minmax(0,1fr); }
 .fbm-vtabs { display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }
 .fbm-vtab {
   display:flex; align-items:center; width:100%;
@@ -118,7 +123,6 @@ class Assets {
 .fbm-vtab:hover{ background:#f8fafc; }
 
 /* ---------- Right side: group panel + preview ---------- */
-.fbm-right{ display:grid; grid-template-rows: auto 1fr; gap:16px; }
 .fbm-group-panel{ border:1px solid #e6e7ea; border-radius:12px; background:#fff; }
 .fbm-panel-inner{ padding:14px; }
 .fbm-panel-title{ margin:0 0 8px; font-size:14px; text-transform:uppercase; letter-spacing:.02em; color:#374151; }
