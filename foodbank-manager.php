@@ -9,7 +9,7 @@
  * Requires at least: 6.0
  * Tested up to: 6.7
  * Requires PHP: 8.1
-* Stable tag: 2.2.1
+* Stable tag: 1.8.0
  * Text Domain: foodbank-manager
  * Domain Path: /languages
  * License: GPL-2.0-or-later

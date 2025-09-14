@@ -97,14 +97,10 @@ class Assets {
     public function enqueue_theme_page(string $hook_suffix = ''): void {
         $GLOBALS['hook_suffix'] = $hook_suffix;
         $screen = function_exists('get_current_screen') ? get_current_screen() : null;
-        $id     = $screen ? $screen->id : $hook_suffix;
-        if ('foodbank_page_fbm_theme' !== $id) {
+        if (!$screen || 'foodbank_page_fbm_theme' !== $screen->id) {
             return;
         }
-        wp_enqueue_style('wp-color-picker');
-        wp_enqueue_script('wp-color-picker');
-        wp_enqueue_script('fbm-theme-admin', plugins_url('assets/js/theme-admin.js', FBM_FILE), ['wp-color-picker', 'jquery'], Plugin::VERSION, true);
-        wp_enqueue_script('fbm-theme-preview', plugins_url('assets/js/theme-preview.js', FBM_FILE), ['jquery', 'wp-color-picker'], Plugin::VERSION, true);
+        // Assets to be enqueued in a later revision.
     }
 
     /**
