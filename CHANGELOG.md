@@ -8,6 +8,14 @@
 ### Tests
 - No new PHPCS/PHPStan issues; tests green
 
+## [1.9.1](https://github.com/FlavioSerra-afk/FoodBank-Manager/compare/1.9.0...1.9.1) (2025-09-14)
+
+
+### Miscellaneous Chores
+
+* bump plugin version to 2.2.2 ([cf88eb2](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/cf88eb206befa4e61e639cbdf3071ba0fc4a0a22))
+* release 2.2.2 ([8495d22](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/8495d22e7c6ae22bb01a10ceb8d56d191cc8f687))
+
 ## [2.2.1] — 2025-09-13
 ### Improved
 - Theme preview script now uses debounced vanilla JS and updates a single `<style data-fbm-preview>` scoped to `@layer fbm` and `.fbm-scope` for live token changes.
