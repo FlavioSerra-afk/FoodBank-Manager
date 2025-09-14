@@ -6,7 +6,7 @@ use FoodBankManager\UI\Theme;
 final class SettingsThemeTest extends \BaseTestCase {
     protected function setUp(): void {
         parent::setUp();
-        update_option( 'fbm_theme', function_exists( 'fbm_theme_defaults' ) ? fbm_theme_defaults() : [] );
+        update_option( 'fbm_theme', \FoodBankManager\UI\Theme::defaults() );
     }
 
     public function test_valid_values_emit_tokens(): void {

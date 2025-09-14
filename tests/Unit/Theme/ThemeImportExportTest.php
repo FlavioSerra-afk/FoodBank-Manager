@@ -11,7 +11,8 @@ final class ThemeImportExportTest extends \BaseTestCase {
             define('FBM_PATH', dirname(__DIR__, 3) . '/');
         }
         Options::update('theme', Theme::defaults());
-        Options::update('theme', array('match_front_to_admin' => true));
+        Options::update('theme', array_replace_recursive(Theme::defaults(), array('match_front_to_admin' => true)));
+        update_option('fbm_theme', Theme::defaults());
         $data = array(
             'version' => 1,
             'style'   => 'basic',

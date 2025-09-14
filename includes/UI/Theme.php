@@ -54,6 +54,15 @@ final class Theme {
                 return $defaults['theme'];
         }
 
+        /**
+         * Schema stub – use existing global helper if available.
+         *
+         * @return array<string,array<string,mixed>>
+         */
+        public static function schema(): array {
+                return function_exists('fbm_theme_schema') ? fbm_theme_schema() : array();
+        }
+
 	/**
 	 * Retrieve sanitized theme settings.
 	 *
@@ -95,8 +104,8 @@ final class Theme {
 
                 // Reject oversized payloads (basic flood guard)
                 if (count($in, COUNT_RECURSIVE) > 2000) {
-                        // Flood guard; fall back to safe defaults
-                        return function_exists('fbm_theme_defaults') ? fbm_theme_defaults() : [];
+                        // Flood guard – fall back to safe defaults.
+                        return self::defaults();
                 }
 
                 $schema = fbm_theme_schema();
@@ -139,9 +148,8 @@ final class Theme {
                         }
                 }
 
-                // Final merge: ensure group keys exist (admin/menu/forms/tabs/etc.)
-                $defaults = function_exists('fbm_theme_defaults') ? fbm_theme_defaults() : [];
-                return array_replace_recursive($defaults, $out);
+                // Ensure every group exists (admin/menu/forms/typography/tabs/etc.)
+                return array_replace_recursive(self::defaults(), $out);
         }
 
         private static function sanitize_full(array $raw): array {
@@ -528,16 +536,26 @@ final class Theme {
         }
 
         /**
-         * Build CSS variables block for live preview values.
-         *
-         * @param array<string,string> $vars Token map.
+         * CSS variables preview – always use fully merged data.
          */
-        public static function css_variables_preview( array $vars ): string {
-                $css = '';
-                foreach ( $vars as $k => $v ) {
-                        $css .= $k . ':' . $v . ';';
-                }
-                return '@layer fbm {.fbm-scope{' . $css . '}}';
+        public static function css_variables_preview( array $opts ): string {
+                $data = array_replace_recursive( self::defaults(), $opts );
+
+                // Example variables – adapt to your actual token map
+                $accent = $data['core']['accent'] ?? '#2b6cb0';
+                $link   = $data['core']['link'] ?? $accent;
+
+                $radius = (string) ( $data['core']['radius'] ?? 8 );
+                $elev   = (string) ( $data['core']['elevation'] ?? 8 );
+
+                return <<<CSS
+:root .fbm-scope{
+  --fbm-accent: {$accent};
+  --fbm-link: {$link};
+  --fbm-radius: {$radius}px;
+  --fbm-elevation: {$elev};
+}
+CSS;
         }
 
 	/**
@@ -1215,27 +1233,7 @@ namespace {
      * @param array<string,mixed> $o Option values.
      */
     function fbm_css_variables_preview( array $o ): string {
-        $defaults = function_exists( 'fbm_theme_defaults' ) ? fbm_theme_defaults() : [];
-        $o        = array_replace_recursive( $defaults, $o );
-        $schema   = fbm_theme_schema();
-        $o        = \FoodBankManager\UI\Theme::sanitize( $o );
-        $css      = '';
-
-        foreach ( $schema as $key => $spec ) {
-            $val = $o[ $key ] ?? ( $spec['default'] ?? '' );
-            if ( is_array( $val ) ) {
-                continue;
-            }
-            $css .= '--fbm-' . str_replace( '_', '-', $key ) . ':' . $val . ';';
-        }
-
-        $out = ':root.fbm-scope{' . $css . '}';
-
-        if ( ( $o['style'] ?? ( $schema['style']['default'] ?? '' ) ) === 'glass' ) {
-            $out .= '.fbm-card{backdrop-filter:blur(var(--fbm-glass-blur));-webkit-backdrop-filter:blur(var(--fbm-glass-blur));background:color-mix(in srgb,var(--fbm-card-bg) calc(var(--fbm-glass-alpha)*100%),transparent);background:rgba(255,255,255,var(--fbm-glass-alpha));}';
-        }
-
-        return $out;
+        return \FoodBankManager\UI\Theme::css_variables_preview( $o );
     }
 
     /**

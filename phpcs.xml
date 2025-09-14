@@ -35,11 +35,14 @@
   </rule>
 
   <!-- Enforce WordPress spacing rules that we can auto-fix -->
-  <rule ref="WordPress.WhiteSpace.ControlStructureSpacing"/>
+  <rule ref="WordPress.WhiteSpace.ControlStructureSpacing">
+    <properties>
+      <property name="requiredSpacesAfterOpenParenthesis" value="1"/>
+    </properties>
+  </rule>
 
   <rule ref="WordPress.WhiteSpace.OperatorSpacing">
     <properties>
-      <!-- disallow missing space before/after operators -->
       <property name="ignoreNewlines" value="false"/>
     </properties>
   </rule>

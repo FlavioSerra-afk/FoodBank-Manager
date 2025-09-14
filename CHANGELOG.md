@@ -1,5 +1,8 @@
 ## 2.2.9 — 2025-09-14
-- Bump version
+- Fix Plugin.php parse error and expose safe version constant.
+- Theme sanitizer/preview now always merge into defaults.
+- Add PHPCS spacing rules and auto-fix spacing.
+- Seed theme defaults in tests to avoid undefined keys.
 
 ## 2.2.8 — 2025-09-14
 - Bump version
