@@ -103,6 +103,12 @@ class Assets {
         $css = '.fbm-grid{display:grid;grid-template-columns:340px 1fr;gap:24px;margin-top:16px}' .
             '.fbm-preview{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:24px}';
         wp_add_inline_style('fbm-admin', $css);
+
+        wp_enqueue_script('fbm-theme-admin', plugins_url('assets/js/theme-admin.js', FBM_FILE), ['jquery'], Plugin::VERSION, true);
+        wp_localize_script('fbm-theme-admin', 'fbmTheme', [
+            'ajaxUrl' => admin_url('admin-ajax.php'),
+            'nonce'   => wp_create_nonce('fbm_theme'),
+        ]);
     }
 
     /**

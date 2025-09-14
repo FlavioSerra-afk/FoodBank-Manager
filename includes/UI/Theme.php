@@ -1155,3 +1155,42 @@ namespace {
         return $out;
     }
 }
+
+namespace FoodBankManager\UI {
+
+use function add_action;
+use function check_ajax_referer;
+use function json_decode;
+use function stripslashes;
+use function wp_die;
+use function wp_send_json;
+
+add_action('wp_ajax_fbm_css_preview', __NAMESPACE__ . '\\fbm_ajax_css_preview');
+add_action('wp_ajax_fbm_theme_defaults', __NAMESPACE__ . '\\fbm_ajax_theme_defaults');
+
+/**
+ * AJAX handler: live CSS preview.
+ */
+function fbm_ajax_css_preview(): void {
+    check_ajax_referer('fbm_theme');
+    $raw = json_decode(stripslashes((string)($_POST['payload'] ?? '')), true);
+    if (!is_array($raw)) {
+        wp_die();
+    }
+    echo fbm_css_variables_preview($raw);
+    wp_die();
+}
+
+/**
+ * AJAX handler: return default token values.
+ */
+function fbm_ajax_theme_defaults(): void {
+    $schema   = fbm_theme_schema();
+    $defaults = array();
+    foreach ($schema as $key => $spec) {
+        $defaults[$key] = $spec['default'] ?? null;
+    }
+    wp_send_json($defaults);
+}
+
+}
