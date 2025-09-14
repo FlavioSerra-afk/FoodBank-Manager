@@ -40,10 +40,6 @@ $readme=r('readme.txt');
 $readme=preg_replace("/^(Stable tag:\s*)\d+\.\d+\.\d+$/m","\\$1{$new}",$readme);
 w('readme.txt',$readme);
 
-/* manifest */
-$man=json_decode(r('.release-please-manifest.json'),true,512,JSON_THROW_ON_ERROR); $man['.']=$new;
-w('.release-please-manifest.json',json_encode($man,JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES)."\n");
-
 /* CHANGELOG stub */
 $chg=r('CHANGELOG.md'); if(strpos($chg,"## {$new}")===false){ $today=(new DateTime('now',new DateTimeZone('UTC')))->format('Y-m-d'); $stub="## {$new} — {$today}\n- Bump version\n\n"; w('CHANGELOG.md',$stub.$chg); }
 

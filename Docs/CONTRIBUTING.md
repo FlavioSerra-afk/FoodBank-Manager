@@ -4,11 +4,11 @@ Docs-Revision: 2025-09-05 (v1.2.9 QA sweep)
 Thanks for helping build a secure and accessible tool for the community!  
 This document explains how to set up your environment, coding standards, and the PR process.
 
-> Every code change must bump the plugin version. Use:
->   composer ver:bump            # patch
->   composer ver:bump:minor
->   composer ver:bump:major
-> CI will fail PRs without a bump; local pre-commit hook enforces it too.
+Releases are manual. Always run a version bump with:
+  composer ver:bump          # patch
+  composer ver:bump:minor
+  composer ver:bump:major
+CI and a pre-commit hook enforce that version files are updated.
 
 ## Table of contents
 - [Project goals](#project-goals)
