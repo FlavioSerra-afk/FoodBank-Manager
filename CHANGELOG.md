@@ -1,3 +1,13 @@
+## [2.2.2] — 2025-09-15
+### Added
+- New two-pane Theme page with accordion controls & style-book preview
+- Live CSS variable preview + JSON Import/Export/Defaults
+### Fixed
+- Fixed settings save (register_setting for fbm_theme)
+- Tight Theme-screen asset gating
+### Tests
+- No new PHPCS/PHPStan issues; tests green
+
 ## [2.2.1] — 2025-09-13
 ### Improved
 - Theme preview script now uses debounced vanilla JS and updates a single `<style data-fbm-preview>` scoped to `@layer fbm` and `.fbm-scope` for live token changes.
