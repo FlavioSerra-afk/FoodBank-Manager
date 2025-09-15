@@ -1,3 +1,6 @@
+## 2.2.11 — 2025-09-15
+- Bump version
+
 ## 2.2.10 — 2025-09-14
 - Contain PHPCBF, pin toolchain, restrict formatting scope, two-pane/preview fixes safe.
 
