@@ -94,63 +94,15 @@ final class Theme {
         /**
          * Sanitize raw theme settings.
          *
-         * @param mixed $raw Raw values.
+         * @param array<string,mixed>|null $raw Raw values.
          * @return array<string,mixed>
          */
-    public static function sanitize($raw): array
+    public static function sanitize(?array $raw = null): array
     {
-                // Normalize input
-                $in = is_array($raw) ? $raw : [];
-
-                // Reject oversized payloads (basic flood guard)
-                if (count($in, COUNT_RECURSIVE) > 2000) {
-                        // Flood guard – fall back to safe defaults.
-                        return self::defaults();
-                }
-
-                $schema = fbm_theme_schema();
-                $out    = [];
-
-                foreach ($schema as $key => $def) {
-                        $type = $def['control'] ?? 'text';
-                        $val  = $in[$key] ?? ($def['default'] ?? null);
-
-                        switch ($type) {
-                                case 'number':
-                                        $num = is_numeric($val) ? (float) $val : (float) ($def['default'] ?? 0);
-                                        if (isset($def['min'])) {
-                                                $num = max((float) $def['min'], $num);
-                                        }
-                                        if (isset($def['max'])) {
-                                                $num = min((float) $def['max'], $num);
-                                        }
-                                        $out[$key] = $num;
-                                        break;
-
-                                case 'radio':
-                                        $allowed = isset($def['choices']) && is_array($def['choices'])
-                                                ? array_keys($def['choices'])
-                                                : (array) ($def['allowed'] ?? []);
-                                        $out[$key] = in_array($val, $allowed, true)
-                                                ? $val
-                                                : ($def['default'] ?? (reset($allowed) ?: ''));
-                                        break;
-
-                                case 'color':
-                                        $s   = is_string($val) ? $val : '';
-                                        $hex = sanitize_hex_color($s);
-                                        $out[$key] = $hex ?: ($def['default'] ?? '');
-                                        break;
-
-                                default: // text
-                                        $s        = is_scalar($val) ? (string) $val : '';
-                                        $out[$key] = wp_strip_all_tags($s);
-                        }
-                }
-
-                // Ensure every group exists (admin/menu/forms/typography/tabs/etc.)
-                return array_replace_recursive(self::defaults(), $out);
-        }
+        $defaults  = self::defaults();
+        $sanitized = self::sanitize_full($raw ?? []);
+        return array_replace_recursive($defaults, $sanitized);
+    }
 
         private static function sanitize_full(array $raw): array {
                 $defaults = self::defaults();
@@ -724,6 +676,10 @@ namespace {
         }
     );
 
+    function fbm_theme_defaults(): array {
+        return \FoodBankManager\UI\Theme::defaults();
+    }
+
     /**
      * Schema for theme settings.
      *
@@ -1121,6 +1077,10 @@ namespace {
             'tabs' => array(
                 'title'  => 'Tabs',
                 'fields' => array( 'tabs_height', 'tabs_px', 'tabs_py', 'tabs_gap', 'tabs_radius', 'tabs_color', 'tabs_hover_color', 'tabs_active_color', 'tabs_hover_bg', 'tabs_active_bg', 'tabs_indicator_h', 'tabs_indicator_offset', 'tabs_indicator_color', 'tab_active_fg', 'tab_active_border', 'tab_inactive_fg' ),
+            ),
+            'admin' => array(
+                'title'  => 'Admin',
+                'fields' => array(),
             ),
         );
     }

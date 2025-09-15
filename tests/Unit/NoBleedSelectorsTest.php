@@ -18,6 +18,7 @@ final class NoBleedSelectorsTest extends \PHPUnit\Framework\TestCase {
     }
 
     public function test_inline_vars_scoped(): void {
+        update_option('fbm_theme', fbm_theme_defaults());
         $vars = Theme::css_variables_scoped();
         $this->assertStringNotContainsString(':root', $vars);
         $this->assertSame(0, preg_match('/(?<!-)\bbody\b/', $vars));

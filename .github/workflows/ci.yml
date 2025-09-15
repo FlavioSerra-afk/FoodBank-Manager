@@ -33,6 +33,8 @@ jobs:
             echo 'WP function declarations found in tests';
             exit 1;
           fi
+      - name: PHPCBF (changed files only)
+        run: composer phpcbf:changed
       - name: Lint
         run: composer lint
       - name: Prepare build dir

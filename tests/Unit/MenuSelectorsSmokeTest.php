@@ -21,6 +21,7 @@ final class MenuSelectorsSmokeTest extends \BaseTestCase {
         $this->assertStringContainsString('fbm-menu__item', $html);
         $this->assertStringContainsString('fbm-menu__icon', $html);
         $this->assertStringContainsString('is-active', $html);
+        update_option('fbm_theme', fbm_theme_defaults());
         $css = \FoodBankManager\UI\Theme::css_variables_scoped();
         $this->assertStringContainsString('--fbm-menu-hover-bg', $css);
         $this->assertStringContainsString('--fbm-menu-active-bg', $css);

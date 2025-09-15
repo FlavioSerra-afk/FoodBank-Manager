@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace FoodBankManager\Core;
 
-if (!defined('ABSPATH')) {
+if ( ! defined('ABSPATH')) {
     exit;
 }
 
 final class Plugin
 {
-    public $12.2.10$2
+    public const FBM_VER = '2.2.10';
     public const SLUG    = 'foodbank-manager';
     public const VERSION = self::FBM_VER;
 
@@ -48,6 +48,6 @@ final class Plugin
 }
 
 // Expose global define for consumers/tests without redeclaration warnings.
-if (!defined('FBM_VER')) {
+if ( ! defined('FBM_VER')) {
     \define('FBM_VER', \FoodBankManager\Core\Plugin::FBM_VER);
 }

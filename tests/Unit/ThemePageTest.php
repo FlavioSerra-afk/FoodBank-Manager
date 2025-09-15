@@ -10,6 +10,7 @@ final class ThemePageTest extends \BaseTestCase {
         if (!defined('FBM_PATH')) {
             define('FBM_PATH', dirname(__DIR__, 2) . '/');
         }
+        update_option('fbm_theme', fbm_theme_defaults());
         fbm_test_trust_nonces(true);
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_POST = [];

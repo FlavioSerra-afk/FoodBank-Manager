@@ -1,5 +1,5 @@
 ## 2.2.10 — 2025-09-14
-- Bump version
+- Contain PHPCBF, pin toolchain, restrict formatting scope, two-pane/preview fixes safe.
 
 ## 2.2.9 — 2025-09-14
 - Fix Plugin.php parse error and expose safe version constant.

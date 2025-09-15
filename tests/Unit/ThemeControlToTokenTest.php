@@ -8,6 +8,7 @@ if (!defined('FBM_URL')) {
 
 final class ThemeControlToTokenTest extends \BaseTestCase {
     public function test_menu_tokens_present_in_css(): void {
+        update_option('fbm_theme', fbm_theme_defaults());
         $t = Theme::defaults();
         $t['menu']['item_height'] = 52;
         Options::update('theme', $t);
