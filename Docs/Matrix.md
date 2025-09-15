@@ -76,9 +76,10 @@ U5 — Diagnostics & Release
 
 ⬜ Changelog + Release
 
+
 Cross-Cutting
 
-⬜ No public analytics or PII exposure
+🟨 No public analytics or PII exposure
 
 🟨 Events table/page removal planned
 
