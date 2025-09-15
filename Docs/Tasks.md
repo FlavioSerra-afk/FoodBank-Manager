@@ -5,6 +5,17 @@
 
 # Tasks
 
+## Change Plan (2025-09-15 15:22 BST)
+
+- P1 • Inventory: plugin bootstrap (foodbank-manager.php) — refactor to drop legacy `fb_manage_*` caps and fallback dashboard; enforce capabilities and nonces. Specs.md §§66-83, D1.
+- P1 • Admin menu consolidation: keep Theme, Diagnostics, Reports, minimal Settings; remove Database, Jobs, Emails, Forms, FormBuilder, Permissions, Events, Dashboard, Attendance, Scan, Shortcodes pages. Specs.md §§12-16, 66-83.
+- P1 • Shortcode registry: register `[fbm_registration_form]` and `[fbm_staff_dashboard]`; delete `DashboardShortcode` and related templates/assets. Specs.md §§24-66.
+- P1 • REST controllers: drop AttendanceController extras, ThrottleController, JobsController; implement single `/fbm/checkin` endpoint with nonce + `fbm_checkin` capability. Specs.md §§54-66.
+- P1 • Attendance & Events data layer: remove EventsRepo, TicketsRepo, TicketService, CheckinsRepo; refactor AttendanceRepo to use `fbm_members`, `fbm_tokens`, `fbm_attendance` with additive migration and legacy tables soft-deprecated. Specs.md §§41-45, 94-119.
+- P1 • Assets cleanup: prune JS/CSS for removed dashboards/events; gate remaining assets by screen and shortcode usage. Specs.md §§66-83.
+- P1 • Uninstall.php: extend to optionally drop `fbm_*` tables and wipe secrets with explicit confirmation. Specs.md §F.
+- P1 • Token service: ensure HMAC issue/verify/revoke of persistent member tokens without PII, constant-time compare. Specs.md §§98-107, C3.
+
 ## Change Plan (2025-09-15 14:08Z)
 
 - P1 • Strip public analytics & dashboard: remove includes/Shortcodes/Dashboard*.php, includes/Admin/DashboardPage.php, templates/public/dashboard.php, templates/admin/dashboard.php. Specs.md lines 12-16.
@@ -17,6 +28,10 @@
 
 ## QA Log
 
+- [2025-09-15 14:23Z] P0 • QA • composer lint: phpcs not found — TODO
+- [2025-09-15 14:23Z] P0 • QA • composer phpcs: vendor/bin/phpcs not found — TODO
+- [2025-09-15 14:23Z] P0 • QA • composer phpstan: phpstan not found — TODO
+- [2025-09-15 14:23Z] P0 • QA • composer test: phpunit not found — TODO
 - [2025-09-15 13:16Z] P0 • QA • composer lint: filename and doc comment errors in tests/Support/Exceptions.php — TODO
 - [2025-09-15 13:16Z] P0 • QA • composer phpcs: deprecated sniffs in coding standard — TODO
 - [2025-09-15 13:16Z] P0 • QA • composer phpstan: syntax error in includes/Core/Plugin.php line 12 — TODO
