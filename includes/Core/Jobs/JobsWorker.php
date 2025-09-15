@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace FBM\Core\Jobs;
 
-use FBM\Attendance\ReportsService;
 use FBM\Exports\CsvWriter;
 use FBM\Exports\XlsxWriter;
 use function absint;
@@ -32,8 +31,9 @@ use function time;
  * Process export jobs via cron.
  */
 final class JobsWorker {
-	public const EVENT = 'fbm_jobs_tick';
-	private const DIR  = 'fbm-exports';
+        public const EVENT = 'fbm_jobs_tick';
+        private const DIR  = 'fbm-exports';
+        private const REPORTS_CLASS = '\\FBM\\Attendance\\ReportsService';
 
 	/** Register cron hook. */
 	public static function init(): void {
@@ -82,7 +82,10 @@ final class JobsWorker {
 		if ( 'attendance_export' !== ( $job['type'] ?? '' ) ) {
 			throw new \RuntimeException( 'unsupported job' );
 		}
-		$rows   = ReportsService::export_rows( $job['filters'], (bool) $job['masked'] );
+                if ( ! class_exists( self::REPORTS_CLASS ) ) {
+                        throw new \RuntimeException( 'reports service unavailable' );
+                }
+                $rows   = (array) call_user_func_array( array( self::REPORTS_CLASS, 'export_rows' ), array( $job['filters'], (bool) $job['masked'] ) );
 		$upload = wp_upload_dir();
 		$dir    = rtrim( $upload['basedir'], '/' ) . '/' . self::DIR;
 		if ( ! is_dir( $dir ) ) {

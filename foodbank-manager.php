@@ -3,7 +3,7 @@
  * Plugin Name: FoodBank Manager
  * Description: Secure forms, encrypted storage, dashboards, and attendance tracking for food banks.
  * Author: Portuguese Community Centre London
-$12.2.11
+ * Version: 2.2.13
  * Requires at least: 6.0
  * Tested up to: 6.7
  * Requires PHP: 8.1
@@ -53,6 +53,10 @@ if ( class_exists( 'FBM\\Core\\Plugin' ) && ! class_exists( 'FoodBankManager\\Co
     class_alias( 'FBM\\Core\\Plugin', 'FoodBankManager\\Core\\Plugin' );
 } elseif ( class_exists( 'FoodBankManager\\Core\\Plugin' ) && ! class_exists( 'FBM\\Core\\Plugin' ) ) {
     class_alias( 'FoodBankManager\\Core\\Plugin', 'FBM\\Core\\Plugin' );
+}
+
+if ( ! defined( 'FBM_VER' ) ) {
+    define( 'FBM_VER', \FoodBankManager\Core\Plugin::FBM_VER );
 }
 
 add_action(
@@ -138,7 +142,6 @@ add_action('admin_notices', static function () {
 }, 1);
 
 // Activation/Deactivation hooks.
-register_activation_hook( FBM_FILE, [ \FBM\Core\Plugin::class, 'activate' ] ); // @phpstan-ignore-line
 register_activation_hook(
     __FILE__,
     static function (): void {
@@ -150,16 +153,13 @@ register_activation_hook(
 register_activation_hook(
     __FILE__,
     static function (): void {
-        if ( class_exists( '\FBM\Core\Install' ) ) {
-            \FBM\Core\Install::onActivate();
+        if ( class_exists( '\FoodBankManager\Core\Install' ) ) {
+            \FoodBankManager\Core\Install::onActivate();
         }
     }
 );
 
-register_activation_hook(
-    __FILE__,
-    array( \FBM\Database\Migration::class, 'run' )
-);
+register_activation_hook( __FILE__, array( 'FBM\Database\Migration', 'run' ) );
 
 
 if ( ! function_exists( 'fbm_deactivate' ) ) {

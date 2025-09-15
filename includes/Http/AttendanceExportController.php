@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace FBM\Http;
 
-use FBM\Attendance\ReportsService;
 use FBM\Core\Jobs\JobsRepo;
 use FBM\Exports\CsvWriter;
 use FBM\Exports\XlsxWriter;
@@ -76,12 +75,15 @@ final class AttendanceExportController {
         );
     }
 
+    private const REPORTS_CLASS = '\\FBM\\Attendance\\ReportsService';
+
     private static function csv(): void {
         $data = self::ensure();
         if (self::maybe_queue('csv', $data, null)) {
             return;
         }
-        $rows = ReportsService::export_rows($data['filters'], $data['masked']);
+        self::ensure_reports_available();
+        $rows = (array) self::call_reports('export_rows', array($data['filters'], $data['masked']));
         if (self::maybe_queue('csv', $data, $rows)) {
             return;
         }
@@ -107,7 +109,8 @@ final class AttendanceExportController {
         if (self::maybe_queue('xlsx', $data, null)) {
             return;
         }
-        $rows = ReportsService::export_rows($data['filters'], $data['masked']);
+        self::ensure_reports_available();
+        $rows = (array) self::call_reports('export_rows', array($data['filters'], $data['masked']));
         if (self::maybe_queue('xlsx', $data, $rows)) {
             return;
         }
@@ -127,11 +130,12 @@ final class AttendanceExportController {
         if (self::maybe_queue('pdf', $data, null)) {
             return;
         }
-        $rows = ReportsService::export_rows($data['filters'], $data['masked']);
+        self::ensure_reports_available();
+        $rows = (array) self::call_reports('export_rows', array($data['filters'], $data['masked']));
         if (self::maybe_queue('pdf', $data, $rows)) {
             return;
         }
-        $summary = ReportsService::period_summary($data['filters']);
+        $summary = (array) self::call_reports('period_summary', array($data['filters']));
         $html = '<h1>Attendance Report</h1>';
         $html .= '<p>Today: ' . (int)$summary['today'] . '</p>';
         $html .= '<table><tr><th>Date</th><th>Event</th><th>Recipient</th><th>Method</th><th>Note</th><th>Operator</th></tr>';
@@ -181,5 +185,20 @@ final class AttendanceExportController {
             return true;
         }
         return false;
+    }
+
+    private static function ensure_reports_available(): void {
+        if (!class_exists(self::REPORTS_CLASS)) {
+            wp_die('Attendance reports are unavailable.');
+        }
+    }
+
+    /**
+     * @param array<int, mixed> $args
+     * @return mixed
+     */
+    private static function call_reports(string $method, array $args)
+    {
+        return call_user_func_array(array(self::REPORTS_CLASS, $method), $args);
     }
 }

@@ -5,6 +5,8 @@
 
 # Tasks
 
+- Pass A1 — bootstrap fixed + activation hook wired (foodbank-manager.php, includes/Core/Plugin.php, includes/Admin/ReportsPage.php, includes/Http/AttendanceExportController.php, includes/Core/Jobs/JobsWorker.php, includes/Admin/ScanPage.php)
+
 ## Enforcement Pass 3 — scope strip + migrate (2025-09-15)
 
 - Scope strip: `includes/Admin/EventsPage.php` → deleted

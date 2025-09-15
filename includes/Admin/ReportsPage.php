@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace FBM\Admin;
 
-use FBM\Attendance\ReportsService;
 use function current_user_can;
 use function esc_html__;
 use function esc_html;
@@ -34,10 +33,23 @@ final class ReportsPage {
 			echo '<div class="wrap fbm-admin"><p>' . esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ) . '</p></div>';
 			return;
 		}
-		$filters       = self::get_filters();
-		$summary       = ReportsService::period_summary( $filters );
-		$daily         = ReportsService::daily_counts( 7, $filters );
-				$nonce = wp_create_nonce( 'fbm_attendance_export' );
+                $filters       = self::get_filters();
+                $summary       = array(
+                        'today'        => 0,
+                        'week'         => 0,
+                        'month'        => 0,
+                        'unique_today' => 0,
+                        'unique_week'  => 0,
+                        'unique_month' => 0,
+                );
+                $daily         = array(
+                        'days' => array(),
+                );
+                if ( class_exists( '\\FBM\\Attendance\\ReportsService' ) ) {
+                        $summary = (array) call_user_func( array( '\\FBM\\Attendance\\ReportsService', 'period_summary' ), $filters );
+                        $daily   = (array) call_user_func( array( '\\FBM\\Attendance\\ReportsService', 'daily_counts' ), 7, $filters );
+                }
+                                $nonce = wp_create_nonce( 'fbm_attendance_export' );
 				$base  = admin_url( 'admin-post.php' );
 				$query = array_merge( $filters, array( '_wpnonce' => $nonce ) );
 		$csv_url       = esc_url( add_query_arg( array_merge( $query, array( 'action' => 'fbm_export_attendance_csv' ) ), $base ) );
