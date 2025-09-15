@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace FBM\Admin;
 
-use FBM\Rest\ScanController;
 use WP_REST_Request;
 use function current_user_can;
 use function wp_nonce_field;
@@ -37,14 +36,19 @@ final class ScanPage {
 		if ( 'POST' === $method ) {
 			check_admin_referer( 'fbm_scan_verify', 'fbm_nonce' );
 			$token      = isset( $_POST['token'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['token'] ) ) : '';
-			$controller = new ScanController();
-			$req        = new WP_REST_Request();
-			$req->set_header( 'x-wp-nonce', wp_create_nonce( 'wp_rest' ) );
-			$req->set_param( 'token', $token );
-			$res       = $controller->verify( $req );
-			$data      = $res->get_data();
-			$status    = (string) ( $data['status'] ?? '' );
-			$recipient = (string) ( $data['recipient_masked'] ?? '' );
+                        $controller_class = '\\FBM\\Rest\\ScanController';
+                        if ( class_exists( $controller_class ) ) {
+                                $controller = new $controller_class();
+                                $req        = new WP_REST_Request();
+                                $req->set_header( 'x-wp-nonce', wp_create_nonce( 'wp_rest' ) );
+                                $req->set_param( 'token', $token );
+                                $res       = $controller->verify( $req );
+                                $data      = $res->get_data();
+                                $status    = (string) ( $data['status'] ?? '' );
+                                $recipient = (string) ( $data['recipient_masked'] ?? '' );
+                        } else {
+                                $status = 'error';
+                        }
 		}
 		require FBM_PATH . 'templates/admin/scan.php';
 	}
