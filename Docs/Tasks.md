@@ -5,6 +5,8 @@
 
 # Tasks
 
+- [2025-09-15] Migration summary recorded in option `fbm_db_migration_summary` (fields: `legacy_attendance_rows`, `attendance_migrated`, `attendance_skipped`, `legacy_checkins_rows`). Legacy check-ins remain under `_deprecated` tables for manual review.
+
 - Pass A1 — bootstrap fixed + activation hook wired (foodbank-manager.php, includes/Core/Plugin.php, includes/Admin/ReportsPage.php, includes/Http/AttendanceExportController.php, includes/Core/Jobs/JobsWorker.php, includes/Admin/ScanPage.php)
 
 ## Enforcement Pass 3 — scope strip + migrate (2025-09-15)

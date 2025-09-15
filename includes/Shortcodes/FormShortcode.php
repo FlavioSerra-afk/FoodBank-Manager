@@ -47,8 +47,8 @@ final class FormShortcode {
 					'preset' => '',
 				),
 				$atts,
-				'fbm_form'
-			);
+                                'fbm_registration_form'
+                        );
 		$id       = (int) $atts['id'];
 		$slug     = '';
 		if ( $id > 0 && function_exists( 'get_post_type' ) && 'fb_form' === get_post_type( $id ) ) {

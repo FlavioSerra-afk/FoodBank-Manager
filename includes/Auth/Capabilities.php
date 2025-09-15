@@ -42,6 +42,8 @@ final class Capabilities {
     /** @return string[] */
     public static function viewerRoleCaps(): array {
         return [
+            'fbm_view',
+            'fbm_checkin',
             'fb_manage_attendance',
             'fb_manage_database',
         ];

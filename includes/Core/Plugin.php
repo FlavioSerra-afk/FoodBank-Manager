@@ -8,28 +8,32 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-final class Plugin {
-    public $12.2.14$2
+use function add_action;
+use function register_setting;
+
+final class Plugin
+{
+    public const FBM_VER = '2.2.14';
     public const VERSION = self::FBM_VER;
 
-    public static function version(): string {
+    public static function version(): string
+    {
         return self::FBM_VER;
     }
 
-    public static function boot(): void {
-        // Register settings early; Theme::sanitize is tolerant to null.
-        add_action( 'admin_init', array( self::class, 'register_settings' ) );
+    public static function boot(): void
+    {
+        add_action('admin_init', array(self::class, 'register_settings'));
     }
 
-    public static function register_settings(): void {
-        // Settings API registration; keep it simple and safe.
+    public static function register_settings(): void
+    {
         register_setting(
             'fbm',
             'fbm_theme',
             array(
                 'type'              => 'array',
-                'sanitize_callback' => array( \FoodBankManager\UI\Theme::class, 'sanitize' ),
-                // Default is always provided by defaults helper; do not force here.
+                'sanitize_callback' => array(\FoodBankManager\UI\Theme::class, 'sanitize'),
             )
         );
     }

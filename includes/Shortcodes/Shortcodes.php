@@ -1,8 +1,8 @@
-<?php // phpcs:ignoreFile
+<?php
 /**
- * Shortcode registry.
+ * Shortcode registry bootstrap.
  *
- * @package FBM\Shortcodes
+ * @package FoodBankManager
  */
 
 declare(strict_types=1);
@@ -11,42 +11,50 @@ namespace FBM\Shortcodes;
 
 use function add_action;
 use function add_shortcode;
+use function function_exists;
 
 /**
- * Handles registration of shortcodes.
+ * Registers supported shortcodes.
  */
-final class Shortcodes {
-		/**
-		 * Bootstrap shortcode registration.
-		 *
-		 * @return void
-		 */
-	public static function register(): void {
-			static $boot = false;
-		if ( $boot ) {
-				return;
-		}
-			$boot = true;
+final class Shortcodes
+{
+    /** @var bool Whether hooks have been attached. */
+    private static bool $booted = false;
 
-		if ( function_exists( 'add_action' ) ) {
-				add_action( 'init', array( __CLASS__, 'add_shortcodes' ) );
-		}
-			self::add_shortcodes();
-	}
+    /** @var bool Whether shortcodes have been registered. */
+    private static bool $registered = false;
 
-		/**
-		 * Actually register the shortcodes.
-		 *
-		 * @return void
-		 */
-	public static function add_shortcodes(): void {
-			static $done = false;
-		if ( $done ) {
-				return;
-		}
-			$done = true;
+    /**
+     * Hook shortcode registration into WordPress.
+     */
+    public static function register(): void
+    {
+        if (self::$booted) {
+            return;
+        }
 
-						add_shortcode( 'fbm_registration_form', array( FormShortcode::class, 'render' ) );
-						add_shortcode( 'fbm_staff_dashboard', array( \FoodBankManager\Shortcodes\AttendanceManager::class, 'render' ) );
-	}
+        self::$booted = true;
+
+        if (function_exists('add_action')) {
+            add_action('init', array(self::class, 'add_shortcodes'));
+        } else {
+            self::add_shortcodes();
+        }
+    }
+
+    /**
+     * Register shortcode callbacks.
+     */
+    public static function add_shortcodes(): void
+    {
+        if (self::$registered || !function_exists('add_shortcode')) {
+            return;
+        }
+
+        self::$registered = true;
+
+        add_shortcode('fbm_registration_form', array(FormShortcode::class, 'render'));
+        add_shortcode('fbm_staff_dashboard', array(\FoodBankManager\Shortcodes\StaffDashboard::class, 'render'));
+    }
 }
+

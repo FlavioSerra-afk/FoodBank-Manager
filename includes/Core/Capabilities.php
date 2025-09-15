@@ -6,6 +6,12 @@ namespace FBM\Core;
 final class Capabilities {
     /** @var string[] Canonical capabilities list. */
     public const ALL = [
+        'fbm_manage',
+        'fbm_edit',
+        'fbm_view',
+        'fbm_checkin',
+        'fbm_export',
+        'fbm_diagnostics',
         'fb_manage_attendance',
         'fb_manage_database',
         'fb_manage_forms',

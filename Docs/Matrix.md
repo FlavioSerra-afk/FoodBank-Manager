@@ -79,9 +79,9 @@ U5 — Diagnostics & Release
 
 Cross-Cutting
 
-🟨 No public analytics or PII exposure
+🟨 Public analytics removed
 
-🟨 Events table/page removal in progress
+🟨 Events feature removed
 
 ⬜ No AIW integration
 

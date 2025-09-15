@@ -43,7 +43,7 @@ if ( ! current_user_can( 'fb_manage_forms' ) ) {
 								</td>
 								<td>
 										<?php
-										$code = '[fbm_form preset="' . $preset_id . '"]';
+                                                                                $code = '[fbm_registration_form preset="' . $preset_id . '"]';
 										?>
 										<input type="text" readonly value="<?php echo esc_attr( $code ); ?>" class="regular-text" />
 										<button type="button"
