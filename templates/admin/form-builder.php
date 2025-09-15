@@ -33,7 +33,7 @@ declare(strict_types=1);
 	<button type="submit" class="button"><?php esc_html_e( 'Delete', 'foodbank-manager' ); ?></button>
 </form>
 <div class="fbm-preview">
-	<?php echo do_shortcode( '[fbm_form id="' . (int) $current['id'] . '"]' ); ?>
+        <?php echo do_shortcode( '[fbm_registration_form id="' . (int) $current['id'] . '"]' ); ?>
 </div>
 <?php else : ?>
 <p><a class="button" href="
