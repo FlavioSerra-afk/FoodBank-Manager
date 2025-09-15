@@ -5,7 +5,8 @@ declare(strict_types=1);
 
 final class ThemePageSaveTest extends \BaseTestCase {
     public function test_valid_theme_saved_once(): void {
-        update_option('fbm_theme', Theme::defaults());
+        Theme::defaults();
+        update_option('fbm_theme', fbm_theme_defaults());
         $payload = array(
             'admin' => array(
                 'style' => 'glass',
@@ -33,7 +34,8 @@ final class ThemePageSaveTest extends \BaseTestCase {
     }
 
     public function test_invalid_theme_rejected(): void {
-        update_option('fbm_theme', Theme::defaults());
+        Theme::defaults();
+        update_option('fbm_theme', fbm_theme_defaults());
         $payload = array('blob' => str_repeat('a', 70000));
         $opts = Theme::sanitize($payload);
         $this->assertSame(Theme::defaults(), $opts);

@@ -69,8 +69,8 @@ final class Theme {
 	 * @return array<string,mixed>
 	 */
         public static function get(): array {
-                $raw = get_option( 'fbm_theme', array() );
-                return self::sanitize_full( is_array( $raw ) ? $raw : array() );
+                $raw = get_option('fbm_theme', array());
+                return self::sanitize(is_array($raw) ? $raw : array());
         }
 
 	/**
@@ -99,231 +99,72 @@ final class Theme {
          */
     public static function sanitize(?array $raw = null): array
     {
-        $defaults  = self::defaults();
-        $sanitized = self::sanitize_full($raw ?? []);
-        return array_replace_recursive($defaults, $sanitized);
+        $raw      = $raw ?? [];
+        $defaults = self::defaults();
+        $out      = [];
+
+        $clamp = static function ($v, $min, $max, $step = null) {
+            if (!is_numeric($v)) {
+                return $min;
+            }
+            $v = (float) $v;
+            if ($step && $step > 0) {
+                $v = round($v / $step) * $step;
+            }
+            return max($min, min($max, $v));
+        };
+
+        foreach (['admin', 'front'] as $section) {
+            $src = isset($raw[$section]) && is_array($raw[$section]) ? $raw[$section] : [];
+            $out[$section] = [
+                'style'  => in_array($src['style'] ?? '', ['glass', 'basic'], true) ? $src['style'] : $defaults[$section]['style'],
+                'preset' => in_array($src['preset'] ?? '', ['light', 'dark', 'high_contrast'], true) ? $src['preset'] : $defaults[$section]['preset'],
+                'accent' => is_string($src['accent'] ?? null) && preg_match('/^#([0-9a-f]{3}|[0-9a-f]{6})$/i', $src['accent']) ? $src['accent'] : $defaults[$section]['accent'],
+                'glass'  => [
+                    'alpha'  => $clamp($src['glass']['alpha'] ?? $defaults[$section]['glass']['alpha'], 0, 1, 0.01),
+                    'blur'   => (int) $clamp($src['glass']['blur'] ?? $defaults[$section]['glass']['blur'], 0, 12, 1),
+                    'elev'   => (int) $clamp($src['glass']['elev'] ?? $defaults[$section]['glass']['elev'], 0, 24, 1),
+                    'radius' => (int) $clamp($src['glass']['radius'] ?? $defaults[$section]['glass']['radius'], 6, 20, 1),
+                    'border' => (int) $clamp($src['glass']['border'] ?? $defaults[$section]['glass']['border'], 1, 2, 1),
+                ],
+                'aliases' => [],
+            ];
+            if (!empty($src['aliases']) && is_array($src['aliases'])) {
+                foreach ($src['aliases'] as $k => $v) {
+                    $col = sanitize_hex_color((string) $v);
+                    if ('' !== $col) {
+                        $out[$section]['aliases'][sanitize_key((string) $k)] = $col;
+                    }
+                }
+            }
+            if ('front' === $section) {
+                $en = filter_var($src['enabled'] ?? $defaults['front']['enabled'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
+                $out['front']['enabled'] = null === $en ? $defaults['front']['enabled'] : (bool) $en;
+            }
+        }
+
+        $match = filter_var($raw['match_front_to_admin'] ?? $defaults['match_front_to_admin'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
+        $out['match_front_to_admin'] = null === $match ? $defaults['match_front_to_admin'] : (bool) $match;
+
+        $adm = filter_var($raw['apply_admin'] ?? ($raw['apply_admin_chrome'] ?? $defaults['apply_admin']), FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
+        $out['apply_admin'] = null === $adm ? $defaults['apply_admin'] : (bool) $adm;
+        $out['apply_admin_chrome'] = $out['apply_admin'];
+
+        $front_menus = filter_var($raw['apply_front_menus'] ?? $defaults['apply_front_menus'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
+        $out['apply_front_menus'] = null === $front_menus ? $defaults['apply_front_menus'] : (bool) $front_menus;
+
+        foreach (['menu', 'typography', 'tabs'] as $grp) {
+            $out[$grp] = isset($raw[$grp]) && is_array($raw[$grp]) ? array_replace_recursive($defaults[$grp], $raw[$grp]) : $defaults[$grp];
+        }
+
+        if ($out['match_front_to_admin']) {
+            $enabled = $out['front']['enabled'];
+            $out['front'] = $out['admin'];
+            $out['front']['enabled'] = $enabled;
+        }
+
+        return array_replace_recursive($defaults, $out);
     }
-
-        private static function sanitize_full(array $raw): array {
-                $defaults = self::defaults();
-                $json     = wp_json_encode($raw);
-                if (is_string($json) && strlen($json) > 65536) {
-                        add_settings_error('fbm_theme', 'fbm_theme', __('Theme payload too large.', 'foodbank-manager'), 'error');
-                        return $defaults;
-                }
-                $admin = self::sanitize_section($raw['admin'] ?? array(), $defaults['admin']);
-                $front = self::sanitize_section($raw['front'] ?? array(), $defaults['front']);
-                $menu  = self::sanitize_menu($raw['menu'] ?? array(), $defaults['menu']);
-                $typography = self::sanitize_typography($raw['typography'] ?? array(), $defaults['typography']);
-                $tabs       = self::sanitize_tabs($raw['tabs'] ?? array(), $defaults['tabs']);
-
-                $front_enabled    = filter_var($raw['front']['enabled'] ?? $defaults['front']['enabled'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
-                $front['enabled'] = null === $front_enabled ? $defaults['front']['enabled'] : (bool) $front_enabled;
-
-                $match = filter_var($raw['match_front_to_admin'] ?? $defaults['match_front_to_admin'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
-                $match = (bool) (null === $match ? $defaults['match_front_to_admin'] : $match);
-
-                $admin_chrome = filter_var($raw['apply_admin'] ?? ($raw['apply_admin_chrome'] ?? $defaults['apply_admin']), FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
-                $admin_chrome = null === $admin_chrome ? $defaults['apply_admin'] : (bool) $admin_chrome;
-
-                $front_menus = filter_var($raw['apply_front_menus'] ?? $defaults['apply_front_menus'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
-                $front_menus = null === $front_menus ? $defaults['apply_front_menus'] : (bool) $front_menus;
-
-                if ($match) {
-                        $front_copy = $front;
-                        unset($front_copy['enabled']);
-                        if ($front_copy !== $admin) {
-                                $enabled          = $front['enabled'];
-                                $front            = $admin;
-                                $front['enabled'] = $enabled;
-                        }
-                }
-
-                return array(
-                        'admin'                => $admin,
-                        'front'                => $front,
-                        'match_front_to_admin' => $match,
-                        'apply_admin'          => $admin_chrome,
-                        'apply_admin_chrome'   => $admin_chrome,
-                        'apply_front_menus'    => $front_menus,
-                        'menu'                 => $menu,
-                        'typography'           => $typography,
-                        'tabs'                 => $tabs,
-                );
-        }
-
-
-	/**
-	 * Sanitize one section (admin/front).
-	 *
-	 * @param array<string,mixed> $raw Raw values.
-	 * @param array<string,mixed> $defaults Defaults.
-	 * @return array<string,mixed>
-	 */
-        private static function sanitize_section( array $raw, array $defaults ): array {
-		$style = sanitize_key( (string) ( $raw['style'] ?? $defaults['style'] ) );
-		if ( ! in_array( $style, array( 'glass', 'basic' ), true ) ) {
-			$style = $defaults['style'];
-		}
-
-		$preset = sanitize_key( (string) ( $raw['preset'] ?? $defaults['preset'] ) );
-		if ( ! in_array( $preset, array( 'light', 'dark', 'high_contrast' ), true ) ) {
-			$preset = $defaults['preset'];
-		}
-
-		$accent = sanitize_hex_color( (string) ( $raw['accent'] ?? $defaults['accent'] ) );
-		if ( '' === $accent ) {
-			$accent = self::DEFAULT_ACCENT;
-		}
-
-                $glass_raw = is_array( $raw['glass'] ?? null ) ? $raw['glass'] : array();
-                $aliases   = array();
-                if ( is_array( $raw['aliases'] ?? null ) ) {
-                        foreach ( $raw['aliases'] as $k => $v ) {
-                                $val = sanitize_hex_color( (string) $v );
-                                if ( '' !== $val ) {
-                                        $aliases[ sanitize_key( (string) $k ) ] = $val;
-                                }
-                        }
-                }
-		$alpha     = (float) ( $glass_raw['alpha'] ?? $defaults['glass']['alpha'] );
-		$alpha     = 'dark' === $preset ? self::clamp( $alpha, 0.18, 0.35 ) : self::clamp( $alpha, 0.08, 0.20 );
-		$blur      = (int) ( $glass_raw['blur'] ?? $defaults['glass']['blur'] );
-		$blur      = self::clamp( $blur, 0, 12 );
-		$elev      = (int) ( $glass_raw['elev'] ?? $defaults['glass']['elev'] );
-		$elev      = self::clamp( $elev, 0, 24 );
-		$radius    = (int) ( $glass_raw['radius'] ?? $defaults['glass']['radius'] );
-		$radius    = self::clamp( $radius, 6, 20 );
-		$border    = (int) ( $glass_raw['border'] ?? $defaults['glass']['border'] );
-		$border    = self::clamp( $border, 1, 2 );
-
-		if ( 'glass' !== $style ) {
-			$alpha = 0.0;
-			$blur  = 0;
-		}
-		if ( 'high_contrast' === $preset ) {
-			$alpha = 0.0;
-			$blur  = 0;
-		}
-
-                return array(
-                        'style'   => $style,
-                        'preset'  => $preset,
-                        'accent'  => $accent,
-                        'glass'   => array(
-                                'alpha'  => $alpha,
-                                'blur'   => $blur,
-                                'elev'   => $elev,
-                                'radius' => $radius,
-                                'border' => $border,
-                        ),
-                        'aliases' => $aliases,
-                );
-        }
-
-        /**
-         * Sanitize menu settings.
-         *
-         * @param array<string,mixed> $raw Raw values.
-         * @param array<string,mixed> $defaults Defaults.
-         * @return array<string,mixed>
-         */
-        private static function sanitize_menu( array $raw, array $defaults ): array {
-                $out = array();
-                $out['item_height']  = self::clamp( absint( $raw['item_height'] ?? $defaults['item_height'] ), 40, 64 );
-                $out['item_px']      = self::clamp( absint( $raw['item_px'] ?? $defaults['item_px'] ), 8, 24 );
-                $out['item_py']      = self::clamp( absint( $raw['item_py'] ?? $defaults['item_py'] ), 6, 16 );
-                $out['gap']          = self::clamp( absint( $raw['gap'] ?? $defaults['gap'] ), 8, 16 );
-                $out['radius']       = self::clamp( absint( $raw['radius'] ?? $defaults['radius'] ), 8, 16 );
-                $out['icon_size']    = self::clamp( absint( $raw['icon_size'] ?? $defaults['icon_size'] ), 16, 24 );
-                $opacity             = (float) ( $raw['icon_opacity'] ?? $defaults['icon_opacity'] );
-                if ( $opacity < 0.6 ) {
-                        $opacity = 0.6;
-                } elseif ( $opacity > 1.0 ) {
-                        $opacity = 1.0;
-                }
-                $out['icon_opacity'] = $opacity;
-                $out['bg']           = sanitize_hex_color( (string) ( $raw['bg'] ?? $defaults['bg'] ) ) ?: $defaults['bg'];
-                $out['color']        = sanitize_hex_color( (string) ( $raw['color'] ?? $defaults['color'] ) ) ?: $defaults['color'];
-                $out['hover_bg']     = sanitize_hex_color( (string) ( $raw['hover_bg'] ?? $defaults['hover_bg'] ) ) ?: $defaults['hover_bg'];
-                $out['hover_color']  = sanitize_hex_color( (string) ( $raw['hover_color'] ?? $defaults['hover_color'] ) ) ?: $defaults['hover_color'];
-                $out['active_bg']    = sanitize_hex_color( (string) ( $raw['active_bg'] ?? $defaults['active_bg'] ) ) ?: $defaults['active_bg'];
-                $out['active_color'] = sanitize_hex_color( (string) ( $raw['active_color'] ?? $defaults['active_color'] ) ) ?: $defaults['active_color'];
-                $divider             = (string) ( $raw['divider'] ?? $defaults['divider'] );
-                $out['divider']      = '' === $divider ? $defaults['divider'] : $divider;
-                return $out;
-        }
-
-        /**
-         * Sanitize typography settings.
-         *
-         * @param array<string,mixed> $raw Raw values.
-         * @param array<string,mixed> $defaults Defaults.
-         * @return array<string,mixed>
-         */
-        private static function sanitize_typography( array $raw, array $defaults ): array {
-                $out = array();
-                foreach ( array( 'h1','h2','h3','h4','h5','h6','body','small' ) as $tag ) {
-                        $src = is_array( $raw[ $tag ] ?? null ) ? $raw[ $tag ] : array();
-                        $def = $defaults[ $tag ];
-                        $item = array();
-                        $item['size']   = self::clamp( absint( $src['size'] ?? $def['size'] ), 10, 64 );
-                        $item['lh']     = self::clamp( (float) ( $src['lh'] ?? $def['lh'] ), 1.0, 2.2 );
-                        if ( isset( $def['weight'] ) ) {
-                                $item['weight'] = self::clamp( absint( $src['weight'] ?? $def['weight'] ), 100, 900 );
-                        }
-                        if ( isset( $def['track'] ) ) {
-                                $item['track'] = self::clamp( (float) ( $src['track'] ?? $def['track'] ), -1.0, 2.0 );
-                        }
-                        $out[ $tag ] = $item;
-                }
-
-                $colors = is_array( $raw['color'] ?? null ) ? $raw['color'] : array();
-                $out['color'] = array(
-                        'text'     => sanitize_hex_color( (string) ( $colors['text'] ?? $defaults['color']['text'] ) ) ?: $defaults['color']['text'],
-                        'headings' => sanitize_hex_color( (string) ( $colors['headings'] ?? $defaults['color']['headings'] ) ) ?: $defaults['color']['headings'],
-                        'muted'    => sanitize_hex_color( (string) ( $colors['muted'] ?? $defaults['color']['muted'] ) ) ?: $defaults['color']['muted'],
-                );
-
-                $link = is_array( $raw['link'] ?? null ) ? $raw['link'] : array();
-                $out['link'] = array(
-                        'normal'  => sanitize_hex_color( (string) ( $link['normal'] ?? $defaults['link']['normal'] ) ) ?: $defaults['link']['normal'],
-                        'hover'   => sanitize_hex_color( (string) ( $link['hover'] ?? $defaults['link']['hover'] ) ) ?: $defaults['link']['hover'],
-                        'active'  => sanitize_hex_color( (string) ( $link['active'] ?? $defaults['link']['active'] ) ) ?: $defaults['link']['active'],
-                        'visited' => sanitize_hex_color( (string) ( $link['visited'] ?? $defaults['link']['visited'] ) ) ?: $defaults['link']['visited'],
-                );
-
-                return $out;
-        }
-
-        /**
-         * Sanitize tabs settings.
-         *
-         * @param array<string,mixed> $raw Raw values.
-         * @param array<string,mixed> $defaults Defaults.
-         * @return array<string,mixed>
-         */
-        private static function sanitize_tabs( array $raw, array $defaults ): array {
-                $out = array();
-                $out['height'] = self::clamp( absint( $raw['height'] ?? $defaults['height'] ), 0, 32 );
-                $out['px']     = self::clamp( absint( $raw['px'] ?? $defaults['px'] ), 0, 32 );
-                $out['py']     = self::clamp( absint( $raw['py'] ?? $defaults['py'] ), 0, 32 );
-                $out['gap']    = self::clamp( absint( $raw['gap'] ?? $defaults['gap'] ), 0, 32 );
-                $out['radius'] = self::clamp( absint( $raw['radius'] ?? $defaults['radius'] ), 0, 32 );
-
-                $out['color']        = sanitize_hex_color( (string) ( $raw['color'] ?? $defaults['color'] ) ) ?: $defaults['color'];
-                $out['hover_color']  = sanitize_hex_color( (string) ( $raw['hover_color'] ?? $defaults['hover_color'] ) ) ?: $defaults['hover_color'];
-                $out['active_color'] = sanitize_hex_color( (string) ( $raw['active_color'] ?? $defaults['active_color'] ) ) ?: $defaults['active_color'];
-                $out['hover_bg']     = sanitize_hex_color( (string) ( $raw['hover_bg'] ?? $defaults['hover_bg'] ) ) ?: $defaults['hover_bg'];
-                $out['active_bg']    = sanitize_hex_color( (string) ( $raw['active_bg'] ?? $defaults['active_bg'] ) ) ?: $defaults['active_bg'];
-
-                $out['indicator_h']      = self::clamp( absint( $raw['indicator_h'] ?? $defaults['indicator_h'] ), 1, 6 );
-                $out['indicator_offset'] = self::clamp( absint( $raw['indicator_offset'] ?? $defaults['indicator_offset'] ), 0, 8 );
-                $ind_color               = sanitize_hex_color( (string) ( $raw['indicator_color'] ?? '' ) );
-                $out['indicator_color']  = '' === $ind_color ? null : $ind_color;
-
-                return $out;
-        }
 
         /**
          * Build CSS variables for menu tokens.
@@ -405,24 +246,6 @@ final class Theme {
                         '--fbm-tabs-indicator-color' => $tabs['indicator_color'] ?? 'var(--fbm-accent)',
                 );
         }
-
-	/**
-	 * Clamp a numeric value.
-	 *
-	 * @param float|int $v Value.
-	 * @param float|int $min Minimum.
-	 * @param float|int $max Maximum.
-	 * @return float|int
-	 */
-	private static function clamp( $v, $min, $max ) {
-		if ( $v < $min ) {
-			return $min;
-		}
-		if ( $v > $max ) {
-			return $max;
-		}
-		return $v;
-	}
 
 	/**
 	 * Convert tokens for a section into CSS vars.
@@ -1222,10 +1045,9 @@ add_action('wp_ajax_fbm_theme_defaults', __NAMESPACE__ . '\\fbm_ajax_theme_defau
 function fbm_ajax_css_preview(): void {
     check_ajax_referer('fbm_theme');
     $raw = json_decode(stripslashes((string)($_POST['payload'] ?? '')), true);
-    if (!is_array($raw)) {
-        wp_die();
-    }
-    echo fbm_css_variables_preview($raw);
+    $san = \FoodBankManager\UI\Theme::sanitize(is_array($raw) ? $raw : []);
+    $opts = array_replace_recursive(fbm_theme_defaults(), $san);
+    echo fbm_css_variables_preview($opts);
     wp_die();
 }
 
