@@ -81,7 +81,7 @@ Cross-Cutting
 
 🟨 No public analytics or PII exposure
 
-🟨 Events table/page removal planned
+🟨 Events table/page removal in progress
 
 ⬜ No AIW integration
 

@@ -13,18 +13,18 @@ declare(strict_types=1);
 <h1><?php esc_html_e( 'Shortcodes', 'foodbank-manager' ); ?></h1>
 <div class="fbm-shortcodes-examples">
 		<h2><?php esc_html_e( 'Quick Examples', 'foodbank-manager' ); ?></h2>
-		<div class="fbm-example">
-				<code><?php echo esc_html( '[fbm_form id="123" preset="basic_intake" mask_sensitive="true"]' ); ?></code>
-				<button type="button" class="fbm-copy button" data-snippet="[fbm_form id=&quot;123&quot; preset=&quot;basic_intake&quot; mask_sensitive=&quot;true&quot;]">
-						<?php esc_html_e( 'Copy example', 'foodbank-manager' ); ?>
-				</button>
-		</div>
-		<div class="fbm-example">
-				<code><?php echo esc_html( '[fbm_dashboard compare="true" range="last_30" preset="manager"]' ); ?></code>
-				<button type="button" class="fbm-copy button" data-snippet="[fbm_dashboard compare=&quot;true&quot; range=&quot;last_30&quot; preset=&quot;manager&quot;]">
-						<?php esc_html_e( 'Copy example', 'foodbank-manager' ); ?>
-				</button>
-		</div>
+				<div class="fbm-example">
+								<code><?php echo esc_html( '[fbm_registration_form]' ); ?></code>
+								<button type="button" class="fbm-copy button" data-snippet="[fbm_registration_form]">
+												<?php esc_html_e( 'Copy example', 'foodbank-manager' ); ?>
+								</button>
+				</div>
+				<div class="fbm-example">
+								<code><?php echo esc_html( '[fbm_staff_dashboard]' ); ?></code>
+								<button type="button" class="fbm-copy button" data-snippet="[fbm_staff_dashboard]">
+												<?php esc_html_e( 'Copy example', 'foodbank-manager' ); ?>
+								</button>
+				</div>
 		<p>
 				<a href="<?php echo esc_url( FBM_URL . 'Docs/Shortcodes.md' ); ?>" target="_blank" rel="noopener">
 						<?php esc_html_e( 'Read the full Shortcodes guide', 'foodbank-manager' ); ?>

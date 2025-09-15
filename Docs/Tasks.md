@@ -5,6 +5,22 @@
 
 # Tasks
 
+## Enforcement Pass 3 — scope strip + migrate (2025-09-15)
+
+- Scope strip: `includes/Admin/EventsPage.php` → deleted
+- Scope strip: `includes/Attendance/{EventsRepo,ManualCheckinService,TicketsRepo,TicketService,CheckinsRepo,ReportsService}.php` → deleted
+- Scope strip: `includes/Shortcodes/Dashboard*.php` → deleted
+- Scope strip: `templates/public/dashboard.php` → deleted
+- Scope strip: `templates/admin/{dashboard.php,events.php}` → deleted
+- Scope strip: `includes/Rest/ScanController.php` → deleted
+- Scope strip: `includes/Http/{DashboardExportController.php,TicketsController.php}` → deleted
+- Added migration for `fbm_members`, `fbm_tokens`, `fbm_attendance`
+- QA: `composer lint:sum` → 436 errors, 119 warnings (71 files)
+- QA: `composer phpstan` → syntax error in `includes/Core/Plugin.php`
+- QA: `composer test -v` → bootstrap parse error
+- QA: `composer i18n:build` → success
+- QA: `bash bin/package.sh` → built zip
+
 ## QA Toolchain Tightening (2025-09-15 15:53 BST)
 
 - Refined phpcs.xml to use WordPress standard and exclude vendor, node_modules, dist, build, assets/*/vendor, languages/*.po, languages/*.pot, tests.

@@ -21,7 +21,6 @@
     "autoload-dev": {
         "files": [
             "tests/Support/WPStubs.php",
-            "tests/Support/Rbac.php",
             "phpstan-bootstrap.php"
         ],
         "psr-4": {

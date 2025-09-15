@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace FoodBankManager\Core;
 
-use FoodBankManager\Shortcodes\Entries;
-use FoodBankManager\Shortcodes\AttendanceManager;
-use FoodBankManager\Shortcodes\Dashboard;
 use FoodBankManager\Rest\Api;
 use FBM\Rest\ErrorHelper;
 use FoodBankManager\Mail\Logger;
@@ -35,8 +32,5 @@ class Hooks {
 
        public function register_shortcodes(): void {
                \FBM\Shortcodes\Shortcodes::register();
-               add_shortcode( 'foodbank_entries', array( Entries::class, 'render' ) );
-               add_shortcode( 'fb_attendance_manager', array( AttendanceManager::class, 'render' ) );
-               add_shortcode( 'fbm_dashboard', array( Dashboard::class, 'render' ) );
        }
 }

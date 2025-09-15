@@ -78,7 +78,7 @@ add_action(
 );
 add_action('admin_menu', static function () {
     // Only admins or FBM dashboard managers can ever see the parent
-    if (!current_user_can('manage_options') && !current_user_can('fb_manage_dashboard')) {
+    if (!current_user_can('manage_options')) {
         return;
     }
 
@@ -106,7 +106,7 @@ add_action('admin_menu', static function () {
     }
 
     // Choose capability (fallback only affects parent)
-    $root_cap = current_user_can('fb_manage_dashboard') ? 'fb_manage_dashboard' : 'manage_options';
+    $root_cap = 'manage_options';
 
     add_menu_page(
         __('FoodBank', 'foodbank-manager'),
@@ -154,6 +154,11 @@ register_activation_hook(
             \FBM\Core\Install::onActivate();
         }
     }
+);
+
+register_activation_hook(
+    __FILE__,
+    array( \FBM\Database\Migration::class, 'run' )
 );
 
 

@@ -14,14 +14,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<label><?php esc_html_e( 'To', 'foodbank-manager' ); ?>
 		<input type="date" name="to" value="<?php echo esc_attr( $filters['to'] ); ?>" />
 	</label>
-	<label><?php esc_html_e( 'Event', 'foodbank-manager' ); ?>
-		<select name="event_id">
-			<option value="0"><?php esc_html_e( 'All', 'foodbank-manager' ); ?></option>
-			<?php foreach ( $events['rows'] as $ev ) : ?>
-				<option value="<?php echo esc_attr( (string) $ev['id'] ); ?>" <?php selected( $filters['event_id'], (int) $ev['id'] ); ?>><?php echo esc_html( $ev['title'] ); ?></option>
-			<?php endforeach; ?>
-		</select>
-	</label>
 	<label><?php esc_html_e( 'Method', 'foodbank-manager' ); ?>
 		<select name="method">
 			<option value="" <?php selected( $filters['method'], '' ); ?>><?php esc_html_e( 'All', 'foodbank-manager' ); ?></option>
