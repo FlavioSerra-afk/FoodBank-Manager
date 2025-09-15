@@ -5,6 +5,12 @@
 
 # Tasks
 
+## ENFORCEMENT RUN — scope strip + apply (2025-09-15 15:36 BST)
+
+- Updated dev tooling versions (phpunit, phpstan, phpcs, wpcs).
+- Fixed plugin version constant in `includes/Core/Plugin.php`.
+- No scope stripping or DB migrations performed yet.
+
 ## Change Plan (2025-09-15 15:22 BST)
 
 - P1 • Inventory: plugin bootstrap (foodbank-manager.php) — refactor to drop legacy `fb_manage_*` caps and fallback dashboard; enforce capabilities and nonces. Specs.md §§66-83, D1.
@@ -28,6 +34,12 @@
 
 ## QA Log
 
+- [2025-09-15 14:36Z] P0 • QA • composer lint: PHPCS found 113 sniff violations in tests/Support/Exceptions.php — TODO
+- [2025-09-15 14:36Z] P0 • QA • composer phpcs: 20773 errors and 1452 warnings in 276 files — TODO
+- [2025-09-15 14:36Z] QA • composer phpstan: no errors
+- [2025-09-15 14:36Z] P0 • QA • composer test: 1 error, 10 failures — TODO
+- [2025-09-15 14:36Z] QA • composer i18n:build: success
+- [2025-09-15 14:36Z] QA • bin/package.sh: built dist/foodbank-manager.zip
 - [2025-09-15 14:23Z] P0 • QA • composer lint: phpcs not found — TODO
 - [2025-09-15 14:23Z] P0 • QA • composer phpcs: vendor/bin/phpcs not found — TODO
 - [2025-09-15 14:23Z] P0 • QA • composer phpstan: phpstan not found — TODO

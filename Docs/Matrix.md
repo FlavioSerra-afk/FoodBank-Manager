@@ -36,7 +36,7 @@ U1 — Foundations
 
 ⬜ Weekly window config (Thu 11:00–14:30)
 
-⚠️ PHPCS/PHPStan/Tests failing
+⚠️ PHPCS/Tests failing; PHPStan passing
 
 U2 — Public Registration
 
