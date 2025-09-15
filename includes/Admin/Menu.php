@@ -21,7 +21,6 @@ use function wp_safe_redirect;
  * @since 0.1.x
  */
 final class Menu {
-        private const CAP_DASHBOARD   = 'fb_manage_dashboard';
         private const CAP_ATTENDANCE  = 'fb_manage_attendance';
         private const CAP_DATABASE    = 'fb_manage_database';
         private const CAP_FORMS       = 'fb_manage_forms';
@@ -31,7 +30,6 @@ final class Menu {
         private const CAP_DIAGNOSTICS = 'fb_manage_diagnostics';
         private const CAP_PERMISSIONS = 'fb_manage_permissions';
         private const CAP_THEME       = 'fb_manage_theme';
-        private const CAP_EVENTS      = 'fbm_manage_events';
         private const CAP_SCAN        = 'fb_manage_attendance';
         private const CAP_REPORTS     = 'fb_manage_reports';
         private const CAP_JOBS        = 'fbm_manage_jobs';
@@ -47,7 +45,6 @@ final class Menu {
                         'fbm_attendance',
                         'fbm_reports',
                         'fbm_jobs',
-                        'fbm_events',
                         'fbm_scan',
                         'fbm_database',
                         'fbm_forms',
@@ -82,27 +79,16 @@ final class Menu {
                 self::$registered = true;
                 $parent_slug      = 'fbm';
 
-                $root_cap = current_user_can( 'fb_manage_dashboard' )
-                        ? 'fb_manage_dashboard'
-                        : ( current_user_can( 'manage_options' ) ? 'manage_options' : 'do_not_allow' );
+                $root_cap = current_user_can( 'manage_options' ) ? 'manage_options' : 'do_not_allow';
 
                 add_menu_page(
                         __( 'FoodBank', 'foodbank-manager' ),
                         __( 'FoodBank', 'foodbank-manager' ),
                         $root_cap,
                         $parent_slug,
-                        array( self::class, 'render_dashboard' ),
+                        array( self::class, 'render_reports' ),
                         'dashicons-groups',
                         58
-                );
-
-                add_submenu_page(
-                        $parent_slug,
-                        esc_html__( 'Dashboard', 'foodbank-manager' ),
-                        esc_html__( 'Dashboard', 'foodbank-manager' ),
-                        self::CAP_DASHBOARD,
-                        $parent_slug,
-                        array( self::class, 'render_dashboard' )
                 );
 
                 add_submenu_page(
@@ -132,16 +118,7 @@ final class Menu {
                         array( self::class, 'render_jobs' )
                 );
 
-                if ( Options::get( 'modules.events', false ) ) {
-                        add_submenu_page(
-                                $parent_slug,
-                                esc_html__( 'Events', 'foodbank-manager' ),
-                                esc_html__( 'Events', 'foodbank-manager' ),
-                                self::CAP_EVENTS,
-                                'fbm_events',
-                                array( self::class, 'render_events' )
-                        );
-                }
+                // Events module removed.
 
                 add_submenu_page(
                         $parent_slug,
@@ -237,13 +214,6 @@ final class Menu {
                 EntryPage::register();
         }
 
-        public static function render_dashboard(): void {
-                self::render_once( 'admin:dashboard', static function (): void {
-                        \FBM\Admin\DashboardPage::route();
-                } );
-        }
-
-
         public static function render_attendance(): void {
                 self::render_once( 'admin:attendance', static function (): void {
                         \FoodBankManager\Admin\AttendancePage::route();
@@ -262,11 +232,6 @@ final class Menu {
                 } );
         }
 
-        public static function render_events(): void {
-                self::render_once( 'admin:events', static function (): void {
-                        \FBM\Admin\EventsPage::route();
-                } );
-        }
 
         public static function redirect_scan(): void {
                 wp_safe_redirect( add_query_arg( array( 'page' => 'fbm_attendance', 'tab' => 'scan' ), admin_url( 'admin.php' ) ) );

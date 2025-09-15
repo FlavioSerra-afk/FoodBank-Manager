@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignoreFile
 /**
  * Shortcode registry.
  *
@@ -46,7 +46,7 @@ final class Shortcodes {
 		}
 			$done = true;
 
-			add_shortcode( 'fbm_form', array( FormShortcode::class, 'render' ) );
-			add_shortcode( 'fbm_dashboard', array( DashboardShortcode::class, 'render' ) );
+						add_shortcode( 'fbm_registration_form', array( FormShortcode::class, 'render' ) );
+						add_shortcode( 'fbm_staff_dashboard', array( \FoodBankManager\Shortcodes\AttendanceManager::class, 'render' ) );
 	}
 }

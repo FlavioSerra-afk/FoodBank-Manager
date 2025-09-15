@@ -187,7 +187,7 @@ CSS;
      */
     public function enqueue_front(): void {
         $content = (string) ($GLOBALS['fbm_post_content'] ?? '');
-        if (str_contains($content, '[fbm_dashboard]')) {
+        if (str_contains($content, '[fbm_staff_dashboard]')) {
             $GLOBALS['fbm_styles']['fbm-frontend-dashboard'] = true;
         }
     }

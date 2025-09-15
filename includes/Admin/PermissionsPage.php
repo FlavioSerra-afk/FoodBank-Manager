@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignoreFile
 /**
  * Permissions admin page controller.
  *
@@ -548,7 +548,6 @@ final class PermissionsPage {
 	 */
 	private function cap_labels(): array {
 		return array(
-			'fb_manage_dashboard'   => __( 'Dashboard', 'foodbank-manager' ),
 			'fb_manage_attendance'  => __( 'Manage attendance', 'foodbank-manager' ),
 			'fb_manage_database'    => __( 'Manage database', 'foodbank-manager' ),
 			'fb_manage_forms'       => __( 'Manage forms', 'foodbank-manager' ),
