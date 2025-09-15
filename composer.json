@@ -53,7 +53,10 @@
         "league/csv": "Robust CSV writer for exports"
     },
     "scripts": {
-        "lint": "phpcs -q",
+        "lint": "vendor/bin/phpcs --report=full",
+        "lint:sum": "vendor/bin/phpcs --report=summary",
+        "lint:src": "vendor/bin/phpcs includes templates foodbank-manager.php uninstall.php",
+        "fix": "vendor/bin/phpcbf --parallel=8",
         "phpcs": "vendor/bin/phpcs --standard=phpcs.xml --report=summary --report-width=120",
         "phpcs:lanes": "phpcs --standard=phpcs.xml --report=full",
         "phpcs:repo": "php -d memory_limit=1024M vendor/bin/phpcs --standard=phpcs.xml --report=summary --report=source --report=json --report-file=build/phpcs-repo.json . --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit 1",
