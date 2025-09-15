@@ -7,7 +7,8 @@ final class ThemeSaveTest extends \BaseTestCase {
     protected function setUp(): void {
         parent::setUp();
         fbm_grant_admin();
-        update_option('fbm_theme', Theme::defaults());
+        Theme::defaults();
+        update_option('fbm_theme', fbm_theme_defaults());
     }
 
     public function test_valid_payload_saved(): void {

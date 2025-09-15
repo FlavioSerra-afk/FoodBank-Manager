@@ -12,7 +12,7 @@ final class ThemeImportExportTest extends \BaseTestCase {
         }
         Options::update('theme', Theme::defaults());
         Options::update('theme', array_replace_recursive(Theme::defaults(), array('match_front_to_admin' => true)));
-        update_option('fbm_theme', Theme::defaults());
+        update_option('fbm_theme', fbm_theme_defaults());
         $data = array(
             'version' => 1,
             'style'   => 'basic',

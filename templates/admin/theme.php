@@ -20,7 +20,7 @@ $groups   = function_exists('fbm_theme_groups') ? fbm_theme_groups() : [];
 
   <form method="post" action="options.php" id="fbm-theme-form">
     <?php settings_fields( 'fbm_theme' ); ?>
-    <div class="fbm-grid fbm-grid--vtabs">
+    <div class="fbm-layout">
       <!-- LEFT: vertical tab buttons -->
       <aside class="fbm-controls" role="tablist" aria-label="<?php esc_attr_e( 'Theme Sections', 'foodbank-manager' ); ?>">
         <?php fbm_render_theme_vertical_nav( $groups ); ?>

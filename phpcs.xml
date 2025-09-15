@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <ruleset name="FoodBank Manager">
-  <description>Scoped, stable PHPCS config that won't reformat the whole repo.</description>
+  <description>Scoped and stable PHPCS rules preventing mass formatting.</description>
 
   <rule ref="WordPress-Core"/>
   <rule ref="WordPress-Docs"/>
   <rule ref="WordPress-Extra"/>
 
-  <!-- Minimal spacing rules we actually want -->
+  <!-- Minimal sniffs we allow auto-fixing for changed files -->
   <rule ref="Squiz.ControlStructures.ControlSignature"/>
   <rule ref="WordPress.WhiteSpace.OperatorSpacing">
     <properties>
@@ -14,14 +14,12 @@
     </properties>
   </rule>
 
-  <!-- Limit to these directories -->
   <file>includes</file>
   <file>templates</file>
   <file>assets</file>
   <file>bin</file>
   <file>tests</file>
 
-  <!-- Don’t scan built artifacts or vendor -->
   <exclude-pattern>^dist/</exclude-pattern>
   <exclude-pattern>^vendor/</exclude-pattern>
 </ruleset>

@@ -1,17 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Prevent mass formatting outside changed files.
 composer phpcbf:changed || {
-  echo "PHPCBF failed on changed files. Fix or revert." >&2
+  echo "PHPCBF failed on changed files. Fix and re-stage." >&2
   exit 1
 }
 
-# Optional: ensure version bumped when PHP files changed.
-CHANGED=$(git diff --cached --name-only | grep -E '\.php$' || true)
-if [ -n "$CHANGED" ]; then
-  if ! git diff --cached --name-only | grep -Eq '(^includes/Core/Plugin\.php$|^foodbank-manager\.php$|^composer\.json$|^readme\.txt$|^CHANGELOG\.md$)'; then
-    echo "Version bump artifacts missing (Plugin.php, main header, composer.json, readme.txt, CHANGELOG.md)." >&2
+CHANGED_PHP=$(git diff --cached --name-only | grep -E '\.php$' || true)
+if [ -n "$CHANGED_PHP" ]; then
+  if ! git diff --cached --name-only | grep -Eq \
+    '(^includes/Core/Plugin\.php$|^foodbank-manager\.php$|^composer\.json$|^readme\.txt$|^CHANGELOG\.md$)'; then
+    echo "Version bump files missing (Plugin.php, main header, composer.json, readme.txt, CHANGELOG.md)." >&2
     exit 1
   fi
 fi

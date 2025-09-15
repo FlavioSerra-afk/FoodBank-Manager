@@ -11,7 +11,8 @@ final class ThemeJsonTest extends \BaseTestCase {
         if (!defined('FBM_PATH')) {
             define('FBM_PATH', dirname(__DIR__, 3) . '/');
         }
-        update_option('fbm_theme', Theme::defaults());
+        Theme::defaults();
+        update_option('fbm_theme', fbm_theme_defaults());
         $json = file_get_contents(FBM_PATH . 'themes/' . $file);
         $data = json_decode((string) $json, true);
         $san  = Theme::sanitize(array('admin' => $data));
