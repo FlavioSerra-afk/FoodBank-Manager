@@ -2,11 +2,10 @@
 
 ## Before you code
 Read:
-- [Docs/PRD-foodbank-manager.md](Docs/PRD-foodbank-manager.md)
-- [Docs/Architecture.md](Docs/Architecture.md)
-- [Docs/SECURITY.md](Docs/SECURITY.md)
-- [Docs/CONTRIBUTING.md](Docs/CONTRIBUTING.md)
-- [Docs/ISSUES-foodbank-manager.md](Docs/ISSUES-foodbank-manager.md)
+- [Docs/Specs.md](Docs/Specs.md)
+- [Docs/Plan.md](Docs/Plan.md)
+- [Docs/Tasks.md](Docs/Tasks.md)
+- [Docs/Matrix.md](Docs/Matrix.md)
 
 ## Workflow (the "Wave" pattern)
 - Work in small, shippable waves focused on one feature or area.
