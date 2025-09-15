@@ -35,15 +35,13 @@ fbm_diagnostics (mail/health)
 
 fbm_checkin (server endpoint guard for scan/record)
 
-Operating Model (No Events)
+Operating Model (Legacy Events)
 
-Food bank runs every Thursday, 11:00–14:30 (single fixed session).
+Current implementation uses an Events table and admin page to schedule distributions. Migration to a fixed weekly window (Thursday 11:00–14:30) is planned.
 
 Registered users keep the same QR code each visit (until revoked/canceled).
 
 Staff scan the QR on the staff front-end dashboard; each scan records a collection for that date.
-
-No Events table/page; logic is date-based with a fixed weekly window.
 
 Functional Scope
 A) Public Registration (Shortcode)
@@ -126,9 +124,11 @@ Optional destructive data drop (explicit confirmation).
 
 Keys/secrets wiped on uninstall.
 
-Data Model (High-Level, no Events)
+Data Model (High-Level)
 
 Tables (prefix fbm_):
+
+fbm_events — legacy schedule table: id, title, starts_at, ends_at, location, status, capacity.
 
 fbm_members — registered person, minimal PII; status: active|revoked|pending.
 
@@ -140,7 +140,7 @@ Settings in wp_options namespaced: fbm_theme, fbm_settings (e.g., session window
 
 Indexes:
 
-fbm_tokens(token_hash), fbm_attendance(member_id, collected_at), fbm_members(status).
+fbm_events(starts_at), fbm_tokens(token_hash), fbm_attendance(member_id, collected_at), fbm_members(status).
 
 QR Token Design:
 
