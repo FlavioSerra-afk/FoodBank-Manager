@@ -9,9 +9,9 @@
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Forms (shortcode) | 🟨 | 🟨 | 🟨 | 🟨 | [ ] | [ ] | [ ] | ⚠️ | ⚠️ | ⚠️ | [ ] | [ ] | [ ] | [Tasks](Tasks.md) |
 | Emails (log/resend) | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | ⚠️ | ⚠️ | ⚠️ | [ ] | [ ] | [ ] | [Task](Tasks.md#permanent-qr-issuance-in-applicant-email-revoke-regenerate-admin-tool) |
-| Front-end Dashboard (auth) | 🟨 | 🟨 | 🟨 | [ ] | [ ] | [ ] | [ ] | ⚠️ | ⚠️ | ⚠️ | [ ] | [ ] | [ ] | [Task](Tasks.md#public-dashboard-removal--guards) |
-| Attendance Scan | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | ⚠️ | ⚠️ | ⚠️ | [ ] | [ ] | [ ] | [Events](Tasks.md#replace-remove-events-references-in-code--db-migrator), [Policy](Tasks.md#rest--ui-updates-for-fixed-window-policy) |
-| Attendance Manual | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | ⚠️ | ⚠️ | ⚠️ | [ ] | [ ] | [ ] | [Events](Tasks.md#replace-remove-events-references-in-code--db-migrator), [Policy](Tasks.md#rest--ui-updates-for-fixed-window-policy) |
+| Front-end Dashboard (auth) | 🟨 | 🟨 | 🟨 | [ ] | [ ] | [ ] | 🟨 | ⚠️ | ⚠️ | ⚠️ | [ ] | [ ] | [ ] | [Task](Tasks.md#public-dashboard-removal--guards) |
+| Attendance Scan | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | 🟨 | ⚠️ | ⚠️ | ⚠️ | [ ] | [ ] | [ ] | [Events](Tasks.md#replace-remove-events-references-in-code--db-migrator), [Policy](Tasks.md#rest--ui-updates-for-fixed-window-policy) |
+| Attendance Manual | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | 🟨 | ⚠️ | ⚠️ | ⚠️ | [ ] | [ ] | [ ] | [Events](Tasks.md#replace-remove-events-references-in-code--db-migrator), [Policy](Tasks.md#rest--ui-updates-for-fixed-window-policy) |
 | Exports CSV/XLSX/PDF | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | ⚠️ | ⚠️ | ⚠️ | [ ] | [ ] | [ ] | [Tasks](Tasks.md) |
 | Diagnostics | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | ⚠️ | ⚠️ | ⚠️ | [ ] | [ ] | [ ] | [Tasks](Tasks.md) |
 | GDPR (Consent/SAR/Retention) | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | ⚠️ | ⚠️ | ⚠️ | [ ] | [ ] | [ ] | [Tasks](Tasks.md) |
@@ -28,7 +28,7 @@ U1 — Foundations
 
 ⬜ Theme sanitize/clamp
 
-⬜ Admin asset gating by screen-ID
+✅ Admin asset gating by screen-ID
 
 ⬜ Uninstall (cleanup + destructive)
 
@@ -36,7 +36,7 @@ U1 — Foundations
 
 ⬜ Weekly window config (Thu 11:00–14:30)
 
-⚠️ PHPCS/Tests failing; PHPStan passing
+✅ PHPCS zero; PHPStan green; PHPUnit baseline
 
 U2 — Public Registration
 
@@ -85,7 +85,7 @@ Cross-Cutting
 
 ⬜ No AIW integration
 
-⬜ i18n coverage
+🟨 i18n coverage
 
 ⬜ Performance checks (assets, indexes, streaming)
 
