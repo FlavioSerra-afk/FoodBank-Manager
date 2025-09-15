@@ -5,6 +5,11 @@
 
 # Tasks
 
+- [2025-09-16] Pass B1 — security + PHPCS zero
+  - Hardened: foodbank-manager.php; includes/Core/*; includes/Attendance/*; includes/Auth/class-capabilities.php; includes/Rest/class-checkincontroller.php; includes/Shortcodes/class-staffdashboard.php; templates/public/staff-dashboard.php; assets/css/*.css; assets/js/staff-dashboard.js; uninstall.php.
+  - PHPCS: WordPress.Files.FileName, WordPress.DB.PreparedSQL, WordPress.Security.NonceVerification, WordPress.WP.Capabilities, WordPress.WhiteSpace, WordPress.NamingConventions.ValidVariableName, WordPress.NamingConventions.ValidFunctionName.
+  - Unresolved P0s: None.
+
 - [2025-09-15] Migration summary recorded in option `fbm_db_migration_summary` (fields: `legacy_attendance_rows`, `attendance_migrated`, `attendance_skipped`, `legacy_checkins_rows`). Legacy check-ins remain under `_deprecated` tables for manual review.
 
 - Pass A1 — bootstrap fixed + activation hook wired (foodbank-manager.php, includes/Core/Plugin.php, includes/Admin/ReportsPage.php, includes/Http/AttendanceExportController.php, includes/Core/Jobs/JobsWorker.php, includes/Admin/ScanPage.php)

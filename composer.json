@@ -20,7 +20,6 @@
     },
     "autoload-dev": {
         "files": [
-            "tests/Support/WPStubs.php",
             "phpstan-bootstrap.php"
         ],
         "psr-4": {

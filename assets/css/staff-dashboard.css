@@ -1,139 +1,60 @@
-@layer fbm {
-    .fbm-staff-dashboard {
-        display: grid;
-        gap: 1.25rem;
-        font-family: var(--fbm-font, system-ui, sans-serif);
-    }
+.fbm-staff-dashboard {
+    border: 2px solid #0f172a;
+    border-radius: 8px;
+    padding: 1.5rem;
+    background: #f8fafc;
+}
 
-    .fbm-staff-dashboard__header {
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-    }
+.fbm-staff-dashboard__heading {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+}
 
-    .fbm-staff-dashboard__title {
-        margin: 0;
-        font-size: 1.125rem;
-        font-weight: 600;
-        color: var(--fbm-heading, #1f2937);
-    }
+.fbm-staff-dashboard__summary {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
 
-    .fbm-staff-dashboard__window {
-        margin: 0;
-        font-size: 0.95rem;
-        color: var(--fbm-muted, #4b5563);
-    }
+.fbm-staff-dashboard__field {
+    display: block;
+    margin-bottom: 1rem;
+}
 
-    .fbm-staff-dashboard__meta {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-        gap: 0.75rem;
-    }
+.fbm-staff-dashboard__label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
 
-    .fbm-staff-dashboard__stat {
-        padding: 0.85rem;
-        border-radius: 12px;
-        background: rgba(15, 23, 42, 0.04);
-    }
+.fbm-staff-dashboard__input {
+    width: 100%;
+    max-width: 320px;
+    padding: 0.5rem;
+    border: 1px solid #94a3b8;
+    border-radius: 6px;
+    font-size: 1rem;
+}
 
-    .fbm-staff-dashboard__stat-label {
-        display: block;
-        font-size: 0.75rem;
-        letter-spacing: 0.02em;
-        text-transform: uppercase;
-        color: var(--fbm-muted, #4b5563);
-    }
+.fbm-staff-dashboard__action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    background-color: #0ea5e9;
+    color: #ffffff;
+    border: none;
+    border-radius: 9999px;
+    cursor: pointer;
+}
 
-    .fbm-staff-dashboard__stat-value {
-        display: block;
-        margin-top: 0.35rem;
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: var(--fbm-accent, #0b5fff);
-    }
+.fbm-staff-dashboard__action:focus {
+    outline: 3px solid #0f172a;
+    outline-offset: 2px;
+}
 
-    .fbm-staff-dashboard__notice {
-        padding: 0.75rem 1rem;
-        border-radius: 10px;
-        background: rgba(11, 95, 255, 0.1);
-        color: var(--fbm-accent, #0b5fff);
-        font-weight: 600;
-    }
-
-    .fbm-staff-dashboard__manual {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.75rem;
-        align-items: flex-end;
-    }
-
-    .fbm-staff-dashboard__manual fieldset {
-        margin: 0;
-        padding: 0;
-        border: 0;
-        flex: 1 1 220px;
-    }
-
-    .fbm-staff-dashboard__label {
-        display: block;
-        margin-bottom: 0.25rem;
-        font-weight: 600;
-        color: var(--fbm-heading, #1f2937);
-    }
-
-    .fbm-staff-dashboard__manual input[type="text"] {
-        width: 100%;
-        padding: 0.65rem 0.75rem;
-        border-radius: 8px;
-        border: 1px solid rgba(15, 23, 42, 0.18);
-        font-size: 1rem;
-    }
-
-    .fbm-staff-dashboard__manual input[type="text"]:focus {
-        outline: 2px solid var(--fbm-accent, #0b5fff);
-        outline-offset: 2px;
-    }
-
-    .fbm-staff-dashboard__scanner {
-        padding: 1rem;
-        border-radius: 12px;
-        border: 1px dashed rgba(15, 23, 42, 0.2);
-        background: rgba(15, 23, 42, 0.02);
-    }
-
-    .fbm-staff-dashboard__section-title {
-        margin-top: 0;
-        font-size: 1rem;
-        font-weight: 600;
-    }
-
-    .fbm-staff-dashboard__hint {
-        margin: 0 0 0.5rem;
-        font-size: 0.85rem;
-        color: var(--fbm-muted, #4b5563);
-    }
-
-    .fbm-staff-dashboard__preview {
-        margin-top: 0.75rem;
-        width: 240px;
-        aspect-ratio: 1 / 1;
-        border-radius: 12px;
-        background: #000;
-        overflow: hidden;
-    }
-
-    .fbm-staff-dashboard__error {
-        margin-top: 0.75rem;
-        color: #b91c1c;
-        font-weight: 600;
-    }
-
-    .fbm-staff-dashboard--denied {
-        padding: 1rem;
-        border-radius: 12px;
-        background: rgba(185, 28, 28, 0.08);
-        color: #7f1d1d;
-        font-weight: 600;
-        text-align: center;
-    }
+.fbm-staff-dashboard__status {
+    margin-top: 1rem;
+    font-weight: 600;
 }

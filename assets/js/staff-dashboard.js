@@ -1,131 +1,99 @@
-(function () {
+(function (window, document) {
     'use strict';
 
-    const config = window.fbmStaffDashboard || null;
-    const dashboard = document.querySelector('[data-fbm-staff-dashboard]');
-
-    if (!config || !dashboard) {
+    if (!window || !document) {
         return;
     }
 
-    const statusEl = dashboard.querySelector('[data-fbm-status]');
-    const countEl = dashboard.querySelector('[data-fbm-today-count]');
-    const lastEl = dashboard.querySelector('[data-fbm-last-result]');
-    const manualForm = dashboard.querySelector('[data-fbm-manual]');
-    const scanButton = dashboard.querySelector('[data-fbm-start-scan]');
-    const scanError = dashboard.querySelector('[data-fbm-scan-error]');
-    const preview = dashboard.querySelector('[data-fbm-preview]');
-
-    let todayCount = parseInt(countEl ? countEl.textContent || '0' : '0', 10);
-
-    const messages = Object.assign(
-        {
-            ready: 'Ready for the next collection.',
-            success: 'Check-in recorded.',
-            duplicate: 'Member already collected today.',
-            error: 'Unable to record attendance. Please try again.',
-        },
-        config.messages || {}
-    );
-
-    function setStatus(message, tone) {
-        if (!statusEl) {
-            return;
-        }
-        statusEl.textContent = message;
-        statusEl.dataset.fbmTone = tone || 'info';
+    var settings = window.fbmStaffDashboard;
+    if (!settings || !settings.strings) {
+        return;
     }
 
-    function setLastResult(text) {
-        if (lastEl) {
-            lastEl.textContent = text;
+    var updateStatus = function (element, message) {
+        if (element) {
+            element.textContent = message;
         }
-    }
+    };
 
-    async function submitToken(token) {
-        if (!config.checkinUrl) {
-            setStatus(messages.error, 'error');
+    document.addEventListener('DOMContentLoaded', function () {
+        var containers = document.querySelectorAll('[data-fbm-staff-dashboard]');
+        if (!containers.length) {
             return;
         }
 
-        setStatus(messages.ready, 'loading');
+        containers.forEach(function (container) {
+            var status = container.querySelector('[data-fbm-status]');
+            updateStatus(status, settings.strings.ready);
 
-        try {
-            const response = await fetch(config.checkinUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-WP-Nonce': config.nonce || '',
-                },
-                body: JSON.stringify({ token: token }),
+            var referenceInput = container.querySelector('[data-fbm-reference]');
+            var action = container.querySelector('[data-fbm-checkin]');
+
+            if (!action) {
+                return;
+            }
+
+            action.addEventListener('click', function () {
+                if (!status) {
+                    return;
+                }
+
+                var reference = '';
+                if (referenceInput && typeof referenceInput.value === 'string') {
+                    reference = referenceInput.value.trim();
+                }
+
+                if (!reference) {
+                    updateStatus(status, settings.strings.error);
+                    return;
+                }
+
+                updateStatus(status, settings.strings.loading);
+
+                var payload = {
+                    reference: reference,
+                    method: action.dataset.fbmCheckin || 'manual'
+                };
+
+                window.fetch(settings.restUrl, {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-WP-Nonce': settings.nonce
+                    },
+                    body: JSON.stringify(payload)
+                })
+                    .then(function (response) {
+                        if (!response.ok) {
+                            throw new Error('request failed');
+                        }
+                        return response.json();
+                    })
+                    .then(function (data) {
+                        if (!data || typeof data.status !== 'string') {
+                            throw new Error('invalid');
+                        }
+
+                        if (data.status === 'duplicate') {
+                            updateStatus(status, settings.strings.duplicate);
+                            return;
+                        }
+
+                        if (data.status === 'success') {
+                            updateStatus(status, settings.strings.success);
+                            if (referenceInput) {
+                                referenceInput.value = '';
+                            }
+                            return;
+                        }
+
+                        updateStatus(status, settings.strings.error);
+                    })
+                    .catch(function () {
+                        updateStatus(status, settings.strings.error);
+                    });
             });
-
-            const payload = await response.json().catch(() => ({}));
-
-            if (response.status === 409) {
-                setStatus(messages.duplicate, 'warning');
-                setLastResult(payload.member || token);
-                return;
-            }
-
-            if (response.ok) {
-                todayCount += 1;
-                if (countEl) {
-                    countEl.textContent = String(todayCount);
-                }
-                setStatus(messages.success, 'success');
-                setLastResult(payload.member || token);
-                return;
-            }
-        } catch (error) {
-            console.error('fbmStaffDashboard', error);
-        }
-
-        setStatus(messages.error, 'error');
-    }
-
-    if (manualForm) {
-        manualForm.addEventListener('submit', function (event) {
-            event.preventDefault();
-
-            const tokenField = manualForm.querySelector('input[name="token"]');
-            const token = tokenField ? tokenField.value.trim() : '';
-
-            if (!token) {
-                setStatus(messages.error, 'error');
-                return;
-            }
-
-            submitToken(token);
-            if (tokenField) {
-                tokenField.value = '';
-                tokenField.focus();
-            }
         });
-    }
-
-    if (scanButton) {
-        scanButton.addEventListener('click', function () {
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                if (scanError) {
-                    scanError.textContent = messages.error;
-                    scanError.hidden = false;
-                }
-                return;
-            }
-
-            if (scanError) {
-                scanError.textContent = '';
-                scanError.hidden = true;
-            }
-            if (preview) {
-                preview.hidden = false;
-            }
-
-            setStatus(messages.ready, 'info');
-            // Detailed camera integration will be added in a later pass.
-        });
-    }
-
-    setStatus(messages.ready, 'info');
-})();
+    });
+})(window, document);
