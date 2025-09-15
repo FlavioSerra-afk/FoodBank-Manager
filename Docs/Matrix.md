@@ -18,3 +18,73 @@
 | Packaging Guard | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [Task](Tasks.md#packaging-guard-verification-upgrade-replaces-in-place) |
 | Encryption (at rest) | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [Tasks](Tasks.md) |
 
+
+
+Legend: ⬜ Planned | 🟨 In Progress | ✅ Done | ⚠️ Blocked/Error
+
+U1 — Foundations
+
+⬜ fbm_theme allowed + save fixed
+
+⬜ Theme sanitize/clamp
+
+⬜ Admin asset gating by screen-ID
+
+⬜ Uninstall (cleanup + destructive)
+
+⬜ Token service (issue/verify/revoke)
+
+⬜ Weekly window config (Thu 11:00–14:30)
+
+⬜ PHPCS/PHPStan/Tests green
+
+U2 — Public Registration
+
+⬜ Registration shortcode
+
+⬜ Validation/anti-spam
+
+⬜ Member status flow (pending/active/revoked)
+
+⬜ Email with QR + code
+
+⬜ Admin approve/resend/revoke
+
+U3 — Staff Front-End Dashboard
+
+⬜ Scanner UI (QR + manual)
+
+⬜ /fbm/checkin (nonce, cap, throttle)
+
+⬜ Idempotent per member/day
+
+⬜ “Today” counters & feedback
+
+U4 — Internal Summaries & Export
+
+⬜ Date-range summaries
+
+⬜ CSV export (admin only)
+
+⬜ Cache
+
+U5 — Diagnostics & Release
+
+⬜ Mail failures + resend
+
+⬜ Packaging + version alignment
+
+⬜ Changelog + Release
+
+Cross-Cutting
+
+⬜ No public analytics or PII exposure
+
+⬜ No Events table/page
+
+⬜ No AIW integration
+
+⬜ i18n coverage
+
+⬜ Performance checks (assets, indexes, streaming)
+
