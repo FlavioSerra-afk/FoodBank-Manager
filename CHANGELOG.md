@@ -1,3 +1,6 @@
+## 2.2.11 — 2025-09-15
+- Bump version
+
 ## 2.2.10 — 2025-09-15
 - Lock PHPCS/WPCS; changed-files fixer; guardrails (pre-commit/CI); Theme defaults/preview hardened; two-pane admin; tests seeded.
 
