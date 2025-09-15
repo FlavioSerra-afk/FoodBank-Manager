@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 final class Plugin {
-    public const FBM_VER = '2.2.13';
+    public $12.2.14$2
     public const VERSION = self::FBM_VER;
 
     public static function version(): string {
