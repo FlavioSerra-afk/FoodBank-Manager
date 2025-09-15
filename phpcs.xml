@@ -1,56 +1,27 @@
 <?xml version="1.0"?>
-<ruleset name="FoodBank-Manager Lanes">
-  <!-- Base (lean, safe) -->
-  <rule ref="WordPress-Core">
-    <exclude-pattern>tests/*</exclude-pattern>
-  </rule>
-  <!-- Curated extras; keep on for safety, we’ll relax surgically if needed -->
-  <rule ref="WordPress-Extra">
-    <exclude-pattern>tests/*</exclude-pattern>
-  </rule>
+<ruleset name="FoodBank Manager">
+  <description>Scoped, stable PHPCS config that won't reformat the whole repo.</description>
 
-  <!-- Lanes to keep green -->
-  <file>includes/Core</file>
-  <file>includes/UI</file>
-  <file>includes/Attendance</file>
-  <file>templates</file>
-  <file>tests</file>
+  <rule ref="WordPress-Core"/>
+  <rule ref="WordPress-Docs"/>
+  <rule ref="WordPress-Extra"/>
 
-  <!-- Hard excludes -->
-  <exclude-pattern>vendor/*</exclude-pattern>
-  <exclude-pattern>dist/*</exclude-pattern>
-  <exclude-pattern>node_modules/*</exclude-pattern>
-  <exclude-pattern>.github/*</exclude-pattern>
-
-  <!-- Relax noisy rules -->
-  <exclude name="WordPress.PHP.YodaConditions"/>
-  <rule ref="WordPress.DB.PreparedSQL">
-    <severity>0</severity>
-  </rule>
-  <rule ref="WordPress.DB.PreparedSQLPlaceholders">
-    <severity>0</severity>
-  </rule>
-  <rule ref="WordPress.Files.FileName">
-    <severity>0</severity>
-  </rule>
-
-  <!-- Enforce WordPress spacing rules that we can auto-fix -->
-  <rule ref="WordPress.WhiteSpace.ControlStructureSpacing">
-    <properties>
-      <property name="requiredSpacesAfterOpenParenthesis" value="1"/>
-    </properties>
-  </rule>
-
+  <!-- Minimal spacing rules we actually want -->
+  <rule ref="Squiz.ControlStructures.ControlSignature"/>
   <rule ref="WordPress.WhiteSpace.OperatorSpacing">
     <properties>
       <property name="ignoreNewlines" value="false"/>
     </properties>
   </rule>
 
-  <!-- (Enable only if tests block green)
-  <rule ref="Generic.Files.LineLength">
-    <type>warning</type>
-    <exclude-pattern>tests/*</exclude-pattern>
-  </rule>
-  -->
+  <!-- Limit to these directories -->
+  <file>includes</file>
+  <file>templates</file>
+  <file>assets</file>
+  <file>bin</file>
+  <file>tests</file>
+
+  <!-- Don’t scan built artifacts or vendor -->
+  <exclude-pattern>^dist/</exclude-pattern>
+  <exclude-pattern>^vendor/</exclude-pattern>
 </ruleset>

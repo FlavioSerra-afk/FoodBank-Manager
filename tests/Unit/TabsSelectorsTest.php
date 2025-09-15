@@ -16,6 +16,7 @@ final class TabsSelectorsTest extends \PHPUnit\Framework\TestCase {
         $this->assertStringContainsString('role="tablist"', $html);
         $this->assertSame(3, substr_count($html, 'role="tab"'));
         $this->assertSame(1, substr_count($html, 'aria-selected="true"'));
+        update_option('fbm_theme', fbm_theme_defaults());
         $css = Theme::css_variables_scoped();
         $this->assertStringContainsString('[role="tab"][aria-selected="true"]::after', $css);
         $this->assertStringContainsString('var(--fbm-tabs-indicator-h)', $css);

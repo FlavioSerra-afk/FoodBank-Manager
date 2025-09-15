@@ -8,6 +8,7 @@ if (!defined('FBM_URL')) {
 
 final class TypographyTokenTest extends \BaseTestCase {
     public function test_typography_tokens_present(): void {
+        update_option('fbm_theme', fbm_theme_defaults());
         $t = Theme::defaults();
         $t['typography']['h3']['size'] = 22;
         $t['typography']['link']['hover'] = '#123456';
