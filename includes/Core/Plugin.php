@@ -9,7 +9,7 @@ if ( ! defined('ABSPATH')) {
 
 final class Plugin
 {
-    public const FBM_VER = '2.2.11';
+    public $12.2.12$2
     public const SLUG    = 'foodbank-manager';
     public const VERSION = self::FBM_VER;
 
