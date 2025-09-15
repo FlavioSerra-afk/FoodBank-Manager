@@ -5,6 +5,16 @@
 
 # Tasks
 
+## Change Plan (2025-09-15 14:08Z)
+
+- P1 • Strip public analytics & dashboard: remove includes/Shortcodes/Dashboard*.php, includes/Admin/DashboardPage.php, templates/public/dashboard.php, templates/admin/dashboard.php. Specs.md lines 12-16.
+- P1 • Remove Events feature & legacy tables: delete includes/Admin/EventsPage.php, templates/admin/events*.php, includes/Attendance/{EventsRepo, TicketsRepo, TicketService, CheckinsRepo}; deprecate fb_events/fb_tickets/fb_checkins tables. Specs.md lines 41-45,94-119.
+- P1 • Refactor shortcodes to [fbm_registration_form] and [fbm_staff_dashboard]; remove [fbm_dashboard]. Specs.md lines 24-27,31-66.
+- P1 • REST endpoint alignment: keep /fbm/checkin only; remove extra routes in AttendanceController. Specs.md lines 54-66.
+- P1 • Update DB schema to fbm_members, fbm_tokens, fbm_attendance with additive migration; preserve legacy tables for rollback. Specs.md lines 94-119.
+- P2 • Fix fbm_theme option group and asset gating per Plan U1. Specs.md lines 66-83.
+
+
 ## QA Log
 
 - [2025-09-15 13:16Z] P0 • QA • composer lint: filename and doc comment errors in tests/Support/Exceptions.php — TODO
