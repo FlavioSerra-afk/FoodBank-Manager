@@ -5,6 +5,13 @@
 
 # Tasks
 
+## QA Toolchain Tightening (2025-09-15 15:53 BST)
+
+- Refined phpcs.xml to use WordPress standard and exclude vendor, node_modules, dist, build, assets/*/vendor, languages/*.po, languages/*.pot, tests.
+- Added composer scripts: lint, lint:sum, lint:src, fix.
+- Restored valid plugin version constant in includes/Core/Plugin.php.
+
+
 ## ENFORCEMENT RUN — scope strip + apply (2025-09-15 15:36 BST)
 
 - Updated dev tooling versions (phpunit, phpstan, phpcs, wpcs).
@@ -116,3 +123,7 @@
 - ExportCsvTest (headers, BOM, streaming).
 - DiagnosticsMailTest (redacted output, resend throttle).
 
+- [2025-09-15 15:53 BST] QA • composer lint: 583 errors, 185 warnings
+- [2025-09-15 15:53 BST] QA • composer phpcs: 583 errors, 185 warnings
+- [2025-09-15 15:53 BST] QA • composer phpstan: no errors
+- [2025-09-15 15:53 BST] QA • composer test: 1 error, 10 failures
