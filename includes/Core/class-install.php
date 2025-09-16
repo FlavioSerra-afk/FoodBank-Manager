@@ -38,7 +38,8 @@ final class Install {
 				$attendance_table = self::attendance_table_name( $wpdb );
 				$tokens_table     = self::tokens_table_name( $wpdb );
 
-		$sql_members = 'CREATE TABLE `' . $members_table . '` (
+				$initial_token_version = self::INITIAL_TOKEN_VERSION;
+		$sql_members                   = 'CREATE TABLE `' . $members_table . '` (
 		id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 		member_reference VARCHAR(64) NOT NULL,
 		first_name VARCHAR(191) NOT NULL,
@@ -73,7 +74,7 @@ final class Install {
 		id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 		member_id BIGINT UNSIGNED NOT NULL,
 		token_hash CHAR(64) NOT NULL,
-		version VARCHAR(10) NOT NULL DEFAULT \' . self::INITIAL_TOKEN_VERSION . \',
+		version VARCHAR(10) NOT NULL DEFAULT \' . $initial_token_version . \',
 		issued_at DATETIME NOT NULL,
 		revoked_at DATETIME NULL,
 		PRIMARY KEY  (id),

@@ -204,6 +204,27 @@ if ( ! class_exists( 'wpdb', false ) ) {
                         $sql  = $this->last_prepare['query'];
                         $args = $this->last_prepare['args'];
 
+                        if ( str_contains( $sql, 'ORDER BY collected_at DESC' ) ) {
+                                $table     = (string) ( $args[0] ?? '' );
+                                $reference = (string) ( $args[1] ?? '' );
+
+                                if ( str_contains( $table, 'fbm_attendance' ) ) {
+                                        $latest = null;
+
+                                        foreach ( $this->attendance as $record ) {
+                                                if ( $record['member_reference'] !== $reference ) {
+                                                        continue;
+                                                }
+
+                                                if ( null === $latest || $record['collected_at'] > $latest ) {
+                                                        $latest = $record['collected_at'];
+                                                }
+                                        }
+
+                                        return $latest;
+                                }
+                        }
+
                         if ( str_contains( $sql, 'member_reference = %s' ) ) {
                                 $table     = (string) ( $args[0] ?? '' );
                                 $reference = (string) ( $args[1] ?? '' );
