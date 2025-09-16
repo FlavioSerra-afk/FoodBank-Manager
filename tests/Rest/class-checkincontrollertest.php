@@ -57,7 +57,8 @@ final class CheckinControllerTest extends TestCase {
                 $data = $response->get_data();
 
                 $this->assertSame( CheckinService::STATUS_SUCCESS, $data['status'] );
-                $this->assertSame( 'FBM100', $data['reference'] );
+                $this->assertArrayHasKey( 'member_ref', $data );
+                $this->assertSame( 'FBM100', $data['member_ref'] );
         }
 
         public function test_handle_checkin_records_attendance_with_manual_code(): void {
@@ -79,7 +80,8 @@ final class CheckinControllerTest extends TestCase {
                 $data = $response->get_data();
 
                 $this->assertSame( CheckinService::STATUS_SUCCESS, $data['status'] );
-                $this->assertSame( 'FBM200', $data['reference'] );
+                $this->assertArrayHasKey( 'member_ref', $data );
+                $this->assertSame( 'FBM200', $data['member_ref'] );
         }
 
         public function test_handle_checkin_rejects_revoked_token(): void {
