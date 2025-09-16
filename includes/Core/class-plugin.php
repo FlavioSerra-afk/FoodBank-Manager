@@ -22,7 +22,7 @@ use function do_action;
  */
 final class Plugin {
 
-	public const VERSION = '2.2.21';
+	public const VERSION = '2.2.22';
 
 
 	/**

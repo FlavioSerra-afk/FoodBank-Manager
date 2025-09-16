@@ -18,6 +18,7 @@ use wpdb;
 use function add_shortcode;
 use function esc_html__;
 use function filter_input;
+use function filter_var;
 use function is_email;
 use function is_readable;
 use function is_string;
@@ -35,6 +36,7 @@ use function wp_verify_nonce;
 use const FILTER_SANITIZE_EMAIL;
 use const FILTER_SANITIZE_FULL_SPECIAL_CHARS;
 use const FILTER_SANITIZE_NUMBER_INT;
+use const FILTER_SANITIZE_URL;
 use const FILTER_UNSAFE_RAW;
 use const INPUT_POST;
 use const INPUT_SERVER;
@@ -57,6 +59,24 @@ final class RegistrationForm {
 	private const DEFAULT_HOUSEHOLD_SIZE  = '1';
 	private const MIN_TIME_TRAP_THRESHOLD = 5;
 	private const LAST_INITIAL_PATTERN    = '/^[A-Z]$/';
+
+		/**
+		 * Optional mailer factory override for testing.
+		 *
+		 * @var callable|null
+		 */
+	private static $mailer_factory = null;
+
+		/**
+		 * Override the welcome mailer dependency.
+		 *
+		 * @internal
+		 *
+		 * @param callable|null $factory Factory returning a mailer instance for test scenarios.
+		 */
+	public static function set_mailer_override( ?callable $factory ): void {
+			self::$mailer_factory = $factory;
+	}
 
 		/**
 		 * Register the shortcode handler.
@@ -117,32 +137,32 @@ final class RegistrationForm {
 				'values'  => $values,
 			);
 
-			$method = filter_input( INPUT_SERVER, 'REQUEST_METHOD', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+						$method = self::read_input( INPUT_SERVER, 'REQUEST_METHOD', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 			if ( ! is_string( $method ) || 'POST' !== strtoupper( $method ) ) {
-					return $result;
+						return $result;
 			}
 
-			$submitted = filter_input( INPUT_POST, self::SUBMIT_FIELD, FILTER_SANITIZE_NUMBER_INT );
+			$submitted = self::read_input( INPUT_POST, self::SUBMIT_FIELD, FILTER_SANITIZE_NUMBER_INT );
 			if ( null === $submitted ) {
 					return $result;
 			}
 
-			$nonce = filter_input( INPUT_POST, self::NONCE_FIELD, FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+						$nonce = self::read_input( INPUT_POST, self::NONCE_FIELD, FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 			if ( ! is_string( $nonce ) || ! wp_verify_nonce( $nonce, self::NONCE_ACTION ) ) {
 					$result['errors'][] = esc_html__( 'Security check failed. Please try again.', 'foodbank-manager' );
 
 					return $result;
 			}
 
-			$honeypot = filter_input( INPUT_POST, self::HONEYPOT_FIELD, FILTER_UNSAFE_RAW );
+						$honeypot = self::read_input( INPUT_POST, self::HONEYPOT_FIELD, FILTER_UNSAFE_RAW );
 			if ( is_string( $honeypot ) && '' !== trim( $honeypot ) ) {
 					$result['errors'][] = esc_html__( 'Invalid submission. Please try again.', 'foodbank-manager' );
 
 					return $result;
 			}
 
-			$submitted_at_raw = filter_input( INPUT_POST, self::TIME_TRAP_FIELD, FILTER_SANITIZE_NUMBER_INT );
-			$submitted_at     = is_string( $submitted_at_raw ) ? (int) $submitted_at_raw : 0;
+						$submitted_at_raw = self::read_input( INPUT_POST, self::TIME_TRAP_FIELD, FILTER_SANITIZE_NUMBER_INT );
+			$submitted_at                 = is_string( $submitted_at_raw ) ? (int) $submitted_at_raw : 0;
 
 			if ( $submitted_at <= 0 || ( time() - $submitted_at ) < self::MIN_TIME_TRAP_THRESHOLD ) {
 					$result['errors'][] = esc_html__( 'Invalid submission. Please try again.', 'foodbank-manager' );
@@ -150,30 +170,30 @@ final class RegistrationForm {
 					return $result;
 			}
 
-			$first_name = filter_input( INPUT_POST, self::FIELD_FIRST_NAME, FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-			$first_name = is_string( $first_name ) ? sanitize_text_field( $first_name ) : '';
+						$first_name = self::read_input( INPUT_POST, self::FIELD_FIRST_NAME, FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+			$first_name             = is_string( $first_name ) ? sanitize_text_field( $first_name ) : '';
 
 			if ( '' === $first_name ) {
 					$result['errors'][] = esc_html__( 'First name is required.', 'foodbank-manager' );
 			}
 
-			$last_initial = filter_input( INPUT_POST, self::FIELD_LAST_INITIAL, FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-			$last_initial = is_string( $last_initial ) ? strtoupper( sanitize_text_field( $last_initial ) ) : '';
-			$last_initial = substr( $last_initial, 0, 1 );
+						$last_initial = self::read_input( INPUT_POST, self::FIELD_LAST_INITIAL, FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+			$last_initial             = is_string( $last_initial ) ? strtoupper( sanitize_text_field( $last_initial ) ) : '';
+			$last_initial             = substr( $last_initial, 0, 1 );
 
 			if ( '' === $last_initial || 1 !== preg_match( self::LAST_INITIAL_PATTERN, $last_initial ) ) {
 					$result['errors'][] = esc_html__( 'Last initial must be a single letter.', 'foodbank-manager' );
 			}
 
-			$email = filter_input( INPUT_POST, self::FIELD_EMAIL, FILTER_SANITIZE_EMAIL );
-			$email = is_string( $email ) ? sanitize_email( $email ) : '';
+						$email = self::read_input( INPUT_POST, self::FIELD_EMAIL, FILTER_SANITIZE_EMAIL );
+			$email             = is_string( $email ) ? sanitize_email( $email ) : '';
 
 			if ( '' === $email || ! is_email( $email ) ) {
 					$result['errors'][] = esc_html__( 'A valid email address is required.', 'foodbank-manager' );
 			}
 
-			$household_raw   = filter_input( INPUT_POST, self::FIELD_HOUSEHOLD_SIZE, FILTER_SANITIZE_NUMBER_INT );
-			$household_value = is_string( $household_raw ) && '' !== $household_raw ? (int) $household_raw : (int) self::DEFAULT_HOUSEHOLD_SIZE;
+						$household_raw = self::read_input( INPUT_POST, self::FIELD_HOUSEHOLD_SIZE, FILTER_SANITIZE_NUMBER_INT );
+			$household_value           = is_string( $household_raw ) && '' !== $household_raw ? (int) $household_raw : (int) self::DEFAULT_HOUSEHOLD_SIZE;
 			if ( $household_value < 1 ) {
 					$household_value = 1;
 			}
@@ -219,8 +239,8 @@ final class RegistrationForm {
 				return $result;
 			}
 
-			$mailer = new WelcomeMailer();
-			$mailer->send( $email, $first_name, $outcome['member_reference'], $outcome['token'] );
+				$mailer = is_callable( self::$mailer_factory ) ? call_user_func( self::$mailer_factory ) : new WelcomeMailer();
+				$mailer->send( $email, $first_name, $outcome['member_reference'], $outcome['token'] );
 
 			$result['success'] = true;
 			$result['message'] = esc_html__( 'Thank you for registering. We have emailed your check-in QR code.', 'foodbank-manager' );
@@ -231,16 +251,63 @@ final class RegistrationForm {
 				'household_size' => self::DEFAULT_HOUSEHOLD_SIZE,
 			);
 
-			return $result;
+						return $result;
 	}
 
-		/**
-		 * Resolve the current page URL for the form action.
-		 */
-	private static function current_action_url(): string {
-			$uri = filter_input( INPUT_SERVER, 'REQUEST_URI', FILTER_SANITIZE_URL );
+				/**
+				 * Read filtered input values with CLI-safe fallback.
+				 *
+				 * @param int    $type     Input type constant.
+				 * @param string $variable Variable name to resolve.
+				 * @param int    $filter   Filter identifier.
+				 *
+				 * @return mixed Filtered value or null when unavailable.
+				 */
+	private static function read_input( int $type, string $variable, int $filter ) {
+			$value = filter_input( $type, $variable, $filter );
 
-			return is_string( $uri ) ? $uri : '';
+		if ( null !== $value && false !== $value ) {
+				return $value;
+		}
+
+		switch ( $type ) {
+			case INPUT_POST:
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- CLI fallback mirrors filter_input() for tests.
+				$source = (array) $_POST;
+				break;
+			case INPUT_SERVER:
+					$source = (array) $_SERVER;
+				break;
+			default:
+					$source = array();
+		}
+
+		if ( ! array_key_exists( $variable, $source ) ) {
+				return null;
+		}
+
+			$raw_value = $source[ $variable ];
+
+		if ( FILTER_UNSAFE_RAW === $filter ) {
+				return $raw_value;
+		}
+
+			$filtered = filter_var( $raw_value, $filter );
+
+		if ( false === $filtered || null === $filtered ) {
+				return null;
+		}
+
+			return $filtered;
+	}
+
+				/**
+				 * Resolve the current page URL for the form action.
+				 */
+	private static function current_action_url(): string {
+					$uri = self::read_input( INPUT_SERVER, 'REQUEST_URI', FILTER_SANITIZE_URL );
+
+					return is_string( $uri ) ? $uri : '';
 	}
 
 		/**

@@ -16,7 +16,6 @@ use function explode;
 use function function_exists;
 use function gmdate;
 use function hash;
-use function hash_equals;
 use function hash_hmac;
 use function is_array;
 use function is_string;

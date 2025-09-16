@@ -41,13 +41,13 @@ U1 — Foundations
 
 U2 — Public Registration
 
-⬜ Registration shortcode
+✅ Registration shortcode
 
-⬜ Validation/anti-spam
+✅ Validation/anti-spam
 
 ⬜ Member status flow (pending/active/revoked)
 
-⬜ Email with QR + code
+✅ Email with QR + code
 
 ⬜ Admin approve/resend/revoke
 
@@ -55,9 +55,9 @@ U3 — Staff Front-End Dashboard
 
 ⬜ Scanner UI (QR + manual)
 
-⬜ /fbm/checkin (nonce, cap, throttle)
+✅ /fbm/checkin (nonce, cap, throttle)
 
-⬜ Idempotent per member/day
+✅ Idempotent per member/day
 
 ⬜ “Today” counters & feedback
 
@@ -90,7 +90,7 @@ Cross-Cutting
 
 ✅ Shortcode scope limited to registration + staff dashboard
 
-🟨 i18n coverage
+✅ i18n coverage
 
 ⬜ Performance checks (assets, indexes, streaming)
 

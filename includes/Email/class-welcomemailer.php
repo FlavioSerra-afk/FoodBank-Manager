@@ -22,7 +22,6 @@ use function is_string;
 use function ob_get_clean;
 use function ob_start;
 use function sprintf;
-use function wp_mail;
 
 /**
  * Composes and sends welcome emails with QR tokens.

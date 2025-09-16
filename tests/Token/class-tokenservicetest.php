@@ -7,12 +7,30 @@
 
 declare(strict_types=1);
 
+namespace FoodBankManager\Token;
+
+if ( ! function_exists( __NAMESPACE__ . '\\hash_equals' ) ) {
+        function hash_equals( $known_string, $user_string ) {
+                if ( ! isset( $GLOBALS['fbm_token_hash_equals_calls'] ) || ! is_array( $GLOBALS['fbm_token_hash_equals_calls'] ) ) {
+                        $GLOBALS['fbm_token_hash_equals_calls'] = array();
+                }
+
+                $GLOBALS['fbm_token_hash_equals_calls'][] = array(
+                        'known' => $known_string,
+                        'user'  => $user_string,
+                );
+
+                return \hash_equals( $known_string, $user_string );
+        }
+}
+
 namespace FBM\Tests\Token;
 
 use FoodBankManager\Token\TokenRepository;
 use FoodBankManager\Token\TokenService;
 use PHPUnit\Framework\TestCase;
 
+use function array_filter;
 use function explode;
 use function hash_hmac;
 use function rtrim;
@@ -50,13 +68,15 @@ final class TokenServiceTest extends TestCase {
 		/**
 		 * Prepare shared fixtures.
 		 */
-	protected function setUp(): void {
-			parent::setUp();
+        protected function setUp(): void {
+                        parent::setUp();
 
-				$this->wpdb   = new \wpdb();
-			$this->repository = new TokenRepository( $this->wpdb );
-			$this->service    = new TokenService( $this->repository, 'unit-signing-secret', 'unit-storage-secret' );
-	}
+                                $this->wpdb   = new \wpdb();
+                        $this->repository = new TokenRepository( $this->wpdb );
+                        $this->service    = new TokenService( $this->repository, 'unit-signing-secret', 'unit-storage-secret' );
+
+                        $GLOBALS['fbm_token_hash_equals_calls'] = array();
+        }
 
 		/**
 		 * Ensure issued tokens include signatures and persisted hashes.
@@ -122,6 +142,40 @@ final class TokenServiceTest extends TestCase {
          */
         public function test_revoke_returns_false_when_no_tokens_found(): void {
                 $this->assertFalse( $this->service->revoke( 999 ) );
+        }
+
+        /**
+         * Ensure verification compares secrets using constant-time checks.
+         */
+        public function test_verify_uses_constant_time_comparisons(): void {
+                $member_id = 2048;
+                $token     = $this->service->issue( $member_id );
+
+                $this->assertSame( $member_id, $this->service->verify( $token ) );
+
+                $calls = $GLOBALS['fbm_token_hash_equals_calls'] ?? array();
+
+                $this->assertNotEmpty( $calls, 'Expected hash_equals calls to be recorded.' );
+
+                $version_checks = array_filter(
+                        $calls,
+                        static function ( array $call ): bool {
+                                return 'v1' === $call['known'] || 'v1' === $call['user'];
+                        }
+                );
+
+                $this->assertNotEmpty( $version_checks, 'Expected token version comparison to use hash_equals.' );
+
+                $token_hash = $this->wpdb->tokens[ $member_id ]['token_hash'] ?? '';
+
+                $hash_checks = array_filter(
+                        $calls,
+                        static function ( array $call ) use ( $token_hash ): bool {
+                                return $token_hash === $call['known'] || $token_hash === $call['user'];
+                        }
+                );
+
+                $this->assertNotEmpty( $hash_checks, 'Expected stored token hash comparison to use hash_equals.' );
         }
 
         /**
