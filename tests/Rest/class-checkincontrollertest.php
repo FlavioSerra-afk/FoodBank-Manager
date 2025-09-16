@@ -33,11 +33,17 @@ final class CheckinControllerTest extends TestCase {
                 CheckinService::set_current_time_override(
                         new DateTimeImmutable( '2023-08-17 12:00:00', new DateTimeZone( 'Europe/London' ) )
                 );
+
+                $GLOBALS['fbm_current_caps'] = array(
+                        'fbm_checkin' => true,
+                        'fbm_manage'  => false,
+                );
         }
 
         protected function tearDown(): void {
                 CheckinService::set_current_time_override( null );
 
+                unset( $GLOBALS['fbm_current_caps'] );
                 unset( $GLOBALS['wpdb'] );
 
                 parent::tearDown();
@@ -207,5 +213,90 @@ final class CheckinControllerTest extends TestCase {
 
                 $this->assertInstanceOf( \WP_Error::class, $response );
                 $this->assertSame( 'fbm_inactive_member', $response->get_error_code() );
+        }
+
+        public function test_handle_checkin_rejects_override_without_permission(): void {
+                $members_repository = new MembersRepository( $this->wpdb );
+                $member_id          = $members_repository->insert_active_member( 'FBM910', 'Robin', 'A', 'robin@example.com', 2 );
+
+                $this->assertIsInt( $member_id );
+
+                $request = new \WP_REST_Request(
+                        array(
+                                'manual_code'   => 'FBM910',
+                                'override'      => '1',
+                                'override_note' => 'Emergency collection needed.',
+                        )
+                );
+
+                $response = CheckinController::handle_checkin( $request );
+
+                $this->assertInstanceOf( \WP_Error::class, $response );
+                $this->assertSame( 'fbm_override_forbidden', $response->get_error_code() );
+        }
+
+        public function test_handle_checkin_requires_note_for_override(): void {
+                $members_repository = new MembersRepository( $this->wpdb );
+                $member_id          = $members_repository->insert_active_member( 'FBM920', 'Ash', 'B', 'ash@example.com', 3 );
+
+                $this->assertIsInt( $member_id );
+
+                $GLOBALS['fbm_current_caps']['fbm_manage'] = true;
+
+                $request = new \WP_REST_Request(
+                        array(
+                                'manual_code' => 'FBM920',
+                                'override'    => true,
+                        )
+                );
+
+                $response = CheckinController::handle_checkin( $request );
+
+                $this->assertInstanceOf( \WP_Error::class, $response );
+                $this->assertSame( 'fbm_override_note_required', $response->get_error_code() );
+        }
+
+        public function test_handle_checkin_records_override_and_logs_audit(): void {
+                $members_repository = new MembersRepository( $this->wpdb );
+                $member_id          = $members_repository->insert_active_member( 'FBM930', 'Sky', 'C', 'sky@example.com', 1 );
+
+                $this->assertIsInt( $member_id );
+
+                $GLOBALS['fbm_current_caps']['fbm_manage'] = true;
+
+                $initial_request = new \WP_REST_Request( array( 'manual_code' => 'FBM930' ) );
+                $initial_response = CheckinController::handle_checkin( $initial_request );
+
+                $this->assertInstanceOf( \WP_REST_Response::class, $initial_response );
+
+                CheckinService::set_current_time_override(
+                        new DateTimeImmutable( '2023-08-24 11:59:00', new DateTimeZone( 'Europe/London' ) )
+                );
+
+                $override_request = new \WP_REST_Request(
+                        array(
+                                'manual_code'   => 'FBM930',
+                                'override'      => '1',
+                                'override_note' => 'Urgent need approved.',
+                        )
+                );
+
+                $override_response = CheckinController::handle_checkin( $override_request );
+
+                $this->assertInstanceOf( \WP_REST_Response::class, $override_response );
+
+                $data = $override_response->get_data();
+
+                $this->assertSame( CheckinService::STATUS_SUCCESS, $data['status'] );
+                $this->assertSame( 'Collection recorded.', $data['message'] );
+
+                $this->assertNotEmpty( $this->wpdb->attendance_overrides );
+                $overrides     = array_values( $this->wpdb->attendance_overrides );
+                $latest_audit = $overrides[ count( $overrides ) - 1 ];
+
+                $this->assertSame( 'FBM930', $latest_audit['member_reference'] );
+                $this->assertSame( 1, $latest_audit['override_by'] );
+                $this->assertSame( 'Urgent need approved.', $latest_audit['override_note'] );
+                $this->assertArrayHasKey( 'override_at', $latest_audit );
         }
 }

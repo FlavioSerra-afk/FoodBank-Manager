@@ -92,7 +92,8 @@ final class CheckinServiceTest extends TestCase {
         }
 
         public function test_record_allows_override_to_bypass_recent_warning(): void {
-                $repository = new AttendanceRepository( new \wpdb() );
+                $wpdb        = new \wpdb();
+                $repository = new AttendanceRepository( $wpdb );
 
                 CheckinService::set_current_time_override(
                         new DateTimeImmutable( '2023-08-17 12:15:00', new DateTimeZone( 'Europe/London' ) )
@@ -106,9 +107,37 @@ final class CheckinServiceTest extends TestCase {
                         new DateTimeImmutable( '2023-08-24 12:14:00', new DateTimeZone( 'Europe/London' ) )
                 );
 
-                $result = $service->record( 'FBM880', 'manual', 4, 'override reason' );
+                $result = $service->record( 'FBM880', 'manual', 4, null, true, 'override reason' );
 
                 $this->assertSame( CheckinService::STATUS_SUCCESS, $result['status'] );
                 $this->assertSame( 'Collection recorded.', $result['message'] );
+
+                $this->assertNotEmpty( $wpdb->attendance_overrides );
+                $overrides     = array_values( $wpdb->attendance_overrides );
+                $latest_audit = $overrides[ count( $overrides ) - 1 ];
+
+                $this->assertSame( 'FBM880', $latest_audit['member_reference'] );
+                $this->assertSame( 4, $latest_audit['override_by'] );
+                $this->assertSame( 'override reason', $latest_audit['override_note'] );
+        }
+
+        public function test_record_keeps_warning_when_note_without_override(): void {
+                $repository = new AttendanceRepository( new \wpdb() );
+
+                CheckinService::set_current_time_override(
+                        new DateTimeImmutable( '2023-08-17 12:15:00', new DateTimeZone( 'Europe/London' ) )
+                );
+
+                $service = new CheckinService( $repository );
+
+                $service->record( 'FBM881', 'qr', 5 );
+
+                CheckinService::set_current_time_override(
+                        new DateTimeImmutable( '2023-08-24 12:14:00', new DateTimeZone( 'Europe/London' ) )
+                );
+
+                $result = $service->record( 'FBM881', 'qr', 5, 'note only' );
+
+                $this->assertSame( CheckinService::STATUS_RECENT_WARNING, $result['status'] );
         }
 }

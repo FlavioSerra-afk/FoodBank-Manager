@@ -26,6 +26,9 @@ use function register_rest_route;
 use function rest_ensure_response;
 use function sanitize_text_field;
 use function sanitize_textarea_field;
+use function in_array;
+use function strtolower;
+use function trim;
 use function wp_verify_nonce;
 
 /**
@@ -63,15 +66,24 @@ final class CheckinController {
 						'required'          => false,
 						'sanitize_callback' => 'sanitize_text_field',
 					),
-					'note'        => array(
-						'type'              => 'string',
-						'required'          => false,
-						'sanitize_callback' => 'sanitize_textarea_field',
-					),
-				),
-			)
-		);
-	}
+                                        'note'        => array(
+                                                'type'              => 'string',
+                                                'required'          => false,
+                                                'sanitize_callback' => 'sanitize_textarea_field',
+                                        ),
+                                        'override'    => array(
+                                                'type'     => 'boolean',
+                                                'required' => false,
+                                        ),
+                                        'override_note' => array(
+                                                'type'              => 'string',
+                                                'required'          => false,
+                                                'sanitize_callback' => 'sanitize_textarea_field',
+                                        ),
+                                ),
+                        )
+                );
+        }
 
 		/**
 		 * Enforce capability and nonce checks.
@@ -109,17 +121,31 @@ final class CheckinController {
 
 						$token       = $request->get_param( 'token' );
 						$manual_code = $request->get_param( 'manual_code' );
-						$method      = $request->get_param( 'method' );
-						$note        = $request->get_param( 'note' );
+                                                $method      = $request->get_param( 'method' );
+                                                $note        = $request->get_param( 'note' );
+                                                $override    = $request->get_param( 'override' );
+                                                $override_note_param = $request->get_param( 'override_note' );
 
-						$token       = is_string( $token ) ? sanitize_text_field( $token ) : '';
-						$manual_code = is_string( $manual_code ) ? sanitize_text_field( $manual_code ) : '';
-						$method      = is_string( $method ) ? sanitize_text_field( $method ) : 'qr';
-						$note        = is_string( $note ) ? sanitize_textarea_field( $note ) : null;
+                                                $token       = is_string( $token ) ? sanitize_text_field( $token ) : '';
+                                                $manual_code = is_string( $manual_code ) ? sanitize_text_field( $manual_code ) : '';
+                                                $method      = is_string( $method ) ? sanitize_text_field( $method ) : 'qr';
+                                                $note        = is_string( $note ) ? sanitize_textarea_field( $note ) : null;
+                                                $override    = self::is_truthy_flag( $override );
+                                                $override_note = is_string( $override_note_param ) ? sanitize_textarea_field( $override_note_param ) : '';
 
-		if ( '' === $token && '' === $manual_code ) {
-						return new WP_Error( 'fbm_invalid_reference', __( 'A token or manual code is required.', 'foodbank-manager' ), array( 'status' => 400 ) );
-		}
+                if ( $override ) {
+                        if ( ! current_user_can( 'fbm_manage' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability registered on activation.
+                                                return new WP_Error( 'fbm_override_forbidden', __( 'You are not allowed to override collection warnings.', 'foodbank-manager' ), array( 'status' => 403 ) );
+                        }
+
+                        if ( '' === $override_note ) {
+                                                return new WP_Error( 'fbm_override_note_required', __( 'An override note is required.', 'foodbank-manager' ), array( 'status' => 400 ) );
+                        }
+                }
+
+                if ( '' === $token && '' === $manual_code ) {
+                                                return new WP_Error( 'fbm_invalid_reference', __( 'A token or manual code is required.', 'foodbank-manager' ), array( 'status' => 400 ) );
+                }
 
 						$attendance_repository = new AttendanceRepository( $wpdb );
 						$members_repository    = new MembersRepository( $wpdb );
@@ -161,8 +187,33 @@ final class CheckinController {
 						$member_reference = $record['member_reference'];
 		}
 
-						$result = $service->record( $member_reference, $method, get_current_user_id(), $note );
+                                        $override_note = '' !== $override_note ? $override_note : null;
 
-						return rest_ensure_response( $result );
-	}
+                                        $result = $service->record( $member_reference, $method, get_current_user_id(), $note, $override, $override_note );
+
+                                        return rest_ensure_response( $result );
+        }
+
+        /**
+         * Normalize boolean-like values from REST parameters.
+         *
+         * @param mixed $value Raw request value.
+         */
+        private static function is_truthy_flag( $value ): bool {
+                if ( is_bool( $value ) ) {
+                        return $value;
+                }
+
+                if ( is_numeric( $value ) ) {
+                        return (bool) (int) $value;
+                }
+
+                if ( is_string( $value ) ) {
+                        $value = strtolower( trim( $value ) );
+
+                        return in_array( $value, array( '1', 'true', 'yes', 'on' ), true );
+                }
+
+                return false;
+        }
 }
