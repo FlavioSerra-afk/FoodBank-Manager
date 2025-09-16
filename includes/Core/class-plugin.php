@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace FoodBankManager\Core;
 
+use FoodBankManager\Admin\MembersPage;
 use FoodBankManager\Auth\Capabilities;
 use FoodBankManager\Rest\CheckinController;
 use FoodBankManager\Shortcodes\RegistrationForm;
@@ -27,7 +28,8 @@ final class Plugin {
 	 * Register runtime hooks.
 	 */
 	public static function boot(): void {
-		Assets::setup();
+				Assets::setup();
+				MembersPage::register();
 				RegistrationForm::register();
 				StaffDashboard::register();
 
