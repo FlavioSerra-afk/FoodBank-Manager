@@ -18,7 +18,7 @@ use function update_option;
  */
 final class Install {
 
-        private const DB_VERSION            = '2024093002';
+	private const DB_VERSION            = '2024093002';
 	private const INITIAL_TOKEN_VERSION = 'v1';
 
 	/**
@@ -33,11 +33,11 @@ final class Install {
 
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
-                $charset                = $wpdb->get_charset_collate();
-                $members_table          = self::members_table_name( $wpdb );
-                $attendance_table       = self::attendance_table_name( $wpdb );
-                $attendance_audit_table = self::attendance_overrides_table_name( $wpdb );
-                $tokens_table           = self::tokens_table_name( $wpdb );
+				$charset                = $wpdb->get_charset_collate();
+				$members_table          = self::members_table_name( $wpdb );
+				$attendance_table       = self::attendance_table_name( $wpdb );
+				$attendance_audit_table = self::attendance_overrides_table_name( $wpdb );
+				$tokens_table           = self::tokens_table_name( $wpdb );
 
 				$initial_token_version = self::INITIAL_TOKEN_VERSION;
 		$sql_members                   = 'CREATE TABLE `' . $members_table . '` (
@@ -57,7 +57,7 @@ final class Install {
 		KEY idx_email (email)
 	) ' . $charset . ';';
 
-                $sql_attendance = 'CREATE TABLE `' . $attendance_table . '` (
+				$sql_attendance = 'CREATE TABLE `' . $attendance_table . '` (
                 id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
                 member_reference VARCHAR(191) NOT NULL,
                 collected_at DATETIME NOT NULL,
@@ -71,7 +71,7 @@ final class Install {
                 KEY idx_collected_at (collected_at)
         ) ' . $charset . ';';
 
-                $sql_attendance_overrides = 'CREATE TABLE `' . $attendance_audit_table . '` (
+				$sql_attendance_overrides = 'CREATE TABLE `' . $attendance_audit_table . '` (
                 id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
                 attendance_id BIGINT UNSIGNED NOT NULL,
                 member_reference VARCHAR(191) NOT NULL,
@@ -96,10 +96,10 @@ final class Install {
                 UNIQUE KEY uq_token_hash (token_hash)
         ) ' . $charset . ';';
 
-                dbDelta( $sql_members );
-                dbDelta( $sql_attendance );
-                dbDelta( $sql_attendance_overrides );
-                dbDelta( $sql_tokens );
+				dbDelta( $sql_members );
+				dbDelta( $sql_attendance );
+				dbDelta( $sql_attendance_overrides );
+				dbDelta( $sql_tokens );
 
 				update_option( 'fbm_db_version', self::DB_VERSION, false );
 	}
@@ -109,26 +109,26 @@ final class Install {
 	 *
 	 * @param wpdb $wpdb WordPress database abstraction.
 	 */
-        public static function attendance_table_name( wpdb $wpdb ): string {
-                return $wpdb->prefix . 'fbm_attendance';
-        }
+	public static function attendance_table_name( wpdb $wpdb ): string {
+			return $wpdb->prefix . 'fbm_attendance';
+	}
 
-        /**
-         * Resolve the fully qualified attendance override audit table name.
-         *
-         * @param wpdb $wpdb WordPress database abstraction.
-         */
-        public static function attendance_overrides_table_name( wpdb $wpdb ): string {
-                return $wpdb->prefix . 'fbm_attendance_overrides';
-        }
+		/**
+		 * Resolve the fully qualified attendance override audit table name.
+		 *
+		 * @param wpdb $wpdb WordPress database abstraction.
+		 */
+	public static function attendance_overrides_table_name( wpdb $wpdb ): string {
+			return $wpdb->prefix . 'fbm_attendance_overrides';
+	}
 
-        /**
-         * Resolve the fully qualified members table name.
-         *
-         * @param wpdb $wpdb WordPress database abstraction.
-         */
-        public static function members_table_name( wpdb $wpdb ): string {
-			return $wpdb->prefix . 'fbm_members';
+		/**
+		 * Resolve the fully qualified members table name.
+		 *
+		 * @param wpdb $wpdb WordPress database abstraction.
+		 */
+	public static function members_table_name( wpdb $wpdb ): string {
+		return $wpdb->prefix . 'fbm_members';
 	}
 
 		/**

@@ -5,6 +5,8 @@
 
 # Tasks
 
+- [2025-09-17] P8 done — PHPCS zero (v2.2.21)
+  - Version recorded: 2.2.21; Milestone: P8
 - [2025-09-17] P6 done — 1/7 policy + override (v2.2.20)
   - Version recorded: 2.2.20; Milestone: P6
   - Release notes: pending CHANGELOG.md update (latest published: 2.2.18)

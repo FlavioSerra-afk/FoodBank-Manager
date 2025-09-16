@@ -27,7 +27,7 @@ if ( defined( 'FBM_ALLOW_DESTRUCTIVE_UNINSTALL' ) ) {
 }
 
 if ( function_exists( 'apply_filters' ) ) {
-        $allow_destructive = (bool) apply_filters( 'fbm_allow_destructive_uninstall', $allow_destructive );
+	$allow_destructive = (bool) apply_filters( 'fbm_allow_destructive_uninstall', $allow_destructive );
 }
 
 if ( $allow_destructive && isset( $wpdb ) && $wpdb instanceof \wpdb ) {
