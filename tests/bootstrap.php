@@ -155,8 +155,8 @@ if ( ! class_exists( 'wpdb', false ) ) {
                         $sql  = $this->last_prepare['query'];
                         $args = $this->last_prepare['args'];
 
-                        if ( str_contains( $sql, 'token_hash = %s' ) ) {
-                                $hash = (string) ( $args[1] ?? '' );
+                        if ( str_contains( $sql, 'token_hash = %s' ) && str_contains( $sql, 'fbm_tokens' ) ) {
+                                $hash = (string) ( $args[0] ?? '' );
 
                                 foreach ( $this->tokens as $record ) {
                                         if ( $record['token_hash'] === $hash && null === $record['revoked_at'] ) {
@@ -171,8 +171,8 @@ if ( ! class_exists( 'wpdb', false ) ) {
                                 return null;
                         }
 
-                        if ( str_contains( $sql, 'WHERE email = %s' ) ) {
-                                $email = (string) ( $args[1] ?? '' );
+                        if ( str_contains( $sql, 'fbm_members' ) && str_contains( $sql, 'WHERE email = %s' ) ) {
+                                $email = (string) ( $args[0] ?? '' );
 
                                 foreach ( $this->members as $member ) {
                                         if ( $member['email'] === $email ) {
@@ -187,8 +187,8 @@ if ( ! class_exists( 'wpdb', false ) ) {
                                 return null;
                         }
 
-                        if ( str_contains( $sql, 'WHERE member_reference = %s' ) ) {
-                                $reference = (string) ( $args[1] ?? '' );
+                        if ( str_contains( $sql, 'fbm_members' ) && str_contains( $sql, 'WHERE member_reference = %s' ) ) {
+                                $reference = (string) ( $args[0] ?? '' );
 
                                 foreach ( $this->members as $member ) {
                                         if ( $member['member_reference'] === $reference ) {
@@ -203,8 +203,8 @@ if ( ! class_exists( 'wpdb', false ) ) {
                                 return null;
                         }
 
-                        if ( str_contains( $sql, 'WHERE id = %d' ) ) {
-                                $member_id = (int) ( $args[1] ?? 0 );
+                        if ( str_contains( $sql, 'fbm_members' ) && str_contains( $sql, 'WHERE id = %d' ) ) {
+                                $member_id = (int) ( $args[0] ?? 0 );
 
                                 if ( isset( $this->members[ $member_id ] ) ) {
                                         $member = $this->members[ $member_id ];
@@ -234,45 +234,46 @@ if ( ! class_exists( 'wpdb', false ) ) {
                         $sql  = $this->last_prepare['query'];
                         $args = $this->last_prepare['args'];
 
-                        if ( str_contains( $sql, 'ORDER BY collected_at DESC' ) ) {
-                                $table     = (string) ( $args[0] ?? '' );
-                                $reference = (string) ( $args[1] ?? '' );
+                        if ( str_contains( $sql, 'ORDER BY collected_at DESC' ) && str_contains( $sql, 'fbm_attendance' ) ) {
+                                $reference = (string) ( $args[0] ?? '' );
 
-                                if ( str_contains( $table, 'fbm_attendance' ) ) {
-                                        $latest = null;
+                                $latest = null;
 
-                                        foreach ( $this->attendance as $record ) {
-                                                if ( $record['member_reference'] !== $reference ) {
-                                                        continue;
-                                                }
-
-                                                if ( null === $latest || $record['collected_at'] > $latest ) {
-                                                        $latest = $record['collected_at'];
-                                                }
+                                foreach ( $this->attendance as $record ) {
+                                        if ( $record['member_reference'] !== $reference ) {
+                                                continue;
                                         }
 
-                                        return $latest;
+                                        if ( null === $latest || $record['collected_at'] > $latest ) {
+                                                $latest = $record['collected_at'];
+                                        }
                                 }
+
+                                return $latest;
                         }
 
-                        if ( str_contains( $sql, 'member_reference = %s' ) ) {
-                                $table     = (string) ( $args[0] ?? '' );
-                                $reference = (string) ( $args[1] ?? '' );
+                        if (
+                                str_contains( $sql, 'fbm_attendance' )
+                                && str_contains( $sql, 'member_reference = %s' )
+                                && str_contains( $sql, 'collected_date = %s' )
+                        ) {
+                                $reference = (string) ( $args[0] ?? '' );
+                                $date      = (string) ( $args[1] ?? '' );
 
-                                if ( str_contains( $table, 'fbm_attendance' ) ) {
-                                        $date = (string) ( $args[2] ?? '' );
-
-                                        foreach ( $this->attendance as $record ) {
-                                                if (
-                                                        $record['member_reference'] === $reference
-                                                        && $record['collected_date'] === $date
-                                                ) {
-                                                        return $record['id'];
-                                                }
+                                foreach ( $this->attendance as $record ) {
+                                        if (
+                                                $record['member_reference'] === $reference
+                                                && $record['collected_date'] === $date
+                                        ) {
+                                                return $record['id'];
                                         }
-
-                                        return null;
                                 }
+
+                                return null;
+                        }
+
+                        if ( str_contains( $sql, 'fbm_members' ) && str_contains( $sql, 'member_reference = %s' ) ) {
+                                $reference = (string) ( $args[0] ?? '' );
 
                                 foreach ( $this->members as $member ) {
                                         if ( $member['member_reference'] === $reference ) {

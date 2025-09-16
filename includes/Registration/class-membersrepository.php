@@ -58,11 +58,11 @@ final class MembersRepository {
 				 * @return array{id:int,status:string,member_reference:string}|null
 				 */
 	public function find_by_email( string $email ): ?array {
-					$sql = $this->wpdb->prepare(
-						'SELECT id, status, member_reference FROM %i WHERE email = %s LIMIT 1',
-						$this->table,
-						$email
-					);
+		$sql = $this->wpdb->prepare(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is trusted.
+			"SELECT id, status, member_reference FROM `{$this->table}` WHERE email = %s LIMIT 1",
+			$email
+		);
 
 		if ( ! is_string( $sql ) ) {
 				return null;
@@ -93,11 +93,11 @@ final class MembersRepository {
 				 * @return array{id:int,status:string,member_reference:string}|null
 				 */
 	public function find_by_reference( string $reference ): ?array {
-			$sql = $this->wpdb->prepare(
-				'SELECT id, status, member_reference FROM %i WHERE member_reference = %s LIMIT 1',
-				$this->table,
-				$reference
-			);
+		$sql = $this->wpdb->prepare(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is trusted.
+			"SELECT id, status, member_reference FROM `{$this->table}` WHERE member_reference = %s LIMIT 1",
+			$reference
+		);
 
 		if ( ! is_string( $sql ) ) {
 			return null;
@@ -126,11 +126,11 @@ final class MembersRepository {
 		 * @param string $reference Candidate member reference.
 		 */
 	public function reference_exists( string $reference ): bool {
-			$sql = $this->wpdb->prepare(
-				'SELECT id FROM %i WHERE member_reference = %s LIMIT 1',
-				$this->table,
-				$reference
-			);
+		$sql = $this->wpdb->prepare(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is trusted.
+			"SELECT id FROM `{$this->table}` WHERE member_reference = %s LIMIT 1",
+			$reference
+		);
 
 		if ( ! is_string( $sql ) ) {
 				return false;
@@ -222,8 +222,8 @@ final class MembersRepository {
 	 */
 	public function all(): array {
 		$sql = $this->wpdb->prepare(
-			'SELECT id, member_reference, first_name, last_initial, email, status, activated_at FROM %i ORDER BY activated_at DESC, first_name ASC',
-			$this->table
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is trusted.
+			"SELECT id, member_reference, first_name, last_initial, email, status, activated_at FROM `{$this->table}` ORDER BY activated_at DESC, first_name ASC"
 		);
 
 		if ( ! is_string( $sql ) ) {
@@ -271,8 +271,8 @@ final class MembersRepository {
 	 */
 	public function find( int $member_id ): ?array {
 		$sql = $this->wpdb->prepare(
-			'SELECT id, status, member_reference, first_name, email FROM %i WHERE id = %d LIMIT 1',
-			$this->table,
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is trusted.
+			"SELECT id, status, member_reference, first_name, email FROM `{$this->table}` WHERE id = %d LIMIT 1",
 			$member_id
 		);
 
