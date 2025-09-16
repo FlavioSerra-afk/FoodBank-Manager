@@ -3,6 +3,7 @@
   <testsuites>
     <testsuite name="Unit">
       <directory suffix="Test.php">tests/Unit</directory>
+      <file>tests/Token/class-tokenservicetest.php</file>
     </testsuite>
   </testsuites>
   <coverage>
