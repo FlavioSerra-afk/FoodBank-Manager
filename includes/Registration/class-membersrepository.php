@@ -85,6 +85,41 @@ final class MembersRepository {
 					);
 	}
 
+				/**
+				 * Locate a member record by canonical reference string.
+				 *
+				 * @param string $reference Canonical member reference.
+				 *
+				 * @return array{id:int,status:string,member_reference:string}|null
+				 */
+	public function find_by_reference( string $reference ): ?array {
+			$sql = $this->wpdb->prepare(
+				'SELECT id, status, member_reference FROM %i WHERE member_reference = %s LIMIT 1',
+				$this->table,
+				$reference
+			);
+
+		if ( ! is_string( $sql ) ) {
+			return null;
+		}
+
+			/**
+			 * Result row data.
+			 *
+			 * @var array{id:numeric,status:string,member_reference:string}|null $row
+			 */
+			$row = $this->wpdb->get_row( $sql, ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Prepared above.
+		if ( ! is_array( $row ) ) {
+			return null;
+		}
+
+		return array(
+			'id'               => (int) $row['id'],
+			'status'           => (string) $row['status'],
+			'member_reference' => (string) $row['member_reference'],
+		);
+	}
+
 		/**
 		 * Determine whether a member reference already exists.
 		 *
