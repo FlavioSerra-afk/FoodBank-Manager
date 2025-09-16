@@ -31,6 +31,16 @@ Network administrators receive `fbm_manage_jobs` on activation; a migration flag
 * **Cron runs**: Diagnostics → Cron Health lists plugin cron hooks with last and next run times.
 * See [Docs/API.md](Docs/API.md) for the error contract and [Docs/Diagnostics.md](Docs/Diagnostics.md) for rate-limit and multisite notes.
 
+== Uninstall ==
+By default uninstall leaves FoodBank Manager database tables in place so the plugin can be reinstalled without data loss.
+Administrators who need a destructive uninstall can opt in by defining `FBM_ALLOW_DESTRUCTIVE_UNINSTALL` in `wp-config.php`:
+
+```
+define( 'FBM_ALLOW_DESTRUCTIVE_UNINSTALL', true );
+```
+
+Alternatively, return `true` from the `fbm_allow_destructive_uninstall` filter prior to deactivating the plugin.
+
 == Upgrade Notice ==
 = 1.5.0 =
 First stable cut with readme polish and release checksums.
