@@ -11,88 +11,230 @@ if ( ! class_exists( 'wpdb', false ) ) {
 	/**
 	 * Minimal wpdb stand-in for unit tests.
 	 */
-	class wpdb {
-		/**
-		 * WordPress table prefix.
-		 *
-		 * @var string
-		 */
-		public string $prefix = 'wp_';
+        class wpdb {
+                /**
+                 * WordPress table prefix.
+                 *
+                 * @var string
+                 */
+                public string $prefix = 'wp_';
 
-		/**
-		 * Captured token rows keyed by member ID.
-		 *
-		 * @var array<int,array{member_id:int,token_hash:string,issued_at:string,revoked_at:?string}>
-		 */
-		public array $tokens = array();
+                /**
+                 * Captured token rows keyed by member ID.
+                 *
+                 * @var array<int,array{member_id:int,token_hash:string,issued_at:string,revoked_at:?string}>
+                 */
+                public array $tokens = array();
 
-		/**
-		 * Arguments from the most recent prepare() call.
-		 *
-		 * @var array<int|string,mixed>|null
-		 */
-		private ?array $last_prepare_args = null;
+                /**
+                 * Captured member rows keyed by member ID.
+                 *
+                 * @var array<int,array<string,mixed>>
+                 */
+                public array $members = array();
 
-		public function replace( string $table, array $data, array $format ) {
-			unset( $format );
-			unset( $table );
+                /**
+                 * Last auto-increment identifier.
+                 *
+                 * @var int
+                 */
+                public int $insert_id = 0;
 
-			$member_id                  = (int) $data['member_id'];
-			$this->tokens[ $member_id ] = array(
-				'member_id'  => $member_id,
-				'token_hash' => (string) $data['token_hash'],
-				'issued_at'  => (string) $data['issued_at'],
-				'revoked_at' => null,
-			);
+                /**
+                 * Arguments and query from the most recent prepare() call.
+                 *
+                 * @var array{query:string,args:array<int|string,mixed>}|null
+                 */
+                private ?array $last_prepare = null;
 
-			return 1;
-		}
+                /**
+                 * Next identifier for inserted members.
+                 *
+                 * @var int
+                 */
+                private int $next_member_id = 1;
 
-		public function prepare( string $query, ...$args ) {
-			$this->last_prepare_args = $args;
+                public function replace( string $table, array $data, array $format ) {
+                        unset( $format );
+                        unset( $table );
 
-			return $query;
-		}
+                        $member_id                  = (int) $data['member_id'];
+                        $this->tokens[ $member_id ] = array(
+                                'member_id'  => $member_id,
+                                'token_hash' => (string) $data['token_hash'],
+                                'issued_at'  => (string) $data['issued_at'],
+                                'revoked_at' => null,
+                        );
 
-		public function get_row( string $query, $output = ARRAY_A ) {
-			unset( $query );
-			unset( $output );
+                        return 1;
+                }
 
-			if ( ! is_array( $this->last_prepare_args ) ) {
-				return null;
-			}
+                public function prepare( string $query, ...$args ) {
+                        $this->last_prepare = array(
+                                'query' => $query,
+                                'args'  => $args,
+                        );
 
-			$hash = (string) ( $this->last_prepare_args[1] ?? '' );
+                        return $query;
+                }
 
-			foreach ( $this->tokens as $record ) {
-				if ( $record['token_hash'] === $hash && null === $record['revoked_at'] ) {
-					return array(
-						'member_id'  => $record['member_id'],
-						'token_hash' => $record['token_hash'],
-					);
-				}
-			}
+                public function insert( string $table, array $data, array $format ) {
+                        unset( $table );
+                        unset( $format );
 
-			return null;
-		}
+                        $member_id           = $this->next_member_id++;
+                        $data['id']          = $member_id;
+                        $this->members[$member_id] = $data;
+                        $this->insert_id     = $member_id;
 
-		public function update( string $table, array $data, array $where, array $format, array $where_format ) {
-			unset( $table );
-			unset( $format );
-			unset( $where_format );
+                        return 1;
+                }
 
-			$member_id = (int) ( $where['member_id'] ?? 0 );
-			if ( ! isset( $this->tokens[ $member_id ] ) ) {
-				return 0;
-			}
+                public function get_row( string $query, $output = ARRAY_A ) {
+                        unset( $query );
+                        unset( $output );
 
-			$this->tokens[ $member_id ]['revoked_at'] = $data['revoked_at'] ?? null;
+                        if ( ! is_array( $this->last_prepare ) ) {
+                                return null;
+                        }
 
-			return 1;
-		}
-	}
+                        $sql  = $this->last_prepare['query'];
+                        $args = $this->last_prepare['args'];
+
+                        if ( str_contains( $sql, 'token_hash = %s' ) ) {
+                                $hash = (string) ( $args[1] ?? '' );
+
+                                foreach ( $this->tokens as $record ) {
+                                        if ( $record['token_hash'] === $hash && null === $record['revoked_at'] ) {
+                                                return array(
+                                                        'member_id'  => $record['member_id'],
+                                                        'token_hash' => $record['token_hash'],
+                                                );
+                                        }
+                                }
+
+                                return null;
+                        }
+
+                        if ( str_contains( $sql, 'WHERE email = %s' ) ) {
+                                $email = (string) ( $args[1] ?? '' );
+
+                                foreach ( $this->members as $member ) {
+                                        if ( $member['email'] === $email ) {
+                                                return array(
+                                                        'id'               => $member['id'],
+                                                        'status'           => $member['status'] ?? 'active',
+                                                        'member_reference' => $member['member_reference'],
+                                                );
+                                        }
+                                }
+
+                                return null;
+                        }
+
+                        if ( str_contains( $sql, 'WHERE id = %d' ) ) {
+                                $member_id = (int) ( $args[1] ?? 0 );
+
+                                if ( isset( $this->members[ $member_id ] ) ) {
+                                        $member = $this->members[ $member_id ];
+
+                                        return array(
+                                                'id'               => $member['id'],
+                                                'member_reference' => $member['member_reference'],
+                                                'first_name'       => $member['first_name'],
+                                                'email'            => $member['email'],
+                                        );
+                                }
+
+                                return null;
+                        }
+
+                        return null;
+                }
+
+                public function get_var( string $query ) {
+                        unset( $query );
+
+                        if ( ! is_array( $this->last_prepare ) ) {
+                                return null;
+                        }
+
+                        $sql  = $this->last_prepare['query'];
+                        $args = $this->last_prepare['args'];
+
+                        if ( str_contains( $sql, 'member_reference = %s' ) ) {
+                                $reference = (string) ( $args[1] ?? '' );
+
+                                foreach ( $this->members as $member ) {
+                                        if ( $member['member_reference'] === $reference ) {
+                                                return $member['id'];
+                                        }
+                                }
+                        }
+
+                        return null;
+                }
+
+                public function update( string $table, array $data, array $where, array $format, array $where_format ) {
+                        unset( $table );
+                        unset( $format );
+                        unset( $where_format );
+
+                        if ( isset( $where['member_id'] ) ) {
+                                $member_id = (int) $where['member_id'];
+
+                                if ( ! isset( $this->tokens[ $member_id ] ) ) {
+                                        return 0;
+                                }
+
+                                $this->tokens[ $member_id ]['revoked_at'] = $data['revoked_at'] ?? null;
+
+                                return 1;
+                        }
+
+                        if ( isset( $where['id'] ) ) {
+                                $member_id = (int) $where['id'];
+
+                                if ( ! isset( $this->members[ $member_id ] ) ) {
+                                        return 0;
+                                }
+
+                                $this->members[ $member_id ] = array_merge( $this->members[ $member_id ], $data );
+
+                                return 1;
+                        }
+
+                        return 0;
+                }
+        }
 }
 
 require_once __DIR__ . '/../includes/Core/class-install.php';
 require_once __DIR__ . '/../includes/Token/class-tokenrepository.php';
 require_once __DIR__ . '/../includes/Token/class-tokenservice.php';
+require_once __DIR__ . '/../includes/Registration/class-membersrepository.php';
+require_once __DIR__ . '/../includes/Registration/class-registrationservice.php';
+require_once __DIR__ . '/../includes/Admin/class-memberspage.php';
+
+if ( ! function_exists( 'do_action' ) ) {
+        function do_action( string $hook, ...$args ): void {
+                unset( $hook );
+                unset( $args );
+        }
+}
+
+if ( ! function_exists( '__' ) ) {
+        function __( string $text, string $domain = '' ): string {
+                unset( $domain );
+
+                return $text;
+        }
+}
+
+if ( ! function_exists( 'esc_html__' ) ) {
+        function esc_html__( string $text, string $domain = '' ): string {
+                unset( $domain );
+
+                return $text;
+        }
+}
