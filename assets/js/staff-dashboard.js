@@ -53,7 +53,7 @@
                 updateStatus(status, strings.loading);
 
                 var payload = {
-                    reference: reference,
+                    manual_code: reference,
                     method: action.dataset.fbmCheckin || 'manual'
                 };
 
