@@ -8,7 +8,7 @@
 | Feature | Admin | Manager | Staff | Public | Mobile | A11y | Security | PHPCS | PHPStan | Unit | Integration | E2E | Docs | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Forms (shortcode) | 🟨 | 🟨 | 🟨 | ✅ | [ ] | [ ] | [ ] | ⚠️ | ⚠️ | ⚠️ | [ ] | [ ] | [ ] | [Tasks](Tasks.md) |
-| Emails (log/resend) | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | ⚠️ | ⚠️ | ⚠️ | [ ] | [ ] | [ ] | [Task](Tasks.md#permanent-qr-issuance-in-applicant-email-revoke-regenerate-admin-tool) |
+| Emails (log/resend) | 🟨 | 🟨 | 🟨 | 🟨 | 🟨 | 🟨 | 🟨 | ⚠️ | ⚠️ | ⚠️ | 🟨 | 🟨 | 🟨 | [Task](Tasks.md#permanent-qr-issuance-in-applicant-email-revoke-regenerate-admin-tool) |
 | Front-end Dashboard (auth) | 🟨 | 🟨 | 🟨 | [ ] | [ ] | [ ] | 🟨 | ⚠️ | ⚠️ | ⚠️ | [ ] | [ ] | [ ] | [Task](Tasks.md#public-dashboard-removal--guards) |
 | Attendance Scan | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | 🟨 | ⚠️ | ⚠️ | ⚠️ | [ ] | [ ] | [ ] | [Events](Tasks.md#replace-remove-events-references-in-code--db-migrator), [Policy](Tasks.md#rest--ui-updates-for-fixed-window-policy) |
 | Attendance Manual | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | 🟨 | ⚠️ | ⚠️ | ⚠️ | [ ] | [ ] | [ ] | [Events](Tasks.md#replace-remove-events-references-in-code--db-migrator), [Policy](Tasks.md#rest--ui-updates-for-fixed-window-policy) |
@@ -32,7 +32,7 @@ U1 — Foundations
 
 ⬜ Uninstall (cleanup + destructive)
 
-⬜ Token service (issue/verify/revoke)
+🟨 Token service (issue/verify/revoke)
 
 ⬜ Weekly window config (Thu 11:00–14:30)
 
