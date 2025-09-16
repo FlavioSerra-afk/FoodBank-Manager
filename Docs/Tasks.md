@@ -5,6 +5,9 @@
 
 # Tasks
 
+- [2025-09-17] P9 done — tests green + CI pass + package (v2.2.22)
+  - Version recorded: 2.2.22; CI: composer phpstan ✅, composer lint ✅ (0 errors), composer test -v ✅, composer i18n:build ✅, bash bin/package.sh ✅ (foodbank-manager/)
+  - Highlights: Token, registration, and check-in suites restored; matrix + docs updated for policy, security, and i18n coverage.
 - [2025-09-17] P8 done — PHPCS zero (v2.2.21)
   - Version recorded: 2.2.21; Milestone: P8
 - [2025-09-17] P6 done — 1/7 policy + override (v2.2.20)

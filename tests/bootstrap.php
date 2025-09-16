@@ -114,6 +114,10 @@ if ( ! class_exists( 'wpdb', false ) ) {
                         return $query;
                 }
 
+                public function get_last_prepare(): ?array {
+                        return $this->last_prepare;
+                }
+
                 public function insert( string $table, array $data, array $format ) {
                         unset( $format );
 
@@ -469,6 +473,22 @@ if ( ! function_exists( 'sanitize_textarea_field' ) ) {
         }
 }
 
+if ( ! function_exists( 'sanitize_email' ) ) {
+        function sanitize_email( $value ): string {
+                $value = (string) $value;
+
+                return filter_var( $value, FILTER_SANITIZE_EMAIL ) ?: '';
+        }
+}
+
+if ( ! function_exists( 'is_email' ) ) {
+        function is_email( $value ): bool {
+                $value = (string) $value;
+
+                return false !== filter_var( $value, FILTER_VALIDATE_EMAIL );
+        }
+}
+
 if ( ! function_exists( 'get_current_user_id' ) ) {
         function get_current_user_id(): int {
                 return 1;
@@ -482,6 +502,9 @@ require_once __DIR__ . '/../includes/Token/class-tokenrepository.php';
 require_once __DIR__ . '/../includes/Token/class-tokenservice.php';
 require_once __DIR__ . '/../includes/Registration/class-membersrepository.php';
 require_once __DIR__ . '/../includes/Registration/class-registrationservice.php';
+require_once __DIR__ . '/../includes/Email/class-welcomemailer.php';
+require_once __DIR__ . '/../includes/Shortcodes/class-registrationform.php';
+require_once __DIR__ . '/../includes/Rest/class-checkincontroller.php';
 require_once __DIR__ . '/../includes/Admin/class-memberspage.php';
 
 if ( ! function_exists( 'do_action' ) ) {
@@ -504,5 +527,39 @@ if ( ! function_exists( 'esc_html__' ) ) {
                 unset( $domain );
 
                 return $text;
+        }
+}
+
+if ( ! function_exists( 'wp_nonce_field' ) ) {
+        function wp_nonce_field( string $action, string $name, bool $referer = true, bool $echo = true ): string {
+                unset( $referer );
+                unset( $echo );
+
+                return '<input type="hidden" name="' . $name . '" value="' . $action . '-nonce" />';
+        }
+}
+
+if ( ! function_exists( 'wp_verify_nonce' ) ) {
+        function wp_verify_nonce( $nonce, string $action ): bool {
+                $nonces = $GLOBALS['fbm_test_nonces'] ?? array();
+
+                return isset( $nonces[ $action ] ) && $nonces[ $action ] === $nonce;
+        }
+}
+
+if ( ! function_exists( 'wp_mail' ) ) {
+        function wp_mail( string $to, string $subject, string $message, $headers = array() ): bool {
+                if ( ! isset( $GLOBALS['fbm_mail_log'] ) || ! is_array( $GLOBALS['fbm_mail_log'] ) ) {
+                        $GLOBALS['fbm_mail_log'] = array();
+                }
+
+                $GLOBALS['fbm_mail_log'][] = array(
+                        'to'      => $to,
+                        'subject' => $subject,
+                        'message' => $message,
+                        'headers' => $headers,
+                );
+
+                return true;
         }
 }
