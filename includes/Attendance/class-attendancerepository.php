@@ -59,12 +59,12 @@ final class AttendanceRepository {
 	 * @param DateTimeImmutable $date             Date to check (UTC).
 	 */
 	public function has_checked_in_for_date( string $member_reference, DateTimeImmutable $date ): bool {
-				$sql = $this->wpdb->prepare(
-					'SELECT id FROM %i WHERE member_reference = %s AND collected_date = %s LIMIT 1',
-					$this->table,
-					$member_reference,
-					$date->format( 'Y-m-d' )
-				);
+		$sql = $this->wpdb->prepare(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is trusted.
+			"SELECT id FROM `{$this->table}` WHERE member_reference = %s AND collected_date = %s LIMIT 1",
+			$member_reference,
+			$date->format( 'Y-m-d' )
+		);
 		if ( ! is_string( $sql ) ) {
 				return false;
 		}
@@ -93,7 +93,7 @@ final class AttendanceRepository {
                         'note'             => $note,
                         'recorded_by'      => $user_id,
                         'created_at'       => gmdate( 'Y-m-d H:i:s' ),
-                );
+		);
 
                 $formats = array(
                         '%s',
@@ -103,7 +103,7 @@ final class AttendanceRepository {
                         '%s',
                         '%d',
                         '%s',
-                );
+		);
 
                 $result = $this->wpdb->insert( $this->table, $data, $formats );
 
@@ -133,7 +133,7 @@ final class AttendanceRepository {
                         'override_note'    => $note,
                         'override_at'      => $recorded_at->format( 'Y-m-d H:i:s' ),
                         'created_at'       => gmdate( 'Y-m-d H:i:s' ),
-                );
+		);
 
                 $formats = array(
                         '%d',
@@ -142,7 +142,7 @@ final class AttendanceRepository {
                         '%s',
                         '%s',
                         '%s',
-                );
+		);
 
                 $result = $this->wpdb->insert( $this->override_table, $data, $formats );
 
@@ -167,11 +167,11 @@ final class AttendanceRepository {
          * @return DateTimeImmutable|null Most recent timestamp in UTC, or null when unavailable.
          */
         public function latest_for_member( string $member_reference ): ?DateTimeImmutable {
-			$sql = $this->wpdb->prepare(
-				'SELECT collected_at FROM %i WHERE member_reference = %s ORDER BY collected_at DESC LIMIT 1',
-				$this->table,
-				$member_reference
-			);
+		$sql = $this->wpdb->prepare(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is trusted.
+			"SELECT collected_at FROM `{$this->table}` WHERE member_reference = %s ORDER BY collected_at DESC LIMIT 1",
+			$member_reference
+		);
 
 		if ( ! is_string( $sql ) ) {
 				return null;

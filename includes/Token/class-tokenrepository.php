@@ -77,11 +77,11 @@ final class TokenRepository {
 		 * @return array{member_id:int,token_hash:string,version:string}|null
 		 */
 	public function find_active_by_hash( string $token_hash ): ?array {
-			$sql = $this->wpdb->prepare(
-				'SELECT member_id, token_hash, version FROM %i WHERE token_hash = %s AND revoked_at IS NULL LIMIT 1',
-				$this->table,
-				$token_hash
-			);
+		$sql = $this->wpdb->prepare(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is trusted.
+			"SELECT member_id, token_hash, version FROM `{$this->table}` WHERE token_hash = %s AND revoked_at IS NULL LIMIT 1",
+			$token_hash
+		);
 
 		if ( ! is_string( $sql ) ) {
 				return null;
