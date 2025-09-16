@@ -167,16 +167,100 @@ final class MembersRepository {
 		 * @param int $id Member row ID.
 		 */
 	public function mark_active( int $id ): bool {
-			$now   = gmdate( 'Y-m-d H:i:s' );
-			$data  = array(
-				'status'       => self::STATUS_ACTIVE,
-				'updated_at'   => $now,
-				'activated_at' => $now,
+					$now   = gmdate( 'Y-m-d H:i:s' );
+					$data  = array(
+						'status'       => self::STATUS_ACTIVE,
+						'updated_at'   => $now,
+						'activated_at' => $now,
+					);
+					$where = array( 'id' => $id );
+
+					$result = $this->wpdb->update( $this->table, $data, $where, array( '%s', '%s', '%s' ), array( '%d' ) );
+
+					return false !== $result;
+	}
+
+	/**
+	 * Retrieve all member records for administrative display.
+	 *
+	 * @return array<int, array{id:int,member_reference:string,first_name:string,last_initial:string,email:string,status:string,activated_at:?string}>
+	 */
+	public function all(): array {
+		$sql = $this->wpdb->prepare(
+			'SELECT id, member_reference, first_name, last_initial, email, status, activated_at FROM %i ORDER BY activated_at DESC, first_name ASC',
+			$this->table
+		);
+
+		if ( ! is_string( $sql ) ) {
+			return array();
+		}
+
+		/**
+		 * Raw member rows.
+		 *
+		 * @var array<int, array<string, mixed>>|null $rows
+		 */
+		$rows = $this->wpdb->get_results( $sql, ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Prepared above.
+
+		if ( ! is_array( $rows ) ) {
+			return array();
+		}
+
+		$members = array();
+
+		foreach ( $rows as $row ) {
+			if ( ! is_array( $row ) ) {
+				continue;
+			}
+
+			$members[] = array(
+				'id'               => (int) $row['id'],
+				'member_reference' => (string) $row['member_reference'],
+				'first_name'       => (string) $row['first_name'],
+				'last_initial'     => (string) $row['last_initial'],
+				'email'            => (string) $row['email'],
+				'status'           => (string) $row['status'],
+				'activated_at'     => isset( $row['activated_at'] ) && '' !== $row['activated_at'] ? (string) $row['activated_at'] : null,
 			);
-			$where = array( 'id' => $id );
+		}
 
-			$result = $this->wpdb->update( $this->table, $data, $where, array( '%s', '%s', '%s' ), array( '%d' ) );
+		return $members;
+	}
 
-			return false !== $result;
+	/**
+	 * Locate a member record by identifier.
+	 *
+	 * @param int $member_id Member identifier.
+	 *
+	 * @return array{id:int,member_reference:string,first_name:string,email:string}|null
+	 */
+	public function find( int $member_id ): ?array {
+		$sql = $this->wpdb->prepare(
+			'SELECT id, member_reference, first_name, email FROM %i WHERE id = %d LIMIT 1',
+			$this->table,
+			$member_id
+		);
+
+		if ( ! is_string( $sql ) ) {
+			return null;
+		}
+
+		/**
+		 * Result row data.
+		 *
+		 * @var array{id:numeric,member_reference:string,first_name:string,email:string}|null $row
+		 */
+		$row = $this->wpdb->get_row( $sql, ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Prepared above.
+
+		if ( ! is_array( $row ) ) {
+			return null;
+		}
+
+		return array(
+			'id'               => (int) $row['id'],
+			'member_reference' => (string) $row['member_reference'],
+			'first_name'       => (string) $row['first_name'],
+			'email'            => (string) $row['email'],
+		);
 	}
 }
