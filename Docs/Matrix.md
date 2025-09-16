@@ -10,6 +10,7 @@
 | Forms (shortcode) | 🟨 | 🟨 | 🟨 | ✅ | [ ] | [ ] | [ ] | ⚠️ | ⚠️ | ⚠️ | [ ] | [ ] | [ ] | [Tasks](Tasks.md) |
 | Emails (log/resend) | 🟨 | 🟨 | 🟨 | 🟨 | 🟨 | 🟨 | 🟨 | ⚠️ | ⚠️ | ⚠️ | 🟨 | 🟨 | 🟨 | [Task](Tasks.md#permanent-qr-issuance-in-applicant-email-revoke-regenerate-admin-tool) |
 | Front-end Dashboard (auth) | 🟨 | 🟨 | 🟨 | [ ] | [ ] | [ ] | 🟨 | ⚠️ | ⚠️ | ⚠️ | [ ] | [ ] | [ ] | [Task](Tasks.md#public-dashboard-removal--guards) |
+| Staff Check-in | 🟨 | 🟨 | 🟨 | [ ] | [ ] | [ ] | 🟨 | ⚠️ | ⚠️ | ⚠️ | [ ] | [ ] | [ ] | [Task](Tasks.md#u3--staff-front-end-dashboard) |
 | Attendance Scan | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | 🟨 | ⚠️ | ⚠️ | ⚠️ | [ ] | [ ] | [ ] | [Events](Tasks.md#replace-remove-events-references-in-code--db-migrator), [Policy](Tasks.md#rest--ui-updates-for-fixed-window-policy) |
 | Attendance Manual | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | 🟨 | ⚠️ | ⚠️ | ⚠️ | [ ] | [ ] | [ ] | [Events](Tasks.md#replace-remove-events-references-in-code--db-migrator), [Policy](Tasks.md#rest--ui-updates-for-fixed-window-policy) |
 | Exports CSV/XLSX/PDF | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | ⚠️ | ⚠️ | ⚠️ | [ ] | [ ] | [ ] | [Tasks](Tasks.md) |
