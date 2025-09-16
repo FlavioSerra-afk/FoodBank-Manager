@@ -64,4 +64,51 @@ final class CheckinServiceTest extends TestCase {
                 $this->assertSame( 'FBM456', $result['member_ref'] );
                 $this->assertNull( $result['time'] );
         }
+
+        public function test_record_returns_warning_when_previous_collection_within_week(): void {
+                $repository = new AttendanceRepository( new \wpdb() );
+
+                CheckinService::set_current_time_override(
+                        new DateTimeImmutable( '2023-08-17 12:15:00', new DateTimeZone( 'Europe/London' ) )
+                );
+
+                $service = new CheckinService( $repository );
+
+                $initial = $service->record( 'FBM789', 'qr', 3 );
+
+                $this->assertSame( CheckinService::STATUS_SUCCESS, $initial['status'] );
+
+                CheckinService::set_current_time_override(
+                        new DateTimeImmutable( '2023-08-24 12:14:00', new DateTimeZone( 'Europe/London' ) )
+                );
+
+                $warning = $service->record( 'FBM789', 'qr', 3 );
+
+                $this->assertSame( CheckinService::STATUS_RECENT_WARNING, $warning['status'] );
+                $this->assertSame(
+                        'Collection recorded, but member collected less than a week ago.',
+                        $warning['message']
+                );
+        }
+
+        public function test_record_allows_override_to_bypass_recent_warning(): void {
+                $repository = new AttendanceRepository( new \wpdb() );
+
+                CheckinService::set_current_time_override(
+                        new DateTimeImmutable( '2023-08-17 12:15:00', new DateTimeZone( 'Europe/London' ) )
+                );
+
+                $service = new CheckinService( $repository );
+
+                $service->record( 'FBM880', 'manual', 4 );
+
+                CheckinService::set_current_time_override(
+                        new DateTimeImmutable( '2023-08-24 12:14:00', new DateTimeZone( 'Europe/London' ) )
+                );
+
+                $result = $service->record( 'FBM880', 'manual', 4, 'override reason' );
+
+                $this->assertSame( CheckinService::STATUS_SUCCESS, $result['status'] );
+                $this->assertSame( 'Collection recorded.', $result['message'] );
+        }
 }

@@ -20,10 +20,13 @@ use function strtolower;
  */
 final class CheckinService {
 
-	public const STATUS_SUCCESS       = 'success';
-	public const STATUS_DUPLICATE_DAY = 'duplicate_day';
-	public const STATUS_ERROR         = 'error';
-	public const STATUS_OUT_OF_WINDOW = 'out_of_window';
+	public const STATUS_SUCCESS        = 'success';
+	public const STATUS_DUPLICATE_DAY  = 'duplicate_day';
+	public const STATUS_ERROR          = 'error';
+	public const STATUS_OUT_OF_WINDOW  = 'out_of_window';
+	public const STATUS_RECENT_WARNING = 'recent_warning';
+
+	private const WEEK_IN_SECONDS = 604800;
 
 	/**
 	 * Optional override for the current time, primarily used by tests.
@@ -78,33 +81,48 @@ final class CheckinService {
 			);
 		}
 
-		$normalized_method = $this->normalize_method( $method );
+				$normalized_method = $this->normalize_method( $method );
 
 		if ( $this->repository->has_checked_in_for_date( $member_reference, $now_utc ) ) {
-			return array(
-				'status'     => self::STATUS_DUPLICATE_DAY,
-				'message'    => esc_html__( 'Member already collected today.', 'foodbank-manager' ),
-				'member_ref' => $member_reference,
-				'time'       => $now_utc->format( DATE_ATOM ),
-			);
+				return array(
+					'status'     => self::STATUS_DUPLICATE_DAY,
+					'message'    => esc_html__( 'Member already collected today.', 'foodbank-manager' ),
+					'member_ref' => $member_reference,
+					'time'       => $now_utc->format( DATE_ATOM ),
+				);
 		}
 
-		$recorded = $this->repository->record( $member_reference, $normalized_method, $user_id, $now_utc, $note );
+				$previous_collection = $this->repository->latest_for_member( $member_reference );
+
+				$recorded = $this->repository->record( $member_reference, $normalized_method, $user_id, $now_utc, $note );
 		if ( ! $recorded ) {
-			return array(
-				'status'     => self::STATUS_ERROR,
-				'message'    => esc_html__( 'Unable to record collection. Please try again.', 'foodbank-manager' ),
-				'member_ref' => $member_reference,
-				'time'       => null,
-			);
+				return array(
+					'status'     => self::STATUS_ERROR,
+					'message'    => esc_html__( 'Unable to record collection. Please try again.', 'foodbank-manager' ),
+					'member_ref' => $member_reference,
+					'time'       => null,
+				);
 		}
 
-		return array(
-			'status'     => self::STATUS_SUCCESS,
-			'message'    => esc_html__( 'Collection recorded.', 'foodbank-manager' ),
-			'member_ref' => $member_reference,
-			'time'       => $now_utc->format( DATE_ATOM ),
-		);
+				$status  = self::STATUS_SUCCESS;
+				$message = esc_html__( 'Collection recorded.', 'foodbank-manager' );
+
+		if ( $previous_collection instanceof DateTimeImmutable ) {
+				$seconds_since_last = $now_utc->getTimestamp() - $previous_collection->getTimestamp();
+				$has_override       = is_string( $note ) && '' !== $note;
+
+			if ( $seconds_since_last >= 0 && $seconds_since_last < self::WEEK_IN_SECONDS && ! $has_override ) {
+						$status  = self::STATUS_RECENT_WARNING;
+						$message = esc_html__( 'Collection recorded, but member collected less than a week ago.', 'foodbank-manager' );
+			}
+		}
+
+				return array(
+					'status'     => $status,
+					'message'    => $message,
+					'member_ref' => $member_reference,
+					'time'       => $now_utc->format( DATE_ATOM ),
+				);
 	}
 
 	/**

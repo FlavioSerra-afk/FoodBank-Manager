@@ -10,6 +10,8 @@ declare(strict_types=1);
 namespace FoodBankManager\Attendance;
 
 use DateTimeImmutable;
+use DateTimeZone;
+use Exception;
 use FoodBankManager\Core\Install;
 use wpdb;
 use function gmdate;
@@ -75,28 +77,60 @@ final class AttendanceRepository {
 	 * @param string|null       $note             Optional note.
 	 */
 	public function record( string $member_reference, string $method, ?int $user_id, DateTimeImmutable $recorded_at, ?string $note = null ): bool {
-		$data = array(
-			'member_reference' => $member_reference,
-			'collected_at'     => $recorded_at->format( 'Y-m-d H:i:s' ),
-			'collected_date'   => $recorded_at->format( 'Y-m-d' ),
-			'method'           => $method,
-			'note'             => $note,
-			'recorded_by'      => $user_id,
-			'created_at'       => gmdate( 'Y-m-d H:i:s' ),
-		);
+			$data = array(
+				'member_reference' => $member_reference,
+				'collected_at'     => $recorded_at->format( 'Y-m-d H:i:s' ),
+				'collected_date'   => $recorded_at->format( 'Y-m-d' ),
+				'method'           => $method,
+				'note'             => $note,
+				'recorded_by'      => $user_id,
+				'created_at'       => gmdate( 'Y-m-d H:i:s' ),
+			);
 
-		$formats = array(
-			'%s',
-			'%s',
-			'%s',
-			'%s',
-			'%s',
-			'%d',
-			'%s',
-		);
+			$formats = array(
+				'%s',
+				'%s',
+				'%s',
+				'%s',
+				'%s',
+				'%d',
+				'%s',
+			);
 
-		$result = $this->wpdb->insert( $this->table, $data, $formats );
+			$result = $this->wpdb->insert( $this->table, $data, $formats );
 
-		return false !== $result;
+			return false !== $result;
+	}
+
+		/**
+		 * Retrieve the most recent collection timestamp for a member.
+		 *
+		 * @param string $member_reference Canonical member reference.
+		 *
+		 * @return DateTimeImmutable|null Most recent timestamp in UTC, or null when unavailable.
+		 */
+	public function latest_for_member( string $member_reference ): ?DateTimeImmutable {
+			$sql = $this->wpdb->prepare(
+				'SELECT collected_at FROM %i WHERE member_reference = %s ORDER BY collected_at DESC LIMIT 1',
+				$this->table,
+				$member_reference
+			);
+
+		if ( ! is_string( $sql ) ) {
+				return null;
+		}
+
+			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $sql prepared above via $wpdb->prepare().
+			$value = $this->wpdb->get_var( $sql );
+
+		if ( ! is_string( $value ) || '' === $value ) {
+				return null;
+		}
+
+		try {
+				return new DateTimeImmutable( $value, new DateTimeZone( 'UTC' ) );
+		} catch ( Exception ) {
+				return null;
+		}
 	}
 }

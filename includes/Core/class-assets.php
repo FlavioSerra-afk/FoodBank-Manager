@@ -120,12 +120,13 @@ final class Assets {
 			'restUrl' => esc_url_raw( rest_url( 'fbm/v1/checkin' ) ),
 			'nonce'   => wp_create_nonce( 'wp_rest' ),
 			'strings' => array(
-				'ready'         => esc_html__( 'Ready for the next collection.', 'foodbank-manager' ),
-				'loading'       => esc_html__( 'Recording collection…', 'foodbank-manager' ),
-				'success'       => esc_html__( 'Collection recorded.', 'foodbank-manager' ),
-				'duplicate_day' => esc_html__( 'Member already collected today.', 'foodbank-manager' ),
-				'out_of_window' => esc_html__( 'Collections are only available on Thursdays between 11:00 and 14:30.', 'foodbank-manager' ),
-				'error'         => esc_html__( 'Unable to record collection. Please try again.', 'foodbank-manager' ),
+				'ready'          => esc_html__( 'Ready for the next collection.', 'foodbank-manager' ),
+				'loading'        => esc_html__( 'Recording collection…', 'foodbank-manager' ),
+				'success'        => esc_html__( 'Collection recorded.', 'foodbank-manager' ),
+				'recent_warning' => esc_html__( 'Collection recorded, but member collected less than a week ago.', 'foodbank-manager' ),
+				'duplicate_day'  => esc_html__( 'Member already collected today.', 'foodbank-manager' ),
+				'out_of_window'  => esc_html__( 'Collections are only available on Thursdays between 11:00 and 14:30.', 'foodbank-manager' ),
+				'error'          => esc_html__( 'Unable to record collection. Please try again.', 'foodbank-manager' ),
 			),
 		);
 
