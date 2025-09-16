@@ -22,7 +22,7 @@ if ( ! class_exists( 'wpdb', false ) ) {
                 /**
                  * Captured token rows keyed by member ID.
                  *
-                 * @var array<int,array{member_id:int,token_hash:string,issued_at:string,revoked_at:?string}>
+                 * @var array<int,array{member_id:int,token_hash:string,issued_at:string,version:string,revoked_at:?string}>
                  */
                 public array $tokens = array();
 
@@ -63,6 +63,7 @@ if ( ! class_exists( 'wpdb', false ) ) {
                                 'member_id'  => $member_id,
                                 'token_hash' => (string) $data['token_hash'],
                                 'issued_at'  => (string) $data['issued_at'],
+                                'version'    => (string) ( $data['version'] ?? 'v1' ),
                                 'revoked_at' => null,
                         );
 
@@ -109,6 +110,7 @@ if ( ! class_exists( 'wpdb', false ) ) {
                                                 return array(
                                                         'member_id'  => $record['member_id'],
                                                         'token_hash' => $record['token_hash'],
+                                                        'version'    => $record['version'] ?? 'v1',
                                                 );
                                         }
                                 }

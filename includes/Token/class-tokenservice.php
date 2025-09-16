@@ -82,7 +82,7 @@ final class TokenService {
 
 			$hash = $this->hash_for_storage( $token );
 
-		if ( ! $this->repository->persist_active( $member_id, $hash, $issued_at ) ) {
+		if ( ! $this->repository->persist_active( $member_id, $hash, $issued_at, self::TOKEN_VERSION ) ) {
 				throw new RuntimeException( 'Unable to persist member token.' );
 		}
 
@@ -103,19 +103,31 @@ final class TokenService {
 		}
 
 			list($version, $payload, $signature) = $parts;
-		if ( self::TOKEN_VERSION !== $version || '' === $payload || '' === $signature ) {
+		if ( '' === $version || '' === $payload || '' === $signature ) {
 				return null;
 		}
 
-			$expected_signature = $this->sign_payload( $payload );
+			$expected_signature = $this->sign_payload_for_version( $version, $payload );
+		if ( null === $expected_signature ) {
+				return null;
+		}
+
 		if ( ! hash_equals( $expected_signature, $signature ) ) {
 				return null;
 		}
 
-			$token_hash = $this->hash_for_storage( $raw_token );
-		$record         = $this->repository->find_active_by_hash( $token_hash );
+			$token_hash = $this->hash_for_storage_for_version( $version, $raw_token );
+		if ( null === $token_hash ) {
+				return null;
+		}
+
+		$record = $this->repository->find_active_by_hash( $token_hash );
 
 		if ( null === $record ) {
+			return null;
+		}
+
+		if ( ! hash_equals( $record['version'], $version ) ) {
 			return null;
 		}
 
@@ -125,7 +137,6 @@ final class TokenService {
 
 			return (int) $record['member_id'];
 	}
-
 		/**
 		 * Revoke all active tokens for the provided member.
 		 *
@@ -157,6 +168,21 @@ final class TokenService {
 			return $this->encode_base64url( $signature );
 	}
 
+
+		/**
+		 * Resolve the expected signature for the provided payload version.
+		 *
+		 * @param string $version Token version identifier.
+		 * @param string $payload Encoded payload.
+		 */
+	private function sign_payload_for_version( string $version, string $payload ): ?string {
+		switch ( $version ) {
+			case 'v1':
+				return $this->sign_payload( $payload );
+		}
+
+		return null;
+	}
 		/**
 		 * Hash a token for storage.
 		 *
@@ -166,6 +192,21 @@ final class TokenService {
 			return hash_hmac( 'sha256', $token, $this->storage_key );
 	}
 
+
+		/**
+		 * Hash a token for storage using the scheme associated with its version.
+		 *
+		 * @param string $version Token version identifier.
+		 * @param string $token   Raw token.
+		 */
+	private function hash_for_storage_for_version( string $version, string $token ): ?string {
+		switch ( $version ) {
+			case 'v1':
+				return $this->hash_for_storage( $token );
+		}
+
+		return null;
+	}
 		/**
 		 * Resolve a secret key from WordPress salts when available.
 		 *

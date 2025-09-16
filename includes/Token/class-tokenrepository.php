@@ -52,15 +52,17 @@ final class TokenRepository {
 		 * @param int    $member_id Member identifier.
 		 * @param string $token_hash Hashed token value.
 		 * @param string $issued_at  Issue timestamp (UTC).
+		 * @param string $version    Token version identifier.
 		 */
-	public function persist_active( int $member_id, string $token_hash, string $issued_at ): bool {
+	public function persist_active( int $member_id, string $token_hash, string $issued_at, string $version ): bool {
 			$data = array(
 				'member_id'  => $member_id,
 				'token_hash' => $token_hash,
 				'issued_at'  => $issued_at,
+				'version'    => $version,
 			);
 
-			$formats = array( '%d', '%s', '%s' );
+			$formats = array( '%d', '%s', '%s', '%s' );
 
 			$result = $this->wpdb->replace( $this->table, $data, $formats );
 
@@ -72,11 +74,11 @@ final class TokenRepository {
 		 *
 		 * @param string $token_hash Hashed token value.
 		 *
-		 * @return array{member_id:int,token_hash:string}|null
+		 * @return array{member_id:int,token_hash:string,version:string}|null
 		 */
 	public function find_active_by_hash( string $token_hash ): ?array {
 			$sql = $this->wpdb->prepare(
-				'SELECT member_id, token_hash FROM %i WHERE token_hash = %s AND revoked_at IS NULL LIMIT 1',
+				'SELECT member_id, token_hash, version FROM %i WHERE token_hash = %s AND revoked_at IS NULL LIMIT 1',
 				$this->table,
 				$token_hash
 			);
@@ -85,20 +87,21 @@ final class TokenRepository {
 				return null;
 		}
 
-			/**
-			 * Result row.
-			 *
-			 * @var array{member_id:int|string,token_hash:string}|null $row
-			 */
-			$row = $this->wpdb->get_row( $sql, ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Prepared above.
+		/**
+		 * Result row.
+		 *
+		 * @var array{member_id:int|string,token_hash:string,version?:string}|null $row
+		 */
+		$row = $this->wpdb->get_row( $sql, ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Prepared above.
 		if ( ! is_array( $row ) ) {
-				return null;
+			return null;
 		}
 
-			return array(
-				'member_id'  => (int) $row['member_id'],
-				'token_hash' => (string) $row['token_hash'],
-			);
+		return array(
+			'member_id'  => (int) $row['member_id'],
+			'token_hash' => (string) $row['token_hash'],
+			'version'    => (string) ( $row['version'] ?? 'v1' ),
+		);
 	}
 
 		/**

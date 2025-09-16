@@ -68,6 +68,7 @@ final class TokenServiceTest extends TestCase {
 
 			$this->assertArrayHasKey( $member_id, $this->wpdb->tokens );
 			$this->assertSame( hash_hmac( 'sha256', $token, 'unit-storage-secret' ), $this->wpdb->tokens[ $member_id ]['token_hash'] );
+			$this->assertSame( 'v1', $this->wpdb->tokens[ $member_id ]['version'] );
 
 			$parts = explode( '.', $token );
 			$this->assertCount( 3, $parts );
