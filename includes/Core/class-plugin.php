@@ -20,7 +20,7 @@ use function do_action;
  */
 final class Plugin {
 
-	public const VERSION = '2.2.15';
+	public const VERSION = '2.2.16';
 
 	/**
 	 * Register runtime hooks.
