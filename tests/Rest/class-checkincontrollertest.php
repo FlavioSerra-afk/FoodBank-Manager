@@ -102,6 +102,24 @@ final class CheckinControllerTest extends TestCase {
                 $this->assertSame( 'fbm_invalid_token', $response->get_error_code() );
         }
 
+        public function test_handle_checkin_rejects_inactive_token(): void {
+                $members_repository = new MembersRepository( $this->wpdb );
+                $member_id          = $members_repository->insert_active_member( 'FBM350', 'Harper', 'T', 'harper@example.com', 2 );
+
+                $this->assertIsInt( $member_id );
+
+                $this->wpdb->members[ $member_id ]['status'] = 'inactive';
+
+                $token_service = new TokenService( new TokenRepository( $this->wpdb ) );
+                $token         = $token_service->issue( $member_id );
+
+                $request  = new \WP_REST_Request( array( 'token' => $token ) );
+                $response = CheckinController::handle_checkin( $request );
+
+                $this->assertInstanceOf( \WP_Error::class, $response );
+                $this->assertSame( 'fbm_inactive_member', $response->get_error_code() );
+        }
+
         public function test_handle_checkin_rejects_inactive_manual_code(): void {
                 $members_repository = new MembersRepository( $this->wpdb );
                 $member_id          = $members_repository->insert_active_member( 'FBM400', 'Morgan', 'S', 'morgan@example.com', 4 );

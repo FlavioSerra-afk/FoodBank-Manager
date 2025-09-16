@@ -267,11 +267,11 @@ final class MembersRepository {
 	 *
 	 * @param int $member_id Member identifier.
 	 *
-	 * @return array{id:int,member_reference:string,first_name:string,email:string}|null
+	 * @return array{id:int,member_reference:string,first_name:string,email:string,status:string}|null
 	 */
 	public function find( int $member_id ): ?array {
 		$sql = $this->wpdb->prepare(
-			'SELECT id, member_reference, first_name, email FROM %i WHERE id = %d LIMIT 1',
+			'SELECT id, status, member_reference, first_name, email FROM %i WHERE id = %d LIMIT 1',
 			$this->table,
 			$member_id
 		);
@@ -283,7 +283,7 @@ final class MembersRepository {
 		/**
 		 * Result row data.
 		 *
-		 * @var array{id:numeric,member_reference:string,first_name:string,email:string}|null $row
+		 * @var array{id:numeric,status:string,member_reference:string,first_name:string,email:string}|null $row
 		 */
 		$row = $this->wpdb->get_row( $sql, ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Prepared above.
 
@@ -293,6 +293,7 @@ final class MembersRepository {
 
 		return array(
 			'id'               => (int) $row['id'],
+			'status'           => (string) $row['status'],
 			'member_reference' => (string) $row['member_reference'],
 			'first_name'       => (string) $row['first_name'],
 			'email'            => (string) $row['email'],
