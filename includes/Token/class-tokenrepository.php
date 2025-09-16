@@ -119,12 +119,12 @@ final class TokenRepository {
 				'member_id' => $member_id,
 			);
 
-                        $result = $this->wpdb->update( $this->table, $data, $where, array( '%s' ), array( '%d' ) );
+			$result = $this->wpdb->update( $this->table, $data, $where, array( '%s' ), array( '%d' ) );
 
-                        if ( false === $result || 0 === $result ) {
-                                return false;
-                        }
+			if ( false === $result || 0 === $result ) {
+				return false;
+			}
 
-                        return true;
-        }
+			return true;
+	}
 }

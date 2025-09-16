@@ -22,9 +22,11 @@
             return;
         }
 
+        var strings = settings.strings;
+
         containers.forEach(function (container) {
             var status = container.querySelector('[data-fbm-status]');
-            updateStatus(status, settings.strings.ready);
+            updateStatus(status, strings.ready);
 
             var referenceInput = container.querySelector('[data-fbm-reference]');
             var action = container.querySelector('[data-fbm-checkin]');
@@ -44,11 +46,11 @@
                 }
 
                 if (!reference) {
-                    updateStatus(status, settings.strings.error);
+                    updateStatus(status, strings.error);
                     return;
                 }
 
-                updateStatus(status, settings.strings.loading);
+                updateStatus(status, strings.loading);
 
                 var payload = {
                     reference: reference,
@@ -75,23 +77,28 @@
                             throw new Error('invalid');
                         }
 
-                        if (data.status === 'duplicate') {
-                            updateStatus(status, settings.strings.duplicate);
-                            return;
+                        var statusKey = data.status;
+                        var fallback = strings.error || '';
+                        var nextMessage = '';
+
+                        if (Object.prototype.hasOwnProperty.call(strings, statusKey) && typeof strings[statusKey] === 'string' && strings[statusKey]) {
+                            nextMessage = strings[statusKey];
+                        } else if (typeof data.message === 'string' && data.message) {
+                            nextMessage = data.message;
                         }
 
-                        if (data.status === 'success') {
-                            updateStatus(status, settings.strings.success);
-                            if (referenceInput) {
-                                referenceInput.value = '';
-                            }
-                            return;
+                        if (!nextMessage) {
+                            nextMessage = fallback;
                         }
 
-                        updateStatus(status, settings.strings.error);
+                        updateStatus(status, nextMessage);
+
+                        if (statusKey === 'success' && referenceInput) {
+                            referenceInput.value = '';
+                        }
                     })
                     .catch(function () {
-                        updateStatus(status, settings.strings.error);
+                        updateStatus(status, strings.error);
                     });
             });
         });

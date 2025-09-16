@@ -92,6 +92,43 @@ final class CheckinControllerTest extends TestCase {
                 $this->assertSame( 'FBM200', $data['member_ref'] );
         }
 
+        public function test_handle_checkin_reports_duplicate_day_on_second_collection(): void {
+                $members_repository = new MembersRepository( $this->wpdb );
+                $member_id          = $members_repository->insert_active_member( 'FBM600', 'Avery', 'B', 'avery@example.com', 2 );
+
+                $this->assertIsInt( $member_id );
+
+                $initial_request  = new \WP_REST_Request(
+                        array(
+                                'manual_code' => 'FBM600',
+                                'method'      => 'manual',
+                        )
+                );
+                $initial_response = CheckinController::handle_checkin( $initial_request );
+
+                $this->assertInstanceOf( \WP_REST_Response::class, $initial_response );
+
+                $first_data = $initial_response->get_data();
+
+                $this->assertSame( CheckinService::STATUS_SUCCESS, $first_data['status'] );
+
+                $second_request  = new \WP_REST_Request(
+                        array(
+                                'manual_code' => 'FBM600',
+                                'method'      => 'manual',
+                        )
+                );
+                $second_response = CheckinController::handle_checkin( $second_request );
+
+                $this->assertInstanceOf( \WP_REST_Response::class, $second_response );
+
+                $second_data = $second_response->get_data();
+
+                $this->assertSame( CheckinService::STATUS_DUPLICATE_DAY, $second_data['status'] );
+                $this->assertSame( 'Member already collected today.', $second_data['message'] );
+                $this->assertSame( 'FBM600', $second_data['member_ref'] );
+        }
+
         public function test_handle_checkin_rejects_requests_outside_collection_window(): void {
                 $members_repository = new MembersRepository( $this->wpdb );
                 $member_id          = $members_repository->insert_active_member( 'FBM500', 'Quinn', 'L', 'quinn@example.com', 1 );
