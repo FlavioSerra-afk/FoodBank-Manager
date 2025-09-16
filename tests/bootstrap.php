@@ -28,10 +28,17 @@ if ( ! class_exists( 'wpdb', false ) ) {
 
                 /**
                  * Captured member rows keyed by member ID.
-                 *
-                 * @var array<int,array<string,mixed>>
-                 */
+		 *
+		 * @var array<int,array<string,mixed>>
+		 */
                 public array $members = array();
+
+                /**
+                 * Captured attendance rows keyed by record ID.
+		 *
+		 * @var array<int,array<string,mixed>>
+		 */
+                public array $attendance = array();
 
                 /**
                  * Last auto-increment identifier.
@@ -53,6 +60,13 @@ if ( ! class_exists( 'wpdb', false ) ) {
                  * @var int
                  */
                 private int $next_member_id = 1;
+
+                /**
+                 * Next identifier for attendance records.
+                 *
+                 * @var int
+                 */
+                private int $next_attendance_id = 1;
 
                 public function replace( string $table, array $data, array $format ) {
                         unset( $format );
@@ -80,8 +94,17 @@ if ( ! class_exists( 'wpdb', false ) ) {
                 }
 
                 public function insert( string $table, array $data, array $format ) {
-                        unset( $table );
                         unset( $format );
+
+                        if ( str_contains( $table, 'fbm_attendance' ) ) {
+                                $record_id                    = $this->next_attendance_id++;
+                                $data['id']                   = $record_id;
+                                $this->attendance[ $record_id ] = $data;
+
+                                return 1;
+                        }
+
+                        unset( $table );
 
                         $member_id           = $this->next_member_id++;
                         $data['id']          = $member_id;
@@ -182,7 +205,23 @@ if ( ! class_exists( 'wpdb', false ) ) {
                         $args = $this->last_prepare['args'];
 
                         if ( str_contains( $sql, 'member_reference = %s' ) ) {
+                                $table     = (string) ( $args[0] ?? '' );
                                 $reference = (string) ( $args[1] ?? '' );
+
+                                if ( str_contains( $table, 'fbm_attendance' ) ) {
+                                        $date = (string) ( $args[2] ?? '' );
+
+                                        foreach ( $this->attendance as $record ) {
+                                                if (
+                                                        $record['member_reference'] === $reference
+                                                        && $record['collected_date'] === $date
+                                                ) {
+                                                        return $record['id'];
+                                                }
+                                        }
+
+                                        return null;
+                                }
 
                                 foreach ( $this->members as $member ) {
                                         if ( $member['member_reference'] === $reference ) {
@@ -347,6 +386,8 @@ if ( ! function_exists( 'get_current_user_id' ) ) {
 }
 
 require_once __DIR__ . '/../includes/Core/class-install.php';
+require_once __DIR__ . '/../includes/Attendance/class-attendancerepository.php';
+require_once __DIR__ . '/../includes/Attendance/class-checkinservice.php';
 require_once __DIR__ . '/../includes/Token/class-tokenrepository.php';
 require_once __DIR__ . '/../includes/Token/class-tokenservice.php';
 require_once __DIR__ . '/../includes/Registration/class-membersrepository.php';

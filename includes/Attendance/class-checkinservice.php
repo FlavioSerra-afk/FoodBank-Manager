@@ -21,7 +21,7 @@ use function strtolower;
 final class CheckinService {
 
 	public const STATUS_SUCCESS       = 'success';
-	public const STATUS_DUPLICATE     = 'duplicate';
+	public const STATUS_DUPLICATE_DAY = 'duplicate_day';
 	public const STATUS_ERROR         = 'error';
 	public const STATUS_OUT_OF_WINDOW = 'out_of_window';
 
@@ -71,10 +71,10 @@ final class CheckinService {
 
 		if ( '4' !== $now_london->format( 'N' ) || $now_london < $window_start || $now_london > $window_end ) {
 			return array(
-				'status'    => self::STATUS_OUT_OF_WINDOW,
-				'message'   => esc_html__( 'Collections are only available on Thursdays between 11:00 and 14:30.', 'foodbank-manager' ),
+				'status'     => self::STATUS_OUT_OF_WINDOW,
+				'message'    => esc_html__( 'Collections are only available on Thursdays between 11:00 and 14:30.', 'foodbank-manager' ),
 				'member_ref' => $member_reference,
-				'time'      => null,
+				'time'       => null,
 			);
 		}
 
@@ -82,28 +82,28 @@ final class CheckinService {
 
 		if ( $this->repository->has_checked_in_for_date( $member_reference, $now_utc ) ) {
 			return array(
-				'status'    => self::STATUS_DUPLICATE,
-				'message'   => esc_html__( 'Member already collected today.', 'foodbank-manager' ),
+				'status'     => self::STATUS_DUPLICATE_DAY,
+				'message'    => esc_html__( 'Member already collected today.', 'foodbank-manager' ),
 				'member_ref' => $member_reference,
-				'time'      => $now_utc->format( DATE_ATOM ),
+				'time'       => $now_utc->format( DATE_ATOM ),
 			);
 		}
 
 		$recorded = $this->repository->record( $member_reference, $normalized_method, $user_id, $now_utc, $note );
 		if ( ! $recorded ) {
 			return array(
-				'status'    => self::STATUS_ERROR,
-				'message'   => esc_html__( 'Unable to record collection. Please try again.', 'foodbank-manager' ),
+				'status'     => self::STATUS_ERROR,
+				'message'    => esc_html__( 'Unable to record collection. Please try again.', 'foodbank-manager' ),
 				'member_ref' => $member_reference,
-				'time'      => null,
+				'time'       => null,
 			);
 		}
 
 		return array(
-			'status'    => self::STATUS_SUCCESS,
-			'message'   => esc_html__( 'Collection recorded.', 'foodbank-manager' ),
+			'status'     => self::STATUS_SUCCESS,
+			'message'    => esc_html__( 'Collection recorded.', 'foodbank-manager' ),
 			'member_ref' => $member_reference,
-			'time'      => $now_utc->format( DATE_ATOM ),
+			'time'       => $now_utc->format( DATE_ATOM ),
 		);
 	}
 
