@@ -11,6 +11,7 @@ namespace FoodBankManager\Core;
 
 use FoodBankManager\Auth\Capabilities;
 use FoodBankManager\Rest\CheckinController;
+use FoodBankManager\Shortcodes\RegistrationForm;
 use FoodBankManager\Shortcodes\StaffDashboard;
 use function add_action;
 use function do_action;
@@ -20,14 +21,15 @@ use function do_action;
  */
 final class Plugin {
 
-	public const VERSION = '2.2.16';
+	public const VERSION = '2.2.17';
 
 	/**
 	 * Register runtime hooks.
 	 */
 	public static function boot(): void {
 		Assets::setup();
-		StaffDashboard::register();
+				RegistrationForm::register();
+				StaffDashboard::register();
 
 		add_action( 'rest_api_init', array( CheckinController::class, 'register_routes' ) );
 
