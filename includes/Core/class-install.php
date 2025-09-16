@@ -18,7 +18,8 @@ use function update_option;
  */
 final class Install {
 
-	private const DB_VERSION = '2024092301';
+	private const DB_VERSION            = '2024093001';
+	private const INITIAL_TOKEN_VERSION = 'v1';
 
 	/**
 	 * Create or update required tables.
@@ -68,13 +69,14 @@ final class Install {
                 KEY idx_collected_at (collected_at)
         ) ' . $charset . ';';
 
-				$sql_tokens = 'CREATE TABLE `' . $tokens_table . '` (
-                id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-                member_id BIGINT UNSIGNED NOT NULL,
-                token_hash CHAR(64) NOT NULL,
-                issued_at DATETIME NOT NULL,
-                revoked_at DATETIME NULL,
-                PRIMARY KEY  (id),
+		$sql_tokens = 'CREATE TABLE `' . $tokens_table . '` (
+		id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+		member_id BIGINT UNSIGNED NOT NULL,
+		token_hash CHAR(64) NOT NULL,
+		version VARCHAR(10) NOT NULL DEFAULT \' . self::INITIAL_TOKEN_VERSION . \',
+		issued_at DATETIME NOT NULL,
+		revoked_at DATETIME NULL,
+		PRIMARY KEY  (id),
                 UNIQUE KEY uq_member (member_id),
                 UNIQUE KEY uq_token_hash (token_hash)
         ) ' . $charset . ';';
