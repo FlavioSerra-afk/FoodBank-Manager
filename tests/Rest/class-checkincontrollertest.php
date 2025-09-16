@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace FBM\Tests\Rest;
 
+use DateTimeImmutable;
+use DateTimeZone;
 use FoodBankManager\Attendance\CheckinService;
 use FoodBankManager\Registration\MembersRepository;
 use FoodBankManager\Rest\CheckinController;
@@ -27,9 +29,15 @@ final class CheckinControllerTest extends TestCase {
 
                 $this->wpdb        = new \wpdb();
                 $GLOBALS['wpdb'] = $this->wpdb;
+
+                CheckinService::set_current_time_override(
+                        new DateTimeImmutable( '2023-08-17 12:00:00', new DateTimeZone( 'Europe/London' ) )
+                );
         }
 
         protected function tearDown(): void {
+                CheckinService::set_current_time_override( null );
+
                 unset( $GLOBALS['wpdb'] );
 
                 parent::tearDown();
@@ -82,6 +90,35 @@ final class CheckinControllerTest extends TestCase {
                 $this->assertSame( CheckinService::STATUS_SUCCESS, $data['status'] );
                 $this->assertArrayHasKey( 'member_ref', $data );
                 $this->assertSame( 'FBM200', $data['member_ref'] );
+        }
+
+        public function test_handle_checkin_rejects_requests_outside_collection_window(): void {
+                $members_repository = new MembersRepository( $this->wpdb );
+                $member_id          = $members_repository->insert_active_member( 'FBM500', 'Quinn', 'L', 'quinn@example.com', 1 );
+
+                $this->assertIsInt( $member_id );
+
+                CheckinService::set_current_time_override(
+                        new DateTimeImmutable( '2023-08-16 10:00:00', new DateTimeZone( 'Europe/London' ) )
+                );
+
+                $request  = new \WP_REST_Request(
+                        array(
+                                'manual_code' => 'FBM500',
+                                'method'      => 'manual',
+                        )
+                );
+                $response = CheckinController::handle_checkin( $request );
+
+                $this->assertInstanceOf( \WP_REST_Response::class, $response );
+
+                $data = $response->get_data();
+
+                $this->assertSame( CheckinService::STATUS_OUT_OF_WINDOW, $data['status'] );
+                $this->assertSame( 'FBM500', $data['member_ref'] );
+                $this->assertSame( 'Collections are only available on Thursdays between 11:00 and 14:30.', $data['message'] );
+                $this->assertArrayHasKey( 'time', $data );
+                $this->assertNull( $data['time'] );
         }
 
         public function test_handle_checkin_rejects_revoked_token(): void {
