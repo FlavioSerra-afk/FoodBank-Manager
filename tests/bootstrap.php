@@ -134,6 +134,22 @@ if ( ! class_exists( 'wpdb', false ) ) {
                                 return null;
                         }
 
+                        if ( str_contains( $sql, 'WHERE member_reference = %s' ) ) {
+                                $reference = (string) ( $args[1] ?? '' );
+
+                                foreach ( $this->members as $member ) {
+                                        if ( $member['member_reference'] === $reference ) {
+                                                return array(
+                                                        'id'               => $member['id'],
+                                                        'status'           => $member['status'] ?? 'active',
+                                                        'member_reference' => $member['member_reference'],
+                                                );
+                                        }
+                                }
+
+                                return null;
+                        }
+
                         if ( str_contains( $sql, 'WHERE id = %d' ) ) {
                                 $member_id = (int) ( $args[1] ?? 0 );
 
@@ -208,6 +224,124 @@ if ( ! class_exists( 'wpdb', false ) ) {
 
                         return 0;
                 }
+        }
+}
+
+if ( ! class_exists( 'WP_Error' ) ) {
+        /**
+         * Minimal WP_Error implementation for unit tests.
+         */
+        class WP_Error {
+                private string $code;
+                private string $message;
+                private $data;
+
+                public function __construct( string $code = '', string $message = '', $data = array() ) {
+                        $this->code    = $code;
+                        $this->message = $message;
+                        $this->data    = $data;
+                }
+
+                public function get_error_code(): string {
+                        return $this->code;
+                }
+
+                public function get_error_message(): string {
+                        return $this->message;
+                }
+
+                public function get_error_data( string $code = '' ) {
+                        unset( $code );
+
+                        return $this->data;
+                }
+        }
+}
+
+if ( ! class_exists( 'WP_REST_Response' ) ) {
+        /**
+         * Minimal WP_REST_Response stand-in.
+         */
+        class WP_REST_Response {
+                private $data;
+
+                public function __construct( $data = null ) {
+                        $this->data = $data;
+                }
+
+                public function get_data() {
+                        return $this->data;
+                }
+        }
+}
+
+if ( ! class_exists( 'WP_REST_Request' ) ) {
+        /**
+         * Minimal WP_REST_Request for controller tests.
+         */
+        class WP_REST_Request {
+                private array $params;
+                private array $headers;
+
+                public function __construct( array $params = array(), array $headers = array() ) {
+                        $this->params  = $params;
+                        $this->headers = array();
+
+                        foreach ( $headers as $name => $value ) {
+                                $this->headers[ strtolower( (string) $name ) ] = $value;
+                        }
+                }
+
+                public function get_param( string $key ) {
+                        return $this->params[ $key ] ?? null;
+                }
+
+                public function set_param( string $key, $value ): void {
+                        $this->params[ $key ] = $value;
+                }
+
+                public function get_header( string $key ) {
+                        $lookup = strtolower( $key );
+
+                        return $this->headers[ $lookup ] ?? '';
+                }
+
+                public function set_header( string $key, $value ): void {
+                        $this->headers[ strtolower( $key ) ] = $value;
+                }
+        }
+}
+
+if ( ! function_exists( 'rest_ensure_response' ) ) {
+        function rest_ensure_response( $response ) {
+                if ( $response instanceof WP_REST_Response || $response instanceof WP_Error ) {
+                        return $response;
+                }
+
+                return new WP_REST_Response( $response );
+        }
+}
+
+if ( ! function_exists( 'sanitize_text_field' ) ) {
+        function sanitize_text_field( $value ): string {
+                $value = (string) $value;
+                $value = trim( $value );
+
+                return preg_replace( '/[\r\n\t]+/', ' ', $value );
+        }
+}
+
+if ( ! function_exists( 'sanitize_textarea_field' ) ) {
+        function sanitize_textarea_field( $value ): string {
+                $value = (string) $value;
+
+                return trim( $value );
+        }
+}
+
+if ( ! function_exists( 'get_current_user_id' ) ) {
+        function get_current_user_id(): int {
+                return 1;
         }
 }
 
