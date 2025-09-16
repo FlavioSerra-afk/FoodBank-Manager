@@ -9,8 +9,11 @@ declare(strict_types=1);
 
 namespace FoodBankManager\Shortcodes;
 
+use FoodBankManager\Email\WelcomeMailer;
 use FoodBankManager\Registration\MembersRepository;
 use FoodBankManager\Registration\RegistrationService;
+use FoodBankManager\Token\TokenRepository;
+use FoodBankManager\Token\TokenService;
 use wpdb;
 use function add_shortcode;
 use function esc_html__;
@@ -202,20 +205,25 @@ final class RegistrationForm {
 					return $result;
 			}
 
-			$repository = new MembersRepository( $wpdb );
-			$service    = new RegistrationService( $repository );
+			$repository       = new MembersRepository( $wpdb );
+			$token_repository = new TokenRepository( $wpdb );
+			$token_service    = new TokenService( $token_repository );
+			$service          = new RegistrationService( $repository, $token_service );
 
-			$saved = $service->register( $first_name, $last_initial, $email, (int) $household_value );
+			$outcome = $service->register( $first_name, $last_initial, $email, (int) $household_value );
 
-			if ( ! $saved ) {
-					$result['errors'][] = esc_html__( 'We could not save your registration. Please try again later.', 'foodbank-manager' );
-					$result['message']  = esc_html__( 'We could not save your registration. Please try again later.', 'foodbank-manager' );
+			if ( null === $outcome ) {
+				$result['errors'][] = esc_html__( 'We could not save your registration. Please try again later.', 'foodbank-manager' );
+				$result['message']  = esc_html__( 'We could not save your registration. Please try again later.', 'foodbank-manager' );
 
-					return $result;
+				return $result;
 			}
 
+			$mailer = new WelcomeMailer();
+			$mailer->send( $email, $first_name, $outcome['member_reference'], $outcome['token'] );
+
 			$result['success'] = true;
-			$result['message'] = esc_html__( 'Thank you for registering. We will be in touch soon.', 'foodbank-manager' );
+			$result['message'] = esc_html__( 'Thank you for registering. We have emailed your check-in QR code.', 'foodbank-manager' );
 			$result['values']  = array(
 				'first_name'     => '',
 				'last_initial'   => '',
