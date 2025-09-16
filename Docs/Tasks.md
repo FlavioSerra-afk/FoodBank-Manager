@@ -5,6 +5,7 @@
 
 # Tasks
 
+- [2025-09-16] P1 done — registration shortcode verified/implemented (v2.2.17)
 - [2025-09-16] P0 start — governance lock confirmed
 - [2025-09-16] Pass B1 — security + PHPCS zero
   - Hardened: foodbank-manager.php; includes/Core/*; includes/Attendance/*; includes/Auth/class-capabilities.php; includes/Rest/class-checkincontroller.php; includes/Shortcodes/class-staffdashboard.php; templates/public/staff-dashboard.php; assets/css/*.css; assets/js/staff-dashboard.js; uninstall.php.

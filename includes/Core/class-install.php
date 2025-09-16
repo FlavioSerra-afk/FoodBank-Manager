@@ -18,7 +18,7 @@ use function update_option;
  */
 final class Install {
 
-	private const DB_VERSION = '2024091501';
+	private const DB_VERSION = '2024091601';
 
 	/**
 	 * Create or update required tables.
@@ -32,34 +32,62 @@ final class Install {
 
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
-		$charset = $wpdb->get_charset_collate();
-		$table   = self::attendance_table_name( $wpdb );
+		$charset          = $wpdb->get_charset_collate();
+		$members_table    = self::members_table_name( $wpdb );
+		$attendance_table = self::attendance_table_name( $wpdb );
 
-		$sql = 'CREATE TABLE `' . $table . '` (
-            id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-            member_reference VARCHAR(191) NOT NULL,
-            collected_at DATETIME NOT NULL,
-            collected_date DATE NOT NULL,
-            method VARCHAR(20) NOT NULL,
-            note TEXT NULL,
-            recorded_by BIGINT UNSIGNED NULL,
-            created_at DATETIME NOT NULL,
-            PRIMARY KEY  (id),
-            UNIQUE KEY uq_member_day (member_reference, collected_date),
-            KEY idx_collected_at (collected_at)
-        ) ' . $charset . ';';
+		$sql_members = 'CREATE TABLE `' . $members_table . '` (
+		id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+		member_reference VARCHAR(64) NOT NULL,
+		first_name VARCHAR(191) NOT NULL,
+		last_initial CHAR(1) NOT NULL,
+		email VARCHAR(191) NOT NULL,
+		household_size SMALLINT UNSIGNED NOT NULL DEFAULT 1,
+		status VARCHAR(20) NOT NULL,
+		created_at DATETIME NOT NULL,
+		updated_at DATETIME NOT NULL,
+		activated_at DATETIME NULL,
+		PRIMARY KEY  (id),
+		UNIQUE KEY uq_member_reference (member_reference),
+		KEY idx_status (status),
+		KEY idx_email (email)
+	) ' . $charset . ';';
 
-		dbDelta( $sql );
+		$sql_attendance = 'CREATE TABLE `' . $attendance_table . '` (
+		id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+		member_reference VARCHAR(191) NOT NULL,
+		collected_at DATETIME NOT NULL,
+		collected_date DATE NOT NULL,
+		method VARCHAR(20) NOT NULL,
+		note TEXT NULL,
+		recorded_by BIGINT UNSIGNED NULL,
+		created_at DATETIME NOT NULL,
+		PRIMARY KEY  (id),
+		UNIQUE KEY uq_member_day (member_reference, collected_date),
+		KEY idx_collected_at (collected_at)
+	) ' . $charset . ';';
+
+		dbDelta( $sql_members );
+		dbDelta( $sql_attendance );
 
 		update_option( 'fbm_db_version', self::DB_VERSION, false );
 	}
 
-		/**
-		 * Resolve the fully qualified attendance table name.
-		 *
-		 * @param wpdb $wpdb WordPress database abstraction.
-		 */
+	/**
+	 * Resolve the fully qualified attendance table name.
+	 *
+	 * @param wpdb $wpdb WordPress database abstraction.
+	 */
 	public static function attendance_table_name( wpdb $wpdb ): string {
-			return $wpdb->prefix . 'fbm_attendance';
+		return $wpdb->prefix . 'fbm_attendance';
+	}
+
+	/**
+	 * Resolve the fully qualified members table name.
+	 *
+	 * @param wpdb $wpdb WordPress database abstraction.
+	 */
+	public static function members_table_name( wpdb $wpdb ): string {
+		return $wpdb->prefix . 'fbm_members';
 	}
 }

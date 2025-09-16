@@ -88,5 +88,5 @@
         "sort-packages": true,
         "optimize-autoloader": true
     },
-    "version": "2.2.15"
+    "version": "2.2.17"
 }
