@@ -79,11 +79,15 @@ U5 — Diagnostics & Release
 
 Cross-Cutting
 
-🟨 Public analytics removed
+✅ Public analytics removed
 
-🟨 Events feature removed
+✅ Events feature removed
 
-⬜ No AIW integration
+✅ No AIW integration
+
+✅ No CRM/ERP integrations
+
+✅ Shortcode scope limited to registration + staff dashboard
 
 🟨 i18n coverage
 

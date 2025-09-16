@@ -5,6 +5,7 @@
 
 # Tasks
 
+- [2025-09-16] P0 start — governance lock confirmed
 - [2025-09-16] Pass B1 — security + PHPCS zero
   - Hardened: foodbank-manager.php; includes/Core/*; includes/Attendance/*; includes/Auth/class-capabilities.php; includes/Rest/class-checkincontroller.php; includes/Shortcodes/class-staffdashboard.php; templates/public/staff-dashboard.php; assets/css/*.css; assets/js/staff-dashboard.js; uninstall.php.
   - PHPCS: WordPress.Files.FileName, WordPress.DB.PreparedSQL, WordPress.Security.NonceVerification, WordPress.WP.Capabilities, WordPress.WhiteSpace, WordPress.NamingConventions.ValidVariableName, WordPress.NamingConventions.ValidFunctionName.
@@ -66,6 +67,7 @@
 
 ## QA Log
 
+- [2025-09-16] Version 2.2.16 — governance lock baseline
 - [2025-09-15 14:36Z] P0 • QA • composer lint: PHPCS found 113 sniff violations in tests/Support/Exceptions.php — TODO
 - [2025-09-15 14:36Z] P0 • QA • composer phpcs: 20773 errors and 1452 warnings in 276 files — TODO
 - [2025-09-15 14:36Z] QA • composer phpstan: no errors
