@@ -5,7 +5,7 @@
 
 # Tasks
 
-- [2025-09-16] P2 done — welcome email + QR (v2.2.18)
+- [2025-09-16] P2 done — welcome email + QR with admin resend/revoke actions (v2.2.18)
   - Version recorded: 2.2.18; Milestone: P2
 - [2025-09-16] P1 done — registration shortcode verified/implemented (v2.2.17)
 - [2025-09-16] P0 start — governance lock confirmed
