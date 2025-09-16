@@ -5,6 +5,7 @@
 
 # Tasks
 
+- P3 done — Token Service core implemented (vX.Y.Z)
 - [2025-09-16] P2 done — welcome email + QR with admin resend/revoke actions (v2.2.18)
   - Version recorded: 2.2.18; Milestone: P2
 - [2025-09-16] P1 done — registration shortcode verified/implemented (v2.2.17)
@@ -111,7 +112,7 @@
 - Sanitize/clamp theme JSON; reject unknown keys; size caps.
 - Enqueue guard: only FBM screens (screen-ID/hook suffix).
 - Implement Uninstall.php (cleanup + destructive drop guarded).
-- Token service:
+- Token service (done):
   - Token::issue(member_id) → {raw_token, token_hash, version}
   - Token::verify(raw_token) constant-time match to token_hash
   - Token::revoke(member_id) → set revoked_at

@@ -32,7 +32,7 @@ U1 — Foundations
 
 ⬜ Uninstall (cleanup + destructive)
 
-🟨 Token service (issue/verify/revoke)
+✅ Token service (issue/verify/revoke)
 
 ⬜ Weekly window config (Thu 11:00–14:30)
 
