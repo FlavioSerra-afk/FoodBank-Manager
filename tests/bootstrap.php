@@ -4,7 +4,14 @@ declare(strict_types=1);
 require_once __DIR__ . '/../vendor/autoload.php';
 
 if ( ! defined( 'ARRAY_A' ) ) {
-	define( 'ARRAY_A', 'ARRAY_A' );
+        define( 'ARRAY_A', 'ARRAY_A' );
+}
+
+if ( ! isset( $GLOBALS['fbm_current_caps'] ) ) {
+        $GLOBALS['fbm_current_caps'] = array(
+                'fbm_checkin' => true,
+                'fbm_manage'  => false,
+        );
 }
 
 if ( ! class_exists( 'wpdb', false ) ) {
@@ -33,12 +40,19 @@ if ( ! class_exists( 'wpdb', false ) ) {
 		 */
                 public array $members = array();
 
-                /**
-                 * Captured attendance rows keyed by record ID.
-		 *
-		 * @var array<int,array<string,mixed>>
-		 */
-                public array $attendance = array();
+        /**
+         * Captured attendance rows keyed by record ID.
+         *
+         * @var array<int,array<string,mixed>>
+         */
+        public array $attendance = array();
+
+        /**
+         * Captured attendance override audit rows keyed by record ID.
+         *
+         * @var array<int,array<string,mixed>>
+         */
+        public array $attendance_overrides = array();
 
                 /**
                  * Last auto-increment identifier.
@@ -61,12 +75,19 @@ if ( ! class_exists( 'wpdb', false ) ) {
                  */
                 private int $next_member_id = 1;
 
-                /**
-                 * Next identifier for attendance records.
-                 *
-                 * @var int
-                 */
-                private int $next_attendance_id = 1;
+        /**
+         * Next identifier for attendance records.
+         *
+         * @var int
+         */
+        private int $next_attendance_id = 1;
+
+        /**
+         * Next identifier for attendance override audit rows.
+         *
+         * @var int
+         */
+        private int $next_override_id = 1;
 
                 public function replace( string $table, array $data, array $format ) {
                         unset( $format );
@@ -96,10 +117,19 @@ if ( ! class_exists( 'wpdb', false ) ) {
                 public function insert( string $table, array $data, array $format ) {
                         unset( $format );
 
+                        if ( str_contains( $table, 'fbm_attendance_overrides' ) ) {
+                                $record_id                         = $this->next_override_id++;
+                                $data['id']                        = $record_id;
+                                $this->attendance_overrides[$record_id] = $data;
+
+                                return 1;
+                        }
+
                         if ( str_contains( $table, 'fbm_attendance' ) ) {
                                 $record_id                    = $this->next_attendance_id++;
                                 $data['id']                   = $record_id;
                                 $this->attendance[ $record_id ] = $data;
+                                $this->insert_id              = $record_id;
 
                                 return 1;
                         }
@@ -285,6 +315,36 @@ if ( ! class_exists( 'wpdb', false ) ) {
 
                         return 0;
                 }
+
+                public function delete( string $table, array $where, array $where_format = array() ) {
+                        unset( $where_format );
+
+                        if ( str_contains( $table, 'fbm_attendance' ) && isset( $where['id'] ) ) {
+                                $attendance_id = (int) $where['id'];
+
+                                if ( isset( $this->attendance[ $attendance_id ] ) ) {
+                                        unset( $this->attendance[ $attendance_id ] );
+
+                                        return 1;
+                                }
+
+                                return 0;
+                        }
+
+                        if ( str_contains( $table, 'fbm_attendance_overrides' ) && isset( $where['id'] ) ) {
+                                $override_id = (int) $where['id'];
+
+                                if ( isset( $this->attendance_overrides[ $override_id ] ) ) {
+                                        unset( $this->attendance_overrides[ $override_id ] );
+
+                                        return 1;
+                                }
+
+                                return 0;
+                        }
+
+                        return 0;
+                }
         }
 }
 
@@ -370,6 +430,14 @@ if ( ! class_exists( 'WP_REST_Request' ) ) {
                 public function set_header( string $key, $value ): void {
                         $this->headers[ strtolower( $key ) ] = $value;
                 }
+        }
+}
+
+if ( ! function_exists( 'current_user_can' ) ) {
+        function current_user_can( string $cap ): bool {
+                $caps = $GLOBALS['fbm_current_caps'] ?? array();
+
+                return (bool) ( $caps[ $cap ] ?? false );
         }
 }
 
