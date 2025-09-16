@@ -35,7 +35,7 @@ U1 — Foundations
 
 ✅ Token service (issue/verify/revoke)
 
-⬜ Weekly window config (Thu 11:00–14:30)
+✅ Policy (1/7) — Weekly window config (Thu 11:00–14:30)
 
 ✅ PHPCS zero; PHPStan green; PHPUnit baseline
 

@@ -5,6 +5,9 @@
 
 # Tasks
 
+- [2025-09-17] P6 done — 1/7 policy + override (v2.2.20)
+  - Version recorded: 2.2.20; Milestone: P6
+  - Release notes: pending CHANGELOG.md update (latest published: 2.2.18)
 - [2025-09-17] P4 done — minimal secure check-in (v2.2.19)
   - Version recorded: 2.2.19; Milestone: P4
   - Release notes: pending CHANGELOG.md update (latest published: 2.2.18)
