@@ -4,6 +4,7 @@
     <testsuite name="Unit">
       <directory suffix="Test.php">tests/Unit</directory>
       <file>tests/Token/class-tokenservicetest.php</file>
+      <file>tests/Registration/RegistrationEmailTest.php</file>
     </testsuite>
   </testsuites>
   <coverage>
