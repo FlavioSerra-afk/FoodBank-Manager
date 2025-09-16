@@ -40,46 +40,46 @@ final class CheckinService {
 			$this->repository = $repository;
 	}
 
-		/**
-		 * Attempt to record a check-in.
-		 *
-		 * @param string      $member_reference Canonical member reference.
-		 * @param string      $method           Raw method string.
-		 * @param int|null    $user_id          Acting user ID.
-		 * @param string|null $note             Optional note.
-		 *
-		 * @return array{status:string,message:string,reference:string,time:?string}
-		 */
-	public function record( string $member_reference, string $method, ?int $user_id, ?string $note = null ): array {
-		$normalized_method = $this->normalize_method( $method );
-		$now               = new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) );
+        /**
+         * Attempt to record a check-in.
+         *
+         * @param string      $member_reference Canonical member reference.
+         * @param string      $method           Raw method string.
+         * @param int|null    $user_id          Acting user ID.
+         * @param string|null $note             Optional note.
+         *
+         * @return array{status:string,message:string,member_ref:string,time:?string}
+         */
+        public function record( string $member_reference, string $method, ?int $user_id, ?string $note = null ): array {
+                $normalized_method = $this->normalize_method( $method );
+                $now               = new DateTimeImmutable( 'now', new DateTimeZone( 'UTC' ) );
 
-		if ( $this->repository->has_checked_in_for_date( $member_reference, $now ) ) {
-			return array(
-				'status'    => self::STATUS_DUPLICATE,
-				'message'   => esc_html__( 'Member already collected today.', 'foodbank-manager' ),
-				'reference' => $member_reference,
-				'time'      => $now->format( DATE_ATOM ),
-			);
-		}
+                if ( $this->repository->has_checked_in_for_date( $member_reference, $now ) ) {
+                        return array(
+                                'status'    => self::STATUS_DUPLICATE,
+                                'message'   => esc_html__( 'Member already collected today.', 'foodbank-manager' ),
+                                'member_ref' => $member_reference,
+                                'time'      => $now->format( DATE_ATOM ),
+                        );
+                }
 
-		$recorded = $this->repository->record( $member_reference, $normalized_method, $user_id, $now, $note );
-		if ( ! $recorded ) {
-			return array(
-				'status'    => self::STATUS_ERROR,
-				'message'   => esc_html__( 'Unable to record collection. Please try again.', 'foodbank-manager' ),
-				'reference' => $member_reference,
-				'time'      => null,
-			);
-		}
+                $recorded = $this->repository->record( $member_reference, $normalized_method, $user_id, $now, $note );
+                if ( ! $recorded ) {
+                        return array(
+                                'status'    => self::STATUS_ERROR,
+                                'message'   => esc_html__( 'Unable to record collection. Please try again.', 'foodbank-manager' ),
+                                'member_ref' => $member_reference,
+                                'time'      => null,
+                        );
+                }
 
-		return array(
-			'status'    => self::STATUS_SUCCESS,
-			'message'   => esc_html__( 'Collection recorded.', 'foodbank-manager' ),
-			'reference' => $member_reference,
-			'time'      => $now->format( DATE_ATOM ),
-		);
-	}
+                return array(
+                        'status'    => self::STATUS_SUCCESS,
+                        'message'   => esc_html__( 'Collection recorded.', 'foodbank-manager' ),
+                        'member_ref' => $member_reference,
+                        'time'      => $now->format( DATE_ATOM ),
+                );
+        }
 
 		/**
 		 * Ensure the method is one of the allowed values.
