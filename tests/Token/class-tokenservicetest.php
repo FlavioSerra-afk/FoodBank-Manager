@@ -103,24 +103,31 @@ final class TokenServiceTest extends TestCase {
 		$this->assertNull( $this->service->verify( $tampered_2 ) );
 	}
 
-	/**
-	 * Tokens should not verify after being revoked.
-	 */
-	public function test_revoke_prevents_future_verification(): void {
-			$member_id = 512;
-			$token     = $this->service->issue( $member_id );
+        /**
+         * Tokens should not verify after being revoked.
+         */
+        public function test_revoke_prevents_future_verification(): void {
+                $member_id = 512;
+                $token     = $this->service->issue( $member_id );
 
-			$this->assertSame( $member_id, $this->service->verify( $token ) );
+                $this->assertSame( $member_id, $this->service->verify( $token ) );
 
-			$this->assertTrue( $this->service->revoke( $member_id ) );
+                $this->assertTrue( $this->service->revoke( $member_id ) );
 
-			$this->assertNull( $this->service->verify( $token ) );
-	}
+                $this->assertNull( $this->service->verify( $token ) );
+        }
 
-	/**
-	 * Encode binary data using base64url for assertions.
-	 *
-	 * @param string $data Raw binary fixture payload.
+        /**
+         * Revoking a member without active tokens should report failure.
+         */
+        public function test_revoke_returns_false_when_no_tokens_found(): void {
+                $this->assertFalse( $this->service->revoke( 999 ) );
+        }
+
+        /**
+         * Encode binary data using base64url for assertions.
+         *
+         * @param string $data Raw binary fixture payload.
 	 */
 	private function encode_base64url( string $data ): string {
 		return rtrim( strtr( base64_encode( $data ), '+/', '-_' ), '=' ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- Test helper to mirror production encoding.
