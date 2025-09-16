@@ -1,3 +1,7 @@
+## 2.2.18 — 2025-09-16
+- Automatically send welcome emails with QR access for approved registrations.
+- Allow administrators to resend or revoke welcome messages from the dashboard.
+
 ## 2.2.15 — 2025-09-15
 - Bump version
 
