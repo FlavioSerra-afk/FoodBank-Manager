@@ -158,6 +158,7 @@ if ( ! class_exists( 'wpdb', false ) ) {
 
                                         return array(
                                                 'id'               => $member['id'],
+                                                'status'           => $member['status'] ?? 'active',
                                                 'member_reference' => $member['member_reference'],
                                                 'first_name'       => $member['first_name'],
                                                 'email'            => $member['email'],

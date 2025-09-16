@@ -139,10 +139,14 @@ final class CheckinController {
 						$member = $members_repository->find( $member_id );
 
 			if ( null === $member || '' === $member['member_reference'] ) {
-									return new WP_Error( 'fbm_invalid_token', __( 'The provided token is not recognized or has been revoked.', 'foodbank-manager' ), array( 'status' => 400 ) );
+								return new WP_Error( 'fbm_invalid_token', __( 'The provided token is not recognized or has been revoked.', 'foodbank-manager' ), array( 'status' => 400 ) );
 			}
 
-						$member_reference = $member['member_reference'];
+			if ( 'active' !== $member['status'] ) {
+								return new WP_Error( 'fbm_inactive_member', __( 'This member is not currently active.', 'foodbank-manager' ), array( 'status' => 400 ) );
+			}
+
+					$member_reference = $member['member_reference'];
 		} else {
 						$record = $members_repository->find_by_reference( $manual_code );
 
