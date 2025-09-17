@@ -15,6 +15,50 @@
     };
     var cancelFrame = window.cancelAnimationFrame || window.clearTimeout;
     var forEach = Array.prototype.forEach;
+    var schedule = (settings.schedule && typeof settings.schedule === 'object') ? settings.schedule : {};
+    if (!settings.schedule || typeof settings.schedule !== 'object') {
+        settings.schedule = schedule;
+    }
+    var scheduleLabels = (schedule.labels && typeof schedule.labels === 'object') ? schedule.labels : {};
+    if (!schedule.labels || typeof schedule.labels !== 'object') {
+        schedule.labels = scheduleLabels;
+    }
+
+    var applyScheduleFromResponse = function (data, strings) {
+        if (!strings || !settings) {
+            return;
+        }
+
+        if (!schedule || typeof schedule !== 'object') {
+            schedule = {};
+            settings.schedule = schedule;
+        }
+
+        if (data && data.window && typeof data.window === 'object') {
+            schedule.window = data.window;
+        }
+
+        if (data && data.window_labels && typeof data.window_labels === 'object') {
+            scheduleLabels = data.window_labels;
+            schedule.labels = scheduleLabels;
+        }
+
+        if (data && typeof data.window_notice === 'string') {
+            strings.collection_window_notice = data.window_notice;
+        } else if (scheduleLabels && typeof scheduleLabels.notice === 'string') {
+            strings.collection_window_notice = scheduleLabels.notice;
+        }
+    };
+
+    var resolveWindowNotice = function (strings) {
+        if (scheduleLabels && typeof scheduleLabels.notice === 'string' && scheduleLabels.notice) {
+            return scheduleLabels.notice;
+        }
+        if (strings.collection_window_notice && typeof strings.collection_window_notice === 'string') {
+            return strings.collection_window_notice;
+        }
+        return strings.out_of_window;
+    };
 
     var updateStatus = function (element, message, tone) {
         if (!element) {
@@ -341,6 +385,8 @@
             var message = '';
             var tone = 'info';
 
+            applyScheduleFromResponse(data, strings);
+
             if (statusKey === 'success') {
                 if (context && context.override === true) {
                     message = strings.override_success || strings.success;
@@ -368,10 +414,7 @@
                     }, strings);
                 }
             } else if (statusKey === 'out_of_window') {
-                message = strings.out_of_window;
-                if (strings.collection_window_notice && typeof strings.collection_window_notice === 'string') {
-                    message = strings.collection_window_notice;
-                }
+                message = resolveWindowNotice(strings);
                 tone = 'warning';
                 hideOverride(container);
             } else if (Object.prototype.hasOwnProperty.call(strings, statusKey) && typeof strings[statusKey] === 'string') {
