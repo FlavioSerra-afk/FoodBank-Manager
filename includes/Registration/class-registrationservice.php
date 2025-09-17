@@ -12,11 +12,20 @@ namespace FoodBankManager\Registration;
 use Exception;
 use FoodBankManager\Token\TokenService;
 use RuntimeException;
+use WP_Error;
+use WP_User;
 use function bin2hex;
 use function gmdate;
 use function random_bytes;
+use function strtolower;
+use function substr;
+use function trim;
 use function strtoupper;
 use function wp_generate_password;
+use function get_user_by;
+use function is_wp_error;
+use function preg_replace;
+use function wp_insert_user;
 
 /**
  * Coordinates member registration writes.
@@ -74,12 +83,14 @@ final class RegistrationService {
                                                                                                 return null;
                         }
 
-				$issuance = $this->issue_member_token( $existing['id'], 'reactivation' );
-			if ( null === $issuance ) {
-					return null;
-			}
+                                $issuance = $this->issue_member_token( $existing['id'], 'reactivation' );
+                        if ( null === $issuance ) {
+                                        return null;
+}
 
-																return array(
+                                $this->ensure_foodbank_member_user( $email, $first_name, $last_initial );
+
+                                                                                                                               return array(
 																	'member_id'        => $existing['id'],
 																	'member_reference' => $existing['member_reference'],
 																	'token'            => $issuance['token'],
@@ -103,20 +114,86 @@ final class RegistrationService {
 		if ( null === $issuance ) {
 				return null;
 		}
+                        $this->ensure_foodbank_member_user( $email, $first_name, $last_initial );
 
-									return array(
-										'member_id'        => $member_id,
-										'member_reference' => $reference,
-										'token'            => $issuance['token'],
-										'reactivated'      => false,
-									);
-	}
+                                                                        return array(
+                                                                                'member_id'        => $member_id,
+                                                                                'member_reference' => $reference,
+                                                                                'token'            => $issuance['token'],
+                                                                                'reactivated'      => false,
+                                                                        );
+        }
 
-		/**
-		 * Approve a pending member and issue a persistent token.
-		 *
-		 * @param int      $member_id Member identifier.
-		 * @param int|null $issued_by Acting user identifier.
+                /**
+                 * Ensure the associated WordPress user has the FoodBank Member role.
+                 *
+                 * @param string $email        Normalized email address.
+                 * @param string $first_name   First name for user provisioning.
+                 * @param string $last_initial Last initial for user provisioning.
+                 */
+        public function ensure_foodbank_member_user( string $email, string $first_name, string $last_initial ): void {
+                if ( '' === $email ) {
+                                return;
+                        }
+
+                $user = get_user_by( 'email', $email );
+
+                if ( $user instanceof WP_User ) {
+                                $user->add_role( 'foodbank_member' );
+
+                                return;
+                        }
+
+                $user_id = wp_insert_user(
+                        array(
+                                'user_login'   => $this->generate_user_login( $email ),
+                                'user_email'   => $email,
+                                'user_pass'    => wp_generate_password( 20, true ),
+                                'first_name'   => $first_name,
+                                'last_name'    => $last_initial,
+                                'display_name' => trim( $first_name . ' ' . $last_initial ),
+                                'role'         => '',
+                        )
+                );
+
+                if ( is_wp_error( $user_id ) ) {
+                                return;
+                        }
+
+                $user_id = (int) $user_id;
+                if ( $user_id <= 0 ) {
+                                return;
+                        }
+
+                $user = get_user_by( 'id', $user_id );
+
+                if ( $user instanceof WP_User ) {
+                                $user->add_role( 'foodbank_member' );
+                        }
+        }
+
+                /**
+                 * Generate a safe fallback login for provisioned users.
+                 */
+        private function generate_user_login( string $email ): string {
+                $seed = preg_replace( '/[^a-z0-9]/', '', strtolower( $email ) );
+
+                if ( ! is_string( $seed ) || '' === $seed ) {
+                                $seed = 'fbm';
+                        }
+
+                $suffix = strtolower( $this->random_segment() );
+                $base   = substr( $seed, 0, 40 );
+                $login  = $base . '_' . $suffix;
+
+                return substr( $login, 0, 60 );
+        }
+
+                /**
+                 * Approve a pending member and issue a persistent token.
+                 *
+                 * @param int      $member_id Member identifier.
+                 * @param int|null $issued_by Acting user identifier.
 		 *
 		 * @return array{member_id:int,member_reference:string,first_name:string,email:string,status:string,token:string,issued_at:string,meta:array<string,mixed>}|null
 		 */

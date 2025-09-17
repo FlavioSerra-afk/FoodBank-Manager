@@ -247,12 +247,14 @@ final class RegistrationForm {
                                 $consented ? time() : null
                         );
 
-			if ( null === $outcome ) {
-				$result['errors'][] = esc_html__( 'We could not save your registration. Please try again later.', 'foodbank-manager' );
-				$result['message']  = esc_html__( 'We could not save your registration. Please try again later.', 'foodbank-manager' );
+                        if ( null === $outcome ) {
+                                $result['errors'][] = esc_html__( 'We could not save your registration. Please try again later.', 'foodbank-manager' );
+                                $result['message']  = esc_html__( 'We could not save your registration. Please try again later.', 'foodbank-manager' );
 
-				return $result;
-			}
+                                return $result;
+                        }
+
+                        $service->ensure_foodbank_member_user( $email, $first_name, $last_initial );
 
                         $mailer = is_callable( self::$mailer_factory ) ? call_user_func( self::$mailer_factory ) : new WelcomeMailer();
 
