@@ -1,16 +1,12 @@
-Docs-Revision: 2025-09-21 (v2.2.26 admin summaries + CLI parity)
+Docs-Revision: 2025-09-22 (v2.2.26-rc.1 S1/S2 sync)
 # FoodBank Manager Plugin
 
-Stable tag: 2.2.26
+Stable tag: 2.2.26-rc.1
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.1
 
-See [Docs/Specs.md](Docs/Specs.md) for the canonical product requirements.
-
-## Theme & Design
-
-Theme & Design only affects FoodBank Manager pages and shortcodes; WordPress admin chrome remains unchanged.
+See [Docs/Specs.md](Docs/Specs.md), [Docs/Plan.md](Docs/Plan.md), [Docs/Tasks.md](Docs/Tasks.md), and [Docs/Matrix.md](Docs/Matrix.md) for the canonical product requirements.
 
 ## Shortcodes
 
@@ -18,6 +14,14 @@ FoodBank Manager registers two shortcodes only:
 
 * `[fbm_registration_form]` — public registration form with validation, nonce enforcement, and anti-spam traps.
 * `[fbm_staff_dashboard]` — staff-facing dashboard (login + FBM capability required) for scanning QR codes or recording manual collections within the configured window.
+
+## Admin summaries & exports
+
+Attendance summaries remain restricted to administrators (or users granted the `fbm_export` capability). CSV downloads:
+
+* Sanitize filenames with `sanitize_file_name()` using the requested date range.
+* Emit UTF-8 BOM + localized column headers for spreadsheet compatibility.
+* Require a nonce tied to the selected date range before streaming.
 
 ## Multisite notes
 
@@ -43,7 +47,7 @@ Rate-limited responses include `RateLimit-Limit`, `RateLimit-Remaining`, and `Ra
 
 - **Logs & debug**: PHP errors are recorded in `wp-content/debug.log`. Mail activity appears under Diagnostics → Mail Log with throttled resend controls.
 - **Health**: Diagnostics → System Health shows badge indicators for mail transport keys and signing secrets.
-- **Docs**: See [Docs/Specs.md](Docs/Specs.md) and [Docs/Plan.md](Docs/Plan.md) for policy, rate-limit, and multisite notes.
+- **Docs**: See [Docs/Specs.md](Docs/Specs.md), [Docs/Plan.md](Docs/Plan.md), [Docs/Tasks.md](Docs/Tasks.md), and [Docs/Matrix.md](Docs/Matrix.md) for policy, milestones, and governance notes.
 
 ## CLI
 

@@ -2,8 +2,16 @@
 > This is 1 of 4 canonical docs (Specs, Plan, Tasks, Matrix).
 > Codex MUST read & update these BEFORE any work, every prompt.
 > Any other files in /Docs are historical and must not drive scope.
+> Docs-Revision: 2025-09-22 (2.2.26-rc.1 S1/S2 sync)
 
 # Tasks
+
+- [2025-09-22] S1/S2 sync + RC tag (v2.2.26-rc.1)
+  - Summary: Publish sanitized admin summaries/exports, ensure WP-CLI version command registers during boot, and align README/readme with LAW docs only.
+  - Packaging: Verified `.gitattributes` and `bin/package.sh` exclude `.githooks/`, `analysis/`, `tests/`, and build outputs from the ZIP.
+  - CLI: `wp fbm version` remains the sole command; stub harness + unit tests cover registration and output.
+  - Docs: README.md/readme.txt/Docs updated with canonical references (Specs/Plan/Tasks/Matrix) and export guardrails; Docs-Revision stamped for RC.
+  - QA: composer lint ❌ (legacy WordPress spacing baseline), composer phpcs ❌ (existing spacing violations), composer phpstan ✅, vendor/bin/phpunit --testsuite Unit --testdox ✅ (vendor QR-code deprecation warnings only).
 
 - [2025-09-21] Admin summaries + CLI parity (v2.2.26)
   - Summary: Sanitized attendance export filenames, confirmed admin-only summaries/filters, restored the `wp fbm version` WP-CLI command, and aligned README/Docs with LAW (including uninstall guarantees and matrix updates).

@@ -3,23 +3,22 @@ Contributors: portuguese-community-centre-london
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.1
-Stable tag: 2.2.26
+Stable tag: 2.2.26-rc.1
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 FoodBank Manager provides secure forms, encrypted storage, dashboards, and attendance tracking for food banks.
+
+Canonical requirements live in Docs/Specs.md, Docs/Plan.md, Docs/Tasks.md, and Docs/Matrix.md inside the plugin repository.
 
 == Description ==
 FoodBank Manager is a volunteer-friendly toolkit for small organisations to handle registration, distributions, and reporting.
 It stores data in encrypted tables, enforces least-privilege access, and offers dashboards and exports for auditors.
 
 == Features ==
-* Secure public registration with validation, nonce checks, and anti-spam traps.
-* Persistent QR tokens delivered in the welcome email alongside a fallback code.
-* Staff dashboard (login + FBM capability required) for scanning or manual check-ins.
-* Attendance summaries with admin-only CSV exports (UTF-8 BOM, localized headers).
-* Theme controls and design tokens scoped to FoodBank Manager screens.
-* Diagnostics for mail delivery with throttled resend and health badges.
+* `[fbm_registration_form]` shortcode — secure public registration with validation, nonce checks, and anti-spam traps.
+* `[fbm_staff_dashboard]` shortcode — staff dashboard (login + FBM capability required) for scanning QR codes or recording manual attendance within the configured window.
+* Admin-only attendance summaries and CSV exports with sanitized filenames, UTF-8 BOM, and localized headers (nonce + capability enforced).
 
 == Multisite ==
 FBM capabilities are granted per site via activation (Administrators retain full access). Options such as theme, schedule, and migration markers store per site. Destructive uninstall remains opt-in so reinstalls can reuse existing data unless explicitly dropped.
@@ -27,7 +26,7 @@ FBM capabilities are granted per site via activation (Administrators retain full
 == Support & Troubleshooting ==
 * **Logs & debug**: PHP errors are recorded in `wp-content/debug.log`. Mail activity appears under Diagnostics → Mail Log with rate-limited resend controls.
 * **Health**: Diagnostics → System Health displays badge indicators for mail keys and signing secrets.
-* **Docs**: See [Docs/Specs.md](Docs/Specs.md) and [Docs/Plan.md](Docs/Plan.md) for policy, rate-limit, and multisite notes.
+* **Docs**: See [Docs/Specs.md](Docs/Specs.md), [Docs/Plan.md](Docs/Plan.md), [Docs/Tasks.md](Docs/Tasks.md), and [Docs/Matrix.md](Docs/Matrix.md) for policy, milestones, and governance notes.
 
 == CLI ==
 Need to confirm what version of FoodBank Manager is active? Run:

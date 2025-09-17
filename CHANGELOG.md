@@ -10,6 +10,16 @@
 ### Changed
 - Packaging guard now enforces version alignment across plugin metadata before building releases.
 
+## [2.2.26-rc.1] - 2025-09-22
+
+### Changed
+- Aligned README/readme/docs with LAW: only two shortcodes, admin-only summaries, sanitized CSV exports, and the minimal `wp fbm version` CLI command.
+- Confirmed packaging excludes `.githooks/`, `analysis/`, and other dev-only folders from the distribution archive.
+
+### Fixed
+- Hardened attendance CSV export to sanitize filenames, emit UTF-8 BOM with localized headers, and enforce nonce + capability checks.
+- Registered the `wp fbm version` WP-CLI command during plugin boot with test coverage and stub harness.
+
 ## [2.2.26] - 2025-09-21
 
 ### Added
