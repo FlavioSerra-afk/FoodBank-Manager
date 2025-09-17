@@ -1,7 +1,7 @@
-Docs-Revision: 2025-09-20 (v2.2.25 scope audit)
+Docs-Revision: 2025-09-21 (v2.2.26 admin summaries + CLI parity)
 # FoodBank Manager Plugin
 
-Stable tag: 2.2.25
+Stable tag: 2.2.26
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.1
@@ -45,9 +45,19 @@ Rate-limited responses include `RateLimit-Limit`, `RateLimit-Remaining`, and `Ra
 - **Health**: Diagnostics → System Health shows badge indicators for mail transport keys and signing secrets.
 - **Docs**: See [Docs/Specs.md](Docs/Specs.md) and [Docs/Plan.md](Docs/Plan.md) for policy, rate-limit, and multisite notes.
 
+## CLI
+
+FoodBank Manager exposes a lightweight WP-CLI command to surface the currently installed version:
+
+```bash
+wp fbm version
+```
+
+The command returns the `FoodBankManager\Core\Plugin::VERSION` string so automation can confirm deployed builds.
+
 ## Manual release steps
 
 1. `composer i18n:build -- --allow-root`
-2. `bash bin/package.sh`
+2. `composer build:zip` (runs `bin/package.sh`, enforcing version alignment and generating `dist/foodbank-manager-manifest.txt`)
 3. `sha256sum dist/foodbank-manager.zip > SHA256SUMS`
-4. Upload the ZIP and publish the release after verifying the checksum.
+4. Upload the ZIP, include the manifest/checksum in the release, and publish after verifying the sums.

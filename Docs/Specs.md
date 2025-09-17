@@ -114,7 +114,7 @@ Summaries (totals by date/week; active vs. revoked; collection counts).
 
 Filters: by date range + status; allow-listed server side.
 
-CSV export (UTF-8 BOM, localized headers) behind fbm_export + nonce.
+CSV export (UTF-8 BOM, sanitized filename, localized headers) behind fbm_export + nonce.
 
 No public analytics pages.
 

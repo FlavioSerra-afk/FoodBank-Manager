@@ -15,6 +15,7 @@ use FoodBankManager\Admin\ReportsPage;
 use FoodBankManager\Admin\SchedulePage;
 use FoodBankManager\Admin\ThemePage;
 use FoodBankManager\Auth\Capabilities;
+use FoodBankManager\CLI\Commands;
 use FoodBankManager\Rest\CheckinController;
 use FoodBankManager\Shortcodes\RegistrationForm;
 use FoodBankManager\Shortcodes\StaffDashboard;
@@ -31,7 +32,7 @@ use function do_action;
  */
 final class Plugin {
 
-        public const VERSION = '2.2.25';
+        public const VERSION = '2.2.26';
 
 
 	/**
@@ -44,13 +45,17 @@ final class Plugin {
 				ReportsPage::register();
 				SchedulePage::register();
 				ThemePage::register();
-		RegistrationForm::register();
-		StaffDashboard::register();
+                RegistrationForm::register();
+                StaffDashboard::register();
 
-		add_action( 'rest_api_init', array( CheckinController::class, 'register_routes' ) );
+                add_action( 'rest_api_init', array( CheckinController::class, 'register_routes' ) );
 
-		do_action( 'fbm_booted' );
-	}
+                if ( defined( 'WP_CLI' ) && WP_CLI ) {
+                        Commands::register();
+                }
+
+                do_action( 'fbm_booted' );
+        }
 
 	/**
 	 * Perform activation tasks.
