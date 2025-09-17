@@ -3,6 +3,7 @@
   <testsuites>
     <testsuite name="Unit">
       <directory suffix="Test.php">tests/Unit</directory>
+      <file>tests/UninstallTest.php</file>
       <file>tests/Token/class-tokenservicetest.php</file>
       <file>tests/Registration/RegistrationFormTest.php</file>
       <file>tests/Rest/class-checkincontrollertest.php</file>

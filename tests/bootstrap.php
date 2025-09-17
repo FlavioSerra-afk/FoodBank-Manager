@@ -527,6 +527,22 @@ if ( ! function_exists( 'update_option' ) ) {
         }
 }
 
+if ( ! function_exists( 'delete_option' ) ) {
+        function delete_option( string $name ): bool {
+                if ( ! isset( $GLOBALS['fbm_deleted_options'] ) || ! is_array( $GLOBALS['fbm_deleted_options'] ) ) {
+                        $GLOBALS['fbm_deleted_options'] = array();
+                }
+
+                $GLOBALS['fbm_deleted_options'][] = $name;
+
+                if ( isset( $GLOBALS['fbm_options'] ) && is_array( $GLOBALS['fbm_options'] ) ) {
+                        unset( $GLOBALS['fbm_options'][ $name ] );
+                }
+
+                return true;
+        }
+}
+
 require_once __DIR__ . '/../includes/Core/class-install.php';
 require_once __DIR__ . '/../includes/Attendance/class-attendancerepository.php';
 require_once __DIR__ . '/../includes/Attendance/class-checkinservice.php';
