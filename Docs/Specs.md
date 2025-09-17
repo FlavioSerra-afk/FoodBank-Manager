@@ -23,6 +23,10 @@ Staff/Volunteers (fbm_edit, fbm_view): access staff front-end dashboard; perform
 
 Public: forms only (registration). No analytics. No QR scanning UI.
 
+FBM disregards legacy WordPress roles (subscriber/customer/etc.) when determining access.
+Successful public registration automatically grants the FoodBank Member role in addition to FBM status fields.
+Operational tooling (dashboards, exports, diagnostics) requires FBM Manager or Staff capabilities.
+
 Core Capabilities
 
 fbm_manage (manage settings/operations)
@@ -56,6 +60,8 @@ Minimal PII collection; strict sanitize/normalize; prepared SQL writes.
 
 On approval (or instant, per config), send Welcome Email including the user’s persistent QR code and a fallback alphanumeric code.
 
+Auto-assign FoodBank Member role on successful registration; ignore legacy WP role defaults.
+
 Optional policy consent capture and audit (timestamps).
 
 B) Staff Front-End Dashboard (Scanner)
@@ -71,6 +77,8 @@ Manual code entry fallback (A11y and “no-camera” cases).
 Session status: shows current window (Thursday 11:00–14:30), number of collections recorded today, last scan result.
 
 Rate-limit & idempotency feedback (e.g., “already checked in today”).
+
+Access limited to FBM Manager/Staff roles; public members receive read-only welcome communications.
 
 Server:
 
