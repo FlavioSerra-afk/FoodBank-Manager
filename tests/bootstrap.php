@@ -101,7 +101,28 @@ if ( ! class_exists( 'wpdb', false ) ) {
          */
         private int $next_override_id = 1;
 
-                public function replace( string $table, array $data, array $format ) {
+        /**
+         * Locate a member record by reference.
+         *
+         * @param string $reference Member reference string.
+         *
+         * @return array<string,mixed>|null
+         */
+        private function find_member_by_reference( string $reference ): ?array {
+                foreach ( $this->members as $member ) {
+                        if ( ! isset( $member['member_reference'] ) ) {
+                                continue;
+                        }
+
+                        if ( (string) $member['member_reference'] === $reference ) {
+                                return $member;
+                        }
+                }
+
+                return null;
+        }
+
+        public function replace( string $table, array $data, array $format ) {
                         unset( $format );
                         unset( $table );
 
@@ -288,6 +309,52 @@ if ( ! class_exists( 'wpdb', false ) ) {
                                 return null;
                         }
 
+                        if (
+                                str_contains( $sql, 'COUNT(*) AS total' )
+                                && str_contains( $sql, 'fbm_attendance' )
+                        ) {
+                                $active_status  = (string) ( $args[0] ?? 'active' );
+                                $revoked_status = (string) ( $args[1] ?? 'revoked' );
+                                $start          = (string) ( $args[2] ?? '' );
+                                $end            = (string) ( $args[3] ?? '' );
+
+                                $total   = 0;
+                                $active  = 0;
+                                $revoked = 0;
+
+                                foreach ( $this->attendance as $record ) {
+                                        $collected_date = (string) ( $record['collected_date'] ?? '' );
+
+                                        if ( '' !== $start && $collected_date < $start ) {
+                                                continue;
+                                        }
+
+                                        if ( '' !== $end && $collected_date > $end ) {
+                                                continue;
+                                        }
+
+                                        $total++;
+
+                                        $member = $this->find_member_by_reference( (string) $record['member_reference'] );
+                                        $status = isset( $member['status'] ) ? (string) $member['status'] : '';
+
+                                        if ( $status === $active_status ) {
+                                                $active++;
+                                                continue;
+                                        }
+
+                                        if ( $status === $revoked_status ) {
+                                                $revoked++;
+                                        }
+                                }
+
+                                return array(
+                                        'total'         => $total,
+                                        'active_total'  => $active,
+                                        'revoked_total' => $revoked,
+                                );
+                        }
+
                         if ( str_contains( $sql, 'fbm_members' ) && str_contains( $sql, 'member_reference = %s' ) ) {
                                 $reference = (string) ( $args[0] ?? '' );
 
@@ -299,6 +366,64 @@ if ( ! class_exists( 'wpdb', false ) ) {
                         }
 
                         return null;
+                }
+
+                public function get_results( string $query, $output = ARRAY_A ) {
+                        unset( $query );
+                        unset( $output );
+
+                        if ( ! is_array( $this->last_prepare ) ) {
+                                return array();
+                        }
+
+                        $sql  = $this->last_prepare['query'];
+                        $args = $this->last_prepare['args'];
+
+                        if (
+                                str_contains( $sql, 'FROM `' )
+                                && str_contains( $sql, 'fbm_attendance' )
+                                && str_contains( $sql, 'ORDER BY' )
+                        ) {
+                                $start = (string) ( $args[0] ?? '' );
+                                $end   = (string) ( $args[1] ?? '' );
+
+                                $rows = array();
+
+                                foreach ( $this->attendance as $record ) {
+                                        $collected_date = (string) ( $record['collected_date'] ?? '' );
+
+                                        if ( '' !== $start && $collected_date < $start ) {
+                                                continue;
+                                        }
+
+                                        if ( '' !== $end && $collected_date > $end ) {
+                                                continue;
+                                        }
+
+                                        $member = $this->find_member_by_reference( (string) $record['member_reference'] );
+
+                                        $rows[] = array(
+                                                'member_reference' => (string) $record['member_reference'],
+                                                'collected_at'     => (string) $record['collected_at'],
+                                                'collected_date'   => $collected_date,
+                                                'method'           => (string) $record['method'],
+                                                'note'             => $record['note'] ?? null,
+                                                'recorded_by'      => $record['recorded_by'] ?? null,
+                                                'status'           => isset( $member['status'] ) ? (string) $member['status'] : '',
+                                        );
+                                }
+
+                                usort(
+                                        $rows,
+                                        static function ( array $a, array $b ): int {
+                                                return strcmp( (string) ( $a['collected_at'] ?? '' ), (string) ( $b['collected_at'] ?? '' ) );
+                                        }
+                                );
+
+                                return $rows;
+                        }
+
+                        return array();
                 }
 
                 public function update( string $table, array $data, array $where, array $format, array $where_format ) {
@@ -551,8 +676,57 @@ if ( ! function_exists( 'delete_option' ) ) {
         }
 }
 
+if ( ! function_exists( 'get_transient' ) ) {
+        function get_transient( string $name ) {
+                $transients = $GLOBALS['fbm_transients'] ?? array();
+
+                if ( ! isset( $transients[ $name ] ) ) {
+                        return false;
+                }
+
+                $record = $transients[ $name ];
+                $expires = isset( $record['expires'] ) ? (int) $record['expires'] : 0;
+
+                if ( $expires > 0 && $expires < time() ) {
+                        unset( $GLOBALS['fbm_transients'][ $name ] );
+
+                        return false;
+                }
+
+                return $record['value'] ?? false;
+        }
+}
+
+if ( ! function_exists( 'set_transient' ) ) {
+        function set_transient( string $name, $value, int $expiration = 0 ): bool {
+                if ( ! isset( $GLOBALS['fbm_transients'] ) || ! is_array( $GLOBALS['fbm_transients'] ) ) {
+                        $GLOBALS['fbm_transients'] = array();
+                }
+
+                $expires = $expiration > 0 ? time() + $expiration : 0;
+
+                $GLOBALS['fbm_transients'][ $name ] = array(
+                        'value'   => $value,
+                        'expires' => $expires,
+                );
+
+                return true;
+        }
+}
+
+if ( ! function_exists( 'delete_transient' ) ) {
+        function delete_transient( string $name ): bool {
+                if ( isset( $GLOBALS['fbm_transients'][ $name ] ) ) {
+                        unset( $GLOBALS['fbm_transients'][ $name ] );
+                }
+
+                return true;
+        }
+}
+
 require_once __DIR__ . '/../includes/Core/class-install.php';
 require_once __DIR__ . '/../includes/Attendance/class-attendancerepository.php';
+require_once __DIR__ . '/../includes/Attendance/class-attendancereportservice.php';
 require_once __DIR__ . '/../includes/Attendance/class-checkinservice.php';
 require_once __DIR__ . '/../includes/Token/class-tokenrepository.php';
 require_once __DIR__ . '/../includes/Token/class-tokenservice.php';
@@ -562,6 +736,7 @@ require_once __DIR__ . '/../includes/Email/class-welcomemailer.php';
 require_once __DIR__ . '/../includes/Shortcodes/class-registrationform.php';
 require_once __DIR__ . '/../includes/Rest/class-checkincontroller.php';
 require_once __DIR__ . '/../includes/Admin/class-memberspage.php';
+require_once __DIR__ . '/../includes/Admin/class-reportspage.php';
 require_once __DIR__ . '/../includes/Admin/class-themepage.php';
 
 if ( ! function_exists( 'add_action' ) ) {
@@ -640,9 +815,21 @@ if ( ! function_exists( 'esc_html' ) ) {
         }
 }
 
+if ( ! function_exists( 'number_format_i18n' ) ) {
+        function number_format_i18n( $number, int $decimals = 0 ): string {
+                return number_format( (float) $number, $decimals, '.', ',' );
+        }
+}
+
 if ( ! function_exists( 'esc_attr' ) ) {
         function esc_attr( $text ): string {
                 return htmlspecialchars( (string) $text, ENT_QUOTES, 'UTF-8' );
+        }
+}
+
+if ( ! function_exists( 'wp_kses_post' ) ) {
+        function wp_kses_post( $data ) {
+                return $data;
         }
 }
 

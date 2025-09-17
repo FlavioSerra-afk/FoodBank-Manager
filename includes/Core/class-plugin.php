@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace FoodBankManager\Core;
 
 use FoodBankManager\Admin\MembersPage;
+use FoodBankManager\Admin\ReportsPage;
 use FoodBankManager\Admin\ThemePage;
 use FoodBankManager\Auth\Capabilities;
 use FoodBankManager\Rest\CheckinController;
@@ -31,8 +32,9 @@ final class Plugin {
 	 */
 	public static function boot(): void {
 		Assets::setup();
-		MembersPage::register();
-		ThemePage::register();
+                MembersPage::register();
+                ReportsPage::register();
+                ThemePage::register();
 		RegistrationForm::register();
 		StaffDashboard::register();
 
