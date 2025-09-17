@@ -13,9 +13,11 @@ use DateTimeImmutable;
 use DateTimeZone;
 use FoodBankManager\Attendance\AttendanceRepository;
 use FoodBankManager\Attendance\CheckinService;
+use FoodBankManager\Core\Schedule;
 use FoodBankManager\Registration\MembersRepository;
 use FoodBankManager\Rest\CheckinController;
 use PHPUnit\Framework\TestCase;
+use function update_option;
 
 /**
  * @covers \FoodBankManager\Rest\CheckinController
@@ -29,6 +31,9 @@ final class CheckinControllerTest extends TestCase {
 
                 unset( $GLOBALS['fbm_transients'] );
 
+                $GLOBALS['fbm_options'] = array();
+                update_option( 'fbm_schedule_window', $this->default_window() );
+
                 $this->wpdb      = new \wpdb();
                 $GLOBALS['wpdb'] = $this->wpdb;
                 $GLOBALS['fbm_current_caps'] = array(
@@ -39,6 +44,8 @@ final class CheckinControllerTest extends TestCase {
 
                 $_SERVER['REMOTE_ADDR'] = '198.51.100.1';
 
+                Schedule::set_current_window_override( null );
+
                 CheckinService::set_current_time_override(
                         new DateTimeImmutable( '2023-08-17 12:00:00', new DateTimeZone( 'Europe/London' ) )
                 );
@@ -46,10 +53,25 @@ final class CheckinControllerTest extends TestCase {
 
         protected function tearDown(): void {
                 CheckinService::set_current_time_override( null );
+                Schedule::set_current_window_override( null );
 
                 unset( $GLOBALS['wpdb'], $GLOBALS['fbm_current_caps'], $GLOBALS['fbm_test_nonces'], $GLOBALS['fbm_transients'], $_SERVER['REMOTE_ADDR'] );
 
                 parent::tearDown();
+        }
+
+        /**
+         * Provide the default schedule window for REST tests.
+         *
+         * @return array{day:string,start:string,end:string,timezone:string}
+         */
+        private function default_window(): array {
+                return array(
+                        'day'      => 'thursday',
+                        'start'    => '11:00',
+                        'end'      => '14:30',
+                        'timezone' => 'Europe/London',
+                );
         }
 
         public function test_handle_checkin_records_success_within_collection_window(): void {
@@ -100,8 +122,20 @@ final class CheckinControllerTest extends TestCase {
         }
 
         public function test_handle_checkin_returns_window_metadata_when_outside_collection_hours(): void {
+                $custom_window = array(
+                        'day'      => 'monday',
+                        'start'    => '09:00',
+                        'end'      => '12:00',
+                        'timezone' => 'America/New_York',
+                );
+
+                update_option( 'fbm_schedule_window', $custom_window );
+
+                $schedule        = new Schedule();
+                $expected_window = $schedule->current_window();
+
                 CheckinService::set_current_time_override(
-                        new DateTimeImmutable( '2023-08-16 10:00:00', new DateTimeZone( 'Europe/London' ) )
+                        new DateTimeImmutable( '2023-08-21 08:15:00', new DateTimeZone( 'America/New_York' ) )
                 );
 
                 $members   = new MembersRepository( $this->wpdb );
@@ -124,15 +158,10 @@ final class CheckinControllerTest extends TestCase {
                 $this->assertSame( CheckinService::STATUS_OUT_OF_WINDOW, $data['status'] );
                 $this->assertSame( 'FBM500', $data['member_ref'] );
                 $this->assertArrayHasKey( 'window', $data );
-                $this->assertSame(
-                        array(
-                                'day'      => 'thursday',
-                                'start'    => '11:00',
-                                'end'      => '14:30',
-                                'timezone' => 'Europe/London',
-                        ),
-                        $data['window']
-                );
+                $this->assertSame( $expected_window, $data['window'] );
+                $this->assertSame( Schedule::window_notice( $expected_window ), $data['message'] );
+                $this->assertSame( Schedule::window_notice( $expected_window ), $data['window_notice'] );
+                $this->assertSame( Schedule::window_labels( $expected_window ), $data['window_labels'] );
         }
 
         public function test_handle_checkin_marks_duplicate_attempts(): void {
