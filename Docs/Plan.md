@@ -55,9 +55,9 @@ Short-TTL caches for common ranges.
 
 U5 — Diagnostics & Release
 
-Mail failures view + secure resend (throttle).
+✅ Mail failures view + secure resend (throttle).
 
-Packaging/runbook; version alignment; changelog.
+✅ Packaging/runbook; version alignment; changelog.
 
 GitHub Release; verify zip contents.
 

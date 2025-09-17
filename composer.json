@@ -68,11 +68,16 @@
         "ver:bump:patch": "php -d detect_unicode=0 bin/bump-version.php patch",
         "ver:bump:minor": "php -d detect_unicode=0 bin/bump-version.php minor",
         "ver:bump:major": "php -d detect_unicode=0 bin/bump-version.php major",
+        "changelog:release": "php bin/changelog-release.php",
         "cs:report": "php -d memory_limit=512M vendor/bin/phpcs --standard=phpcs.xml -q --report=full --report-file=./phpcs-report.txt",
         "cs:fix": "composer phpcbf && composer phpcs || true",
         "qa": "composer phpcs && composer phpstan && composer test",
         "qa:fast": "composer phpcs && composer phpstan:fast && composer test",
         "build:zip": "bash bin/package.sh",
+        "release:prep": [
+            "@changelog:release",
+            "@build:zip"
+        ],
         "i18n:pot": "FBM_SKIP_ABSPATH=1 WP_CLI_ALLOW_ROOT=1 wp i18n make-pot . languages/foodbank-manager.pot --skip-plugins --skip-themes --exclude=vendor,dist,node_modules",
         "i18n:mo": "FBM_SKIP_ABSPATH=1 WP_CLI_ALLOW_ROOT=1 wp i18n make-mo languages languages --skip-plugins --skip-themes",
         "i18n:build": [

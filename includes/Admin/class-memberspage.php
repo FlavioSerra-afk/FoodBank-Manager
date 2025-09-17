@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace FoodBankManager\Admin;
 
+use FoodBankManager\Diagnostics\MailFailureLog;
 use FoodBankManager\Email\WelcomeMailer;
 use FoodBankManager\Registration\MembersRepository;
 use FoodBankManager\Token\TokenRepository;
@@ -380,35 +381,46 @@ final class MembersPage {
 				);
 		}
 
-			$outcome = array(
-				'notice'           => 'resend-issue',
-				'member_reference' => $member['member_reference'],
-				'status'           => false,
-				'error'            => 'issue',
-			);
+                $outcome = array(
+                        'notice'           => 'resend-issue',
+                        'member_reference' => $member['member_reference'],
+                        'status'           => false,
+                        'error'            => 'issue',
+                );
 
-			$tokens = new TokenService( new TokenRepository( $wpdb ) );
+                $tokens = new TokenService( new TokenRepository( $wpdb ) );
+                $log    = new MailFailureLog();
 
-			try {
-					$token = $tokens->issue( $member_id );
-			} catch ( RuntimeException $exception ) {
-					unset( $exception );
-
-					return $outcome;
-			}
-
-			$mailer = new WelcomeMailer();
-
-			if ( ! $mailer->send( $member['email'], $member['first_name'], $member['member_reference'], $token ) ) {
-					$outcome['notice'] = 'resend-mail';
-					$outcome['error']  = 'mail';
+                try {
+                        $token = $tokens->issue( $member_id );
+                } catch ( RuntimeException $exception ) {
+                        unset( $exception );
 
 					return $outcome;
 			}
 
-			$outcome['notice'] = 'resent';
-			$outcome['status'] = true;
-			unset( $outcome['error'] );
+                $mailer = new WelcomeMailer();
+
+                if ( ! $mailer->send( $member['email'], $member['first_name'], $member['member_reference'], $token ) ) {
+                        $log->record_failure(
+                                (int) $member['id'],
+                                $member['member_reference'],
+                                $member['email'],
+                                MailFailureLog::CONTEXT_ADMIN_RESEND,
+                                MailFailureLog::ERROR_MAIL
+                        );
+
+                        $outcome['notice'] = 'resend-mail';
+                        $outcome['error']  = 'mail';
+
+                        return $outcome;
+                }
+
+                $log->resolve_member( (int) $member['id'] );
+
+                $outcome['notice'] = 'resent';
+                $outcome['status'] = true;
+                unset( $outcome['error'] );
 
 			do_action( 'fbm_members_page_resend_sent', $member_id, $member );
 
