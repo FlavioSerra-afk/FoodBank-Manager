@@ -144,6 +144,7 @@ if ( ! class_exists( 'wpdb', false ) ) {
                                 'issued_at'  => (string) $data['issued_at'],
                                 'version'    => (string) ( $data['version'] ?? 'v1' ),
                                 'revoked_at' => null,
+                                'meta'       => isset( $data['meta'] ) ? (string) $data['meta'] : '{}',
                         );
 
                         return 1;
@@ -212,6 +213,7 @@ if ( ! class_exists( 'wpdb', false ) ) {
                                                         'member_id'  => $record['member_id'],
                                                         'token_hash' => $record['token_hash'],
                                                         'version'    => $record['version'] ?? 'v1',
+                                                        'meta'       => $record['meta'] ?? '{}',
                                                 );
                                         }
                                 }

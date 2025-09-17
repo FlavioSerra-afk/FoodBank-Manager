@@ -12,9 +12,9 @@ namespace FoodBankManager\Admin;
 use FoodBankManager\Diagnostics\MailFailureLog;
 use FoodBankManager\Email\WelcomeMailer;
 use FoodBankManager\Registration\MembersRepository;
+use FoodBankManager\Registration\RegistrationService;
 use FoodBankManager\Token\TokenRepository;
 use FoodBankManager\Token\TokenService;
-use RuntimeException;
 use wpdb;
 use function __;
 use function absint;
@@ -24,10 +24,15 @@ use function add_query_arg;
 use function admin_url;
 use function apply_filters;
 use function check_admin_referer;
+use function call_user_func;
 use function current_user_can;
 use function do_action;
 use function esc_html__;
+use function get_current_user_id;
+use function is_callable;
+use function is_object;
 use function is_readable;
+use function method_exists;
 use function sanitize_key;
 use function sanitize_text_field;
 use function sprintf;
@@ -52,15 +57,35 @@ final class MembersPage {
 	private const STATUS_PARAM = 'fbm_status';
 	private const ERROR_PARAM  = 'fbm_error';
 
-	private const ACTION_RESEND = 'resend';
-	private const ACTION_REVOKE = 'revoke';
+	private const ACTION_APPROVE    = 'approve';
+	private const ACTION_RESEND     = 'resend';
+	private const ACTION_REGENERATE = 'regenerate';
+	private const ACTION_REVOKE     = 'revoke';
+
+		/**
+		 * Optional factory for mailer instances.
+		 *
+		 * @var callable|null
+		 */
+	private static $mailer_factory = null;
 
 		/**
 		 * Register WordPress hooks.
 		 */
 	public static function register(): void {
-			add_action( 'admin_menu', array( __CLASS__, 'register_menu' ) );
-			add_action( 'admin_init', array( __CLASS__, 'handle_actions' ) );
+					add_action( 'admin_menu', array( __CLASS__, 'register_menu' ) );
+					add_action( 'admin_init', array( __CLASS__, 'handle_actions' ) );
+	}
+
+		/**
+		 * Override the mailer factory for testing.
+		 *
+		 * @internal
+		 *
+		 * @param callable|null $factory Callable returning a mailer instance.
+		 */
+	public static function set_mailer_factory( ?callable $factory ): void {
+			self::$mailer_factory = $factory;
 	}
 
 		/**
@@ -95,8 +120,10 @@ final class MembersPage {
 			$members    = $repository->all();
 
 		foreach ( $members as $index => $member ) {
-				$members[ $index ]['resend_url'] = self::build_action_url( self::ACTION_RESEND, $member['id'] );
-				$members[ $index ]['revoke_url'] = self::build_action_url( self::ACTION_REVOKE, $member['id'] );
+						$members[ $index ]['approve_url']    = self::build_action_url( self::ACTION_APPROVE, $member['id'] );
+						$members[ $index ]['resend_url']     = self::build_action_url( self::ACTION_RESEND, $member['id'] );
+						$members[ $index ]['regenerate_url'] = self::build_action_url( self::ACTION_REGENERATE, $member['id'] );
+						$members[ $index ]['revoke_url']     = self::build_action_url( self::ACTION_REVOKE, $member['id'] );
 		}
 
 			$members = apply_filters( 'fbm_members_page_members', $members );
@@ -164,13 +191,21 @@ final class MembersPage {
 		}
 
 		switch ( $action ) {
+			case self::ACTION_APPROVE:
+								check_admin_referer( self::approve_nonce_action( $member_id ) );
+								$outcome = self::process_approve( $member_id );
+				break;
 			case self::ACTION_RESEND:
-					check_admin_referer( self::resend_nonce_action( $member_id ) );
-					$outcome = self::process_resend( $member_id );
+									check_admin_referer( self::resend_nonce_action( $member_id ) );
+									$outcome = self::process_resend( $member_id );
+				break;
+			case self::ACTION_REGENERATE:
+						check_admin_referer( self::regenerate_nonce_action( $member_id ) );
+						$outcome = self::process_regenerate( $member_id );
 				break;
 			case self::ACTION_REVOKE:
-					check_admin_referer( self::revoke_nonce_action( $member_id ) );
-					$outcome = self::process_revoke( $member_id );
+						check_admin_referer( self::revoke_nonce_action( $member_id ) );
+						$outcome = self::process_revoke( $member_id );
 				break;
 			default:
 				return;
@@ -210,27 +245,77 @@ final class MembersPage {
 			$notices = array();
 
 		switch ( $code ) {
-			case 'resent':
+			case 'approved':
 				if ( '' !== $member_reference ) {
 					$message = sprintf(
-						/* translators: %s: Member reference. */
-						__( 'Sent a new QR code email to %s.', 'foodbank-manager' ),
+					/* translators: %s: Member reference. */
+						__( 'Approved %s and sent their welcome email.', 'foodbank-manager' ),
 						$member_reference
 					);
 				} else {
-						$message = __( 'Sent a new QR code email.', 'foodbank-manager' );
+					$message = __( 'Approved the member and sent their welcome email.', 'foodbank-manager' );
 				}
 
-					$notices[] = array(
-						'type'    => 'success',
-						'message' => $message,
-					);
+						$notices[] = array(
+							'type'    => 'success',
+							'message' => $message,
+						);
+				break;
+			case 'approve-mail':
+							$notices[] = array(
+								'type'    => 'warning',
+								'message' => __( 'Approved the member, but the welcome email could not be sent.', 'foodbank-manager' ),
+							);
+				break;
+			case 'approve-issue':
+				$notices[] = array(
+					'type'    => 'error',
+					'message' => __( 'Unable to approve the selected member.', 'foodbank-manager' ),
+				);
+				break;
+			case 'resent':
+				if ( '' !== $member_reference ) {
+						$message = sprintf(
+					/* translators: %s: Member reference. */
+							__( 'Sent a new QR code email to %s.', 'foodbank-manager' ),
+							$member_reference
+						);
+				} else {
+									$message = __( 'Sent a new QR code email.', 'foodbank-manager' );
+				}
+
+								$notices[] = array(
+									'type'    => 'success',
+									'message' => $message,
+								);
+				break;
+			case 'regenerated':
+				if ( '' !== $member_reference ) {
+						$message = sprintf(
+								/* translators: %s: Member reference. */
+							__( 'Issued a new QR token for %s.', 'foodbank-manager' ),
+							$member_reference
+						);
+				} else {
+							$message = __( 'Issued a new QR token for the member.', 'foodbank-manager' );
+				}
+
+								$notices[] = array(
+									'type'    => 'success',
+									'message' => $message,
+								);
+				break;
+			case 'regenerate-issue':
+				$notices[] = array(
+					'type'    => 'error',
+					'message' => __( 'Unable to regenerate a token for the selected member.', 'foodbank-manager' ),
+				);
 				break;
 			case 'resend-mail':
-					$notices[] = array(
-						'type'    => 'error',
-						'message' => __( 'Issued a new token, but the email could not be sent.', 'foodbank-manager' ),
-					);
+						$notices[] = array(
+							'type'    => 'error',
+							'message' => __( 'Issued a new token, but the email could not be sent.', 'foodbank-manager' ),
+						);
 				break;
 			case 'resend-issue':
 					$notices[] = array(
@@ -285,20 +370,40 @@ final class MembersPage {
 		 * @param int    $member_id Member identifier.
 		 */
 	private static function build_action_url( string $action, int $member_id ): string {
-			$url = add_query_arg(
-				array(
-					'page'             => self::MENU_SLUG,
-					self::ACTION_PARAM => $action,
-					'member_id'        => $member_id,
-				),
-				admin_url( 'admin.php' )
-			);
+					$url = add_query_arg(
+						array(
+							'page'             => self::MENU_SLUG,
+							self::ACTION_PARAM => $action,
+							'member_id'        => $member_id,
+						),
+						admin_url( 'admin.php' )
+					);
 
-			$nonce = self::ACTION_RESEND === $action
-					? self::resend_nonce_action( $member_id )
-					: self::revoke_nonce_action( $member_id );
+		switch ( $action ) {
+			case self::ACTION_APPROVE:
+								$nonce = self::approve_nonce_action( $member_id );
+				break;
+			case self::ACTION_RESEND:
+							$nonce = self::resend_nonce_action( $member_id );
+				break;
+			case self::ACTION_REGENERATE:
+				$nonce = self::regenerate_nonce_action( $member_id );
+				break;
+			case self::ACTION_REVOKE:
+			default:
+				$nonce = self::revoke_nonce_action( $member_id );
+		}
 
-			return wp_nonce_url( $url, $nonce );
+					return wp_nonce_url( $url, $nonce );
+	}
+
+		/**
+		 * Compute the approve nonce action for a member.
+		 *
+		 * @param int $member_id Member identifier.
+		 */
+	private static function approve_nonce_action( int $member_id ): string {
+			return 'fbm_member_approve_' . $member_id;
 	}
 
 		/**
@@ -308,6 +413,15 @@ final class MembersPage {
 		 */
 	private static function resend_nonce_action( int $member_id ): string {
 			return 'fbm_member_resend_' . $member_id;
+	}
+
+		/**
+		 * Compute the regenerate nonce action for a member.
+		 *
+		 * @param int $member_id Member identifier.
+		 */
+	private static function regenerate_nonce_action( int $member_id ): string {
+			return 'fbm_member_regenerate_' . $member_id;
 	}
 
 		/**
@@ -353,6 +467,88 @@ final class MembersPage {
 	}
 
 		/**
+		 * Process the approve action.
+		 *
+		 * @param int $member_id Member identifier.
+		 *
+		 * @return array{notice:string,member_reference?:string,status:bool,error?:string}
+		 */
+	private static function process_approve( int $member_id ): array {
+					global $wpdb;
+
+		if ( ! $wpdb instanceof wpdb ) {
+						return array(
+							'notice' => 'approve-issue',
+							'status' => false,
+							'error'  => 'database',
+						);
+		}
+
+					$repository = new MembersRepository( $wpdb );
+					$member     = $repository->find( $member_id );
+
+		if ( null === $member ) {
+						return array(
+							'notice' => 'member-missing',
+							'status' => false,
+							'error'  => 'missing',
+						);
+		}
+
+			$outcome = array(
+				'notice'           => 'approve-issue',
+				'member_reference' => $member['member_reference'],
+				'status'           => false,
+				'error'            => 'issue',
+			);
+
+			$log          = new MailFailureLog();
+			$tokens       = new TokenService( new TokenRepository( $wpdb ) );
+			$registration = new RegistrationService( $repository, $tokens );
+			$approval     = $registration->approve( $member_id, get_current_user_id() );
+
+			if ( null === $approval ) {
+					$log->record_failure(
+						(int) $member['id'],
+						$member['member_reference'],
+						$member['email'],
+						MailFailureLog::CONTEXT_ADMIN_RESEND,
+						MailFailureLog::ERROR_TOKEN
+					);
+
+					return $outcome;
+			}
+
+			$mailer = self::resolve_mailer();
+
+			if ( ! $mailer->send( $approval['email'], $approval['first_name'], $approval['member_reference'], $approval['token'] ) ) {
+					$log->record_failure(
+						(int) $member['id'],
+						$member['member_reference'],
+						$member['email'],
+						MailFailureLog::CONTEXT_ADMIN_RESEND,
+						MailFailureLog::ERROR_MAIL
+					);
+
+					$outcome['notice'] = 'approve-mail';
+					$outcome['error']  = 'mail';
+
+					return $outcome;
+			}
+
+			$log->resolve_member( (int) $member['id'] );
+
+			$outcome['notice']           = 'approved';
+			$outcome['status']           = true;
+			$outcome['member_reference'] = $approval['member_reference'];
+			unset( $outcome['error'] );
+
+					do_action( 'fbm_members_page_member_approved', $member_id, $approval );
+
+					return $outcome;
+	}
+
+		/**
 		 * Process the resend action.
 		 *
 		 * @param int $member_id Member identifier.
@@ -360,71 +556,151 @@ final class MembersPage {
 		 * @return array{notice:string,member_reference?:string,status:bool,error?:string}
 		 */
 	private static function process_resend( int $member_id ): array {
-			global $wpdb;
+					global $wpdb;
 
 		if ( ! $wpdb instanceof wpdb ) {
-				return array(
-					'notice' => 'resend-issue',
-					'status' => false,
-					'error'  => 'database',
-				);
+						return array(
+							'notice' => 'resend-issue',
+							'status' => false,
+							'error'  => 'database',
+						);
 		}
 
-			$repository = new MembersRepository( $wpdb );
-			$member     = $repository->find( $member_id );
+					$repository = new MembersRepository( $wpdb );
+					$member     = $repository->find( $member_id );
 
 		if ( null === $member ) {
-				return array(
-					'notice' => 'member-missing',
-					'status' => false,
-					'error'  => 'missing',
-				);
+						return array(
+							'notice' => 'member-missing',
+							'status' => false,
+							'error'  => 'missing',
+						);
 		}
 
-                $outcome = array(
-                        'notice'           => 'resend-issue',
-                        'member_reference' => $member['member_reference'],
-                        'status'           => false,
-                        'error'            => 'issue',
-                );
+			$outcome = array(
+				'notice'           => 'resend-issue',
+				'member_reference' => $member['member_reference'],
+				'status'           => false,
+				'error'            => 'issue',
+			);
 
-                $tokens = new TokenService( new TokenRepository( $wpdb ) );
-                $log    = new MailFailureLog();
+			$log          = new MailFailureLog();
+			$tokens       = new TokenService( new TokenRepository( $wpdb ) );
+			$registration = new RegistrationService( $repository, $tokens );
+			$issuance     = $registration->regenerate( $member_id, 'resend', get_current_user_id() );
 
-                try {
-                        $token = $tokens->issue( $member_id );
-                } catch ( RuntimeException $exception ) {
-                        unset( $exception );
+			if ( null === $issuance ) {
+					$log->record_failure(
+						(int) $member['id'],
+						$member['member_reference'],
+						$member['email'],
+						MailFailureLog::CONTEXT_ADMIN_RESEND,
+						MailFailureLog::ERROR_TOKEN
+					);
 
 					return $outcome;
 			}
 
-                $mailer = new WelcomeMailer();
+			$mailer = self::resolve_mailer();
 
-                if ( ! $mailer->send( $member['email'], $member['first_name'], $member['member_reference'], $token ) ) {
-                        $log->record_failure(
-                                (int) $member['id'],
-                                $member['member_reference'],
-                                $member['email'],
-                                MailFailureLog::CONTEXT_ADMIN_RESEND,
-                                MailFailureLog::ERROR_MAIL
-                        );
+			if ( ! $mailer->send( $member['email'], $member['first_name'], $member['member_reference'], $issuance['token'] ) ) {
+					$log->record_failure(
+						(int) $member['id'],
+						$member['member_reference'],
+						$member['email'],
+						MailFailureLog::CONTEXT_ADMIN_RESEND,
+						MailFailureLog::ERROR_MAIL
+					);
 
-                        $outcome['notice'] = 'resend-mail';
-                        $outcome['error']  = 'mail';
+					$outcome['notice'] = 'resend-mail';
+					$outcome['error']  = 'mail';
 
-                        return $outcome;
-                }
+					return $outcome;
+			}
 
-                $log->resolve_member( (int) $member['id'] );
+			$log->resolve_member( (int) $member['id'] );
 
-                $outcome['notice'] = 'resent';
-                $outcome['status'] = true;
-                unset( $outcome['error'] );
+			$outcome['notice'] = 'resent';
+			$outcome['status'] = true;
+			unset( $outcome['error'] );
 
-			do_action( 'fbm_members_page_resend_sent', $member_id, $member );
+			$member['token'] = $issuance['token'];
 
-			return $outcome;
+					do_action( 'fbm_members_page_resend_sent', $member_id, $member, $issuance );
+
+					return $outcome;
+	}
+
+		/**
+		 * Process the regenerate action.
+		 *
+		 * @param int $member_id Member identifier.
+		 *
+		 * @return array{notice:string,member_reference?:string,status:bool,error?:string}
+		 */
+	private static function process_regenerate( int $member_id ): array {
+					global $wpdb;
+
+		if ( ! $wpdb instanceof wpdb ) {
+						return array(
+							'notice' => 'regenerate-issue',
+							'status' => false,
+							'error'  => 'database',
+						);
+		}
+
+					$repository = new MembersRepository( $wpdb );
+					$member     = $repository->find( $member_id );
+
+		if ( null === $member ) {
+						return array(
+							'notice' => 'member-missing',
+							'status' => false,
+							'error'  => 'missing',
+						);
+		}
+
+			$outcome = array(
+				'notice'           => 'regenerate-issue',
+				'member_reference' => $member['member_reference'],
+				'status'           => false,
+				'error'            => 'issue',
+			);
+
+			$tokens       = new TokenService( new TokenRepository( $wpdb ) );
+			$registration = new RegistrationService( $repository, $tokens );
+			$issuance     = $registration->regenerate( $member_id, 'regenerate', get_current_user_id() );
+
+			if ( null === $issuance ) {
+					return $outcome;
+			}
+
+			$outcome['notice'] = 'regenerated';
+			$outcome['status'] = true;
+			unset( $outcome['error'] );
+
+			$member['token'] = $issuance['token'];
+
+					do_action( 'fbm_members_page_token_regenerated', $member_id, $member, $issuance );
+
+					return $outcome;
+	}
+
+		/**
+		 * Resolve the welcome mailer dependency.
+		 *
+		 * @return WelcomeMailer|object
+		 */
+	private static function resolve_mailer() {
+		if ( is_callable( self::$mailer_factory ) ) {
+				$mailer = call_user_func( self::$mailer_factory );
+
+			if ( is_object( $mailer ) && method_exists( $mailer, 'send' ) ) {
+				return $mailer;
+			}
+		}
+
+			return new WelcomeMailer();
 	}
 
 		/**

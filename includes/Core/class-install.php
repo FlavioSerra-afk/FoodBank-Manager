@@ -100,6 +100,7 @@ final class Install {
 		version VARCHAR(10) NOT NULL DEFAULT \' . $initial_token_version . \',
 		issued_at DATETIME NOT NULL,
 		revoked_at DATETIME NULL,
+		meta LONGTEXT NULL,
 		PRIMARY KEY  (id),
                 UNIQUE KEY uq_member (member_id),
                 UNIQUE KEY uq_token_hash (token_hash)

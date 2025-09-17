@@ -12,8 +12,11 @@ namespace FoodBankManager\Token;
 use FoodBankManager\Core\Install;
 use wpdb;
 
+use function function_exists;
 use function is_array;
 use function is_string;
+use function json_decode;
+use function wp_json_encode;
 
 use const ARRAY_A;
 
@@ -49,20 +52,22 @@ final class TokenRepository {
 		/**
 		 * Persist an active token for a member, replacing any previous value.
 		 *
-		 * @param int    $member_id Member identifier.
-		 * @param string $token_hash Hashed token value.
-		 * @param string $issued_at  Issue timestamp (UTC).
-		 * @param string $version    Token version identifier.
+		 * @param int                  $member_id Member identifier.
+		 * @param string               $token_hash Hashed token value.
+		 * @param string               $issued_at  Issue timestamp (UTC).
+		 * @param string               $version    Token version identifier.
+		 * @param array<string, mixed> $meta Token issuance metadata.
 		 */
-	public function persist_active( int $member_id, string $token_hash, string $issued_at, string $version ): bool {
+	public function persist_active( int $member_id, string $token_hash, string $issued_at, string $version, array $meta = array() ): bool {
 			$data = array(
 				'member_id'  => $member_id,
 				'token_hash' => $token_hash,
 				'issued_at'  => $issued_at,
 				'version'    => $version,
+				'meta'       => $this->encode_meta( $meta ),
 			);
 
-			$formats = array( '%d', '%s', '%s', '%s' );
+			$formats = array( '%d', '%s', '%s', '%s', '%s' );
 
 			$result = $this->wpdb->replace( $this->table, $data, $formats );
 
@@ -74,7 +79,7 @@ final class TokenRepository {
 		 *
 		 * @param string $token_hash Hashed token value.
 		 *
-		 * @return array{member_id:int,token_hash:string,version:string}|null
+		 * @return array{member_id:int,token_hash:string,version:string,meta:array<string,mixed>}|null
 		 */
 	public function find_active_by_hash( string $token_hash ): ?array {
 		$sql = $this->wpdb->prepare(
@@ -87,11 +92,11 @@ final class TokenRepository {
 				return null;
 		}
 
-		/**
-		 * Result row.
-		 *
-		 * @var array{member_id:int|string,token_hash:string,version?:string}|null $row
-		 */
+        /**
+         * Result row.
+         *
+         * @var array{member_id:int|string,token_hash:string,version?:string,meta?:string}|null $row
+         */
 		$row = $this->wpdb->get_row( $sql, ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Prepared above.
 		if ( ! is_array( $row ) ) {
 			return null;
@@ -101,6 +106,7 @@ final class TokenRepository {
 			'member_id'  => (int) $row['member_id'],
 			'token_hash' => (string) $row['token_hash'],
 			'version'    => (string) ( $row['version'] ?? 'v1' ),
+			'meta'       => $this->decode_meta( $row['meta'] ?? '' ),
 		);
 	}
 
@@ -126,5 +132,41 @@ final class TokenRepository {
 			}
 
 			return true;
+	}
+
+	/**
+	 * Encode token metadata for storage.
+	 *
+	 * @param array<string, mixed> $meta Arbitrary metadata payload.
+	 */
+	private function encode_meta( array $meta ): string {
+		if ( empty( $meta ) ) {
+			return '{}';
+		}
+
+		if ( function_exists( 'wp_json_encode' ) ) {
+			$encoded = wp_json_encode( $meta );
+		} else {
+			$encoded = json_encode( $meta ); // phpcs:ignore WordPress.WP.AlternativeFunctions.json_encode_json_encode -- Fallback when WordPress helper is unavailable.
+		}
+
+		return is_string( $encoded ) && '' !== $encoded ? $encoded : '{}';
+	}
+
+	/**
+	 * Decode persisted metadata into an associative array.
+	 *
+	 * @param string $raw Persisted metadata payload.
+	 *
+	 * @return array<string, mixed>
+	 */
+	private function decode_meta( string $raw ): array {
+		if ( '' === $raw ) {
+			return array();
+		}
+
+		$decoded = json_decode( $raw, true );
+
+		return is_array( $decoded ) ? $decoded : array();
 	}
 }
