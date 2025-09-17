@@ -2,6 +2,7 @@
 > This is 1 of 4 canonical docs (Specs, Plan, Tasks, Matrix).
 > Codex MUST read & update these BEFORE any work, every prompt.
 > Any other files in /Docs are historical and must not drive scope.
+> Docs-Revision: 2025-09-22 (2.2.26-rc.1 S1/S2 sync)
 
 # Matrix
 
@@ -15,6 +16,7 @@
 | Attendance Manual | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | [ ] | [Events](Tasks.md#replace-remove-events-references-in-code--db-migrator), [Policy](Tasks.md#rest--ui-updates-for-fixed-window-policy); Final audit 2025-09-17 |
 | Exports CSV/XLSX/PDF | ✅ | ✅ | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | ✅ | [Tasks](Tasks.md) |
 | Diagnostics | ✅ | [ ] | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | [ ] | [Tasks](Tasks.md) |
+| WP-CLI (fbm version) | ✅ | [ ] | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | ✅ | [Tasks](Tasks.md) |
 | GDPR (Consent/SAR/Retention) | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ⚠️ | [ ] | [ ] | [ ] | [Tasks](Tasks.md) |
 | Packaging Guard | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | [Runbook](Runbooks/Release.md) | [Task](Tasks.md#packaging-guard-verification-upgrade-replaces-in-place) |
 | Encryption (at rest) | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ⚠️ | [ ] | [ ] | [ ] | [Tasks](Tasks.md) |

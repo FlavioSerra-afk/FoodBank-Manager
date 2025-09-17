@@ -2,6 +2,7 @@
 > This is 1 of 4 canonical docs (Specs, Plan, Tasks, Matrix).
 > Codex MUST read & update these BEFORE any work, every prompt.
 > Any other files in /Docs are historical and must not drive scope.
+> Docs-Revision: 2025-09-22 (2.2.26-rc.1 S1/S2 sync)
 
 # Plan
 
@@ -66,6 +67,8 @@ U5 — Diagnostics & Release
 ✅ Mail failures view + secure resend (throttle).
 
 ✅ Packaging/runbook; version alignment; changelog.
+
+✅ WP-CLI: `wp fbm version` registered on boot; stub harness + unit tests enforce output.
 
 GitHub Release; verify zip contents.
 

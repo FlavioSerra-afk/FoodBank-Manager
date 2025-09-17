@@ -2,6 +2,7 @@
 > This is 1 of 4 canonical docs (Specs, Plan, Tasks, Matrix).
 > Codex MUST read & update these BEFORE any work, every prompt.
 > Any other files in /Docs are historical and must not drive scope.
+> Docs-Revision: 2025-09-22 (2.2.26-rc.1 S1/S2 sync)
 
 # Specs
 
@@ -26,6 +27,7 @@ Public: forms only (registration). No analytics. No QR scanning UI.
 FBM disregards legacy WordPress roles (subscriber/customer/etc.) when determining access.
 Successful public registration automatically grants the FoodBank Member role in addition to FBM status fields.
 Operational tooling (dashboards, exports, diagnostics) requires FBM Manager or Staff capabilities.
+WP-CLI: expose `wp fbm version` for deployment automation; command must register during plugin boot and log `Plugin::VERSION` only.
 
 Core Capabilities
 
