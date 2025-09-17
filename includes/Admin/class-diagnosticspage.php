@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace FoodBankManager\Admin;
 
+use FoodBankManager\Diagnostics\HealthStatus;
 use FoodBankManager\Diagnostics\MailFailureLog;
 use FoodBankManager\Email\WelcomeMailer;
 use FoodBankManager\Registration\MembersRepository;
@@ -27,6 +28,7 @@ use function esc_html__;
 use function filter_input;
 use function gmdate;
 use function is_array;
+use function is_scalar;
 use function is_readable;
 use function sanitize_key;
 use function sanitize_text_field;
@@ -81,11 +83,13 @@ final class DiagnosticsPage {
 				wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ) );
 		}
 
-			$log     = new MailFailureLog();
-			$raw     = $log->entries();
-			$entries = array();
-			$notices = self::collect_notices();
-			$rate    = MailFailureLog::rate_limit_interval();
+			$log = new MailFailureLog();
+		$raw = $log->entries();
+		$entries = array();
+		$notices = self::collect_notices();
+		$rate = MailFailureLog::rate_limit_interval();
+		$health = new HealthStatus();
+		$badges = $health->badges();
 
 		foreach ( $raw as $entry ) {
 			if ( ! is_array( $entry ) ) {
@@ -116,14 +120,15 @@ final class DiagnosticsPage {
 				wp_die( esc_html__( 'Diagnostics template is missing.', 'foodbank-manager' ) );
 		}
 
-			$data = array(
-				'entries'            => $entries,
-				'notices'            => $notices,
-				'rate_limit_seconds' => $rate,
-				'page_slug'          => self::MENU_SLUG,
-			);
+						$data = array(
+							'entries'            => $entries,
+							'notices'            => $notices,
+							'rate_limit_seconds' => $rate,
+							'page_slug'          => self::MENU_SLUG,
+							'health_badges'      => $badges,
+						);
 
-			include $template;
+						include $template;
 	}
 
 		/**
@@ -134,22 +139,22 @@ final class DiagnosticsPage {
 				return;
 		}
 
-			$page_param = filter_input( INPUT_GET, 'page', FILTER_UNSAFE_RAW );
-			$page       = is_string( $page_param ) ? sanitize_key( wp_unslash( $page_param ) ) : '';
+						$page_param = self::read_query_arg( 'page' );
+						$page       = '' !== $page_param ? sanitize_key( wp_unslash( $page_param ) ) : '';
 
 		if ( self::MENU_SLUG !== $page ) {
 				return;
 		}
 
-			$action_param = filter_input( INPUT_GET, self::ACTION_PARAM, FILTER_UNSAFE_RAW );
-			$action       = is_string( $action_param ) ? sanitize_key( wp_unslash( $action_param ) ) : '';
+						$action_param = self::read_query_arg( self::ACTION_PARAM );
+						$action       = '' !== $action_param ? sanitize_key( wp_unslash( $action_param ) ) : '';
 
 		if ( self::ACTION_RESEND !== $action ) {
 				return;
 		}
 
-			$entry_param = filter_input( INPUT_GET, self::ENTRY_PARAM, FILTER_UNSAFE_RAW );
-			$entry_id    = is_string( $entry_param ) ? sanitize_text_field( wp_unslash( $entry_param ) ) : '';
+						$entry_param = self::read_query_arg( self::ENTRY_PARAM );
+						$entry_id    = '' !== $entry_param ? sanitize_text_field( wp_unslash( $entry_param ) ) : '';
 
 		if ( '' === $entry_id ) {
 				self::redirect_with_outcome(
@@ -177,13 +182,13 @@ final class DiagnosticsPage {
 	private static function collect_notices(): array {
 			$notices = array();
 
-			$status_param = filter_input( INPUT_GET, self::STATUS_PARAM, FILTER_UNSAFE_RAW );
-			$code_param   = filter_input( INPUT_GET, self::CODE_PARAM, FILTER_UNSAFE_RAW );
-			$member_param = filter_input( INPUT_GET, self::MEMBER_PARAM, FILTER_UNSAFE_RAW );
+						$status_param = self::read_query_arg( self::STATUS_PARAM );
+						$code_param   = self::read_query_arg( self::CODE_PARAM );
+						$member_param = self::read_query_arg( self::MEMBER_PARAM );
 
-			$status = is_string( $status_param ) ? sanitize_key( wp_unslash( $status_param ) ) : '';
-			$code   = is_string( $code_param ) ? sanitize_key( wp_unslash( $code_param ) ) : '';
-			$member = is_string( $member_param ) ? sanitize_text_field( wp_unslash( $member_param ) ) : '';
+						$status = '' !== $status_param ? sanitize_key( wp_unslash( $status_param ) ) : '';
+						$code   = '' !== $code_param ? sanitize_key( wp_unslash( $code_param ) ) : '';
+						$member = '' !== $member_param ? sanitize_text_field( wp_unslash( $member_param ) ) : '';
 
 		if ( '' === $status || '' === $code ) {
 				return $notices;
@@ -409,5 +414,27 @@ final class DiagnosticsPage {
 			default:
 				return __( 'Unknown error', 'foodbank-manager' );
 		}
+	}
+	/**
+	 * Retrieve a query argument with CLI-compatible fallback.
+	 *
+	 * @param string $param Query parameter name.
+	 */
+	private static function read_query_arg( string $param ): string {
+		$value = filter_input( INPUT_GET, $param, FILTER_UNSAFE_RAW );
+
+		if ( is_string( $value ) ) {
+			return $value;
+		}
+
+		if ( isset( $_GET[ $param ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- CLI fallback for tests.
+			$raw = wp_unslash( $_GET[ $param ] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- CLI fallback for tests.
+
+			if ( is_scalar( $raw ) ) {
+				return (string) $raw;
+			}
+		}
+
+		return '';
 	}
 }

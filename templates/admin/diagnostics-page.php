@@ -20,23 +20,28 @@ use function number_format_i18n;
 $entries            = array();
 $notices            = array();
 $rate_limit_seconds = 0;
+$health_badges      = array();
 
 if ( isset( $data['entries'] ) && is_array( $data['entries'] ) ) {
-		$entries = $data['entries'];
+				$entries = $data['entries'];
 }
 
 if ( isset( $data['notices'] ) && is_array( $data['notices'] ) ) {
-		$notices = $data['notices'];
+				$notices = $data['notices'];
 }
 
 if ( isset( $data['rate_limit_seconds'] ) ) {
-		$rate_limit_seconds = (int) $data['rate_limit_seconds'];
+				$rate_limit_seconds = (int) $data['rate_limit_seconds'];
+}
+
+if ( isset( $data['health_badges'] ) && is_array( $data['health_badges'] ) ) {
+				$health_badges = $data['health_badges'];
 }
 
 $rate_limit_minutes = max( 1, (int) floor( $rate_limit_seconds / 60 ) );
 ?>
 <div class="wrap">
-		<h1 class="wp-heading-inline"><?php esc_html_e( 'Food Bank Diagnostics', 'foodbank-manager' ); ?></h1>
+				<h1 class="wp-heading-inline"><?php esc_html_e( 'Food Bank Diagnostics', 'foodbank-manager' ); ?></h1>
 
 <?php
 foreach ( $notices as $notice ) :
@@ -60,9 +65,42 @@ printf(
 ?>
 </p>
 
-		<table class="widefat striped">
-				<thead>
-						<tr>
+<?php if ( ! empty( $health_badges ) ) : ?>
+<section class="fbm-status-panel" aria-labelledby="fbm-status-heading">
+				<h2 id="fbm-status-heading"><?php esc_html_e( 'System health', 'foodbank-manager' ); ?></h2>
+				<ul class="fbm-status-badges" role="list">
+	<?php
+	foreach ( $health_badges as $badge ) :
+		$badge_label   = isset( $badge['label'] ) ? (string) $badge['label'] : '';
+		$badge_status  = isset( $badge['status'] ) ? (string) $badge['status'] : '';
+		$badge_message = isset( $badge['message'] ) ? (string) $badge['message'] : '';
+		$status_class  = 'fbm-status-badge--neutral';
+		$status_phrase = esc_html__( 'Status unknown', 'foodbank-manager' );
+
+		switch ( $badge_status ) {
+			case \FoodBankManager\Diagnostics\HealthStatus::STATUS_HEALTHY:
+					$status_class  = 'fbm-status-badge--healthy';
+					$status_phrase = esc_html__( 'Healthy', 'foodbank-manager' );
+				break;
+			case \FoodBankManager\Diagnostics\HealthStatus::STATUS_DEGRADED:
+					$status_class  = 'fbm-status-badge--degraded';
+					$status_phrase = esc_html__( 'Needs attention', 'foodbank-manager' );
+				break;
+		}
+		?>
+								<li class="fbm-status-badge <?php echo esc_attr( $status_class ); ?>">
+												<span class="fbm-status-badge__label"><?php echo esc_html( $badge_label ); ?></span>
+												<span class="fbm-status-badge__state"><?php echo esc_html( $status_phrase ); ?></span>
+												<span class="fbm-status-badge__message"><?php echo esc_html( $badge_message ); ?></span>
+								</li>
+	<?php endforeach; ?>
+				</ul>
+</section>
+<?php endif; ?>
+
+				<table class="widefat striped">
+								<thead>
+												<tr>
 								<th scope="col"><?php esc_html_e( 'Recorded', 'foodbank-manager' ); ?></th>
 								<th scope="col"><?php esc_html_e( 'Member reference', 'foodbank-manager' ); ?></th>
 								<th scope="col"><?php esc_html_e( 'Email', 'foodbank-manager' ); ?></th>
