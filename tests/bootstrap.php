@@ -59,12 +59,19 @@ if ( ! class_exists( 'wpdb', false ) ) {
          */
         public array $attendance = array();
 
-        /**
-         * Captured attendance override audit rows keyed by record ID.
-         *
-         * @var array<int,array<string,mixed>>
-         */
-        public array $attendance_overrides = array();
+                /**
+                 * Captured attendance override audit rows keyed by record ID.
+                 *
+                 * @var array<int,array<string,mixed>>
+                 */
+                public array $attendance_overrides = array();
+
+                /**
+                 * Captured raw SQL queries executed via query().
+                 *
+                 * @var array<int,string>
+                 */
+                public array $queries = array();
 
                 /**
                  * Last auto-increment identifier.
@@ -122,7 +129,11 @@ if ( ! class_exists( 'wpdb', false ) ) {
                 return null;
         }
 
-        public function replace( string $table, array $data, array $format ) {
+                public function get_charset_collate(): string {
+                        return 'DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci';
+                }
+
+                public function replace( string $table, array $data, array $format ) {
                         unset( $format );
                         unset( $table );
 
@@ -424,6 +435,12 @@ if ( ! class_exists( 'wpdb', false ) ) {
                         }
 
                         return array();
+                }
+
+                public function query( string $query ) {
+                        $this->queries[] = $query;
+
+                        return 0;
                 }
 
                 public function update( string $table, array $data, array $where, array $format, array $where_format ) {
