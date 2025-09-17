@@ -23,32 +23,67 @@ final class StaffDashboardTest extends TestCase {
 		/**
 		 * Reset global fixtures before each test.
 		 */
-	protected function setUp(): void {
-			parent::setUp();
+    protected function setUp(): void {
+        parent::setUp();
 
-		$GLOBALS['fbm_user_logged_in']      = false;
-		$GLOBALS['fbm_current_caps']        = array();
-		$GLOBALS['fbm_status_header']       = null;
-		$GLOBALS['fbm_registered_styles']   = array();
-		$GLOBALS['fbm_enqueued_styles']     = array();
-		$GLOBALS['fbm_registered_scripts']  = array();
-		$GLOBALS['fbm_localized_scripts']   = array();
-		$GLOBALS['fbm_enqueued_scripts']    = array();
-		$GLOBALS['fbm_script_translations'] = array();
-	}
+        $GLOBALS['fbm_user_logged_in']      = false;
+        $GLOBALS['fbm_current_caps']        = array();
+        $GLOBALS['fbm_status_header']       = null;
+        $GLOBALS['fbm_registered_styles']   = array();
+        $GLOBALS['fbm_enqueued_styles']     = array();
+        $GLOBALS['fbm_registered_scripts']  = array();
+        $GLOBALS['fbm_localized_scripts']   = array();
+        $GLOBALS['fbm_enqueued_scripts']    = array();
+        $GLOBALS['fbm_script_translations'] = array();
+    }
 
-		/**
-		 * Denies access to users without staff capabilities.
-		 */
-	public function test_render_denies_access_when_user_not_authorised(): void {
-			$output = StaffDashboard::render();
+                /**
+                 * Blocks unauthenticated visitors from viewing the dashboard.
+                 */
+    public function test_render_denies_access_when_user_not_authenticated(): void {
+        $output = StaffDashboard::render();
 
-		$this->assertStringContainsString(
-			'Staff dashboard is available to authorised team members only.',
-			$output
-		);
-		$this->assertSame( 403, $GLOBALS['fbm_status_header'] );
-	}
+        $this->assertStringContainsString(
+            'Staff dashboard is available to authorised team members only.',
+            $output
+        );
+        $this->assertStringNotContainsString( 'data-fbm-staff-dashboard="1"', $output );
+        $this->assertSame( 403, $GLOBALS['fbm_status_header'] );
+
+        Assets::maybe_enqueue_staff_dashboard();
+
+        $this->assertEmpty( $GLOBALS['fbm_registered_styles'] );
+        $this->assertEmpty( $GLOBALS['fbm_enqueued_styles'] );
+        $this->assertEmpty( $GLOBALS['fbm_registered_scripts'] );
+        $this->assertEmpty( $GLOBALS['fbm_enqueued_scripts'] );
+        $this->assertEmpty( $GLOBALS['fbm_localized_scripts'] );
+        $this->assertEmpty( $GLOBALS['fbm_script_translations'] );
+    }
+
+    /**
+     * Denies access to logged-in users without staff capabilities.
+     */
+    public function test_render_denies_access_when_user_lacks_capability(): void {
+        $GLOBALS['fbm_user_logged_in'] = true;
+
+        $output = StaffDashboard::render();
+
+        $this->assertStringContainsString(
+            'Staff dashboard is available to authorised team members only.',
+            $output
+        );
+        $this->assertStringNotContainsString( 'data-fbm-staff-dashboard="1"', $output );
+        $this->assertSame( 403, $GLOBALS['fbm_status_header'] );
+
+        Assets::maybe_enqueue_staff_dashboard();
+
+        $this->assertEmpty( $GLOBALS['fbm_registered_styles'] );
+        $this->assertEmpty( $GLOBALS['fbm_enqueued_styles'] );
+        $this->assertEmpty( $GLOBALS['fbm_registered_scripts'] );
+        $this->assertEmpty( $GLOBALS['fbm_enqueued_scripts'] );
+        $this->assertEmpty( $GLOBALS['fbm_localized_scripts'] );
+        $this->assertEmpty( $GLOBALS['fbm_script_translations'] );
+    }
 
 		/**
 		 * Loads template markup and enqueues assets for authorised viewers.
