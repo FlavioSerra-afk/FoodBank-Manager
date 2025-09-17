@@ -17,20 +17,26 @@ use FoodBankManager\Token\TokenRepository;
 use FoodBankManager\Token\TokenService;
 use wpdb;
 use function add_shortcode;
+use function apply_filters;
 use function esc_html__;
 use function filter_input;
 use function filter_var;
 use function is_email;
 use function is_readable;
 use function is_string;
+use function md5;
 use function ob_get_clean;
 use function ob_start;
 use function preg_match;
 use function sanitize_email;
 use function sanitize_text_field;
+use function strtolower;
 use function substr;
 use function strtoupper;
 use function time;
+use function delete_transient;
+use function get_transient;
+use function set_transient;
 use function wp_nonce_field;
 use function wp_verify_nonce;
 
@@ -60,10 +66,12 @@ final class RegistrationForm {
         private const FIELD_CONSENT           = 'fbm_registration_consent';
 	private const DEFAULT_HOUSEHOLD_SIZE  = '1';
 	private const MIN_TIME_TRAP_THRESHOLD = 5;
-	private const LAST_INITIAL_PATTERN    = '/^[A-Z]$/';
+        private const LAST_INITIAL_PATTERN    = '/^[A-Z]$/';
+        private const SUBMISSION_COOLDOWN_DEFAULT = 120;
+        private const SUBMISSION_COOLDOWN_FILTER  = 'fbm_registration_submission_cooldown';
 
-		/**
-		 * Optional mailer factory override for testing.
+                /**
+                 * Optional mailer factory override for testing.
 		 *
 		 * @var callable|null
 		 */
@@ -225,9 +233,33 @@ final class RegistrationForm {
                                         return $result;
                         }
 
-			global $wpdb;
+                        $throttle_key = null;
+                        $cooldown     = self::get_submission_cooldown();
+                        $fingerprint  = self::build_submission_fingerprint( $email );
 
-			if ( ! $wpdb instanceof wpdb ) {
+                        if ( $cooldown > 0 && null !== $fingerprint ) {
+                                $throttle_key    = 'fbm_registration_cooldown_' . md5( $fingerprint );
+                                $last_submission = get_transient( $throttle_key );
+
+                                if ( is_numeric( $last_submission ) ) {
+                                        $last_submission = (int) $last_submission;
+                                } else {
+                                        $last_submission = null;
+                                }
+
+                                if ( null !== $last_submission && ( time() - $last_submission ) < $cooldown ) {
+                                        $result['errors'][] = esc_html__( 'Please wait before submitting again.', 'foodbank-manager' );
+                                        $result['message']  = esc_html__( 'Please wait before submitting again.', 'foodbank-manager' );
+
+                                        return $result;
+                                }
+
+                                set_transient( $throttle_key, time(), $cooldown );
+                        }
+
+                        global $wpdb;
+
+                        if ( ! $wpdb instanceof wpdb ) {
 					$result['errors'][] = esc_html__( 'Service temporarily unavailable. Please try again later.', 'foodbank-manager' );
 					$result['message']  = esc_html__( 'We could not save your registration. Please try again later.', 'foodbank-manager' );
 
@@ -269,8 +301,8 @@ final class RegistrationForm {
                                 );
                         }
 
-			$result['success'] = true;
-			$result['message'] = esc_html__( 'Thank you for registering. We have emailed your check-in QR code.', 'foodbank-manager' );
+                        $result['success'] = true;
+                        $result['message'] = esc_html__( 'Thank you for registering. We have emailed your check-in QR code.', 'foodbank-manager' );
                         $result['values']  = array(
                                 'first_name'     => '',
                                 'last_initial'   => '',
@@ -279,8 +311,12 @@ final class RegistrationForm {
                                 'consent'        => '',
                         );
 
-						return $result;
-	}
+                        if ( null !== $throttle_key ) {
+                                delete_transient( $throttle_key );
+                        }
+
+                                                return $result;
+        }
 
 				/**
 				 * Read filtered input values with CLI-safe fallback.
@@ -332,14 +368,45 @@ final class RegistrationForm {
 				/**
 				 * Resolve the current page URL for the form action.
 				 */
-	private static function current_action_url(): string {
-					$uri = self::read_input( INPUT_SERVER, 'REQUEST_URI', FILTER_SANITIZE_URL );
+        private static function current_action_url(): string {
+                                        $uri = self::read_input( INPUT_SERVER, 'REQUEST_URI', FILTER_SANITIZE_URL );
 
-					return is_string( $uri ) ? $uri : '';
-	}
+                                        return is_string( $uri ) ? $uri : '';
+        }
 
-		/**
-		 * Render the view template safely.
+                /**
+                 * Resolve the submission cooldown duration.
+                 */
+        private static function get_submission_cooldown(): int {
+                        $cooldown = (int) apply_filters( self::SUBMISSION_COOLDOWN_FILTER, self::SUBMISSION_COOLDOWN_DEFAULT );
+
+                        return $cooldown > 0 ? $cooldown : 0;
+        }
+
+                /**
+                 * Build a repeatable fingerprint for throttling submissions.
+                 *
+                 * @param string $email Email address used for the submission.
+                 */
+        private static function build_submission_fingerprint( string $email ): ?string {
+                        $email = strtolower( trim( $email ) );
+
+                        if ( '' === $email ) {
+                                return null;
+                        }
+
+                        $remote = self::read_input( INPUT_SERVER, 'REMOTE_ADDR', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+                        $remote = is_string( $remote ) ? trim( sanitize_text_field( $remote ) ) : '';
+
+                        if ( '' === $remote ) {
+                                return null;
+                        }
+
+                        return $email . '|' . $remote;
+        }
+
+                /**
+                 * Render the view template safely.
 		 *
 		 * @param array<string, mixed> $context Template context.
 		 */

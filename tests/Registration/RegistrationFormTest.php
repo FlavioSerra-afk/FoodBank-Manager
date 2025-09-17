@@ -53,6 +53,7 @@ final class RegistrationFormTest extends TestCase {
 
                 $_SERVER = array();
                 $_POST   = array();
+                $GLOBALS['fbm_transients'] = array();
 
                 $this->mailer = new SpyWelcomeMailer();
                 RegistrationForm::set_mailer_override(
@@ -67,6 +68,7 @@ final class RegistrationFormTest extends TestCase {
 
                 $_SERVER = array();
                 $_POST   = array();
+                $GLOBALS['fbm_transients'] = array();
 
                 parent::tearDown();
         }
@@ -237,6 +239,30 @@ final class RegistrationFormTest extends TestCase {
                 $this->assertArrayHasKey( 'consent_recorded_at', $member );
                 $this->assertNotSame( '', $member['consent_recorded_at'] );
                 $this->assertNotFalse( strtotime( (string) $member['consent_recorded_at'] ) );
+        }
+
+        /**
+         * Submissions within the cooldown window must be rejected.
+         */
+        public function test_submission_is_throttled_when_cooldown_is_active(): void {
+                $_SERVER['REMOTE_ADDR'] = '203.0.113.10';
+
+                $this->prepare_valid_submission(
+                        array(
+                                'fbm_registration_time' => (string) ( time() - 120 ),
+                        )
+                );
+
+                $fingerprint = strtolower( 'taylor@example.com' ) . '|203.0.113.10';
+                $transient   = 'fbm_registration_cooldown_' . md5( $fingerprint );
+
+                set_transient( $transient, time(), 120 );
+
+                $result = $this->invoke_handle_submission();
+
+                $this->assertFalse( $result['success'] );
+                $this->assertContains( 'Please wait before submitting again.', $result['errors'] );
+                $this->assertSame( 'Please wait before submitting again.', $result['message'] );
         }
 
         /**
