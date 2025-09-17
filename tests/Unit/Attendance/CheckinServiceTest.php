@@ -15,17 +15,22 @@ use FoodBankManager\Attendance\AttendanceRepository;
 use FoodBankManager\Attendance\CheckinService;
 use FoodBankManager\Core\Schedule;
 use PHPUnit\Framework\TestCase;
+use function update_option;
 
 /**
  * @covers \FoodBankManager\Attendance\CheckinService
  */
 final class CheckinServiceTest extends TestCase {
-	protected function setUp(): void {
-			parent::setUp();
+        protected function setUp(): void {
+                        parent::setUp();
 
-			unset( $GLOBALS['fbm_transients'] );
-			Schedule::set_current_window_override( $this->default_window() );
-	}
+                        unset( $GLOBALS['fbm_transients'] );
+
+                        $GLOBALS['fbm_options'] = array();
+                        update_option( 'fbm_schedule_window', $this->default_window() );
+
+                        Schedule::set_current_window_override( null );
+        }
 
 	protected function tearDown(): void {
 			CheckinService::set_current_time_override( null );
@@ -69,35 +74,27 @@ final class CheckinServiceTest extends TestCase {
 			$this->assertSame( '2023-08-17T11:15:00+00:00', $duplicate['time'] );
 	}
 
-	public function test_record_returns_out_of_window_status_when_not_available(): void {
-			$wpdb       = new \wpdb();
-			$repository = new AttendanceRepository( $wpdb );
+        public function test_record_returns_out_of_window_status_when_not_available(): void {
+                        $wpdb       = new \wpdb();
+                        $repository = new AttendanceRepository( $wpdb );
 
-			CheckinService::set_current_time_override(
-				new DateTimeImmutable( '2023-08-16 10:00:00', new DateTimeZone( 'Europe/London' ) )
-			);
+                        $schedule = new Schedule();
+                        $window   = $schedule->current_window();
 
-			$service = new CheckinService( $repository, new Schedule() );
+                        CheckinService::set_current_time_override(
+                                new DateTimeImmutable( '2023-08-16 10:00:00', new DateTimeZone( 'Europe/London' ) )
+                        );
 
-			$result = $service->record( 'FBM456', 'qr', 2 );
+                        $service = new CheckinService( $repository, $schedule );
 
-			$this->assertSame( CheckinService::STATUS_OUT_OF_WINDOW, $result['status'] );
-			$this->assertSame(
-				'Collections can only be recorded on Thursday between 11:00 and 14:30 (Europe/London).',
-				$result['message']
-			);
-			$this->assertSame( 'FBM456', $result['member_ref'] );
-			$this->assertNull( $result['time'] );
-			$this->assertSame(
-				array(
-					'day'      => 'thursday',
-					'start'    => '11:00',
-					'end'      => '14:30',
-					'timezone' => 'Europe/London',
-				),
-				$result['window']
-			);
-	}
+                        $result = $service->record( 'FBM456', 'qr', 2 );
+
+                        $this->assertSame( CheckinService::STATUS_OUT_OF_WINDOW, $result['status'] );
+                        $this->assertSame( Schedule::window_notice( $window ), $result['message'] );
+                        $this->assertSame( 'FBM456', $result['member_ref'] );
+                        $this->assertNull( $result['time'] );
+                        $this->assertSame( $window, $result['window'] );
+        }
 
 	public function test_record_returns_warning_when_previous_collection_within_week(): void {
 			$wpdb       = new \wpdb();
@@ -183,39 +180,37 @@ final class CheckinServiceTest extends TestCase {
 			$this->assertCount( 1, $wpdb->attendance );
 	}
 
-	public function test_record_honors_custom_schedule_window(): void {
-			$wpdb       = new \wpdb();
-			$repository = new AttendanceRepository( $wpdb );
+        public function test_record_honors_custom_schedule_window(): void {
+                        $wpdb       = new \wpdb();
+                        $repository = new AttendanceRepository( $wpdb );
 
-			$window = array(
-				'day'      => 'monday',
-				'start'    => '09:00',
-				'end'      => '10:15',
-				'timezone' => 'Europe/London',
-			);
+                        $window = array(
+                                'day'      => 'monday',
+                                'start'    => '09:00',
+                                'end'      => '10:15',
+                                'timezone' => 'Europe/London',
+                        );
 
-			Schedule::set_current_window_override( $window );
+                        Schedule::set_current_window_override( $window );
+                        $schedule = new Schedule();
 
-			CheckinService::set_current_time_override(
-				new DateTimeImmutable( '2023-08-21 09:30:00', new DateTimeZone( 'Europe/London' ) )
-			);
+                        CheckinService::set_current_time_override(
+                                new DateTimeImmutable( '2023-08-21 09:30:00', new DateTimeZone( 'Europe/London' ) )
+                        );
 
-			$service = new CheckinService( $repository, new Schedule() );
-			$result  = $service->record( 'FBM900', 'qr', 6 );
+                        $service = new CheckinService( $repository, $schedule );
+                        $result  = $service->record( 'FBM900', 'qr', 6 );
 
-			$this->assertSame( CheckinService::STATUS_SUCCESS, $result['status'] );
+                        $this->assertSame( CheckinService::STATUS_SUCCESS, $result['status'] );
 
-			CheckinService::set_current_time_override(
-				new DateTimeImmutable( '2023-08-21 08:30:00', new DateTimeZone( 'Europe/London' ) )
-			);
+                        CheckinService::set_current_time_override(
+                                new DateTimeImmutable( '2023-08-21 08:30:00', new DateTimeZone( 'Europe/London' ) )
+                        );
 
-			$out_of_window = $service->record( 'FBM901', 'qr', 6 );
+                        $out_of_window = $service->record( 'FBM901', 'qr', 6 );
 
-			$this->assertSame( CheckinService::STATUS_OUT_OF_WINDOW, $out_of_window['status'] );
-			$this->assertSame(
-				'Collections can only be recorded on Monday between 09:00 and 10:15 (Europe/London).',
-				$out_of_window['message']
-			);
-			$this->assertSame( $window, $out_of_window['window'] );
-	}
+                        $this->assertSame( CheckinService::STATUS_OUT_OF_WINDOW, $out_of_window['status'] );
+                        $this->assertSame( Schedule::window_notice( $window ), $out_of_window['message'] );
+                        $this->assertSame( $window, $out_of_window['window'] );
+        }
 }

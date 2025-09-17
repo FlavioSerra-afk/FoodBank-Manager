@@ -7,7 +7,10 @@ namespace FBM\Tests\Admin;
 use FoodBankManager\Admin\SchedulePage;
 use FoodBankManager\Core\Schedule;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use WP_Error;
+use function get_option;
+use function update_option;
 
 final class SchedulePageTest extends TestCase {
 
@@ -154,5 +157,59 @@ final class SchedulePageTest extends TestCase {
                 $this->assertStringContainsString( 'value="10:45"', $output );
                 $this->assertStringContainsString( 'America/Chicago', $output );
                 $this->assertStringContainsString( 'value="friday"', $output );
+        }
+
+        public function testHandleSaveRequiresManageCapability(): void {
+                $before = get_option( 'fbm_schedule_window' );
+
+                $_POST = array(
+                        'fbm_schedule'      => array(
+                                'day'      => 'tuesday',
+                                'start'    => '10:00',
+                                'end'      => '12:00',
+                                'timezone' => 'Europe/London',
+                        ),
+                        'fbm_schedule_nonce' => 'missing-cap',
+                );
+
+                $_REQUEST = $_POST;
+
+                $this->expectException( RuntimeException::class );
+                $this->expectExceptionMessage( 'You do not have permission to save the schedule.' );
+
+                try {
+                        SchedulePage::handle_save();
+                } finally {
+                        $this->assertSame( $before, get_option( 'fbm_schedule_window' ) );
+                }
+        }
+
+        public function testHandleSaveRequiresValidNonce(): void {
+                $GLOBALS['fbm_current_caps']['fbm_manage'] = true;
+
+                $GLOBALS['fbm_test_nonces'] = array();
+
+                $before = get_option( 'fbm_schedule_window' );
+
+                $_POST = array(
+                        'fbm_schedule'      => array(
+                                'day'      => 'tuesday',
+                                'start'    => '10:00',
+                                'end'      => '12:00',
+                                'timezone' => 'Europe/London',
+                        ),
+                        'fbm_schedule_nonce' => 'invalid-nonce',
+                );
+
+                $_REQUEST = $_POST;
+
+                $this->expectException( RuntimeException::class );
+                $this->expectExceptionMessage( 'invalid_nonce' );
+
+                try {
+                        SchedulePage::handle_save();
+                } finally {
+                        $this->assertSame( $before, get_option( 'fbm_schedule_window' ) );
+                }
         }
 }
