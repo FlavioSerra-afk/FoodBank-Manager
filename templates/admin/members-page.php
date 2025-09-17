@@ -66,38 +66,65 @@ if ( isset( $data['notices'] ) && is_array( $data['notices'] ) ) {
 						<tbody>
 			<?php foreach ( $members as $member ) : ?>
 				<?php
-				$reference     = isset( $member['member_reference'] ) ? (string) $member['member_reference'] : '';
-				$first_name    = isset( $member['first_name'] ) ? (string) $member['first_name'] : '';
-				$last_init     = isset( $member['last_initial'] ) ? (string) $member['last_initial'] : '';
-				$email         = isset( $member['email'] ) ? (string) $member['email'] : '';
-				$member_status = isset( $member['status'] ) ? (string) $member['status'] : '';
-				$activated     = isset( $member['activated_at'] ) && null !== $member['activated_at'] ? (string) $member['activated_at'] : '';
-				$resend_url    = isset( $member['resend_url'] ) ? (string) $member['resend_url'] : '';
-				$revoke_url    = isset( $member['revoke_url'] ) ? (string) $member['revoke_url'] : '';
-				$name          = trim( $first_name . ' ' . $last_init );
+				$reference                      = isset( $member['member_reference'] ) ? (string) $member['member_reference'] : '';
+				$first_name                     = isset( $member['first_name'] ) ? (string) $member['first_name'] : '';
+				$last_init                      = isset( $member['last_initial'] ) ? (string) $member['last_initial'] : '';
+				$email                          = isset( $member['email'] ) ? (string) $member['email'] : '';
+				$member_status                  = isset( $member['status'] ) ? (string) $member['status'] : '';
+				$activated                      = isset( $member['activated_at'] ) && null !== $member['activated_at'] ? (string) $member['activated_at'] : '';
+								$approve_url    = isset( $member['approve_url'] ) ? (string) $member['approve_url'] : '';
+								$resend_url     = isset( $member['resend_url'] ) ? (string) $member['resend_url'] : '';
+								$regenerate_url = isset( $member['regenerate_url'] ) ? (string) $member['regenerate_url'] : '';
+								$revoke_url     = isset( $member['revoke_url'] ) ? (string) $member['revoke_url'] : '';
+								$name           = trim( $first_name . ' ' . $last_init );
+								$actions        = array();
+
+				if ( 'pending' === $member_status && '' !== $approve_url ) {
+						$actions[] = sprintf(
+							'<span class="approve"><a href="%s">%s</a></span>',
+							esc_url( $approve_url ),
+							esc_html__( 'Approve &amp; Send', 'foodbank-manager' )
+						);
+				} else {
+					if ( '' !== $resend_url ) {
+										$actions[] = sprintf(
+											'<span class="resend"><a href="%s">%s</a></span>',
+											esc_url( $resend_url ),
+											esc_html__( 'Resend Welcome Email', 'foodbank-manager' )
+										);
+					}
+
+					if ( '' !== $regenerate_url ) {
+											$actions[] = sprintf(
+												'<span class="regenerate"><a href="%s">%s</a></span>',
+												esc_url( $regenerate_url ),
+												esc_html__( 'Regenerate Token', 'foodbank-manager' )
+											);
+					}
+
+					if ( '' !== $revoke_url ) {
+							$actions[] = sprintf(
+								'<span class="revoke"><a href="%s">%s</a></span>',
+								esc_url( $revoke_url ),
+								esc_html__( 'Revoke Token', 'foodbank-manager' )
+							);
+					}
+				}
 				?>
 <tr>
 <td><?php echo esc_html( $reference ); ?></td>
 <td><?php echo esc_html( $name ); ?></td>
 <td><?php echo esc_html( $email ); ?></td>
 <td><?php echo esc_html( $member_status ); ?></td>
-												<td><?php echo esc_html( $activated ); ?></td>
-												<td>
-														<div class="row-actions">
-																<span class="resend">
-																		<a href="<?php echo esc_url( $resend_url ); ?>">
-																				<?php esc_html_e( 'Resend QR', 'foodbank-manager' ); ?>
-																		</a>
-																</span>
-																|
-																<span class="revoke">
-																		<a href="<?php echo esc_url( $revoke_url ); ?>">
-																				<?php esc_html_e( 'Revoke/Regenerate', 'foodbank-manager' ); ?>
-																		</a>
-																</span>
-														</div>
-												</td>
-										</tr>
+																								<td><?php echo esc_html( $activated ); ?></td>
+																								<td>
+																												<?php if ( ! empty( $actions ) ) : ?>
+																																<div class="row-actions">
+																																<?php echo wp_kses_post( implode( ' | ', $actions ) ); ?>
+																																</div>
+																												<?php endif; ?>
+																								</td>
+																				</tr>
 								<?php endforeach; ?>
 						</tbody>
 				</table>

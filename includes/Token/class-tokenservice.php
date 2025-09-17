@@ -69,23 +69,44 @@ final class TokenService {
 		/**
 		 * Issue a new token for the provided member identifier.
 		 *
-		 * @param int $member_id Member identifier.
+		 * @param int                  $member_id Member identifier.
+		 * @param array<string, mixed> $meta      Optional token metadata to persist.
 		 *
 		 * @throws RuntimeException When the token cannot be persisted.
 		 */
-	public function issue( int $member_id ): string {
-			$payload   = $this->encode_base64url( random_bytes( 32 ) );
-			$signature = $this->sign_payload( $payload );
-			$token     = self::TOKEN_VERSION . '.' . $payload . '.' . $signature;
-			$issued_at = gmdate( 'Y-m-d H:i:s' );
+	public function issue( int $member_id, array $meta = array() ): string {
+		$details = $this->issue_with_details( $member_id, $meta );
 
-			$hash = $this->hash_for_storage( $token );
+		return $details['token'];
+	}
 
-		if ( ! $this->repository->persist_active( $member_id, $hash, $issued_at, self::TOKEN_VERSION ) ) {
-				throw new RuntimeException( 'Unable to persist member token.' );
+	/**
+	 * Issue a token and return the full issuance payload.
+	 *
+	 * @param int                  $member_id Member identifier.
+	 * @param array<string, mixed> $meta      Optional metadata context.
+	 *
+	 * @return array{token:string,issued_at:string,meta:array<string,mixed>}
+	 *
+	 * @throws RuntimeException When the token cannot be persisted.
+	 */
+	public function issue_with_details( int $member_id, array $meta = array() ): array {
+		$payload   = $this->encode_base64url( random_bytes( 32 ) );
+		$signature = $this->sign_payload( $payload );
+		$token     = self::TOKEN_VERSION . '.' . $payload . '.' . $signature;
+		$issued_at = gmdate( 'Y-m-d H:i:s' );
+
+		$hash = $this->hash_for_storage( $token );
+
+		if ( ! $this->repository->persist_active( $member_id, $hash, $issued_at, self::TOKEN_VERSION, $meta ) ) {
+			throw new RuntimeException( 'Unable to persist member token.' );
 		}
 
-			return $token;
+		return array(
+			'token'     => $token,
+			'issued_at' => $issued_at,
+			'meta'      => $meta,
+		);
 	}
 
 		/**
