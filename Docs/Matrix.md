@@ -25,13 +25,13 @@ Legend: ⬜ Planned | 🟨 In Progress | ✅ Done | ⚠️ Blocked/Error
 
 U1 — Foundations
 
-⬜ fbm_theme allowed + save fixed
+✅ fbm_theme allowed + save fixed
 
-⬜ Theme sanitize/clamp
+✅ Theme sanitize/clamp
 
 ✅ Admin asset gating by screen-ID
 
-⬜ Uninstall (cleanup + destructive)
+✅ Uninstall (cleanup + destructive)
 
 ✅ Token service (issue/verify/revoke)
 

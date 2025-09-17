@@ -5,6 +5,13 @@
 
 # Tasks
 
+- [2025-09-19] Schedule configuration + window helper (v2.2.25)
+  - Summary: Introduced `Schedule::current_window()` with admin Schedule page to manage `fbm_schedule_window`; REST, staff dashboard assets, and templates now consume helper labels for consistent messaging.
+  - Routes: POST /fbm/v1/checkin (nonce + `fbm_checkin` capability) returns window metadata/labels.
+  - Access gating: Staff dashboard continues to require login + `fbm_view`; localized strings include resolved schedule window/notice.
+  - Config: Default Thursday 11:00–14:30 Europe/London with option overrides for day/start/end/timezone; uninstall removes schedule options.
+  - QA: composer lint ❌ (existing coding-standard violations); composer phpcs ❌ (existing coding-standard violations); composer phpstan ✅; composer test ✅ (vendor deprecation notices only).
+
 - [2025-09-18] Final audit — results (v2.2.24)
   - Version recorded: 2.2.24; Summary: verified shortcode registry, capability gating, and data policies align with Specs; bumped documentation matrix security statuses.
   - Routes: POST /fbm/v1/checkin (nonce + `fbm_checkin` capability).
@@ -119,9 +126,6 @@
 
 ### Replace/remove Events references in code + DB migrator
 [2025-09-15 13:16Z] P1 • DB • TODO
-
-### REST & UI updates for fixed window policy
-[2025-09-15 13:16Z] P1 • REST/UI • TODO
 
 ### Public dashboard removal / guards
 [2025-09-15 13:16Z] P1 • Dashboard • TODO
