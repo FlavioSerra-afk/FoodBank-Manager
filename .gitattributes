@@ -1,8 +1,10 @@
 /.github export-ignore
+/.githooks export-ignore
 /Docs export-ignore
 /tests export-ignore
 /node_modules export-ignore
 dist/ export-ignore
 /phpcs-report.txt export-ignore
 build/ export-ignore
+/analysis export-ignore
 *.mo binary

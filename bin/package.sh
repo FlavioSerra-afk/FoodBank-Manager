@@ -38,11 +38,13 @@ cp "$SLUG.php" "$WORK/$SLUG.php"
 rsync -a --delete \
   --exclude ".git" \
   --exclude ".github" \
+  --exclude ".githooks" \
   --exclude "node_modules" \
   --exclude "vendor/bin" \
   --exclude "tests" \
   --exclude "dist" \
   --exclude "build" \
+  --exclude "analysis" \
   --exclude ".DS_Store" \
   --exclude "*.zip" \
   --exclude "$SLUG.php" \

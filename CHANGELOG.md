@@ -10,6 +10,15 @@
 ### Changed
 - Packaging guard now enforces version alignment across plugin metadata before building releases.
 
+## [2.2.25] - 2025-09-20
+
+### Removed
+- Dropped unused `league/csv` and `mpdf/mpdf` dependencies to stay within LAW.
+
+### Changed
+- Updated packaging rules to exclude `analysis/` and `.githooks/` from release archives.
+- Aligned README.md and readme.txt with the canonical shortcode/admin scope.
+
 ## [2.2.24] - 2025-09-17
 
 - _No documented changes._

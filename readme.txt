@@ -3,7 +3,7 @@ Contributors: portuguese-community-centre-london
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.1
-Stable tag: 2.2.24
+Stable tag: 2.2.25
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -14,22 +14,20 @@ FoodBank Manager is a volunteer-friendly toolkit for small organisations to hand
 It stores data in encrypted tables, enforces least-privilege access, and offers dashboards and exports for auditors.
 
 == Features ==
-* Secure intake forms with encrypted storage
-* Dashboard KPIs for attendance and inventory
-* QR-based ticketing and check-in
-* Role-based permissions with per-user overrides
-* CSV and PDF exports with masked personal data
-* GDPR export and erasure helpers
-* Customisable email templates and themes
+* Secure public registration with validation, nonce checks, and anti-spam traps.
+* Persistent QR tokens delivered in the welcome email alongside a fallback code.
+* Staff dashboard (login + FBM capability required) for scanning or manual check-ins.
+* Attendance summaries with admin-only CSV exports (UTF-8 BOM, localized headers).
+* Theme controls and design tokens scoped to FoodBank Manager screens.
+* Diagnostics for mail delivery with throttled resend and health badges.
 
 == Multisite ==
-Network administrators receive `fbm_manage_jobs` on activation; a migration flag prevents re-granting on upgrade. Cron hooks such as retention are idempotent and safe per site.
+FBM capabilities are granted per site via activation (Administrators retain full access). Options such as theme, schedule, and migration markers store per site. Destructive uninstall remains opt-in so reinstalls can reuse existing data unless explicitly dropped.
 
 == Support & Troubleshooting ==
-* **Logs & debug**: PHP errors are recorded in `wp-content/debug.log`. Mail activity appears under Diagnostics → Mail Log.
-* **System report**: Diagnostics → Report offers a "Copy report" button for a JSON system report.
-* **Cron runs**: Diagnostics → Cron Health lists plugin cron hooks with last and next run times.
-* See [Docs/API.md](Docs/API.md) for the error contract and [Docs/Diagnostics.md](Docs/Diagnostics.md) for rate-limit and multisite notes.
+* **Logs & debug**: PHP errors are recorded in `wp-content/debug.log`. Mail activity appears under Diagnostics → Mail Log with rate-limited resend controls.
+* **Health**: Diagnostics → System Health displays badge indicators for mail keys and signing secrets.
+* **Docs**: See [Docs/Specs.md](Docs/Specs.md) and [Docs/Plan.md](Docs/Plan.md) for policy, rate-limit, and multisite notes.
 
 == Uninstall ==
 By default uninstall leaves FoodBank Manager database tables in place so the plugin can be reinstalled without data loss.
