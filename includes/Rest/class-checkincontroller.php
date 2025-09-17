@@ -11,6 +11,7 @@ namespace FoodBankManager\Rest;
 
 use FoodBankManager\Attendance\AttendanceRepository;
 use FoodBankManager\Attendance\CheckinService;
+use FoodBankManager\Core\Schedule;
 use FoodBankManager\Registration\MembersRepository;
 use FoodBankManager\Token\TokenRepository;
 use FoodBankManager\Token\TokenService;
@@ -24,6 +25,7 @@ use function current_user_can;
 use function explode;
 use function get_current_user_id;
 use function in_array;
+use function is_array;
 use function is_string;
 use function register_rest_route;
 use function rest_ensure_response;
@@ -148,9 +150,10 @@ final class CheckinController {
 			return new WP_Error( 'fbm_invalid_reference', __( 'A token or manual code is required.', 'foodbank-manager' ), array( 'status' => 400 ) );
 		}
 
-		$attendance_repository = new AttendanceRepository( $wpdb );
-		$members_repository    = new MembersRepository( $wpdb );
-		$service               = new CheckinService( $attendance_repository );
+                $attendance_repository = new AttendanceRepository( $wpdb );
+                $members_repository    = new MembersRepository( $wpdb );
+                $schedule              = new Schedule();
+                $service               = new CheckinService( $attendance_repository, $schedule );
 
 		$member_reference = null;
 
@@ -194,18 +197,30 @@ final class CheckinController {
 
         $result = $service->record( $member_reference, $method, get_current_user_id(), $note, $override, $override_note, $fingerprint );
 
+        $window      = $schedule->current_window();
+        $window_data = $window;
+
+        if ( isset( $result['window'] ) ) {
+                $provided = $result['window'];
+
+                $window_data = array(
+                        'day'      => (string) $provided['day'],
+                        'start'    => (string) $provided['start'],
+                        'end'      => (string) $provided['end'],
+                        'timezone' => (string) $provided['timezone'],
+                );
+        }
+
+        $window_labels = Schedule::window_labels( $window_data );
+
+        $result['window']        = $window_data;
+        $result['window_notice'] = $window_labels['notice'];
+        $result['window_labels'] = $window_labels;
+
         $status = (string) $result['status'];
 
         switch ( $status ) {
                 case CheckinService::STATUS_OUT_OF_WINDOW:
-                                if ( ! isset( $result['window'] ) ) {
-                                        $result['window'] = array(
-                                                'day'      => 'thursday',
-                                                'start'    => '11:00',
-                                                'end'      => '14:30',
-                                                'timezone' => 'Europe/London',
-                                        );
-                                }
                                 break;
                         case CheckinService::STATUS_DUPLICATE_DAY:
                                 if ( ! isset( $result['duplicate'] ) ) {

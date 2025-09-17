@@ -7,16 +7,27 @@
 
 declare(strict_types=1);
 
+use FoodBankManager\Core\Schedule;
 use function esc_attr;
+use function esc_html;
 use function esc_html__;
 use function esc_html_e;
+
+$schedule = new Schedule();
+$window   = $schedule->current_window();
+$labels   = Schedule::window_labels( $window );
 ?>
 <div class="fbm-staff-dashboard" data-fbm-staff-dashboard="1">
-		<h2 class="fbm-staff-dashboard__heading">
-				<?php esc_html_e( 'FoodBank Manager — Staff Dashboard', 'foodbank-manager' ); ?>
-		</h2>
+                <h2 class="fbm-staff-dashboard__heading">
+                                <?php esc_html_e( 'FoodBank Manager — Staff Dashboard', 'foodbank-manager' ); ?>
+                </h2>
                 <p class="fbm-staff-dashboard__summary">
-                                <?php esc_html_e( 'Collections run on Thursdays between 11:00 and 14:30. Scan member QR codes or record a manual collection during this window, and record a manager override with a justification if the member collected within the last week.', 'foodbank-manager' ); ?>
+                                <?php
+                                printf(
+                                        esc_html__( 'Collections run on %s. Scan member QR codes or record a manual collection during this window, and record a manager override with a justification if the member collected within the last week.', 'foodbank-manager' ),
+                                        esc_html( $labels['sentence'] )
+                                );
+                                ?>
                 </p>
 		<div class="fbm-staff-dashboard__today" data-fbm-today>
 				<div class="fbm-staff-dashboard__today-item">

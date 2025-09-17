@@ -18,11 +18,9 @@ use function get_transient;
 use function in_array;
 use function is_array;
 use function md5;
-use function sprintf;
 use function sanitize_text_field;
 use function set_transient;
 use function strtolower;
-use function ucfirst;
 use function trim;
 use function wp_unslash;
 
@@ -110,14 +108,7 @@ final class CheckinService {
 		$expected_day       = Schedule::day_to_index( $window['day'] );
 
         if ( $expected_day !== (int) $now_window->format( 'N' ) || $now_window < $window_start || $now_window > $window_end ) {
-            $window_message = sprintf(
-                /* translators: 1: Day of week, 2: Start time, 3: End time, 4: Timezone identifier. */
-                esc_html__( 'Collections can only be recorded on %1$s between %2$s and %3$s (%4$s).', 'foodbank-manager' ),
-                ucfirst( $window['day'] ),
-                $window['start'],
-                $window['end'],
-                $window['timezone']
-            );
+            $window_message = Schedule::window_notice( $window );
 
             return array(
                 'status'     => self::STATUS_OUT_OF_WINDOW,

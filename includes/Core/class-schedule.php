@@ -12,6 +12,8 @@ namespace FoodBankManager\Core;
 use DateTimeImmutable;
 use DateTimeZone;
 use Exception;
+use function __;
+use function esc_html__;
 use function array_key_exists;
 use function constant;
 use function defined;
@@ -20,6 +22,7 @@ use function is_array;
 use function is_int;
 use function is_numeric;
 use function is_string;
+use function sprintf;
 use function strtolower;
 use function trim;
 
@@ -77,11 +80,11 @@ final class Schedule {
 	 *
 	 * @var array<string,int>
 	 */
-	private const DAY_INDICES = array(
-		'monday'    => 1,
-		'tuesday'   => 2,
-		'wednesday' => 3,
-		'thursday'  => 4,
+        private const DAY_INDICES = array(
+                'monday'    => 1,
+                'tuesday'   => 2,
+                'wednesday' => 3,
+                'thursday'  => 4,
 		'friday'    => 5,
 		'saturday'  => 6,
 		'sunday'    => 7,
@@ -141,14 +144,90 @@ final class Schedule {
 			$canonical = self::default_day();
 		}
 
-		return self::DAY_INDICES[ $canonical ] ?? self::DAY_INDICES[ self::DEFAULT_DAY ];
-	}
+                return self::DAY_INDICES[ $canonical ] ?? self::DAY_INDICES[ self::DEFAULT_DAY ];
+        }
 
-	/**
-	 * Compose the default window from constants or sensible fallbacks.
-	 *
-	 * @return array{day:string,start:string,end:string,timezone:string}
-	 */
+        /**
+         * Provide a localized label for a canonical day.
+         */
+        public static function day_label( string $day ): string {
+                switch ( self::canonical_day( $day ) ) {
+                        case 'monday':
+                                return __( 'Monday', 'foodbank-manager' );
+                        case 'tuesday':
+                                return __( 'Tuesday', 'foodbank-manager' );
+                        case 'wednesday':
+                                return __( 'Wednesday', 'foodbank-manager' );
+                        case 'thursday':
+                                return __( 'Thursday', 'foodbank-manager' );
+                        case 'friday':
+                                return __( 'Friday', 'foodbank-manager' );
+                        case 'saturday':
+                                return __( 'Saturday', 'foodbank-manager' );
+                        case 'sunday':
+                                return __( 'Sunday', 'foodbank-manager' );
+                }
+
+                return __( 'Thursday', 'foodbank-manager' );
+        }
+
+        /**
+         * Compose localized labels for a schedule window.
+         *
+         * @param array{day:string,start:string,end:string,timezone:string} $window Window configuration.
+         *
+         * @return array{day:string,range:string,sentence:string,timezone:string,notice:string}
+         */
+        public static function window_labels( array $window ): array {
+                $day_label     = self::day_label( $window['day'] );
+                $range_label   = sprintf(
+                        /* translators: 1: Start time, 2: End time. */
+                        __( '%1$s–%2$s', 'foodbank-manager' ),
+                        $window['start'],
+                        $window['end']
+                );
+                $sentence      = self::window_sentence( $window, $day_label );
+                $timezone_name = self::timezone_label( $window['timezone'] );
+
+                return array(
+                        'day'       => $day_label,
+                        'range'     => $range_label,
+                        'sentence'  => $sentence,
+                        'timezone'  => $timezone_name,
+                        'notice'    => self::build_window_notice( $sentence, $timezone_name ),
+                );
+        }
+
+        /**
+         * Build a localized notice for a schedule window.
+         *
+         * @param array{day:string,start:string,end:string,timezone:string} $window Window configuration.
+         */
+        public static function window_notice( array $window ): string {
+                $day_label     = self::day_label( $window['day'] );
+                $sentence      = self::window_sentence( $window, $day_label );
+                $timezone_name = self::timezone_label( $window['timezone'] );
+
+                return self::build_window_notice( $sentence, $timezone_name );
+        }
+
+        /**
+         * Build a localized notice with precomputed context.
+         */
+        private static function build_window_notice( string $sentence, string $timezone_name ): string {
+                return sprintf(
+                        /* translators: 1: Day of week and time range, 2: Timezone identifier. */
+                        esc_html__( 'Collections can only be recorded on %1$s (%2$s).', 'foodbank-manager' ),
+                        $sentence,
+                        $timezone_name
+                );
+        }
+
+        /**
+         * Compose the default window from constants or sensible fallbacks.
+         *
+         * @return array{day:string,start:string,end:string,timezone:string}
+         */
 	private static function default_window(): array {
 		return array(
 			'day'      => self::default_day(),
@@ -314,21 +393,43 @@ final class Schedule {
 	 * @param mixed  $timezone Provided timezone value.
 	 * @param string $fallback Fallback timezone.
 	 */
-	private static function normalize_timezone( $timezone, string $fallback ): string {
-		if ( is_string( $timezone ) ) {
-			$timezone = trim( $timezone );
+        private static function normalize_timezone( $timezone, string $fallback ): string {
+                if ( is_string( $timezone ) ) {
+                        $timezone = trim( $timezone );
 
-			if ( '' !== $timezone ) {
-				try {
-					$tz = new DateTimeZone( $timezone );
+                        if ( '' !== $timezone ) {
+                                try {
+                                        $tz = new DateTimeZone( $timezone );
 
-					return $tz->getName();
-				} catch ( Exception $exception ) {
-					return $fallback;
-				}
-			}
-		}
+                                        return $tz->getName();
+                                } catch ( Exception $exception ) {
+                                        return $fallback;
+                                }
+                        }
+                }
 
-		return $fallback;
-	}
+                return $fallback;
+        }
+
+        /**
+         * Provide a human-friendly timezone label.
+         */
+        private static function timezone_label( string $timezone ): string {
+                return $timezone;
+        }
+
+        /**
+         * Build a localized window sentence.
+         *
+         * @param array{day:string,start:string,end:string,timezone:string} $window Window configuration.
+         */
+        private static function window_sentence( array $window, string $day_label ): string {
+                return sprintf(
+                        /* translators: 1: Day of week, 2: Start time, 3: End time. */
+                        __( '%1$s between %2$s and %3$s', 'foodbank-manager' ),
+                        $day_label,
+                        $window['start'],
+                        $window['end']
+                );
+        }
 }
