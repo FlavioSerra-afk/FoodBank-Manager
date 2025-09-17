@@ -39,9 +39,9 @@ fbm_diagnostics (mail/health)
 
 fbm_checkin (server endpoint guard for scan/record)
 
-Operating Model (Legacy Events)
+Operating Model (Weekly Window)
 
-Current implementation uses an Events table and admin page to schedule distributions. Migration to a fixed weekly window (Thursday 11:00–14:30) is planned.
+Collections now run against a configurable weekly window exposed via the `fbm_schedule_window` option and `Schedule::current_window()` helper. The default remains Thursday 11:00–14:30 Europe/London, and administrators can adjust the day, times, and timezone from the Schedule settings page.
 
 Registered users keep the same QR code each visit (until revoked/canceled).
 
@@ -74,7 +74,7 @@ QR Scanner (camera via getUserMedia, client-side decode).
 
 Manual code entry fallback (A11y and “no-camera” cases).
 
-Session status: shows current window (Thursday 11:00–14:30), number of collections recorded today, last scan result.
+Session status: shows the resolved weekly window (default Thursday 11:00–14:30), number of collections recorded today, last scan result.
 
 Rate-limit & idempotency feedback (e.g., “already checked in today”).
 
@@ -136,15 +136,13 @@ Data Model (High-Level)
 
 Tables (prefix fbm_):
 
-fbm_events — legacy schedule table: id, title, starts_at, ends_at, location, status, capacity.
-
 fbm_members — registered person, minimal PII; status: active|revoked|pending.
 
 fbm_tokens — persistent QR token per member: member_id, token_hash, issued_at, revoked_at, version, meta.
 
 fbm_attendance — row per collection date: member_id, collected_at (DATE/TIMESTAMP), source (qr|manual), note.
 
-Settings in wp_options namespaced: fbm_theme, fbm_settings (e.g., session window, email templates).
+Settings in wp_options namespaced: fbm_theme, fbm_schedule_window, fbm_settings (e.g., session window, email templates).
 
 Indexes:
 

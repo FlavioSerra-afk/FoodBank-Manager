@@ -9,21 +9,21 @@
 
 U1 — Foundations & Hardening (P0)
 
-Theme Save Fix: ensure fbm_theme option group/page is allowed; align slug/group/nonce/capability; sanitize & clamp payload.
+Theme Save Fix — ✅ fbm_theme option registered/allowed with nonce + capability enforcement and payload sanitization/clamping.
 
-Asset Gating: only enqueue FBM assets on FBM screens (screen-ID / hook suffix fallback).
+Asset Gating — ✅ FBM assets gated to FBM admin screens and staff dashboard requests.
 
-Uninstall: implement cleanup + optional destructive drop; wipe secrets.
+Uninstall — ✅ Options cleaned on uninstall with guarded destructive drop for tables/secrets.
 
-Token Framework:
+Token Framework — ✅
 
 Token format + signer (hash_hmac(sha256, payload, secret)).
 
 Storage of token_hash only; revocation handling.
 
-Weekly Window Config: default Thursday 11:00–14:30; server constants + option.
+Weekly Window Config — ✅ Schedule helper + admin page storing day/time/timezone with defaults (Thu 11:00–14:30 Europe/London).
 
-QA Baseline: PHPCS green (delta), PHPStan green, unit tests pass.
+QA Baseline — ✅ PHPCS green (delta), PHPStan green, unit tests pass.
 
 Remove Events dependencies: migrate to fixed weekly window; provide DB migrator.
 
