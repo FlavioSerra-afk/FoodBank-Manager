@@ -7,6 +7,10 @@ if ( ! defined( 'ARRAY_A' ) ) {
         define( 'ARRAY_A', 'ARRAY_A' );
 }
 
+if ( ! defined( 'FBM_TESTING' ) ) {
+        define( 'FBM_TESTING', true );
+}
+
 if ( ! isset( $GLOBALS['fbm_current_caps'] ) ) {
         $GLOBALS['fbm_current_caps'] = array(
                 'fbm_checkin' => true,
@@ -456,6 +460,14 @@ if ( ! function_exists( 'rest_ensure_response' ) ) {
         }
 }
 
+if ( ! function_exists( 'sanitize_key' ) ) {
+        function sanitize_key( $value ): string {
+                $value = strtolower( (string) $value );
+
+                return preg_replace( '/[^a-z0-9_]/', '', $value );
+        }
+}
+
 if ( ! function_exists( 'sanitize_text_field' ) ) {
         function sanitize_text_field( $value ): string {
                 $value = (string) $value;
@@ -495,6 +507,26 @@ if ( ! function_exists( 'get_current_user_id' ) ) {
         }
 }
 
+if ( ! function_exists( 'get_option' ) ) {
+        function get_option( string $name, $default = false ) {
+                $options = $GLOBALS['fbm_options'] ?? array();
+
+                return $options[ $name ] ?? $default;
+        }
+}
+
+if ( ! function_exists( 'update_option' ) ) {
+        function update_option( string $name, $value ) {
+                if ( ! isset( $GLOBALS['fbm_options'] ) || ! is_array( $GLOBALS['fbm_options'] ) ) {
+                        $GLOBALS['fbm_options'] = array();
+                }
+
+                $GLOBALS['fbm_options'][ $name ] = $value;
+
+                return true;
+        }
+}
+
 require_once __DIR__ . '/../includes/Core/class-install.php';
 require_once __DIR__ . '/../includes/Attendance/class-attendancerepository.php';
 require_once __DIR__ . '/../includes/Attendance/class-checkinservice.php';
@@ -506,11 +538,59 @@ require_once __DIR__ . '/../includes/Email/class-welcomemailer.php';
 require_once __DIR__ . '/../includes/Shortcodes/class-registrationform.php';
 require_once __DIR__ . '/../includes/Rest/class-checkincontroller.php';
 require_once __DIR__ . '/../includes/Admin/class-memberspage.php';
+require_once __DIR__ . '/../includes/Admin/class-themepage.php';
+
+if ( ! function_exists( 'add_action' ) ) {
+        function add_action( string $hook, $callback, int $priority = 10, int $accepted_args = 1 ): void {
+                $registry = $GLOBALS['fbm_actions'] ?? array();
+                $registry[ $hook ][ $priority ][] = array(
+                        'callback' => $callback,
+                        'args'     => $accepted_args,
+                );
+                $GLOBALS['fbm_actions'] = $registry;
+        }
+}
+
+if ( ! function_exists( 'add_filter' ) ) {
+        function add_filter( string $hook, $callback, int $priority = 10, int $accepted_args = 1 ): void {
+                $registry = $GLOBALS['fbm_filters'] ?? array();
+                $registry[ $hook ][ $priority ][] = array(
+                        'callback' => $callback,
+                        'args'     => $accepted_args,
+                );
+                $GLOBALS['fbm_filters'] = $registry;
+        }
+}
 
 if ( ! function_exists( 'do_action' ) ) {
         function do_action( string $hook, ...$args ): void {
                 unset( $hook );
                 unset( $args );
+        }
+}
+
+if ( ! function_exists( 'apply_filters' ) ) {
+        function apply_filters( string $hook, $value, ...$args ) {
+                $registry = $GLOBALS['fbm_filters'][ $hook ] ?? array();
+
+                if ( empty( $registry ) ) {
+                        return $value;
+                }
+
+                ksort( $registry );
+
+                foreach ( $registry as $callbacks ) {
+                        foreach ( $callbacks as $callback ) {
+                                $callable      = $callback['callback'];
+                                $accepted_args = (int) $callback['args'];
+                                $params        = array_merge( array( $value ), $args );
+                                $arguments     = array_slice( $params, 0, max( 1, $accepted_args ) );
+
+                                $value = call_user_func_array( $callable, $arguments );
+                        }
+                }
+
+                return $value;
         }
 }
 
@@ -530,6 +610,32 @@ if ( ! function_exists( 'esc_html__' ) ) {
         }
 }
 
+if ( ! function_exists( 'esc_html' ) ) {
+        function esc_html( $text ): string {
+                return htmlspecialchars( (string) $text, ENT_QUOTES, 'UTF-8' );
+        }
+}
+
+if ( ! function_exists( 'esc_attr' ) ) {
+        function esc_attr( $text ): string {
+                return htmlspecialchars( (string) $text, ENT_QUOTES, 'UTF-8' );
+        }
+}
+
+if ( ! function_exists( 'esc_html_e' ) ) {
+        function esc_html_e( string $text, string $domain = '' ): void {
+                echo esc_html( __( $text, $domain ) );
+        }
+}
+
+if ( ! function_exists( 'esc_url' ) ) {
+        function esc_url( $url ): string {
+                $value = filter_var( (string) $url, FILTER_SANITIZE_URL );
+
+                return $value ?: '';
+        }
+}
+
 if ( ! function_exists( 'wp_nonce_field' ) ) {
         function wp_nonce_field( string $action, string $name, bool $referer = true, bool $echo = true ): string {
                 unset( $referer );
@@ -539,11 +645,143 @@ if ( ! function_exists( 'wp_nonce_field' ) ) {
         }
 }
 
+if ( ! function_exists( 'wp_unslash' ) ) {
+        function wp_unslash( $value ) {
+                if ( is_array( $value ) ) {
+                        return array_map( 'wp_unslash', $value );
+                }
+
+                return stripslashes( (string) $value );
+        }
+}
+
+if ( ! function_exists( 'wp_json_encode' ) ) {
+        function wp_json_encode( $data, int $options = 0, int $depth = 512 ) {
+                return json_encode( $data, $options | JSON_UNESCAPED_SLASHES, $depth );
+        }
+}
+
 if ( ! function_exists( 'wp_verify_nonce' ) ) {
         function wp_verify_nonce( $nonce, string $action ): bool {
                 $nonces = $GLOBALS['fbm_test_nonces'] ?? array();
 
                 return isset( $nonces[ $action ] ) && $nonces[ $action ] === $nonce;
+        }
+}
+
+if ( ! function_exists( 'wp_die' ) ) {
+        function wp_die( $message = '' ): void {
+                throw new RuntimeException( (string) $message );
+        }
+}
+
+if ( ! function_exists( 'check_admin_referer' ) ) {
+        function check_admin_referer( string $action, string $query_arg = '_wpnonce' ) {
+                $nonce = $_REQUEST[ $query_arg ] ?? '';
+
+                if ( ! wp_verify_nonce( $nonce, $action ) ) {
+                        wp_die( 'invalid_nonce' );
+                }
+
+                return true;
+        }
+}
+
+if ( ! function_exists( 'admin_url' ) ) {
+        function admin_url( string $path = '' ): string {
+                $path = ltrim( $path, '/' );
+
+                return 'https://example.org/wp-admin/' . $path;
+        }
+}
+
+if ( ! function_exists( 'add_query_arg' ) ) {
+        function add_query_arg( array $args, string $url ): string {
+                $parts = parse_url( $url );
+                $query = array();
+
+                if ( isset( $parts['query'] ) ) {
+                        parse_str( (string) $parts['query'], $query );
+                }
+
+                foreach ( $args as $key => $value ) {
+                        $query[ $key ] = $value;
+                }
+
+                $parts['query'] = http_build_query( $query );
+
+                $scheme   = $parts['scheme'] ?? 'https';
+                $host     = $parts['host'] ?? 'example.org';
+                $port     = isset( $parts['port'] ) ? ':' . $parts['port'] : '';
+                $path     = $parts['path'] ?? '';
+                $querystr = $parts['query'] ? '?' . $parts['query'] : '';
+
+                return $scheme . '://' . $host . $port . $path . $querystr;
+        }
+}
+
+if ( ! function_exists( 'wp_safe_redirect' ) ) {
+        function wp_safe_redirect( string $location, int $status = 302 ): bool {
+                $GLOBALS['fbm_last_redirect'] = array(
+                        'location' => $location,
+                        'status'   => $status,
+                );
+
+                return true;
+        }
+}
+
+if ( ! function_exists( 'selected' ) ) {
+        function selected( $selected, $current, bool $echo = true ) {
+                $result = (string) $selected === (string) $current ? ' selected="selected"' : '';
+
+                if ( $echo ) {
+                        echo $result;
+                }
+
+                return $result;
+        }
+}
+
+if ( ! function_exists( 'register_setting' ) ) {
+        function register_setting( string $option_group, string $option_name, array $args = array() ): bool {
+                if ( ! isset( $GLOBALS['fbm_registered_settings'] ) || ! is_array( $GLOBALS['fbm_registered_settings'] ) ) {
+                        $GLOBALS['fbm_registered_settings'] = array();
+                }
+
+                $GLOBALS['fbm_registered_settings'][ $option_name ] = array(
+                        'group' => $option_group,
+                        'args'  => $args,
+                );
+
+                return true;
+        }
+}
+
+if ( ! function_exists( 'add_settings_section' ) ) {
+        function add_settings_section( string $id, string $title, $callback, string $page ): void {
+                if ( ! isset( $GLOBALS['fbm_settings_sections'] ) || ! is_array( $GLOBALS['fbm_settings_sections'] ) ) {
+                        $GLOBALS['fbm_settings_sections'] = array();
+                }
+
+                $GLOBALS['fbm_settings_sections'][ $page ][ $id ] = array(
+                        'title'    => $title,
+                        'callback' => $callback,
+                );
+        }
+}
+
+if ( ! function_exists( 'add_settings_field' ) ) {
+        function add_settings_field( string $id, string $title, $callback, string $page, string $section = 'default', array $args = array() ): void {
+                if ( ! isset( $GLOBALS['fbm_settings_fields'] ) || ! is_array( $GLOBALS['fbm_settings_fields'] ) ) {
+                        $GLOBALS['fbm_settings_fields'] = array();
+                }
+
+                $GLOBALS['fbm_settings_fields'][ $page ][ $section ][ $id ] = array(
+                        'title'    => $title,
+                        'callback' => $callback,
+                        'args'     => $args,
+                );
         }
 }
 

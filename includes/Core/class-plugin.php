@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace FoodBankManager\Core;
 
 use FoodBankManager\Admin\MembersPage;
+use FoodBankManager\Admin\ThemePage;
 use FoodBankManager\Auth\Capabilities;
 use FoodBankManager\Rest\CheckinController;
 use FoodBankManager\Shortcodes\RegistrationForm;
@@ -29,10 +30,11 @@ final class Plugin {
 	 * Register runtime hooks.
 	 */
 	public static function boot(): void {
-				Assets::setup();
-				MembersPage::register();
-				RegistrationForm::register();
-				StaffDashboard::register();
+		Assets::setup();
+		MembersPage::register();
+		ThemePage::register();
+		RegistrationForm::register();
+		StaffDashboard::register();
 
 		add_action( 'rest_api_init', array( CheckinController::class, 'register_routes' ) );
 
