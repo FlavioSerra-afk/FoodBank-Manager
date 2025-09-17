@@ -47,7 +47,7 @@ U2 — Public Registration
 
 ✅ Validation/anti-spam
 
-⬜ Member status flow (pending/active/revoked)
+✅ Member status flow (pending/active/revoked)
 
 ✅ Email with QR + code
 

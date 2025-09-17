@@ -46,7 +46,14 @@ final class RegistrationService {
 				 *
 				 * @var TokenService
 				 */
-	private TokenService $tokens;
+    private TokenService $tokens;
+
+        /**
+         * Registration settings accessor.
+         *
+         * @var RegistrationSettings
+         */
+        private RegistrationSettings $settings;
 
 				/**
 				 * Constructor.
@@ -54,10 +61,11 @@ final class RegistrationService {
 				 * @param MembersRepository $repository   Members repository instance.
 				 * @param TokenService      $token_service Token issuance service.
 				 */
-	public function __construct( MembersRepository $repository, TokenService $token_service ) {
-			$this->repository = $repository;
-			$this->tokens     = $token_service;
-	}
+        public function __construct( MembersRepository $repository, TokenService $token_service, ?RegistrationSettings $settings = null ) {
+                $this->repository = $repository;
+                $this->tokens     = $token_service;
+                $this->settings   = $settings ?? new RegistrationSettings();
+        }
 
 				/**
 				 * Register or reactivate a member record.
@@ -68,8 +76,8 @@ final class RegistrationService {
                                  * @param int      $household_size      Household size clamp.
                                  * @param int|null $consent_recorded_at Consent acknowledgement timestamp.
 				 *
-				 * @return array{member_id:int,member_reference:string,token:string,reactivated:bool}|null
-				 */
+         * @return array{member_id:int,member_reference:string,token:?string,reactivated:bool,status?:string}|null
+         */
         public function register( string $first_name, string $last_initial, string $email, int $household_size, ?int $consent_recorded_at = null ): ?array {
                 $consent_at = null;
                 if ( null !== $consent_recorded_at && $consent_recorded_at > 0 ) {
@@ -91,37 +99,56 @@ final class RegistrationService {
                                 $this->ensure_foodbank_member_user( $email, $first_name, $last_initial );
 
                                                                                                                                return array(
-																	'member_id'        => $existing['id'],
-																	'member_reference' => $existing['member_reference'],
-																	'token'            => $issuance['token'],
-																	'reactivated'      => true,
-																);
-		}
+                                                                                                                              'member_id'        => $existing['id'],
+                                                                                                                              'member_reference' => $existing['member_reference'],
+                                                                                                                              'token'            => $issuance['token'],
+                                                                                                                              'reactivated'      => true,
+                                                                                                                              'status'           => MembersRepository::STATUS_ACTIVE,
+                                                                                                                               );
+                }
 
-				$reference = $this->generate_reference();
+                                $reference = $this->generate_reference();
 
-		if ( '' === $reference ) {
+                if ( '' === $reference ) {
                                 return null;
                         }
 
-                                $member_id = $this->repository->insert_active_member( $reference, $first_name, $last_initial, $email, $household_size, $consent_at );
+                if ( $this->settings->auto_approve() ) {
+                        $member_id = $this->repository->insert_active_member( $reference, $first_name, $last_initial, $email, $household_size, $consent_at );
 
-		if ( null === $member_id ) {
-			return null;
-		}
+                        if ( null === $member_id ) {
+                                return null;
+                        }
 
-			$issuance = $this->issue_member_token( $member_id, 'registration' );
-		if ( null === $issuance ) {
-				return null;
-		}
+                        $issuance = $this->issue_member_token( $member_id, 'registration' );
+                        if ( null === $issuance ) {
+                                return null;
+                        }
+
                         $this->ensure_foodbank_member_user( $email, $first_name, $last_initial );
 
-                                                                        return array(
-                                                                                'member_id'        => $member_id,
-                                                                                'member_reference' => $reference,
-                                                                                'token'            => $issuance['token'],
-                                                                                'reactivated'      => false,
-                                                                        );
+                        return array(
+                                'member_id'        => $member_id,
+                                'member_reference' => $reference,
+                                'token'            => $issuance['token'],
+                                'reactivated'      => false,
+                                'status'           => MembersRepository::STATUS_ACTIVE,
+                        );
+                }
+
+                $member_id = $this->repository->insert_pending_member( $reference, $first_name, $last_initial, $email, $household_size, $consent_at );
+
+                if ( null === $member_id ) {
+                        return null;
+                }
+
+                return array(
+                        'member_id'        => $member_id,
+                        'member_reference' => $reference,
+                        'token'            => null,
+                        'reactivated'      => false,
+                        'status'           => MembersRepository::STATUS_PENDING,
+                );
         }
 
                 /**
@@ -197,11 +224,11 @@ final class RegistrationService {
 		 *
 		 * @return array{member_id:int,member_reference:string,first_name:string,email:string,status:string,token:string,issued_at:string,meta:array<string,mixed>}|null
 		 */
-	public function approve( int $member_id, ?int $issued_by = null ): ?array {
-			$member = $this->repository->find( $member_id );
-		if ( null === $member ) {
-				return null;
-		}
+        public function approve( int $member_id, ?int $issued_by = null ): ?array {
+                        $member = $this->repository->find( $member_id );
+                if ( null === $member ) {
+                                return null;
+                }
 
 		if ( 'active' !== $member['status'] ) {
 			if ( ! $this->repository->mark_active( $member_id ) ) {
@@ -211,22 +238,25 @@ final class RegistrationService {
 				$member['status'] = 'active';
 		}
 
-			$issuance = $this->issue_member_token( $member_id, 'approval', $issued_by );
-		if ( null === $issuance ) {
-				return null;
-		}
+                        $issuance = $this->issue_member_token( $member_id, 'approval', $issued_by );
+                if ( null === $issuance ) {
+                                return null;
+                }
 
-			return array(
-				'member_id'        => $member['id'],
-				'member_reference' => $member['member_reference'],
-				'first_name'       => $member['first_name'],
-				'email'            => $member['email'],
-				'status'           => $member['status'],
-				'token'            => $issuance['token'],
-				'issued_at'        => $issuance['issued_at'],
-				'meta'             => $issuance['meta'],
-			);
-	}
+                $last_initial = (string) ( $member['last_initial'] ?? '' );
+                $this->ensure_foodbank_member_user( $member['email'], $member['first_name'], $last_initial );
+
+                        return array(
+                                'member_id'        => $member['id'],
+                                'member_reference' => $member['member_reference'],
+                                'first_name'       => $member['first_name'],
+                                'email'            => $member['email'],
+                                'status'           => MembersRepository::STATUS_ACTIVE,
+                                'token'            => $issuance['token'],
+                                'issued_at'        => $issuance['issued_at'],
+                                'meta'             => $issuance['meta'],
+                        );
+        }
 
 		/**
 		 * Regenerate a member token without changing status.

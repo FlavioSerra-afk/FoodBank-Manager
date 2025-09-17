@@ -286,23 +286,34 @@ final class RegistrationForm {
                                 return $result;
                         }
 
-                        $service->ensure_foodbank_member_user( $email, $first_name, $last_initial );
+                        $status    = (string) ( $outcome['status'] ?? MembersRepository::STATUS_ACTIVE );
+                        $token_raw = $outcome['token'] ?? null;
+                        $token     = is_string( $token_raw ) ? $token_raw : '';
 
-                        $mailer = is_callable( self::$mailer_factory ) ? call_user_func( self::$mailer_factory ) : new WelcomeMailer();
+                        if ( MembersRepository::STATUS_ACTIVE === $status ) {
+                                $service->ensure_foodbank_member_user( $email, $first_name, $last_initial );
 
-                        if ( ! $mailer->send( $email, $first_name, $outcome['member_reference'], $outcome['token'] ) ) {
-                                $log = new MailFailureLog();
-                                $log->record_failure(
-                                        (int) $outcome['member_id'],
-                                        $outcome['member_reference'],
-                                        $email,
-                                        MailFailureLog::CONTEXT_REGISTRATION,
-                                        MailFailureLog::ERROR_MAIL
-                                );
+                                if ( '' !== $token ) {
+                                        $mailer = is_callable( self::$mailer_factory ) ? call_user_func( self::$mailer_factory ) : new WelcomeMailer();
+
+                                        if ( ! $mailer->send( $email, $first_name, $outcome['member_reference'], $token ) ) {
+                                                $log = new MailFailureLog();
+                                                $log->record_failure(
+                                                        (int) $outcome['member_id'],
+                                                        $outcome['member_reference'],
+                                                        $email,
+                                                        MailFailureLog::CONTEXT_REGISTRATION,
+                                                        MailFailureLog::ERROR_MAIL
+                                                );
+                                        }
+                                }
+
+                                $result['message'] = esc_html__( 'Thank you for registering. We have emailed your check-in QR code.', 'foodbank-manager' );
+                        } else {
+                                $result['message'] = esc_html__( 'Thank you for registering. Our team will review your application and send your QR code once approved.', 'foodbank-manager' );
                         }
 
                         $result['success'] = true;
-                        $result['message'] = esc_html__( 'Thank you for registering. We have emailed your check-in QR code.', 'foodbank-manager' );
                         $result['values']  = array(
                                 'first_name'     => '',
                                 'last_initial'   => '',
