@@ -88,6 +88,9 @@ final class RegistrationEmailTest extends TestCase {
 
                 global $wpdb;
                 $wpdb = new \wpdb();
+                $GLOBALS['fbm_users'] = array();
+                $GLOBALS['fbm_roles'] = array();
+                $GLOBALS['fbm_next_user_id'] = 1;
         }
 
         /**

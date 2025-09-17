@@ -540,12 +540,240 @@ if ( ! class_exists( 'WP_Error' ) ) {
         }
 }
 
+if ( ! function_exists( 'is_wp_error' ) ) {
+        function is_wp_error( $thing ): bool {
+                return $thing instanceof WP_Error;
+        }
+}
+
+if ( ! class_exists( 'WP_Role' ) ) {
+        /**
+         * Minimal WP_Role stand-in for capability assignment tests.
+         */
+        class WP_Role {
+                public string $name;
+
+                /**
+                 * @var array<string,bool>
+                 */
+                public array $capabilities;
+
+                public string $display_name;
+
+                public function __construct( string $role, array $capabilities = array(), string $display_name = '' ) {
+                        $this->name         = $role;
+                        $this->capabilities = $capabilities;
+                        $this->display_name = $display_name;
+                }
+
+                public function add_cap( string $capability, bool $grant = true ): void {
+                        if ( $grant ) {
+                                $this->capabilities[ $capability ] = true;
+                        } else {
+                                unset( $this->capabilities[ $capability ] );
+                        }
+
+                        if ( isset( $GLOBALS['fbm_roles'][ $this->name ] ) ) {
+                                $GLOBALS['fbm_roles'][ $this->name ] = $this;
+                        }
+                }
+        }
+}
+
+if ( ! class_exists( 'WP_User' ) ) {
+        /**
+         * Minimal WP_User stand-in for registration flows.
+         */
+        class WP_User {
+                public int $ID = 0;
+
+                /**
+                 * @var array<int,string>
+                 */
+                public array $roles = array();
+
+                public string $user_email = '';
+                public string $user_login = '';
+                public string $first_name = '';
+                public string $last_name = '';
+                public string $display_name = '';
+
+                public function __construct( $id = 0, array $data = array() ) {
+                        if ( is_numeric( $id ) && (int) $id > 0 ) {
+                                $record = $GLOBALS['fbm_users'][ (int) $id ] ?? null;
+                                if ( is_array( $record ) ) {
+                                        $this->hydrate( $record );
+
+                                        return;
+                                }
+
+                                $this->ID = (int) $id;
+                        }
+
+                        if ( ! empty( $data ) ) {
+                                $this->hydrate( $data );
+                        }
+                }
+
+                /**
+                 * Populate the user object from the shared store.
+                 *
+                 * @param array<string,mixed> $data User row data.
+                 */
+                private function hydrate( array $data ): void {
+                        $this->ID           = (int) ( $data['ID'] ?? $this->ID );
+                        $this->user_email   = (string) ( $data['user_email'] ?? '' );
+                        $this->user_login   = (string) ( $data['user_login'] ?? '' );
+                        $this->first_name   = (string) ( $data['first_name'] ?? '' );
+                        $this->last_name    = (string) ( $data['last_name'] ?? '' );
+                        $this->display_name = (string) ( $data['display_name'] ?? '' );
+
+                        $roles = $data['roles'] ?? array();
+                        if ( is_string( $roles ) ) {
+                                $roles = array( $roles );
+                        }
+
+                        $this->roles = array_values( array_unique( array_map( 'strval', (array) $roles ) ) );
+                }
+
+                public function add_role( string $role ): void {
+                        if ( '' === $role ) {
+                                return;
+                        }
+
+                        if ( ! in_array( $role, $this->roles, true ) ) {
+                                $this->roles[] = $role;
+                        }
+
+                        if ( ! isset( $GLOBALS['fbm_users'][ $this->ID ] ) || ! is_array( $GLOBALS['fbm_users'][ $this->ID ] ) ) {
+                                $GLOBALS['fbm_users'][ $this->ID ] = array();
+                        }
+
+                        $GLOBALS['fbm_users'][ $this->ID ]['roles'] = $this->roles;
+                }
+        }
+}
+
+if ( ! function_exists( 'add_role' ) ) {
+        function add_role( string $role, string $display_name, array $capabilities = array() ) {
+                if ( ! isset( $GLOBALS['fbm_roles'] ) || ! is_array( $GLOBALS['fbm_roles'] ) ) {
+                        $GLOBALS['fbm_roles'] = array();
+                }
+
+                $role_object                      = new WP_Role( $role, $capabilities, $display_name );
+                $GLOBALS['fbm_roles'][ $role ] = $role_object;
+
+                return $role_object;
+        }
+}
+
+if ( ! function_exists( 'get_role' ) ) {
+        function get_role( string $role ) {
+                $roles = $GLOBALS['fbm_roles'] ?? array();
+
+                return $roles[ $role ] ?? null;
+        }
+}
+
+if ( ! function_exists( 'get_user_by' ) ) {
+        function get_user_by( string $field, $value ) {
+                $users = $GLOBALS['fbm_users'] ?? array();
+
+                switch ( strtolower( $field ) ) {
+                        case 'id':
+                                $user_id = (int) $value;
+                                if ( $user_id > 0 && isset( $users[ $user_id ] ) ) {
+                                        return new WP_User( $user_id, $users[ $user_id ] );
+                                }
+
+                                return false;
+                        case 'email':
+                                $email = strtolower( (string) $value );
+
+                                foreach ( $users as $id => $user ) {
+                                        $stored = strtolower( (string) ( $user['user_email'] ?? '' ) );
+                                        if ( '' !== $stored && $stored === $email ) {
+                                                return new WP_User( (int) $id, $user );
+                                        }
+                                }
+
+                                return false;
+                        case 'login':
+                                $login = (string) $value;
+
+                                foreach ( $users as $id => $user ) {
+                                        if ( (string) ( $user['user_login'] ?? '' ) === $login ) {
+                                                return new WP_User( (int) $id, $user );
+                                        }
+                                }
+
+                                return false;
+                        default:
+                                return false;
+                }
+        }
+}
+
+if ( ! function_exists( 'wp_insert_user' ) ) {
+        function wp_insert_user( array $userdata ) {
+                if ( ! isset( $GLOBALS['fbm_users'] ) || ! is_array( $GLOBALS['fbm_users'] ) ) {
+                        $GLOBALS['fbm_users'] = array();
+                }
+
+                if ( ! isset( $GLOBALS['fbm_next_user_id'] ) ) {
+                        $GLOBALS['fbm_next_user_id'] = 1;
+                }
+
+                $user = array_merge(
+                        array(
+                                'user_login'   => '',
+                                'user_pass'    => '',
+                                'user_email'   => '',
+                                'first_name'   => '',
+                                'last_name'    => '',
+                                'display_name' => '',
+                                'roles'        => array(),
+                                'role'         => '',
+                        ),
+                        $userdata
+                );
+
+                if ( '' === $user['user_login'] ) {
+                        $user['user_login'] = $user['user_email'] ?: 'fbm_user_' . (string) $GLOBALS['fbm_next_user_id'];
+                }
+
+                $user['roles'] = array_values( array_filter( array_unique( array_map( 'strval', (array) $user['roles'] ) ) ) );
+
+                if ( '' !== (string) $user['role'] ) {
+                        $user['roles'][] = (string) $user['role'];
+                        unset( $user['role'] );
+                }
+
+                $id = isset( $user['ID'] ) ? (int) $user['ID'] : 0;
+
+                if ( $id > 0 && isset( $GLOBALS['fbm_users'][ $id ] ) ) {
+                        $user['ID'] = $id;
+                        $GLOBALS['fbm_users'][ $id ] = array_merge( $GLOBALS['fbm_users'][ $id ], $user );
+
+                        return $id;
+                }
+
+                $id           = (int) $GLOBALS['fbm_next_user_id'];
+                $user['ID']   = $id;
+                $GLOBALS['fbm_users'][ $id ] = $user;
+                $GLOBALS['fbm_next_user_id']++;
+
+                return $id;
+        }
+}
+
 if ( ! class_exists( 'WP_REST_Response' ) ) {
         /**
          * Minimal WP_REST_Response stand-in.
          */
         class WP_REST_Response {
                 private $data;
+                private int $status = 200;
 
                 public function __construct( $data = null ) {
                         $this->data = $data;
@@ -553,6 +781,14 @@ if ( ! class_exists( 'WP_REST_Response' ) ) {
 
                 public function get_data() {
                         return $this->data;
+                }
+
+                public function set_status( int $status ): void {
+                        $this->status = $status;
+                }
+
+                public function get_status(): int {
+                        return $this->status;
                 }
         }
 }
@@ -660,6 +896,22 @@ if ( ! function_exists( 'wp_rand' ) ) {
                 }
 
                 return random_int( $min, $max );
+        }
+}
+
+if ( ! function_exists( 'wp_generate_password' ) ) {
+        function wp_generate_password( int $length = 12, bool $special_chars = true, bool $extra_special_chars = false ): string {
+                unset( $special_chars, $extra_special_chars );
+
+                $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                $password = '';
+                $max      = strlen( $alphabet ) - 1;
+
+                for ( $i = 0; $i < $length; $i++ ) {
+                        $password .= $alphabet[ random_int( 0, $max ) ];
+                }
+
+                return $password;
         }
 }
 

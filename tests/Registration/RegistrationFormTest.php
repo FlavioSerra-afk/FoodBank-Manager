@@ -44,6 +44,9 @@ final class RegistrationFormTest extends TestCase {
 
                 $this->wpdb        = new \wpdb();
                 $GLOBALS['wpdb']   = $this->wpdb;
+                $GLOBALS['fbm_users'] = array();
+                $GLOBALS['fbm_roles'] = array();
+                $GLOBALS['fbm_next_user_id'] = 1;
                 $GLOBALS['fbm_test_nonces'] = array(
                         'fbm_registration_submit' => 'valid-nonce',
                 );
@@ -60,7 +63,7 @@ final class RegistrationFormTest extends TestCase {
         protected function tearDown(): void {
                 RegistrationForm::set_mailer_override( null );
 
-                unset( $GLOBALS['wpdb'], $GLOBALS['fbm_test_nonces'] );
+                unset( $GLOBALS['wpdb'], $GLOBALS['fbm_test_nonces'], $GLOBALS['fbm_users'], $GLOBALS['fbm_roles'], $GLOBALS['fbm_next_user_id'] );
 
                 $_SERVER = array();
                 $_POST   = array();
@@ -157,10 +160,56 @@ final class RegistrationFormTest extends TestCase {
                 $this->assertNotNull( $this->mailer->last_args );
                 $this->assertSame( 'Robin@example.com', $this->mailer->last_args[0] );
 
+                $user = get_user_by( 'email', 'robin@example.com' );
+                $this->assertInstanceOf( \WP_User::class, $user );
+                $this->assertContains( 'foodbank_member', $user->roles );
+
                 $last_prepare = $this->wpdb->get_last_prepare();
                 $this->assertIsArray( $last_prepare );
                 $this->assertStringContainsString( 'member_reference = %s', $last_prepare['query'] );
                 $this->assertMatchesRegularExpression( '/^FBM-/', (string) ( $last_prepare['args'][0] ?? '' ) );
+        }
+
+        /**
+         * Re-registering a member should retain existing user roles while adding FoodBank Member.
+         */
+        public function test_reregistration_preserves_existing_user_roles(): void {
+                $this->prepare_valid_submission(
+                        array(
+                                'fbm_first_name'        => 'Sasha',
+                                'fbm_last_initial'      => 'L',
+                                'fbm_email'             => 'sasha@example.com',
+                                'fbm_registration_time' => (string) ( time() - 120 ),
+                        )
+                );
+
+                $first = $this->invoke_handle_submission();
+
+                $this->assertTrue( $first['success'] );
+
+                $user = get_user_by( 'email', 'sasha@example.com' );
+                $this->assertInstanceOf( \WP_User::class, $user );
+                $this->assertContains( 'foodbank_member', $user->roles );
+
+                $user->add_role( 'subscriber' );
+
+                $this->prepare_valid_submission(
+                        array(
+                                'fbm_first_name'        => 'Sasha',
+                                'fbm_last_initial'      => 'L',
+                                'fbm_email'             => 'sasha@example.com',
+                                'fbm_registration_time' => (string) ( time() - 90 ),
+                        )
+                );
+
+                $second = $this->invoke_handle_submission();
+
+                $this->assertTrue( $second['success'] );
+
+                $updated = get_user_by( 'email', 'sasha@example.com' );
+                $this->assertInstanceOf( \WP_User::class, $updated );
+                $this->assertContains( 'subscriber', $updated->roles );
+                $this->assertContains( 'foodbank_member', $updated->roles );
         }
 
         /**

@@ -61,16 +61,19 @@ final class MembersPageTest extends TestCase {
 	private TokenService $tokens;
 	private RegistrationService $registration;
 
-	protected function setUp(): void {
-			parent::setUp();
+        protected function setUp(): void {
+                parent::setUp();
 
-			global $wpdb;
-			$wpdb = new \wpdb();
+                global $wpdb;
+                $wpdb = new \wpdb();
+                $GLOBALS['fbm_users'] = array();
+                $GLOBALS['fbm_roles'] = array();
+                $GLOBALS['fbm_next_user_id'] = 1;
 
-			$this->members      = new MembersRepository( $wpdb );
-			$token_repository   = new TokenRepository( $wpdb );
-			$this->tokens       = new TokenService( $token_repository );
-			$this->registration = new RegistrationService( $this->members, $this->tokens );
+                $this->members      = new MembersRepository( $wpdb );
+                $token_repository   = new TokenRepository( $wpdb );
+                $this->tokens       = new TokenService( $token_repository );
+                $this->registration = new RegistrationService( $this->members, $this->tokens );
 
 			MembersPageMailerStub::reset();
 			MembersPage::set_mailer_factory(
@@ -78,13 +81,13 @@ final class MembersPageTest extends TestCase {
 			);
 	}
 
-	protected function tearDown(): void {
-			MembersPage::set_mailer_factory( null );
+        protected function tearDown(): void {
+                MembersPage::set_mailer_factory( null );
 
-			unset( $GLOBALS['wpdb'] );
+                unset( $GLOBALS['wpdb'], $GLOBALS['fbm_users'], $GLOBALS['fbm_roles'], $GLOBALS['fbm_next_user_id'] );
 
-			parent::tearDown();
-	}
+                parent::tearDown();
+        }
 
 		/**
 		 * Resend action should mint a fresh token and dispatch a welcome email.
