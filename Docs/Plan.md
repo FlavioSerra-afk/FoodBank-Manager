@@ -35,6 +35,14 @@ Member creation (pending|active per config); email template engine.
 
 Welcome Email with attached QR image and fallback code; regenerate on re-send.
 
+### Public User Flow
+
+1. Visitor submits the public registration form (shortcode) with validated fields.
+2. FBM auto-creates the WordPress user, ignores legacy WP roles, and assigns the FoodBank Member role.
+3. System sends the welcome email containing the persistent QR code and fallback alphanumeric code.
+4. Admin/Manager/Staff verifies the QR at check-in using authorized FBM tooling.
+5. Attendance service stores the successful visit in fbm_attendance for reporting.
+
 U3 — Staff Front-End Dashboard (Scanner)
 
 [fbm_staff_dashboard] (requires login + fbm_view or higher).

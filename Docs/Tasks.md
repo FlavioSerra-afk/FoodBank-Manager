@@ -148,6 +148,7 @@
 - PHPCS green, PHPStan green, unit tests green.
 
 ### U2 — Public Registration
+- See Plan §U2 “Public User Flow” for the registration → FoodBank Member role → welcome email → staff check-in → attendance pipeline and role isolation requirements.
 - Build [fbm_registration_form] view + handlers; enqueue minimal assets.
 - Server validation; anti-spam; transient throttle.
 - Repo writes using prepared statements; status machine (pending/active/revoked).
