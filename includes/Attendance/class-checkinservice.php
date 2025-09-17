@@ -12,20 +12,28 @@ namespace FoodBankManager\Attendance;
 use DateTimeImmutable;
 use DateTimeZone;
 use function esc_html__;
+use function get_transient;
 use function in_array;
+use function is_array;
+use function md5;
+use function set_transient;
 use function strtolower;
+use function trim;
 
 /**
  * Coordinates attendance check-in writes.
  */
 final class CheckinService {
 	public const STATUS_SUCCESS        = 'success';
-	public const STATUS_DUPLICATE_DAY  = 'duplicate_day';
-	public const STATUS_ERROR          = 'error';
-	public const STATUS_OUT_OF_WINDOW  = 'out_of_window';
-	public const STATUS_RECENT_WARNING = 'recent_warning';
+    public const STATUS_DUPLICATE_DAY  = 'duplicate_day';
+    public const STATUS_ERROR          = 'error';
+    public const STATUS_OUT_OF_WINDOW  = 'out_of_window';
+    public const STATUS_RECENT_WARNING = 'recent_warning';
+    public const STATUS_THROTTLED      = 'throttled';
 
-	private const WEEK_IN_SECONDS = 604800;
+    private const WEEK_IN_SECONDS = 604800;
+    private const THROTTLE_MAX_ATTEMPTS = 5;
+    private const THROTTLE_WINDOW       = 60;
 
 	/**
 	 * Optional override for the current time, primarily used by tests.
@@ -57,8 +65,9 @@ final class CheckinService {
 	 * @param string      $method           Raw method string.
 	 * @param int|null    $user_id          Acting user ID.
 	 * @param string|null $note             Optional note.
-	 * @param bool        $override         Whether an override was requested.
-	 * @param string|null $override_note    Justification for the override.
+     * @param bool        $override         Whether an override was requested.
+     * @param string|null $override_note    Justification for the override.
+     * @param string|null $fingerprint      Request fingerprint for throttling (e.g. IP address).
 	 *
          * @return array{
          *     status:string,
@@ -70,7 +79,7 @@ final class CheckinService {
          *     window?:array{day:string,start:string,end:string,timezone:string}
          * }
          */
-        public function record( string $member_reference, string $method, ?int $user_id, ?string $note = null, bool $override = false, ?string $override_note = null ): array {
+    public function record( string $member_reference, string $method, ?int $user_id, ?string $note = null, bool $override = false, ?string $override_note = null, ?string $fingerprint = null ): array {
 		$utc_timezone    = new DateTimeZone( 'UTC' );
 		$now_utc         = self::$current_time_override instanceof DateTimeImmutable
 		? self::$current_time_override->setTimezone( $utc_timezone )
@@ -81,16 +90,27 @@ final class CheckinService {
 		$window_start = $now_london->setTime( 11, 0, 0 );
 		$window_end   = $now_london->setTime( 14, 30, 0 );
 
-                if ( '4' !== $now_london->format( 'N' ) || $now_london < $window_start || $now_london > $window_end ) {
-                        return array(
-                                'status'     => self::STATUS_OUT_OF_WINDOW,
+        if ( '4' !== $now_london->format( 'N' ) || $now_london < $window_start || $now_london > $window_end ) {
+            return array(
+                'status'     => self::STATUS_OUT_OF_WINDOW,
                                 'message'    => esc_html__( 'Collections can only be recorded on Thursdays between 11:00 and 14:30 (UK time).', 'foodbank-manager' ),
                                 'member_ref' => $member_reference,
                                 'time'       => null,
                         );
 		}
 
-		$normalized_method = $this->normalize_method( $method );
+        $throttle_key = $this->build_throttle_key( $user_id, $fingerprint );
+
+        if ( null !== $throttle_key && ! $this->register_attempt( $throttle_key ) ) {
+            return array(
+                'status'     => self::STATUS_THROTTLED,
+                'message'    => esc_html__( 'Please wait a moment before trying again.', 'foodbank-manager' ),
+                'member_ref' => $member_reference,
+                'time'       => null,
+            );
+        }
+
+        $normalized_method = $this->normalize_method( $method );
 
 		if ( $this->repository->has_checked_in_for_date( $member_reference, $now_utc ) ) {
 			return array(
@@ -158,20 +178,128 @@ final class CheckinService {
                         }
                 }
 
-				return array(
-					'status'     => $status,
-					'message'    => $message,
-					'member_ref' => $member_reference,
-					'time'       => $now_utc->format( DATE_ATOM ),
-				);
-	}
+        return array(
+                'status'     => $status,
+                'message'    => $message,
+                'member_ref' => $member_reference,
+                'time'       => $now_utc->format( DATE_ATOM ),
+        );
+    }
 
-	/**
-	 * Override the current time for deterministic testing.
-	 *
-	 * @internal
-	 *
-	 * @param DateTimeImmutable|null $override Custom "now" instance.
+    /**
+     * Register an attempt for a throttle key and determine if it is allowed.
+     *
+     * @param string $key Unique throttle key.
+     */
+    private function register_attempt( string $key ): bool {
+        $record = get_transient( $key );
+        $now    = time();
+
+        if ( ! is_array( $record ) || ! isset( $record['attempts'], $record['first_at'] ) ) {
+            set_transient(
+                $key,
+                array(
+                    'attempts' => 1,
+                    'first_at' => $now,
+                ),
+                self::THROTTLE_WINDOW
+            );
+
+            return true;
+        }
+
+        $attempts = (int) $record['attempts'];
+        $first_at = (int) $record['first_at'];
+
+        if ( $now - $first_at >= self::THROTTLE_WINDOW ) {
+            set_transient(
+                $key,
+                array(
+                    'attempts' => 1,
+                    'first_at' => $now,
+                ),
+                self::THROTTLE_WINDOW
+            );
+
+            return true;
+        }
+
+        if ( $attempts >= self::THROTTLE_MAX_ATTEMPTS ) {
+            set_transient(
+                $key,
+                array(
+                    'attempts' => $attempts,
+                    'first_at' => $first_at,
+                ),
+                self::THROTTLE_WINDOW
+            );
+
+            return false;
+        }
+
+        set_transient(
+            $key,
+            array(
+                'attempts' => $attempts + 1,
+                'first_at' => $first_at,
+            ),
+            self::THROTTLE_WINDOW
+        );
+
+        return true;
+    }
+
+    /**
+     * Build a throttle key based on the acting user or request fingerprint.
+     *
+     * @param int|null    $user_id     Acting user identifier.
+     * @param string|null $fingerprint Request fingerprint.
+     */
+    private function build_throttle_key( ?int $user_id, ?string $fingerprint ): ?string {
+        if ( null !== $user_id && $user_id > 0 ) {
+            return 'fbm_checkin_throttle_user_' . $user_id;
+        }
+
+        $fingerprint = $this->resolve_fingerprint( $fingerprint );
+
+        if ( null === $fingerprint ) {
+            return null;
+        }
+
+        return 'fbm_checkin_throttle_ip_' . md5( $fingerprint );
+    }
+
+    /**
+     * Resolve the most appropriate fingerprint for the current request.
+     *
+     * @param string|null $fingerprint Provided fingerprint.
+     */
+    private function resolve_fingerprint( ?string $fingerprint ): ?string {
+        if ( is_string( $fingerprint ) ) {
+            $fingerprint = trim( $fingerprint );
+        }
+
+        if ( is_string( $fingerprint ) && '' !== $fingerprint ) {
+            return $fingerprint;
+        }
+
+        if ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
+            $remote_address = trim( (string) $_SERVER['REMOTE_ADDR'] );
+
+            if ( '' !== $remote_address ) {
+                return $remote_address;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Override the current time for deterministic testing.
+     *
+     * @internal
+     *
+     * @param DateTimeImmutable|null $override Custom "now" instance.
 	 */
 	public static function set_current_time_override( ?DateTimeImmutable $override ): void {
 		self::$current_time_override = $override;
