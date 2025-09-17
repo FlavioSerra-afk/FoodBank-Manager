@@ -7,8 +7,25 @@ DIST="dist"
 WORK="$DIST/$SLUG"
 BUILD="build"
 
+PLUGIN_VERSION=$(grep -E "^\s*\*\s*Version:" -m1 "$SLUG.php" | sed -E "s/.*Version:\s*([0-9A-Za-z._+-]+).*/\\1/")
+CORE_VERSION=$(grep -E "VERSION\s*=\s*'[^']+'" -m1 includes/Core/class-plugin.php | sed -E "s/.*'([^']+)'.*/\\1/")
+README_VERSION=$(grep -E "^Stable tag:" -m1 readme.txt | sed -E "s/^Stable tag:\s*([0-9A-Za-z._+-]+).*/\\1/")
+
+if [[ -z "$PLUGIN_VERSION" || -z "$CORE_VERSION" || -z "$README_VERSION" ]]; then
+  echo "Error: Unable to resolve plugin, core, or readme version markers" >&2
+  exit 1
+fi
+
+if [[ "$PLUGIN_VERSION" != "$CORE_VERSION" || "$PLUGIN_VERSION" != "$README_VERSION" ]]; then
+  echo "Error: Version mismatch. Plugin=$PLUGIN_VERSION, Core=$CORE_VERSION, Readme=$README_VERSION" >&2
+  exit 1
+fi
+
+mkdir -p "$BUILD"
+echo "Plugin version: $PLUGIN_VERSION" > "$BUILD/version.txt"
+
 rm -rf "$WORK" "$DIST/$SLUG.zip"
-mkdir -p "$WORK" "$BUILD"
+mkdir -p "$WORK"
 
 # Ensure main file exists in repository root and copy it into the package first
 if [[ ! -f "$SLUG.php" ]]; then
@@ -31,9 +48,14 @@ rsync -a --delete \
   --exclude "$SLUG.php" \
   ./ "$WORK/"
 
-# Production install without dev dependencies
+# Production install without dev dependencies unless instructed to reuse local vendor
 rm -rf "$WORK/vendor"
-( cd "$WORK" && composer install --no-dev --optimize-autoloader && composer dump-autoload --optimize --classmap-authoritative )
+if [[ -n "${FBM_PACKAGE_USE_LOCAL_VENDOR:-}" ]]; then
+  echo "[build] Using local vendor directory (FBM_PACKAGE_USE_LOCAL_VENDOR set)"
+  rsync -a --delete vendor/ "$WORK/vendor/"
+else
+  ( cd "$WORK" && composer install --no-dev --optimize-autoloader && composer dump-autoload --optimize --classmap-authoritative )
+fi
 
 # Compile all translations if msgfmt is available (soft fail otherwise)
 if command -v msgfmt >/dev/null 2>&1; then
@@ -49,9 +71,12 @@ fi
 # Build the ZIP with a stable top-level directory
 ( cd "$DIST" && zip -rq "$SLUG.zip" "$SLUG" )
 
+zipinfo -1 "$DIST/$SLUG.zip" | sort > "$BUILD/zip-contents.txt"
+cp "$BUILD/zip-contents.txt" "$DIST/$SLUG-manifest.txt"
+
 # Verify first ZIP entry is the slug directory
 set +o pipefail
-FIRST_ENTRY=$(zipinfo -1 "$DIST/$SLUG.zip" | head -n1)
+FIRST_ENTRY=$(head -n1 "$BUILD/zip-contents.txt")
 echo "$FIRST_ENTRY" > "$BUILD/zip-root.txt"
 set -o pipefail
 if [[ "$FIRST_ENTRY" != "$SLUG/" ]]; then

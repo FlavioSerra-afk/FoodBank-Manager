@@ -1,42 +1,58 @@
-## 2.2.18 — 2025-09-16
+# Changelog
+
+## [Unreleased]
+
+### Added
+- Diagnostics mail failure log with redacted entries and rate-limited resend controls.
+- Packaging manifest generation plus release scripts for changelog preparation.
+- PHPUnit coverage for packaging integrity and version drift detection.
+
+### Changed
+- Packaging guard now enforces version alignment across plugin metadata before building releases.
+
+## [2.2.24] - 2025-09-17
+
+- _No documented changes._
+
+## [2.2.18] - 2025-09-16
 - Automatically send welcome emails with QR access for approved registrations.
 - Allow administrators to resend or revoke welcome messages from the dashboard.
 
-## 2.2.15 — 2025-09-15
+## [2.2.15] - 2025-09-15
 - Bump version
 
-## 2.2.14 — 2025-09-15
+## [2.2.14] - 2025-09-15
 - Bump version
 
-## 2.2.13 — 2025-09-15
+## [2.2.13] - 2025-09-15
 - Bump version
 
-## 2.2.12 — 2025-09-15
+## [2.2.12] - 2025-09-15
 - Bump version
 
-## 2.2.11 — 2025-09-15
+## [2.2.11] - 2025-09-15
 - Bump version
 
-## 2.2.10 — 2025-09-15
+## [2.2.10] - 2025-09-15
 - Lock PHPCS/WPCS; changed-files fixer; guardrails (pre-commit/CI); Theme defaults/preview hardened; two-pane admin; tests seeded.
 
-## 2.2.9 — 2025-09-14
+## [2.2.9] - 2025-09-14
 - Fix Plugin.php parse error and expose safe version constant.
 - Theme sanitizer/preview now always merge into defaults.
 - Add PHPCS spacing rules and auto-fix spacing.
 - Seed theme defaults in tests to avoid undefined keys.
 
-## 2.2.8 — 2025-09-14
+## [2.2.8] - 2025-09-14
 - Bump version
 
-## 2.2.7 — 2025-09-14
+## [2.2.7] - 2025-09-14
 - Bump version
 
-## 2.2.6 — 2025-09-14
+## [2.2.6] - 2025-09-14
 - Bump version
 - Switch to manual release flow
 
-## 2.2.5 — 2025-09-14
+## [2.2.5] - 2025-09-14
 - Fix release-please to manifest mode (stop `chore(main): 1.8.0` PRs).
 - Repair Plugin.php parse error; centralize FBM_VER and global define.
 - Harden sanitize (null/flat/nested, clamp, payload limit).
@@ -221,7 +237,7 @@
 * **theme:** wire tokens & classes across admin/public + reliable enqueue & fallbacks ([354e26e](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/354e26e1068e339f0a220d670eb6e636cb815116))
 * **version:** auto-bump patch [skip ci] ([4988a46](https://github.com/FlavioSerra-afk/FoodBank-Manager/commit/4988a463375c7de04d7536a2886caddffeb80b7a))
 
-## 2.2.4 — 2025-09-14
+## [2.2.4] - 2025-09-14
 - Bump version
 
 ## [2.2.3] — 2025-09-16
@@ -1045,15 +1061,15 @@ Docs-Revision: 2025-09-08 (Wave U2)
 ### Known
 - PHPUnit still has permission-alignment failures in a subset of suites (tracked in Docs/ISSUES - see RBAC alignment items).
 
-## 1.2.10 — 2025-09-05
+## [1.2.10] - 2025-09-05
 - feat(bootstrap): boot watchdog and parent menu failsafe with Diagnostics link
 
-## 1.2.9 — 2025-09-05
+## [1.2.9] - 2025-09-05
 - test(harness): add WP helpers (transients/options/nonces), reset globals, gate ext branches
 - test(notices/menu): align with cap self-heal + admin fallback; de-dup verified
 - chore(release): metadata bump only
 
-## 1.2.8 — 2025-09-05
+## [1.2.8] - 2025-09-05
 - chore(release): version bump only (no runtime changes)
 - docs: note test stubs (WP helpers), retention config normalizer, notices de-dup diagnostics
 

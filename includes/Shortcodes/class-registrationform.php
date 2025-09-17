@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace FoodBankManager\Shortcodes;
 
+use FoodBankManager\Diagnostics\MailFailureLog;
 use FoodBankManager\Email\WelcomeMailer;
 use FoodBankManager\Registration\MembersRepository;
 use FoodBankManager\Registration\RegistrationService;
@@ -239,8 +240,18 @@ final class RegistrationForm {
 				return $result;
 			}
 
-				$mailer = is_callable( self::$mailer_factory ) ? call_user_func( self::$mailer_factory ) : new WelcomeMailer();
-				$mailer->send( $email, $first_name, $outcome['member_reference'], $outcome['token'] );
+                        $mailer = is_callable( self::$mailer_factory ) ? call_user_func( self::$mailer_factory ) : new WelcomeMailer();
+
+                        if ( ! $mailer->send( $email, $first_name, $outcome['member_reference'], $outcome['token'] ) ) {
+                                $log = new MailFailureLog();
+                                $log->record_failure(
+                                        (int) $outcome['member_id'],
+                                        $outcome['member_reference'],
+                                        $email,
+                                        MailFailureLog::CONTEXT_REGISTRATION,
+                                        MailFailureLog::ERROR_MAIL
+                                );
+                        }
 
 			$result['success'] = true;
 			$result['message'] = esc_html__( 'Thank you for registering. We have emailed your check-in QR code.', 'foodbank-manager' );

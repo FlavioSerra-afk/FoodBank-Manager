@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace FoodBankManager\Core;
 
+use FoodBankManager\Admin\DiagnosticsPage;
 use FoodBankManager\Admin\MembersPage;
 use FoodBankManager\Admin\ReportsPage;
 use FoodBankManager\Admin\ThemePage;
@@ -31,7 +32,8 @@ final class Plugin {
 	 * Register runtime hooks.
 	 */
 	public static function boot(): void {
-		Assets::setup();
+                Assets::setup();
+                DiagnosticsPage::register();
                 MembersPage::register();
                 ReportsPage::register();
                 ThemePage::register();

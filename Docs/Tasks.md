@@ -10,6 +10,7 @@
   - Routes: POST /fbm/v1/checkin (nonce + `fbm_checkin` capability).
   - Access gating: Staff dashboard shortcode requires login + `fbm_view`; Assets::mark_staff_dashboard() only enqueues scanner JS/CSS when authorized; admin stylesheet gated to `fbm` screens via Assets::maybe_enqueue_admin().
   - Schema/policy: Install provisions `fbm_members`, `fbm_tokens`, `fbm_attendance`, `fbm_attendance_overrides`; tokens store HMAC hashes only; daily unique window enforced; Thursday 11:00–14:30 window retained; <7 day repeat still requires manager override with note audit trail.
+  - Diagnostics: admin mail log added with redacted entries, rate-limited resend, and manifest-backed packaging checks.
   - Items removed: None (no out-of-scope features detected during sweep).
   - CI: PASS — composer phpstan ✅; composer lint ✅; composer test -v ✅ (vendor QR-code deprecations only); composer i18n:build ✅; bash bin/package.sh ✅.
 

@@ -634,6 +634,16 @@ if ( ! function_exists( 'is_email' ) ) {
         }
 }
 
+if ( ! function_exists( 'wp_rand' ) ) {
+        function wp_rand( int $min = 0, int $max = 0 ): int {
+                if ( $max <= $min ) {
+                        return random_int( $min, $min );
+                }
+
+                return random_int( $min, $max );
+        }
+}
+
 if ( ! function_exists( 'get_current_user_id' ) ) {
         function get_current_user_id(): int {
                 return 1;
