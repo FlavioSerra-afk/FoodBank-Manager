@@ -139,6 +139,50 @@ final class RegistrationEmailTest extends TestCase {
         }
 
         /**
+         * Providing consent should capture the recorded timestamp.
+         */
+        public function test_registration_records_consent_timestamp(): void {
+                list( $registration ) = $this->createServices();
+
+                $now     = time();
+                $outcome = $registration->register( 'Devon', 'H', 'devon@example.com', 2, $now );
+
+                $this->assertNotNull( $outcome );
+
+                global $wpdb;
+
+                $this->assertArrayHasKey( $outcome['member_id'], $wpdb->members );
+                $member = $wpdb->members[ $outcome['member_id'] ];
+
+                $this->assertArrayHasKey( 'consent_recorded_at', $member );
+                $this->assertNotFalse( strtotime( (string) $member['consent_recorded_at'] ) );
+        }
+
+        /**
+         * Reactivating an existing member honours new consent submissions.
+         */
+        public function test_reactivation_updates_consent_timestamp_when_present(): void {
+                list( $registration ) = $this->createServices();
+
+                $first = $registration->register( 'Emery', 'Q', 'emery@example.com', 4 );
+
+                $this->assertNotNull( $first );
+
+                global $wpdb;
+                $member_id = $first['member_id'];
+
+                $this->assertArrayHasKey( $member_id, $wpdb->members );
+                $this->assertArrayNotHasKey( 'consent_recorded_at', $wpdb->members[ $member_id ] );
+
+                $reactivated = $registration->register( 'Emery', 'Q', 'emery@example.com', 4, time() );
+
+                $this->assertNotNull( $reactivated );
+                $this->assertTrue( $reactivated['reactivated'] );
+                $this->assertArrayHasKey( 'consent_recorded_at', $wpdb->members[ $member_id ] );
+                $this->assertNotFalse( strtotime( (string) $wpdb->members[ $member_id ]['consent_recorded_at'] ) );
+        }
+
+        /**
          * Resending credentials should mint a fresh token and invalidate the prior one.
          */
         public function test_resend_regenerates_tokens(): void {

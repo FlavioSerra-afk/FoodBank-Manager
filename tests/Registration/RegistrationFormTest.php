@@ -140,6 +140,7 @@ final class RegistrationFormTest extends TestCase {
                 $this->assertSame( '', $result['values']['last_initial'] );
                 $this->assertSame( '', $result['values']['email'] );
                 $this->assertSame( '1', $result['values']['household_size'] );
+                $this->assertSame( '', $result['values']['consent'] );
 
                 $this->assertCount( 1, $this->wpdb->members );
                 $member = reset( $this->wpdb->members );
@@ -148,6 +149,7 @@ final class RegistrationFormTest extends TestCase {
                 $this->assertSame( 'M', $member['last_initial'] );
                 $this->assertSame( 'Robin@example.com', $member['email'] );
                 $this->assertSame( 12, $member['household_size'] );
+                $this->assertNull( $member['consent_recorded_at'] ?? null );
 
                 $this->assertNotEmpty( $this->wpdb->tokens );
 
@@ -159,6 +161,33 @@ final class RegistrationFormTest extends TestCase {
                 $this->assertIsArray( $last_prepare );
                 $this->assertStringContainsString( 'member_reference = %s', $last_prepare['query'] );
                 $this->assertMatchesRegularExpression( '/^FBM-/', (string) ( $last_prepare['args'][0] ?? '' ) );
+        }
+
+        /**
+         * Optional consent should persist when provided.
+         */
+        public function test_successful_submission_with_consent_records_timestamp(): void {
+                $this->prepare_valid_submission(
+                        array(
+                                'fbm_first_name'             => 'Jordan',
+                                'fbm_last_initial'           => 'k',
+                                'fbm_email'                  => 'jordan@example.com',
+                                'fbm_registration_time'      => (string) ( time() - 60 ),
+                                'fbm_registration_consent'   => '1',
+                        )
+                );
+
+                $result = $this->invoke_handle_submission();
+
+                $this->assertTrue( $result['success'] );
+                $this->assertSame( '', $result['values']['consent'] );
+
+                $this->assertCount( 1, $this->wpdb->members );
+                $member = reset( $this->wpdb->members );
+
+                $this->assertArrayHasKey( 'consent_recorded_at', $member );
+                $this->assertNotSame( '', $member['consent_recorded_at'] );
+                $this->assertNotFalse( strtotime( (string) $member['consent_recorded_at'] ) );
         }
 
         /**
@@ -192,6 +221,7 @@ final class RegistrationFormTest extends TestCase {
                                 'fbm_last_initial'           => 'J',
                                 'fbm_email'                  => 'taylor@example.com',
                                 'fbm_household_size'         => '3',
+                                'fbm_registration_consent'   => '',
                         ),
                         $overrides
                 );

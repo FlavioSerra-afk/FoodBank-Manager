@@ -32,11 +32,14 @@ $last_initial_key = isset( $fields['last_initial'] ) && is_string( $fields['last
 $email_key        = isset( $fields['email'] ) && is_string( $fields['email'] ) ? $fields['email'] : 'fbm_email';
 $household_key    = isset( $fields['household_size'] ) && is_string( $fields['household_size'] ) ? $fields['household_size'] : 'fbm_household_size';
 $submit_key       = isset( $fields['submit'] ) && is_string( $fields['submit'] ) ? $fields['submit'] : 'fbm_registration_submitted';
+$consent_key      = isset( $fields['consent'] ) && is_string( $fields['consent'] ) ? $fields['consent'] : 'fbm_registration_consent';
 
 $first_name_value   = isset( $values['first_name'] ) ? (string) $values['first_name'] : '';
 $last_initial_value = isset( $values['last_initial'] ) ? (string) $values['last_initial'] : '';
 $email_value        = isset( $values['email'] ) ? (string) $values['email'] : '';
 $household_value    = isset( $values['household_size'] ) ? (string) $values['household_size'] : '1';
+$consent_value      = isset( $values['consent'] ) ? (string) $values['consent'] : '';
+$consent_checked    = '1' === $consent_value;
 ?>
 <div class="fbm-registration-form" data-fbm-component="registration-form">
 		<?php if ( $success ) : ?>
@@ -106,8 +109,8 @@ $household_value    = isset( $values['household_size'] ) ? (string) $values['hou
 								/>
 						</div>
 
-						<div class="fbm-registration-form__field">
-								<label for="<?php echo esc_attr( $household_key ); ?>">
+                                                <div class="fbm-registration-form__field">
+                                                                <label for="<?php echo esc_attr( $household_key ); ?>">
 										<?php esc_html_e( 'Household size', 'foodbank-manager' ); ?>
 								</label>
 								<input
@@ -120,7 +123,22 @@ $household_value    = isset( $values['household_size'] ) ? (string) $values['hou
 										inputmode="numeric"
 										required
 								/>
-						</div>
+                                                </div>
+
+                                                <div class="fbm-registration-form__field fbm-registration-form__field--consent">
+                                                                <p class="fbm-registration-form__consent-copy">
+                                                                                <?php esc_html_e( 'You can opt in to receive occasional updates about service hours or urgent notices.', 'foodbank-manager' ); ?>
+                                                                </p>
+                                                                <label for="<?php echo esc_attr( $consent_key ); ?>" class="fbm-registration-form__consent">
+                                                                                <input
+                                                                                                type="checkbox"
+                                                                                                id="<?php echo esc_attr( $consent_key ); ?>"
+                                                                                                name="<?php echo esc_attr( $consent_key ); ?>"
+                                                                                                value="1"<?php echo $consent_checked ? ' checked' : ''; ?>
+                                                                                />
+                                                                                <?php esc_html_e( 'Yes, I consent to Food Bank Manager contacting me with these updates.', 'foodbank-manager' ); ?>
+                                                                </label>
+                                                </div>
 
 						<div class="fbm-registration-form__honeypot" aria-hidden="true" style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden;">
 								<label for="<?php echo esc_attr( $honeypot_name ); ?>">
