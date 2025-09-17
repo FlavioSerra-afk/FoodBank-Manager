@@ -26,7 +26,8 @@ final class CheckinServiceTest extends TestCase {
         }
 
         public function test_record_returns_duplicate_day_status_when_member_already_checked_in(): void {
-                $repository = new AttendanceRepository( new \wpdb() );
+                $wpdb       = new \wpdb();
+                $repository = new AttendanceRepository( $wpdb );
 
                 CheckinService::set_current_time_override(
                         new DateTimeImmutable( '2023-08-17 12:15:00', new DateTimeZone( 'Europe/London' ) )
@@ -46,7 +47,8 @@ final class CheckinServiceTest extends TestCase {
         }
 
         public function test_record_returns_out_of_window_status_when_not_available(): void {
-                $repository = new AttendanceRepository( new \wpdb() );
+                $wpdb       = new \wpdb();
+                $repository = new AttendanceRepository( $wpdb );
 
                 CheckinService::set_current_time_override(
                         new DateTimeImmutable( '2023-08-16 10:00:00', new DateTimeZone( 'Europe/London' ) )
@@ -66,7 +68,8 @@ final class CheckinServiceTest extends TestCase {
         }
 
         public function test_record_returns_warning_when_previous_collection_within_week(): void {
-                $repository = new AttendanceRepository( new \wpdb() );
+                $wpdb       = new \wpdb();
+                $repository = new AttendanceRepository( $wpdb );
 
                 CheckinService::set_current_time_override(
                         new DateTimeImmutable( '2023-08-17 12:15:00', new DateTimeZone( 'Europe/London' ) )
@@ -77,6 +80,7 @@ final class CheckinServiceTest extends TestCase {
                 $initial = $service->record( 'FBM789', 'qr', 3 );
 
                 $this->assertSame( CheckinService::STATUS_SUCCESS, $initial['status'] );
+                $this->assertCount( 1, $wpdb->attendance );
 
                 CheckinService::set_current_time_override(
                         new DateTimeImmutable( '2023-08-24 12:14:00', new DateTimeZone( 'Europe/London' ) )
@@ -86,13 +90,16 @@ final class CheckinServiceTest extends TestCase {
 
                 $this->assertSame( CheckinService::STATUS_RECENT_WARNING, $warning['status'] );
                 $this->assertSame(
-                        'Collection recorded, but member collected less than a week ago.',
+                        'Member collected less than a week ago. Manager override required.',
                         $warning['message']
                 );
+                $this->assertSame( 'FBM789', $warning['member_ref'] );
+                $this->assertSame( '2023-08-17T11:15:00+00:00', $warning['time'] );
+                $this->assertCount( 1, $wpdb->attendance );
         }
 
         public function test_record_allows_override_to_bypass_recent_warning(): void {
-                $wpdb        = new \wpdb();
+                $wpdb       = new \wpdb();
                 $repository = new AttendanceRepository( $wpdb );
 
                 CheckinService::set_current_time_override(
@@ -112,6 +119,7 @@ final class CheckinServiceTest extends TestCase {
                 $this->assertSame( CheckinService::STATUS_SUCCESS, $result['status'] );
                 $this->assertSame( 'Collection recorded.', $result['message'] );
 
+                $this->assertCount( 2, $wpdb->attendance );
                 $this->assertNotEmpty( $wpdb->attendance_overrides );
                 $overrides     = array_values( $wpdb->attendance_overrides );
                 $latest_audit = $overrides[ count( $overrides ) - 1 ];
@@ -122,7 +130,8 @@ final class CheckinServiceTest extends TestCase {
         }
 
         public function test_record_keeps_warning_when_note_without_override(): void {
-                $repository = new AttendanceRepository( new \wpdb() );
+                $wpdb       = new \wpdb();
+                $repository = new AttendanceRepository( $wpdb );
 
                 CheckinService::set_current_time_override(
                         new DateTimeImmutable( '2023-08-17 12:15:00', new DateTimeZone( 'Europe/London' ) )
@@ -139,5 +148,6 @@ final class CheckinServiceTest extends TestCase {
                 $result = $service->record( 'FBM881', 'qr', 5, 'note only' );
 
                 $this->assertSame( CheckinService::STATUS_RECENT_WARNING, $result['status'] );
+                $this->assertCount( 1, $wpdb->attendance );
         }
 }

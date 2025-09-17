@@ -7,12 +7,12 @@
 
 | Feature | Admin | Manager | Staff | Public | Mobile | A11y | Security | PHPCS | PHPStan | Unit | Integration | E2E | Docs | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Forms (shortcode) | 🟨 | 🟨 | 🟨 | ✅ | [ ] | [ ] | [ ] | ✅ | ✅ | ⚠️ | [ ] | [ ] | [ ] | [Tasks](Tasks.md) |
+| Forms (shortcode) | 🟨 | 🟨 | 🟨 | ✅ | [ ] | [ ] | ✅ | ✅ | ✅ | ⚠️ | [ ] | [ ] | [ ] | [Tasks](Tasks.md) |
 | Emails (log/resend) | 🟨 | 🟨 | 🟨 | 🟨 | 🟨 | 🟨 | 🟨 | ✅ | ✅ | ⚠️ | 🟨 | 🟨 | 🟨 | [Task](Tasks.md#permanent-qr-issuance-in-applicant-email-revoke-regenerate-admin-tool) |
-| Front-end Dashboard (auth) | 🟨 | 🟨 | 🟨 | [ ] | [ ] | [ ] | 🟨 | ✅ | ✅ | ⚠️ | [ ] | [ ] | [ ] | [Task](Tasks.md#public-dashboard-removal--guards) |
-| Staff Check-in | 🟨 | 🟨 | 🟨 | [ ] | [ ] | [ ] | 🟨 | ✅ | ✅ | ⚠️ | [ ] | [ ] | [ ] | [Task](Tasks.md#u3--staff-front-end-dashboard) |
-| Attendance Scan | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | 🟨 | ✅ | ✅ | ⚠️ | [ ] | [ ] | [ ] | [Events](Tasks.md#replace-remove-events-references-in-code--db-migrator), [Policy](Tasks.md#rest--ui-updates-for-fixed-window-policy) |
-| Attendance Manual | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | 🟨 | ✅ | ✅ | ⚠️ | [ ] | [ ] | [ ] | [Events](Tasks.md#replace-remove-events-references-in-code--db-migrator), [Policy](Tasks.md#rest--ui-updates-for-fixed-window-policy) |
+| Front-end Dashboard (auth) | 🟨 | 🟨 | 🟨 | [ ] | [ ] | [ ] | ✅ | ✅ | ✅ | ⚠️ | [ ] | [ ] | [ ] | [Task](Tasks.md#public-dashboard-removal--guards) |
+| Staff Check-in | 🟨 | 🟨 | 🟨 | [ ] | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | [ ] | [Task](Tasks.md#u3--staff-front-end-dashboard); Final audit 2025-09-17 |
+| Attendance Scan | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ⚠️ | [ ] | [ ] | [ ] | [Events](Tasks.md#replace-remove-events-references-in-code--db-migrator), [Policy](Tasks.md#rest--ui-updates-for-fixed-window-policy) |
+| Attendance Manual | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | [ ] | [Events](Tasks.md#replace-remove-events-references-in-code--db-migrator), [Policy](Tasks.md#rest--ui-updates-for-fixed-window-policy); Final audit 2025-09-17 |
 | Exports CSV/XLSX/PDF | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ⚠️ | [ ] | [ ] | [ ] | [Tasks](Tasks.md) |
 | Diagnostics | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ⚠️ | [ ] | [ ] | [ ] | [Tasks](Tasks.md) |
 | GDPR (Consent/SAR/Retention) | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ⚠️ | [ ] | [ ] | [ ] | [Tasks](Tasks.md) |
@@ -58,6 +58,8 @@ U3 — Staff Front-End Dashboard
 ✅ /fbm/checkin (nonce, cap, throttle)
 
 ✅ Idempotent per member/day
+
+✅ Weekly repeat block requires manager override + note audit
 
 ⬜ “Today” counters & feedback
 
