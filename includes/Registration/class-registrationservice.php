@@ -13,6 +13,7 @@ use Exception;
 use FoodBankManager\Token\TokenService;
 use RuntimeException;
 use function bin2hex;
+use function gmdate;
 use function random_bytes;
 use function strtoupper;
 use function wp_generate_password;
@@ -52,20 +53,26 @@ final class RegistrationService {
 				/**
 				 * Register or reactivate a member record.
 				 *
-				 * @param string $first_name     Sanitized first name.
-				 * @param string $last_initial   Sanitized last initial.
-				 * @param string $email          Normalized email address.
-				 * @param int    $household_size Household size clamp.
+                                 * @param string   $first_name          Sanitized first name.
+                                 * @param string   $last_initial        Sanitized last initial.
+                                 * @param string   $email               Normalized email address.
+                                 * @param int      $household_size      Household size clamp.
+                                 * @param int|null $consent_recorded_at Consent acknowledgement timestamp.
 				 *
 				 * @return array{member_id:int,member_reference:string,token:string,reactivated:bool}|null
 				 */
-	public function register( string $first_name, string $last_initial, string $email, int $household_size ): ?array {
-									$existing = $this->repository->find_by_email( $email );
+        public function register( string $first_name, string $last_initial, string $email, int $household_size, ?int $consent_recorded_at = null ): ?array {
+                $consent_at = null;
+                if ( null !== $consent_recorded_at && $consent_recorded_at > 0 ) {
+                        $consent_at = gmdate( 'Y-m-d H:i:s', $consent_recorded_at );
+                }
 
-		if ( null !== $existing ) {
-			if ( ! $this->repository->mark_active( $existing['id'] ) ) {
-												return null;
-			}
+                                                                        $existing = $this->repository->find_by_email( $email );
+
+                if ( null !== $existing ) {
+                        if ( ! $this->repository->mark_active( $existing['id'], $consent_at ) ) {
+                                                                                                return null;
+                        }
 
 				$issuance = $this->issue_member_token( $existing['id'], 'reactivation' );
 			if ( null === $issuance ) {
@@ -83,10 +90,10 @@ final class RegistrationService {
 				$reference = $this->generate_reference();
 
 		if ( '' === $reference ) {
-			return null;
-		}
+                                return null;
+                        }
 
-				$member_id = $this->repository->insert_active_member( $reference, $first_name, $last_initial, $email, $household_size );
+                                $member_id = $this->repository->insert_active_member( $reference, $first_name, $last_initial, $email, $household_size, $consent_at );
 
 		if ( null === $member_id ) {
 			return null;

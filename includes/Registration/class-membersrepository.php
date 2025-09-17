@@ -145,39 +145,48 @@ final class MembersRepository {
 				/**
 				 * Persist a new active member record.
 				 *
-				 * @param string $reference      Canonical member reference.
-				 * @param string $first_name     Sanitized first name.
-				 * @param string $last_initial   Sanitized last initial.
-				 * @param string $email          Normalized email address.
-				 * @param int    $household_size Household size clamp.
-				 *
-				 * @return int|null Inserted member identifier when successful.
-				 */
-	public function insert_active_member( string $reference, string $first_name, string $last_initial, string $email, int $household_size ): ?int {
+                                 * @param string      $reference           Canonical member reference.
+                                 * @param string      $first_name          Sanitized first name.
+                                 * @param string      $last_initial        Sanitized last initial.
+                                 * @param string      $email               Normalized email address.
+                                 * @param int         $household_size      Household size clamp.
+                                 * @param string|null $consent_recorded_at Consent acknowledgement timestamp.
+                                 *
+                                 * @return int|null Inserted member identifier when successful.
+                                 */
+        public function insert_active_member( string $reference, string $first_name, string $last_initial, string $email, int $household_size, ?string $consent_recorded_at = null ): ?int {
 					$now  = gmdate( 'Y-m-d H:i:s' );
-					$data = array(
-						'member_reference' => $reference,
-						'first_name'       => $first_name,
-						'last_initial'     => $last_initial,
-						'email'            => $email,
-						'household_size'   => $household_size,
-						'status'           => self::STATUS_ACTIVE,
-						'created_at'       => $now,
-						'updated_at'       => $now,
-						'activated_at'     => $now,
-					);
+                                        $data = array(
+                                                'member_reference' => $reference,
+                                                'first_name'       => $first_name,
+                                                'last_initial'     => $last_initial,
+                                                'email'            => $email,
+                                                'household_size'   => $household_size,
+                                                'status'           => self::STATUS_ACTIVE,
+                                                'created_at'       => $now,
+                                                'updated_at'       => $now,
+                                                'activated_at'     => $now,
+                                        );
 
-					$formats = array(
-						'%s',
-						'%s',
-						'%s',
-						'%s',
-						'%d',
-						'%s',
-						'%s',
-						'%s',
-						'%s',
-					);
+                                        if ( null !== $consent_recorded_at && '' !== $consent_recorded_at ) {
+                                                $data['consent_recorded_at'] = $consent_recorded_at;
+                                        }
+
+                                        $formats = array(
+                                                '%s',
+                                                '%s',
+                                                '%s',
+                                                '%s',
+                                                '%d',
+                                                '%s',
+                                                '%s',
+                                                '%s',
+                                                '%s',
+                                        );
+
+                                        if ( array_key_exists( 'consent_recorded_at', $data ) ) {
+                                                $formats[] = '%s';
+                                        }
 
 					$result = $this->wpdb->insert( $this->table, $data, $formats );
 
@@ -199,21 +208,29 @@ final class MembersRepository {
 		/**
 		 * Mark an existing member record as active.
 		 *
-		 * @param int $id Member row ID.
-		 */
-	public function mark_active( int $id ): bool {
-					$now   = gmdate( 'Y-m-d H:i:s' );
-					$data  = array(
-						'status'       => self::STATUS_ACTIVE,
-						'updated_at'   => $now,
-						'activated_at' => $now,
-					);
-					$where = array( 'id' => $id );
+                 * @param int         $id                  Member row ID.
+                 * @param string|null $consent_recorded_at Consent acknowledgement timestamp.
+                 */
+        public function mark_active( int $id, ?string $consent_recorded_at = null ): bool {
+                                        $now    = gmdate( 'Y-m-d H:i:s' );
+                                        $data   = array(
+                                                'status'       => self::STATUS_ACTIVE,
+                                                'updated_at'   => $now,
+                                                'activated_at' => $now,
+                                        );
+                                        $format = array( '%s', '%s', '%s' );
 
-					$result = $this->wpdb->update( $this->table, $data, $where, array( '%s', '%s', '%s' ), array( '%d' ) );
+                                        if ( null !== $consent_recorded_at && '' !== $consent_recorded_at ) {
+                                                $data['consent_recorded_at'] = $consent_recorded_at;
+                                                $format[]                    = '%s';
+                                        }
 
-					return false !== $result;
-	}
+                                        $where = array( 'id' => $id );
+
+                                        $result = $this->wpdb->update( $this->table, $data, $where, $format, array( '%d' ) );
+
+                                        return false !== $result;
+        }
 
 	/**
 	 * Retrieve all member records for administrative display.

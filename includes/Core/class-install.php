@@ -18,7 +18,7 @@ use function update_option;
  */
 final class Install {
 
-        private const DB_VERSION            = '2024093002';
+        private const DB_VERSION            = '2024093003';
         private const INITIAL_TOKEN_VERSION = 'v1';
         private const LEGACY_TABLE_SUFFIXES = array(
                 'fb_events',
@@ -59,7 +59,8 @@ final class Install {
 		status VARCHAR(20) NOT NULL,
 		created_at DATETIME NOT NULL,
 		updated_at DATETIME NOT NULL,
-		activated_at DATETIME NULL,
+                activated_at DATETIME NULL,
+                consent_recorded_at DATETIME NULL,
 		PRIMARY KEY  (id),
 		UNIQUE KEY uq_member_reference (member_reference),
 		KEY idx_status (status),

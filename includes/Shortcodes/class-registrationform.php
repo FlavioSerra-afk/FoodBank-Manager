@@ -55,8 +55,9 @@ final class RegistrationForm {
 	private const SUBMIT_FIELD            = 'fbm_registration_submitted';
 	private const FIELD_FIRST_NAME        = 'fbm_first_name';
 	private const FIELD_LAST_INITIAL      = 'fbm_last_initial';
-	private const FIELD_EMAIL             = 'fbm_email';
-	private const FIELD_HOUSEHOLD_SIZE    = 'fbm_household_size';
+        private const FIELD_EMAIL             = 'fbm_email';
+        private const FIELD_HOUSEHOLD_SIZE    = 'fbm_household_size';
+        private const FIELD_CONSENT           = 'fbm_registration_consent';
 	private const DEFAULT_HOUSEHOLD_SIZE  = '1';
 	private const MIN_TIME_TRAP_THRESHOLD = 5;
 	private const LAST_INITIAL_PATTERN    = '/^[A-Z]$/';
@@ -96,11 +97,11 @@ final class RegistrationForm {
 
 			$state = self::handle_submission();
 
-			$context = array(
-				'success'        => $state['success'],
-				'errors'         => $state['errors'],
-				'message'        => $state['message'],
-				'values'         => $state['values'],
+                        $context = array(
+                                'success'        => $state['success'],
+                                'errors'         => $state['errors'],
+                                'message'        => $state['message'],
+                                'values'         => $state['values'],
 				'nonce_field'    => wp_nonce_field( self::NONCE_ACTION, self::NONCE_FIELD, false, false ),
 				'honeypot_field' => self::HONEYPOT_FIELD,
 				'time_field'     => self::TIME_TRAP_FIELD,
@@ -108,12 +109,13 @@ final class RegistrationForm {
 				'action'         => self::current_action_url(),
 				'fields'         => array(
 					'first_name'     => self::FIELD_FIRST_NAME,
-					'last_initial'   => self::FIELD_LAST_INITIAL,
-					'email'          => self::FIELD_EMAIL,
-					'household_size' => self::FIELD_HOUSEHOLD_SIZE,
-					'submit'         => self::SUBMIT_FIELD,
-				),
-			);
+                                        'last_initial'   => self::FIELD_LAST_INITIAL,
+                                        'email'          => self::FIELD_EMAIL,
+                                        'household_size' => self::FIELD_HOUSEHOLD_SIZE,
+                                        'consent'        => self::FIELD_CONSENT,
+                                        'submit'         => self::SUBMIT_FIELD,
+                                ),
+                        );
 
 			return self::render_template( $context );
 	}
@@ -124,12 +126,13 @@ final class RegistrationForm {
 		 * @return array{success:bool,errors:array<int,string>,message:string,values:array<string,string>}
 		 */
 	private static function handle_submission(): array {
-			$values = array(
-				'first_name'     => '',
-				'last_initial'   => '',
-				'email'          => '',
-				'household_size' => self::DEFAULT_HOUSEHOLD_SIZE,
-			);
+                        $values = array(
+                                'first_name'     => '',
+                                'last_initial'   => '',
+                                'email'          => '',
+                                'household_size' => self::DEFAULT_HOUSEHOLD_SIZE,
+                                'consent'        => '',
+                        );
 
 			$result = array(
 				'success' => false,
@@ -199,23 +202,28 @@ final class RegistrationForm {
 					$household_value = 1;
 			}
 
-			if ( $household_value > 12 ) {
-					$household_value = 12;
-			}
+                        if ( $household_value > 12 ) {
+                                        $household_value = 12;
+                        }
 
-			$values           = array(
-				'first_name'     => $first_name,
-				'last_initial'   => $last_initial,
-				'email'          => $email,
-				'household_size' => (string) $household_value,
-			);
-			$result['values'] = $values;
+                        $consent_raw = self::read_input( INPUT_POST, self::FIELD_CONSENT, FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+                        $consent     = is_string( $consent_raw ) ? sanitize_text_field( $consent_raw ) : '';
+                        $consented   = '1' === $consent;
 
-			if ( ! empty( $result['errors'] ) ) {
-					$result['message'] = esc_html__( 'Please correct the errors below and try again.', 'foodbank-manager' );
+                        $values           = array(
+                                'first_name'     => $first_name,
+                                'last_initial'   => $last_initial,
+                                'email'          => $email,
+                                'household_size' => (string) $household_value,
+                                'consent'        => $consented ? '1' : '',
+                        );
+                        $result['values'] = $values;
 
-					return $result;
-			}
+                        if ( ! empty( $result['errors'] ) ) {
+                                        $result['message'] = esc_html__( 'Please correct the errors below and try again.', 'foodbank-manager' );
+
+                                        return $result;
+                        }
 
 			global $wpdb;
 
@@ -231,7 +239,13 @@ final class RegistrationForm {
 			$token_service    = new TokenService( $token_repository );
 			$service          = new RegistrationService( $repository, $token_service );
 
-			$outcome = $service->register( $first_name, $last_initial, $email, (int) $household_value );
+                        $outcome = $service->register(
+                                $first_name,
+                                $last_initial,
+                                $email,
+                                (int) $household_value,
+                                $consented ? time() : null
+                        );
 
 			if ( null === $outcome ) {
 				$result['errors'][] = esc_html__( 'We could not save your registration. Please try again later.', 'foodbank-manager' );
@@ -255,12 +269,13 @@ final class RegistrationForm {
 
 			$result['success'] = true;
 			$result['message'] = esc_html__( 'Thank you for registering. We have emailed your check-in QR code.', 'foodbank-manager' );
-			$result['values']  = array(
-				'first_name'     => '',
-				'last_initial'   => '',
-				'email'          => '',
-				'household_size' => self::DEFAULT_HOUSEHOLD_SIZE,
-			);
+                        $result['values']  = array(
+                                'first_name'     => '',
+                                'last_initial'   => '',
+                                'email'          => '',
+                                'household_size' => self::DEFAULT_HOUSEHOLD_SIZE,
+                                'consent'        => '',
+                        );
 
 						return $result;
 	}
