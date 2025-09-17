@@ -19,6 +19,12 @@ use PHPUnit\Framework\TestCase;
  * @covers \FoodBankManager\Attendance\CheckinService
  */
 final class CheckinServiceTest extends TestCase {
+        protected function setUp(): void {
+                parent::setUp();
+
+                unset( $GLOBALS['fbm_transients'] );
+        }
+
         protected function tearDown(): void {
                 CheckinService::set_current_time_override( null );
 
