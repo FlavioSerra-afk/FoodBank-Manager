@@ -703,54 +703,62 @@ final class MembersPage {
 			return new WelcomeMailer();
 	}
 
-		/**
-		 * Process the revoke action.
-		 *
-		 * @param int $member_id Member identifier.
-		 *
-		 * @return array{notice:string,member_reference?:string,status:bool,error?:string}
-		 */
-	private static function process_revoke( int $member_id ): array {
-			global $wpdb;
+		                /**
+                 * Process the revoke action.
+                 *
+                 * @param int $member_id Member identifier.
+                 *
+                 * @return array{notice:string,member_reference?:string,status:bool,error?:string}
+                 */
+        private static function process_revoke( int $member_id ): array {
+                global $wpdb;
 
-		if ( ! $wpdb instanceof wpdb ) {
-				return array(
-					'notice' => 'revoke-failed',
-					'status' => false,
-					'error'  => 'database',
-				);
-		}
+                if ( ! $wpdb instanceof wpdb ) {
+                        return array(
+                                'notice' => 'revoke-failed',
+                                'status' => false,
+                                'error'  => 'database',
+                        );
+                }
 
-			$repository = new MembersRepository( $wpdb );
-			$member     = $repository->find( $member_id );
+                $repository = new MembersRepository( $wpdb );
+                $member     = $repository->find( $member_id );
 
-		if ( null === $member ) {
-				return array(
-					'notice' => 'member-missing',
-					'status' => false,
-					'error'  => 'missing',
-				);
-		}
+                if ( null === $member ) {
+                        return array(
+                                'notice' => 'member-missing',
+                                'status' => false,
+                                'error'  => 'missing',
+                        );
+                }
 
-			$outcome = array(
-				'notice'           => 'revoke-failed',
-				'member_reference' => $member['member_reference'],
-				'status'           => false,
-				'error'            => 'revoke',
-			);
+                $outcome = array(
+                        'notice'           => 'revoke-failed',
+                        'member_reference' => $member['member_reference'],
+                        'status'           => false,
+                        'error'            => 'revoke',
+                );
 
-			$tokens = new TokenService( new TokenRepository( $wpdb ) );
+                $tokens = new TokenService( new TokenRepository( $wpdb ) );
+                $log    = new MailFailureLog();
 
-			if ( ! $tokens->revoke( $member_id ) ) {
-					return $outcome;
-			}
+                if ( ! $tokens->revoke( $member_id ) ) {
+                        return $outcome;
+                }
 
-			$outcome['notice'] = 'revoked';
-			$outcome['status'] = true;
-			unset( $outcome['error'] );
+                if ( ! $repository->mark_revoked( $member_id ) ) {
+                        return $outcome;
+                }
 
-			do_action( 'fbm_members_page_tokens_revoked', $member_id, $member );
+                $log->resolve_member( (int) $member['id'] );
+                $member['status'] = MembersRepository::STATUS_REVOKED;
 
-			return $outcome;
-	}
+                $outcome['notice'] = 'revoked';
+                $outcome['status'] = true;
+                unset( $outcome['error'] );
+
+                do_action( 'fbm_members_page_tokens_revoked', $member_id, $member );
+
+                return $outcome;
+        }
 }
