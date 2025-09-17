@@ -6,7 +6,7 @@
       <file>tests/UninstallTest.php</file>
       <file>tests/Token/class-tokenservicetest.php</file>
       <file>tests/Registration/RegistrationFormTest.php</file>
-      <file>tests/Rest/class-checkincontrollertest.php</file>
+      <file>tests/Rest/CheckinControllerTest.php</file>
       <file>tests/Registration/RegistrationEmailTest.php</file>
     </testsuite>
   </testsuites>

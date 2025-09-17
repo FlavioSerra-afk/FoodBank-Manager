@@ -15,9 +15,9 @@ use function esc_html_e;
 		<h2 class="fbm-staff-dashboard__heading">
 				<?php esc_html_e( 'FoodBank Manager — Staff Dashboard', 'foodbank-manager' ); ?>
 		</h2>
-		<p class="fbm-staff-dashboard__summary">
-				<?php esc_html_e( 'Scan member QR codes or record a manual collection.', 'foodbank-manager' ); ?>
-		</p>
+                <p class="fbm-staff-dashboard__summary">
+                                <?php esc_html_e( 'Collections run on Thursdays between 11:00 and 14:30. Scan member QR codes or record a manual collection during this window, and record a manager override with a justification if the member collected within the last week.', 'foodbank-manager' ); ?>
+                </p>
 		<div class="fbm-staff-dashboard__today" data-fbm-today>
 				<div class="fbm-staff-dashboard__today-item">
 						<span class="fbm-staff-dashboard__today-label"><?php esc_html_e( 'Collections today', 'foodbank-manager' ); ?></span>
@@ -74,9 +74,9 @@ use function esc_html_e;
 				</button>
 		</form>
 		<div class="fbm-staff-dashboard__override" data-fbm-override hidden>
-				<p class="fbm-staff-dashboard__helper" data-fbm-override-message>
-						<?php esc_html_e( 'This member collected within the last week. Managers may record an override with a justification.', 'foodbank-manager' ); ?>
-				</p>
+                                <p class="fbm-staff-dashboard__helper" data-fbm-override-message>
+                                                <?php esc_html_e( 'This member collected within the last week. Only managers can continue by recording an override with a justification.', 'foodbank-manager' ); ?>
+                                </p>
 				<label class="fbm-staff-dashboard__field" for="fbm-staff-dashboard-override-note">
 						<span class="fbm-staff-dashboard__label">
 								<?php esc_html_e( 'Override note', 'foodbank-manager' ); ?>

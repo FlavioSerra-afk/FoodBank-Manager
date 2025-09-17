@@ -115,6 +115,9 @@
             if (prompt.indexOf('%s') !== -1) {
                 prompt = prompt.replace('%s', context.reference);
             }
+            if (strings.override_requirements && typeof strings.override_requirements === 'string') {
+                prompt += ' ' + strings.override_requirements;
+            }
             message.textContent = prompt;
         }
 
@@ -366,6 +369,9 @@
                 }
             } else if (statusKey === 'out_of_window') {
                 message = strings.out_of_window;
+                if (strings.collection_window_notice && typeof strings.collection_window_notice === 'string') {
+                    message = strings.collection_window_notice;
+                }
                 tone = 'warning';
                 hideOverride(container);
             } else if (Object.prototype.hasOwnProperty.call(strings, statusKey) && typeof strings[statusKey] === 'string') {
