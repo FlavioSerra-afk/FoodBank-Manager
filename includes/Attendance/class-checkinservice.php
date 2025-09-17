@@ -93,17 +93,30 @@ final class CheckinService {
 			);
 		}
 
-		$previous_collection = $this->repository->latest_for_member( $member_reference );
+				$previous_collection = $this->repository->latest_for_member( $member_reference );
 
-		$override_note   = $override && is_string( $override_note ) ? $override_note : null;
-		$should_override = $override && null !== $user_id && null !== $override_note && '' !== $override_note;
+				$override_note   = $override && is_string( $override_note ) ? $override_note : null;
+				$should_override = $override && null !== $user_id && null !== $override_note && '' !== $override_note;
 
-		$note_to_store = $note;
-		if ( $should_override && ( null === $note_to_store || '' === $note_to_store ) ) {
-			$note_to_store = $override_note;
+		if ( $previous_collection instanceof DateTimeImmutable ) {
+				$seconds_since_last = $now_utc->getTimestamp() - $previous_collection->getTimestamp();
+
+			if ( $seconds_since_last >= 0 && $seconds_since_last < self::WEEK_IN_SECONDS && ! $should_override ) {
+						return array(
+							'status'     => self::STATUS_RECENT_WARNING,
+							'message'    => esc_html__( 'Member collected less than a week ago. Manager override required.', 'foodbank-manager' ),
+							'member_ref' => $member_reference,
+							'time'       => $previous_collection->format( DATE_ATOM ),
+						);
+			}
 		}
 
-		$attendance_id = $this->repository->record( $member_reference, $normalized_method, $user_id, $now_utc, $note_to_store );
+				$note_to_store = $note;
+		if ( $should_override && ( null === $note_to_store || '' === $note_to_store ) ) {
+				$note_to_store = $override_note;
+		}
+
+				$attendance_id = $this->repository->record( $member_reference, $normalized_method, $user_id, $now_utc, $note_to_store );
 		if ( null === $attendance_id ) {
 			return array(
 				'status'     => self::STATUS_ERROR,
@@ -130,19 +143,19 @@ final class CheckinService {
 		$message = esc_html__( 'Collection recorded.', 'foodbank-manager' );
 
 		if ( $previous_collection instanceof DateTimeImmutable ) {
-			$seconds_since_last = $now_utc->getTimestamp() - $previous_collection->getTimestamp();
+				$seconds_since_last = $now_utc->getTimestamp() - $previous_collection->getTimestamp();
 			if ( $seconds_since_last >= 0 && $seconds_since_last < self::WEEK_IN_SECONDS && ! $should_override ) {
-				$status  = self::STATUS_RECENT_WARNING;
-				$message = esc_html__( 'Collection recorded, but member collected less than a week ago.', 'foodbank-manager' );
+						$status  = self::STATUS_RECENT_WARNING;
+						$message = esc_html__( 'Member collected less than a week ago. Manager override required.', 'foodbank-manager' );
 			}
 		}
 
-		return array(
-			'status'     => $status,
-			'message'    => $message,
-			'member_ref' => $member_reference,
-			'time'       => $now_utc->format( DATE_ATOM ),
-		);
+				return array(
+					'status'     => $status,
+					'message'    => $message,
+					'member_ref' => $member_reference,
+					'time'       => $now_utc->format( DATE_ATOM ),
+				);
 	}
 
 	/**

@@ -153,6 +153,44 @@ final class CheckinEndpointTest extends TestCase {
                 $this->assertSame( 'Emergency pickup', $override['override_note'] );
         }
 
+        public function test_handle_checkin_blocks_recent_repeat_without_override(): void {
+                $members = new MembersRepository( $this->wpdb );
+                $member_id = $members->insert_active_member( 'FBM778', 'Morgan', 'T', 'morgan@example.com', 2 );
+
+                $this->assertIsInt( $member_id );
+
+                $attendance = new AttendanceRepository( $this->wpdb );
+                $attendance->record(
+                        'FBM778',
+                        'manual',
+                        5,
+                        new DateTimeImmutable( '2023-08-17 11:45:00', new DateTimeZone( 'UTC' ) ),
+                        'Weekly pickup'
+                );
+
+                CheckinService::set_current_time_override(
+                        new DateTimeImmutable( '2023-08-24 12:29:00', new DateTimeZone( 'Europe/London' ) )
+                );
+
+                $request  = new \WP_REST_Request(
+                        array(
+                                'manual_code' => 'FBM778',
+                                'method'      => 'manual',
+                        )
+                );
+
+                $response = CheckinController::handle_checkin( $request );
+
+                $this->assertInstanceOf( \WP_REST_Response::class, $response );
+
+                $data = $response->get_data();
+
+                $this->assertSame( CheckinService::STATUS_RECENT_WARNING, $data['status'] );
+                $this->assertSame( 'Member collected less than a week ago. Manager override required.', $data['message'] );
+                $this->assertSame( 'FBM778', $data['member_ref'] );
+                $this->assertCount( 1, $this->wpdb->attendance );
+        }
+
         public function test_handle_checkin_rejects_requests_outside_collection_window(): void {
                 CheckinService::set_current_time_override(
                         new DateTimeImmutable( '2023-08-16 10:00:00', new DateTimeZone( 'Europe/London' ) )

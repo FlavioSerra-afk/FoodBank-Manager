@@ -5,6 +5,22 @@
 
 # Tasks
 
+- [2025-09-18] Final audit — results (v2.2.24)
+  - Version recorded: 2.2.24; Summary: verified shortcode registry, capability gating, and data policies align with Specs; bumped documentation matrix security statuses.
+  - Routes: POST /fbm/v1/checkin (nonce + `fbm_checkin` capability).
+  - Access gating: Staff dashboard shortcode requires login + `fbm_view`; Assets::mark_staff_dashboard() only enqueues scanner JS/CSS when authorized; admin stylesheet gated to `fbm` screens via Assets::maybe_enqueue_admin().
+  - Schema/policy: Install provisions `fbm_members`, `fbm_tokens`, `fbm_attendance`, `fbm_attendance_overrides`; tokens store HMAC hashes only; daily unique window enforced; Thursday 11:00–14:30 window retained; <7 day repeat still requires manager override with note audit trail.
+  - Items removed: None (no out-of-scope features detected during sweep).
+  - CI: PASS — composer phpstan ✅; composer lint ✅; composer test -v ✅ (vendor QR-code deprecations only); composer i18n:build ✅; bash bin/package.sh ✅.
+
+- [2025-09-17] Final audit — results (v2.2.23)
+  - Version recorded: 2.2.23; Summary: enforced weekly (1-in-7) policy with manager override, tightened staff dashboard messaging, refreshed tests/docs.
+  - Routes: POST /fbm/v1/checkin (nonce + `fbm_checkin` capability).
+  - Access gating: Staff dashboard shortcode requires login + `fbm_view`; Assets::mark_staff_dashboard() only enqueues scanner JS/CSS when authorized; admin stylesheet gated to `fbm` screens via Assets::maybe_enqueue_admin().
+  - Schema/policy: Install provisions `fbm_members`, `fbm_tokens`, `fbm_attendance`, `fbm_attendance_overrides`; tokens store HMAC hashes only; daily unique window enforced; Thursday 11:00–14:30 window retained; <7 day repeat now blocked without manager override and note audit trail.
+  - Items removed: None (no out-of-scope features detected during sweep).
+  - CI: PASS — composer phpstan ✅; composer lint ✅ (0 errors); composer test -v ✅; composer i18n:build ✅; bash bin/package.sh ✅.
+
 - [2025-09-17] P9 done — tests green + CI pass + package (v2.2.22)
   - Version recorded: 2.2.22; CI: composer phpstan ✅, composer lint ✅ (0 errors), composer test -v ✅, composer i18n:build ✅, bash bin/package.sh ✅ (foodbank-manager/)
   - Highlights: Token, registration, and check-in suites restored; matrix + docs updated for policy, security, and i18n coverage.
