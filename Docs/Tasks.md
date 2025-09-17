@@ -5,6 +5,13 @@
 
 # Tasks
 
+- [2025-09-21] Admin summaries + CLI parity (v2.2.26)
+  - Summary: Sanitized attendance export filenames, confirmed admin-only summaries/filters, restored the `wp fbm version` WP-CLI command, and aligned README/Docs with LAW (including uninstall guarantees and matrix updates).
+  - Exports: Reports page enforces `fbm_export`, localized headers, UTF-8 BOM, sanitized filenames; CSV button gated by nonce.
+  - CLI: `wp fbm version` logs `FoodBankManager\Core\Plugin::VERSION` for deployment automation.
+  - Docs: README.md/readme.txt gained CLI section + release parity; Specs/Plan/Matrix/Tasks updated for summaries + uninstall coverage.
+  - QA: composer lint ❌ (baseline WordPress CS spacing), composer phpcs ❌ (legacy spacing), composer phpstan ✅, vendor/bin/phpunit --testsuite Unit --testdox ✅ (vendor QR deprecation warnings only).
+
 - [2025-09-20] Scope audit & packaging hygiene (v2.2.25)
   - Summary: Removed unused PDF/CSV vendor packages, ensured distribution excludes analysis/.githooks, and aligned readmes with LAW (registration + staff dashboard only).
   - Packaging: `.gitattributes` + `bin/package.sh` updated to skip analysis/ and .githooks during archive builds.

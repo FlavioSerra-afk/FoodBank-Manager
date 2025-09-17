@@ -10,6 +10,14 @@
 ### Changed
 - Packaging guard now enforces version alignment across plugin metadata before building releases.
 
+## [2.2.26] - 2025-09-21
+
+### Added
+- Restored the `wp fbm version` WP-CLI command for deployment verification.
+
+### Changed
+- Attendance CSV exports now sanitize filenames while retaining BOM and localized headers; LAW docs updated for admin summaries and uninstall guarantees.
+
 ## [2.2.25] - 2025-09-20
 
 ### Removed

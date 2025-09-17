@@ -55,11 +55,11 @@ UI feedback (success/already/error), counters for “today.”
 
 U4 — Internal Summaries & Export
 
-Date-range summaries (no PII outside admin); allow-listed filters.
+✅ Date-range summaries (no PII outside admin); allow-listed filters.
 
-CSV export behind fbm_export + nonce; UTF-8 BOM; localized headers.
+✅ CSV export behind fbm_export + nonce; UTF-8 BOM; sanitized filename; localized headers.
 
-Short-TTL caches for common ranges.
+✅ Short-TTL caches for common ranges.
 
 U5 — Diagnostics & Release
 

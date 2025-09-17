@@ -28,6 +28,7 @@ use function fopen;
 use function fputcsv;
 use function header;
 use function is_readable;
+use function sanitize_file_name;
 use function sanitize_key;
 use function sanitize_text_field;
 use function sprintf;
@@ -243,6 +244,7 @@ final class ReportsPage {
          */
         private static function stream_csv( array $rows, DateTimeImmutable $start, DateTimeImmutable $end ): void {
                 $filename = sprintf( 'attendance-%s-%s.csv', $start->format( 'Ymd' ), $end->format( 'Ymd' ) );
+                $filename = sanitize_file_name( $filename );
 
                 header( 'Content-Type: text/csv; charset=utf-8' );
                 header( 'Content-Disposition: attachment; filename="' . $filename . '"' );

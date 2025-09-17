@@ -13,7 +13,7 @@
 | Staff Check-in | 🟨 | 🟨 | 🟨 | [ ] | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | [ ] | [Task](Tasks.md#u3--staff-front-end-dashboard); Final audit 2025-09-17 |
 | Attendance Scan | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ⚠️ | [ ] | [ ] | [ ] | [Events](Tasks.md#replace-remove-events-references-in-code--db-migrator), [Policy](Tasks.md#rest--ui-updates-for-fixed-window-policy) |
 | Attendance Manual | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | [ ] | [Events](Tasks.md#replace-remove-events-references-in-code--db-migrator), [Policy](Tasks.md#rest--ui-updates-for-fixed-window-policy); Final audit 2025-09-17 |
-| Exports CSV/XLSX/PDF | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ⚠️ | [ ] | [ ] | [ ] | [Tasks](Tasks.md) |
+| Exports CSV/XLSX/PDF | ✅ | ✅ | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | ✅ | [Tasks](Tasks.md) |
 | Diagnostics | ✅ | [ ] | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | [ ] | [Tasks](Tasks.md) |
 | GDPR (Consent/SAR/Retention) | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ⚠️ | [ ] | [ ] | [ ] | [Tasks](Tasks.md) |
 | Packaging Guard | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | [Runbook](Runbooks/Release.md) | [Task](Tasks.md#packaging-guard-verification-upgrade-replaces-in-place) |
@@ -65,11 +65,11 @@ U3 — Staff Front-End Dashboard
 
 U4 — Internal Summaries & Export
 
-⬜ Date-range summaries
+✅ Date-range summaries
 
-⬜ CSV export (admin only)
+✅ CSV export (admin only)
 
-⬜ Cache
+✅ Cache
 
 U5 — Diagnostics & Release
 

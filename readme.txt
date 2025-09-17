@@ -3,7 +3,7 @@ Contributors: portuguese-community-centre-london
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.1
-Stable tag: 2.2.25
+Stable tag: 2.2.26
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -28,6 +28,15 @@ FBM capabilities are granted per site via activation (Administrators retain full
 * **Logs & debug**: PHP errors are recorded in `wp-content/debug.log`. Mail activity appears under Diagnostics → Mail Log with rate-limited resend controls.
 * **Health**: Diagnostics → System Health displays badge indicators for mail keys and signing secrets.
 * **Docs**: See [Docs/Specs.md](Docs/Specs.md) and [Docs/Plan.md](Docs/Plan.md) for policy, rate-limit, and multisite notes.
+
+== CLI ==
+Need to confirm what version of FoodBank Manager is active? Run:
+
+```
+wp fbm version
+```
+
+This surfaces the plugin version constant so deployment automation can assert the expected build is installed.
 
 == Uninstall ==
 By default uninstall leaves FoodBank Manager database tables in place so the plugin can be reinstalled without data loss.
