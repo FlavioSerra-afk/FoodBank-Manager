@@ -1,39 +1,31 @@
-Docs-Revision: 2025-09-12 (v1.11.5 patch finalize)
+Docs-Revision: 2025-09-20 (v2.2.25 scope audit)
 # FoodBank Manager Plugin
 
-Stable tag: 1.11.5
+Stable tag: 2.2.25
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.1
 
-See [Docs/PRD-foodbank-manager.md](../Docs/PRD-foodbank-manager.md) for the full product requirements and specifications.
+See [Docs/Specs.md](Docs/Specs.md) for the canonical product requirements.
 
 ## Theme & Design
 
 Theme & Design only affects FoodBank Manager pages and shortcodes; WordPress admin chrome remains unchanged.
 
-## CLI
+## Shortcodes
 
-FoodBank Manager exposes a parent command via `WP_CLI::add_command()`. After
-activation you can run:
+FoodBank Manager registers two shortcodes only:
 
-```bash
-wp fbm version
-```
-
-## Jobs access
-
-The Jobs page is read-only unless a user has the `fbm_manage_jobs` capability.
-On multisite, network administrators receive this capability on activation and a
-migration flag prevents re-granting on upgrade.
+* `[fbm_registration_form]` — public registration form with validation, nonce enforcement, and anti-spam traps.
+* `[fbm_staff_dashboard]` — staff-facing dashboard (login + FBM capability required) for scanning QR codes or recording manual collections within the configured window.
 
 ## Multisite notes
 
-Network administrators receive `fbm_manage_jobs` on activation; a migration flag prevents re-granting on upgrade. Cron hooks such as retention are idempotent and safe to run per site. See [Docs/Diagnostics.md](../Docs/Diagnostics.md) for rate-limit and multisite notes.
+Capabilities are granted per site on activation: administrators retain all FBM capabilities while custom FBM Manager/Staff roles receive their mapped bundles. Options such as theme, schedule, and migration markers store per site, and destructive uninstall requires explicit opt-in. See [Docs/Plan.md](Docs/Plan.md) for rate-limit and multisite notes.
 
 ## API errors
 
-FoodBank Manager normalizes error responses across REST and AJAX (see [Docs/API.md](../Docs/API.md) for a detailed cheat-sheet):
+FoodBank Manager normalizes error responses across REST and AJAX (see [Docs/Specs.md](Docs/Specs.md) for policy details):
 
 | Code | Meaning |
 | ---- | ------- |
@@ -49,10 +41,9 @@ Rate-limited responses include `RateLimit-Limit`, `RateLimit-Remaining`, and `Ra
 
 ## Support & Troubleshooting
 
-- **Logs & debug**: PHP errors are recorded in `wp-content/debug.log`. Mail activity appears under Diagnostics → Mail Log.
-- **System report**: Diagnostics → Report offers a "Copy report" button for a JSON system report.
-- **Cron runs**: Diagnostics → Cron Health lists plugin cron hooks with last and next run times.
-- See [Docs/API.md](../Docs/API.md) for the error contract and [Docs/Diagnostics.md](../Docs/Diagnostics.md) for rate-limit and multisite notes.
+- **Logs & debug**: PHP errors are recorded in `wp-content/debug.log`. Mail activity appears under Diagnostics → Mail Log with throttled resend controls.
+- **Health**: Diagnostics → System Health shows badge indicators for mail transport keys and signing secrets.
+- **Docs**: See [Docs/Specs.md](Docs/Specs.md) and [Docs/Plan.md](Docs/Plan.md) for policy, rate-limit, and multisite notes.
 
 ## Manual release steps
 

@@ -5,6 +5,13 @@
 
 # Tasks
 
+- [2025-09-20] Scope audit & packaging hygiene (v2.2.25)
+  - Summary: Removed unused PDF/CSV vendor packages, ensured distribution excludes analysis/.githooks, and aligned readmes with LAW (registration + staff dashboard only).
+  - Packaging: `.gitattributes` + `bin/package.sh` updated to skip analysis/ and .githooks during archive builds.
+  - Dependencies: composer remove `league/csv`, `mpdf/mpdf`.
+  - Docs: README.md, readme.txt updated to reflect actual features and multisite scope.
+  - QA: composer lint ❌ (pre-existing WordPress indentation violations); composer phpcs ❌ (same baseline issues); composer phpstan ✅; vendor/bin/phpunit --testsuite Unit --testdox ✅ (vendor QR-code deprecation notices only).
+
 - [2025-09-19] Schedule configuration + window helper (v2.2.25)
   - Summary: Introduced `Schedule::current_window()` with admin Schedule page to manage `fbm_schedule_window`; REST, staff dashboard assets, and templates now consume helper labels for consistent messaging.
   - Routes: POST /fbm/v1/checkin (nonce + `fbm_checkin` capability) returns window metadata/labels.

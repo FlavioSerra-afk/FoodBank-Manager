@@ -87,7 +87,7 @@ final class UninstallTest extends TestCase {
          */
         private function optionFixture(): array {
                 return array(
-                        'fbm_db_version'             => '2.2.24',
+                        'fbm_db_version'             => '2.2.25',
                         'fbm_theme'                  => array( 'style' => 'basic' ),
                         'fbm_settings'               => array( 'window' => 'thursday' ),
                         'fbm_db_migration_summary'   => array( 'attendance_migrated' => 100 ),

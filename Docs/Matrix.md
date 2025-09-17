@@ -94,5 +94,7 @@ Cross-Cutting
 
 ✅ i18n coverage
 
+✅ Packaging excludes dev artifacts from release archives
+
 ⬜ Performance checks (assets, indexes, streaming)
 
