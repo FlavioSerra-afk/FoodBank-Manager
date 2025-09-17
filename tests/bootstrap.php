@@ -3,8 +3,16 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+if ( ! defined( 'FBM_PATH' ) ) {
+	define( 'FBM_PATH', dirname( __DIR__ ) . '/' );
+}
+
+if ( ! defined( 'FBM_FILE' ) ) {
+	define( 'FBM_FILE', FBM_PATH . 'foodbank-manager.php' );
+}
+
 if ( ! defined( 'ARRAY_A' ) ) {
-        define( 'ARRAY_A', 'ARRAY_A' );
+	define( 'ARRAY_A', 'ARRAY_A' );
 }
 
 if ( ! defined( 'FBM_TESTING' ) ) {
@@ -815,5 +823,213 @@ if ( ! function_exists( 'wp_mail' ) ) {
                 );
 
                 return true;
+        }
+}
+
+if ( ! function_exists( 'add_shortcode' ) ) {
+        /**
+         * Capture shortcode registration during tests.
+         *
+         * @param string   $tag      Shortcode tag.
+         * @param callable $callback Shortcode handler.
+         */
+        function add_shortcode( string $tag, callable $callback ): void {
+                $GLOBALS['fbm_shortcodes'][ $tag ] = $callback;
+        }
+}
+
+if ( ! function_exists( 'is_user_logged_in' ) ) {
+        /**
+         * Determine if the current test request is authenticated.
+         */
+        function is_user_logged_in(): bool {
+                return ! empty( $GLOBALS['fbm_user_logged_in'] );
+        }
+}
+
+if ( ! function_exists( 'current_user_can' ) ) {
+        /**
+         * Check the mocked capability store.
+         *
+         * @param string $capability Capability identifier.
+         */
+        function current_user_can( string $capability ): bool {
+                $caps = $GLOBALS['fbm_current_caps'] ?? array();
+
+                return ! empty( $caps[ $capability ] );
+        }
+}
+
+if ( ! function_exists( 'status_header' ) ) {
+        /**
+         * Record HTTP status codes for assertions.
+         *
+         * @param int $code Status code.
+         */
+        function status_header( int $code ): void {
+                $GLOBALS['fbm_status_header'] = $code;
+        }
+}
+
+if ( ! function_exists( 'esc_html__' ) ) {
+        /**
+         * Simple passthrough translation stub.
+         *
+         * @param string      $text   Text to translate.
+         * @param string|null $domain Text domain.
+         */
+        function esc_html__( string $text, ?string $domain = null ): string { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals
+                unset( $domain );
+
+                return $text;
+        }
+}
+
+if ( ! function_exists( 'esc_html_e' ) ) {
+        /**
+         * Echo translation stub.
+         *
+         * @param string      $text   Text to output.
+         * @param string|null $domain Text domain.
+         */
+        function esc_html_e( string $text, ?string $domain = null ): void { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals
+                echo esc_html__( $text, $domain );
+        }
+}
+
+if ( ! function_exists( 'esc_attr' ) ) {
+        /**
+         * Attribute escaping stub.
+         *
+         * @param string $text Raw attribute text.
+         */
+        function esc_attr( string $text ): string { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals
+                return $text;
+        }
+}
+
+if ( ! function_exists( 'esc_url_raw' ) ) {
+        /**
+         * URL escaping stub.
+         *
+         * @param string $url URL to normalise.
+         */
+        function esc_url_raw( string $url ): string { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals
+                return $url;
+        }
+}
+
+if ( ! function_exists( 'plugins_url' ) ) {
+        /**
+         * Generate plugin asset URLs for tests.
+         *
+         * @param string $path        Relative asset path.
+         * @param string $plugin_file Plugin file reference.
+         */
+        function plugins_url( string $path, string $plugin_file ): string { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals
+                unset( $plugin_file );
+
+                return 'https://example.test/plugin/' . ltrim( $path, '/' );
+        }
+}
+
+if ( ! function_exists( 'rest_url' ) ) {
+        /**
+         * Compose a REST API URL for tests.
+         *
+         * @param string $path Route path.
+         */
+        function rest_url( string $path = '' ): string { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals
+                return 'https://example.test/wp-json/' . ltrim( $path, '/' );
+        }
+}
+
+if ( ! function_exists( 'wp_create_nonce' ) ) {
+        /**
+         * Create deterministic nonces for tests.
+         *
+         * @param string $action Action name.
+         */
+        function wp_create_nonce( string $action ): string { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals
+                return 'nonce-' . $action;
+        }
+}
+
+if ( ! function_exists( 'wp_register_style' ) ) {
+        /**
+         * Record registered styles.
+         *
+         * @param string      $handle Style handle.
+         * @param string      $src    Source URL.
+         * @param array       $deps   Dependencies.
+         * @param string|bool $ver    Version string.
+         */
+        function wp_register_style( string $handle, string $src, array $deps = array(), $ver = false ): void { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals
+                $GLOBALS['fbm_registered_styles'][ $handle ] = compact( 'handle', 'src', 'deps', 'ver' );
+        }
+}
+
+if ( ! function_exists( 'wp_enqueue_style' ) ) {
+        /**
+         * Record enqueued styles.
+         *
+         * @param string $handle Style handle.
+         */
+        function wp_enqueue_style( string $handle ): void { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals
+                $GLOBALS['fbm_enqueued_styles'][] = $handle;
+        }
+}
+
+if ( ! function_exists( 'wp_register_script' ) ) {
+        /**
+         * Record registered scripts.
+         *
+         * @param string      $handle    Script handle.
+         * @param string      $src       Source URL.
+         * @param array       $deps      Dependencies.
+         * @param string|bool $ver       Version.
+         * @param bool        $in_footer Whether to load in footer.
+         */
+        function wp_register_script( string $handle, string $src, array $deps = array(), $ver = false, bool $in_footer = false ): void { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals
+                $GLOBALS['fbm_registered_scripts'][ $handle ] = compact( 'handle', 'src', 'deps', 'ver', 'in_footer' );
+        }
+}
+
+if ( ! function_exists( 'wp_localize_script' ) ) {
+        /**
+         * Record localized script data.
+         *
+         * @param string $handle      Script handle.
+         * @param string $object_name Exposed object name.
+         * @param array  $l10n        Data payload.
+         */
+        function wp_localize_script( string $handle, string $object_name, array $l10n ): void { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals
+                $GLOBALS['fbm_localized_scripts'][ $handle ] = array(
+                        'name' => $object_name,
+                        'data' => $l10n,
+                );
+        }
+}
+
+if ( ! function_exists( 'wp_set_script_translations' ) ) {
+        /**
+         * Record translation domain associations.
+         *
+         * @param string $handle Script handle.
+         * @param string $domain Text domain.
+         */
+        function wp_set_script_translations( string $handle, string $domain ): void { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals
+                $GLOBALS['fbm_script_translations'][ $handle ] = $domain;
+        }
+}
+
+if ( ! function_exists( 'wp_enqueue_script' ) ) {
+        /**
+         * Record enqueued scripts.
+         *
+         * @param string $handle Script handle.
+         */
+        function wp_enqueue_script( string $handle ): void { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals
+                $GLOBALS['fbm_enqueued_scripts'][] = $handle;
         }
 }
