@@ -46,6 +46,7 @@ namespace FBM\Tests\Admin;
 
 use FBM\Tests\Admin\Fixtures\MembersPageMailerStub;
 use FoodBankManager\Admin\MembersPage;
+use FoodBankManager\Diagnostics\MailFailureLog;
 use FoodBankManager\Registration\MembersRepository;
 use FoodBankManager\Registration\RegistrationService;
 use FoodBankManager\Token\TokenRepository;
@@ -69,6 +70,7 @@ final class MembersPageTest extends TestCase {
                 $GLOBALS['fbm_users'] = array();
                 $GLOBALS['fbm_roles'] = array();
                 $GLOBALS['fbm_next_user_id'] = 1;
+                unset( $GLOBALS['fbm_options'], $GLOBALS['fbm_deleted_options'] );
 
                 $this->members      = new MembersRepository( $wpdb );
                 $token_repository   = new TokenRepository( $wpdb );
@@ -146,35 +148,72 @@ final class MembersPageTest extends TestCase {
 			$this->assertNull( $this->tokens->verify( $original_token ) );
 	}
 
-		/**
-		 * Approve action should activate pending members and send the welcome email.
-		 */
-	public function test_process_approve_issues_token_for_pending_member(): void {
-			$reference = 'FBM-PENDING';
-			$member_id = $this->members->insert_active_member( $reference, 'Taylor', 'Q', 'pending@example.com', 1 );
+		                /**
+                 * Approve action should activate pending members and send the welcome email.
+                 */
+        public function test_process_approve_issues_token_for_pending_member(): void {
+                $reference = 'FBM-PENDING';
+                $member_id = $this->members->insert_active_member( $reference, 'Taylor', 'Q', 'pending@example.com', 1 );
 
-			$this->assertIsInt( $member_id );
+                $this->assertIsInt( $member_id );
 
-			global $wpdb;
-			$wpdb->members[ $member_id ]['status']       = 'pending';
-			$wpdb->members[ $member_id ]['activated_at'] = null;
+                global $wpdb;
+                $wpdb->members[ $member_id ]['status']       = MembersRepository::STATUS_PENDING;
+                $wpdb->members[ $member_id ]['activated_at'] = null;
 
-			MembersPageMailerStub::reset();
+                MembersPageMailerStub::reset();
 
-			$outcome = $this->invokeAction( 'process_approve', $member_id );
+                $outcome = $this->invokeAction( 'process_approve', $member_id );
 
-			$this->assertTrue( $outcome['status'] );
-			$this->assertSame( 'approved', $outcome['notice'] );
-			$this->assertSame( 'active', $wpdb->members[ $member_id ]['status'] );
+                $this->assertTrue( $outcome['status'] );
+                $this->assertSame( 'approved', $outcome['notice'] );
+                $this->assertSame( 'active', $wpdb->members[ $member_id ]['status'] );
 
-			$this->assertCount( 1, MembersPageMailerStub::$sent );
-			$approval = MembersPageMailerStub::$sent[0];
+                $this->assertCount( 1, MembersPageMailerStub::$sent );
+                $approval = MembersPageMailerStub::$sent[0];
 
-			$this->assertSame( 'pending@example.com', $approval['email'] );
-			$this->assertSame( 'Taylor', $approval['first_name'] );
-			$this->assertSame( $reference, $approval['member_reference'] );
-			$this->assertSame( $member_id, $this->tokens->verify( $approval['token'] ) );
-	}
+                $this->assertSame( 'pending@example.com', $approval['email'] );
+                $this->assertSame( 'Taylor', $approval['first_name'] );
+                $this->assertSame( $reference, $approval['member_reference'] );
+                $this->assertSame( $member_id, $this->tokens->verify( $approval['token'] ) );
+        }
+
+                                /**
+                 * Revoke action should mark members as revoked and resolve outstanding mail failures.
+                 */
+        public function test_process_revoke_marks_member_revoked_and_resolves_failures(): void {
+                $registration = $this->registration->register( 'Jamie', 'R', 'jamie@example.com', 2 );
+
+                $this->assertIsArray( $registration );
+
+                $member_id = $registration['member_id'];
+
+                global $wpdb;
+                $original_updated_at                   = $wpdb->members[ $member_id ]['updated_at'];
+                $wpdb->members[ $member_id ]['updated_at'] = '2000-01-01 00:00:00';
+
+                $log = new MailFailureLog();
+                $log->record_failure(
+                        $member_id,
+                        $registration['member_reference'],
+                        'jamie@example.com',
+                        MailFailureLog::CONTEXT_ADMIN_RESEND,
+                        MailFailureLog::ERROR_MAIL
+                );
+
+                $this->assertNotSame( array(), \get_option( 'fbm_mail_failures', array() ) );
+
+                $outcome = $this->invokeAction( 'process_revoke', $member_id );
+
+                $this->assertTrue( $outcome['status'] );
+                $this->assertSame( 'revoked', $outcome['notice'] );
+                $this->assertSame( MembersRepository::STATUS_REVOKED, $wpdb->members[ $member_id ]['status'] );
+                $this->assertNull( $wpdb->members[ $member_id ]['activated_at'] );
+                $this->assertNotSame( '2000-01-01 00:00:00', $wpdb->members[ $member_id ]['updated_at'] );
+                $this->assertNotSame( $original_updated_at, $wpdb->members[ $member_id ]['updated_at'] );
+                $this->assertSame( array(), \get_option( 'fbm_mail_failures', array() ) );
+        }
+
 
 		/**
 		 * Invoke a private MembersPage action helper.

@@ -13,6 +13,7 @@ use DateTimeImmutable;
 use DateTimeZone;
 use Exception;
 use FoodBankManager\Core\Install;
+use FoodBankManager\Registration\MembersRepository;
 use wpdb;
 use function array_key_exists;
 use function gmdate;
@@ -195,8 +196,8 @@ final class AttendanceRepository {
                         FROM `{$this->table}` a
                         LEFT JOIN `{$this->members_table}` m ON m.member_reference = a.member_reference
                         WHERE a.collected_date BETWEEN %s AND %s",
-                        'active',
-                        'revoked',
+                        MembersRepository::STATUS_ACTIVE,
+                        MembersRepository::STATUS_REVOKED,
                         $start->format( 'Y-m-d' ),
                         $end->format( 'Y-m-d' )
                 );

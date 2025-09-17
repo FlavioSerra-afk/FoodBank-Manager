@@ -37,7 +37,8 @@ final class AttendanceReportServiceTest extends TestCase {
                 $members_repo->insert_active_member( 'FBM100', 'Alice', 'A', 'alice@example.com', 2 );
                 $members_repo->insert_active_member( 'FBM200', 'Bob', 'B', 'bob@example.com', 3 );
 
-                $wpdb->members[2]['status'] = 'revoked';
+                $this->assertTrue( $members_repo->mark_revoked( 2 ) );
+                $this->assertSame( MembersRepository::STATUS_REVOKED, $wpdb->members[2]['status'] );
 
                 $timezone = new DateTimeZone( 'UTC' );
                 $service  = new AttendanceReportService( $attendance_repo );
@@ -65,7 +66,8 @@ final class AttendanceReportServiceTest extends TestCase {
                 $members_repo->insert_active_member( 'FBM300', 'Cara', 'C', 'cara@example.com', 2 );
                 $members_repo->insert_active_member( 'FBM400', 'Dan', 'D', 'dan@example.com', 1 );
 
-                $wpdb->members[2]['status'] = 'revoked';
+                $this->assertTrue( $members_repo->mark_revoked( 2 ) );
+                $this->assertSame( MembersRepository::STATUS_REVOKED, $wpdb->members[2]['status'] );
 
                 $timezone = new DateTimeZone( 'UTC' );
                 $service  = new AttendanceReportService( $attendance_repo );

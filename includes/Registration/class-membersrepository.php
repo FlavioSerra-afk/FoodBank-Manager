@@ -24,7 +24,9 @@ use const ARRAY_A;
  */
 final class MembersRepository {
 
-	private const STATUS_ACTIVE = 'active';
+	public const STATUS_ACTIVE  = 'active';
+	public const STATUS_PENDING = 'pending';
+	public const STATUS_REVOKED = 'revoked';
 
 		/**
 		 * WordPress database client.
@@ -205,32 +207,76 @@ final class MembersRepository {
 					return null;
 	}
 
-		/**
+		                		/**
 		 * Mark an existing member record as active.
 		 *
-                 * @param int         $id                  Member row ID.
-                 * @param string|null $consent_recorded_at Consent acknowledgement timestamp.
-                 */
-        public function mark_active( int $id, ?string $consent_recorded_at = null ): bool {
-                                        $now    = gmdate( 'Y-m-d H:i:s' );
-                                        $data   = array(
-                                                'status'       => self::STATUS_ACTIVE,
-                                                'updated_at'   => $now,
-                                                'activated_at' => $now,
-                                        );
-                                        $format = array( '%s', '%s', '%s' );
+		 * @param int         $id                  Member row ID.
+		 * @param string|null $consent_recorded_at Consent acknowledgement timestamp.
+		 */
+	public function mark_active( int $id, ?string $consent_recorded_at = null ): bool {
+		$now    = gmdate( 'Y-m-d H:i:s' );
+		$data   = array(
+			'status'       => self::STATUS_ACTIVE,
+			'updated_at'   => $now,
+			'activated_at' => $now,
+		);
+		$format = array( '%s', '%s', '%s' );
 
-                                        if ( null !== $consent_recorded_at && '' !== $consent_recorded_at ) {
-                                                $data['consent_recorded_at'] = $consent_recorded_at;
-                                                $format[]                    = '%s';
-                                        }
+		if ( null !== $consent_recorded_at && '' !== $consent_recorded_at ) {
+			$data['consent_recorded_at'] = $consent_recorded_at;
+			$format[]                    = '%s';
+		}
 
-                                        $where = array( 'id' => $id );
+		$where = array( 'id' => $id );
 
-                                        $result = $this->wpdb->update( $this->table, $data, $where, $format, array( '%d' ) );
+		$result = $this->wpdb->update( $this->table, $data, $where, $format, array( '%d' ) );
 
-                                        return false !== $result;
-        }
+		return false !== $result;
+	}
+
+	/**
+	 * Mark an existing member record as pending.
+	 *
+	 * @param int $id Member row ID.
+	 */
+	public function mark_pending( int $id ): bool {
+		$now    = gmdate( 'Y-m-d H:i:s' );
+		$data   = array(
+			'status'       => self::STATUS_PENDING,
+			'updated_at'   => $now,
+			'activated_at' => null,
+		);
+		$format = array( '%s', '%s', '%s' );
+
+		$where = array( 'id' => $id );
+
+		$result = $this->wpdb->update( $this->table, $data, $where, $format, array( '%d' ) );
+
+		return false !== $result;
+	}
+
+	/**
+	 * Mark an existing member record as revoked.
+	 *
+	 * @param int $id Member row ID.
+	 */
+	public function mark_revoked( int $id ): bool {
+		$now    = gmdate( 'Y-m-d H:i:s' );
+		$data   = array(
+			'status'       => self::STATUS_REVOKED,
+			'updated_at'   => $now,
+			'activated_at' => null,
+		);
+		$format = array( '%s', '%s', '%s' );
+
+		$where = array( 'id' => $id );
+
+		$result = $this->wpdb->update( $this->table, $data, $where, $format, array( '%d' ) );
+
+		return false !== $result;
+	}
+
+
 
 	/**
 	 * Retrieve all member records for administrative display.
