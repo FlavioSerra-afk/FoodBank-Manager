@@ -1005,6 +1005,8 @@ if ( ! function_exists( 'delete_transient' ) ) {
         }
 }
 
+require_once __DIR__ . '/../includes/Auth/class-capabilities.php';
+require_once __DIR__ . '/../includes/Core/class-plugin.php';
 require_once __DIR__ . '/../includes/Core/class-install.php';
 require_once __DIR__ . '/../includes/Attendance/class-attendancerepository.php';
 require_once __DIR__ . '/../includes/Attendance/class-attendancereportservice.php';

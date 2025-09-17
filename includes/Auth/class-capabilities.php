@@ -38,13 +38,37 @@ final class Capabilities {
 	 */
 	private const ROLE_MAP = array(
 		'administrator' => self::CAPABILITIES,
+		'fbm_manager'   => array(
+			'fbm_manage',
+			'fbm_edit',
+			'fbm_view',
+			'fbm_export',
+			'fbm_checkin',
+		),
+		'fbm_staff'     => array(
+			'fbm_edit',
+			'fbm_view',
+			'fbm_checkin',
+		),
 	);
 
-		/**
-		 * Tracks whether ensure() has been executed.
-		 *
-		 * @var bool
-		 */
+	/**
+	 * Retrieve the capability bundle for a managed role.
+	 *
+	 * @param string $role Role name.
+	 * @return string[]
+	 */
+	public static function bundle( string $role ): array {
+		$map = self::ROLE_MAP;
+
+		return $map[ $role ] ?? array();
+	}
+
+	/**
+	 * Tracks whether ensure() has been executed.
+	 *
+	 * @var bool
+	 */
 	private static bool $ensured = false;
 
 	/**

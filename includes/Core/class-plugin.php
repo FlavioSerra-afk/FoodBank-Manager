@@ -37,11 +37,11 @@ final class Plugin {
 	 * Register runtime hooks.
 	 */
 	public static function boot(): void {
-                Assets::setup();
-                DiagnosticsPage::register();
-                MembersPage::register();
-                ReportsPage::register();
-                ThemePage::register();
+		Assets::setup();
+		DiagnosticsPage::register();
+		MembersPage::register();
+		ReportsPage::register();
+		ThemePage::register();
 		RegistrationForm::register();
 		StaffDashboard::register();
 
@@ -53,27 +53,41 @@ final class Plugin {
 	/**
 	 * Perform activation tasks.
 	 */
-        public static function activate(): void {
-                Capabilities::ensure();
+	public static function activate(): void {
+		Capabilities::ensure();
 
-                $capabilities = array_fill_keys( Capabilities::all(), true );
-                $role         = get_role( 'foodbank_member' );
+		$roles = array(
+			'foodbank_member' => array(
+				'label'        => __( 'FoodBank Member', 'foodbank-manager' ),
+				'capabilities' => array_fill_keys( Capabilities::all(), true ),
+			),
+			'fbm_manager'     => array(
+				'label'        => __( 'FoodBank Manager', 'foodbank-manager' ),
+				'capabilities' => array_fill_keys( Capabilities::bundle( 'fbm_manager' ), true ),
+			),
+			'fbm_staff'       => array(
+				'label'        => __( 'FoodBank Staff', 'foodbank-manager' ),
+				'capabilities' => array_fill_keys( Capabilities::bundle( 'fbm_staff' ), true ),
+			),
+		);
 
-                if ( $role instanceof WP_Role ) {
-                        foreach ( array_keys( $capabilities ) as $capability ) {
-                                $role->add_cap( $capability );
-                        }
-                } else {
-                        add_role(
-                                'foodbank_member',
-                                __( 'FoodBank Member', 'foodbank-manager' ),
-                                $capabilities
-                        );
-                }
+		foreach ( $roles as $role_name => $definition ) {
+			$role = get_role( $role_name );
 
-                Install::ensure_tables();
-                do_action( 'fbm_activated' );
-        }
+			if ( $role instanceof WP_Role ) {
+				foreach ( array_keys( $definition['capabilities'] ) as $capability ) {
+					$role->add_cap( $capability );
+				}
+
+				continue;
+			}
+
+			add_role( $role_name, $definition['label'], $definition['capabilities'] );
+		}
+
+		Install::ensure_tables();
+		do_action( 'fbm_activated' );
+	}
 
 	/**
 	 * Perform deactivation cleanup.
