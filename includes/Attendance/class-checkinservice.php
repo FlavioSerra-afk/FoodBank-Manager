@@ -10,15 +10,21 @@ declare(strict_types=1);
 namespace FoodBankManager\Attendance;
 
 use DateTimeImmutable;
+use FoodBankManager\Core\Schedule;
 use DateTimeZone;
 use function esc_html__;
+use function explode;
 use function get_transient;
 use function in_array;
 use function is_array;
 use function md5;
+use function sprintf;
+use function sanitize_text_field;
 use function set_transient;
 use function strtolower;
+use function ucfirst;
 use function trim;
+use function wp_unslash;
 
 /**
  * Coordinates attendance check-in writes.
@@ -50,12 +56,21 @@ final class CheckinService {
 	private AttendanceRepository $repository;
 
 	/**
+	 * Schedule helper.
+	 *
+	 * @var Schedule
+	 */
+	private Schedule $schedule;
+
+	/**
 	 * Class constructor.
 	 *
 	 * @param AttendanceRepository $repository Attendance repository instance.
+	 * @param Schedule|null        $schedule   Optional schedule helper.
 	 */
-	public function __construct( AttendanceRepository $repository ) {
+	public function __construct( AttendanceRepository $repository, ?Schedule $schedule = null ) {
 		$this->repository = $repository;
+		$this->schedule   = $schedule ?? new Schedule();
 	}
 
 	/**
@@ -84,20 +99,34 @@ final class CheckinService {
 		$now_utc         = self::$current_time_override instanceof DateTimeImmutable
 		? self::$current_time_override->setTimezone( $utc_timezone )
 		: new DateTimeImmutable( 'now', $utc_timezone );
-		$london_timezone = new DateTimeZone( 'Europe/London' );
-		$now_london      = $now_utc->setTimezone( $london_timezone );
+		$window          = $this->schedule->current_window();
+		$window_timezone = new DateTimeZone( $window['timezone'] );
+		$now_window      = $now_utc->setTimezone( $window_timezone );
 
-		$window_start = $now_london->setTime( 11, 0, 0 );
-		$window_end   = $now_london->setTime( 14, 30, 0 );
+		$window_start_parts = explode( ':', $window['start'] );
+		$window_end_parts   = explode( ':', $window['end'] );
+		$window_start       = $now_window->setTime( (int) $window_start_parts[0], (int) $window_start_parts[1], 0 );
+		$window_end         = $now_window->setTime( (int) $window_end_parts[0], (int) $window_end_parts[1], 0 );
+		$expected_day       = Schedule::day_to_index( $window['day'] );
 
-        if ( '4' !== $now_london->format( 'N' ) || $now_london < $window_start || $now_london > $window_end ) {
+        if ( $expected_day !== (int) $now_window->format( 'N' ) || $now_window < $window_start || $now_window > $window_end ) {
+            $window_message = sprintf(
+                /* translators: 1: Day of week, 2: Start time, 3: End time, 4: Timezone identifier. */
+                esc_html__( 'Collections can only be recorded on %1$s between %2$s and %3$s (%4$s).', 'foodbank-manager' ),
+                ucfirst( $window['day'] ),
+                $window['start'],
+                $window['end'],
+                $window['timezone']
+            );
+
             return array(
                 'status'     => self::STATUS_OUT_OF_WINDOW,
-                                'message'    => esc_html__( 'Collections can only be recorded on Thursdays between 11:00 and 14:30 (UK time).', 'foodbank-manager' ),
-                                'member_ref' => $member_reference,
-                                'time'       => null,
-                        );
-		}
+                'message'    => $window_message,
+                'member_ref' => $member_reference,
+                'time'       => null,
+                'window'     => $window,
+            );
+        }
 
         $throttle_key = $this->build_throttle_key( $user_id, $fingerprint );
 
@@ -284,7 +313,7 @@ final class CheckinService {
         }
 
         if ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
-            $remote_address = trim( (string) $_SERVER['REMOTE_ADDR'] );
+            $remote_address = sanitize_text_field( wp_unslash( (string) $_SERVER['REMOTE_ADDR'] ) );
 
             if ( '' !== $remote_address ) {
                 return $remote_address;
