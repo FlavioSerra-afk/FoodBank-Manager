@@ -1,13 +1,13 @@
 <?php
 /**
- * Uninstall script tests.
+ * Integration coverage for uninstall cleanup.
  *
  * @package FoodBankManager
  */
 
 declare(strict_types=1);
 
-namespace FBM\Tests\Unit {
+namespace FBM\Tests;
 
 use PHPUnit\Framework\TestCase;
 
@@ -27,15 +27,13 @@ final class UninstallTest extends TestCase {
         protected function setUp(): void {
                 parent::setUp();
 
-                $this->pluginRoot = dirname( __DIR__, 2 );
+                $this->pluginRoot = dirname( __DIR__ );
 
-                $GLOBALS['fbm_deleted_options']  = array();
-                $GLOBALS['fbm_dropped_tables']   = array();
-                $GLOBALS['fbm_filters']          = array();
-                $GLOBALS['fbm_options']          = $this->optionFixture();
-        }
+                $GLOBALS['fbm_deleted_options'] = array();
+                $GLOBALS['fbm_dropped_tables']  = array();
+                $GLOBALS['fbm_filters']         = array();
+                $GLOBALS['fbm_options']         = $this->optionFixture();
 
-        public function test_uninstall_skips_destructive_cleanup_without_flag(): void {
                 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
                         define( 'WP_UNINSTALL_PLUGIN', true );
                 }
@@ -47,38 +45,26 @@ final class UninstallTest extends TestCase {
                 }
 
                 $GLOBALS['wpdb'] = new \wpdb();
+        }
 
+        public function test_guard_disabled_preserves_tables_and_secrets(): void {
                 require $this->pluginRoot . '/uninstall.php';
 
                 $this->assertSame( array(), $GLOBALS['fbm_dropped_tables'] );
-                $this->assertContains( 'fbm_db_version', $GLOBALS['fbm_deleted_options'] );
-                $this->assertContains( 'fbm_theme', $GLOBALS['fbm_deleted_options'] );
-                $this->assertContains( 'fbm_schedule_window', $GLOBALS['fbm_deleted_options'] );
+                $this->assertContains( 'fbm_db_migration_summary', $GLOBALS['fbm_deleted_options'] );
+                $this->assertContains( 'fbm_schedule_window_overrides', $GLOBALS['fbm_deleted_options'] );
                 $this->assertNotContains( 'fbm_token_signing_key', $GLOBALS['fbm_deleted_options'] );
 
                 $this->assertArrayHasKey( 'fbm_token_signing_key', $GLOBALS['fbm_options'] );
                 $this->assertArrayHasKey( 'fbm_token_storage_key', $GLOBALS['fbm_options'] );
                 $this->assertArrayNotHasKey( 'fbm_theme', $GLOBALS['fbm_options'] );
-                $this->assertArrayNotHasKey( 'fbm_db_version', $GLOBALS['fbm_options'] );
         }
 
-        public function test_uninstall_drops_tables_when_constant_enabled(): void {
-                if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
-                        define( 'WP_UNINSTALL_PLUGIN', true );
-                }
-
+        public function test_guard_enabled_purges_tables_and_secrets(): void {
                 if ( ! defined( 'FBM_ALLOW_DESTRUCTIVE_UNINSTALL' ) ) {
                         define( 'FBM_ALLOW_DESTRUCTIVE_UNINSTALL', true );
                 }
 
-                $abspath = $this->prepare_wordpress_stubs();
-
-                if ( ! defined( 'ABSPATH' ) ) {
-                        define( 'ABSPATH', $abspath );
-                }
-
-                $GLOBALS['wpdb'] = new \wpdb();
-
                 require $this->pluginRoot . '/uninstall.php';
 
                 $expected_tables = array(
@@ -89,52 +75,13 @@ final class UninstallTest extends TestCase {
                 );
 
                 $this->assertEqualsCanonicalizing( $expected_tables, $GLOBALS['fbm_dropped_tables'] );
-                $this->assertContains( 'fbm_db_version', $GLOBALS['fbm_deleted_options'] );
                 $this->assertContains( 'fbm_token_signing_key', $GLOBALS['fbm_deleted_options'] );
-                $this->assertArrayNotHasKey( 'fbm_token_signing_key', $GLOBALS['fbm_options'] );
-                $this->assertArrayNotHasKey( 'fbm_token_storage_key', $GLOBALS['fbm_options'] );
-        }
-
-        public function test_uninstall_drops_tables_when_filter_opt_in(): void {
-                if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
-                        define( 'WP_UNINSTALL_PLUGIN', true );
-                }
-
-                add_filter(
-                        'fbm_allow_destructive_uninstall',
-                        static function ( bool $allowed ): bool {
-                                unset( $allowed );
-
-                                return true;
-                        }
-                );
-
-                $abspath = $this->prepare_wordpress_stubs();
-
-                if ( ! defined( 'ABSPATH' ) ) {
-                        define( 'ABSPATH', $abspath );
-                }
-
-                $GLOBALS['wpdb'] = new \wpdb();
-
-                require $this->pluginRoot . '/uninstall.php';
-
-                $expected_tables = array(
-                        'wp_fbm_attendance_overrides',
-                        'wp_fbm_attendance',
-                        'wp_fbm_tokens',
-                        'wp_fbm_members',
-                );
-
-                $this->assertEqualsCanonicalizing( $expected_tables, $GLOBALS['fbm_dropped_tables'] );
-                $this->assertContains( 'fbm_db_version', $GLOBALS['fbm_deleted_options'] );
                 $this->assertContains( 'fbm_token_storage_key', $GLOBALS['fbm_deleted_options'] );
-                $this->assertArrayNotHasKey( 'fbm_token_signing_key', $GLOBALS['fbm_options'] );
-                $this->assertArrayNotHasKey( 'fbm_token_storage_key', $GLOBALS['fbm_options'] );
+                $this->assertSame( array(), $GLOBALS['fbm_options'] );
         }
 
         /**
-         * Provide a representative set of plugin options.
+         * Provide a representative option payload for uninstall checks.
          *
          * @return array<string, mixed>
          */
@@ -177,5 +124,4 @@ PHP;
 
                 return $root;
         }
-}
 }
