@@ -188,10 +188,35 @@ final class CheckinController {
 
 		$override_note = '' !== $override_note ? $override_note : null;
 
-		$result = $service->record( $member_reference, $method, get_current_user_id(), $note, $override, $override_note );
+                $result = $service->record( $member_reference, $method, get_current_user_id(), $note, $override, $override_note );
 
-		return rest_ensure_response( $result );
-	}
+                $status = (string) $result['status'];
+
+                switch ( $status ) {
+                        case CheckinService::STATUS_OUT_OF_WINDOW:
+                                if ( ! isset( $result['window'] ) ) {
+                                        $result['window'] = array(
+                                                'day'      => 'thursday',
+                                                'start'    => '11:00',
+                                                'end'      => '14:30',
+                                                'timezone' => 'Europe/London',
+                                        );
+                                }
+                                break;
+                        case CheckinService::STATUS_DUPLICATE_DAY:
+                                if ( ! isset( $result['duplicate'] ) ) {
+                                        $result['duplicate'] = true;
+                                }
+                                break;
+                        case CheckinService::STATUS_RECENT_WARNING:
+                                if ( ! isset( $result['requires_override'] ) ) {
+                                        $result['requires_override'] = true;
+                                }
+                                break;
+                }
+
+                return rest_ensure_response( $result );
+        }
 
 	/**
 	 * Normalize boolean-like values from REST parameters.

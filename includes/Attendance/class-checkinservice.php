@@ -60,9 +60,17 @@ final class CheckinService {
 	 * @param bool        $override         Whether an override was requested.
 	 * @param string|null $override_note    Justification for the override.
 	 *
-	 * @return array{status:string,message:string,member_ref:string,time:?string}
-	 */
-	public function record( string $member_reference, string $method, ?int $user_id, ?string $note = null, bool $override = false, ?string $override_note = null ): array {
+         * @return array{
+         *     status:string,
+         *     message:string,
+         *     member_ref:string,
+         *     time:?string,
+         *     duplicate?:bool,
+         *     requires_override?:bool,
+         *     window?:array{day:string,start:string,end:string,timezone:string}
+         * }
+         */
+        public function record( string $member_reference, string $method, ?int $user_id, ?string $note = null, bool $override = false, ?string $override_note = null ): array {
 		$utc_timezone    = new DateTimeZone( 'UTC' );
 		$now_utc         = self::$current_time_override instanceof DateTimeImmutable
 		? self::$current_time_override->setTimezone( $utc_timezone )
@@ -73,13 +81,13 @@ final class CheckinService {
 		$window_start = $now_london->setTime( 11, 0, 0 );
 		$window_end   = $now_london->setTime( 14, 30, 0 );
 
-		if ( '4' !== $now_london->format( 'N' ) || $now_london < $window_start || $now_london > $window_end ) {
-			return array(
-				'status'     => self::STATUS_OUT_OF_WINDOW,
-				'message'    => esc_html__( 'Collections are only available on Thursdays between 11:00 and 14:30.', 'foodbank-manager' ),
-				'member_ref' => $member_reference,
-				'time'       => null,
-			);
+                if ( '4' !== $now_london->format( 'N' ) || $now_london < $window_start || $now_london > $window_end ) {
+                        return array(
+                                'status'     => self::STATUS_OUT_OF_WINDOW,
+                                'message'    => esc_html__( 'Collections can only be recorded on Thursdays between 11:00 and 14:30 (UK time).', 'foodbank-manager' ),
+                                'member_ref' => $member_reference,
+                                'time'       => null,
+                        );
 		}
 
 		$normalized_method = $this->normalize_method( $method );
@@ -101,13 +109,13 @@ final class CheckinService {
 		if ( $previous_collection instanceof DateTimeImmutable ) {
 				$seconds_since_last = $now_utc->getTimestamp() - $previous_collection->getTimestamp();
 
-			if ( $seconds_since_last >= 0 && $seconds_since_last < self::WEEK_IN_SECONDS && ! $should_override ) {
-						return array(
-							'status'     => self::STATUS_RECENT_WARNING,
-							'message'    => esc_html__( 'Member collected less than a week ago. Manager override required.', 'foodbank-manager' ),
-							'member_ref' => $member_reference,
-							'time'       => $previous_collection->format( DATE_ATOM ),
-						);
+                        if ( $seconds_since_last >= 0 && $seconds_since_last < self::WEEK_IN_SECONDS && ! $should_override ) {
+                                                return array(
+                                                        'status'     => self::STATUS_RECENT_WARNING,
+                                                        'message'    => esc_html__( 'Member collected less than a week ago. Only managers can continue with a justified override.', 'foodbank-manager' ),
+                                                        'member_ref' => $member_reference,
+                                                        'time'       => $previous_collection->format( DATE_ATOM ),
+                                                );
 			}
 		}
 
@@ -144,11 +152,11 @@ final class CheckinService {
 
 		if ( $previous_collection instanceof DateTimeImmutable ) {
 				$seconds_since_last = $now_utc->getTimestamp() - $previous_collection->getTimestamp();
-			if ( $seconds_since_last >= 0 && $seconds_since_last < self::WEEK_IN_SECONDS && ! $should_override ) {
-						$status  = self::STATUS_RECENT_WARNING;
-						$message = esc_html__( 'Member collected less than a week ago. Manager override required.', 'foodbank-manager' );
-			}
-		}
+                        if ( $seconds_since_last >= 0 && $seconds_since_last < self::WEEK_IN_SECONDS && ! $should_override ) {
+                                                $status  = self::STATUS_RECENT_WARNING;
+                                                $message = esc_html__( 'Member collected less than a week ago. Only managers can continue with a justified override.', 'foodbank-manager' );
+                        }
+                }
 
 				return array(
 					'status'     => $status,

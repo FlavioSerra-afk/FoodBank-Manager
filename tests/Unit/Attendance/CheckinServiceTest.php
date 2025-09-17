@@ -60,7 +60,7 @@ final class CheckinServiceTest extends TestCase {
 
                 $this->assertSame( CheckinService::STATUS_OUT_OF_WINDOW, $result['status'] );
                 $this->assertSame(
-                        'Collections are only available on Thursdays between 11:00 and 14:30.',
+                        'Collections can only be recorded on Thursdays between 11:00 and 14:30 (UK time).',
                         $result['message']
                 );
                 $this->assertSame( 'FBM456', $result['member_ref'] );
@@ -90,7 +90,7 @@ final class CheckinServiceTest extends TestCase {
 
                 $this->assertSame( CheckinService::STATUS_RECENT_WARNING, $warning['status'] );
                 $this->assertSame(
-                        'Member collected less than a week ago. Manager override required.',
+                        'Member collected less than a week ago. Only managers can continue with a justified override.',
                         $warning['message']
                 );
                 $this->assertSame( 'FBM789', $warning['member_ref'] );
