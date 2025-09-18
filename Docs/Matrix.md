@@ -55,7 +55,7 @@ U2 — Public Registration
 
 U3 — Staff Front-End Dashboard
 
-⬜ Scanner UI (QR + manual)
+✅ Scanner (camera QR decode + manual fallback)
 
 ✅ /fbm/checkin (nonce, cap, throttle)
 
