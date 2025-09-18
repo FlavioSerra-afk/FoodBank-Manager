@@ -1,0 +1,38 @@
+ROLE: Codex for FoodBank Manager v1.0.0. LAW: Docs/Specs.md, Docs/Plan.md, Docs/Tasks.md, Docs/Matrix.md.
+
+GOAL: Fully implement and harden the QR token system per LAW (opaque, versioned payload; HMAC verify; constant-time; no PII) and satisfy U2/U3 flows. Do NOT widen scope.
+
+FILES (touch surgically):
+- includes/Token/Token.php (issue/verify/revoke/canonicalize)
+- includes/Email/class-welcomemailer.php (ensure identical payload for QR + fallback)
+- includes/Shortcodes/class-staffdashboard.php (manual entry path)
+- includes/Rest/class-checkincontroller.php (guards + verify + idempotent insert)
+- tests/Token/TokenServiceTest.php
+- tests/Email/WelcomeMailerTokenTest.php
+- tests/Rest/CheckinEndpointTest.php
+- tests/Shortcodes/StaffDashboardManualEntryTest.php
+- wp-cli/TokenCommand.php (probe; optional)
+
+WORKFLOW:
+1) Read LAW; summarize constraints in 3 bullets (do not quote docs).
+2) AUDIT current issuer/verify paths for secret mismatch, payload mutation, version/prefix drift, revocation handling.
+3) IMPLEMENT:
+   - Token::canonicalize(): trim trailing ws, normalize newlines; strict regex; forbid decoding/lowercasing.
+   - Token::issue(): generate payload + HMAC; store token_hash only.
+   - Token::verify(): HMAC with CURRENT or PREV secret; constant-time compare; return reason on fail (revoked/invalid/already).
+   - WelcomeMailer: same payload → QR + fallback; add unit test.
+   - Staff manual entry: `wp_unslash` then canonicalize → verify; keep rate-limits generic.
+   - /fbm/checkin: nonce + fbm_checkin + throttle + per-day idempotency; JSON {status,message,member_ref,time}.
+4) QA:
+   composer lint && composer phpcs && composer phpstan && composer test
+   Aim: touched files WPCS=0; PHPStan/tests green; no deprecations.
+5) PR:
+   Conventional commits:
+   - feat(token): opaque versioned tokens + HMAC verify (v1.0.0)
+   - fix(email): identical payload for QR and fallback (v1.0.0)
+   - test(token): round-trip + mutation + revoke (v1.0.0)
+   PR body: LAW sections satisfied; before/after tests; risk/rollback.
+6) REPORT (JSON ≤400 tokens): repo_access, law_snapshot, gaps, changes, qa, matrix_diff, pr, next_wave (resend/revoke UI).
+
+CONSTRAINTS:
+- No PII in payload or logs. Use prepared SQL; caps + nonces everywhere; constant-time compare only; return generic messages on failure.
