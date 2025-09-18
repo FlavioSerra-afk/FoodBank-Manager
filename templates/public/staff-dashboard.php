@@ -18,17 +18,18 @@ $window   = $schedule->current_window();
 $labels   = Schedule::window_labels( $window );
 ?>
 <div class="fbm-staff-dashboard" data-fbm-staff-dashboard="1">
-                <h2 class="fbm-staff-dashboard__heading">
-                                <?php esc_html_e( 'FoodBank Manager — Staff Dashboard', 'foodbank-manager' ); ?>
-                </h2>
-                <p class="fbm-staff-dashboard__summary">
-                                <?php
-                                printf(
-                                        esc_html__( 'Collections run on %s. Scan member QR codes or record a manual collection during this window, and record a manager override with a justification if the member collected within the last week.', 'foodbank-manager' ),
-                                        esc_html( $labels['sentence'] )
-                                );
-                                ?>
-                </p>
+				<h2 class="fbm-staff-dashboard__heading">
+								<?php esc_html_e( 'FoodBank Manager — Staff Dashboard', 'foodbank-manager' ); ?>
+				</h2>
+				<p class="fbm-staff-dashboard__summary">
+<?php
+printf(
+/* translators: %s: weekly collection window sentence. */
+	esc_html__( 'Collections run on %s. Scan member QR codes or record a manual collection during this window, and record a manager override with a justification if the member collected within the last week.', 'foodbank-manager' ),
+	esc_html( $labels['sentence'] )
+);
+?>
+				</p>
 		<div class="fbm-staff-dashboard__today" data-fbm-today>
 				<div class="fbm-staff-dashboard__today-item">
 						<span class="fbm-staff-dashboard__today-label"><?php esc_html_e( 'Collections today', 'foodbank-manager' ); ?></span>
@@ -85,9 +86,9 @@ $labels   = Schedule::window_labels( $window );
 				</button>
 		</form>
 		<div class="fbm-staff-dashboard__override" data-fbm-override hidden>
-                                <p class="fbm-staff-dashboard__helper" data-fbm-override-message>
-                                                <?php esc_html_e( 'This member collected within the last week. Only managers can continue by recording an override with a justification.', 'foodbank-manager' ); ?>
-                                </p>
+								<p class="fbm-staff-dashboard__helper" data-fbm-override-message>
+												<?php esc_html_e( 'This member collected within the last week. Only managers can continue by recording an override with a justification.', 'foodbank-manager' ); ?>
+								</p>
 				<label class="fbm-staff-dashboard__field" for="fbm-staff-dashboard-override-note">
 						<span class="fbm-staff-dashboard__label">
 								<?php esc_html_e( 'Override note', 'foodbank-manager' ); ?>

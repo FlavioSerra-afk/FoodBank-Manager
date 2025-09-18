@@ -35,6 +35,8 @@ jobs:
           fi
       - name: PHPCBF (changed files only)
         run: composer phpcbf:changed
+      - name: PHPCS (changed files only)
+        run: composer phpcs:changed
       - name: Lint
         run: composer lint
       - name: Prepare build dir
