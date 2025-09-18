@@ -204,6 +204,33 @@ if ( ! class_exists( 'wpdb', false ) ) {
                         $sql  = $this->last_prepare['query'];
                         $args = $this->last_prepare['args'];
 
+                        if (
+                                str_contains( $sql, 'fbm_tokens' )
+                                && str_contains( $sql, 'member_id = %d' )
+                        ) {
+                                $member_id = (int) ( $args[0] ?? 0 );
+
+                                if ( isset( $this->tokens[ $member_id ] ) ) {
+                                        $record = $this->tokens[ $member_id ];
+
+                                        $result = array(
+                                                'member_id'  => $record['member_id'],
+                                                'token_hash' => $record['token_hash'],
+                                                'version'    => $record['version'] ?? 'v1',
+                                                'issued_at'  => $record['issued_at'] ?? gmdate( 'Y-m-d H:i:s' ),
+                                                'meta'       => $record['meta'] ?? '{}',
+                                        );
+
+                                        if ( array_key_exists( 'revoked_at', $record ) ) {
+                                                $result['revoked_at'] = $record['revoked_at'];
+                                        }
+
+                                        return $result;
+                                }
+
+                                return null;
+                        }
+
                         if ( str_contains( $sql, 'token_hash = %s' ) && str_contains( $sql, 'fbm_tokens' ) ) {
                                 $hash            = (string) ( $args[0] ?? '' );
                                 $include_revoked = str_contains( $sql, 'revoked_at' );
@@ -943,7 +970,9 @@ if ( ! function_exists( 'get_option' ) ) {
 }
 
 if ( ! function_exists( 'update_option' ) ) {
-        function update_option( string $name, $value ) {
+        function update_option( string $name, $value, $autoload = null ) {
+                unset( $autoload );
+
                 if ( ! isset( $GLOBALS['fbm_options'] ) || ! is_array( $GLOBALS['fbm_options'] ) ) {
                         $GLOBALS['fbm_options'] = array();
                 }

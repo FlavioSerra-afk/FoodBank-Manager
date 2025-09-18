@@ -69,13 +69,16 @@ if ( isset( $data['notices'] ) && is_array( $data['notices'] ) ) {
 				$reference                      = isset( $member['member_reference'] ) ? (string) $member['member_reference'] : '';
 				$first_name                     = isset( $member['first_name'] ) ? (string) $member['first_name'] : '';
 				$last_init                      = isset( $member['last_initial'] ) ? (string) $member['last_initial'] : '';
-				$email                          = isset( $member['email'] ) ? (string) $member['email'] : '';
-				$member_status                  = isset( $member['status'] ) ? (string) $member['status'] : '';
-				$activated                      = isset( $member['activated_at'] ) && null !== $member['activated_at'] ? (string) $member['activated_at'] : '';
-								$approve_url    = isset( $member['approve_url'] ) ? (string) $member['approve_url'] : '';
-								$resend_url     = isset( $member['resend_url'] ) ? (string) $member['resend_url'] : '';
-								$regenerate_url = isset( $member['regenerate_url'] ) ? (string) $member['regenerate_url'] : '';
-								$revoke_url     = isset( $member['revoke_url'] ) ? (string) $member['revoke_url'] : '';
+                                $email                          = isset( $member['email'] ) ? (string) $member['email'] : '';
+                                $member_status                  = isset( $member['status'] ) ? (string) $member['status'] : '';
+                                $activated                      = isset( $member['activated_at'] ) && null !== $member['activated_at'] ? (string) $member['activated_at'] : '';
+                                                                $approve_url    = isset( $member['approve_url'] ) ? (string) $member['approve_url'] : '';
+                                                                $resend_url     = isset( $member['resend_url'] ) ? (string) $member['resend_url'] : '';
+                                                                $reissue_url    = isset( $member['reissue_url'] ) ? (string) $member['reissue_url'] : '';
+                                                                if ( '' === $reissue_url ) {
+                                                                        $reissue_url = isset( $member['regenerate_url'] ) ? (string) $member['regenerate_url'] : '';
+                                                                }
+                                                                $revoke_url = isset( $member['revoke_url'] ) ? (string) $member['revoke_url'] : '';
 								$name           = trim( $first_name . ' ' . $last_init );
 								$actions        = array();
 
@@ -94,13 +97,13 @@ if ( isset( $data['notices'] ) && is_array( $data['notices'] ) ) {
 										);
 					}
 
-					if ( '' !== $regenerate_url ) {
-											$actions[] = sprintf(
-												'<span class="regenerate"><a href="%s">%s</a></span>',
-												esc_url( $regenerate_url ),
-												esc_html__( 'Regenerate Token', 'foodbank-manager' )
-											);
-					}
+                                        if ( '' !== $reissue_url ) {
+                                                                                        $actions[] = sprintf(
+                                                                                                '<span class="regenerate"><a href="%s">%s</a></span>',
+                                                                                                esc_url( $reissue_url ),
+                                                                                                esc_html__( 'Re-issue Token', 'foodbank-manager' )
+                                                                                        );
+                                        }
 
 					if ( '' !== $revoke_url ) {
 							$actions[] = sprintf(

@@ -23,12 +23,18 @@ use function add_menu_page;
 use function add_query_arg;
 use function admin_url;
 use function apply_filters;
+use function array_slice;
+use function array_unshift;
 use function check_admin_referer;
 use function call_user_func;
 use function current_user_can;
 use function do_action;
 use function esc_html__;
+use function filter_input;
 use function get_current_user_id;
+use function get_option;
+use function gmdate;
+use function is_array;
 use function is_callable;
 use function is_object;
 use function is_readable;
@@ -36,7 +42,7 @@ use function method_exists;
 use function sanitize_key;
 use function sanitize_text_field;
 use function sprintf;
-use function filter_input;
+use function update_option;
 use function wp_die;
 use function wp_nonce_url;
 use function wp_safe_redirect;
@@ -57,10 +63,12 @@ final class MembersPage {
 	private const STATUS_PARAM = 'fbm_status';
 	private const ERROR_PARAM  = 'fbm_error';
 
-	private const ACTION_APPROVE    = 'approve';
-	private const ACTION_RESEND     = 'resend';
-	private const ACTION_REGENERATE = 'regenerate';
-	private const ACTION_REVOKE     = 'revoke';
+        private const ACTION_APPROVE       = 'approve';
+        private const ACTION_RESEND        = 'resend';
+        private const ACTION_REGENERATE    = 'regenerate';
+        private const ACTION_REVOKE        = 'revoke';
+        private const AUDIT_OPTION         = 'fbm_members_action_audit';
+        private const AUDIT_MAX_ENTRIES    = 50;
 
 		/**
 		 * Optional factory for mailer instances.
@@ -121,8 +129,10 @@ final class MembersPage {
 
 		foreach ( $members as $index => $member ) {
 						$members[ $index ]['approve_url']    = self::build_action_url( self::ACTION_APPROVE, $member['id'] );
-						$members[ $index ]['resend_url']     = self::build_action_url( self::ACTION_RESEND, $member['id'] );
-						$members[ $index ]['regenerate_url'] = self::build_action_url( self::ACTION_REGENERATE, $member['id'] );
+                                                $members[ $index ]['resend_url']     = self::build_action_url( self::ACTION_RESEND, $member['id'] );
+                                                $reissue_url                         = self::build_action_url( self::ACTION_REGENERATE, $member['id'] );
+                                                $members[ $index ]['reissue_url']    = $reissue_url;
+                                                $members[ $index ]['regenerate_url'] = $reissue_url;
 						$members[ $index ]['revoke_url']     = self::build_action_url( self::ACTION_REVOKE, $member['id'] );
 		}
 
@@ -211,10 +221,12 @@ final class MembersPage {
 				return;
 		}
 
-			do_action( 'fbm_members_page_action_processed', $action, $outcome );
+                        do_action( 'fbm_members_page_action_processed', $action, $outcome );
 
-			self::redirect_with_outcome( $outcome );
-	}
+                        self::record_audit_entry( $action, $member_id, $outcome );
+
+                        self::redirect_with_outcome( $outcome );
+        }
 
 		/**
 		 * Resolve notices for the current request.
@@ -317,11 +329,11 @@ final class MembersPage {
 							'message' => __( 'Issued a new token, but the email could not be sent.', 'foodbank-manager' ),
 						);
 				break;
-			case 'resend-issue':
-					$notices[] = array(
-						'type'    => 'error',
-						'message' => __( 'Unable to issue a new token for the selected member.', 'foodbank-manager' ),
-					);
+                        case 'resend-issue':
+                                        $notices[] = array(
+                                                'type'    => 'error',
+                                                'message' => __( 'Unable to resend the welcome email for the selected member.', 'foodbank-manager' ),
+                                        );
 				break;
 			case 'revoked':
 				if ( '' !== $member_reference ) {
@@ -538,14 +550,15 @@ final class MembersPage {
 
 			$log->resolve_member( (int) $member['id'] );
 
-			$outcome['notice']           = 'approved';
-			$outcome['status']           = true;
-			$outcome['member_reference'] = $approval['member_reference'];
-			unset( $outcome['error'] );
+                        $outcome['notice']           = 'approved';
+                        $outcome['status']           = true;
+                        $outcome['member_reference'] = $approval['member_reference'];
+                        $outcome['token_hash']       = (string) $approval['token_hash'];
+                        unset( $outcome['error'] );
 
-					do_action( 'fbm_members_page_member_approved', $member_id, $approval );
+                                        do_action( 'fbm_members_page_member_approved', $member_id, $approval );
 
-					return $outcome;
+                                        return $outcome;
 	}
 
 		/**
@@ -577,59 +590,87 @@ final class MembersPage {
 						);
 		}
 
-			$outcome = array(
-				'notice'           => 'resend-issue',
-				'member_reference' => $member['member_reference'],
-				'status'           => false,
-				'error'            => 'issue',
-			);
+                        $outcome = array(
+                                'notice'           => 'resend-issue',
+                                'member_reference' => $member['member_reference'],
+                                'status'           => false,
+                                'error'            => 'issue',
+                        );
 
-			$log          = new MailFailureLog();
-			$tokens       = new TokenService( new TokenRepository( $wpdb ) );
-			$registration = new RegistrationService( $repository, $tokens );
-			$issuance     = $registration->regenerate( $member_id, 'resend', get_current_user_id() );
+                        $log    = new MailFailureLog();
+                        $tokens = new TokenService( new TokenRepository( $wpdb ) );
 
-			if ( null === $issuance ) {
-					$log->record_failure(
-						(int) $member['id'],
-						$member['member_reference'],
-						$member['email'],
-						MailFailureLog::CONTEXT_ADMIN_RESEND,
-						MailFailureLog::ERROR_TOKEN
-					);
+                        $active_token = $tokens->find_active_for_member( $member_id );
 
-					return $outcome;
-			}
+                        if ( null === $active_token ) {
+                                $log->record_failure(
+                                        (int) $member['id'],
+                                        $member['member_reference'],
+                                        $member['email'],
+                                        MailFailureLog::CONTEXT_ADMIN_RESEND,
+                                        MailFailureLog::ERROR_TOKEN
+                                );
 
-			$mailer = self::resolve_mailer();
+                                return $outcome;
+                        }
 
-			if ( ! $mailer->send( $member['email'], $member['first_name'], $member['member_reference'], $issuance['token'] ) ) {
-					$log->record_failure(
-						(int) $member['id'],
-						$member['member_reference'],
-						$member['email'],
-						MailFailureLog::CONTEXT_ADMIN_RESEND,
-						MailFailureLog::ERROR_MAIL
-					);
+                        $payload = isset( $active_token['meta']['payload'] ) ? (string) $active_token['meta']['payload'] : '';
 
-					$outcome['notice'] = 'resend-mail';
-					$outcome['error']  = 'mail';
+                        if ( '' === $payload ) {
+                                $log->record_failure(
+                                        (int) $member['id'],
+                                        $member['member_reference'],
+                                        $member['email'],
+                                        MailFailureLog::CONTEXT_ADMIN_RESEND,
+                                        MailFailureLog::ERROR_TOKEN
+                                );
 
-					return $outcome;
-			}
+                                return $outcome;
+                        }
 
-			$log->resolve_member( (int) $member['id'] );
+                        $mailer = self::resolve_mailer();
 
-			$outcome['notice'] = 'resent';
-			$outcome['status'] = true;
-			unset( $outcome['error'] );
+                        if ( ! $mailer->send( $member['email'], $member['first_name'], $member['member_reference'], $payload ) ) {
+                                $log->record_failure(
+                                        (int) $member['id'],
+                                        $member['member_reference'],
+                                        $member['email'],
+                                        MailFailureLog::CONTEXT_ADMIN_RESEND,
+                                        MailFailureLog::ERROR_MAIL
+                                );
 
-			$member['token'] = $issuance['token'];
+                                $outcome['notice'] = 'resend-mail';
+                                $outcome['error']  = 'mail';
 
-					do_action( 'fbm_members_page_resend_sent', $member_id, $member, $issuance );
+                                return $outcome;
+                        }
 
-					return $outcome;
-	}
+                        $log->resolve_member( (int) $member['id'] );
+
+                        $outcome['notice']     = 'resent';
+                        $outcome['status']     = true;
+                        $outcome['token_hash'] = $active_token['token_hash'];
+                        unset( $outcome['error'] );
+
+                        $member['token']      = $payload;
+                        $member['token_hash'] = $active_token['token_hash'];
+
+                        $issuance = array(
+                                'member_id'        => $member['id'],
+                                'member_reference' => $member['member_reference'],
+                                'email'            => $member['email'],
+                                'first_name'       => $member['first_name'],
+                                'status'           => $member['status'],
+                                'token'            => $payload,
+                                'token_hash'       => $active_token['token_hash'],
+                                'issued_at'        => $active_token['issued_at'],
+                                'meta'             => $active_token['meta'],
+                        );
+
+                                        do_action( 'fbm_members_page_resend_sent', $member_id, $member, $issuance );
+
+                                        return $outcome;
+        }
 
 		/**
 		 * Process the regenerate action.
@@ -675,11 +716,13 @@ final class MembersPage {
 					return $outcome;
 			}
 
-			$outcome['notice'] = 'regenerated';
-			$outcome['status'] = true;
-			unset( $outcome['error'] );
+                        $outcome['notice']     = 'regenerated';
+                        $outcome['status']     = true;
+                        $outcome['token_hash'] = $issuance['token_hash'];
+                        unset( $outcome['error'] );
 
-			$member['token'] = $issuance['token'];
+                        $member['token']      = $issuance['token'];
+                        $member['token_hash'] = $issuance['token_hash'];
 
 					do_action( 'fbm_members_page_token_regenerated', $member_id, $member, $issuance );
 
@@ -760,5 +803,41 @@ final class MembersPage {
                 do_action( 'fbm_members_page_tokens_revoked', $member_id, $member );
 
                 return $outcome;
+        }
+
+        /**
+         * Record an audit entry for administrative actions.
+         *
+         * @param string                                         $action  Action key.
+         * @param int                                            $member_id Target member identifier.
+         * @param array{notice:string,status:bool,error?:string} $outcome Action outcome payload.
+         */
+        private static function record_audit_entry( string $action, int $member_id, array $outcome ): void {
+                $actor_id = (int) get_current_user_id();
+                $log      = get_option( self::AUDIT_OPTION, array() );
+
+                if ( ! is_array( $log ) ) {
+                        $log = array();
+                }
+
+                $entry = array(
+                        'actor'       => $actor_id,
+                        'action'      => sanitize_key( $action ),
+                        'member_id'   => $member_id,
+                        'status'      => (bool) $outcome['status'],
+                        'notice'      => (string) $outcome['notice'],
+                        'error'       => isset( $outcome['error'] ) ? (string) $outcome['error'] : '',
+                        'recorded_at' => gmdate( 'c' ),
+                );
+
+                array_unshift( $log, $entry );
+
+                if ( count( $log ) > self::AUDIT_MAX_ENTRIES ) {
+                        $log = array_slice( $log, 0, self::AUDIT_MAX_ENTRIES );
+                }
+
+                update_option( self::AUDIT_OPTION, $log, false );
+
+                do_action( 'fbm_members_page_action_audit', $entry );
         }
 }

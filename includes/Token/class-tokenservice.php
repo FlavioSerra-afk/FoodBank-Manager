@@ -92,7 +92,18 @@ final class TokenService {
 	 *
 	 * @param int $member_id Member identifier.
 	 */
-	public function revoke( int $member_id ): bool {
-		return $this->token->revoke( $member_id );
-	}
+        public function revoke( int $member_id ): bool {
+                return $this->token->revoke( $member_id );
+        }
+
+        /**
+         * Retrieve the active token details for a member.
+         *
+         * @param int $member_id Member identifier.
+         *
+         * @return array{member_id:int,token_hash:string,version:string,issued_at:string,meta:array<string,mixed>}|null
+         */
+        public function find_active_for_member( int $member_id ): ?array {
+                return $this->token->find_active_for_member( $member_id );
+        }
 }

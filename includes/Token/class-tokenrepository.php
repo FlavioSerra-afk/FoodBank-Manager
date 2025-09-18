@@ -106,11 +106,11 @@ final class TokenRepository {
         * @return array{member_id:int,token_hash:string,version:string,revoked_at:?string,meta:array<string,mixed>}|null
         */
        public function find_by_hash( string $token_hash ): ?array {
-               $sql = $this->wpdb->prepare(
-                       // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is trusted.
-                       "SELECT member_id, token_hash, version, revoked_at, meta FROM `{$this->table}` WHERE token_hash = %s LIMIT 1",
-                       $token_hash
-               );
+                $sql = $this->wpdb->prepare(
+                        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is trusted.
+                        "SELECT member_id, token_hash, version, revoked_at, meta FROM `{$this->table}` WHERE token_hash = %s LIMIT 1",
+                        $token_hash
+                );
 
                if ( ! is_string( $sql ) ) {
                        return null;
@@ -145,10 +145,60 @@ final class TokenRepository {
                );
        }
 
-		/**
-		 * Mark all tokens for a member as revoked.
-		 *
-		 * @param int    $member_id  Member identifier.
+        /**
+         * Locate the latest token record for a member.
+         *
+         * @param int $member_id Member identifier.
+         *
+         * @return array{member_id:int,token_hash:string,version:string,issued_at:string,revoked_at:?string,meta:array<string,mixed>}|null
+         */
+        public function find_active_for_member( int $member_id ): ?array {
+                $sql = $this->wpdb->prepare(
+                        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is trusted.
+                        "SELECT member_id, token_hash, version, issued_at, revoked_at, meta FROM `{$this->table}` WHERE member_id = %d LIMIT 1",
+                        $member_id
+                );
+
+                if ( ! is_string( $sql ) ) {
+                        return null;
+                }
+
+                /**
+                 * Result row.
+                 *
+                 * @var array{member_id:int|string,token_hash:string,version?:string,issued_at?:string,revoked_at?:string|null,meta?:string}|null $row
+                 */
+                $row = $this->wpdb->get_row( $sql, ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Prepared above.
+                if ( ! is_array( $row ) ) {
+                        return null;
+                }
+
+                $revoked_at = null;
+
+                if ( isset( $row['revoked_at'] ) ) {
+                        $candidate = trim( (string) $row['revoked_at'] );
+
+                        if ( '' !== $candidate ) {
+                                $revoked_at = $candidate;
+                        }
+                }
+
+                $issued_at = isset( $row['issued_at'] ) ? (string) $row['issued_at'] : '';
+
+                return array(
+                        'member_id'  => (int) $row['member_id'],
+                        'token_hash' => (string) $row['token_hash'],
+                        'version'    => (string) ( $row['version'] ?? 'v1' ),
+                        'issued_at'  => $issued_at,
+                        'revoked_at' => $revoked_at,
+                        'meta'       => $this->decode_meta( $row['meta'] ?? '' ),
+                );
+        }
+
+        /**
+         * Mark all tokens for a member as revoked.
+         *
+         * @param int    $member_id  Member identifier.
 		 * @param string $revoked_at Revocation timestamp (UTC).
 		 */
 	public function revoke_member( int $member_id, string $revoked_at ): bool {

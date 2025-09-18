@@ -89,10 +89,12 @@ final class Token {
 	 *
 	 * @throws RuntimeException When token persistence fails or entropy generation fails.
 	 */
-	public function issue( int $member_id, array $meta = array() ): array {
-		$payload   = $this->generate_payload();
-		$issued_at = gmdate( 'Y-m-d H:i:s' );
-		$token_hash = $this->hash_payload( $payload, $this->current_secret );
+        public function issue( int $member_id, array $meta = array() ): array {
+                $payload   = $this->generate_payload();
+                $issued_at = gmdate( 'Y-m-d H:i:s' );
+                $token_hash = $this->hash_payload( $payload, $this->current_secret );
+
+                $meta['payload'] = $payload;
 
 		if ( ! $this->repository->persist_active( $member_id, $token_hash, $issued_at, self::STORAGE_VERSION, $meta ) ) {
 			throw new RuntimeException( 'Unable to persist member token.' );
@@ -197,11 +199,38 @@ final class Token {
 	 *
 	 * @param int $member_id Member identifier.
 	 */
-	public function revoke( int $member_id ): bool {
-		$revoked_at = gmdate( 'Y-m-d H:i:s' );
+        public function revoke( int $member_id ): bool {
+                $revoked_at = gmdate( 'Y-m-d H:i:s' );
 
-		return $this->repository->revoke_member( $member_id, $revoked_at );
-	}
+                return $this->repository->revoke_member( $member_id, $revoked_at );
+        }
+
+        /**
+         * Locate the active token record for a member.
+         *
+         * @param int $member_id Member identifier.
+         *
+         * @return array{member_id:int,token_hash:string,version:string,issued_at:string,meta:array<string,mixed>}|null
+         */
+        public function find_active_for_member( int $member_id ): ?array {
+                $record = $this->repository->find_active_for_member( $member_id );
+
+                if ( null === $record ) {
+                        return null;
+                }
+
+                if ( null !== $record['revoked_at'] ) {
+                        return null;
+                }
+
+                return array(
+                        'member_id'  => (int) $record['member_id'],
+                        'token_hash' => (string) $record['token_hash'],
+                        'version'    => (string) $record['version'],
+                        'issued_at'  => (string) $record['issued_at'],
+                        'meta'       => $record['meta'],
+                );
+        }
 
 	/**
 	 * Generate a signed payload string.
