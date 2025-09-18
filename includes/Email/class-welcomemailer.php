@@ -14,6 +14,7 @@ use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\ErrorCorrectionLevel;
 use Endroid\QrCode\RoundBlockSizeMode;
 use Endroid\QrCode\Writer\PngWriter;
+use FoodBankManager\Token\Token;
 use Throwable;
 
 use function class_exists;
@@ -25,7 +26,6 @@ use function is_string;
 use function ob_get_clean;
 use function ob_start;
 use function sprintf;
-use function trim;
 
 /**
  * Composes and sends welcome emails with QR tokens.
@@ -43,14 +43,18 @@ final class WelcomeMailer {
 	 * @param string $member_reference Canonical member reference string.
 	 * @param string $token            Raw token issued for the member.
 	 */
-	public function send( string $email, string $first_name, string $member_reference, string $token ): bool {
-		$qr_data_uri = $this->build_qr_data_uri( $token );
+        public function send( string $email, string $first_name, string $member_reference, string $token ): bool {
+                $payload = Token::canonicalize( $token );
 
-		$context = array(
-			'first_name'       => $first_name,
-			'member_reference' => $member_reference,
-			'qr_data_uri'      => $qr_data_uri,
-		);
+                $token_payload = null === $payload ? '' : $payload;
+                $qr_data_uri   = '' === $token_payload ? '' : $this->build_qr_data_uri( $token_payload );
+
+                $context = array(
+                        'first_name'       => $first_name,
+                        'member_reference' => $member_reference,
+                        'qr_data_uri'      => $qr_data_uri,
+                        'token_payload'    => $token_payload,
+                );
 
 		$body = $this->render_template( $context );
 
@@ -66,27 +70,25 @@ final class WelcomeMailer {
 		return wp_mail( $email, $subject, $body, $headers );
 	}
 
-		/**
-		 * Render the QR token as a data URI for embedding.
-		 *
-		 * @param string $token Raw token issued for the member.
-		 */
-	private function build_qr_data_uri( string $token ): string {
-		$token = trim( $token );
+        /**
+         * Render the QR token as a data URI for embedding.
+         *
+         * @param string $token Canonical token payload to encode.
+         */
+        private function build_qr_data_uri( string $token ): string {
+                if ( '' === $token ) {
+                        return '';
+                }
 
-		if ( '' === $token ) {
-			return '';
-		}
-
-		if ( ! class_exists( Builder::class ) ) {
-			return '';
+                if ( ! class_exists( Builder::class ) ) {
+                        return '';
 		}
 
 		try {
 			$builder = new Builder();
 			$result  = $builder->build(
 				writer: new PngWriter(),
-				data: $token,
+                                data: $token,
 				encoding: new Encoding( 'UTF-8' ),
 				errorCorrectionLevel: ErrorCorrectionLevel::High,
 				size: self::QR_SIZE,
