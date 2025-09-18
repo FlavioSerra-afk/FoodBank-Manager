@@ -15,6 +15,9 @@ use Endroid\QrCode\ErrorCorrectionLevel;
 use Endroid\QrCode\RoundBlockSizeMode;
 use Endroid\QrCode\Writer\PngWriter;
 use Throwable;
+
+use function class_exists;
+use function method_exists;
 use function __;
 use function implode;
 use function is_readable;
@@ -22,6 +25,7 @@ use function is_string;
 use function ob_get_clean;
 use function ob_start;
 use function sprintf;
+use function trim;
 
 /**
  * Composes and sends welcome emails with QR tokens.
@@ -68,8 +72,19 @@ final class WelcomeMailer {
 		 * @param string $token Raw token issued for the member.
 		 */
 	private function build_qr_data_uri( string $token ): string {
+		$token = trim( $token );
+
+		if ( '' === $token ) {
+			return '';
+		}
+
+		if ( ! class_exists( Builder::class ) ) {
+			return '';
+		}
+
 		try {
-			$builder = new Builder(
+			$builder = new Builder();
+			$result  = $builder->build(
 				writer: new PngWriter(),
 				data: $token,
 				encoding: new Encoding( 'UTF-8' ),
@@ -79,9 +94,11 @@ final class WelcomeMailer {
 				roundBlockSizeMode: RoundBlockSizeMode::Margin,
 			);
 
-			$result = $builder->build();
+			if ( ! method_exists( $result, 'getDataUri' ) ) {
+				return '';
+			}
 
-			return $result->getDataUri();
+			return (string) $result->getDataUri();
 		} catch ( Throwable $exception ) {
 			unset( $exception );
 
