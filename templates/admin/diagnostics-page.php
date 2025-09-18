@@ -13,6 +13,7 @@ use function esc_html__;
 use function esc_html_e;
 use function esc_url;
 use function is_array;
+use function is_readable;
 use function floor;
 use function max;
 use function number_format_i18n;
@@ -21,6 +22,8 @@ $entries            = array();
 $notices            = array();
 $rate_limit_seconds = 0;
 $health_badges      = array();
+$token_probe        = array();
+$token_failures     = array();
 
 if ( isset( $data['entries'] ) && is_array( $data['entries'] ) ) {
 				$entries = $data['entries'];
@@ -35,7 +38,15 @@ if ( isset( $data['rate_limit_seconds'] ) ) {
 }
 
 if ( isset( $data['health_badges'] ) && is_array( $data['health_badges'] ) ) {
-				$health_badges = $data['health_badges'];
+                                $health_badges = $data['health_badges'];
+}
+
+if ( isset( $data['token_probe'] ) && is_array( $data['token_probe'] ) ) {
+                                $token_probe = $data['token_probe'];
+}
+
+if ( isset( $data['token_failures'] ) && is_array( $data['token_failures'] ) ) {
+                                $token_failures = $data['token_failures'];
 }
 
 $rate_limit_minutes = max( 1, (int) floor( $rate_limit_seconds / 60 ) );
@@ -98,7 +109,15 @@ printf(
 </section>
 <?php endif; ?>
 
-				<table class="widefat striped">
+<?php
+$token_template = FBM_PATH . 'templates/admin/diagnostics-token.php';
+
+if ( is_readable( $token_template ) ) {
+        include $token_template;
+}
+?>
+
+                                <table class="widefat striped">
 								<thead>
 												<tr>
 								<th scope="col"><?php esc_html_e( 'Recorded', 'foodbank-manager' ); ?></th>

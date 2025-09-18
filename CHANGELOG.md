@@ -1,5 +1,11 @@
 # Changelog
 
+# [1.0.6] - 2025-09-22
+
+### Added
+- Redacted token probe diagnostics in the admin panel with nonce-protected submission and token resend failure list.
+- Safe `wp fbm token` WP-CLI command for canonical token verification output.
+
 ## [1.0.0] - 2025-09-18
 
 ### Changed

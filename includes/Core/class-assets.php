@@ -84,7 +84,7 @@ final class Assets {
 			return;
 		}
 
-			$version = defined( 'FBM_VER' ) ? FBM_VER : '1.0.0';
+                        $version = defined( 'FBM_VER' ) ? FBM_VER : '1.0.6';
 			$style   = plugins_url( 'assets/css/admin.css', FBM_FILE );
 
 			wp_enqueue_style( 'fbm-admin', $style, array(), $version );
@@ -108,7 +108,7 @@ final class Assets {
 			return;
 		}
 
-                $version = defined( 'FBM_VER' ) ? FBM_VER : '1.0.0';
+                $version = defined( 'FBM_VER' ) ? FBM_VER : '1.0.6';
                 $style   = plugins_url( 'assets/css/staff-dashboard.css', FBM_FILE );
                 $script  = plugins_url( 'assets/js/staff-dashboard.js', FBM_FILE );
                 $window  = ( new Schedule() )->current_window();

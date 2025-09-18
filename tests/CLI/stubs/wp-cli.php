@@ -5,6 +5,10 @@
 
 declare(strict_types=1);
 
+if ( ! defined( 'WP_CLI' ) ) {
+        define( 'WP_CLI', true );
+}
+
 if ( class_exists( 'WP_CLI', false ) ) {
         return;
 }
@@ -25,6 +29,13 @@ class WP_CLI {
         public static array $logs = array();
 
         /**
+         * Successful command outputs.
+         *
+         * @var array<int, string>
+         */
+        public static array $successes = array();
+
+        /**
          * Register a command.
          *
          * @param string   $name     Command signature.
@@ -41,5 +52,23 @@ class WP_CLI {
          */
         public static function log( string $message ): void {
                 self::$logs[] = $message;
+        }
+
+        /**
+         * Record a success message.
+         *
+         * @param string $message Message to record.
+         */
+        public static function success( string $message ): void {
+                self::$successes[] = $message;
+        }
+
+        /**
+         * Simulate a WP-CLI error by throwing an exception.
+         *
+         * @param string $message Error message.
+         */
+        public static function error( string $message ): void {
+                throw new \RuntimeException( $message );
         }
 }
