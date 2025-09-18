@@ -16,6 +16,7 @@ use function function_exists;
 use function is_array;
 use function is_string;
 use function json_decode;
+use function trim;
 use function wp_json_encode;
 
 use const ARRAY_A;
@@ -74,41 +75,75 @@ final class TokenRepository {
 			return false !== $result;
 	}
 
-		/**
-		 * Find an active token by its hashed value.
-		 *
-		 * @param string $token_hash Hashed token value.
-		 *
-		 * @return array{member_id:int,token_hash:string,version:string,meta:array<string,mixed>}|null
-		 */
-	public function find_active_by_hash( string $token_hash ): ?array {
-		$sql = $this->wpdb->prepare(
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is trusted.
-			"SELECT member_id, token_hash, version FROM `{$this->table}` WHERE token_hash = %s AND revoked_at IS NULL LIMIT 1",
-			$token_hash
-		);
+       /**
+        * Find an active token by its hashed value.
+        *
+        * @param string $token_hash Hashed token value.
+        *
+        * @return array{member_id:int,token_hash:string,version:string,meta:array<string,mixed>}|null
+        */
+       public function find_active_by_hash( string $token_hash ): ?array {
+               $record = $this->find_by_hash( $token_hash );
 
-		if ( ! is_string( $sql ) ) {
-				return null;
-		}
+               if ( null === $record ) {
+                       return null;
+               }
 
-        /**
-         * Result row.
-         *
-         * @var array{member_id:int|string,token_hash:string,version?:string,meta?:string}|null $row
-         */
-		$row = $this->wpdb->get_row( $sql, ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Prepared above.
-		if ( ! is_array( $row ) ) {
-			return null;
-		}
+               if ( null !== $record['revoked_at'] ) {
+                       return null;
+               }
 
-		return array(
-			'member_id'  => (int) $row['member_id'],
-			'token_hash' => (string) $row['token_hash'],
-			'version'    => (string) ( $row['version'] ?? 'v1' ),
-			'meta'       => $this->decode_meta( $row['meta'] ?? '' ),
-		);
-	}
+               unset( $record['revoked_at'] );
+
+               return $record;
+       }
+
+       /**
+        * Find a token by its hashed value regardless of revocation state.
+        *
+        * @param string $token_hash Hashed token value.
+        *
+        * @return array{member_id:int,token_hash:string,version:string,revoked_at:?string,meta:array<string,mixed>}|null
+        */
+       public function find_by_hash( string $token_hash ): ?array {
+               $sql = $this->wpdb->prepare(
+                       // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is trusted.
+                       "SELECT member_id, token_hash, version, revoked_at, meta FROM `{$this->table}` WHERE token_hash = %s LIMIT 1",
+                       $token_hash
+               );
+
+               if ( ! is_string( $sql ) ) {
+                       return null;
+               }
+
+               /**
+                * Result row.
+                *
+                * @var array{member_id:int|string,token_hash:string,version?:string,revoked_at?:string|null,meta?:string}|null $row
+                */
+               $row = $this->wpdb->get_row( $sql, ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Prepared above.
+               if ( ! is_array( $row ) ) {
+                       return null;
+               }
+
+               $revoked_at = null;
+
+               if ( isset( $row['revoked_at'] ) ) {
+                       $candidate = trim( (string) $row['revoked_at'] );
+
+                       if ( '' !== $candidate ) {
+                               $revoked_at = $candidate;
+                       }
+               }
+
+               return array(
+                       'member_id'  => (int) $row['member_id'],
+                       'token_hash' => (string) $row['token_hash'],
+                       'version'    => (string) ( $row['version'] ?? 'v1' ),
+                       'revoked_at' => $revoked_at,
+                       'meta'       => $this->decode_meta( $row['meta'] ?? '' ),
+               );
+       }
 
 		/**
 		 * Mark all tokens for a member as revoked.

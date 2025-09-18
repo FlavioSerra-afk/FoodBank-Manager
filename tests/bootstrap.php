@@ -205,17 +205,30 @@ if ( ! class_exists( 'wpdb', false ) ) {
                         $args = $this->last_prepare['args'];
 
                         if ( str_contains( $sql, 'token_hash = %s' ) && str_contains( $sql, 'fbm_tokens' ) ) {
-                                $hash = (string) ( $args[0] ?? '' );
+                                $hash            = (string) ( $args[0] ?? '' );
+                                $include_revoked = str_contains( $sql, 'revoked_at' );
 
                                 foreach ( $this->tokens as $record ) {
-                                        if ( $record['token_hash'] === $hash && null === $record['revoked_at'] ) {
-                                                return array(
-                                                        'member_id'  => $record['member_id'],
-                                                        'token_hash' => $record['token_hash'],
-                                                        'version'    => $record['version'] ?? 'v1',
-                                                        'meta'       => $record['meta'] ?? '{}',
-                                                );
+                                        if ( $record['token_hash'] !== $hash ) {
+                                                continue;
                                         }
+
+                                        if ( ! $include_revoked && null !== $record['revoked_at'] ) {
+                                                continue;
+                                        }
+
+                                        $result = array(
+                                                'member_id'  => $record['member_id'],
+                                                'token_hash' => $record['token_hash'],
+                                                'version'    => $record['version'] ?? 'v1',
+                                                'meta'       => $record['meta'] ?? '{}',
+                                        );
+
+                                        if ( $include_revoked ) {
+                                                $result['revoked_at'] = $record['revoked_at'];
+                                        }
+
+                                        return $result;
                                 }
 
                                 return null;
