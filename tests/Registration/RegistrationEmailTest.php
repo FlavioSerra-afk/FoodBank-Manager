@@ -186,9 +186,9 @@ final class RegistrationEmailTest extends TestCase {
         }
 
         /**
-         * Resending credentials should mint a fresh token and invalidate the prior one.
+         * Resending credentials should reuse the active token payload without rotation.
          */
-        public function test_resend_regenerates_tokens(): void {
+        public function test_resend_reuses_existing_token(): void {
                 list( $registration, $tokens ) = $this->createServices();
 
                 $outcome        = $registration->register( 'Bob', 'C', 'bob@example.com', 2 );
@@ -196,6 +196,9 @@ final class RegistrationEmailTest extends TestCase {
                 $original_token = $outcome['token'];
 
                 $this->assertSame( $member_id, $tokens->verify( $original_token ) );
+
+                global $wpdb;
+                $original_hash = $wpdb->tokens[ $member_id ]['token_hash'] ?? '';
 
                 SpyWelcomeMailer::reset();
 
@@ -205,13 +208,15 @@ final class RegistrationEmailTest extends TestCase {
 
                 $this->assertTrue( $result['status'] );
                 $this->assertSame( 'resent', $result['notice'] );
+                $this->assertArrayHasKey( 'token_hash', $result );
 
                 $this->assertCount( 1, SpyWelcomeMailer::$sent );
                 $resent_token = SpyWelcomeMailer::$sent[0]['token'];
 
-                $this->assertNotSame( $original_token, $resent_token );
-                $this->assertNull( $tokens->verify( $original_token ) );
-                $this->assertSame( $member_id, $tokens->verify( $resent_token ) );
+                $this->assertSame( $original_token, $resent_token );
+                $this->assertSame( $member_id, $tokens->verify( $original_token ) );
+                $this->assertSame( $original_hash, $wpdb->tokens[ $member_id ]['token_hash'] ?? '' );
+                $this->assertSame( $original_hash, $result['token_hash'] );
         }
 
         /**

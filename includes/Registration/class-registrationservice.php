@@ -220,41 +220,63 @@ final class RegistrationService {
 	 * @param int      $member_id Member identifier.
 	 * @param int|null $issued_by Acting user identifier.
 	 *
-	 * @return array{member_id:int,member_reference:string,first_name:string,email:string,status:string,token:string,issued_at:string,meta:array<string,mixed>}|null
+         * @return array{member_id:int,member_reference:string,first_name:string,email:string,status:string,token:string,token_hash:string,issued_at:string,meta:array<string,mixed>}|null
 	 */
-	public function approve( int $member_id, ?int $issued_by = null ): ?array {
-		$member = $this->repository->find( $member_id );
-		if ( null === $member ) {
-			return null;
-		}
+        public function approve( int $member_id, ?int $issued_by = null ): ?array {
+                $member = $this->repository->find( $member_id );
+                if ( null === $member ) {
+                        return null;
+                }
 
-		if ( MembersRepository::STATUS_ACTIVE !== $member['status'] ) {
-			if ( ! $this->repository->mark_active( $member_id ) ) {
-				return null;
-			}
+                $existing_token = $this->tokens->find_active_for_member( $member_id );
 
-			$member['status'] = MembersRepository::STATUS_ACTIVE;
-		}
+                if ( MembersRepository::STATUS_ACTIVE !== $member['status'] ) {
+                        if ( ! $this->repository->mark_active( $member_id ) ) {
+                                return null;
+                        }
 
-		$issuance = $this->issue_member_token( $member_id, 'approval', $issued_by );
-		if ( null === $issuance ) {
-			return null;
-		}
+                        $member['status'] = MembersRepository::STATUS_ACTIVE;
+                }
 
-		$last_initial = (string) ( $member['last_initial'] ?? '' );
-		$this->ensure_foodbank_member_user( $member['email'], $member['first_name'], $last_initial );
+                $issuance = null;
 
-		return array(
-			'member_id'        => $member['id'],
-			'member_reference' => $member['member_reference'],
-			'first_name'       => $member['first_name'],
-			'email'            => $member['email'],
-			'status'           => MembersRepository::STATUS_ACTIVE,
-			'token'            => $issuance['token'],
-			'issued_at'        => $issuance['issued_at'],
-			'meta'             => $issuance['meta'],
-		);
-	}
+                if ( null !== $existing_token ) {
+                        $payload = isset( $existing_token['meta']['payload'] )
+                                ? (string) $existing_token['meta']['payload']
+                                : '';
+
+                        if ( '' !== $payload ) {
+                                $issuance = array(
+                                        'token'      => $payload,
+                                        'token_hash' => $existing_token['token_hash'],
+                                        'issued_at'  => $existing_token['issued_at'],
+                                        'meta'       => $existing_token['meta'],
+                                );
+                        }
+                }
+
+                if ( null === $issuance ) {
+                        $issuance = $this->issue_member_token( $member_id, 'approval', $issued_by );
+                        if ( null === $issuance ) {
+                                return null;
+                        }
+                }
+
+                $last_initial = (string) ( $member['last_initial'] ?? '' );
+                $this->ensure_foodbank_member_user( $member['email'], $member['first_name'], $last_initial );
+
+                return array(
+                        'member_id'        => $member['id'],
+                        'member_reference' => $member['member_reference'],
+                        'first_name'       => $member['first_name'],
+                        'email'            => $member['email'],
+                        'status'           => MembersRepository::STATUS_ACTIVE,
+                        'token'            => $issuance['token'],
+                        'token_hash'       => $issuance['token_hash'],
+                        'issued_at'        => $issuance['issued_at'],
+                        'meta'             => $issuance['meta'],
+                );
+        }
 
 	/**
 	 * Regenerate a member token without changing status.
@@ -263,7 +285,7 @@ final class RegistrationService {
 	 * @param string   $context   Issuance context descriptor.
 	 * @param int|null $issued_by Acting user identifier.
 	 *
-	 * @return array{member_id:int,member_reference:string,first_name:string,email:string,status:string,token:string,issued_at:string,meta:array<string,mixed>}|null
+         * @return array{member_id:int,member_reference:string,first_name:string,email:string,status:string,token:string,token_hash:string,issued_at:string,meta:array<string,mixed>}|null
 	 */
 	public function regenerate( int $member_id, string $context = 'regenerate', ?int $issued_by = null ): ?array {
 		$member = $this->repository->find( $member_id );
@@ -276,17 +298,18 @@ final class RegistrationService {
 			return null;
 		}
 
-		return array(
-			'member_id'        => $member['id'],
-			'member_reference' => $member['member_reference'],
-			'first_name'       => $member['first_name'],
-			'email'            => $member['email'],
-			'status'           => $member['status'],
-			'token'            => $issuance['token'],
-			'issued_at'        => $issuance['issued_at'],
-			'meta'             => $issuance['meta'],
-		);
-	}
+                return array(
+                        'member_id'        => $member['id'],
+                        'member_reference' => $member['member_reference'],
+                        'first_name'       => $member['first_name'],
+                        'email'            => $member['email'],
+                        'status'           => $member['status'],
+                        'token'            => $issuance['token'],
+                        'token_hash'       => $issuance['token_hash'],
+                        'issued_at'        => $issuance['issued_at'],
+                        'meta'             => $issuance['meta'],
+                );
+        }
 
 	/**
 	 * Generate a unique member reference token.
@@ -328,7 +351,7 @@ final class RegistrationService {
 	 * @param string   $context   Issuance context descriptor.
 	 * @param int|null $issued_by Acting user identifier.
 	 *
-	 * @return array{token:string,issued_at:string,meta:array<string,mixed>}|null
+         * @return array{token:string,token_hash:string,issued_at:string,meta:array<string,mixed>}|null
 	 */
 	private function issue_member_token( int $member_id, string $context, ?int $issued_by = null ): ?array {
 		$meta = array(
@@ -339,12 +362,12 @@ final class RegistrationService {
 			$meta['issued_by'] = (int) $issued_by;
 		}
 
-		try {
-			return $this->tokens->issue_with_details( $member_id, $meta );
-		} catch ( RuntimeException $exception ) {
-			unset( $exception );
+                try {
+                        return $this->tokens->issue_with_details( $member_id, $meta );
+                } catch ( RuntimeException $exception ) {
+                        unset( $exception );
 
-			return null;
-		}
-	}
+                        return null;
+                }
+        }
 }

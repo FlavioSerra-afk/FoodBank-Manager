@@ -91,19 +91,19 @@ final class MembersPageTest extends TestCase {
                 parent::tearDown();
         }
 
-		/**
-		 * Resend action should mint a fresh token and dispatch a welcome email.
-		 */
-	public function test_process_resend_regenerates_token_and_sends_email(): void {
-			$registration = $this->registration->register( 'Robin', 'M', 'robin@example.com', 3 );
+                /**
+                 * Resend action should reuse the active token and dispatch a welcome email.
+                 */
+        public function test_process_resend_reuses_active_token_and_sends_email(): void {
+                        $registration = $this->registration->register( 'Robin', 'M', 'robin@example.com', 3 );
 
-			$this->assertIsArray( $registration );
+                        $this->assertIsArray( $registration );
 
-			$member_id      = $registration['member_id'];
-			$original_token = $registration['token'];
+                        $member_id      = $registration['member_id'];
+                        $original_token = $registration['token'];
 
-			global $wpdb;
-			$original_hash = $wpdb->tokens[ $member_id ]['token_hash'] ?? '';
+                        global $wpdb;
+                        $original_hash = $wpdb->tokens[ $member_id ]['token_hash'] ?? '';
 
 			MembersPageMailerStub::reset();
 
@@ -112,17 +112,18 @@ final class MembersPageTest extends TestCase {
 			$this->assertTrue( $outcome['status'] );
 			$this->assertSame( 'resent', $outcome['notice'] );
 
-			$this->assertCount( 1, MembersPageMailerStub::$sent );
+                        $this->assertCount( 1, MembersPageMailerStub::$sent );
 
-			$resent = MembersPageMailerStub::$sent[0];
-			$this->assertSame( 'robin@example.com', $resent['email'] );
-			$this->assertSame( 'Robin', $resent['first_name'] );
+                        $resent = MembersPageMailerStub::$sent[0];
+                        $this->assertSame( 'robin@example.com', $resent['email'] );
+                        $this->assertSame( 'Robin', $resent['first_name'] );
 
-			$this->assertNotSame( $original_token, $resent['token'] );
-			$this->assertNotSame( $original_hash, $wpdb->tokens[ $member_id ]['token_hash'] );
+                        $this->assertSame( $original_token, $resent['token'] );
+                        $this->assertSame( $original_hash, $wpdb->tokens[ $member_id ]['token_hash'] );
 
-			$this->assertNull( $this->tokens->verify( $original_token ) );
-			$this->assertSame( $member_id, $this->tokens->verify( $resent['token'] ) );
+                        $this->assertSame( $member_id, $this->tokens->verify( $original_token ) );
+                        $this->assertSame( $member_id, $this->tokens->verify( $resent['token'] ) );
+                        $this->assertSame( $original_hash, $outcome['token_hash'] ?? '' );
 	}
 
 		/**
@@ -143,9 +144,10 @@ final class MembersPageTest extends TestCase {
 
 			$this->assertTrue( $outcome['status'] );
 			$this->assertSame( 'regenerated', $outcome['notice'] );
-			$this->assertCount( 0, MembersPageMailerStub::$sent );
-			$this->assertNotSame( $original_hash, $wpdb->tokens[ $member_id ]['token_hash'] );
-			$this->assertNull( $this->tokens->verify( $original_token ) );
+                        $this->assertCount( 0, MembersPageMailerStub::$sent );
+                        $this->assertNotSame( $original_hash, $wpdb->tokens[ $member_id ]['token_hash'] );
+                        $this->assertNull( $this->tokens->verify( $original_token ) );
+                        $this->assertArrayHasKey( 'token_hash', $outcome );
 	}
 
 		                /**
@@ -163,6 +165,7 @@ final class MembersPageTest extends TestCase {
 
                 $this->assertTrue( $outcome['status'] );
                 $this->assertSame( 'approved', $outcome['notice'] );
+                global $wpdb;
                 $this->assertSame( 'active', $wpdb->members[ $member_id ]['status'] );
 
                 $this->assertCount( 1, MembersPageMailerStub::$sent );
@@ -172,6 +175,7 @@ final class MembersPageTest extends TestCase {
                 $this->assertSame( 'Taylor', $approval['first_name'] );
                 $this->assertSame( $reference, $approval['member_reference'] );
                 $this->assertSame( $member_id, $this->tokens->verify( $approval['token'] ) );
+                $this->assertArrayHasKey( 'token_hash', $outcome );
         }
 
                                 /**
@@ -211,19 +215,19 @@ final class MembersPageTest extends TestCase {
         }
 
 
-		/**
-		 * Invoke a private MembersPage action helper.
-		 *
-		 * @param string $method     Action handler name.
-		 * @param int    $member_id  Target member identifier.
-		 *
-		 * @return array{notice:string,status:bool,member_reference?:string,error?:string}
-		 */
-	private function invokeAction( string $method, int $member_id ): array {
+        /**
+         * Invoke a private MembersPage action helper.
+         *
+         * @param string $method     Action handler name.
+         * @param int    $member_id  Target member identifier.
+         *
+         * @return array{notice:string,status:bool,member_reference?:string,error?:string,token_hash?:string}
+         */
+        private function invokeAction( string $method, int $member_id ): array {
 			$reflection = new ReflectionMethod( MembersPage::class, $method );
 			$reflection->setAccessible( true );
 
-			/** @var array{notice:string,status:bool,member_reference?:string,error?:string} */
-			return $reflection->invoke( null, $member_id );
-	}
+                        /** @var array{notice:string,status:bool,member_reference?:string,error?:string,token_hash?:string} */
+                        return $reflection->invoke( null, $member_id );
+        }
 }
