@@ -1,14 +1,9 @@
 # Changelog
 
-## [Unreleased]
-
-### Added
-- Diagnostics mail failure log with redacted entries and rate-limited resend controls.
-- Packaging manifest generation plus release scripts for changelog preparation.
-- PHPUnit coverage for packaging integrity and version drift detection.
+## [1.0.0] - 2025-09-18
 
 ### Changed
-- Packaging guard now enforces version alignment across plugin metadata before building releases.
+- Version alignment; no functional changes.
 
 ## [2.2.26-rc.1] - 2025-09-22
 

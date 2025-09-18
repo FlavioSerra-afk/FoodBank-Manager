@@ -2,7 +2,7 @@
 > This is 1 of 4 canonical docs (Specs, Plan, Tasks, Matrix).
 > Codex MUST read & update these BEFORE any work, every prompt.
 > Any other files in /Docs are historical and must not drive scope.
-> Docs-Revision: 2025-09-22 (2.2.26-rc.1 S1/S2 sync)
+> Docs-Revision: 2025-09-22 (v1.0.0 alignment)
 
 # Plan
 
