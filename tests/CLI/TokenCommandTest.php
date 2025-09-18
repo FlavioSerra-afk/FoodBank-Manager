@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignoreFile
 /**
  * @package FoodBankManager\Tests
  */
@@ -7,7 +7,7 @@ declare(strict_types=1);
 
 namespace FBM\Tests\CLI;
 
-use FoodBankManager\CLI\TokenCommand;
+use FBM\CLI\TokenCommand;
 use FoodBankManager\Diagnostics\TokenProbeService;
 use FoodBankManager\Token\Token;
 use FoodBankManager\Token\TokenRepository;
@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use function json_decode;
 
 /**
- * @covers \FoodBankManager\CLI\TokenCommand
+ * @covers \FBM\CLI\TokenCommand
  */
 final class TokenCommandTest extends TestCase {
         protected function setUp(): void {
@@ -56,7 +56,7 @@ final class TokenCommandTest extends TestCase {
 
                 $this->assertSame(
                         array(
-                                'version'    => 'v1',
+                                'version'    => '1',
                                 'hmac_match' => true,
                                 'revoked'    => false,
                         ),

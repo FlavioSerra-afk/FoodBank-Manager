@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace FoodBankManager\Core;
 
+use FBM\CLI\TokenCommand;
 use FoodBankManager\Admin\DiagnosticsPage;
 use FoodBankManager\Admin\MembersPage;
 use FoodBankManager\Admin\ReportsPage;
@@ -16,7 +17,6 @@ use FoodBankManager\Admin\SchedulePage;
 use FoodBankManager\Admin\SettingsPage;
 use FoodBankManager\Admin\ThemePage;
 use FoodBankManager\Auth\Capabilities;
-use FoodBankManager\CLI\Commands;
 use FoodBankManager\Rest\CheckinController;
 use FoodBankManager\Shortcodes\RegistrationForm;
 use FoodBankManager\Shortcodes\StaffDashboard;
@@ -52,8 +52,8 @@ final class Plugin {
 
                 add_action( 'rest_api_init', array( CheckinController::class, 'register_routes' ) );
 
-                if ( defined( 'WP_CLI' ) && WP_CLI ) {
-                        Commands::register();
+                if ( defined( 'WP_CLI' ) && WP_CLI && class_exists( '\\WP_CLI' ) ) {
+                        self::register_cli_commands();
                 }
 
                 do_action( 'fbm_booted' );
@@ -101,7 +101,21 @@ final class Plugin {
 	/**
 	 * Perform deactivation cleanup.
 	 */
-	public static function deactivate(): void {
-		do_action( 'fbm_deactivated' );
-	}
+        public static function deactivate(): void {
+                do_action( 'fbm_deactivated' );
+        }
+
+        /**
+         * Register WP-CLI commands under the fbm namespace.
+         */
+        public static function register_cli_commands(): void {
+                \WP_CLI::add_command(
+                        'fbm version',
+                        static function (): void {
+                                \WP_CLI::log( self::VERSION );
+                        }
+                );
+
+                \WP_CLI::add_command( 'fbm token', TokenCommand::class );
+        }
 }

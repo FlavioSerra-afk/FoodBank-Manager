@@ -81,6 +81,6 @@ final class TokenProbeService {
 
                 $segment = (string) $matches[1];
 
-                return 'v' . $segment;
+                return $segment;
         }
 }

@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignoreFile
 /**
  * Diagnostics admin page tests.
  *
@@ -36,7 +36,7 @@ parent::setUp();
 
 $GLOBALS['fbm_options']       = array();
 $GLOBALS['fbm_last_redirect'] = null;
-$GLOBALS['fbm_current_caps']['fbm_diagnostics'] = false;
+$GLOBALS['fbm_current_caps']['fbm_manage'] = false;
 $GLOBALS['fbm_test_salts'] = array(
 'fbm-token-sign'  => 'secure-signing-key',
 'fbm-token-store' => 'secure-storage-key',
@@ -45,6 +45,7 @@ $GLOBALS['fbm_test_salts'] = array(
 $_GET     = array();
 $_POST    = array();
 $_REQUEST = array();
+$_SERVER['REQUEST_METHOD'] = 'GET';
 
 update_option( 'fbm_mail_failures', array() );
 }
@@ -53,9 +54,10 @@ protected function tearDown(): void {
 $_GET     = array();
 $_POST    = array();
 $_REQUEST = array();
+unset( $_SERVER['REQUEST_METHOD'] );
 
 $GLOBALS['fbm_last_redirect'] = null;
-$GLOBALS['fbm_current_caps']['fbm_diagnostics'] = false;
+$GLOBALS['fbm_current_caps']['fbm_manage'] = false;
 $GLOBALS['fbm_test_salts']    = array();
 
 parent::tearDown();
@@ -65,7 +67,7 @@ parent::tearDown();
  * Diagnostics page should surface healthy badges when configuration is complete.
  */
 public function test_render_displays_healthy_badges(): void {
-$GLOBALS['fbm_current_caps']['fbm_diagnostics'] = true;
+$GLOBALS['fbm_current_caps']['fbm_manage'] = true;
 
 update_option(
 'fbm_settings',
@@ -93,7 +95,7 @@ $this->assertStringContainsString( 'Custom salts are configured for token signin
  * Missing credentials or salts should downgrade the status badges.
  */
 public function test_render_shows_degraded_badges(): void {
-$GLOBALS['fbm_current_caps']['fbm_diagnostics'] = true;
+$GLOBALS['fbm_current_caps']['fbm_manage'] = true;
 
 $GLOBALS['fbm_test_salts'] = array(
 'fbm-token-sign'  => 'put your unique phrase here',
@@ -135,7 +137,7 @@ DiagnosticsPage::render();
  * Resend actions must validate the nonce before processing.
  */
 public function test_handle_actions_rejects_invalid_nonce(): void {
-$GLOBALS['fbm_current_caps']['fbm_diagnostics'] = true;
+$GLOBALS['fbm_current_caps']['fbm_manage'] = true;
 
 $_GET = array(
 'page'             => 'fbm-diagnostics',

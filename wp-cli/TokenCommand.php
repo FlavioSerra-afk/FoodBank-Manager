@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace FoodBankManager\CLI;
+namespace FBM\CLI;
 
 use FoodBankManager\Diagnostics\TokenProbeService;
 use FoodBankManager\Token\Token;
@@ -15,6 +15,7 @@ use FoodBankManager\Token\TokenRepository;
 use RuntimeException;
 use wpdb;
 
+use function array_key_exists;
 use function count;
 use function json_encode;
 use function trim;
@@ -69,7 +70,7 @@ final class TokenCommand {
                         \WP_CLI::error( 'The token payload cannot be empty.' );
                 }
 
-                $result  = $this->service->probe( $payload );
+                $result  = $this->sanitize_result( $this->service->probe( $payload ) );
                 $encoded = json_encode( $result );
 
                 if ( false === $encoded ) {
@@ -93,5 +94,25 @@ final class TokenCommand {
                 $token      = new Token( $repository );
 
                 return new TokenProbeService( $token );
+        }
+
+        /**
+         * Restrict probe results to redacted diagnostics fields.
+         *
+         * @param array<string,mixed> $result Raw probe result.
+         * @return array{version:?string,hmac_match:bool,revoked:bool}
+         */
+        private function sanitize_result( array $result ): array {
+                $version = null;
+
+                if ( array_key_exists( 'version', $result ) && null !== $result['version'] ) {
+                        $version = (string) $result['version'];
+                }
+
+                return array(
+                        'version'    => $version,
+                        'hmac_match' => (bool) ( $result['hmac_match'] ?? false ),
+                        'revoked'    => (bool) ( $result['revoked'] ?? false ),
+                );
         }
 }

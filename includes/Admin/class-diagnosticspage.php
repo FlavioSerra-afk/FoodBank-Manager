@@ -28,6 +28,7 @@ use function check_admin_referer;
 use function current_user_can;
 use function esc_html__;
 use function filter_input;
+use function array_key_exists;
 use function array_slice;
 use function gmdate;
 use function is_array;
@@ -37,6 +38,7 @@ use function sanitize_key;
 use function sanitize_textarea_field;
 use function sanitize_text_field;
 use function sprintf;
+use function strtoupper;
 use function str_repeat;
 use function strlen;
 use function substr;
@@ -81,7 +83,7 @@ final class DiagnosticsPage {
 			add_menu_page(
 				__( 'Food Bank Diagnostics', 'foodbank-manager' ),
 				__( 'Food Bank Diagnostics', 'foodbank-manager' ),
-				'fbm_diagnostics', // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability registered during activation.
+                                'fbm_manage', // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability registered during activation.
 				self::MENU_SLUG,
 				array( __CLASS__, 'render' ),
 				'dashicons-shield-alt'
@@ -92,7 +94,7 @@ final class DiagnosticsPage {
 		 * Render the diagnostics dashboard.
 		 */
 	public static function render(): void {
-		if ( ! current_user_can( 'fbm_diagnostics' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
+                if ( ! current_user_can( 'fbm_manage' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
 				wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ) );
 		}
 
@@ -161,7 +163,7 @@ final class DiagnosticsPage {
 		 * Handle resend attempts triggered from the diagnostics view.
 		 */
 	public static function handle_actions(): void {
-		if ( ! current_user_can( 'fbm_diagnostics' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
+                if ( ! current_user_can( 'fbm_manage' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
 				return;
 		}
 
@@ -282,9 +284,9 @@ final class DiagnosticsPage {
          * @return array{payload:string,submitted:bool,result:?array{version:?string,hmac_match:bool,revoked:bool},error:?string}
          */
         private static function prepare_token_probe(): array {
-                $nonce = self::read_post_field( self::TOKEN_PROBE_NONCE );
+                $method = isset( $_SERVER['REQUEST_METHOD'] ) ? strtoupper( (string) $_SERVER['REQUEST_METHOD'] ) : 'GET';
 
-                if ( '' === $nonce ) {
+                if ( 'POST' !== $method ) {
                         return array(
                                 'payload'   => '',
                                 'submitted' => false,
@@ -293,9 +295,11 @@ final class DiagnosticsPage {
                         );
                 }
 
-                $payload = self::read_post_field( self::TOKEN_PROBE_FIELD );
+                $payload   = self::read_post_field( self::TOKEN_PROBE_FIELD );
+                $nonce_raw = filter_input( INPUT_POST, self::TOKEN_PROBE_NONCE, FILTER_UNSAFE_RAW );
+                $nonce     = is_string( $nonce_raw ) ? (string) wp_unslash( $nonce_raw ) : '';
 
-                if ( ! wp_verify_nonce( $nonce, self::TOKEN_PROBE_ACTION ) ) {
+                if ( '' === $nonce || ! wp_verify_nonce( $nonce, self::TOKEN_PROBE_ACTION ) ) {
                         return array(
                                 'payload'   => $payload,
                                 'submitted' => true,
@@ -318,8 +322,28 @@ final class DiagnosticsPage {
                 return array(
                         'payload'   => $payload,
                         'submitted' => true,
-                        'result'    => $service->probe( $payload ),
+                        'result'    => self::filter_token_probe_result( $service->probe( $payload ) ),
                         'error'     => null,
+                );
+        }
+
+        /**
+         * Limit the token probe output to redacted fields.
+         *
+         * @param array<string,mixed> $result Raw probe result.
+         * @return array{version:?string,hmac_match:bool,revoked:bool}
+         */
+        private static function filter_token_probe_result( array $result ): array {
+                $version = null;
+
+                if ( array_key_exists( 'version', $result ) && null !== $result['version'] ) {
+                        $version = (string) $result['version'];
+                }
+
+                return array(
+                        'version'    => $version,
+                        'hmac_match' => (bool) ( $result['hmac_match'] ?? false ),
+                        'revoked'    => (bool) ( $result['revoked'] ?? false ),
                 );
         }
 
