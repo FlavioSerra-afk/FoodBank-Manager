@@ -3,7 +3,7 @@ Contributors: portuguese-community-centre-london
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.1
-Stable tag: 1.0.0
+Stable tag: 1.0.6
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -29,13 +29,14 @@ FBM capabilities are granted per site via activation (Administrators retain full
 * **Docs**: See [Docs/Specs.md](Docs/Specs.md), [Docs/Plan.md](Docs/Plan.md), [Docs/Tasks.md](Docs/Tasks.md), and [Docs/Matrix.md](Docs/Matrix.md) for policy, milestones, and governance notes.
 
 == CLI ==
-Need to confirm what version of FoodBank Manager is active? Run:
+Need to confirm what version of FoodBank Manager is active or probe a token payload? Run:
 
 ```
 wp fbm version
+wp fbm token probe 'FBM1:example...'
 ```
 
-This surfaces the plugin version constant so deployment automation can assert the expected build is installed.
+`wp fbm version` surfaces the plugin version constant so deployment automation can assert the expected build is installed. `wp fbm token probe` returns a redacted JSON payload describing the canonical version, HMAC validation, and revocation state without revealing the raw token.
 
 == Uninstall ==
 By default uninstall leaves FoodBank Manager database tables in place so the plugin can be reinstalled without data loss.

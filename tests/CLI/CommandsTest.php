@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace FBM\Tests\CLI;
 
 use FoodBankManager\CLI\Commands;
+use FoodBankManager\CLI\TokenCommand;
 use FoodBankManager\Core\Plugin;
 use PHPUnit\Framework\TestCase;
 
@@ -21,6 +22,7 @@ final class CommandsTest extends TestCase {
                 if ( class_exists( '\\WP_CLI', false ) ) {
                         \WP_CLI::$commands = array();
                         \WP_CLI::$logs      = array();
+                        \WP_CLI::$successes = array();
                 }
         }
 
@@ -50,5 +52,18 @@ final class CommandsTest extends TestCase {
                 $handler();
 
                 $this->assertSame( array( Plugin::VERSION ), \WP_CLI::$logs );
+        }
+
+        public function test_register_adds_token_command(): void {
+                if ( ! class_exists( '\\WP_CLI', false ) ) {
+                        require_once __DIR__ . '/stubs/wp-cli.php';
+                }
+
+                Commands::register();
+
+                $this->assertArrayHasKey( 'fbm token', \WP_CLI::$commands );
+
+                $handler = \WP_CLI::$commands['fbm token'];
+                $this->assertSame( TokenCommand::class, $handler );
         }
 }

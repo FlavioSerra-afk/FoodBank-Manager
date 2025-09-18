@@ -11,8 +11,10 @@ namespace FoodBankManager\Admin;
 
 use FoodBankManager\Diagnostics\HealthStatus;
 use FoodBankManager\Diagnostics\MailFailureLog;
+use FoodBankManager\Diagnostics\TokenProbeService;
 use FoodBankManager\Email\WelcomeMailer;
 use FoodBankManager\Registration\MembersRepository;
+use FoodBankManager\Token\Token;
 use FoodBankManager\Token\TokenRepository;
 use FoodBankManager\Token\TokenService;
 use RuntimeException;
@@ -26,19 +28,26 @@ use function check_admin_referer;
 use function current_user_can;
 use function esc_html__;
 use function filter_input;
+use function array_slice;
 use function gmdate;
 use function is_array;
 use function is_scalar;
 use function is_readable;
 use function sanitize_key;
+use function sanitize_textarea_field;
 use function sanitize_text_field;
 use function sprintf;
+use function str_repeat;
+use function strlen;
+use function substr;
 use function wp_die;
 use function wp_nonce_url;
 use function wp_safe_redirect;
 use function wp_unslash;
+use function wp_verify_nonce;
 use const FILTER_UNSAFE_RAW;
 use const INPUT_GET;
+use const INPUT_POST;
 
 /**
  * Presents diagnostic information including mail failures.
@@ -50,13 +59,17 @@ final class DiagnosticsPage {
 	private const ENTRY_PARAM   = 'fbm_diag_entry';
 	private const STATUS_PARAM  = 'fbm_diag_status';
 	private const CODE_PARAM    = 'fbm_diag_code';
-	private const MEMBER_PARAM  = 'fbm_diag_member';
-	private const ACTION_RESEND = 'resend';
+        private const MEMBER_PARAM          = 'fbm_diag_member';
+        private const ACTION_RESEND        = 'resend';
+        private const TOKEN_PROBE_FIELD     = 'fbm_token_probe_payload';
+        private const TOKEN_PROBE_NONCE     = 'fbm_token_probe_nonce';
+        private const TOKEN_PROBE_ACTION    = 'fbm_token_probe';
+        private const TOKEN_FAILURES_LIMIT  = 10;
 
-		/**
-		 * Register WordPress hooks.
-		 */
-	public static function register(): void {
+                /**
+                 * Register WordPress hooks.
+                 */
+        public static function register(): void {
 			add_action( 'admin_menu', array( __CLASS__, 'register_menu' ) );
 			add_action( 'admin_init', array( __CLASS__, 'handle_actions' ) );
 	}
@@ -91,10 +104,10 @@ final class DiagnosticsPage {
 		$health = new HealthStatus();
 		$badges = $health->badges();
 
-		foreach ( $raw as $entry ) {
-			if ( ! is_array( $entry ) ) {
-					continue;
-			}
+                foreach ( $raw as $entry ) {
+                        if ( ! is_array( $entry ) ) {
+                                        continue;
+                        }
 
 				$entry_id    = isset( $entry['id'] ) ? (string) $entry['id'] : '';
 				$recorded_at = isset( $entry['recorded_at'] ) ? (int) $entry['recorded_at'] : 0;
@@ -111,25 +124,38 @@ final class DiagnosticsPage {
 					'can_resend'       => '' !== $entry_id && $log->can_attempt( $entry ),
 					'resend_url'       => '' !== $entry_id ? self::build_action_url( $entry_id ) : '',
 					'blocked_until'    => is_int( $blocked ) && $blocked > 0 ? gmdate( 'Y-m-d H:i:s \U\T\C', $blocked ) : null,
-				);
-		}
+                                );
+                }
 
-			$template = FBM_PATH . self::TEMPLATE;
+                $token_probe   = self::prepare_token_probe();
+                $token_failures = self::collect_token_failures( $raw );
 
-		if ( ! is_readable( $template ) ) {
-				wp_die( esc_html__( 'Diagnostics template is missing.', 'foodbank-manager' ) );
-		}
+                        $template = FBM_PATH . self::TEMPLATE;
 
-						$data = array(
-							'entries'            => $entries,
-							'notices'            => $notices,
-							'rate_limit_seconds' => $rate,
-							'page_slug'          => self::MENU_SLUG,
-							'health_badges'      => $badges,
-						);
+                if ( ! is_readable( $template ) ) {
+                                wp_die( esc_html__( 'Diagnostics template is missing.', 'foodbank-manager' ) );
+                }
 
-						include $template;
-	}
+                                                $data = array(
+                                                        'entries'            => $entries,
+                                                        'notices'            => $notices,
+                                                        'rate_limit_seconds' => $rate,
+                                                        'page_slug'          => self::MENU_SLUG,
+                                                        'health_badges'      => $badges,
+                                                        'token_probe'        => array(
+                                                                'field'       => self::TOKEN_PROBE_FIELD,
+                                                                'nonce_field' => self::TOKEN_PROBE_NONCE,
+                                                                'nonce_action'=> self::TOKEN_PROBE_ACTION,
+                                                                'payload'     => $token_probe['payload'],
+                                                                'submitted'   => $token_probe['submitted'],
+                                                                'result'      => $token_probe['result'],
+                                                                'error'       => $token_probe['error'],
+                                                        ),
+                                                        'token_failures'     => $token_failures,
+                                                );
+
+                                                include $template;
+        }
 
 		/**
 		 * Handle resend attempts triggered from the diagnostics view.
@@ -179,7 +205,7 @@ final class DiagnosticsPage {
 		 *
 		 * @return array<int, array{type:string,message:string}>
 		 */
-	private static function collect_notices(): array {
+        private static function collect_notices(): array {
 			$notices = array();
 
 						$status_param = self::read_query_arg( self::STATUS_PARAM );
@@ -247,11 +273,109 @@ final class DiagnosticsPage {
 				break;
 		}
 
-			return $notices;
-	}
+                return $notices;
+        }
 
-		/**
-		 * Process the resend action for a specific failure entry.
+        /**
+         * Process token probe submissions.
+         *
+         * @return array{payload:string,submitted:bool,result:?array{version:?string,hmac_match:bool,revoked:bool},error:?string}
+         */
+        private static function prepare_token_probe(): array {
+                $nonce = self::read_post_field( self::TOKEN_PROBE_NONCE );
+
+                if ( '' === $nonce ) {
+                        return array(
+                                'payload'   => '',
+                                'submitted' => false,
+                                'result'    => null,
+                                'error'     => null,
+                        );
+                }
+
+                $payload = self::read_post_field( self::TOKEN_PROBE_FIELD );
+
+                if ( ! wp_verify_nonce( $nonce, self::TOKEN_PROBE_ACTION ) ) {
+                        return array(
+                                'payload'   => $payload,
+                                'submitted' => true,
+                                'result'    => null,
+                                'error'     => __( 'Security check failed. Please try again.', 'foodbank-manager' ),
+                        );
+                }
+
+                $service = self::build_token_probe_service();
+
+                if ( null === $service ) {
+                        return array(
+                                'payload'   => $payload,
+                                'submitted' => true,
+                                'result'    => null,
+                                'error'     => __( 'Token diagnostics are temporarily unavailable.', 'foodbank-manager' ),
+                        );
+                }
+
+                return array(
+                        'payload'   => $payload,
+                        'submitted' => true,
+                        'result'    => $service->probe( $payload ),
+                        'error'     => null,
+                );
+        }
+
+        /**
+         * Instantiate the token probe service when the database layer is available.
+         */
+        private static function build_token_probe_service(): ?TokenProbeService {
+                global $wpdb;
+
+                if ( ! $wpdb instanceof wpdb ) {
+                        return null;
+                }
+
+                $token = new Token( new TokenRepository( $wpdb ) );
+
+                return new TokenProbeService( $token );
+        }
+
+        /**
+         * Collect recent token resend failures for diagnostics display.
+         *
+         * @param array<int,mixed> $entries Raw mail failure entries.
+         *
+         * @return array<int,array<string,mixed>>
+         */
+        private static function collect_token_failures( array $entries ): array {
+                $failures = array();
+
+                foreach ( $entries as $entry ) {
+                        if ( ! is_array( $entry ) ) {
+                                continue;
+                        }
+
+                        if ( ! isset( $entry['error'] ) || MailFailureLog::ERROR_TOKEN !== (string) $entry['error'] ) {
+                                continue;
+                        }
+
+                        $recorded_at = isset( $entry['recorded_at'] ) ? (int) $entry['recorded_at'] : 0;
+
+                        $failures[] = array(
+                                'member_reference' => self::redact_member_reference( isset( $entry['member_reference'] ) ? (string) $entry['member_reference'] : '' ),
+                                'recorded_at'      => $recorded_at > 0 ? gmdate( 'Y-m-d H:i:s \U\T\C', $recorded_at ) : '',
+                                'context'          => self::context_label( isset( $entry['context'] ) ? (string) $entry['context'] : '' ),
+                                'attempts'         => isset( $entry['attempts'] ) ? (int) $entry['attempts'] : 0,
+                        );
+                }
+
+                if ( empty( $failures ) ) {
+                        return array();
+                }
+
+                return array_slice( $failures, 0, self::TOKEN_FAILURES_LIMIT );
+        }
+
+                /**
+                 * Process the resend action for a specific failure entry.
 		 *
 		 * @param string $entry_id Failure entry identifier.
 		 *
@@ -403,18 +527,53 @@ final class DiagnosticsPage {
 		 *
 		 * @param string $error Error key.
 		 */
-	private static function error_label( string $error ): string {
-		switch ( $error ) {
-			case MailFailureLog::ERROR_TOKEN:
-				return __( 'Token issuance failure', 'foodbank-manager' );
+        private static function error_label( string $error ): string {
+                switch ( $error ) {
+                        case MailFailureLog::ERROR_TOKEN:
+                                return __( 'Token issuance failure', 'foodbank-manager' );
 			case MailFailureLog::ERROR_MEMBER:
 				return __( 'Missing member record', 'foodbank-manager' );
 			case MailFailureLog::ERROR_MAIL:
 				return __( 'Mail transport failure', 'foodbank-manager' );
 			default:
-				return __( 'Unknown error', 'foodbank-manager' );
-		}
-	}
+                                return __( 'Unknown error', 'foodbank-manager' );
+                }
+        }
+
+        /**
+         * Retrieve a POSTed field with sanitization.
+         */
+        private static function read_post_field( string $field ): string {
+                $value = filter_input( INPUT_POST, $field, FILTER_UNSAFE_RAW );
+
+                if ( null === $value ) {
+                        return '';
+                }
+
+                return sanitize_textarea_field( wp_unslash( (string) $value ) );
+        }
+
+        /**
+         * Redact a member reference to avoid exposing identifiers.
+         */
+        private static function redact_member_reference( string $reference ): string {
+                $reference = trim( $reference );
+
+                if ( '' === $reference ) {
+                        return '';
+                }
+
+                $length = strlen( $reference );
+
+                if ( $length <= 4 ) {
+                        return str_repeat( '•', $length );
+                }
+
+                $prefix = substr( $reference, 0, 2 );
+                $suffix = substr( $reference, -2 );
+
+                return $prefix . '…' . $suffix;
+        }
 	/**
 	 * Retrieve a query argument with CLI-compatible fallback.
 	 *

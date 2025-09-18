@@ -1,7 +1,7 @@
 Docs-Revision: 2025-09-22 (v1.0.0 alignment)
 # FoodBank Manager Plugin
 
-Stable tag: 1.0.0
+Stable tag: 1.0.6
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.1
@@ -51,13 +51,14 @@ Rate-limited responses include `RateLimit-Limit`, `RateLimit-Remaining`, and `Ra
 
 ## CLI
 
-FoodBank Manager exposes a lightweight WP-CLI command to surface the currently installed version:
+FoodBank Manager exposes lightweight WP-CLI commands for deployments and diagnostics:
 
 ```bash
 wp fbm version
+wp fbm token probe 'FBM1:example...'
 ```
 
-The command returns the `FoodBankManager\Core\Plugin::VERSION` string so automation can confirm deployed builds.
+The version command returns the `FoodBankManager\Core\Plugin::VERSION` string so automation can confirm deployed builds. The token probe command returns a redacted JSON payload describing the canonical token version, HMAC validation result, and revocation status without exposing PII.
 
 ## Manual release steps
 
