@@ -53,6 +53,7 @@
         "phpcs:repo": "php -d memory_limit=1024M vendor/bin/phpcs --standard=phpcs.xml --report=summary --report=source --report=json --report-file=build/phpcs-repo.json . --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit 1",
         "phpcbf": "vendor/bin/phpcbf --standard=phpcs.xml",
         "phpcbf:changed": "bash bin/phpcbf-changed.sh",
+        "phpcs:changed": "bash bin/phpcs-changed.sh",
         "phpstan": "phpstan analyse -c phpstan.neon --no-progress --memory-limit=1G",
         "phpstan:fast": "phpstan analyse -c phpstan.neon --no-progress --level=5 --memory-limit=1G",
         "phpstan:debug": "phpstan analyse -c phpstan.neon --debug --no-progress --memory-limit=1G",

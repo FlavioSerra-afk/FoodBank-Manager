@@ -34,6 +34,7 @@ use function sanitize_textarea_field;
 use function strtolower;
 use function trim;
 use function wp_verify_nonce;
+use function wp_unslash;
 
 /**
  * REST routes for the staff dashboard.
@@ -150,10 +151,10 @@ final class CheckinController {
 			return new WP_Error( 'fbm_invalid_reference', __( 'A token or manual code is required.', 'foodbank-manager' ), array( 'status' => 400 ) );
 		}
 
-                $attendance_repository = new AttendanceRepository( $wpdb );
-                $members_repository    = new MembersRepository( $wpdb );
-                $schedule              = new Schedule();
-                $service               = new CheckinService( $attendance_repository, $schedule );
+				$attendance_repository = new AttendanceRepository( $wpdb );
+				$members_repository    = new MembersRepository( $wpdb );
+				$schedule              = new Schedule();
+				$service               = new CheckinService( $attendance_repository, $schedule );
 
 		$member_reference = null;
 
@@ -193,105 +194,105 @@ final class CheckinController {
 
 		$override_note = '' !== $override_note ? $override_note : null;
 
-        $fingerprint = self::extract_fingerprint( $request );
+		$fingerprint = self::extract_fingerprint( $request );
 
-        $result = $service->record( $member_reference, $method, get_current_user_id(), $note, $override, $override_note, $fingerprint );
+		$result = $service->record( $member_reference, $method, get_current_user_id(), $note, $override, $override_note, $fingerprint );
 
-        $window      = $schedule->current_window();
-        $window_data = $window;
+		$window      = $schedule->current_window();
+		$window_data = $window;
 
-        if ( isset( $result['window'] ) ) {
-                $provided = $result['window'];
+		if ( isset( $result['window'] ) ) {
+				$provided = $result['window'];
 
-                $window_data = array(
-                        'day'      => (string) $provided['day'],
-                        'start'    => (string) $provided['start'],
-                        'end'      => (string) $provided['end'],
-                        'timezone' => (string) $provided['timezone'],
-                );
-        }
+				$window_data = array(
+					'day'      => (string) $provided['day'],
+					'start'    => (string) $provided['start'],
+					'end'      => (string) $provided['end'],
+					'timezone' => (string) $provided['timezone'],
+				);
+		}
 
-        $window_labels = Schedule::window_labels( $window_data );
+		$window_labels = Schedule::window_labels( $window_data );
 
-        $result['window']        = $window_data;
-        $result['window_notice'] = $window_labels['notice'];
-        $result['window_labels'] = $window_labels;
+		$result['window']        = $window_data;
+		$result['window_notice'] = $window_labels['notice'];
+		$result['window_labels'] = $window_labels;
 
-        $status = (string) $result['status'];
+		$status = (string) $result['status'];
 
-        switch ( $status ) {
-                case CheckinService::STATUS_OUT_OF_WINDOW:
-                                break;
-                        case CheckinService::STATUS_DUPLICATE_DAY:
-                                if ( ! isset( $result['duplicate'] ) ) {
-                                        $result['duplicate'] = true;
-                                }
-                                break;
-                        case CheckinService::STATUS_RECENT_WARNING:
-                                if ( ! isset( $result['requires_override'] ) ) {
-                                        $result['requires_override'] = true;
-                                }
-                                break;
-                }
+		switch ( $status ) {
+			case CheckinService::STATUS_OUT_OF_WINDOW:
+				break;
+			case CheckinService::STATUS_DUPLICATE_DAY:
+				if ( ! isset( $result['duplicate'] ) ) {
+								$result['duplicate'] = true;
+				}
+				break;
+			case CheckinService::STATUS_RECENT_WARNING:
+				if ( ! isset( $result['requires_override'] ) ) {
+								$result['requires_override'] = true;
+				}
+				break;
+		}
 
-        $response = rest_ensure_response( $result );
+		$response = rest_ensure_response( $result );
 
-        if ( CheckinService::STATUS_THROTTLED === $status ) {
-                $response->set_status( 429 );
-        }
+		if ( CheckinService::STATUS_THROTTLED === $status ) {
+				$response->set_status( 429 );
+		}
 
-        return $response;
-        }
+		return $response;
+	}
 
-        /**
-         * Determine the best available request fingerprint for throttling.
-         *
-         * @param WP_REST_Request $request Incoming request.
-         */
-        private static function extract_fingerprint( WP_REST_Request $request ): ?string {
-                $headers = array(
-                        $request->get_header( 'X-Forwarded-For' ),
-                        $request->get_header( 'CF-Connecting-IP' ),
-                        $request->get_header( 'X-Real-IP' ),
-                        $request->get_header( 'REMOTE_ADDR' ),
-                );
+	/**
+	 * Determine the best available request fingerprint for throttling.
+	 *
+	 * @param WP_REST_Request $request Incoming request.
+	 */
+	private static function extract_fingerprint( WP_REST_Request $request ): ?string {
+		$headers = array(
+			$request->get_header( 'X-Forwarded-For' ),
+			$request->get_header( 'CF-Connecting-IP' ),
+			$request->get_header( 'X-Real-IP' ),
+			$request->get_header( 'REMOTE_ADDR' ),
+		);
 
-                foreach ( $headers as $raw_header ) {
-                        if ( ! is_string( $raw_header ) ) {
-                                continue;
-                        }
+		foreach ( $headers as $raw_header ) {
+			if ( ! is_string( $raw_header ) ) {
+				continue;
+			}
 
-                        $raw_header = trim( $raw_header );
+			$raw_header = trim( $raw_header );
 
-                        if ( '' === $raw_header ) {
-                                continue;
-                        }
+			if ( '' === $raw_header ) {
+				continue;
+			}
 
-                        $parts = explode( ',', $raw_header );
-                        $value = trim( $parts[0] );
+			$parts = explode( ',', $raw_header );
+			$value = trim( $parts[0] );
 
-                        if ( '' !== $value ) {
-                                return $value;
-                        }
-                }
+			if ( '' !== $value ) {
+				return sanitize_text_field( $value );
+			}
+		}
 
-                if ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
-                        $server_address = trim( (string) $_SERVER['REMOTE_ADDR'] );
+		if ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
+			$server_address = sanitize_text_field( wp_unslash( (string) $_SERVER['REMOTE_ADDR'] ) );
 
-                        if ( '' !== $server_address ) {
-                                return $server_address;
-                        }
-                }
+			if ( '' !== $server_address ) {
+				return $server_address;
+			}
+		}
 
-                return null;
-        }
+		return null;
+	}
 
-        /**
-         * Normalize boolean-like values from REST parameters.
-         *
-         * @param mixed $value Raw request value.
-         */
-        private static function is_truthy_flag( $value ): bool {
+		/**
+		 * Normalize boolean-like values from REST parameters.
+		 *
+		 * @param mixed $value Raw request value.
+		 */
+	private static function is_truthy_flag( $value ): bool {
 		if ( is_bool( $value ) ) {
 			return $value;
 		}
