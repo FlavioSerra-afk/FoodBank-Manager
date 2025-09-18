@@ -1021,6 +1021,7 @@ if ( ! function_exists( 'delete_transient' ) ) {
 require_once __DIR__ . '/../includes/Auth/class-capabilities.php';
 require_once __DIR__ . '/../includes/Core/class-plugin.php';
 require_once __DIR__ . '/../includes/Core/class-install.php';
+require_once __DIR__ . '/../includes/Core/class-assets.php';
 require_once __DIR__ . '/../includes/Core/class-schedule.php';
 require_once __DIR__ . '/../includes/Attendance/class-attendancerepository.php';
 require_once __DIR__ . '/../includes/Attendance/class-attendancereportservice.php';
@@ -1032,6 +1033,7 @@ require_once __DIR__ . '/../includes/Registration/class-registrationsettings.php
 require_once __DIR__ . '/../includes/Registration/class-registrationservice.php';
 require_once __DIR__ . '/../includes/Email/class-welcomemailer.php';
 require_once __DIR__ . '/../includes/Shortcodes/class-registrationform.php';
+require_once __DIR__ . '/../includes/Shortcodes/class-staffdashboard.php';
 require_once __DIR__ . '/../includes/Rest/class-checkincontroller.php';
 require_once __DIR__ . '/../includes/Admin/class-memberspage.php';
 require_once __DIR__ . '/../includes/Admin/class-reportspage.php';
