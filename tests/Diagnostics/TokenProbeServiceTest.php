@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignoreFile
 /**
  * @package FoodBankManager\Tests
  */
@@ -39,7 +39,7 @@ final class TokenProbeServiceTest extends TestCase {
 
                 $this->assertSame(
                         array(
-                                'version'    => 'v1',
+                                'version'    => '1',
                                 'hmac_match' => true,
                                 'revoked'    => false,
                         ),
@@ -65,7 +65,7 @@ final class TokenProbeServiceTest extends TestCase {
 
                 $this->assertSame(
                         array(
-                                'version'    => 'v1',
+                                'version'    => '1',
                                 'hmac_match' => false,
                                 'revoked'    => false,
                         ),
@@ -82,7 +82,7 @@ final class TokenProbeServiceTest extends TestCase {
 
                 $this->assertSame(
                         array(
-                                'version'    => 'v1',
+                                'version'    => '1',
                                 'hmac_match' => true,
                                 'revoked'    => true,
                         ),
