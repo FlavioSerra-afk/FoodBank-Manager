@@ -9,12 +9,13 @@ declare(strict_types=1);
 
 namespace FoodBankManager\Rest;
 
+use DateTimeImmutable;
 use FoodBankManager\Attendance\AttendanceRepository;
 use FoodBankManager\Attendance\CheckinService;
 use FoodBankManager\Core\Schedule;
 use FoodBankManager\Registration\MembersRepository;
+use FoodBankManager\Token\Token;
 use FoodBankManager\Token\TokenRepository;
-use FoodBankManager\Token\TokenService;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -22,17 +23,11 @@ use WP_REST_Server;
 use wpdb;
 use function __;
 use function current_user_can;
-use function explode;
 use function get_current_user_id;
-use function in_array;
-use function is_array;
 use function is_string;
 use function register_rest_route;
 use function rest_ensure_response;
 use function sanitize_text_field;
-use function sanitize_textarea_field;
-use function strtolower;
-use function trim;
 use function wp_verify_nonce;
 use function wp_unslash;
 
@@ -50,44 +45,20 @@ final class CheckinController {
 		register_rest_route(
 			self::ROUTE_NAMESPACE,
 			self::ROUTE_PATH,
-			array(
-				'methods'             => WP_REST_Server::CREATABLE,
-				'callback'            => array( self::class, 'handle_checkin' ),
-				'permission_callback' => array( self::class, 'verify_permissions' ),
-				'args'                => array(
-					'token'         => array(
-						'type'              => 'string',
-						'required'          => false,
-						'sanitize_callback' => 'sanitize_text_field',
-					),
-					'manual_code'   => array(
-						'type'              => 'string',
-						'required'          => false,
-						'sanitize_callback' => 'sanitize_text_field',
-					),
-					'method'        => array(
-						'type'              => 'string',
-						'required'          => false,
-						'sanitize_callback' => 'sanitize_text_field',
-					),
-					'note'          => array(
-						'type'              => 'string',
-						'required'          => false,
-						'sanitize_callback' => 'sanitize_textarea_field',
-					),
-					'override'      => array(
-						'type'     => 'boolean',
-						'required' => false,
-					),
-					'override_note' => array(
-						'type'              => 'string',
-						'required'          => false,
-						'sanitize_callback' => 'sanitize_textarea_field',
-					),
-				),
-			)
-		);
-	}
+                        array(
+                                'methods'             => WP_REST_Server::CREATABLE,
+                                'callback'            => array( self::class, 'handle_checkin' ),
+                                'permission_callback' => array( self::class, 'verify_permissions' ),
+                                'args'                => array(
+                                        'token' => array(
+                                                'type'              => 'string',
+                                                'required'          => true,
+                                                'sanitize_callback' => 'sanitize_text_field',
+                                        ),
+                                ),
+                        )
+                );
+        }
 
 	/**
 	 * Enforce capability and nonce checks.
@@ -123,126 +94,83 @@ final class CheckinController {
 			return new WP_Error( 'fbm_db_unavailable', __( 'Database connection unavailable.', 'foodbank-manager' ), array( 'status' => 500 ) );
 		}
 
-		$token               = $request->get_param( 'token' );
-		$manual_code         = $request->get_param( 'manual_code' );
-		$method              = $request->get_param( 'method' );
-		$note                = $request->get_param( 'note' );
-		$override            = $request->get_param( 'override' );
-		$override_note_param = $request->get_param( 'override_note' );
+		$raw_token = $request->get_param( 'token' );
 
-		$token         = is_string( $token ) ? sanitize_text_field( $token ) : '';
-		$manual_code   = is_string( $manual_code ) ? sanitize_text_field( $manual_code ) : '';
-		$method        = is_string( $method ) ? sanitize_text_field( $method ) : 'qr';
-		$note          = is_string( $note ) ? sanitize_textarea_field( $note ) : null;
-		$override      = self::is_truthy_flag( $override );
-		$override_note = is_string( $override_note_param ) ? sanitize_textarea_field( $override_note_param ) : '';
-
-		if ( $override ) {
-			if ( ! current_user_can( 'fbm_manage' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability registered on activation.
-				return new WP_Error( 'fbm_override_forbidden', __( 'You are not allowed to override collection warnings.', 'foodbank-manager' ), array( 'status' => 403 ) );
-			}
-
-			if ( '' === $override_note ) {
-				return new WP_Error( 'fbm_override_note_required', __( 'An override note is required.', 'foodbank-manager' ), array( 'status' => 400 ) );
-			}
+		if ( ! is_string( $raw_token ) ) {
+			return new WP_Error( 'fbm_missing_token', __( 'A token is required.', 'foodbank-manager' ), array( 'status' => 400 ) );
 		}
 
-		if ( '' === $token && '' === $manual_code ) {
-			return new WP_Error( 'fbm_invalid_reference', __( 'A token or manual code is required.', 'foodbank-manager' ), array( 'status' => 400 ) );
+		$raw_token = sanitize_text_field( $raw_token );
+
+		if ( '' === $raw_token ) {
+			return new WP_Error( 'fbm_missing_token', __( 'A token is required.', 'foodbank-manager' ), array( 'status' => 400 ) );
 		}
 
-				$attendance_repository = new AttendanceRepository( $wpdb );
-				$members_repository    = new MembersRepository( $wpdb );
-				$schedule              = new Schedule();
-				$service               = new CheckinService( $attendance_repository, $schedule );
+		$canonical_token = Token::canonicalize( $raw_token );
 
-		$member_reference = null;
-
-		if ( '' !== $token ) {
-			$token_repository = new TokenRepository( $wpdb );
-			$token_service    = new TokenService( $token_repository );
-			$member_id        = $token_service->verify( $token );
-
-			if ( null === $member_id ) {
-				return new WP_Error( 'fbm_invalid_token', __( 'The provided token is not recognized or has been revoked.', 'foodbank-manager' ), array( 'status' => 400 ) );
-			}
-
-			$member = $members_repository->find( $member_id );
-
-			if ( null === $member || '' === $member['member_reference'] ) {
-				return new WP_Error( 'fbm_invalid_token', __( 'The provided token is not recognized or has been revoked.', 'foodbank-manager' ), array( 'status' => 400 ) );
-			}
-
-			if ( 'active' !== $member['status'] ) {
-				return new WP_Error( 'fbm_inactive_member', __( 'This member is not currently active.', 'foodbank-manager' ), array( 'status' => 400 ) );
-			}
-
-			$member_reference = $member['member_reference'];
-		} else {
-			$record = $members_repository->find_by_reference( $manual_code );
-
-			if ( null === $record ) {
-				return new WP_Error( 'fbm_unknown_reference', __( 'The provided manual code is not recognized.', 'foodbank-manager' ), array( 'status' => 400 ) );
-			}
-
-			if ( 'active' !== $record['status'] ) {
-				return new WP_Error( 'fbm_inactive_member', __( 'This member is not currently active.', 'foodbank-manager' ), array( 'status' => 400 ) );
-			}
-
-			$member_reference = $record['member_reference'];
+		if ( null === $canonical_token ) {
+			return new WP_Error( 'fbm_invalid_token', __( 'Invalid or expired token.', 'foodbank-manager' ), array( 'status' => 400 ) );
 		}
 
-		$override_note = '' !== $override_note ? $override_note : null;
+		$token_repository = new TokenRepository( $wpdb );
+		$token_service    = new Token( $token_repository );
+		$verification     = $token_service->verify( $canonical_token );
+
+		if ( ! $verification['ok'] || null === $verification['member_id'] ) {
+			if ( 'revoked' === $verification['reason'] ) {
+				return new WP_Error( 'fbm_revoked_token', __( 'This token has been revoked.', 'foodbank-manager' ), array( 'status' => 403 ) );
+			}
+
+			return new WP_Error( 'fbm_invalid_token', __( 'Invalid or expired token.', 'foodbank-manager' ), array( 'status' => 400 ) );
+		}
+
+		$member_id          = (int) $verification['member_id'];
+		$members_repository = new MembersRepository( $wpdb );
+		$member             = $members_repository->find( $member_id );
+
+		if ( null === $member || '' === $member['member_reference'] ) {
+			return new WP_Error( 'fbm_invalid_token', __( 'Invalid or expired token.', 'foodbank-manager' ), array( 'status' => 400 ) );
+		}
+
+		if ( MembersRepository::STATUS_ACTIVE !== $member['status'] ) {
+			return new WP_Error( 'fbm_inactive_member', __( 'Member account is not active.', 'foodbank-manager' ), array( 'status' => 403 ) );
+		}
+
+		$attendance_repository = new AttendanceRepository( $wpdb );
+		$schedule              = new Schedule();
+		$service               = new CheckinService( $attendance_repository, $schedule );
 
 		$fingerprint = self::extract_fingerprint( $request );
 
-		$result = $service->record( $member_reference, $method, get_current_user_id(), $note, $override, $override_note, $fingerprint );
+		$result = $service->record( $member['member_reference'], 'qr', get_current_user_id(), null, false, null, $fingerprint );
 
-		$window      = $schedule->current_window();
-		$window_data = $window;
+		$status  = self::normalize_status( (string) $result['status'] );
+		$message = (string) $result['message'];
+		$time    = $result['time'] ?? null;
 
-		if ( isset( $result['window'] ) ) {
-				$provided = $result['window'];
+		if ( 'already' === $status ) {
+			$latest = $attendance_repository->latest_for_member( $member['member_reference'] );
 
-				$window_data = array(
-					'day'      => (string) $provided['day'],
-					'start'    => (string) $provided['start'],
-					'end'      => (string) $provided['end'],
-					'timezone' => (string) $provided['timezone'],
-				);
+			if ( $latest instanceof DateTimeImmutable ) {
+				$time = $latest->format( DATE_ATOM );
+			}
 		}
 
-		$window_labels = Schedule::window_labels( $window_data );
+		$payload = array(
+			'status'     => $status,
+			'message'    => $message,
+			'member_ref' => (string) $member['member_reference'],
+			'time'       => is_string( $time ) ? $time : null,
+		);
 
-		$result['window']        = $window_data;
-		$result['window_notice'] = $window_labels['notice'];
-		$result['window_labels'] = $window_labels;
+		$response = rest_ensure_response( $payload );
 
-		$status = (string) $result['status'];
-
-		switch ( $status ) {
-			case CheckinService::STATUS_OUT_OF_WINDOW:
-				break;
-			case CheckinService::STATUS_DUPLICATE_DAY:
-				if ( ! isset( $result['duplicate'] ) ) {
-								$result['duplicate'] = true;
-				}
-				break;
-			case CheckinService::STATUS_RECENT_WARNING:
-				if ( ! isset( $result['requires_override'] ) ) {
-								$result['requires_override'] = true;
-				}
-				break;
-		}
-
-		$response = rest_ensure_response( $result );
-
-		if ( CheckinService::STATUS_THROTTLED === $status ) {
-				$response->set_status( 429 );
+		if ( 'throttled' === $status ) {
+			$response->set_status( 429 );
 		}
 
 		return $response;
-	}
+        }
 
 	/**
 	 * Determine the best available request fingerprint for throttling.
@@ -287,26 +215,20 @@ final class CheckinController {
 		return null;
 	}
 
-		/**
-		 * Normalize boolean-like values from REST parameters.
-		 *
-		 * @param mixed $value Raw request value.
-		 */
-	private static function is_truthy_flag( $value ): bool {
-		if ( is_bool( $value ) ) {
-			return $value;
-		}
+        /**
+         * Normalize service status values for the REST payload.
+         *
+         * @param string $status Raw status from the check-in service.
+         */
+        private static function normalize_status( string $status ): string {
+                if ( CheckinService::STATUS_DUPLICATE_DAY === $status ) {
+                        return 'already';
+                }
 
-		if ( is_numeric( $value ) ) {
-			return (bool) (int) $value;
-		}
+                if ( '' === $status ) {
+                        return 'error';
+                }
 
-		if ( is_string( $value ) ) {
-			$value = strtolower( trim( $value ) );
-
-			return in_array( $value, array( '1', 'true', 'yes', 'on' ), true );
-		}
-
-		return false;
-	}
+                return $status;
+        }
 }
