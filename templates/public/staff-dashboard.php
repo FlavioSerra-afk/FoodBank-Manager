@@ -8,10 +8,13 @@
 declare(strict_types=1);
 
 use FoodBankManager\Core\Schedule;
-use function esc_attr;
-use function esc_html;
-use function esc_html__;
-use function esc_html_e;
+use function \esc_attr as esc_attr;
+use function \esc_html as esc_html;
+use function \esc_html__ as esc_html__;
+use function \esc_html_e as esc_html_e;
+use function \is_array as is_array;
+use function \is_string as is_string;
+use function \wp_nonce_field as wp_nonce_field;
 
 $schedule = new Schedule();
 $window   = $schedule->current_window();
@@ -64,26 +67,36 @@ printf(
 						<?php esc_html_e( 'Camera scanning is not available on this device. Use manual entry below.', 'foodbank-manager' ); ?>
 				</p>
 		</div>
-		<form class="fbm-staff-dashboard__section" data-fbm-manual>
-				<h3 class="fbm-staff-dashboard__subheading">
-						<?php esc_html_e( 'Manual entry', 'foodbank-manager' ); ?>
-				</h3>
-				<label class="fbm-staff-dashboard__field" for="fbm-staff-dashboard-reference">
-						<span class="fbm-staff-dashboard__label">
-								<?php esc_html_e( 'Member reference', 'foodbank-manager' ); ?>
-						</span>
-						<input
-								type="text"
-								id="fbm-staff-dashboard-reference"
-								name="fbm-staff-dashboard-reference"
-								class="fbm-staff-dashboard__input"
-								data-fbm-reference
-								autocomplete="off"
-						/>
-				</label>
-				<button type="submit" class="fbm-staff-dashboard__action" data-fbm-checkin="manual">
-						<?php esc_html_e( 'Record manual collection', 'foodbank-manager' ); ?>
-				</button>
+		<form class="fbm-staff-dashboard__section" data-fbm-manual method="post">
+			<h3 class="fbm-staff-dashboard__subheading">
+				<?php esc_html_e( 'Manual entry', 'foodbank-manager' ); ?>
+			</h3>
+			<label class="fbm-staff-dashboard__field" for="fbm-staff-dashboard-reference">
+				<span class="fbm-staff-dashboard__label">
+					<?php esc_html_e( 'Member reference', 'foodbank-manager' ); ?>
+				</span>
+				<input
+					type="text"
+					id="fbm-staff-dashboard-reference"
+					name="code"
+					class="fbm-staff-dashboard__input"
+					data-fbm-reference
+					autocomplete="off"
+				/>
+			</label>
+			<?php wp_nonce_field( 'fbm_staff_manual_entry', 'fbm_staff_manual_nonce' ); ?>
+			<button type="submit" class="fbm-staff-dashboard__action" data-fbm-checkin="manual">
+				<?php esc_html_e( 'Record manual collection', 'foodbank-manager' ); ?>
+			</button>
+			<?php if ( isset( $manual_entry ) && is_array( $manual_entry ) && isset( $manual_entry['message'] ) && '' !== $manual_entry['message'] ) : ?>
+				<?php
+				$manual_status       = isset( $manual_entry['status'] ) && is_string( $manual_entry['status'] ) && '' !== $manual_entry['status'] ? $manual_entry['status'] : 'info';
+				$manual_status_class = 'fbm-staff-dashboard__manual-status--' . $manual_status;
+				?>
+				<div class="fbm-staff-dashboard__manual-status <?php echo esc_attr( $manual_status_class ); ?>" role="status" aria-live="polite">
+					<?php echo esc_html( $manual_entry['message'] ); ?>
+				</div>
+			<?php endif; ?>
 		</form>
 		<div class="fbm-staff-dashboard__override" data-fbm-override hidden>
 								<p class="fbm-staff-dashboard__helper" data-fbm-override-message>
