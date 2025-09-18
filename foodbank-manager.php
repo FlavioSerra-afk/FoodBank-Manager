@@ -5,7 +5,7 @@
  * Author: Portuguese Community Centre London
  * Version: 1.0.7
  * Requires at least: 6.0
- * Requires PHP: 8.1
+ * Requires PHP: 8.2
  * Text Domain: foodbank-manager
  * Domain Path: /languages
  * License: GPL-2.0-or-later

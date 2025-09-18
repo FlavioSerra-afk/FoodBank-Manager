@@ -193,10 +193,25 @@
             },
             body: JSON.stringify(payload)
         }).then(function (response) {
-            if (!response || !response.ok) {
+            if (!response) {
                 throw new Error('request failed');
             }
-            return response.json();
+
+            return response.json().catch(function () {
+                return null;
+            }).then(function (data) {
+                if (!data || typeof data.status !== 'string') {
+                    if (!response.ok) {
+                        throw new Error('request failed');
+                    }
+
+                    throw new Error('invalid');
+                }
+
+                data.__responseOk = !!response.ok;
+
+                return data;
+            });
         }).then(function (data) {
             if (!data || typeof data.status !== 'string') {
                 throw new Error('invalid');
@@ -219,8 +234,8 @@
                     updateCounters(container, 'success');
                 }
                 hideOverride(container);
-            } else if (statusKey === 'duplicate_day') {
-                message = strings.duplicate_day;
+            } else if (statusKey === 'already') {
+                message = strings.already || strings.duplicate_day;
                 tone = 'warning';
                 updateCounters(container, 'duplicate');
                 hideOverride(container);
@@ -234,9 +249,23 @@
                         method: context.method
                     }, strings);
                 }
-            } else if (statusKey === 'out_of_window') {
-                message = resolveWindowNotice(strings);
+            } else if (statusKey === 'throttled') {
+                message = (data && typeof data.message === 'string') ? data.message : (strings.throttled || strings.error);
                 tone = 'warning';
+                hideOverride(container);
+            } else if (statusKey === 'invalid') {
+                if (data && typeof data.message === 'string' && data.message) {
+                    message = data.message;
+                } else if (strings.invalid) {
+                    message = strings.invalid;
+                } else {
+                    message = resolveWindowNotice(strings);
+                }
+                tone = 'error';
+                hideOverride(container);
+            } else if (statusKey === 'revoked') {
+                message = (data && typeof data.message === 'string') ? data.message : (strings.revoked || strings.error);
+                tone = 'error';
                 hideOverride(container);
             } else if (Object.prototype.hasOwnProperty.call(strings, statusKey) && typeof strings[statusKey] === 'string') {
                 message = strings[statusKey];
@@ -614,7 +643,7 @@
                     updateStatus(statusEl, strings.loading, 'info');
 
                     sendCheckin(container, {
-                        token: value,
+                        code: value,
                         method: 'qr'
                     }, {
                         reference: value,

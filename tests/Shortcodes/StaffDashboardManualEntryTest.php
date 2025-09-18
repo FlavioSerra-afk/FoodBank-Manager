@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignoreFile
 /**
  * Staff dashboard manual entry integration tests.
  *
@@ -77,33 +77,52 @@ final class StaffDashboardManualEntryTest extends TestCase {
 		/**
 		 * Records a collection via manual entry when the token is valid.
 		 */
-	public function test_manual_entry_records_collection_successfully(): void {
-			$token = $this->issue_token_for_reference( 'FBM900' );
+        public function test_manual_entry_records_collection_successfully(): void {
+                        $this->issue_token_for_reference( 'FBM900' );
 
-			$this->simulate_post( $token );
+                        $this->simulate_post( 'FBM900' );
 
-			$output = StaffDashboard::render();
+                        $output = StaffDashboard::render();
 
-			$this->assertStringContainsString( 'Collection recorded.', $output );
-			$this->assertStringContainsString( 'fbm-staff-dashboard__manual-status--success', $output );
-	}
+                        $this->assertStringContainsString( 'Collection recorded.', $output );
+                        $this->assertStringContainsString( 'fbm-staff-dashboard__manual-status--success', $output );
+        }
 
-		/**
-		 * Surfaces duplicate feedback when the member has already collected today.
-		 */
-	public function test_manual_entry_returns_duplicate_feedback_when_already_checked_in(): void {
-			$reference = 'FBM901';
-			$token     = $this->issue_token_for_reference( $reference );
+                /**
+                 * Surfaces duplicate feedback when the member has already collected today.
+                 */
+        public function test_manual_entry_returns_duplicate_feedback_when_already_checked_in(): void {
+                        $reference = 'FBM901';
+                        $this->issue_token_for_reference( $reference );
 
-			$this->record_manual_collection( $reference );
+                        $this->record_manual_collection( $reference );
 
-			$this->simulate_post( $token );
+                        $this->simulate_post( $reference );
 
-			$output = StaffDashboard::render();
+                        $output = StaffDashboard::render();
 
-			$this->assertStringContainsString( 'Member already collected today.', $output );
-			$this->assertStringContainsString( 'fbm-staff-dashboard__manual-status--already', $output );
-	}
+                        $this->assertStringContainsString( 'Member already collected today.', $output );
+                        $this->assertStringContainsString( 'fbm-staff-dashboard__manual-status--already', $output );
+        }
+
+                /**
+                 * Prompts for an override when the member collected within the last week.
+                 */
+        public function test_manual_entry_prompts_for_override_when_recent_warning(): void {
+                        $reference = 'FBM902';
+                        $this->issue_token_for_reference( $reference );
+
+                        $this->record_manual_collection( $reference );
+
+                        $this->simulate_post( $reference );
+
+                        $output = StaffDashboard::render();
+
+                        $this->assertStringContainsString( 'fbm-staff-dashboard__manual-status--recent_warning', $output );
+                        $this->assertStringContainsString( 'fbm-staff-dashboard__manual-override', $output );
+                        $this->assertStringContainsString( 'Confirm override', $output );
+                        $this->assertStringContainsString( 'name="override" value="1"', $output );
+        }
 
 		/**
 		 * Provides validation feedback when the submitted code is invalid.
@@ -166,11 +185,14 @@ final class StaffDashboardManualEntryTest extends TestCase {
 		 *
 		 * @param string $code Manual code payload.
 		 */
-	private function simulate_post( string $code ): void {
-			$_SERVER['REQUEST_METHOD'] = 'POST';
-			$_POST                     = array(
-				'code'                   => $code,
-				'fbm_staff_manual_nonce' => 'fbm_staff_manual_entry-nonce',
-			);
-	}
+        private function simulate_post( string $code, array $extra = array() ): void {
+                        $_SERVER['REQUEST_METHOD'] = 'POST';
+                        $_POST                     = array_merge(
+                                array(
+                                        'code'                   => $code,
+                                        'fbm_staff_manual_nonce' => 'fbm_staff_manual_entry-nonce',
+                                ),
+                                $extra
+                        );
+        }
 }
