@@ -11,8 +11,8 @@ namespace FoodBankManager\Email;
 
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Encoding\Encoding;
-use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelHigh;
-use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
+use Endroid\QrCode\ErrorCorrectionLevel;
+use Endroid\QrCode\RoundBlockSizeMode;
 use Endroid\QrCode\Writer\PngWriter;
 use Throwable;
 use function __;
@@ -69,15 +69,17 @@ final class WelcomeMailer {
 		 */
 	private function build_qr_data_uri( string $token ): string {
 		try {
-			$result = Builder::create()
-				->writer( new PngWriter() )
-				->data( $token )
-				->encoding( new Encoding( 'UTF-8' ) )
-				->errorCorrectionLevel( new ErrorCorrectionLevelHigh() )
-				->size( self::QR_SIZE )
-				->margin( 12 )
-				->roundBlockSizeMode( new RoundBlockSizeModeMargin() )
-				->build();
+			$builder = new Builder(
+				writer: new PngWriter(),
+				data: $token,
+				encoding: new Encoding( 'UTF-8' ),
+				errorCorrectionLevel: ErrorCorrectionLevel::High,
+				size: self::QR_SIZE,
+				margin: 12,
+				roundBlockSizeMode: RoundBlockSizeMode::Margin,
+			);
+
+			$result = $builder->build();
 
 			return $result->getDataUri();
 		} catch ( Throwable $exception ) {
