@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace FBM\Tests\Registration;
 
+use FoodBankManager\Registration\MembersRepository;
 use FoodBankManager\Shortcodes\RegistrationForm;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
@@ -51,6 +52,8 @@ final class RegistrationFormTest extends TestCase {
                         'fbm_registration_submit' => 'valid-nonce',
                 );
 
+                $GLOBALS['fbm_options'] = array();
+
                 $_SERVER = array();
                 $_POST   = array();
                 $GLOBALS['fbm_transients'] = array();
@@ -64,7 +67,7 @@ final class RegistrationFormTest extends TestCase {
         protected function tearDown(): void {
                 RegistrationForm::set_mailer_override( null );
 
-                unset( $GLOBALS['wpdb'], $GLOBALS['fbm_test_nonces'], $GLOBALS['fbm_users'], $GLOBALS['fbm_roles'], $GLOBALS['fbm_next_user_id'] );
+                unset( $GLOBALS['wpdb'], $GLOBALS['fbm_test_nonces'], $GLOBALS['fbm_users'], $GLOBALS['fbm_roles'], $GLOBALS['fbm_next_user_id'], $GLOBALS['fbm_options'] );
 
                 $_SERVER = array();
                 $_POST   = array();
@@ -170,6 +173,43 @@ final class RegistrationFormTest extends TestCase {
                 $this->assertIsArray( $last_prepare );
                 $this->assertStringContainsString( 'member_reference = %s', $last_prepare['query'] );
                 $this->assertMatchesRegularExpression( '/^FBM-/', (string) ( $last_prepare['args'][0] ?? '' ) );
+        }
+
+        /**
+         * Pending registrations should not trigger immediate welcome emails.
+         */
+        public function test_pending_registration_requires_manual_approval(): void {
+                update_option(
+                        'fbm_settings',
+                        array(
+                                'registration' => array(
+                                        'auto_approve' => false,
+                                ),
+                        )
+                );
+
+                $this->prepare_valid_submission(
+                        array(
+                                'fbm_first_name'        => 'Morgan',
+                                'fbm_last_initial'      => 'T',
+                                'fbm_email'             => 'morgan@example.com',
+                                'fbm_registration_time' => (string) ( time() - 120 ),
+                        )
+                );
+
+                $result = $this->invoke_handle_submission();
+
+                $this->assertTrue( $result['success'] );
+                $this->assertSame(
+                        'Thank you for registering. Our team will review your application and send your QR code once approved.',
+                        $result['message']
+                );
+                $this->assertSame( 0, $this->mailer->send_calls );
+                $this->assertEmpty( $this->wpdb->tokens );
+                $this->assertCount( 1, $this->wpdb->members );
+
+                $member = reset( $this->wpdb->members );
+                $this->assertSame( MembersRepository::STATUS_PENDING, $member['status'] ?? '' );
         }
 
         /**

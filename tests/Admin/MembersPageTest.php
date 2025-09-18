@@ -153,13 +153,9 @@ final class MembersPageTest extends TestCase {
                  */
         public function test_process_approve_issues_token_for_pending_member(): void {
                 $reference = 'FBM-PENDING';
-                $member_id = $this->members->insert_active_member( $reference, 'Taylor', 'Q', 'pending@example.com', 1 );
+                $member_id = $this->members->insert_pending_member( $reference, 'Taylor', 'Q', 'pending@example.com', 1 );
 
                 $this->assertIsInt( $member_id );
-
-                global $wpdb;
-                $wpdb->members[ $member_id ]['status']       = MembersRepository::STATUS_PENDING;
-                $wpdb->members[ $member_id ]['activated_at'] = null;
 
                 MembersPageMailerStub::reset();
 

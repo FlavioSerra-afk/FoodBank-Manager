@@ -13,6 +13,7 @@ use FoodBankManager\Admin\DiagnosticsPage;
 use FoodBankManager\Admin\MembersPage;
 use FoodBankManager\Admin\ReportsPage;
 use FoodBankManager\Admin\SchedulePage;
+use FoodBankManager\Admin\SettingsPage;
 use FoodBankManager\Admin\ThemePage;
 use FoodBankManager\Auth\Capabilities;
 use FoodBankManager\CLI\Commands;
@@ -42,9 +43,10 @@ final class Plugin {
 		Assets::setup();
 				DiagnosticsPage::register();
 				MembersPage::register();
-				ReportsPage::register();
-				SchedulePage::register();
-				ThemePage::register();
+                ReportsPage::register();
+                SchedulePage::register();
+                SettingsPage::register();
+                                ThemePage::register();
                 RegistrationForm::register();
                 StaffDashboard::register();
 

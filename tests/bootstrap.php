@@ -1015,6 +1015,7 @@ require_once __DIR__ . '/../includes/Attendance/class-checkinservice.php';
 require_once __DIR__ . '/../includes/Token/class-tokenrepository.php';
 require_once __DIR__ . '/../includes/Token/class-tokenservice.php';
 require_once __DIR__ . '/../includes/Registration/class-membersrepository.php';
+require_once __DIR__ . '/../includes/Registration/class-registrationsettings.php';
 require_once __DIR__ . '/../includes/Registration/class-registrationservice.php';
 require_once __DIR__ . '/../includes/Email/class-welcomemailer.php';
 require_once __DIR__ . '/../includes/Shortcodes/class-registrationform.php';
@@ -1023,6 +1024,7 @@ require_once __DIR__ . '/../includes/Admin/class-memberspage.php';
 require_once __DIR__ . '/../includes/Admin/class-reportspage.php';
 require_once __DIR__ . '/../includes/Admin/class-schedulepage.php';
 require_once __DIR__ . '/../includes/Admin/class-themepage.php';
+require_once __DIR__ . '/../includes/Admin/class-settingspage.php';
 
 if ( ! function_exists( 'add_action' ) ) {
         function add_action( string $hook, $callback, int $priority = 10, int $accepted_args = 1 ): void {

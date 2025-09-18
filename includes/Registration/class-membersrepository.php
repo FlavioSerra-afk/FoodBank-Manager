@@ -156,56 +156,87 @@ final class MembersRepository {
                                  *
                                  * @return int|null Inserted member identifier when successful.
                                  */
-        public function insert_active_member( string $reference, string $first_name, string $last_initial, string $email, int $household_size, ?string $consent_recorded_at = null ): ?int {
-					$now  = gmdate( 'Y-m-d H:i:s' );
-                                        $data = array(
-                                                'member_reference' => $reference,
-                                                'first_name'       => $first_name,
-                                                'last_initial'     => $last_initial,
-                                                'email'            => $email,
-                                                'household_size'   => $household_size,
-                                                'status'           => self::STATUS_ACTIVE,
-                                                'created_at'       => $now,
-                                                'updated_at'       => $now,
-                                                'activated_at'     => $now,
-                                        );
+    public function insert_active_member( string $reference, string $first_name, string $last_initial, string $email, int $household_size, ?string $consent_recorded_at = null ): ?int {
+                return $this->insert_member( $reference, $first_name, $last_initial, $email, $household_size, self::STATUS_ACTIVE, $consent_recorded_at );
+        }
 
-                                        if ( null !== $consent_recorded_at && '' !== $consent_recorded_at ) {
-                                                $data['consent_recorded_at'] = $consent_recorded_at;
-                                        }
+        /**
+         * Persist a new pending member record.
+         *
+         * @param string      $reference           Canonical member reference.
+         * @param string      $first_name          Sanitized first name.
+         * @param string      $last_initial        Sanitized last initial.
+         * @param string      $email               Normalized email address.
+         * @param int         $household_size      Household size clamp.
+         * @param string|null $consent_recorded_at Consent acknowledgement timestamp.
+         *
+         * @return int|null Inserted member identifier when successful.
+         */
+        public function insert_pending_member( string $reference, string $first_name, string $last_initial, string $email, int $household_size, ?string $consent_recorded_at = null ): ?int {
+                return $this->insert_member( $reference, $first_name, $last_initial, $email, $household_size, self::STATUS_PENDING, $consent_recorded_at );
+        }
 
-                                        $formats = array(
-                                                '%s',
-                                                '%s',
-                                                '%s',
-                                                '%s',
-                                                '%d',
-                                                '%s',
-                                                '%s',
-                                                '%s',
-                                                '%s',
-                                        );
+        /**
+         * Persist a member record with the provided status.
+         *
+         * @param string      $reference           Canonical member reference.
+         * @param string      $first_name          Sanitized first name.
+         * @param string      $last_initial        Sanitized last initial.
+         * @param string      $email               Normalized email address.
+         * @param int         $household_size      Household size clamp.
+         * @param string      $status              Member status value.
+         * @param string|null $consent_recorded_at Consent acknowledgement timestamp.
+         */
+        private function insert_member( string $reference, string $first_name, string $last_initial, string $email, int $household_size, string $status, ?string $consent_recorded_at = null ): ?int {
+                $now  = gmdate( 'Y-m-d H:i:s' );
+                $data = array(
+                        'member_reference'   => $reference,
+                        'first_name'         => $first_name,
+                        'last_initial'       => $last_initial,
+                        'email'              => $email,
+                        'household_size'     => $household_size,
+                        'status'             => $status,
+                        'created_at'         => $now,
+                        'updated_at'         => $now,
+                        'activated_at'       => self::STATUS_ACTIVE === $status ? $now : null,
+                );
 
-                                        if ( array_key_exists( 'consent_recorded_at', $data ) ) {
-                                                $formats[] = '%s';
-                                        }
+                if ( null !== $consent_recorded_at && '' !== $consent_recorded_at ) {
+                        $data['consent_recorded_at'] = $consent_recorded_at;
+                }
 
-					$result = $this->wpdb->insert( $this->table, $data, $formats );
+                $formats = array(
+                        '%s',
+                        '%s',
+                        '%s',
+                        '%s',
+                        '%d',
+                        '%s',
+                        '%s',
+                        '%s',
+                        '%s',
+                );
 
-					if ( false === $result ) {
-							return null;
-					}
+                if ( array_key_exists( 'consent_recorded_at', $data ) ) {
+                        $formats[] = '%s';
+                }
 
-					if ( property_exists( $this->wpdb, 'insert_id' ) && is_numeric( $this->wpdb->insert_id ) ) {
-							$insert_id = (int) $this->wpdb->insert_id;
+                $result = $this->wpdb->insert( $this->table, $data, $formats );
 
-						if ( $insert_id > 0 ) {
-								return $insert_id;
-						}
-					}
+                if ( false === $result ) {
+                        return null;
+                }
 
-					return null;
-	}
+                if ( property_exists( $this->wpdb, 'insert_id' ) && is_numeric( $this->wpdb->insert_id ) ) {
+                        $insert_id = (int) $this->wpdb->insert_id;
+
+                        if ( $insert_id > 0 ) {
+                                return $insert_id;
+                        }
+                }
+
+                return null;
+        }
 
 		                		/**
 		 * Mark an existing member record as active.
@@ -330,36 +361,37 @@ final class MembersRepository {
 	 *
 	 * @param int $member_id Member identifier.
 	 *
-	 * @return array{id:int,member_reference:string,first_name:string,email:string,status:string}|null
-	 */
-	public function find( int $member_id ): ?array {
-		$sql = $this->wpdb->prepare(
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is trusted.
-			"SELECT id, status, member_reference, first_name, email FROM `{$this->table}` WHERE id = %d LIMIT 1",
-			$member_id
-		);
+         * @return array{id:int,member_reference:string,first_name:string,last_initial:?string,email:string,status:string}|null
+         */
+        public function find( int $member_id ): ?array {
+                $sql = $this->wpdb->prepare(
+                        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is trusted.
+                        "SELECT id, status, member_reference, first_name, last_initial, email FROM `{$this->table}` WHERE id = %d LIMIT 1",
+                        $member_id
+                );
 
 		if ( ! is_string( $sql ) ) {
 			return null;
 		}
 
-		/**
-		 * Result row data.
-		 *
-		 * @var array{id:numeric,status:string,member_reference:string,first_name:string,email:string}|null $row
-		 */
+                /**
+                 * Result row data.
+                 *
+                 * @var array{id:numeric,status:string,member_reference:string,first_name:string,last_initial?:string,email:string}|null $row
+                 */
 		$row = $this->wpdb->get_row( $sql, ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Prepared above.
 
 		if ( ! is_array( $row ) ) {
 			return null;
 		}
 
-		return array(
-			'id'               => (int) $row['id'],
-			'status'           => (string) $row['status'],
-			'member_reference' => (string) $row['member_reference'],
-			'first_name'       => (string) $row['first_name'],
-			'email'            => (string) $row['email'],
-		);
-	}
+                return array(
+                        'id'               => (int) $row['id'],
+                        'status'           => (string) $row['status'],
+                        'member_reference' => (string) $row['member_reference'],
+                        'first_name'       => (string) $row['first_name'],
+                        'last_initial'     => isset( $row['last_initial'] ) ? (string) $row['last_initial'] : '',
+                        'email'            => (string) $row['email'],
+                );
+        }
 }
