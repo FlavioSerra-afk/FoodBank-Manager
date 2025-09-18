@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignoreFile
 /**
  * Check-in endpoint behavioural tests.
  *
@@ -11,6 +11,7 @@ namespace FBM\Tests\Rest;
 
 use DateTimeImmutable;
 use DateTimeZone;
+use FoodBankManager\Attendance\AttendanceRepository;
 use FoodBankManager\Attendance\CheckinService;
 use FoodBankManager\Core\Schedule;
 use FoodBankManager\Registration\MembersRepository;
@@ -122,7 +123,7 @@ final class CheckinEndpointTest extends TestCase {
                 $member = $this->create_member_with_token( 'FBM600' );
                 $request = new WP_REST_Request(
                         array(
-                                'token' => $member['token'],
+                                'code' => $member['token'],
                         )
                 );
 
@@ -137,6 +138,10 @@ final class CheckinEndpointTest extends TestCase {
                 $this->assertSame( esc_html__( 'Collection recorded.', 'foodbank-manager' ), $data['message'] );
                 $this->assertSame( 'FBM600', $data['member_ref'] );
                 $this->assertSame( '2023-08-17T11:00:00+00:00', $data['time'] );
+                $this->assertSame( $this->default_window(), $data['window'] );
+                $this->assertSame( Schedule::window_labels( $this->default_window() ), $data['window_labels'] );
+                $this->assertSame( Schedule::window_notice( $this->default_window() ), $data['window_notice'] );
+                $this->assertFalse( (bool) $data['requires_override'] );
                 $this->assertCount( 1, $this->wpdb->attendance );
         }
 
@@ -144,7 +149,7 @@ final class CheckinEndpointTest extends TestCase {
                 $member  = $this->create_member_with_token( 'FBM601' );
                 $request = new WP_REST_Request(
                         array(
-                                'token' => $member['token'],
+                                'code' => $member['token'],
                         )
                 );
 
@@ -162,6 +167,8 @@ final class CheckinEndpointTest extends TestCase {
                 $this->assertSame( esc_html__( 'Member already collected today.', 'foodbank-manager' ), $duplicate['message'] );
                 $this->assertSame( 'FBM601', $duplicate['member_ref'] );
                 $this->assertSame( '2023-08-17T11:00:00+00:00', $duplicate['time'] );
+                $this->assertSame( $this->default_window(), $duplicate['window'] );
+                $this->assertFalse( (bool) $duplicate['requires_override'] );
                 $this->assertCount( 1, $this->wpdb->attendance );
         }
 
@@ -176,7 +183,7 @@ final class CheckinEndpointTest extends TestCase {
                         $response = CheckinController::handle_checkin(
                                 new WP_REST_Request(
                                         array(
-                                                'token' => $token_data['token'],
+                                                'code' => $token_data['token'],
                                         )
                                 )
                         );
@@ -188,7 +195,7 @@ final class CheckinEndpointTest extends TestCase {
                 $throttled = CheckinController::handle_checkin(
                         new WP_REST_Request(
                                 array(
-                                        'token' => $extra['token'],
+                                        'code' => $extra['token'],
                                 )
                         )
                 );
@@ -213,13 +220,18 @@ final class CheckinEndpointTest extends TestCase {
                 $response = CheckinController::handle_checkin(
                         new WP_REST_Request(
                                 array(
-                                        'token' => $member['token'],
+                                        'code' => $member['token'],
                                 )
                         )
                 );
 
-                $this->assertInstanceOf( WP_Error::class, $response );
-                $this->assertSame( 'fbm_revoked_token', $response->get_error_code() );
+                $this->assertInstanceOf( WP_REST_Response::class, $response );
+                $this->assertSame( 200, $response->get_status() );
+
+                $data = $response->get_data();
+
+                $this->assertSame( 'revoked', $data['status'] );
+                $this->assertSame( esc_html__( 'This code has been revoked.', 'foodbank-manager' ), $data['message'] );
         }
 
         public function test_handle_checkin_rejects_inactive_member(): void {
@@ -230,33 +242,112 @@ final class CheckinEndpointTest extends TestCase {
                 $response = CheckinController::handle_checkin(
                         new WP_REST_Request(
                                 array(
-                                        'token' => $member['token'],
+                                        'code' => $member['token'],
                                 )
                         )
                 );
 
-                $this->assertInstanceOf( WP_Error::class, $response );
-                $this->assertSame( 'fbm_inactive_member', $response->get_error_code() );
+                $this->assertInstanceOf( WP_REST_Response::class, $response );
+                $this->assertSame( 200, $response->get_status() );
+
+                $data = $response->get_data();
+
+                $this->assertSame( 'revoked', $data['status'] );
+                $this->assertSame( esc_html__( 'This member is not currently active.', 'foodbank-manager' ), $data['message'] );
+                $this->assertSame( 'FBM701', $data['member_ref'] );
         }
 
         public function test_handle_checkin_rejects_invalid_token_format(): void {
                 $response = CheckinController::handle_checkin(
                         new WP_REST_Request(
                                 array(
-                                        'token' => 'invalid',
+                                        'code' => 'invalid',
                                 )
                         )
                 );
 
-                $this->assertInstanceOf( WP_Error::class, $response );
-                $this->assertSame( 'fbm_invalid_token', $response->get_error_code() );
+                $this->assertInstanceOf( WP_REST_Response::class, $response );
+                $this->assertSame( 200, $response->get_status() );
+
+                $data = $response->get_data();
+
+                $this->assertSame( 'invalid', $data['status'] );
         }
 
         public function test_handle_checkin_requires_token_parameter(): void {
                 $response = CheckinController::handle_checkin( new WP_REST_Request() );
 
-                $this->assertInstanceOf( WP_Error::class, $response );
-                $this->assertSame( 'fbm_missing_token', $response->get_error_code() );
+                $this->assertInstanceOf( WP_REST_Response::class, $response );
+                $this->assertSame( 200, $response->get_status() );
+
+                $data = $response->get_data();
+
+                $this->assertSame( 'invalid', $data['status'] );
+        }
+
+        public function test_handle_checkin_records_manual_code_successfully(): void {
+                $member  = $this->create_member_with_token( 'FBM750' );
+                $request = new WP_REST_Request(
+                        array(
+                                'manual_code' => $member['reference'],
+                                'method'      => 'manual',
+                        )
+                );
+
+                $response = CheckinController::handle_checkin( $request );
+
+                $this->assertInstanceOf( WP_REST_Response::class, $response );
+                $this->assertSame( 200, $response->get_status() );
+
+                $data = $response->get_data();
+
+                $this->assertSame( 'success', $data['status'] );
+                $this->assertSame( 'FBM750', $data['member_ref'] );
+                $this->assertSame( esc_html__( 'Collection recorded.', 'foodbank-manager' ), $data['message'] );
+                $this->assertFalse( (bool) $data['requires_override'] );
+        }
+
+        public function test_handle_checkin_requires_override_before_recent_warning_override(): void {
+                $member = $this->create_member_with_token( 'FBM751' );
+
+                $attendance = new AttendanceRepository( $this->wpdb );
+                $attendance->record(
+                        $member['reference'],
+                        'manual',
+                        1,
+                        new DateTimeImmutable( '2023-08-15 11:00:00', new DateTimeZone( 'UTC' ) ),
+                        null
+                );
+
+                $warning_request = new WP_REST_Request(
+                        array(
+                                'manual_code' => $member['reference'],
+                                'method'      => 'manual',
+                        )
+                );
+
+                $warning_response = CheckinController::handle_checkin( $warning_request );
+                $warning_data     = $warning_response->get_data();
+
+                $this->assertSame( 'recent_warning', $warning_data['status'] );
+                $this->assertTrue( (bool) $warning_data['requires_override'] );
+                $this->assertSame( '2023-08-15T11:00:00+00:00', $warning_data['time'] );
+
+                $override_request = new WP_REST_Request(
+                        array(
+                                'manual_code'   => $member['reference'],
+                                'method'        => 'manual',
+                                'override'      => true,
+                                'override_note' => 'Manager approval',
+                        )
+                );
+
+                $override_response = CheckinController::handle_checkin( $override_request );
+                $override_data     = $override_response->get_data();
+
+                $this->assertSame( 'success', $override_data['status'] );
+                $this->assertFalse( (bool) $override_data['requires_override'] );
+                $this->assertSame( 'FBM751', $override_data['member_ref'] );
         }
 
         /**

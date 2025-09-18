@@ -9,17 +9,17 @@ declare(strict_types=1);
 
 namespace FoodBankManager\Shortcodes;
 
-use FoodBankManager\Attendance\AttendanceRepository;
-use FoodBankManager\Attendance\CheckinService;
 use FoodBankManager\Core\Assets;
 use FoodBankManager\Core\Schedule;
-use FoodBankManager\Registration\MembersRepository;
-use FoodBankManager\Token\Token;
-use FoodBankManager\Token\TokenRepository;
+use FoodBankManager\Rest\CheckinController;
+use wpdb;
 use function add_shortcode;
 use function current_user_can;
 use function esc_html__;
+use function in_array;
 use function function_exists;
+use function is_bool;
+use function is_numeric;
 use function is_readable;
 use function is_user_logged_in;
 use function is_string;
@@ -27,7 +27,10 @@ use function ob_get_clean;
 use function ob_start;
 use function get_current_user_id;
 use function status_header;
-use function strtoupper;
+use function strtolower;
+use function trim;
+use function sanitize_text_field;
+use function sanitize_textarea_field;
 use function wp_unslash;
 use function wp_verify_nonce;
 
@@ -36,14 +39,14 @@ use function wp_verify_nonce;
  */
 final class StaffDashboard {
 
-        private const SHORTCODE = 'fbm_staff_dashboard';
-        private const MANUAL_NONCE_ACTION = 'fbm_staff_manual_entry';
-        private const MANUAL_NONCE_FIELD  = 'fbm_staff_manual_nonce';
+	private const SHORTCODE           = 'fbm_staff_dashboard';
+	private const MANUAL_NONCE_ACTION = 'fbm_staff_manual_entry';
+	private const MANUAL_NONCE_FIELD  = 'fbm_staff_manual_nonce';
 
-        /**
-         * Register the shortcode with WordPress.
-         */
-        public static function register(): void {
+		/**
+		 * Register the shortcode with WordPress.
+		 */
+	public static function register(): void {
 		add_shortcode( self::SHORTCODE, array( self::class, 'render' ) );
 	}
 
@@ -55,146 +58,160 @@ final class StaffDashboard {
 	public static function render( array $atts = array() ): string {
 			unset( $atts );
 
-                if ( ! is_user_logged_in() || ! current_user_can( 'fbm_view' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability registered on activation.
-                        if ( function_exists( 'status_header' ) ) {
-                                status_header( 403 );
-                        }
+		if ( ! is_user_logged_in() || ! current_user_can( 'fbm_view' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability registered on activation.
+			if ( function_exists( 'status_header' ) ) {
+						status_header( 403 );
+			}
 
-                        return '<div class="fbm-staff-dashboard fbm-staff-dashboard--denied">'
-				. esc_html__( 'Staff dashboard is available to authorised team members only.', 'foodbank-manager' )
-				. '</div>';
+				return '<div class="fbm-staff-dashboard fbm-staff-dashboard--denied">'
+					. esc_html__( 'Staff dashboard is available to authorised team members only.', 'foodbank-manager' )
+					. '</div>';
 		}
 
-                Assets::mark_staff_dashboard();
+				Assets::mark_staff_dashboard();
 
-                $manual_entry = self::maybe_handle_manual_entry();
+				$manual_entry = self::maybe_handle_manual_entry();
 
-                ob_start();
-                $template = FBM_PATH . 'templates/public/staff-dashboard.php';
-                if ( is_readable( $template ) ) {
-                        include $template;
+				ob_start();
+				$template = FBM_PATH . 'templates/public/staff-dashboard.php';
+		if ( is_readable( $template ) ) {
+				include $template;
 		}
 
 			$output = ob_get_clean();
 
-                return is_string( $output ) ? $output : '';
-        }
+				return is_string( $output ) ? $output : '';
+	}
 
-        /**
-         * Handle manual code submissions when JavaScript is unavailable.
-         *
-         * @return array{status:string,message:string}|null
-         */
-        private static function maybe_handle_manual_entry(): ?array {
-                if ( ! current_user_can( 'fbm_checkin' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability registered on activation.
-                        return null;
-                }
+		/**
+		 * Handle manual code submissions when JavaScript is unavailable.
+		 *
+		 * @return array{status:string,message:string,code?:string,requires_override?:bool,override_note?:string}|null
+		 */
+	private static function maybe_handle_manual_entry(): ?array {
+		if ( ! current_user_can( 'fbm_checkin' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability registered on activation.
+				return null;
+		}
 
-                if ( 'POST' !== strtoupper( (string) ( $_SERVER['REQUEST_METHOD'] ?? '' ) ) ) {
-                        return null;
-                }
+		$request_method = isset( $_SERVER['REQUEST_METHOD'] ) ? (string) wp_unslash( $_SERVER['REQUEST_METHOD'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Request method sanitized by strict comparison below.
 
-                $nonce = $_POST[ self::MANUAL_NONCE_FIELD ] ?? null; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Checked below.
-                if ( ! is_string( $nonce ) ) {
-                        return self::manual_response( 'invalid', esc_html__( 'Security check failed. Please try again.', 'foodbank-manager' ) );
-                }
+		if ( 'POST' !== strtoupper( $request_method ) ) {
+			return null;
+		}
 
-                $nonce = wp_unslash( $nonce );
+		$nonce_input = isset( $_POST[ self::MANUAL_NONCE_FIELD ] ) ? wp_unslash( $_POST[ self::MANUAL_NONCE_FIELD ] ) : null; // phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Checked below and validated prior to use.
+		if ( ! is_string( $nonce_input ) ) {
+			return self::manual_response( 'invalid', esc_html__( 'Security check failed. Please try again.', 'foodbank-manager' ) );
+		}
 
-                if ( ! wp_verify_nonce( $nonce, self::MANUAL_NONCE_ACTION ) ) {
-                        return self::manual_response( 'invalid', esc_html__( 'Security check failed. Please try again.', 'foodbank-manager' ) );
-                }
+		$nonce = $nonce_input;
 
-                $raw_code = $_POST['code'] ?? ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Intentional manual submission handler.
-                if ( ! is_string( $raw_code ) ) {
-                        return self::manual_response( 'invalid', esc_html__( 'Enter a valid collection code.', 'foodbank-manager' ) );
-                }
+		if ( ! wp_verify_nonce( $nonce, self::MANUAL_NONCE_ACTION ) ) {
+			return self::manual_response( 'invalid', esc_html__( 'Security check failed. Please try again.', 'foodbank-manager' ) );
+		}
 
-                $raw_code   = wp_unslash( $raw_code );
-                $canonical  = Token::canonicalize( $raw_code );
-                $invalid    = esc_html__( 'Enter a valid collection code.', 'foodbank-manager' );
-                $manual_ref = null;
+		$code_input = isset( $_POST['code'] ) ? wp_unslash( $_POST['code'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Intentional manual submission handler and sanitized below.
+		if ( ! is_string( $code_input ) ) {
+			return self::manual_response( 'invalid', esc_html__( 'Enter a valid collection code.', 'foodbank-manager' ) );
+		}
 
-                if ( null === $canonical ) {
-                        return self::manual_response( 'invalid', $invalid );
-                }
+		$raw_code = sanitize_text_field( $code_input );
+		$raw_code = trim( $raw_code );
 
-                global $wpdb;
+		if ( '' === $raw_code ) {
+				return self::manual_response( 'invalid', esc_html__( 'Enter a valid collection code.', 'foodbank-manager' ) );
+		}
 
-                $token_repository = new TokenRepository( $wpdb );
-                $token            = new Token( $token_repository );
-                $verification     = $token->verify( $canonical );
+		$override_flag = isset( $_POST['override'] ) ? wp_unslash( $_POST['override'] ) : null; // phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Checked above and normalized below.
+			$override  = false;
 
-                if ( ! $verification['ok'] ) {
-                        if ( 'revoked' === $verification['reason'] ) {
-                                return self::manual_response( 'revoked', esc_html__( 'This code has been revoked.', 'foodbank-manager' ) );
-                        }
+		if ( is_bool( $override_flag ) ) {
+				$override = $override_flag;
+		} elseif ( is_numeric( $override_flag ) ) {
+				$override = ( (int) $override_flag ) === 1;
+		} elseif ( is_string( $override_flag ) ) {
+				$override = in_array( strtolower( trim( $override_flag ) ), array( '1', 'true', 'yes', 'on' ), true );
+		}
 
-                        return self::manual_response( 'invalid', $invalid );
-                }
+			$override_note = '';
+		if ( $override ) {
+			$note_input = isset( $_POST['override_note'] ) ? wp_unslash( $_POST['override_note'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Intentional manual submission handler sanitized immediately below.
+			if ( is_string( $note_input ) ) {
+				$override_note = sanitize_textarea_field( $note_input );
+			}
+		}
 
-                $member_id = $verification['member_id'];
+			global $wpdb;
 
-                if ( null === $member_id ) {
-                        return self::manual_response( 'invalid', $invalid );
-                }
+			$invalid = esc_html__( 'Enter a valid collection code.', 'foodbank-manager' );
 
-                $members_repository = new MembersRepository( $wpdb );
-                $member             = $members_repository->find( $member_id );
+		if ( ! $wpdb instanceof wpdb ) {
+				return self::manual_response( 'invalid', $invalid, array( 'code' => $raw_code ) );
+		}
 
-                if ( null === $member ) {
-                        return self::manual_response( 'invalid', $invalid );
-                }
+			$payload = array(
+				'manual_code'   => $raw_code,
+				'method'        => 'manual',
+				'override'      => $override,
+				'override_note' => $override ? $override_note : '',
+			);
 
-                if ( MembersRepository::STATUS_ACTIVE !== $member['status'] ) {
-                        return self::manual_response( 'invalid', esc_html__( 'This member is not currently active.', 'foodbank-manager' ) );
-                }
+			/**
+			 * Manual entry result payload.
+			 *
+			 * @var array<string,mixed> $result
+			 */
+			$result = CheckinController::process_checkin_payload( $payload, $wpdb, null, get_current_user_id() );
 
-                if ( empty( $member['member_reference'] ) ) {
-                        return self::manual_response( 'invalid', $invalid );
-                }
+			$status = (string) ( $result['status'] ?? '' );
+			if ( '' === $status ) {
+				$status = 'invalid';
+			}
 
-                $manual_ref            = (string) $member['member_reference'];
-                $attendance_repository = new AttendanceRepository( $wpdb );
-                $schedule              = new Schedule();
-                $service               = new CheckinService( $attendance_repository, $schedule );
+			$message = (string) ( $result['message'] ?? '' );
+			if ( '' === $message ) {
+				$message = $invalid;
+			}
+			$requires_override = ! empty( $result['requires_override'] );
+			if ( ! $requires_override && 'already' === $status && isset( $result['time'] ) && is_string( $result['time'] ) && '' !== $result['time'] ) {
+				$requires_override = true;
+			}
 
-                $result = $service->record( $manual_ref, 'manual', get_current_user_id() );
-                $status = (string) $result['status'];
+			$code_for_form = 'success' === $status ? '' : $raw_code;
+			if ( $requires_override ) {
+					$code_for_form = $raw_code;
+			}
 
-                if ( CheckinService::STATUS_SUCCESS === $status ) {
-                        return self::manual_response( 'success', (string) $result['message'] );
-                }
+			$override_note_for_form = ( $override && 'success' !== $status ) ? $override_note : '';
 
-                if ( CheckinService::STATUS_DUPLICATE_DAY === $status ) {
-                        return self::manual_response( 'already', (string) $result['message'] );
-                }
+			return self::manual_response(
+				$status,
+				$message,
+				array(
+					'code'              => $code_for_form,
+					'requires_override' => $requires_override,
+					'override_note'     => $override_note_for_form,
+				)
+			);
+	}
 
-                if ( CheckinService::STATUS_THROTTLED === $status ) {
-                        return self::manual_response( 'throttled', (string) $result['message'] );
-                }
+		/**
+		 * Compose a manual entry response payload.
+		 *
+		 * @param string              $status  Response status identifier.
+		 * @param string              $message Localized response message.
+		 * @param array<string,mixed> $extra   Additional response context.
+		 */
+	private static function manual_response( string $status, string $message, array $extra = array() ): array {
+			$payload = array(
+				'status'  => $status,
+				'message' => $message,
+			);
 
-                $message = (string) $result['message'];
+			foreach ( $extra as $key => $value ) {
+					$payload[ $key ] = $value;
+			}
 
-                if ( '' !== $message ) {
-                        return self::manual_response( 'invalid', $message );
-                }
-
-                return self::manual_response( 'invalid', $invalid );
-        }
-
-        /**
-         * Compose a manual entry response payload.
-         *
-         * @param string $status  Response status identifier.
-         * @param string $message Localized response message.
-         *
-         * @return array{status:string,message:string}
-         */
-        private static function manual_response( string $status, string $message ): array {
-                return array(
-                        'status'  => $status,
-                        'message' => $message,
-                );
-        }
+			return $payload;
+	}
 }

@@ -86,6 +86,12 @@ printf(
 <span class="fbm-staff-dashboard__label">
 <?php esc_html_e( 'Member reference', 'foodbank-manager' ); ?>
 </span>
+<?php
+$manual_value = '';
+if ( isset( $manual_entry ) && is_array( $manual_entry ) && isset( $manual_entry['code'] ) && is_string( $manual_entry['code'] ) ) {
+		$manual_value = $manual_entry['code'];
+}
+?>
 <input
 type="text"
 id="fbm-staff-dashboard-reference"
@@ -93,6 +99,7 @@ name="code"
 class="fbm-staff-dashboard__input"
 data-fbm-reference
 autocomplete="off"
+value="<?php echo esc_attr( $manual_value ); ?>"
 />
 </label>
 <?php wp_nonce_field( 'fbm_staff_manual_entry', 'fbm_staff_manual_nonce' ); ?>
@@ -103,12 +110,52 @@ autocomplete="off"
 	<?php
 	$manual_status       = isset( $manual_entry['status'] ) && is_string( $manual_entry['status'] ) && '' !== $manual_entry['status'] ? $manual_entry['status'] : 'info';
 	$manual_status_class = 'fbm-staff-dashboard__manual-status--' . $manual_status;
+	if ( ! empty( $manual_entry['requires_override'] ) ) {
+		$manual_status_class .= ' fbm-staff-dashboard__manual-status--recent_warning';
+	}
 	?>
 <div class="fbm-staff-dashboard__manual-status <?php echo esc_attr( $manual_status_class ); ?>" role="status" aria-live="polite">
 	<?php echo esc_html( $manual_entry['message'] ); ?>
 </div>
 <?php endif; ?>
 </form>
+
+<?php if ( isset( $manual_entry ) && is_array( $manual_entry ) && ! empty( $manual_entry['requires_override'] ) ) : ?>
+	<?php
+	$override_code = '';
+	if ( isset( $manual_entry['code'] ) && is_string( $manual_entry['code'] ) ) {
+		$override_code = $manual_entry['code'];
+	}
+
+	$override_note_value = '';
+	if ( isset( $manual_entry['override_note'] ) && is_string( $manual_entry['override_note'] ) ) {
+		$override_note_value = $manual_entry['override_note'];
+	}
+	?>
+<form class="fbm-staff-dashboard__manual-override" method="post">
+<input type="hidden" name="code" value="<?php echo esc_attr( $override_code ); ?>" />
+<input type="hidden" name="override" value="1" />
+	<?php wp_nonce_field( 'fbm_staff_manual_entry', 'fbm_staff_manual_nonce' ); ?>
+<label class="fbm-staff-dashboard__field" for="fbm-staff-dashboard-manual-override-note">
+<span class="fbm-staff-dashboard__label"><?php esc_html_e( 'Override note', 'foodbank-manager' ); ?></span>
+<textarea
+id="fbm-staff-dashboard-manual-override-note"
+name="override_note"
+class="fbm-staff-dashboard__input fbm-staff-dashboard__input--textarea"
+rows="3"
+>
+	<?php
+	if ( function_exists( 'esc_textarea' ) ) {
+		echo esc_textarea( $override_note_value );
+	} else {
+		echo esc_html( $override_note_value );
+	}
+	?>
+</textarea>
+</label>
+<button type="submit" class="fbm-staff-dashboard__action"><?php esc_html_e( 'Confirm override', 'foodbank-manager' ); ?></button>
+</form>
+<?php endif; ?>
 
 <div class="fbm-staff-dashboard__override" data-fbm-override hidden>
 <p class="fbm-staff-dashboard__helper" data-fbm-override-message>
