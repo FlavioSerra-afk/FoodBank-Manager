@@ -1,7 +1,7 @@
-Docs-Revision: 2025-09-22 (v2.2.26-rc.1 S1/S2 sync)
+Docs-Revision: 2025-09-22 (v1.0.0 alignment)
 # FoodBank Manager Plugin
 
-Stable tag: 2.2.26-rc.1
+Stable tag: 1.0.0
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.1
