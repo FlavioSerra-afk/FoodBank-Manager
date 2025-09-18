@@ -29,7 +29,7 @@ final class WelcomeMailerTest extends TestCase {
 	public function test_send_dispatches_html_email_with_qr_image(): void {
 			$mailer = new WelcomeMailer();
 
-			$result = $mailer->send( 'erin@example.com', 'Erin', 'FBM-1234', 'TOKEN-VALUE' );
+                        $result = $mailer->send( 'erin@example.com', 'Erin', 'FBM-1234', 'FBM1:ABCDEFGH' );
 
 			$this->assertTrue( $result );
 
@@ -40,7 +40,8 @@ final class WelcomeMailerTest extends TestCase {
 
 			$this->assertSame( 'erin@example.com', $entry['to'] );
 			$this->assertSame( __( 'Your food bank check-in QR code', 'foodbank-manager' ), $entry['subject'] );
-			$this->assertStringContainsString( 'FBM-1234', $entry['message'] );
+                        $this->assertStringContainsString( '<code', $entry['message'] );
+                        $this->assertStringContainsString( 'FBM1:ABCDEFGH', $entry['message'] );
 			$this->assertStringContainsString( 'data:image/png;base64', $entry['message'] );
 			$this->assertContains( 'Content-Type: text/html; charset=UTF-8', $entry['headers'] );
 	}
