@@ -3,7 +3,7 @@ Contributors: portuguese-community-centre-london
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.2
-Stable tag: 1.0.9
+Stable tag: 1.0.10
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -19,6 +19,7 @@ It stores data in encrypted tables, enforces least-privilege access, and offers 
 * `[fbm_registration_form]` shortcode — secure public registration with validation, nonce checks, and anti-spam traps.
 * `[fbm_staff_dashboard]` shortcode — staff dashboard (login + FBM capability required) for scanning QR codes or recording manual attendance within the configured window.
 * Admin-only attendance summaries and CSV exports with sanitized filenames, UTF-8 BOM, and localized headers (nonce + capability enforced).
+* Settings → Uninstall & Privacy: manager-controlled destructive uninstall opt-in plus shortcuts into WordPress privacy exporter/eraser tools.
 
 == Multisite ==
 FBM capabilities are granted per site via activation (Administrators retain full access). Options such as theme, schedule, and migration markers store per site. Destructive uninstall remains opt-in so reinstalls can reuse existing data unless explicitly dropped.
@@ -39,14 +40,10 @@ wp fbm token probe 'FBM1:example...'
 `wp fbm version` surfaces the plugin version constant so deployment automation can assert the expected build is installed. `wp fbm token probe` returns a redacted JSON payload describing the canonical version, HMAC validation, and revocation state without revealing the raw token.
 
 == Uninstall ==
-By default uninstall leaves FoodBank Manager database tables in place so the plugin can be reinstalled without data loss.
-Administrators who need a destructive uninstall can opt in by defining `FBM_ALLOW_DESTRUCTIVE_UNINSTALL` in `wp-config.php`:
+By default uninstall leaves FoodBank Manager database tables in place so the plugin can be reinstalled without data loss. Managers can opt into destructive uninstall via Settings → Uninstall & Privacy; when enabled (or when `FBM_ALLOW_DESTRUCTIVE_UNINSTALL` is defined in `wp-config.php`) uninstall removes FBM tables, options, caches, and scheduled events.
 
-```
-define( 'FBM_ALLOW_DESTRUCTIVE_UNINSTALL', true );
-```
-
-Alternatively, return `true` from the `fbm_allow_destructive_uninstall` filter prior to deactivating the plugin.
+== Privacy ==
+FoodBank Manager registers with the WordPress privacy exporter/eraser registry and surfaces policy text describing stored data and retention guarantees. Managers can enqueue a privacy eraser run for an email address or member reference from Settings → Uninstall & Privacy.
 
 == Upgrade Notice ==
 = 1.5.0 =

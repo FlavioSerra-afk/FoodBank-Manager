@@ -1,10 +1,10 @@
 Docs-Revision: 2025-09-22 (v1.0.0 alignment)
 # FoodBank Manager Plugin
 
-Stable tag: 1.0.9
+Stable tag: 1.0.10
 Requires at least: 6.0
 Tested up to: 6.7
-Requires PHP: 8.1
+Requires PHP: 8.2
 
 See [Docs/Specs.md](Docs/Specs.md), [Docs/Plan.md](Docs/Plan.md), [Docs/Tasks.md](Docs/Tasks.md), and [Docs/Matrix.md](Docs/Matrix.md) for the canonical product requirements.
 
@@ -26,6 +26,10 @@ Attendance summaries remain restricted to administrators (or users granted the `
 ## Multisite notes
 
 Capabilities are granted per site on activation: administrators retain all FBM capabilities while custom FBM Manager/Staff roles receive their mapped bundles. Options such as theme, schedule, and migration markers store per site, and destructive uninstall requires explicit opt-in. See [Docs/Plan.md](Docs/Plan.md) for rate-limit and multisite notes.
+
+## Uninstall & privacy
+
+Settings → Uninstall & Privacy exposes a manager-only checkbox to allow destructive uninstall. When enabled (or when the `FBM_ALLOW_DESTRUCTIVE_UNINSTALL` constant is defined), uninstall removes FBM tables, options, caches, and scheduled events; otherwise, data remains for reinstalls and audits. The same screen includes a shortcut to enqueue the WordPress privacy eraser for a member email or reference. FoodBank Manager also registers privacy exporter/eraser callbacks and injects policy text describing retained data and the use of opaque QR tokens.
 
 ## API errors
 

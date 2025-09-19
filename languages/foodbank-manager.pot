@@ -2,20 +2,24 @@
 # This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: FoodBank Manager 1.0.9\n"
+"Project-Id-Version: FoodBank Manager 1.0.10\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/FoodBank-Manager\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-09-17T00:16:28+00:00\n"
+"POT-Creation-Date: 2025-09-19T01:31:00+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: foodbank-manager\n"
 
 #. Plugin Name of the plugin
 #: foodbank-manager.php
+#: includes/Core/class-plugin.php:75
+#: includes/Privacy/class-privacy.php:41
+#: includes/Privacy/class-privacy.php:57
+#: includes/Privacy/class-privacy.php:84
 msgid "FoodBank Manager"
 msgstr ""
 
@@ -29,197 +33,1080 @@ msgstr ""
 msgid "Portuguese Community Centre London"
 msgstr ""
 
-#: includes/Admin/class-memberspage.php:70
-#: includes/Admin/class-memberspage.php:71
+#: includes/Admin/class-diagnosticspage.php:84
+#: includes/Admin/class-diagnosticspage.php:85
+#: templates/admin/diagnostics-page.php:55
+msgid "Food Bank Diagnostics"
+msgstr ""
+
+#: includes/Admin/class-diagnosticspage.php:98
+#: includes/Admin/class-memberspage.php:118
+#: includes/Admin/class-reportspage.php:104
+#: includes/Admin/class-schedulepage.php:79
+#: includes/Admin/class-settingspage.php:88
+#: includes/Admin/class-themepage.php:208
+msgid "You do not have permission to access this page."
+msgstr ""
+
+#: includes/Admin/class-diagnosticspage.php:138
+msgid "Diagnostics template is missing."
+msgstr ""
+
+#. translators: %s: Member reference.
+#: includes/Admin/class-diagnosticspage.php:230
+#, php-format
+msgid "Resent the welcome email for %s."
+msgstr ""
+
+#: includes/Admin/class-diagnosticspage.php:233
+msgid "Resent the welcome email."
+msgstr ""
+
+#: includes/Admin/class-diagnosticspage.php:242
+msgid "Resend is temporarily rate-limited. Please try again later."
+msgstr ""
+
+#: includes/Admin/class-diagnosticspage.php:248
+msgid "The associated member record could not be found."
+msgstr ""
+
+#: includes/Admin/class-diagnosticspage.php:254
+msgid "Database connection unavailable. Please retry later."
+msgstr ""
+
+#: includes/Admin/class-diagnosticspage.php:260
+msgid "Unable to issue a new token for the member."
+msgstr ""
+
+#: includes/Admin/class-diagnosticspage.php:266
+msgid "The mail provider rejected the resend attempt."
+msgstr ""
+
+#: includes/Admin/class-diagnosticspage.php:273
+msgid "The selected mail failure entry could not be processed."
+msgstr ""
+
+#: includes/Admin/class-diagnosticspage.php:307
+#: includes/Shortcodes/class-registrationform.php:164
+#: includes/Shortcodes/class-staffdashboard.php:104
+#: includes/Shortcodes/class-staffdashboard.php:110
+msgid "Security check failed. Please try again."
+msgstr ""
+
+#: includes/Admin/class-diagnosticspage.php:318
+msgid "Token diagnostics are temporarily unavailable."
+msgstr ""
+
+#: includes/Admin/class-diagnosticspage.php:539
+msgid "Admin resend"
+msgstr ""
+
+#: includes/Admin/class-diagnosticspage.php:541
+msgid "Diagnostics resend"
+msgstr ""
+
+#: includes/Admin/class-diagnosticspage.php:543
+msgid "Registration"
+msgstr ""
+
+#: includes/Admin/class-diagnosticspage.php:545
+msgid "Email delivery"
+msgstr ""
+
+#: includes/Admin/class-diagnosticspage.php:557
+msgid "Token issuance failure"
+msgstr ""
+
+#: includes/Admin/class-diagnosticspage.php:559
+msgid "Missing member record"
+msgstr ""
+
+#: includes/Admin/class-diagnosticspage.php:561
+msgid "Mail transport failure"
+msgstr ""
+
+#: includes/Admin/class-diagnosticspage.php:563
+msgid "Unknown error"
+msgstr ""
+
+#: includes/Admin/class-memberspage.php:104
+#: includes/Admin/class-memberspage.php:105
 #: templates/admin/members-page.php:31
 msgid "Food Bank Members"
 msgstr ""
 
-#: includes/Admin/class-memberspage.php:84
-msgid "You do not have permission to access this page."
-msgstr ""
-
-#: includes/Admin/class-memberspage.php:90
-#: includes/Rest/class-checkincontroller.php:118
+#: includes/Admin/class-memberspage.php:124
+#: includes/Admin/class-reportspage.php:110
+#: includes/Admin/class-reportspage.php:343
+#: includes/Rest/class-checkincontroller.php:95
 msgid "Database connection unavailable."
 msgstr ""
 
-#: includes/Admin/class-memberspage.php:115
+#: includes/Admin/class-memberspage.php:153
 msgid "Members admin template is missing."
 msgstr ""
 
 #. translators: %s: Member reference.
-#: includes/Admin/class-memberspage.php:216
+#: includes/Admin/class-memberspage.php:264
+#, php-format
+msgid "Approved %s and sent their welcome email."
+msgstr ""
+
+#: includes/Admin/class-memberspage.php:268
+msgid "Approved the member and sent their welcome email."
+msgstr ""
+
+#: includes/Admin/class-memberspage.php:279
+msgid "Approved the member, but the welcome email could not be sent."
+msgstr ""
+
+#: includes/Admin/class-memberspage.php:285
+msgid "Unable to approve the selected member."
+msgstr ""
+
+#. translators: %s: Member reference.
+#: includes/Admin/class-memberspage.php:292
 #, php-format
 msgid "Sent a new QR code email to %s."
 msgstr ""
 
-#: includes/Admin/class-memberspage.php:220
+#: includes/Admin/class-memberspage.php:296
 msgid "Sent a new QR code email."
 msgstr ""
 
-#: includes/Admin/class-memberspage.php:231
+#. translators: %s: Member reference.
+#: includes/Admin/class-memberspage.php:308
+#, php-format
+msgid "Issued a new QR token for %s."
+msgstr ""
+
+#: includes/Admin/class-memberspage.php:312
+msgid "Issued a new QR token for the member."
+msgstr ""
+
+#: includes/Admin/class-memberspage.php:323
+msgid "Unable to regenerate a token for the selected member."
+msgstr ""
+
+#: includes/Admin/class-memberspage.php:329
 msgid "Issued a new token, but the email could not be sent."
 msgstr ""
 
-#: includes/Admin/class-memberspage.php:237
-msgid "Unable to issue a new token for the selected member."
+#: includes/Admin/class-memberspage.php:335
+msgid "Unable to resend the welcome email for the selected member."
 msgstr ""
 
 #. translators: %s: Member reference.
-#: includes/Admin/class-memberspage.php:244
+#: includes/Admin/class-memberspage.php:342
 #, php-format
 msgid "Revoked active tokens for %s."
 msgstr ""
 
-#: includes/Admin/class-memberspage.php:248
+#: includes/Admin/class-memberspage.php:346
 msgid "Revoked active tokens for the member."
 msgstr ""
 
-#: includes/Admin/class-memberspage.php:259
+#: includes/Admin/class-memberspage.php:357
 msgid "The requested member could not be found."
 msgstr ""
 
-#: includes/Admin/class-memberspage.php:265
+#: includes/Admin/class-memberspage.php:363
 msgid "Unable to revoke tokens for the selected member."
 msgstr ""
 
-#: includes/Admin/class-memberspage.php:271
+#: includes/Admin/class-memberspage.php:369
 msgid "The requested action could not be completed."
 msgstr ""
 
-#: includes/Attendance/class-checkinservice.php:79
-#: includes/Core/class-assets.php:128
-msgid "Collections are only available on Thursdays between 11:00 and 14:30."
+#: includes/Admin/class-reportspage.php:90
+#: includes/Admin/class-reportspage.php:91
+#: templates/admin/reports.php:62
+msgid "Food Bank Reports"
 msgstr ""
 
-#: includes/Attendance/class-checkinservice.php:90
-#: includes/Core/class-assets.php:127
+#: includes/Admin/class-reportspage.php:122
+msgid "Rows per page capped at 500."
+msgstr ""
+
+#: includes/Admin/class-reportspage.php:145
+msgid "Cache bypass requested; latest data loaded."
+msgstr ""
+
+#: includes/Admin/class-reportspage.php:161
+msgid "Page reset to the last available page for this range."
+msgstr ""
+
+#. translators: %s: Number of seconds since the cache was generated.
+#: includes/Admin/class-reportspage.php:175
+#, php-format
+msgid "Using cached results (updated %s seconds ago)."
+msgstr ""
+
+#: includes/Admin/class-reportspage.php:179
+msgid "Fresh results generated moments ago."
+msgstr ""
+
+#: includes/Admin/class-reportspage.php:218
+msgid "Report cache cleared."
+msgstr ""
+
+#: includes/Admin/class-reportspage.php:284
+msgid "Last 7 days"
+msgstr ""
+
+#: includes/Admin/class-reportspage.php:288
+msgid "Last 30 days"
+msgstr ""
+
+#: includes/Admin/class-reportspage.php:291
+#: templates/admin/reports.php:49
+msgid "Custom range"
+msgstr ""
+
+#: includes/Admin/class-reportspage.php:297
+msgid "Reports admin template is missing."
+msgstr ""
+
+#: includes/Admin/class-reportspage.php:363
+msgid "You do not have permission to invalidate the report cache."
+msgstr ""
+
+#: includes/Admin/class-reportspage.php:421
+msgid "The refresh link has expired. Showing cached data instead."
+msgstr ""
+
+#: includes/Admin/class-reportspage.php:481
+msgid "Invalid custom dates. Showing the last seven days instead."
+msgstr ""
+
+#: includes/Admin/class-reportspage.php:494
+msgid "End date adjusted to the most recent collection day."
+msgstr ""
+
+#: includes/Admin/class-reportspage.php:502
+msgid "Start date adjusted to match the end date."
+msgstr ""
+
+#: includes/Admin/class-reportspage.php:512
+msgid "Date range shortened to the most recent 180 days."
+msgstr ""
+
+#: includes/Admin/class-schedulepage.php:66
+#: templates/admin/schedule-page.php:43
+msgid "Food Bank Schedule"
+msgstr ""
+
+#: includes/Admin/class-schedulepage.php:67
+msgid "Schedule"
+msgstr ""
+
+#: includes/Admin/class-schedulepage.php:85
+msgid "Schedule admin template is missing."
+msgstr ""
+
+#: includes/Admin/class-schedulepage.php:117
+msgid "You do not have permission to save the schedule."
+msgstr ""
+
+#: includes/Admin/class-schedulepage.php:131
+msgid "Schedule could not be saved."
+msgstr ""
+
+#: includes/Admin/class-schedulepage.php:142
+msgid "Schedule saved."
+msgstr ""
+
+#: includes/Admin/class-schedulepage.php:174
+msgid "Schedule payload must be an array."
+msgstr ""
+
+#: includes/Admin/class-schedulepage.php:188
+#: includes/Admin/class-schedulepage.php:283
+msgid "A valid schedule day must be selected."
+msgstr ""
+
+#: includes/Admin/class-schedulepage.php:194
+#: includes/Admin/class-schedulepage.php:202
+msgid "Start time must be a valid 24-hour time."
+msgstr ""
+
+#: includes/Admin/class-schedulepage.php:208
+#: includes/Admin/class-schedulepage.php:216
+msgid "End time must be a valid 24-hour time."
+msgstr ""
+
+#: includes/Admin/class-schedulepage.php:230
+#: includes/Admin/class-schedulepage.php:338
+msgid "Timezone must be a valid identifier."
+msgstr ""
+
+#: includes/Admin/class-schedulepage.php:238
+msgid "End time must be after the start time."
+msgstr ""
+
+#: includes/Admin/class-schedulepage.php:257
+#: includes/Core/class-schedule.php:156
+msgid "Monday"
+msgstr ""
+
+#: includes/Admin/class-schedulepage.php:258
+#: includes/Core/class-schedule.php:158
+msgid "Tuesday"
+msgstr ""
+
+#: includes/Admin/class-schedulepage.php:259
+#: includes/Core/class-schedule.php:160
+msgid "Wednesday"
+msgstr ""
+
+#: includes/Admin/class-schedulepage.php:260
+#: includes/Core/class-schedule.php:162
+#: includes/Core/class-schedule.php:171
+msgid "Thursday"
+msgstr ""
+
+#: includes/Admin/class-schedulepage.php:261
+#: includes/Core/class-schedule.php:164
+msgid "Friday"
+msgstr ""
+
+#: includes/Admin/class-schedulepage.php:262
+#: includes/Core/class-schedule.php:166
+msgid "Saturday"
+msgstr ""
+
+#: includes/Admin/class-schedulepage.php:263
+#: includes/Core/class-schedule.php:168
+msgid "Sunday"
+msgstr ""
+
+#: includes/Admin/class-settingspage.php:75
+#: templates/admin/settings-page.php:42
+msgid "Food Bank Settings"
+msgstr ""
+
+#: includes/Admin/class-settingspage.php:76
+msgid "Settings"
+msgstr ""
+
+#: includes/Admin/class-settingspage.php:94
+msgid "Settings template is missing."
+msgstr ""
+
+#: includes/Admin/class-settingspage.php:148
+msgid "Transient caches beginning with fbm_"
+msgstr ""
+
+#: includes/Admin/class-settingspage.php:149
+msgid "Cache registries stored under fbm_cache_registry:*"
+msgstr ""
+
+#: includes/Admin/class-settingspage.php:152
+msgid "Scheduled cron hooks prefixed with fbm_"
+msgstr ""
+
+#: includes/Admin/class-settingspage.php:189
+msgid "You do not have permission to save these settings."
+msgstr ""
+
+#: includes/Admin/class-settingspage.php:203
+msgid "Settings could not be saved."
+msgstr ""
+
+#: includes/Admin/class-settingspage.php:219
+msgid "Settings saved."
+msgstr ""
+
+#: includes/Admin/class-settingspage.php:245
+msgid "You do not have permission to modify these settings."
+msgstr ""
+
+#: includes/Admin/class-settingspage.php:261
+msgid "Destructive uninstall enabled. FoodBank Manager tables and options will be removed when the plugin is uninstalled."
+msgstr ""
+
+#: includes/Admin/class-settingspage.php:262
+msgid "Destructive uninstall disabled."
+msgstr ""
+
+#: includes/Admin/class-settingspage.php:287
+msgid "You do not have permission to erase this data."
+msgstr ""
+
+#: includes/Admin/class-settingspage.php:293
+msgid "No FoodBank Manager data was erased."
+msgstr ""
+
+#: includes/Admin/class-settingspage.php:304
+msgid "Please provide an email address or member reference."
+msgstr ""
+
+#: includes/Admin/class-settingspage.php:306
+msgid "WordPress privacy tools are unavailable on this site."
+msgstr ""
+
+#: includes/Admin/class-settingspage.php:311
+msgid "FoodBank Manager eraser is unavailable."
+msgstr ""
+
+#: includes/Admin/class-settingspage.php:345
+msgid "FoodBank Manager data erasure completed."
+msgstr ""
+
+#: includes/Admin/class-settingspage.php:347
+msgid "Some FoodBank Manager data could not be erased."
+msgstr ""
+
+#: includes/Admin/class-settingspage.php:349
+msgid "No FoodBank Manager data matched that identifier."
+msgstr ""
+
+#: includes/Admin/class-settingspage.php:385
+msgid "Settings payload must be an array."
+msgstr ""
+
+#: includes/Admin/class-themepage.php:100
+#: templates/admin/theme-page.php:41
+msgid "Food Bank Theme"
+msgstr ""
+
+#: includes/Admin/class-themepage.php:101
+msgid "Theme"
+msgstr ""
+
+#: includes/Admin/class-themepage.php:126
+#: templates/admin/theme-page.php:53
+msgid "Display"
+msgstr ""
+
+#: includes/Admin/class-themepage.php:133
+#: templates/admin/theme-page.php:59
+msgid "Theme style"
+msgstr ""
+
+#: includes/Admin/class-themepage.php:141
+#: templates/admin/theme-page.php:65
+msgid "Preset"
+msgstr ""
+
+#: includes/Admin/class-themepage.php:149
+#: templates/admin/theme-page.php:71
+msgid "Accent color"
+msgstr ""
+
+#: includes/Admin/class-themepage.php:157
+#: templates/admin/theme-page.php:78
+msgid "Glass effects"
+msgstr ""
+
+#: includes/Admin/class-themepage.php:164
+#: templates/admin/theme-page.php:84
+msgid "Alpha"
+msgstr ""
+
+#: includes/Admin/class-themepage.php:172
+#: templates/admin/theme-page.php:90
+msgid "Blur"
+msgstr ""
+
+#: includes/Admin/class-themepage.php:180
+#: templates/admin/theme-page.php:96
+msgid "Elevation"
+msgstr ""
+
+#: includes/Admin/class-themepage.php:188
+#: templates/admin/theme-page.php:102
+msgid "Radius"
+msgstr ""
+
+#: includes/Admin/class-themepage.php:196
+#: templates/admin/theme-page.php:108
+msgid "Border width"
+msgstr ""
+
+#: includes/Admin/class-themepage.php:227
+msgid "Theme admin template is missing."
+msgstr ""
+
+#: includes/Admin/class-themepage.php:244
+msgid "You do not have permission to save theme settings."
+msgstr ""
+
+#: includes/Admin/class-themepage.php:258
+msgid "Theme settings could not be saved."
+msgstr ""
+
+#: includes/Admin/class-themepage.php:269
+msgid "Theme settings saved."
+msgstr ""
+
+#: includes/Admin/class-themepage.php:301
+msgid "Theme payload must be an array."
+msgstr ""
+
+#: includes/Admin/class-themepage.php:313
+msgid "The selected style is not available."
+msgstr ""
+
+#: includes/Admin/class-themepage.php:325
+msgid "The selected preset is not available."
+msgstr ""
+
+#: includes/Admin/class-themepage.php:337
+msgid "Accent color must be a valid hex value."
+msgstr ""
+
+#: includes/Admin/class-themepage.php:357
+msgid "Unable to encode theme settings."
+msgstr ""
+
+#: includes/Admin/class-themepage.php:361
+msgid "Theme settings payload is too large."
+msgstr ""
+
+#: includes/Admin/class-themepage.php:399
+msgid "Control the base theme, preset, and accent color."
+msgstr ""
+
+#: includes/Admin/class-themepage.php:406
+msgid "Adjust the glass styling parameters for supported themes."
+msgstr ""
+
+#: includes/Admin/class-themepage.php:416
+msgid "Basic"
+msgstr ""
+
+#: includes/Admin/class-themepage.php:417
+msgid "Glass"
+msgstr ""
+
+#: includes/Admin/class-themepage.php:436
+msgid "Light"
+msgstr ""
+
+#: includes/Admin/class-themepage.php:437
+msgid "Dark"
+msgstr ""
+
+#: includes/Admin/class-themepage.php:438
+msgid "High contrast"
+msgstr ""
+
+#: includes/Admin/class-themepage.php:523
+msgid "Glass alpha must be a number."
+msgstr ""
+
+#: includes/Admin/class-themepage.php:532
+msgid "Glass blur must be an integer."
+msgstr ""
+
+#: includes/Admin/class-themepage.php:541
+msgid "Glass elevation must be an integer."
+msgstr ""
+
+#: includes/Admin/class-themepage.php:550
+msgid "Glass radius must be an integer."
+msgstr ""
+
+#: includes/Admin/class-themepage.php:559
+msgid "Glass border width must be an integer."
+msgstr ""
+
+#: includes/Attendance/class-checkinservice.php:127
+#: includes/Core/class-assets.php:156
+msgid "Please wait a moment before trying again."
+msgstr ""
+
+#: includes/Attendance/class-checkinservice.php:138
+#: includes/Core/class-assets.php:149
+#: includes/Core/class-assets.php:150
 msgid "Member already collected today."
 msgstr ""
 
-#: includes/Attendance/class-checkinservice.php:107
-#: includes/Attendance/class-checkinservice.php:149
-#: includes/Core/class-assets.php:126
-msgid "Member collected less than a week ago. Manager override required."
+#: includes/Attendance/class-checkinservice.php:155
+#: includes/Attendance/class-checkinservice.php:197
+#: includes/Core/class-assets.php:148
+msgid "Member collected less than a week ago. Only managers can continue with a justified override."
 msgstr ""
 
-#: includes/Attendance/class-checkinservice.php:123
-#: includes/Core/class-assets.php:129
+#: includes/Attendance/class-checkinservice.php:171
+#: includes/Core/class-assets.php:153
 msgid "Unable to record collection. Please try again."
 msgstr ""
 
-#: includes/Attendance/class-checkinservice.php:135
+#: includes/Attendance/class-checkinservice.php:183
 msgid "Unable to record override. Please try again."
 msgstr ""
 
-#: includes/Attendance/class-checkinservice.php:143
-#: includes/Core/class-assets.php:125
+#: includes/Attendance/class-checkinservice.php:191
+#: includes/Core/class-assets.php:147
 msgid "Collection recorded."
 msgstr ""
 
-#: includes/Core/class-assets.php:123
-msgid "Ready for the next collection."
+#. translators: %s: Description of the scheduled collection window.
+#: includes/Core/class-assets.php:120
+#, php-format
+msgid "Ready for the next collection. Collections run on %s."
 msgstr ""
 
-#: includes/Core/class-assets.php:124
+#. translators: %s: Description of the scheduled collection window.
+#: includes/Core/class-assets.php:126
+#, php-format
+msgid "Outside the %s collection window."
+msgstr ""
+
+#: includes/Core/class-assets.php:146
 msgid "Recording collection…"
 msgstr ""
 
-#: includes/Email/class-welcomemailer.php:60
-#: templates/emails/welcome.php:27
+#: includes/Core/class-assets.php:154
+#: includes/Rest/class-checkincontroller.php:164
+#: includes/Shortcodes/class-staffdashboard.php:115
+#: includes/Shortcodes/class-staffdashboard.php:122
+#: includes/Shortcodes/class-staffdashboard.php:146
+msgid "Enter a valid collection code."
+msgstr ""
+
+#: includes/Core/class-assets.php:155
+#: includes/Rest/class-checkincontroller.php:248
+#: includes/Rest/class-checkincontroller.php:371
+msgid "This code has been revoked."
+msgstr ""
+
+#: includes/Core/class-assets.php:157
+msgid "Camera starting…"
+msgstr ""
+
+#: includes/Core/class-assets.php:158
+msgid "Scanning for QR codes…"
+msgstr ""
+
+#: includes/Core/class-assets.php:159
+msgid "Unable to start the camera. Try manual entry instead."
+msgstr ""
+
+#: includes/Core/class-assets.php:160
+msgid "Camera scanning is not supported on this device."
+msgstr ""
+
+#: includes/Core/class-assets.php:161
+msgid "Camera permission denied. Use manual entry instead."
+msgstr ""
+
+#: includes/Core/class-assets.php:162
+msgid "Hold steady, avoid glare."
+msgstr ""
+
+#: includes/Core/class-assets.php:163
+#: templates/public/staff-dashboard.php:52
+msgid "Camera source"
+msgstr ""
+
+#: includes/Core/class-assets.php:164
+#: templates/public/staff-dashboard.php:54
+msgid "Default camera"
+msgstr ""
+
+#: includes/Core/class-assets.php:165
+#: templates/public/staff-dashboard.php:58
+msgid "Turn torch on"
+msgstr ""
+
+#: includes/Core/class-assets.php:166
+msgid "Turn torch off"
+msgstr ""
+
+#: includes/Core/class-assets.php:167
+msgid "Enter a member reference before recording."
+msgstr ""
+
+#: includes/Core/class-assets.php:168
+#: includes/Rest/class-checkincontroller.php:167
+msgid "An override note is required."
+msgstr ""
+
+#: includes/Core/class-assets.php:169
+msgid "Override recorded successfully."
+msgstr ""
+
+#. translators: %s: Member reference.
+#: includes/Core/class-assets.php:171
+#, php-format
+msgid "Member %s collected within the last week."
+msgstr ""
+
+#: includes/Core/class-assets.php:172
+msgid "Only managers can continue by recording an override with a justification."
+msgstr ""
+
+#: includes/Core/class-plugin.php:71
+msgid "FoodBank Member"
+msgstr ""
+
+#: includes/Core/class-plugin.php:79
+msgid "FoodBank Staff"
+msgstr ""
+
+#. translators: 1: Start time, 2: End time.
+#: includes/Core/class-schedule.php:185
+#, php-format
+msgid "%1$s–%2$s"
+msgstr ""
+
+#. translators: 1: Day of week and time range, 2: Timezone identifier.
+#: includes/Core/class-schedule.php:220
+#, php-format
+msgid "Collections can only be recorded on %1$s (%2$s)."
+msgstr ""
+
+#. translators: 1: Day of week, 2: Start time, 3: End time.
+#: includes/Core/class-schedule.php:429
+#, php-format
+msgid "%1$s between %2$s and %3$s"
+msgstr ""
+
+#: includes/Diagnostics/class-healthstatus.php:59
+msgid "Mail transport"
+msgstr ""
+
+#: includes/Diagnostics/class-healthstatus.php:61
+msgid "Using the default WordPress mail transport."
+msgstr ""
+
+#: includes/Diagnostics/class-healthstatus.php:72
+msgid "External mail transport is configured but credentials are incomplete."
+msgstr ""
+
+#: includes/Diagnostics/class-healthstatus.php:74
+msgid "External mail credentials are configured."
+msgstr ""
+
+#: includes/Diagnostics/class-healthstatus.php:92
+msgid "Token salts"
+msgstr ""
+
+#: includes/Diagnostics/class-healthstatus.php:94
+msgid "Custom salts are configured for token signing."
+msgstr ""
+
+#: includes/Diagnostics/class-healthstatus.php:103
+#: includes/Diagnostics/class-healthstatus.php:118
+msgid "Token salts should be updated in wp-config.php."
+msgstr ""
+
+#: includes/Email/class-welcomemailer.php:68
+#: templates/emails/welcome.php:28
 msgid "Your food bank check-in QR code"
 msgstr ""
 
-#: includes/Email/class-welcomemailer.php:119
+#: includes/Email/class-welcomemailer.php:140
 msgid "Welcome!"
 msgstr ""
 
-#: includes/Email/class-welcomemailer.php:120
+#: includes/Email/class-welcomemailer.php:141
 msgid "Show this email during check-in or share your reference code with a volunteer."
 msgstr ""
 
 #. translators: %s: Member reference code.
-#: includes/Email/class-welcomemailer.php:123
+#: includes/Email/class-welcomemailer.php:144
 #, php-format
 msgid "Reference code: %s"
 msgstr ""
 
-#: includes/Rest/class-checkincontroller.php:94
+#: includes/Privacy/class-eraser.php:67
+msgid "FoodBank Manager member profile anonymized."
+msgstr ""
+
+#: includes/Privacy/class-eraser.php:72
+msgid "Attendance history detached and notes cleared."
+msgstr ""
+
+#: includes/Privacy/class-eraser.php:77
+msgid "Attendance override audit entries anonymized."
+msgstr ""
+
+#: includes/Privacy/class-eraser.php:82
+msgid "Authentication tokens revoked."
+msgstr ""
+
+#: includes/Privacy/class-exporter.php:55
+msgid "FoodBank Manager Member"
+msgstr ""
+
+#: includes/Privacy/class-exporter.php:66
+msgid "FoodBank Manager Attendance"
+msgstr ""
+
+#: includes/Privacy/class-exporter.php:79
+msgid "FoodBank Manager Attendance Overrides"
+msgstr ""
+
+#: includes/Privacy/class-exporter.php:200
+#: includes/Reports/class-csvexporter.php:118
+msgid "Member Reference"
+msgstr ""
+
+#: includes/Privacy/class-exporter.php:204
+#: templates/admin/members-page.php:61
+#: templates/admin/reports.php:282
+msgid "Status"
+msgstr ""
+
+#: includes/Privacy/class-exporter.php:208
+msgid "First Name"
+msgstr ""
+
+#: includes/Privacy/class-exporter.php:212
+msgid "Last Initial"
+msgstr ""
+
+#: includes/Privacy/class-exporter.php:216
+#: templates/admin/diagnostics-page.php:125
+#: templates/admin/members-page.php:60
+msgid "Email"
+msgstr ""
+
+#: includes/Privacy/class-exporter.php:220
+msgid "Household Size"
+msgstr ""
+
+#: includes/Privacy/class-exporter.php:224
+msgid "Created At"
+msgstr ""
+
+#: includes/Privacy/class-exporter.php:228
+msgid "Updated At"
+msgstr ""
+
+#: includes/Privacy/class-exporter.php:232
+msgid "Activated At"
+msgstr ""
+
+#: includes/Privacy/class-exporter.php:236
+msgid "Consent Recorded At"
+msgstr ""
+
+#: includes/Privacy/class-exporter.php:286
+msgid "Collection Date"
+msgstr ""
+
+#: includes/Privacy/class-exporter.php:290
+msgid "Collection Time"
+msgstr ""
+
+#: includes/Privacy/class-exporter.php:294
+#: includes/Reports/class-csvexporter.php:120
+#: templates/admin/reports.php:283
+msgid "Method"
+msgstr ""
+
+#: includes/Privacy/class-exporter.php:344
+msgid "Override Note"
+msgstr ""
+
+#: includes/Privacy/class-exporter.php:348
+msgid "Override Timestamp"
+msgstr ""
+
+#: includes/Privacy/class-exporter.php:352
+msgid "Attendance Record ID"
+msgstr ""
+
+#: includes/Privacy/class-privacy.php:73
+msgid "FoodBank Manager stores FoodBank member contact details (first name, last initial, and email), household size, status history, and timestamps related to registration and approvals."
+msgstr ""
+
+#: includes/Privacy/class-privacy.php:74
+msgid "Attendance records capture the member reference, visit dates, check-in method, and any staff-entered notes. Administrators can export or erase this information using WordPress privacy tools."
+msgstr ""
+
+#: includes/Privacy/class-privacy.php:75
+msgid "QR codes issued to members are opaque tokens without embedded personal data. Operational data is retained until a manager revokes the member or requests deletion through the privacy eraser."
+msgstr ""
+
+#: includes/Reports/class-csvexporter.php:108
+msgid "Unable to open export stream."
+msgstr ""
+
+#: includes/Reports/class-csvexporter.php:116
+msgid "Collected Date"
+msgstr ""
+
+#: includes/Reports/class-csvexporter.php:117
+msgid "Collected Time"
+msgstr ""
+
+#: includes/Reports/class-csvexporter.php:119
+msgid "Member Status"
+msgstr ""
+
+#: includes/Reports/class-csvexporter.php:121
+#: templates/admin/reports.php:284
+msgid "Note"
+msgstr ""
+
+#: includes/Reports/class-csvexporter.php:122
+msgid "Recorded By"
+msgstr ""
+
+#: includes/Rest/class-checkincontroller.php:71
 msgid "You are not allowed to record collections."
 msgstr ""
 
-#: includes/Rest/class-checkincontroller.php:103
+#: includes/Rest/class-checkincontroller.php:80
 msgid "Security check failed."
 msgstr ""
 
-#: includes/Rest/class-checkincontroller.php:137
-msgid "You are not allowed to override collection warnings."
-msgstr ""
-
-#: includes/Rest/class-checkincontroller.php:141
-msgid "An override note is required."
-msgstr ""
-
-#: includes/Rest/class-checkincontroller.php:146
-msgid "A token or manual code is required."
-msgstr ""
-
-#: includes/Rest/class-checkincontroller.php:161
-#: includes/Rest/class-checkincontroller.php:167
-msgid "The provided token is not recognized or has been revoked."
-msgstr ""
-
-#: includes/Rest/class-checkincontroller.php:171
-#: includes/Rest/class-checkincontroller.php:183
+#: includes/Rest/class-checkincontroller.php:461
 msgid "This member is not currently active."
 msgstr ""
 
-#: includes/Rest/class-checkincontroller.php:179
-msgid "The provided manual code is not recognized."
-msgstr ""
-
-#: includes/Shortcodes/class-registrationform.php:152
-msgid "Security check failed. Please try again."
-msgstr ""
-
-#: includes/Shortcodes/class-registrationform.php:159
-#: includes/Shortcodes/class-registrationform.php:168
+#: includes/Shortcodes/class-registrationform.php:171
+#: includes/Shortcodes/class-registrationform.php:180
 msgid "Invalid submission. Please try again."
 msgstr ""
 
-#: includes/Shortcodes/class-registrationform.php:177
+#: includes/Shortcodes/class-registrationform.php:189
 msgid "First name is required."
 msgstr ""
 
-#: includes/Shortcodes/class-registrationform.php:185
+#: includes/Shortcodes/class-registrationform.php:197
 msgid "Last initial must be a single letter."
 msgstr ""
 
-#: includes/Shortcodes/class-registrationform.php:192
+#: includes/Shortcodes/class-registrationform.php:204
 msgid "A valid email address is required."
 msgstr ""
 
-#: includes/Shortcodes/class-registrationform.php:214
+#: includes/Shortcodes/class-registrationform.php:231
 msgid "Please correct the errors below and try again."
 msgstr ""
 
-#: includes/Shortcodes/class-registrationform.php:222
+#: includes/Shortcodes/class-registrationform.php:251
+#: includes/Shortcodes/class-registrationform.php:252
+msgid "Please wait before submitting again."
+msgstr ""
+
+#: includes/Shortcodes/class-registrationform.php:263
 msgid "Service temporarily unavailable. Please try again later."
 msgstr ""
 
-#: includes/Shortcodes/class-registrationform.php:223
-#: includes/Shortcodes/class-registrationform.php:236
-#: includes/Shortcodes/class-registrationform.php:237
+#: includes/Shortcodes/class-registrationform.php:264
+#: includes/Shortcodes/class-registrationform.php:283
+#: includes/Shortcodes/class-registrationform.php:284
 msgid "We could not save your registration. Please try again later."
 msgstr ""
 
-#: includes/Shortcodes/class-registrationform.php:246
+#: includes/Shortcodes/class-registrationform.php:311
 msgid "Thank you for registering. We have emailed your check-in QR code."
 msgstr ""
 
-#: includes/Shortcodes/class-staffdashboard.php:51
+#: includes/Shortcodes/class-registrationform.php:313
+msgid "Thank you for registering. Our team will review your application and send your QR code once approved."
+msgstr ""
+
+#: includes/Shortcodes/class-staffdashboard.php:67
 msgid "Staff dashboard is available to authorised team members only."
+msgstr ""
+
+#. translators: %s: Number of minutes between resend attempts.
+#: templates/admin/diagnostics-page.php:73
+#, php-format
+msgid "Mail resend attempts are limited to once every %s minutes per member."
+msgstr ""
+
+#: templates/admin/diagnostics-page.php:81
+msgid "System health"
+msgstr ""
+
+#: templates/admin/diagnostics-page.php:89
+msgid "Status unknown"
+msgstr ""
+
+#: templates/admin/diagnostics-page.php:94
+msgid "Healthy"
+msgstr ""
+
+#: templates/admin/diagnostics-page.php:98
+msgid "Needs attention"
+msgstr ""
+
+#: templates/admin/diagnostics-page.php:123
+msgid "Recorded"
+msgstr ""
+
+#: templates/admin/diagnostics-page.php:124
+#: templates/admin/reports.php:281
+#: templates/public/staff-dashboard.php:87
+msgid "Member reference"
+msgstr ""
+
+#: templates/admin/diagnostics-page.php:126
+msgid "Context"
+msgstr ""
+
+#: templates/admin/diagnostics-page.php:127
+msgid "Error"
+msgstr ""
+
+#: templates/admin/diagnostics-page.php:128
+msgid "Attempts"
+msgstr ""
+
+#: templates/admin/diagnostics-page.php:129
+msgid "Action"
+msgstr ""
+
+#: templates/admin/diagnostics-page.php:136
+msgid "No mail failures have been recorded."
+msgstr ""
+
+#: templates/admin/diagnostics-page.php:162
+msgid "Resend"
+msgstr ""
+
+#. translators: %s: Timestamp when the resend is available.
+#: templates/admin/diagnostics-page.php:169
+#, php-format
+msgid "Available after %s"
+msgstr ""
+
+#: templates/admin/diagnostics-page.php:175
+msgid "Resend unavailable."
+msgstr ""
+
+#: templates/admin/diagnostics-token.php:39
+msgid "Token Probe (redacted)"
+msgstr ""
+
+#: templates/admin/diagnostics-token.php:40
+msgid "Submit a token payload to check signature validity and revocation status without exposing the raw value."
+msgstr ""
+
+#: templates/admin/diagnostics-token.php:46
+msgid "Token payload"
+msgstr ""
+
+#: templates/admin/diagnostics-token.php:50
+msgid "Probe token"
+msgstr ""
+
+#: templates/admin/diagnostics-token.php:60
+msgid "No diagnostics available for the provided payload."
+msgstr ""
+
+#: templates/admin/diagnostics-token.php:67
+msgid "Token Resend Failures"
+msgstr ""
+
+#: templates/admin/diagnostics-token.php:69
+msgid "No token resend failures have been recorded."
+msgstr ""
+
+#. translators: %d: Number of resend attempts.
+#: templates/admin/diagnostics-token.php:86
+#, php-format
+msgid "%d attempts"
 msgstr ""
 
 #: templates/admin/members-page.php:53
@@ -234,14 +1121,6 @@ msgstr ""
 msgid "Name"
 msgstr ""
 
-#: templates/admin/members-page.php:60
-msgid "Email"
-msgstr ""
-
-#: templates/admin/members-page.php:61
-msgid "Status"
-msgstr ""
-
 #: templates/admin/members-page.php:62
 msgid "Activated"
 msgstr ""
@@ -251,75 +1130,394 @@ msgid "Actions"
 msgstr ""
 
 #: templates/admin/members-page.php:89
-msgid "Resend QR"
+msgid "Approve &amp; Send"
 msgstr ""
 
-#: templates/admin/members-page.php:95
-msgid "Revoke/Regenerate"
+#: templates/admin/members-page.php:96
+msgid "Resend Welcome Email"
+msgstr ""
+
+#: templates/admin/members-page.php:104
+msgid "Re-issue Token"
+msgstr ""
+
+#: templates/admin/members-page.php:112
+msgid "Revoke Token"
+msgstr ""
+
+#. translators: 1: Day and time window, 2: Timezone.
+#: templates/admin/reports.php:76
+#, php-format
+msgid "Current window: %1$s (%2$s)."
+msgstr ""
+
+#: templates/admin/reports.php:124
+msgid "Refresh"
+msgstr ""
+
+#: templates/admin/reports.php:131
+msgid "Quick ranges"
+msgstr ""
+
+#: templates/admin/reports.php:160
+msgid "Start date"
+msgstr ""
+
+#: templates/admin/reports.php:164
+msgid "End date"
+msgstr ""
+
+#: templates/admin/reports.php:168
+msgid "Rows per page"
+msgstr ""
+
+#. translators: %s: Maximum number of rows per page.
+#: templates/admin/reports.php:186
+#, php-format
+msgid "Maximum %s rows per page."
+msgstr ""
+
+#: templates/admin/reports.php:194
+msgid "Update results"
+msgstr ""
+
+#: templates/admin/reports.php:200
+msgid "Summary"
+msgstr ""
+
+#: templates/admin/reports.php:204
+msgid "Date range"
+msgstr ""
+
+#. translators: 1: Start date, 2: End date.
+#: templates/admin/reports.php:209
+#, php-format
+msgid "%1$s to %2$s"
+msgstr ""
+
+#: templates/admin/reports.php:217
+msgid "Total collections"
+msgstr ""
+
+#: templates/admin/reports.php:221
+msgid "Active members"
+msgstr ""
+
+#: templates/admin/reports.php:225
+msgid "Revoked members"
+msgstr ""
+
+#: templates/admin/reports.php:229
+msgid "Other statuses"
+msgstr ""
+
+#: templates/admin/reports.php:235
+msgid "Attendance records"
+msgstr ""
+
+#. translators: 1: Number of rows, 2: Current page, 3: Total pages.
+#: templates/admin/reports.php:241
+#, php-format
+msgid "%1$s rows across %2$s of %3$s page(s)."
+msgstr ""
+
+#: templates/admin/reports.php:258
+msgid "Download CSV"
+msgstr ""
+
+#: templates/admin/reports.php:268
+msgid "Clear cached report results?"
+msgstr ""
+
+#: templates/admin/reports.php:269
+msgid "Invalidate cache"
+msgstr ""
+
+#: templates/admin/reports.php:279
+msgid "Collected date"
+msgstr ""
+
+#: templates/admin/reports.php:280
+msgid "Collected time"
+msgstr ""
+
+#: templates/admin/reports.php:285
+msgid "Recorded by"
+msgstr ""
+
+#: templates/admin/reports.php:292
+msgid "No attendance records found for this range."
+msgstr ""
+
+#: templates/admin/reports.php:324
+msgid "Pagination"
+msgstr ""
+
+#. translators: 1: First row number, 2: Last row number, 3: Total rows.
+#: templates/admin/reports.php:330
+#, php-format
+msgid "Showing %1$s–%2$s of %3$s rows"
+msgstr ""
+
+#: templates/admin/reports.php:340
+msgid "Previous page"
+msgstr ""
+
+#: templates/admin/reports.php:349
+msgid "of"
+msgstr ""
+
+#: templates/admin/reports.php:355
+msgid "Next page"
+msgstr ""
+
+#: templates/admin/schedule-page.php:59
+msgid "Schedule day"
+msgstr ""
+
+#: templates/admin/schedule-page.php:71
+msgid "Start time"
+msgstr ""
+
+#: templates/admin/schedule-page.php:75
+#: templates/admin/schedule-page.php:84
+msgid "Use 24-hour time (HH:MM)."
+msgstr ""
+
+#: templates/admin/schedule-page.php:80
+msgid "End time"
+msgstr ""
+
+#: templates/admin/schedule-page.php:89
+msgid "Timezone"
+msgstr ""
+
+#: templates/admin/schedule-page.php:93
+msgid "Enter a valid PHP timezone identifier (for example, Europe/London)."
+msgstr ""
+
+#: templates/admin/schedule-page.php:100
+msgid "Save schedule"
+msgstr ""
+
+#: templates/admin/settings-page.php:58
+msgid "Auto-approve new registrations"
+msgstr ""
+
+#: templates/admin/settings-page.php:63
+msgid "Automatically approve and email new registrations"
+msgstr ""
+
+#: templates/admin/settings-page.php:66
+msgid "When unchecked, new registrations remain pending until approved in the members dashboard."
+msgstr ""
+
+#: templates/admin/settings-page.php:73
+msgid "Save settings"
+msgstr ""
+
+#: templates/admin/settings-uninstall.php:42
+msgid "Uninstall & Privacy"
+msgstr ""
+
+#: templates/admin/settings-uninstall.php:43
+msgid "Control whether FoodBank Manager removes all data during uninstall and trigger WordPress privacy tools for an individual member."
+msgstr ""
+
+#: templates/admin/settings-uninstall.php:45
+msgid "Destructive uninstall"
+msgstr ""
+
+#: templates/admin/settings-uninstall.php:46
+msgid "When enabled, uninstall will drop the following data. Leave unchecked to retain operational history for reinstalls or audits."
+msgstr ""
+
+#: templates/admin/settings-uninstall.php:49
+msgid "Database tables"
+msgstr ""
+
+#: templates/admin/settings-uninstall.php:56
+msgid "Options & logs"
+msgstr ""
+
+#: templates/admin/settings-uninstall.php:63
+msgid "Transients & caches"
+msgstr ""
+
+#: templates/admin/settings-uninstall.php:70
+msgid "Scheduled events"
+msgstr ""
+
+#: templates/admin/settings-uninstall.php:84
+msgid "Allow FoodBank Manager to remove all data on uninstall"
+msgstr ""
+
+#: templates/admin/settings-uninstall.php:89
+msgid "The FBM_ALLOW_DESTRUCTIVE_UNINSTALL constant currently enforces destructive uninstall."
+msgstr ""
+
+#: templates/admin/settings-uninstall.php:91
+msgid "You can also enforce this via the FBM_ALLOW_DESTRUCTIVE_UNINSTALL constant in wp-config.php."
+msgstr ""
+
+#: templates/admin/settings-uninstall.php:96
+msgid "Save uninstall preference"
+msgstr ""
+
+#: templates/admin/settings-uninstall.php:101
+msgid "Erase a member's FoodBank Manager data"
+msgstr ""
+
+#: templates/admin/settings-uninstall.php:102
+msgid "Queue the WordPress privacy eraser for a specific email address or member reference. The request will run via Tools → Erase Personal Data."
+msgstr ""
+
+#: templates/admin/settings-uninstall.php:108
+msgid "Email or member reference"
+msgstr ""
+
+#: templates/admin/settings-uninstall.php:110
+msgid "Start eraser"
+msgstr ""
+
+#: templates/admin/settings-uninstall.php:113
+msgid "The eraser removes personal data while retaining anonymized attendance counts for operational reporting."
+msgstr ""
+
+#: templates/admin/theme-page.php:116
+msgid "Save theme settings"
 msgstr ""
 
 #. translators: %s: Recipient first name.
-#: templates/emails/welcome.php:36
+#: templates/emails/welcome.php:37
 #, php-format
 msgid "Hi %s,"
 msgstr ""
 
-#: templates/emails/welcome.php:41
+#: templates/emails/welcome.php:42
 msgid "Hello,"
 msgstr ""
 
-#: templates/emails/welcome.php:46
+#: templates/emails/welcome.php:47
 msgid "Thank you for registering with our food bank program. Bring this QR code to check in quickly at your next visit."
 msgstr ""
 
-#: templates/emails/welcome.php:53
+#: templates/emails/welcome.php:54
 msgid "Food bank check-in QR code"
 msgstr ""
 
-#: templates/emails/welcome.php:60
+#: templates/emails/welcome.php:63
+#: templates/emails/welcome.php:71
 msgid "If you cannot scan the QR code, share this reference code with a volunteer:"
 msgstr ""
 
-#: templates/emails/welcome.php:68
+#: templates/emails/welcome.php:80
 msgid "See you soon!"
 msgstr ""
 
-#: templates/public/registration-form.php:68
+#: templates/public/registration-form.php:71
 msgid "First name"
 msgstr ""
 
-#: templates/public/registration-form.php:82
+#: templates/public/registration-form.php:85
 msgid "Last initial"
 msgstr ""
 
-#: templates/public/registration-form.php:97
+#: templates/public/registration-form.php:100
 msgid "Email address"
 msgstr ""
 
-#: templates/public/registration-form.php:111
+#: templates/public/registration-form.php:114
 msgid "Household size"
 msgstr ""
 
-#: templates/public/registration-form.php:127
-msgid "If you are human, leave this field empty."
+#: templates/public/registration-form.php:130
+msgid "You can opt in to receive occasional updates about service hours or urgent notices."
 msgstr ""
 
 #: templates/public/registration-form.php:139
+msgid "Yes, I consent to Food Bank Manager contacting me with these updates."
+msgstr ""
+
+#: templates/public/registration-form.php:145
+msgid "If you are human, leave this field empty."
+msgstr ""
+
+#: templates/public/registration-form.php:157
 msgid "Submit registration"
 msgstr ""
 
-#: templates/public/staff-dashboard.php:15
+#: templates/public/staff-dashboard.php:18
 msgid "FoodBank Manager — Staff Dashboard"
 msgstr ""
 
-#: templates/public/staff-dashboard.php:18
-msgid "Scan member QR codes or record a manual collection."
+#. translators: %s: weekly collection window sentence.
+#: templates/public/staff-dashboard.php:24
+#, php-format
+msgid "Collections run on %s. Scan member QR codes or record a manual collection during this window, and record a manager override with a justification if the member collected within the last week."
 msgstr ""
 
-#: templates/public/staff-dashboard.php:22
-msgid "Member reference"
+#: templates/public/staff-dashboard.php:31
+msgid "Collections today"
 msgstr ""
 
-#: templates/public/staff-dashboard.php:34
+#: templates/public/staff-dashboard.php:35
+msgid "Duplicate attempts"
+msgstr ""
+
+#: templates/public/staff-dashboard.php:39
+msgid "Overrides recorded"
+msgstr ""
+
+#: templates/public/staff-dashboard.php:45
+msgid "Camera scanning"
+msgstr ""
+
+#: templates/public/staff-dashboard.php:48
+msgid "Use the device camera to scan a member QR token. Manual entry is always available as a fallback."
+msgstr ""
+
+#: templates/public/staff-dashboard.php:63
+msgid "QR scanner preview"
+msgstr ""
+
+#: templates/public/staff-dashboard.php:68
+msgid "Stop scanning"
+msgstr ""
+
+#: templates/public/staff-dashboard.php:73
+msgid "Start camera scan"
+msgstr ""
+
+#: templates/public/staff-dashboard.php:77
+msgid "Camera scanning is not available on this device. Use manual entry below."
+msgstr ""
+
+#: templates/public/staff-dashboard.php:83
+msgid "Manual entry"
+msgstr ""
+
+#: templates/public/staff-dashboard.php:107
 msgid "Record manual collection"
+msgstr ""
+
+#: templates/public/staff-dashboard.php:140
+#: templates/public/staff-dashboard.php:166
+msgid "Override note"
+msgstr ""
+
+#: templates/public/staff-dashboard.php:156
+msgid "Confirm override"
+msgstr ""
+
+#: templates/public/staff-dashboard.php:162
+msgid "This member collected within the last week. Only managers can continue by recording an override with a justification."
+msgstr ""
+
+#: templates/public/staff-dashboard.php:177
+msgid "Record override"
+msgstr ""
+
+#: templates/public/staff-dashboard.php:180
+msgid "Cancel override"
 msgstr ""

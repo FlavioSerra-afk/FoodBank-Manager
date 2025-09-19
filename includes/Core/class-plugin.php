@@ -17,47 +17,48 @@ use FoodBankManager\Admin\SchedulePage;
 use FoodBankManager\Admin\SettingsPage;
 use FoodBankManager\Admin\ThemePage;
 use FoodBankManager\Auth\Capabilities;
+use FoodBankManager\Privacy\Privacy;
 use FoodBankManager\Rest\CheckinController;
 use FoodBankManager\Shortcodes\RegistrationForm;
 use FoodBankManager\Shortcodes\StaffDashboard;
 use WP_Role;
 use function __;
+use function add_action;
 use function add_role;
 use function array_fill_keys;
-use function get_role;
-use function add_action;
 use function do_action;
+use function get_role;
 
 /**
  * Main plugin orchestrator.
  */
 final class Plugin {
 
-	public const VERSION = '1.0.9';
+        public const VERSION = '1.0.10';
 
+        /**
+         * Register runtime hooks.
+         */
+        public static function boot(): void {
+                Assets::setup();
+                DiagnosticsPage::register();
+                MembersPage::register();
+                ReportsPage::register();
+                SchedulePage::register();
+                SettingsPage::register();
+                ThemePage::register();
+                RegistrationForm::register();
+                StaffDashboard::register();
+                Privacy::register();
 
-	/**
-	 * Register runtime hooks.
-	 */
-	public static function boot(): void {
-		Assets::setup();
-				DiagnosticsPage::register();
-				MembersPage::register();
-				ReportsPage::register();
-				SchedulePage::register();
-				SettingsPage::register();
-								ThemePage::register();
-				RegistrationForm::register();
-				StaffDashboard::register();
+                add_action( 'rest_api_init', array( CheckinController::class, 'register_routes' ) );
 
-				add_action( 'rest_api_init', array( CheckinController::class, 'register_routes' ) );
+                if ( defined( 'WP_CLI' ) && WP_CLI && class_exists( '\\WP_CLI' ) ) {
+                        self::register_cli_commands();
+                }
 
-		if ( defined( 'WP_CLI' ) && WP_CLI && class_exists( '\\WP_CLI' ) ) {
-				self::register_cli_commands();
-		}
-
-				do_action( 'fbm_booted' );
-	}
+                do_action( 'fbm_booted' );
+        }
 
 	/**
 	 * Perform activation tasks.
@@ -101,21 +102,21 @@ final class Plugin {
 	/**
 	 * Perform deactivation cleanup.
 	 */
-	public static function deactivate(): void {
-			do_action( 'fbm_deactivated' );
-	}
+        public static function deactivate(): void {
+                do_action( 'fbm_deactivated' );
+        }
 
-		/**
-		 * Register WP-CLI commands under the fbm namespace.
-		 */
-	public static function register_cli_commands(): void {
-			\WP_CLI::add_command(
-				'fbm version',
-				static function (): void {
-							\WP_CLI::log( self::VERSION );
-				}
-			);
+        /**
+         * Register WP-CLI commands under the fbm namespace.
+         */
+        public static function register_cli_commands(): void {
+                \WP_CLI::add_command(
+                        'fbm version',
+                        static function (): void {
+                                \WP_CLI::log( self::VERSION );
+                        }
+                );
 
-			\WP_CLI::add_command( 'fbm token', TokenCommand::class );
-	}
+                \WP_CLI::add_command( 'fbm token', TokenCommand::class );
+        }
 }
