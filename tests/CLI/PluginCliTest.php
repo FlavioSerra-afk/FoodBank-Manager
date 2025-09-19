@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace FBM\Tests\CLI;
 
+use FBM\CLI\CryptoCommand;
 use FBM\CLI\TokenCommand;
 use FoodBankManager\Core\Plugin;
 use PHPUnit\Framework\TestCase;
@@ -58,5 +59,7 @@ final class PluginCliTest extends TestCase {
 
                 $this->assertArrayHasKey( 'fbm token', \WP_CLI::$commands );
                 $this->assertSame( TokenCommand::class, \WP_CLI::$commands['fbm token'] );
+                $this->assertArrayHasKey( 'fbm crypto', \WP_CLI::$commands );
+                $this->assertSame( CryptoCommand::class, \WP_CLI::$commands['fbm crypto'] );
         }
 }

@@ -12,6 +12,7 @@ use function esc_html;
 use function esc_html__;
 use function esc_html_e;
 use function esc_url;
+use function wp_nonce_field;
 use function is_array;
 use function is_readable;
 use function floor;
@@ -24,6 +25,7 @@ $rate_limit_seconds = 0;
 $health_badges      = array();
 $token_probe        = array();
 $token_failures     = array();
+$encryption         = array();
 
 if ( isset( $data['entries'] ) && is_array( $data['entries'] ) ) {
 				$entries = $data['entries'];
@@ -46,7 +48,11 @@ if ( isset( $data['token_probe'] ) && is_array( $data['token_probe'] ) ) {
 }
 
 if ( isset( $data['token_failures'] ) && is_array( $data['token_failures'] ) ) {
-								$token_failures = $data['token_failures'];
+																$token_failures = $data['token_failures'];
+}
+
+if ( isset( $data['encryption'] ) && is_array( $data['encryption'] ) ) {
+								$encryption = $data['encryption'];
 }
 
 $rate_limit_minutes = max( 1, (int) floor( $rate_limit_seconds / 60 ) );
@@ -106,6 +112,157 @@ printf(
 								</li>
 	<?php endforeach; ?>
 				</ul>
+</section>
+<?php endif; ?>
+
+<?php
+$encryption_adapters = array();
+$encryption_notice   = array();
+$encryption_form     = array();
+$encryption_enabled  = false;
+
+if ( isset( $encryption['adapters'] ) && is_array( $encryption['adapters'] ) ) {
+		$encryption_adapters = $encryption['adapters'];
+}
+
+if ( isset( $encryption['notice'] ) && is_array( $encryption['notice'] ) ) {
+		$encryption_notice = $encryption['notice'];
+}
+
+if ( isset( $encryption['form'] ) && is_array( $encryption['form'] ) ) {
+		$encryption_form = $encryption['form'];
+}
+
+if ( ! empty( $encryption['encrypt_new_writes'] ) ) {
+		$encryption_enabled = (bool) $encryption['encrypt_new_writes'];
+}
+
+if ( ! empty( $encryption_adapters ) ) :
+		$form_action       = isset( $encryption_form['url'] ) ? (string) $encryption_form['url'] : admin_url( 'admin-post.php' );
+		$form_action_name  = isset( $encryption_form['action'] ) ? (string) $encryption_form['action'] : '';
+		$form_nonce_name   = isset( $encryption_form['nonce_name'] ) ? (string) $encryption_form['nonce_name'] : '';
+		$form_nonce_action = isset( $encryption_form['nonce_action'] ) ? (string) $encryption_form['nonce_action'] : '';
+		$default_limit     = isset( $encryption_form['limit'] ) ? (int) $encryption_form['limit'] : 50;
+	?>
+<section class="fbm-encryption-panel" aria-labelledby="fbm-encryption-heading">
+		<h2 id="fbm-encryption-heading"><?php esc_html_e( 'Data encryption', 'foodbank-manager' ); ?></h2>
+
+		<p class="description">
+				<?php
+				echo $encryption_enabled
+						? esc_html__( 'New records are encrypted automatically.', 'foodbank-manager' )
+						: esc_html__( 'New records are currently stored without encryption.', 'foodbank-manager' );
+				?>
+		</p>
+
+		<?php
+		if ( ! empty( $encryption_notice['message'] ) ) :
+				$notice_state = isset( $encryption_notice['status'] ) ? (string) $encryption_notice['status'] : 'info';
+				$notice_class = 'notice-info';
+
+			if ( 'error' === $notice_state ) {
+					$notice_class = 'notice-error';
+			} elseif ( 'warning' === $notice_state ) {
+					$notice_class = 'notice-warning';
+			} elseif ( 'success' === $notice_state ) {
+					$notice_class = 'notice-success';
+			}
+			?>
+				<div class="notice <?php echo esc_attr( $notice_class ); ?>">
+						<p><?php echo esc_html( (string) $encryption_notice['message'] ); ?></p>
+				</div>
+		<?php endif; ?>
+
+		<table class="widefat striped">
+				<thead>
+						<tr>
+								<th scope="col"><?php esc_html_e( 'Adapter', 'foodbank-manager' ); ?></th>
+								<th scope="col"><?php esc_html_e( 'Status', 'foodbank-manager' ); ?></th>
+								<th scope="col"><?php esc_html_e( 'Progress', 'foodbank-manager' ); ?></th>
+								<th scope="col"><?php esc_html_e( 'Actions', 'foodbank-manager' ); ?></th>
+						</tr>
+				</thead>
+				<tbody>
+			<?php
+			foreach ( $encryption_adapters as $adapter ) :
+				$adapter_id     = isset( $adapter['id'] ) ? (string) $adapter['id'] : '';
+				$adapter_label  = isset( $adapter['label'] ) ? (string) $adapter['label'] : '';
+				$adapter_status = isset( $adapter['status'] ) && is_array( $adapter['status'] ) ? $adapter['status'] : array();
+				$total          = isset( $adapter_status['total'] ) ? (int) $adapter_status['total'] : 0;
+				$encrypted      = isset( $adapter_status['encrypted'] ) ? (int) $adapter_status['encrypted'] : 0;
+				$remaining      = isset( $adapter_status['remaining'] ) ? (int) $adapter_status['remaining'] : max( 0, $total - $encrypted );
+				$progress       = isset( $adapter_status['progress'] ) && is_array( $adapter_status['progress'] ) ? $adapter_status['progress'] : array();
+				$progress_label = '';
+
+				if ( ! empty( $progress['mode'] ) ) {
+					/* translators: 1: processing mode, 2: cursor identifier. */
+					$progress_label = sprintf(
+					/* translators: 1: processing mode, 2: cursor identifier. */
+						__( 'Mode: %1$s, cursor: %2$s', 'foodbank-manager' ),
+						(string) $progress['mode'],
+						isset( $progress['cursor'] ) ? (string) $progress['cursor'] : ''
+					);
+				}
+				?>
+						<tr>
+								<td>
+										<strong><?php echo esc_html( $adapter_label ); ?></strong>
+								</td>
+								<td>
+										<?php
+										printf(
+												/* translators: 1: total records, 2: encrypted count, 3: remaining count. */
+											esc_html__( '%1$s total / %2$s encrypted / %3$s remaining', 'foodbank-manager' ),
+											esc_html( number_format_i18n( $total ) ),
+											esc_html( number_format_i18n( $encrypted ) ),
+											esc_html( number_format_i18n( $remaining ) )
+										);
+										?>
+								</td>
+<td>
+				<?php echo '' !== $progress_label ? esc_html( $progress_label ) : esc_html__( 'Idle', 'foodbank-manager' ); ?>
+</td>
+								<td class="fbm-encryption-actions">
+										<form method="post" action="<?php echo esc_url( $form_action ); ?>" class="fbm-encryption-form">
+												<input type="hidden" name="action" value="<?php echo esc_attr( $form_action_name ); ?>" />
+												<?php wp_nonce_field( $form_nonce_action, $form_nonce_name ); ?>
+												<input type="hidden" name="fbm_crypto_adapter" value="<?php echo esc_attr( $adapter_id ); ?>" />
+												<input type="hidden" name="fbm_crypto_operation" value="migrate" />
+												<label>
+														<?php esc_html_e( 'Batch size', 'foodbank-manager' ); ?>
+														<input type="number" min="1" step="1" name="fbm_crypto_limit" value="<?php echo esc_attr( (string) $default_limit ); ?>" />
+												</label>
+												<label class="fbm-encryption-dry-run">
+														<input type="checkbox" name="fbm_crypto_dry_run" value="1" checked />
+														<?php esc_html_e( 'Dry run', 'foodbank-manager' ); ?>
+												</label>
+												<button type="submit" class="button button-secondary">
+														<?php esc_html_e( 'Migrate plaintext', 'foodbank-manager' ); ?>
+												</button>
+										</form>
+
+										<form method="post" action="<?php echo esc_url( $form_action ); ?>" class="fbm-encryption-form">
+												<input type="hidden" name="action" value="<?php echo esc_attr( $form_action_name ); ?>" />
+												<?php wp_nonce_field( $form_nonce_action, $form_nonce_name ); ?>
+												<input type="hidden" name="fbm_crypto_adapter" value="<?php echo esc_attr( $adapter_id ); ?>" />
+												<input type="hidden" name="fbm_crypto_operation" value="rotate" />
+												<label>
+														<?php esc_html_e( 'Batch size', 'foodbank-manager' ); ?>
+														<input type="number" min="1" step="1" name="fbm_crypto_limit" value="<?php echo esc_attr( (string) $default_limit ); ?>" />
+												</label>
+												<label class="fbm-encryption-dry-run">
+														<input type="checkbox" name="fbm_crypto_dry_run" value="1" />
+														<?php esc_html_e( 'Dry run', 'foodbank-manager' ); ?>
+												</label>
+												<button type="submit" class="button button-secondary">
+														<?php esc_html_e( 'Rotate envelopes', 'foodbank-manager' ); ?>
+												</button>
+										</form>
+								</td>
+						</tr>
+				<?php endforeach; ?>
+				</tbody>
+		</table>
 </section>
 <?php endif; ?>
 

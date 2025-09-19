@@ -26,6 +26,7 @@ $form_action  = $data['form_action'] ?? 'fbm_settings_save';
 $nonce_action = $data['nonce_action'] ?? 'fbm_settings_save';
 $nonce_name   = $data['nonce_name'] ?? 'fbm_settings_nonce';
 $uninstall    = $data['uninstall'] ?? array();
+$encryption   = $data['encryption'] ?? array();
 
 $notice_class = '';
 
@@ -35,7 +36,8 @@ if ( 'success' === $status_value ) {
 	$notice_class = 'notice-error';
 }
 
-$auto_approve = ! empty( $registration['auto_approve'] );
+$auto_approve       = ! empty( $registration['auto_approve'] );
+$encrypt_new_writes = ! empty( $encryption['encrypt_new_writes'] );
 
 ?>
 <div class="wrap">
@@ -53,11 +55,11 @@ $auto_approve = ! empty( $registration['auto_approve'] );
 
 				<table class="form-table" role="presentation">
 						<tbody>
-						<tr>
-								<th scope="row">
-										<?php esc_html_e( 'Auto-approve new registrations', 'foodbank-manager' ); ?>
-								</th>
-								<td>
+												<tr>
+																<th scope="row">
+																				<?php esc_html_e( 'Auto-approve new registrations', 'foodbank-manager' ); ?>
+																</th>
+																<td>
 										<label>
 												<input type="checkbox" name="fbm_settings[registration][auto_approve]" value="1" <?php checked( $auto_approve ); ?> />
 												<?php esc_html_e( 'Automatically approve and email new registrations', 'foodbank-manager' ); ?>
@@ -65,8 +67,22 @@ $auto_approve = ! empty( $registration['auto_approve'] );
 										<p class="description">
 												<?php esc_html_e( 'When unchecked, new registrations remain pending until approved in the members dashboard.', 'foodbank-manager' ); ?>
 										</p>
-								</td>
-						</tr>
+																</td>
+												</tr>
+												<tr>
+																<th scope="row">
+																				<?php esc_html_e( 'Encrypt new writes', 'foodbank-manager' ); ?>
+																</th>
+																<td>
+																				<label>
+																								<input type="checkbox" name="fbm_encrypt_new_writes" value="1" <?php checked( $encrypt_new_writes ); ?> />
+																								<?php esc_html_e( 'Encrypt newly stored member names and diagnostics emails', 'foodbank-manager' ); ?>
+																				</label>
+																				<p class="description">
+																								<?php esc_html_e( 'When enabled, FoodBank Manager encrypts selected personally identifiable information at rest. Existing plaintext can be migrated from the Diagnostics page.', 'foodbank-manager' ); ?>
+																				</p>
+																</td>
+												</tr>
 						</tbody>
 				</table>
 

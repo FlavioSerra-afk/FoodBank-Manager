@@ -262,7 +262,7 @@ final class RegistrationService {
                         }
                 }
 
-                $last_initial = (string) ( $member['last_initial'] ?? '' );
+                $last_initial = (string) $member['last_initial'];
                 $this->ensure_foodbank_member_user( $member['email'], $member['first_name'], $last_initial );
 
                 return array(

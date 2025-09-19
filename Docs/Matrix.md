@@ -19,7 +19,7 @@
 | WP-CLI (fbm version) | ✅ | [ ] | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | ✅ | [Tasks](Tasks.md) |
 | GDPR (Consent/SAR/Retention) | ✅ | ✅ | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | ✅ | v1.0.10: WP privacy exporter/eraser hooks + policy text. |
 | Packaging Guard | ✅ | [ ] | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | ✅ | [ ] | ✅ | v1.1.1: bin/package.sh manifest + version alignment |
-| Encryption (at rest) | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ⚠️ | [ ] | [ ] | [ ] | [Tasks](Tasks.md) |
+| Encryption (at rest) | ✅ | ✅ | ✅ | [ ] | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | ✅ | [ ] | ✅ | Envelope encryption with AES-256-GCM + HKDF master key (v1.3.0) |
 
 
 
