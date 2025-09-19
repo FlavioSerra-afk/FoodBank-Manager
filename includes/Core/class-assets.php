@@ -86,8 +86,8 @@ final class Assets {
 			return;
 		}
 
-		$version = defined( 'FBM_VER' ) ? FBM_VER : '1.0.7';
-		$style   = plugins_url( 'assets/css/admin.css', FBM_FILE );
+			$version = defined( 'FBM_VER' ) ? FBM_VER : '1.0.9';
+		$style       = plugins_url( 'assets/css/admin.css', FBM_FILE );
 
 		wp_enqueue_style( 'fbm-admin', $style, array(), $version );
 	}
@@ -110,7 +110,7 @@ final class Assets {
 			return;
 		}
 
-		$version        = defined( 'FBM_VER' ) ? FBM_VER : '1.0.7';
+			$version    = defined( 'FBM_VER' ) ? FBM_VER : '1.0.9';
 		$style          = plugins_url( 'assets/css/staff-dashboard.css', FBM_FILE );
 		$script         = plugins_url( 'assets/js/staff-dashboard.js', FBM_FILE );
 		$scanner_script = plugins_url( 'assets/js/fbm-scanner.js', FBM_FILE );

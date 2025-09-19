@@ -151,6 +151,10 @@ if ( ! class_exists( 'wpdb', false ) ) {
                 }
 
                 public function prepare( string $query, ...$args ) {
+                        if ( 1 === count( $args ) && is_array( $args[0] ) ) {
+                                $args = array_values( $args[0] );
+                        }
+
                         $this->last_prepare = array(
                                 'query' => $query,
                                 'args'  => $args,
@@ -418,6 +422,22 @@ if ( ! class_exists( 'wpdb', false ) ) {
                                 }
                         }
 
+                        if (
+                                str_contains( $sql, 'SELECT COUNT(*)' )
+                                && str_contains( $sql, 'fbm_attendance' )
+                                && ! str_contains( $sql, 'member_reference = %s' )
+                        ) {
+                                $start    = (string) ( $args[0] ?? '' );
+                                $end      = (string) ( $args[1] ?? '' );
+                                $statuses = array();
+
+                                if ( count( $args ) > 2 ) {
+                                        $statuses = array_map( 'strval', array_slice( $args, 2 ) );
+                                }
+
+                                return count( $this->collect_attendance_rows( $start, $end, $statuses ) );
+                        }
+
                         return null;
                 }
 
@@ -439,44 +459,82 @@ if ( ! class_exists( 'wpdb', false ) ) {
                         ) {
                                 $start = (string) ( $args[0] ?? '' );
                                 $end   = (string) ( $args[1] ?? '' );
+                                $total = count( $args );
 
-                                $rows = array();
+                                $limit  = $total >= 4 ? (int) $args[ $total - 2 ] : 0;
+                                $offset = $total >= 4 ? (int) $args[ $total - 1 ] : 0;
+                                $status_count = max( 0, $total - 4 );
+                                $statuses     = array();
 
-                                foreach ( $this->attendance as $record ) {
-                                        $collected_date = (string) ( $record['collected_date'] ?? '' );
-
-                                        if ( '' !== $start && $collected_date < $start ) {
-                                                continue;
-                                        }
-
-                                        if ( '' !== $end && $collected_date > $end ) {
-                                                continue;
-                                        }
-
-                                        $member = $this->find_member_by_reference( (string) $record['member_reference'] );
-
-                                        $rows[] = array(
-                                                'member_reference' => (string) $record['member_reference'],
-                                                'collected_at'     => (string) $record['collected_at'],
-                                                'collected_date'   => $collected_date,
-                                                'method'           => (string) $record['method'],
-                                                'note'             => $record['note'] ?? null,
-                                                'recorded_by'      => $record['recorded_by'] ?? null,
-                                                'status'           => isset( $member['status'] ) ? (string) $member['status'] : '',
-                                        );
+                                if ( $status_count > 0 ) {
+                                        $statuses = array_map( 'strval', array_slice( $args, 2, $status_count ) );
                                 }
 
-                                usort(
-                                        $rows,
-                                        static function ( array $a, array $b ): int {
-                                                return strcmp( (string) ( $a['collected_at'] ?? '' ), (string) ( $b['collected_at'] ?? '' ) );
-                                        }
-                                );
+                                $rows = $this->collect_attendance_rows( $start, $end, $statuses );
+
+                                if ( $offset > 0 ) {
+                                        $rows = array_slice( $rows, $offset );
+                                }
+
+                                if ( $limit > 0 ) {
+                                        $rows = array_slice( $rows, 0, $limit );
+                                }
 
                                 return $rows;
                         }
 
                         return array();
+                }
+
+                /**
+                 * Filter and normalize attendance rows for the provided range and statuses.
+                 *
+                 * @param string      $start    Inclusive start date (Y-m-d).
+                 * @param string      $end      Inclusive end date (Y-m-d).
+                 * @param array<int,string> $statuses Optional statuses to include.
+                 *
+                 * @return array<int,array<string,mixed>>
+                 */
+                private function collect_attendance_rows( string $start, string $end, array $statuses = array() ): array {
+                        $rows = array();
+
+                        foreach ( $this->attendance as $record ) {
+                                $collected_date = (string) ( $record['collected_date'] ?? '' );
+
+                                if ( '' !== $start && $collected_date < $start ) {
+                                        continue;
+                                }
+
+                                if ( '' !== $end && $collected_date > $end ) {
+                                        continue;
+                                }
+
+                                $member = $this->find_member_by_reference( (string) $record['member_reference'] );
+                                $status = isset( $member['status'] ) ? (string) $member['status'] : '';
+
+                                if ( ! empty( $statuses ) && ! in_array( $status, $statuses, true ) ) {
+                                        continue;
+                                }
+
+                                $rows[] = array(
+                                        'member_reference' => (string) $record['member_reference'],
+                                        'collected_at'     => (string) $record['collected_at'],
+                                        'collected_date'   => $collected_date,
+                                        'method'           => (string) $record['method'],
+                                        'note'             => $record['note'] ?? null,
+                                        'recorded_by'      => $record['recorded_by'] ?? null,
+                                        'status'           => $status,
+                                );
+                        }
+
+                        usort(
+                                $rows,
+                                static function ( array $a, array $b ): int {
+                                        return strcmp( (string) ( $a['collected_at'] ?? '' ), (string) ( $b['collected_at'] ?? '' ) );
+                                }
+                        );
+
+                        return $rows;
                 }
 
                 public function query( string $query ) {
@@ -913,6 +971,18 @@ if ( ! function_exists( 'sanitize_textarea_field' ) ) {
         }
 }
 
+if ( ! function_exists( 'sanitize_file_name' ) ) {
+        function sanitize_file_name( $filename ): string {
+                $filename = (string) $filename;
+                $filename = trim( $filename );
+                $filename = preg_replace( '/[^A-Za-z0-9\-_. ]+/', '', $filename );
+                $filename = preg_replace( '/\s+/', '-', $filename );
+                $filename = trim( (string) $filename, "-_." );
+
+                return strtolower( (string) $filename );
+        }
+}
+
 if ( ! function_exists( 'sanitize_email' ) ) {
         function sanitize_email( $value ): string {
                 $value = (string) $value;
@@ -1051,9 +1121,9 @@ require_once __DIR__ . '/../includes/Auth/class-capabilities.php';
 require_once __DIR__ . '/../includes/Core/class-plugin.php';
 require_once __DIR__ . '/../includes/Core/class-install.php';
 require_once __DIR__ . '/../includes/Core/class-assets.php';
+require_once __DIR__ . '/../includes/Core/class-cache.php';
 require_once __DIR__ . '/../includes/Core/class-schedule.php';
 require_once __DIR__ . '/../includes/Attendance/class-attendancerepository.php';
-require_once __DIR__ . '/../includes/Attendance/class-attendancereportservice.php';
 require_once __DIR__ . '/../includes/Attendance/class-checkinservice.php';
 require_once __DIR__ . '/../includes/Token/class-tokenrepository.php';
 require_once __DIR__ . '/../includes/Token/class-tokenservice.php';
@@ -1069,6 +1139,9 @@ require_once __DIR__ . '/../includes/Admin/class-reportspage.php';
 require_once __DIR__ . '/../includes/Admin/class-schedulepage.php';
 require_once __DIR__ . '/../includes/Admin/class-themepage.php';
 require_once __DIR__ . '/../includes/Admin/class-settingspage.php';
+require_once __DIR__ . '/../includes/Reports/class-reportsrepository.php';
+require_once __DIR__ . '/../includes/Reports/class-summarybuilder.php';
+require_once __DIR__ . '/../includes/Reports/class-csvexporter.php';
 
 if ( ! function_exists( 'add_action' ) ) {
         function add_action( string $hook, $callback, int $priority = 10, int $accepted_args = 1 ): void {
