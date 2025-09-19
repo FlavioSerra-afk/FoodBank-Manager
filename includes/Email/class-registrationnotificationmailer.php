@@ -45,17 +45,33 @@ final class RegistrationNotificationMailer {
                         : __( 'Pending review', 'foodbank-manager' );
 
                 $lines = array(
-                        __( 'A new registration has been submitted.', 'foodbank-manager' ),
-                        '',
-                        sprintf( __( 'Name: %1$s %2$s.', 'foodbank-manager' ), $first_name, $last_initial ),
-                        sprintf( __( 'Email: %s', 'foodbank-manager' ), $email ),
-                        sprintf( __( 'Status: %s', 'foodbank-manager' ), $status_label ),
-                        sprintf( __( 'Member reference: %s', 'foodbank-manager' ), $member_reference ),
-                        '',
+                        __( 'A new registration has been received.', 'foodbank-manager' ),
                         sprintf(
-                                __( 'Review the application: %s', 'foodbank-manager' ),
-                                admin_url( 'admin.php?page=fbm-members' )
+                                /* translators: %s: Registration status label. */
+                                __( 'Status: %s', 'foodbank-manager' ),
+                                $status_label
                         ),
+                        sprintf(
+                                /* translators: %s: Canonical member reference identifier. */
+                                __( 'Member reference: %s', 'foodbank-manager' ),
+                                $member_reference
+                        ),
+                );
+
+                if ( '' !== $first_name ) {
+                        $lines[] = sprintf(
+                                /* translators: 1: Member first name, 2: Member last initial. */
+                                __( 'Name: %1$s %2$s.', 'foodbank-manager' ),
+                                $first_name,
+                                $last_initial
+                        );
+                }
+
+                $lines[] = '';
+                $lines[] = sprintf(
+                        /* translators: %s: Admin URL for reviewing the application. */
+                        __( 'Review the application: %s', 'foodbank-manager' ),
+                        admin_url( 'admin.php?page=fbm-members' )
                 );
 
                 wp_mail( $recipient, $subject, implode( "\n", $lines ) );

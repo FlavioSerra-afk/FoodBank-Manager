@@ -1366,6 +1366,123 @@ if ( ! function_exists( 'sanitize_file_name' ) ) {
 	}
 }
 
+if ( ! isset( $GLOBALS['fbm_upload_stub'] ) || ! is_array( $GLOBALS['fbm_upload_stub'] ) ) {
+        $GLOBALS['fbm_upload_stub'] = array();
+}
+
+if ( ! function_exists( 'wp_check_filetype_and_ext' ) ) {
+        function wp_check_filetype_and_ext( string $file, string $filename, array $mimes = array(), string $real_mime = '' ) {
+                unset( $file );
+                unset( $filename );
+                unset( $real_mime );
+
+                if ( isset( $GLOBALS['fbm_upload_stub']['filetype_result'] ) ) {
+                        return (array) $GLOBALS['fbm_upload_stub']['filetype_result'];
+                }
+
+                if ( ! empty( $mimes ) ) {
+                        $first_extension = array_key_first( $mimes );
+
+                        if ( null !== $first_extension && isset( $mimes[ $first_extension ] ) ) {
+                                return array(
+                                        'type' => (string) $mimes[ $first_extension ],
+                                        'ext'  => (string) $first_extension,
+                                );
+                        }
+                }
+
+                return array(
+                        'type' => '',
+                        'ext'  => '',
+                );
+        }
+}
+
+if ( ! function_exists( 'wp_handle_upload' ) ) {
+        function wp_handle_upload( array $file, array $overrides = array() ) {
+                $GLOBALS['fbm_upload_stub']['handle_upload_calls'][] = array(
+                        'file'      => $file,
+                        'overrides' => $overrides,
+                );
+
+                if ( isset( $GLOBALS['fbm_upload_stub']['handle_upload_result'] ) ) {
+                        return $GLOBALS['fbm_upload_stub']['handle_upload_result'];
+                }
+
+                $name = isset( $file['name'] ) ? (string) $file['name'] : 'upload.bin';
+
+                return array(
+                        'file' => '/tmp/' . $name,
+                        'url'  => 'https://example.test/uploads/' . $name,
+                        'type' => isset( $file['type'] ) ? (string) $file['type'] : '',
+                );
+        }
+}
+
+if ( ! function_exists( 'wp_insert_attachment' ) ) {
+        function wp_insert_attachment( array $attachment, string $file = '' ) {
+                $GLOBALS['fbm_upload_stub']['insert_attachment_calls'][] = array(
+                        'attachment' => $attachment,
+                        'file'       => $file,
+                );
+
+                if ( isset( $GLOBALS['fbm_upload_stub']['insert_attachment_result'] ) ) {
+                        return $GLOBALS['fbm_upload_stub']['insert_attachment_result'];
+                }
+
+                if ( ! isset( $GLOBALS['fbm_upload_stub']['next_attachment_id'] ) ) {
+                        $GLOBALS['fbm_upload_stub']['next_attachment_id'] = 1000;
+                }
+
+                $next = (int) $GLOBALS['fbm_upload_stub']['next_attachment_id'];
+                $GLOBALS['fbm_upload_stub']['next_attachment_id'] = $next + 1;
+
+                return $next;
+        }
+}
+
+if ( ! function_exists( 'wp_generate_attachment_metadata' ) ) {
+        function wp_generate_attachment_metadata( int $attachment_id, string $file ): array {
+                $GLOBALS['fbm_upload_stub']['generate_metadata_calls'][] = array(
+                        'attachment_id' => $attachment_id,
+                        'file'          => $file,
+                );
+
+                return isset( $GLOBALS['fbm_upload_stub']['generate_metadata_result'] )
+                        ? (array) $GLOBALS['fbm_upload_stub']['generate_metadata_result']
+                        : array();
+        }
+}
+
+if ( ! function_exists( 'wp_update_attachment_metadata' ) ) {
+        function wp_update_attachment_metadata( int $attachment_id, array $metadata ): bool {
+                $GLOBALS['fbm_upload_stub']['update_metadata_calls'][] = array(
+                        'attachment_id' => $attachment_id,
+                        'metadata'      => $metadata,
+                );
+
+                return true;
+        }
+}
+
+if ( ! function_exists( 'wp_delete_attachment' ) ) {
+        function wp_delete_attachment( int $attachment_id, bool $force_delete = false ): bool {
+                $GLOBALS['fbm_upload_stub']['deleted_attachments'][] = array(
+                        'attachment_id' => $attachment_id,
+                        'force'         => $force_delete,
+                );
+
+                return true;
+        }
+}
+
+if ( ! function_exists( 'wp_delete_file' ) ) {
+        function wp_delete_file( string $file ): void {
+                $GLOBALS['fbm_upload_stub']['deleted_files'][] = $file;
+        }
+}
+
+
 if ( ! function_exists( 'sanitize_email' ) ) {
 	function sanitize_email( $value ): string {
 			$value = (string) $value;

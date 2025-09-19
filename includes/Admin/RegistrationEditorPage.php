@@ -33,6 +33,8 @@ use function is_readable;
 use function is_string;
 use function json_decode;
 use function nocache_headers;
+use function plugins_url;
+use function rest_url;
 use function sanitize_key;
 use function sanitize_text_field;
 use function sanitize_textarea_field;
@@ -222,9 +224,13 @@ final class RegistrationEditorPage {
                 $version = defined( 'FBM_VER' ) ? FBM_VER : Plugin::VERSION;
                 wp_enqueue_script( 'jquery' );
 
-                $handle = 'fbm-registration-editor';
-                $script = plugins_url( 'assets/js/registration-editor.js', FBM_FILE );
-                wp_register_script( $handle, $script, array( 'jquery', 'code-editor' ), $version, true );
+		$handle = 'fbm-registration-editor';
+		$script = plugins_url( 'assets/js/registration-editor.js', FBM_FILE );
+		$dependencies = array( 'jquery' );
+		if ( ! empty( $editor_settings ) ) {
+			$dependencies[] = 'code-editor';
+		}
+		wp_register_script( $handle, $script, $dependencies, $version, true );
                 wp_localize_script(
                         $handle,
                         'fbmRegistrationEditor',
@@ -237,6 +243,8 @@ final class RegistrationEditorPage {
                                 'i18n'         => array(
                                         'previewTitle' => esc_html__( 'Template Preview', 'foodbank-manager' ),
                                         'previewError' => esc_html__( 'Unable to load the preview. Please save first or try again.', 'foodbank-manager' ),
+                                        'closeLabel'   => esc_html__( 'Close preview', 'foodbank-manager' ),
+                                        'modalDescription' => esc_html__( 'Preview only. Form controls are disabled.', 'foodbank-manager' ),
                                 ),
                         )
                 );
@@ -474,7 +482,16 @@ final class RegistrationEditorPage {
                 foreach ( $required as $key ) {
                         if ( ! in_array( $key, $present, true ) ) {
                                 $label = ucfirst( str_replace( '_', ' ', $key ) );
-                                add_settings_error( self::OPTION_GROUP, 'fbm_registration_template_missing_' . $key, sprintf( __( 'Template is missing the required %s field.', 'foodbank-manager' ), $label ), 'notice-warning' );
+                                add_settings_error(
+                                        self::OPTION_GROUP,
+                                        'fbm_registration_template_missing_' . $key,
+                                        sprintf(
+                                                /* translators: %s: Missing canonical field label. */
+                                                __( 'Template is missing the required %s field.', 'foodbank-manager' ),
+                                                $label
+                                        ),
+                                        'notice-warning'
+                                );
                         }
                 }
         }
@@ -523,8 +540,32 @@ final class RegistrationEditorPage {
                                 'snippet' => '[email* fbm_email placeholder "name@example.com" autocomplete "email"]',
                         ),
                         array(
+                                'label'   => __( 'Telephone field', 'foodbank-manager' ),
+                                'snippet' => '[tel fbm_phone placeholder "+44 7123 456789" autocomplete "tel"]',
+                        ),
+                        array(
+                                'label'   => __( 'Date field', 'foodbank-manager' ),
+                                'snippet' => '[date fbm_preferred_date min:2024-01-01 max:2030-12-31]',
+                        ),
+                        array(
                                 'label'   => __( 'Number field', 'foodbank-manager' ),
                                 'snippet' => '[number* fbm_household_size min:1 max:12 step:1]',
+                        ),
+                        array(
+                                'label'   => __( 'Textarea', 'foodbank-manager' ),
+                                'snippet' => '[textarea fbm_additional_notes placeholder "Share any additional information"]',
+                        ),
+                        array(
+                                'label'   => __( 'Radio options', 'foodbank-manager' ),
+                                'snippet' => '[radio* fbm_contact_method "Email" "Phone" "SMS"]',
+                        ),
+                        array(
+                                'label'   => __( 'Checkbox group', 'foodbank-manager' ),
+                                'snippet' => '[checkbox fbm_support_needs use_label_element "Delivery" "Dietary requirements" "Accessibility support"]',
+                        ),
+                        array(
+                                'label'   => __( 'Select field', 'foodbank-manager' ),
+                                'snippet' => '[select* fbm_collection_day "Thursday|thu" "Friday|fri" "Saturday|sat"]',
                         ),
                         array(
                                 'label'   => __( 'File upload', 'foodbank-manager' ),

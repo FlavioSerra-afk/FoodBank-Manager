@@ -165,5 +165,26 @@ $import_action    = isset( $data['import_action'] ) ? (string) $data['import_act
                 <input type="hidden" name="action" value="<?php echo esc_attr( $import_action ); ?>" />
                 <?php submit_button( esc_html__( 'Import', 'foodbank-manager' ), 'secondary' ); ?>
         </form>
+
+        <div class="fbm-registration-editor__preview-modal" data-fbm-preview-modal hidden>
+                <div class="fbm-registration-editor__preview-backdrop" data-fbm-preview-close></div>
+                <div class="fbm-registration-editor__preview-dialog" role="dialog" aria-modal="true" aria-labelledby="fbm-registration-editor-preview-title" tabindex="-1" data-fbm-preview-dialog>
+                        <div class="fbm-registration-editor__preview-header">
+                                <h2 id="fbm-registration-editor-preview-title"><?php esc_html_e( 'Template Preview', 'foodbank-manager' ); ?></h2>
+                                <button type="button" class="fbm-registration-editor__preview-close button-link" data-fbm-preview-close aria-label="<?php esc_attr_e( 'Close preview', 'foodbank-manager' ); ?>">
+                                        <span aria-hidden="true">&times;</span>
+                                        <span class="screen-reader-text"><?php esc_html_e( 'Close preview', 'foodbank-manager' ); ?></span>
+                                </button>
+                        </div>
+                        <div class="fbm-registration-editor__preview-body" data-fbm-preview-body>
+                                <p class="fbm-registration-editor__preview-note" data-fbm-preview-note><?php esc_html_e( 'Preview only. Form controls are disabled.', 'foodbank-manager' ); ?></p>
+                                <div class="fbm-registration-editor__preview-content" data-fbm-preview-content></div>
+                        </div>
+                        <div class="fbm-registration-editor__preview-warnings" data-fbm-preview-warnings hidden>
+                                <h3><?php esc_html_e( 'Template warnings', 'foodbank-manager' ); ?></h3>
+                                <ul></ul>
+                        </div>
+                </div>
+        </div>
 </div>
 
