@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace FoodBankManager\Core;
 
+use FoodBankManager\Shortcodes\StaffDashboard as StaffDashboardShortcode;
+
 use function add_action;
 use function current_user_can;
 use function esc_html__;
@@ -84,8 +86,8 @@ final class Assets {
 			return;
 		}
 
-				$version = defined( 'FBM_VER' ) ? FBM_VER : Plugin::VERSION;
-		$style           = plugins_url( 'assets/css/admin.css', FBM_FILE );
+		$version = defined( 'FBM_VER' ) ? FBM_VER : Plugin::VERSION;
+		$style   = plugins_url( 'assets/css/admin.css', FBM_FILE );
 
 		wp_enqueue_style( 'fbm-admin', $style, array(), $version );
 	}
@@ -108,13 +110,14 @@ final class Assets {
 			return;
 		}
 
-				$version = defined( 'FBM_VER' ) ? FBM_VER : Plugin::VERSION;
-		$style           = plugins_url( 'assets/css/staff-dashboard.css', FBM_FILE );
-		$script          = plugins_url( 'assets/js/staff-dashboard.js', FBM_FILE );
-		$scanner_script  = plugins_url( 'assets/js/fbm-scanner.js', FBM_FILE );
-		$zxing_script    = plugins_url( 'assets/vendor/zxing-browser.min.js', FBM_FILE );
-		$window          = ( new Schedule() )->current_window();
-		$labels          = Schedule::window_labels( $window );
+		$version        = defined( 'FBM_VER' ) ? FBM_VER : Plugin::VERSION;
+		$style          = plugins_url( 'assets/css/staff-dashboard.css', FBM_FILE );
+		$script         = plugins_url( 'assets/js/staff-dashboard.js', FBM_FILE );
+		$scanner_script = plugins_url( 'assets/js/fbm-scanner.js', FBM_FILE );
+		$zxing_script   = plugins_url( 'assets/vendor/zxing-browser.min.js', FBM_FILE );
+		$window         = ( new Schedule() )->current_window();
+		$labels         = Schedule::window_labels( $window );
+		$config         = StaffDashboardShortcode::settings();
 
 		$ready_message = sprintf(
 			/* translators: %s: Description of the scheduled collection window. */
@@ -131,15 +134,15 @@ final class Assets {
 		wp_register_style( self::STAFF_STYLE, $style, array(), $version );
 		wp_enqueue_style( self::STAFF_STYLE );
 
-				wp_register_script( self::STAFF_HANDLE, $script, array( 'wp-i18n' ), $version, true );
-				wp_register_script( self::ZXING_HANDLE, $zxing_script, array(), '0.1.5', true );
-				wp_register_script(
-					self::SCANNER_HANDLE,
-					$scanner_script,
-					array( 'wp-i18n', self::STAFF_HANDLE, self::ZXING_HANDLE ),
-					$version,
-					true
-				);
+		wp_register_script( self::STAFF_HANDLE, $script, array( 'wp-i18n' ), $version, true );
+		wp_register_script( self::ZXING_HANDLE, $zxing_script, array(), '0.1.5', true );
+		wp_register_script(
+			self::SCANNER_HANDLE,
+			$scanner_script,
+			array( 'wp-i18n', self::STAFF_HANDLE, self::ZXING_HANDLE ),
+			$version,
+			true
+		);
 
 		$data = array(
 			'restUrl'  => esc_url_raw( rest_url( 'fbm/v1/checkin' ) ),
@@ -177,7 +180,9 @@ final class Assets {
 				/* translators: %s: Member reference. */
 				'override_prompt'          => esc_html__( 'Member %s collected within the last week.', 'foodbank-manager' ),
 				'override_requirements'    => esc_html__( 'Only managers can continue by recording an override with a justification.', 'foodbank-manager' ),
+				'override_disabled'        => esc_html__( 'Override prompts are disabled for this dashboard.', 'foodbank-manager' ),
 			),
+			'config'   => $config,
 		);
 
 				wp_localize_script( self::STAFF_HANDLE, 'fbmStaffDashboard', $data );

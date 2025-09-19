@@ -47,7 +47,7 @@ use const INPUT_POST;
  */
 final class SettingsPage {
 	private const MENU_SLUG             = 'fbm-settings';
-	private const PARENT_SLUG           = 'fbm-members';
+	private const PARENT_SLUG           = Menu::SLUG;
 	private const TEMPLATE              = 'templates/admin/settings-page.php';
 	private const FORM_ACTION           = 'fbm_settings_save';
 	private const NONCE_NAME            = 'fbm_settings_nonce';

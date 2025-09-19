@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignoreFile
 declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -1546,25 +1546,75 @@ require_once __DIR__ . '/../includes/Privacy/class-exporter.php';
 require_once __DIR__ . '/../includes/Privacy/class-eraser.php';
 
 if ( ! function_exists( 'add_action' ) ) {
-	function add_action( string $hook, $callback, int $priority = 10, int $accepted_args = 1 ): void {
-			$registry                         = $GLOBALS['fbm_actions'] ?? array();
-			$registry[ $hook ][ $priority ][] = array(
-				'callback' => $callback,
-				'args'     => $accepted_args,
-			);
-			$GLOBALS['fbm_actions']           = $registry;
-	}
+        function add_action( string $hook, $callback, int $priority = 10, int $accepted_args = 1 ): void {
+                $registry                         = $GLOBALS['fbm_actions'] ?? array();
+                $registry[ $hook ][ $priority ][] = array(
+                        'callback' => $callback,
+                        'args'     => $accepted_args,
+                );
+                $GLOBALS['fbm_actions']           = $registry;
+        }
 }
 
 if ( ! function_exists( 'add_filter' ) ) {
-	function add_filter( string $hook, $callback, int $priority = 10, int $accepted_args = 1 ): void {
-			$registry                         = $GLOBALS['fbm_filters'] ?? array();
-			$registry[ $hook ][ $priority ][] = array(
-				'callback' => $callback,
-				'args'     => $accepted_args,
-			);
-			$GLOBALS['fbm_filters']           = $registry;
-	}
+        function add_filter( string $hook, $callback, int $priority = 10, int $accepted_args = 1 ): void {
+                $registry                         = $GLOBALS['fbm_filters'] ?? array();
+                $registry[ $hook ][ $priority ][] = array(
+                        'callback' => $callback,
+                        'args'     => $accepted_args,
+                );
+                $GLOBALS['fbm_filters']           = $registry;
+        }
+}
+
+if ( ! function_exists( 'add_menu_page' ) ) {
+        function add_menu_page(
+                string $page_title,
+                string $menu_title,
+                string $capability,
+                string $menu_slug,
+                $callback = '',
+                string $icon_url = '',
+                $position = null
+        ) {
+                $GLOBALS['fbm_admin_menu'][] = array(
+                        'page_title' => $page_title,
+                        'menu_title' => $menu_title,
+                        'capability' => $capability,
+                        'menu_slug'  => $menu_slug,
+                        'callback'   => $callback,
+                        'icon_url'   => $icon_url,
+                        'position'   => $position,
+                );
+
+                return $menu_slug;
+        }
+}
+
+if ( ! function_exists( 'add_submenu_page' ) ) {
+        function add_submenu_page(
+                string $parent_slug,
+                string $page_title,
+                string $menu_title,
+                string $capability,
+                string $menu_slug,
+                $callback = ''
+        ) {
+                if ( ! isset( $GLOBALS['fbm_admin_submenu'][ $parent_slug ] ) ) {
+                        $GLOBALS['fbm_admin_submenu'][ $parent_slug ] = array();
+                }
+
+                $GLOBALS['fbm_admin_submenu'][ $parent_slug ][] = array(
+                        'parent_slug' => $parent_slug,
+                        'page_title'  => $page_title,
+                        'menu_title'  => $menu_title,
+                        'capability'  => $capability,
+                        'menu_slug'   => $menu_slug,
+                        'callback'    => $callback,
+                );
+
+                return $menu_slug;
+        }
 }
 
 if ( ! function_exists( 'do_action' ) ) {

@@ -21,7 +21,7 @@ use wpdb;
 use function absint;
 use function array_merge;
 use function add_action;
-use function add_menu_page;
+use function add_submenu_page;
 use function add_query_arg;
 use function admin_url;
 use function ceil;
@@ -86,14 +86,14 @@ final class ReportsPage {
 		 * Register the admin menu entry.
 		 */
 	public static function register_menu(): void {
-			add_menu_page(
-				esc_html__( 'Food Bank Reports', 'foodbank-manager' ),
-				esc_html__( 'Food Bank Reports', 'foodbank-manager' ),
-				'fbm_export', // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability registered during activation.
-				self::MENU_SLUG,
-				array( __CLASS__, 'render' ),
-				'dashicons-chart-area'
-			);
+		add_submenu_page(
+			Menu::SLUG,
+			esc_html__( 'Food Bank Reports', 'foodbank-manager' ),
+			esc_html__( 'Reports', 'foodbank-manager' ),
+			'fbm_export', // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability registered during activation.
+			self::MENU_SLUG,
+			array( __CLASS__, 'render' )
+		);
 	}
 
 		/**

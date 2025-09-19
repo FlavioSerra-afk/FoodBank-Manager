@@ -12,8 +12,28 @@ use FoodBankManager\Core\Schedule;
 $schedule = new Schedule();
 $window   = $schedule->current_window();
 $labels   = Schedule::window_labels( $window );
+
+$dashboard_settings = isset( $settings ) && is_array( $settings ) ? $settings : array();
+$show_counters      = isset( $dashboard_settings['show_counters'] ) ? (bool) $dashboard_settings['show_counters'] : true;
+$allow_override     = isset( $dashboard_settings['allow_override'] ) ? (bool) $dashboard_settings['allow_override'] : true;
+$scanner_settings   = isset( $dashboard_settings['scanner'] ) && is_array( $dashboard_settings['scanner'] ) ? $dashboard_settings['scanner'] : array();
+$scanner_roi        = isset( $scanner_settings['roi'] ) ? (int) $scanner_settings['roi'] : 80;
+$scanner_debounce   = isset( $scanner_settings['decode_debounce'] ) ? (int) $scanner_settings['decode_debounce'] : 1200;
+$scanner_torch      = isset( $scanner_settings['prefer_torch'] ) ? (bool) $scanner_settings['prefer_torch'] : false;
+
+$scanner_roi      = max( 30, min( 100, $scanner_roi ) );
+$scanner_debounce = max( 0, min( 5000, $scanner_debounce ) );
+$roi_variable     = $scanner_roi . '%';
 ?>
-<div class="fbm-staff-dashboard" data-fbm-staff-dashboard="1">
+<div
+		class="fbm-staff-dashboard"
+		data-fbm-staff-dashboard="1"
+		data-fbm-scanner-roi="<?php echo esc_attr( (string) $scanner_roi ); ?>"
+		data-fbm-scanner-debounce="<?php echo esc_attr( (string) $scanner_debounce ); ?>"
+		data-fbm-scanner-torch="<?php echo esc_attr( $scanner_torch ? '1' : '0' ); ?>"
+		data-fbm-show-counters="<?php echo esc_attr( $show_counters ? '1' : '0' ); ?>"
+		data-fbm-allow-override="<?php echo esc_attr( $allow_override ? '1' : '0' ); ?>"
+>
 <h1 class="fbm-staff-dashboard__heading">
 <?php esc_html_e( 'FoodBank Manager — Staff Dashboard', 'foodbank-manager' ); ?>
 </h1>
@@ -26,6 +46,7 @@ printf(
 );
 ?>
 </p>
+<?php if ( $show_counters ) : ?>
 <div class="fbm-staff-dashboard__today" data-fbm-today>
 <div class="fbm-staff-dashboard__today-item">
 <span class="fbm-staff-dashboard__today-label"><?php esc_html_e( 'Collections today', 'foodbank-manager' ); ?></span>
@@ -40,6 +61,7 @@ printf(
 <span class="fbm-staff-dashboard__today-value" data-fbm-today-override>0</span>
 </div>
 </div>
+<?php endif; ?>
 <div class="fbm-staff-dashboard__section" data-fbm-scanner-module>
 <h2 class="fbm-staff-dashboard__subheading" id="fbm-staff-dashboard-scanner-heading">
 <?php esc_html_e( 'Camera scanning', 'foodbank-manager' ); ?>
@@ -62,7 +84,7 @@ printf(
 </fieldset>
 </div>
 <div class="fbm-staff-dashboard__camera-wrapper" id="fbm-staff-dashboard-camera-wrapper" data-fbm-scanner-wrapper hidden>
-<div class="fbm-staff-dashboard__camera-frame" data-fbm-scanner-frame aria-hidden="true">
+<div class="fbm-staff-dashboard__camera-frame" data-fbm-scanner-frame aria-hidden="true" style="--fbm-scanner-roi: <?php echo esc_attr( $roi_variable ); ?>;">
 <video class="fbm-staff-dashboard__camera" data-fbm-scanner-video playsinline muted aria-label="<?php echo esc_attr( esc_html__( 'QR scanner preview', 'foodbank-manager' ) ); ?>"></video>
 <div class="fbm-staff-dashboard__camera-overlay" data-fbm-scanner-overlay aria-hidden="true"></div>
 </div>
@@ -128,21 +150,22 @@ aria-describedby="fbm-staff-dashboard-status"
 </form>
 
 <?php if ( isset( $manual_entry ) && is_array( $manual_entry ) && ! empty( $manual_entry['requires_override'] ) ) : ?>
-	<?php
-	$override_code = '';
-	if ( isset( $manual_entry['code'] ) && is_string( $manual_entry['code'] ) ) {
-		$override_code = $manual_entry['code'];
-	}
+		<?php
+		$override_code = '';
+		if ( isset( $manual_entry['code'] ) && is_string( $manual_entry['code'] ) ) {
+				$override_code = $manual_entry['code'];
+		}
 
-	$override_note_value = '';
-	if ( isset( $manual_entry['override_note'] ) && is_string( $manual_entry['override_note'] ) ) {
-		$override_note_value = $manual_entry['override_note'];
-	}
-	?>
+		$override_note_value = '';
+		if ( isset( $manual_entry['override_note'] ) && is_string( $manual_entry['override_note'] ) ) {
+				$override_note_value = $manual_entry['override_note'];
+		}
+		?>
+		<?php if ( $allow_override ) : ?>
 <form class="fbm-staff-dashboard__manual-override" method="post">
 <input type="hidden" name="code" value="<?php echo esc_attr( $override_code ); ?>" />
 <input type="hidden" name="override" value="1" />
-		<?php wp_nonce_field( 'fbm_staff_manual_entry', 'fbm_staff_manual_nonce' ); ?>
+				<?php wp_nonce_field( 'fbm_staff_manual_entry', 'fbm_staff_manual_nonce' ); ?>
 <fieldset class="fbm-staff-dashboard__fieldset">
 <legend class="screen-reader-text"><?php esc_html_e( 'Confirm manual override', 'foodbank-manager' ); ?></legend>
 <label class="fbm-staff-dashboard__field" for="fbm-staff-dashboard-manual-override-note">
@@ -154,29 +177,35 @@ class="fbm-staff-dashboard__input fbm-staff-dashboard__input--textarea"
 rows="3"
 aria-describedby="fbm-staff-dashboard-status"
 >
-		<?php
-		if ( function_exists( 'esc_textarea' ) ) {
-				echo esc_textarea( $override_note_value );
-		} else {
-				echo esc_html( $override_note_value );
-		}
-		?>
+				<?php
+				if ( function_exists( 'esc_textarea' ) ) {
+								echo esc_textarea( $override_note_value );
+				} else {
+								echo esc_html( $override_note_value );
+				}
+				?>
 </textarea>
 </label>
 <button type="submit" class="fbm-staff-dashboard__action"><?php esc_html_e( 'Confirm override', 'foodbank-manager' ); ?></button>
 </fieldset>
 </form>
+		<?php else : ?>
+<div class="fbm-staff-dashboard__manual-status fbm-staff-dashboard__manual-status--warning" role="status" aria-live="polite">
+			<?php esc_html_e( 'Override prompts are disabled. Please contact a manager to record this visit.', 'foodbank-manager' ); ?>
+</div>
+		<?php endif; ?>
 <?php endif; ?>
 
+<?php if ( $allow_override ) : ?>
 <div class="fbm-staff-dashboard__override" data-fbm-override hidden>
 <fieldset class="fbm-staff-dashboard__fieldset" aria-describedby="fbm-staff-dashboard-status">
 <legend class="screen-reader-text"><?php esc_html_e( 'Manager override confirmation', 'foodbank-manager' ); ?></legend>
 <p class="fbm-staff-dashboard__helper" data-fbm-override-message role="status" aria-live="polite">
-<?php esc_html_e( 'This member collected within the last week. Only managers can continue by recording an override with a justification.', 'foodbank-manager' ); ?>
+	<?php esc_html_e( 'This member collected within the last week. Only managers can continue by recording an override with a justification.', 'foodbank-manager' ); ?>
 </p>
 <label class="fbm-staff-dashboard__field" for="fbm-staff-dashboard-override-note">
 <span class="fbm-staff-dashboard__label">
-<?php esc_html_e( 'Override note', 'foodbank-manager' ); ?>
+	<?php esc_html_e( 'Override note', 'foodbank-manager' ); ?>
 </span>
 <textarea
 id="fbm-staff-dashboard-override-note"
@@ -188,14 +217,15 @@ aria-describedby="fbm-staff-dashboard-status"
 </label>
 <div class="fbm-staff-dashboard__override-actions">
 <button type="button" class="fbm-staff-dashboard__action" data-fbm-confirm-override>
-<?php esc_html_e( 'Record override', 'foodbank-manager' ); ?>
+	<?php esc_html_e( 'Record override', 'foodbank-manager' ); ?>
 </button>
 <button type="button" class="fbm-staff-dashboard__action fbm-staff-dashboard__action--secondary" data-fbm-cancel-override>
-<?php esc_html_e( 'Cancel override', 'foodbank-manager' ); ?>
+	<?php esc_html_e( 'Cancel override', 'foodbank-manager' ); ?>
 </button>
 </div>
 </fieldset>
 </div>
+<?php endif; ?>
 
 <div class="fbm-staff-dashboard__status" id="fbm-staff-dashboard-status" data-fbm-status role="status" aria-live="polite" aria-atomic="true"></div>
 </div>

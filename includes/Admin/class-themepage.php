@@ -52,7 +52,7 @@ use function wp_unslash;
 final class ThemePage {
 
 	private const MENU_SLUG     = 'fbm-theme';
-	private const PARENT_SLUG   = 'fbm-members';
+	private const PARENT_SLUG   = Menu::SLUG;
 	private const OPTION_GROUP  = 'fbm_theme';
 	private const OPTION_NAME   = 'fbm_theme';
 	private const TEMPLATE      = 'templates/admin/theme-page.php';

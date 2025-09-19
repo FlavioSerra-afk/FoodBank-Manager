@@ -14,6 +14,157 @@
         return;
     }
 
+    var parseBool = function (value, fallback) {
+        if (typeof value === 'boolean') {
+            return value;
+        }
+
+        if (typeof value === 'number') {
+            return value !== 0;
+        }
+
+        if (typeof value === 'string') {
+            var normalized = value.toLowerCase().trim();
+            if (normalized === '1' || normalized === 'true' || normalized === 'yes' || normalized === 'on') {
+                return true;
+            }
+            if (normalized === '0' || normalized === 'false' || normalized === 'no' || normalized === 'off') {
+                return false;
+            }
+        }
+
+        return fallback;
+    };
+
+    var clampInt = function (value, fallback, min, max) {
+        var parsed = parseInt(value, 10);
+
+        if (isNaN(parsed)) {
+            parsed = typeof fallback === 'number' ? fallback : 0;
+        }
+
+        if (typeof min === 'number' && parsed < min) {
+            parsed = min;
+        }
+
+        if (typeof max === 'number' && parsed > max) {
+            parsed = max;
+        }
+
+        return parsed;
+    };
+
+    var baseConfig = {
+        showCounters: true,
+        allowOverride: true,
+        scanner: {
+            preferTorch: false,
+            roi: 80,
+            decodeDebounce: 1200
+        }
+    };
+
+    var localizedConfig = settings.config;
+    if (localizedConfig && typeof localizedConfig === 'object') {
+        if (Object.prototype.hasOwnProperty.call(localizedConfig, 'show_counters')) {
+            baseConfig.showCounters = parseBool(localizedConfig.show_counters, baseConfig.showCounters);
+        }
+        if (Object.prototype.hasOwnProperty.call(localizedConfig, 'allow_override')) {
+            baseConfig.allowOverride = parseBool(localizedConfig.allow_override, baseConfig.allowOverride);
+        }
+        if (localizedConfig.scanner && typeof localizedConfig.scanner === 'object') {
+            var scanner = localizedConfig.scanner;
+            if (Object.prototype.hasOwnProperty.call(scanner, 'prefer_torch')) {
+                baseConfig.scanner.preferTorch = parseBool(scanner.prefer_torch, baseConfig.scanner.preferTorch);
+            }
+            if (Object.prototype.hasOwnProperty.call(scanner, 'roi')) {
+                baseConfig.scanner.roi = clampInt(scanner.roi, baseConfig.scanner.roi, 30, 100);
+            }
+            if (Object.prototype.hasOwnProperty.call(scanner, 'decode_debounce')) {
+                baseConfig.scanner.decodeDebounce = clampInt(scanner.decode_debounce, baseConfig.scanner.decodeDebounce, 0, 5000);
+            }
+        }
+    }
+
+    var cloneConfig = function () {
+        return {
+            showCounters: baseConfig.showCounters,
+            allowOverride: baseConfig.allowOverride,
+            scanner: {
+                preferTorch: baseConfig.scanner.preferTorch,
+                roi: baseConfig.scanner.roi,
+                decodeDebounce: baseConfig.scanner.decodeDebounce
+            }
+        };
+    };
+
+    var resolveRoot = function (element) {
+        if (!element) {
+            return null;
+        }
+
+        if (typeof element.hasAttribute === 'function' && element.hasAttribute('data-fbm-staff-dashboard')) {
+            return element;
+        }
+
+        if (element.dataset && element.dataset.fbmStaffDashboard) {
+            return element;
+        }
+
+        if (typeof element.closest === 'function') {
+            var candidate = element.closest('[data-fbm-staff-dashboard]');
+            if (candidate) {
+                return candidate;
+            }
+        }
+
+        return null;
+    };
+
+    var applyDatasetConfig = function (config, root) {
+        if (!root || !root.dataset) {
+            return;
+        }
+
+        var data = root.dataset;
+
+        if (Object.prototype.hasOwnProperty.call(data, 'fbmShowCounters')) {
+            config.showCounters = parseBool(data.fbmShowCounters, config.showCounters);
+        }
+
+        if (Object.prototype.hasOwnProperty.call(data, 'fbmAllowOverride')) {
+            config.allowOverride = parseBool(data.fbmAllowOverride, config.allowOverride);
+        }
+
+        if (Object.prototype.hasOwnProperty.call(data, 'fbmScannerTorch')) {
+            config.scanner.preferTorch = parseBool(data.fbmScannerTorch, config.scanner.preferTorch);
+        }
+
+        if (Object.prototype.hasOwnProperty.call(data, 'fbmScannerRoi')) {
+            config.scanner.roi = clampInt(data.fbmScannerRoi, config.scanner.roi, 30, 100);
+        }
+
+        if (Object.prototype.hasOwnProperty.call(data, 'fbmScannerDebounce')) {
+            config.scanner.decodeDebounce = clampInt(data.fbmScannerDebounce, config.scanner.decodeDebounce, 0, 5000);
+        }
+    };
+
+    var getContainerConfig = function (element) {
+        var root = resolveRoot(element);
+
+        if (!root) {
+            return cloneConfig();
+        }
+
+        if (!root.__fbmConfig) {
+            var merged = cloneConfig();
+            applyDatasetConfig(merged, root);
+            root.__fbmConfig = merged;
+        }
+
+        return root.__fbmConfig;
+    };
+
     var requestFrame = window.requestAnimationFrame || function (callback) {
         return window.setTimeout(callback, 1000 / 30);
     };
@@ -89,6 +240,11 @@
             return;
         }
 
+        var config = getContainerConfig(container);
+        if (!config.showCounters) {
+            return;
+        }
+
         if (!container.__fbmState) {
             container.__fbmState = {};
         }
@@ -146,6 +302,11 @@
             return;
         }
 
+        var config = getContainerConfig(container);
+        if (!config.allowOverride) {
+            return;
+        }
+
         if (!container.__fbmState) {
             container.__fbmState = {};
         }
@@ -175,19 +336,43 @@
         }
     };
 
-    var prepareScanner = function (container, statusEl, strings, onScan) {
-        var startButton = container.querySelector('[data-fbm-start-scan]');
-        var stopButton = container.querySelector('[data-fbm-stop-scan]');
-        var wrapper = container.querySelector('[data-fbm-camera-wrapper]');
-        var video = container.querySelector('[data-fbm-camera]');
-        var fallback = container.querySelector('[data-fbm-camera-fallback]');
+    var prepareScanner = function (section, statusEl, strings, onScan) {
+        if (!section) {
+            return;
+        }
+
+        var root = resolveRoot(section) || section;
+        var config = getContainerConfig(root);
+        var scannerOptions = config.scanner || {};
+        var roi = clampInt(scannerOptions.roi, baseConfig.scanner.roi, 30, 100);
+        var decodeDelay = clampInt(scannerOptions.decodeDebounce, baseConfig.scanner.decodeDebounce, 0, 5000);
+        var preferTorch = !!scannerOptions.preferTorch;
+
+        var startButton = section.querySelector('[data-fbm-scanner-start]');
+        var stopButton = section.querySelector('[data-fbm-scanner-stop]');
+        var wrapper = section.querySelector('[data-fbm-scanner-wrapper]');
+        var video = section.querySelector('[data-fbm-scanner-video]');
+        var fallback = section.querySelector('[data-fbm-scanner-fallback]');
+        var overlay = section.querySelector('[data-fbm-scanner-overlay]');
+        var frame = section.querySelector('[data-fbm-scanner-frame]');
+
+        if (overlay) {
+            overlay.style.width = roi + '%';
+            overlay.style.height = roi + '%';
+        }
+
+        if (frame && frame.style && typeof frame.style.setProperty === 'function') {
+            frame.style.setProperty('--fbm-scanner-roi', roi + '%');
+        }
 
         var supported = typeof window.BarcodeDetector === 'function';
         var detector = null;
         var scanning = false;
         var rafId = null;
         var mediaStream = null;
+        var currentTrack = null;
         var lastResult = '';
+        var lastDecodeAt = 0;
 
         if (supported) {
             try {
@@ -215,6 +400,8 @@
             }
 
             mediaStream = null;
+            currentTrack = null;
+            lastDecodeAt = 0;
 
             if (video) {
                 if (typeof video.pause === 'function') {
@@ -229,6 +416,11 @@
 
             if (startButton) {
                 startButton.hidden = false;
+                startButton.disabled = false;
+            }
+
+            if (fallback) {
+                fallback.hidden = true;
             }
         };
 
@@ -241,6 +433,13 @@
                 rafId = requestFrame(scanFrame);
                 return;
             }
+
+            var now = Date.now();
+            if (decodeDelay > 0 && now - lastDecodeAt < decodeDelay) {
+                rafId = requestFrame(scanFrame);
+                return;
+            }
+            lastDecodeAt = now;
 
             detector.detect(video).then(function (codes) {
                 if (!codes || !codes.length) {
@@ -290,6 +489,7 @@
 
             navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }).then(function (stream) {
                 mediaStream = stream;
+                currentTrack = stream.getVideoTracks && stream.getVideoTracks().length ? stream.getVideoTracks()[0] : null;
 
                 if (video) {
                     video.srcObject = stream;
@@ -298,8 +498,22 @@
                     }
                 }
 
+                if (preferTorch && currentTrack && typeof currentTrack.getCapabilities === 'function' && typeof currentTrack.applyConstraints === 'function') {
+                    try {
+                        var capabilities = currentTrack.getCapabilities();
+                        if (capabilities && Object.prototype.hasOwnProperty.call(capabilities, 'torch') && capabilities.torch) {
+                            currentTrack.applyConstraints({ advanced: [{ torch: true }] }).catch(function () {
+                                // Ignore torch preference failures.
+                            });
+                        }
+                    } catch (torchError) {
+                        // Ignore capability errors.
+                    }
+                }
+
                 scanning = true;
                 lastResult = '';
+                lastDecodeAt = 0;
 
                 if (wrapper) {
                     wrapper.hidden = false;
@@ -364,6 +578,7 @@
 
         var strings = settings.strings;
         var statusEl = container.querySelector('[data-fbm-status]');
+        var config = getContainerConfig(container);
 
         updateStatus(statusEl, strings.loading, 'info');
 
@@ -425,12 +640,15 @@
             } else if (statusKey === 'recent_warning') {
                 message = strings.recent_warning;
                 tone = 'warning';
-                if (context && context.reference) {
+                if (config.allowOverride && context && context.reference) {
                     showOverride(container, {
                         reference: context.reference,
                         mode: context.mode,
                         method: context.method
                     }, strings);
+                } else {
+                    message = strings.override_disabled || message;
+                    hideOverride(container);
                 }
             } else if (statusKey === 'throttled') {
                 message = (data && typeof data.message === 'string') ? data.message : (strings.throttled || strings.error);
@@ -483,6 +701,7 @@
         }
 
         forEach.call(containers, function (container) {
+            var config = getContainerConfig(container);
             updateCounters(container);
 
             var statusEl = container.querySelector('[data-fbm-status]');
@@ -490,7 +709,7 @@
 
             hideOverride(container);
 
-            var scannerSection = container.querySelector('[data-fbm-scanner]');
+            var scannerSection = container.querySelector('[data-fbm-scanner-module]');
             if (scannerSection) {
                 prepareScanner(scannerSection, statusEl, settings.strings, function (token) {
                     if (!token) {
@@ -545,6 +764,11 @@
             var overrideConfirm = container.querySelector('[data-fbm-confirm-override]');
             if (overrideConfirm) {
                 overrideConfirm.addEventListener('click', function () {
+                    if (!config.allowOverride) {
+                        updateStatus(statusEl, settings.strings.override_disabled || settings.strings.error, 'error');
+                        return;
+                    }
+
                     var state = container.__fbmState || {};
                     var context = state.overrideContext;
                     if (!context || !context.reference) {
@@ -566,17 +790,17 @@
                         return;
                     }
 
-                var payload = {
-                    method: context.method || 'manual',
-                    override: true,
-                    override_note: noteValue
-                };
+                    var payload = {
+                        method: context.method || 'manual',
+                        override: true,
+                        override_note: noteValue
+                    };
 
-                if (context.mode === 'token') {
-                    payload.code = context.reference;
-                } else {
-                    payload.manual_code = context.reference;
-                }
+                    if (context.mode === 'token') {
+                        payload.code = context.reference;
+                    } else {
+                        payload.manual_code = context.reference;
+                    }
 
                     sendCheckin(container, payload, {
                         override: true,

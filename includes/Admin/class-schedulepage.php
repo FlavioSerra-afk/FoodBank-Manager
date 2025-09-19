@@ -41,7 +41,7 @@ use const INPUT_GET;
 final class SchedulePage {
 
 	private const MENU_SLUG     = 'fbm-schedule';
-	private const PARENT_SLUG   = 'fbm-members';
+	private const PARENT_SLUG   = Menu::SLUG;
 	private const TEMPLATE      = 'templates/admin/schedule-page.php';
 	private const OPTION_NAME   = 'fbm_schedule_window';
 	private const FORM_ACTION   = 'fbm_schedule_save';
