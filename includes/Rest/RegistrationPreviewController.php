@@ -15,7 +15,9 @@ use WP_REST_Request;
 use WP_REST_Response;
 use function current_user_can;
 use function esc_html__;
+use function register_rest_route;
 use function rest_ensure_response;
+use function wp_create_nonce;
 use function wp_verify_nonce;
 
 /**
@@ -72,14 +74,13 @@ final class RegistrationPreviewController {
                 $renderer = new TemplateRenderer( new TagParser() );
                 $rendered = $renderer->render( $template, array(), array() );
 
-                $markup = '<!DOCTYPE html><html><head><meta charset="utf-8" /><title>' . esc_html__( 'Registration preview', 'foodbank-manager' ) . '</title>';
-                $markup .= '<style>body{font-family:system-ui, sans-serif;margin:20px;} .fbm-preview-note{margin-top:16px;font-size:14px;color:#555;} .fbm-registration-preview input, .fbm-registration-preview select, .fbm-registration-preview textarea{display:block;width:100%;max-width:420px;margin-bottom:12px;padding:6px;border:1px solid #ccc;border-radius:4px;}</style>';
-                $markup .= '</head><body><div class="fbm-registration-preview">' . $rendered['html'] . '<p class="fbm-preview-note">' . esc_html__( 'Preview only. Form controls are disabled.', 'foodbank-manager' ) . '</p></div></body></html>';
+                $markup = '<div class="fbm-registration-preview">' . $rendered['html'] . '<p class="fbm-preview-note">' . esc_html__( 'Preview only. Form controls are disabled.', 'foodbank-manager' ) . '</p></div>';
 
                 return rest_ensure_response(
                         array(
                                 'markup'   => $markup,
                                 'warnings' => $rendered['warnings'],
+                                'nonce'    => wp_create_nonce( 'fbm_registration_preview_modal' ),
                         )
                 );
         }

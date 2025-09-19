@@ -174,14 +174,14 @@ final class RegistrationForm {
                 return self::render_template( $context );
         }
 
-        /**
-         * Resolve the stored registration template.
-         */
-        private static function current_template(): string {
-                        $stored = get_option( self::TEMPLATE_OPTION, '' );
+	/**
+	 * Resolve the stored registration template.
+	 */
+	private static function current_template(): string {
+		$stored = get_option( self::TEMPLATE_OPTION, '' );
 
-                        return is_string( $stored ) && '' !== trim( $stored ) ? $stored : TemplateDefaults::template();
-        }
+		return is_string( $stored ) && '' !== trim( $stored ) ? $stored : TemplateDefaults::template();
+	}
 
         /**
          * Merge stored settings with defaults.
@@ -327,8 +327,15 @@ final class RegistrationForm {
                                 if ( 'error' === $upload['status'] ) {
                                         $result['field_errors'][ $name ][] = isset( $upload['error'] ) ? (string) $upload['error'] : esc_html__( 'Unable to process the uploaded file.', 'foodbank-manager' );
                                 } elseif ( 'stored' === $upload['status'] ) {
-                                        $uploads[]     = $upload;
-                                        $stored_meta[] = $upload;
+                                        $uploads[] = array(
+                                                'attachment_id' => (int) $upload['attachment_id'],
+                                                'path'          => (string) $upload['path'],
+                                        );
+                                        $stored_meta[] = array(
+                                                'attachment_id' => (int) $upload['attachment_id'],
+                                                'url'           => (string) $upload['url'],
+                                                'type'          => (string) $upload['type'],
+                                        );
                                 }
 
                                 continue;
@@ -726,6 +733,14 @@ final class RegistrationForm {
                                 continue;
                         }
 
+                        if ( is_numeric( $value ) ) {
+                                if ( self::is_truthy_checkbox_value( (string) $value ) ) {
+                                        return true;
+                                }
+
+                                continue;
+                        }
+
                         if ( ! empty( $value ) ) {
                                 return true;
                         }
@@ -740,19 +755,7 @@ final class RegistrationForm {
          * @param string $value Checkbox value payload.
          */
         private static function is_truthy_checkbox_value( string $value ): bool {
-                $normalized = strtolower( trim( $value ) );
-
-                if ( '' === $normalized ) {
-                        return false;
-                }
-
-                $falsey = array( '0', 'false', 'no', 'decline', 'deny', 'reject', 'opt-out', 'opt_out', 'off' );
-
-                if ( in_array( $normalized, $falsey, true ) ) {
-                        return false;
-                }
-
-                return true;
+                return '' !== trim( $value );
         }
 
         /**

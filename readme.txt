@@ -3,7 +3,7 @@ Contributors: portuguese-community-centre-london
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.2
-Stable tag: 1.3.1
+Stable tag: 1.4.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -60,6 +60,10 @@ FoodBank Manager registers with the WordPress privacy exporter/eraser registry a
 First stable cut with readme polish and release checksums.
 
 == Changelog ==
+= 1.4.0 =
+* Registration editor preview now opens in an accessible modal with sanitized markup and improved toolbar snippets.
+* Hardened registration submissions with consent timestamp persistence, stricter household size clamps, and secured upload handling.
+* Streamlined admin notifications and member history links from reports for quicker follow-up.
 = 1.3.0 =
 * Added versioned AES-256-GCM envelope encryption for member names and diagnostics mail log emails with HKDF-derived master key wrapping.
 * Introduced Diagnostics admin controls and `wp fbm crypto` WP-CLI commands for status, migration, rotation, and verification (dry-run + batching).

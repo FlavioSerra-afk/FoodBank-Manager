@@ -8,7 +8,7 @@
 
 | Feature | Admin | Manager | Staff | Public | Mobile | A11y | Security | PHPCS | PHPStan | Unit | Integration | E2E | Docs | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Forms (shortcode) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | [ ] | ✅ | v1.1.1: shortcode hardened + admin approval/resend coverage; v1.3.1 editor + preview |
+| Forms (shortcode) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | [ ] | ✅ | v1.1.1: shortcode hardened + admin approval/resend coverage; v1.4.0 editor modal preview + upload/consent hardening |
 | Emails (log/resend) | ✅ | ✅ | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | ✅ | v1.1.1: diagnostics resend log with rate limiting |
 | Front-end Dashboard (auth) | ✅ | ✅ | ✅ | [ ] | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | ✅ | v1.1.1: scanner UI + REST nonce/throttle coverage |
 | Staff Check-in | ✅ | ✅ | ✅ | [ ] | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | [ ] | ✅ | v1.1.1: /fbm/checkin throttling + override audit |

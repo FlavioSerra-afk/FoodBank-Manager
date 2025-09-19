@@ -48,7 +48,11 @@ final class RegistrationPreviewControllerTest extends TestCase {
                 $data     = $response->get_data();
 
                 $this->assertArrayHasKey( 'markup', $data );
+                $this->assertArrayHasKey( 'warnings', $data );
+                $this->assertArrayHasKey( 'nonce', $data );
+                $this->assertStringContainsString( 'fbm-registration-preview', $data['markup'] );
                 $this->assertStringContainsString( '<input', $data['markup'] );
                 $this->assertStringNotContainsString( '<script', $data['markup'] );
+                $this->assertSame( 'nonce-fbm_registration_preview_modal', $data['nonce'] );
         }
 }

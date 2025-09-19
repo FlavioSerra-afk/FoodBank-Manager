@@ -60,13 +60,15 @@ Validation, nonce, anti-spam (honeypot + time trap).
 
 Minimal PII collection; strict sanitize/normalize; prepared SQL writes.
 
-Single-template editor in admin (CodeMirror-backed) manages the registration markup with CF7-style tags; templates sanitized via `wp_kses` allow-list. Admin preview endpoint (`/fbm/v1/registration/preview`, manager-only nonce/cap) renders safe HTML for review.
+Single-template editor in admin (CodeMirror-backed) manages the registration markup with CF7-style tags; templates sanitized via a `wp_kses` allow-list that preserves fieldsets, headings, lists, and safe `aria-`/`data-` attributes while stripping scripts. Admin preview endpoint (`/fbm/v1/registration/preview`, manager-only nonce/cap) returns sanitized HTML, warnings, and a transient nonce for an accessible modal preview (focus trap + ESC close).
 
 On approval (or instant, per config), send Welcome Email including the user’s persistent QR code and a fallback alphanumeric code.
 
 Auto-assign FoodBank Member role on successful registration; ignore legacy WP role defaults.
 
-Optional policy consent capture and audit (timestamps).
+Optional policy consent capture and audit (timestamps). Any checked consent value counts as affirmative, and re-submissions keep the most recent timestamp.
+
+Uploads respect WordPress MIME/size validation APIs with private attachment storage; templates define min/max ranges (e.g. household size) that server-side handlers clamp before persistence.
 
 B) Staff Front-End Dashboard (Scanner)
 

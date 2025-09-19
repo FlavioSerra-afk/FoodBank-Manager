@@ -2,12 +2,21 @@
 
 ## [Unreleased]
 
+- _No changes yet._
+
+## [1.4.0] - 2025-09-25
+
 ### Added
-- Registration form editor with CodeMirror toolbar snippets, REST preview, and stricter template sanitization.
-- Admin notification email on new registrations plus reports member-detail view with historical check-ins.
+- Accessible registration editor preview modal driven by the admin-only REST endpoint, returning sanitized markup, warnings, and a transient nonce for follow-up requests.
+- Unit coverage for the expanded `wp_kses` allow-list, preview permissions, and upload enforcement edge cases.
 
 ### Changed
-- Public registration shortcode now renders stored templates through the new parser/renderer pipeline with expanded unit coverage.
+- Toolbar snippets now cover text, email, tel, date, number, textarea, radio, checkbox, select, file, and submit tags using Contact Form 7 syntax so pasted templates remain compatible.
+- Registration submissions persist consent timestamps for any checked value, clamp household size using template min/max definitions, and enforce upload MIME/size rules via core WordPress APIs.
+- Admin notification emails now deliver concise “new application received” copy with a secure review link, and reports surface member history through clickable names.
+
+### Fixed
+- Upload metadata storage no longer retains local file paths, preventing inadvertent disclosure during diagnostics.
 
 ## [1.3.0] - 2025-09-24
 

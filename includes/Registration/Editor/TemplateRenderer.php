@@ -150,6 +150,11 @@ final class TemplateRenderer {
                         'small'    => $common_attributes,
                         'sup'      => $common_attributes,
                         'sub'      => $common_attributes,
+                        'br'       => array(),
+                        'hr'       => $common_attributes,
+                        'dl'       => $common_attributes,
+                        'dt'       => $common_attributes,
+                        'dd'       => $common_attributes,
                 );
         }
 

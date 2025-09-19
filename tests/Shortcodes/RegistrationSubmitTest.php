@@ -124,6 +124,187 @@ final class RegistrationSubmitTest extends TestCase {
                 $this->assertContains( 'foodbank_member', $user->roles );
         }
 
+        public function test_consent_timestamp_recorded_when_checkbox_checked(): void {
+                $schema   = $this->schema();
+                $settings = TemplateDefaults::settings();
+                $consent  = $this->consent_value( $schema );
+
+                $_SERVER['REQUEST_METHOD'] = 'POST';
+                $_POST = array(
+                        'fbm_registration_submitted' => '1',
+                        'fbm_registration_nonce'     => 'valid-nonce',
+                        'fbm_registration_hp'        => '',
+                        'fbm_registration_time'      => (string) ( time() - 60 ),
+                        'fbm_first_name'             => 'Morgan',
+                        'fbm_last_initial'           => 'T',
+                        'fbm_email'                  => 'morgan@example.com',
+                        'fbm_household_size'         => '2',
+                        'fbm_registration_consent'   => $consent,
+                );
+
+                $result = $this->handle_submission( $schema['fields'], $settings );
+
+                $this->assertTrue( $result['success'] );
+
+                $member = $this->last_member_row();
+                $this->assertArrayHasKey( 'consent_recorded_at', $member );
+                $this->assertNotSame( '', $member['consent_recorded_at'] );
+        }
+
+        public function test_consent_timestamp_not_recorded_when_unchecked(): void {
+                $schema   = $this->schema();
+                $settings = TemplateDefaults::settings();
+
+                $_SERVER['REQUEST_METHOD'] = 'POST';
+                $_POST = array(
+                        'fbm_registration_submitted' => '1',
+                        'fbm_registration_nonce'     => 'valid-nonce',
+                        'fbm_registration_hp'        => '',
+                        'fbm_registration_time'      => (string) ( time() - 60 ),
+                        'fbm_first_name'             => 'Jamie',
+                        'fbm_last_initial'           => 'Q',
+                        'fbm_email'                  => 'jamie@example.com',
+                        'fbm_household_size'         => '3',
+                );
+
+                $result = $this->handle_submission( $schema['fields'], $settings );
+
+                $this->assertTrue( $result['success'] );
+
+                $member = $this->last_member_row();
+                $this->assertFalse( array_key_exists( 'consent_recorded_at', $member ) );
+        }
+
+        public function test_consent_timestamp_updates_on_resubmission(): void {
+                $schema   = $this->schema();
+                $settings = TemplateDefaults::settings();
+                $consent  = $this->consent_value( $schema );
+
+                $_SERVER['REQUEST_METHOD'] = 'POST';
+                $_POST = array(
+                        'fbm_registration_submitted' => '1',
+                        'fbm_registration_nonce'     => 'valid-nonce',
+                        'fbm_registration_hp'        => '',
+                        'fbm_registration_time'      => (string) ( time() - 60 ),
+                        'fbm_first_name'             => 'River',
+                        'fbm_last_initial'           => 'S',
+                        'fbm_email'                  => 'river@example.com',
+                        'fbm_household_size'         => '4',
+                );
+
+                $initial = $this->handle_submission( $schema['fields'], $settings );
+                $this->assertTrue( $initial['success'] );
+
+                $first_member = $this->last_member_row();
+                $this->assertFalse( array_key_exists( 'consent_recorded_at', $first_member ) );
+
+                $_POST = array(
+                        'fbm_registration_submitted' => '1',
+                        'fbm_registration_nonce'     => 'valid-nonce',
+                        'fbm_registration_hp'        => '',
+                        'fbm_registration_time'      => (string) ( time() - 60 ),
+                        'fbm_first_name'             => 'River',
+                        'fbm_last_initial'           => 'S',
+                        'fbm_email'                  => 'river@example.com',
+                        'fbm_household_size'         => '4',
+                        'fbm_registration_consent'   => $consent,
+                );
+
+                $resubmission = $this->handle_submission( $schema['fields'], $settings );
+
+                $this->assertTrue( $resubmission['success'] );
+
+                $updated_member = $this->last_member_row();
+                $this->assertArrayHasKey( 'consent_recorded_at', $updated_member );
+                $this->assertNotSame( '', $updated_member['consent_recorded_at'] );
+        }
+
+        public function test_consent_checkbox_custom_label_array_counts_as_truthy(): void {
+                $schema   = $this->schema();
+                $settings = TemplateDefaults::settings();
+
+                $schema['fields']['fbm_registration_consent']['options'] = array(
+                        array(
+                                'value' => 'custom-label',
+                                'label' => 'Custom label',
+                        ),
+                );
+
+                $_SERVER['REQUEST_METHOD'] = 'POST';
+                $_POST = array(
+                        'fbm_registration_submitted' => '1',
+                        'fbm_registration_nonce'     => 'valid-nonce',
+                        'fbm_registration_hp'        => '',
+                        'fbm_registration_time'      => (string) ( time() - 60 ),
+                        'fbm_first_name'             => 'Lee',
+                        'fbm_last_initial'           => 'N',
+                        'fbm_email'                  => 'lee@example.com',
+                        'fbm_household_size'         => '3',
+                        'fbm_registration_consent'   => array( 'custom-label' ),
+                );
+
+                $result = $this->handle_submission( $schema['fields'], $settings );
+
+                $this->assertTrue( $result['success'] );
+
+                $member = $this->last_member_row();
+                $this->assertArrayHasKey( 'consent_recorded_at', $member );
+                $this->assertNotSame( '', $member['consent_recorded_at'] );
+        }
+
+        public function test_household_size_clamped_to_minimum(): void {
+                $schema   = $this->schema();
+                $settings = TemplateDefaults::settings();
+                $consent  = $this->consent_value( $schema );
+
+                $_SERVER['REQUEST_METHOD'] = 'POST';
+                $_POST = array(
+                        'fbm_registration_submitted' => '1',
+                        'fbm_registration_nonce'     => 'valid-nonce',
+                        'fbm_registration_hp'        => '',
+                        'fbm_registration_time'      => (string) ( time() - 60 ),
+                        'fbm_first_name'             => 'Devon',
+                        'fbm_last_initial'           => 'A',
+                        'fbm_email'                  => 'devon@example.com',
+                        'fbm_household_size'         => '-5',
+                        'fbm_registration_consent'   => $consent,
+                );
+
+                $result = $this->handle_submission( $schema['fields'], $settings );
+
+                $this->assertTrue( $result['success'] );
+
+                $member = $this->last_member_row();
+                $this->assertSame( 1, $member['household_size'] );
+        }
+
+        public function test_household_size_clamped_to_maximum(): void {
+                $schema   = $this->schema();
+                $settings = TemplateDefaults::settings();
+                $consent  = $this->consent_value( $schema );
+                $max      = (int) ( $schema['fields']['fbm_household_size']['range']['max'] ?? 12 );
+
+                $_SERVER['REQUEST_METHOD'] = 'POST';
+                $_POST = array(
+                        'fbm_registration_submitted' => '1',
+                        'fbm_registration_nonce'     => 'valid-nonce',
+                        'fbm_registration_hp'        => '',
+                        'fbm_registration_time'      => (string) ( time() - 60 ),
+                        'fbm_first_name'             => 'Robin',
+                        'fbm_last_initial'           => 'C',
+                        'fbm_email'                  => 'robin@example.com',
+                        'fbm_household_size'         => '99',
+                        'fbm_registration_consent'   => $consent,
+                );
+
+                $result = $this->handle_submission( $schema['fields'], $settings );
+
+                $this->assertTrue( $result['success'] );
+
+                $member = $this->last_member_row();
+                $this->assertSame( $max, $member['household_size'] );
+        }
+
         public function test_file_upload_exceeding_limit_returns_field_error(): void {
                 $schema   = $this->schema();
                 $settings = TemplateDefaults::settings();
@@ -168,6 +349,21 @@ final class RegistrationSubmitTest extends TestCase {
         }
 
         /**
+         * Retrieve the most recently stored member row.
+         *
+         * @return array<string,mixed>
+         */
+        private function last_member_row(): array {
+                $members = $this->wpdb->members;
+                $this->assertNotEmpty( $members, 'Expected at least one stored member.' );
+
+                $last = end( $members );
+                $this->assertIsArray( $last );
+
+                return $last;
+        }
+
+        /**
          * Invoke the submission handler via reflection.
          *
          * @param array<string,array<string,mixed>> $fields Field schema.
@@ -180,6 +376,25 @@ final class RegistrationSubmitTest extends TestCase {
                 $method->setAccessible( true );
 
                 return $method->invoke( null, $fields, $settings );
+        }
+
+        /**
+         * Resolve the sanitized consent option value for tests.
+         *
+         * @param array<string,array<string,mixed>> $schema_fields Schema fields array.
+         */
+        private function consent_value( array $schema_fields ): string {
+                if ( isset( $schema_fields['fields'] ) && is_array( $schema_fields['fields'] ) ) {
+                        $schema_fields = $schema_fields['fields'];
+                }
+
+                $options = $schema_fields['fbm_registration_consent']['options'] ?? array();
+
+                if ( ! empty( $options ) && isset( $options[0]['value'] ) ) {
+                        return (string) $options[0]['value'];
+                }
+
+                return '1';
         }
 }
 

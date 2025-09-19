@@ -1,4 +1,96 @@
-/* Admin assets are gated; placeholder keeps file non-empty. */
-.fbm-admin-placeholder {
+/* Registration editor preview modal */
+body.fbm-registration-editor--modal-open {
+    overflow: hidden;
+}
+
+.fbm-registration-editor__preview-modal[hidden] {
     display: none;
+}
+
+.fbm-registration-editor__preview-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.fbm-registration-editor__preview-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.fbm-registration-editor__preview-dialog {
+    position: relative;
+    z-index: 100001;
+    max-width: 720px;
+    width: min(90%, 720px);
+    max-height: 90vh;
+    overflow-y: auto;
+    background: #ffffff;
+    border-radius: 6px;
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.35);
+    padding: 24px;
+    outline: none;
+}
+
+.fbm-registration-editor__preview-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.fbm-registration-editor__preview-header h2 {
+    margin: 0;
+}
+
+.fbm-registration-editor__preview-close {
+    border: 0;
+    background: transparent;
+    color: #1d2327;
+    font-size: 26px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 4px 8px;
+}
+
+.fbm-registration-editor__preview-close:focus-visible {
+    outline: 2px solid #2271b1;
+    outline-offset: 2px;
+}
+
+.fbm-registration-editor__preview-body {
+    margin-top: 16px;
+}
+
+.fbm-registration-editor__preview-note {
+    font-size: 14px;
+    color: #50575e;
+    margin: 0 0 16px;
+}
+
+.fbm-registration-editor__preview-content > *:last-child {
+    margin-bottom: 0;
+}
+
+.fbm-registration-editor__preview-warnings {
+    margin-top: 24px;
+    background: #fef8e6;
+    border-left: 4px solid #ffb900;
+    padding: 16px 20px;
+}
+
+.fbm-registration-editor__preview-warnings h3 {
+    margin: 0 0 8px;
+    font-size: 16px;
+}
+
+.fbm-registration-editor__preview-warnings ul {
+    margin: 0;
+    padding-left: 20px;
+    list-style: disc;
 }

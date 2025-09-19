@@ -23,6 +23,7 @@ use function trim;
 use function update_post_meta;
 use function wp_check_filetype_and_ext;
 use function wp_delete_attachment;
+use function wp_delete_file;
 use function wp_generate_attachment_metadata;
 use function wp_handle_upload;
 use function wp_insert_attachment;
@@ -281,6 +282,17 @@ final class Uploads {
 
                         if ( $attachment_id > 0 ) {
                                 wp_delete_attachment( $attachment_id, true );
+                                continue;
+                        }
+
+                        $path = '';
+
+                        if ( isset( $upload['path'] ) && is_string( $upload['path'] ) ) {
+                                $path = trim( (string) $upload['path'] );
+                        }
+
+                        if ( '' !== $path && function_exists( 'wp_delete_file' ) ) {
+                                wp_delete_file( $path );
                         }
                 }
         }
