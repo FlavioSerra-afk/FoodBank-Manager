@@ -35,12 +35,8 @@ jobs:
       - name: Install Node dependencies
         run: npm ci
 
-      - name: End-to-end setup
-        run: npm run e2e:setup
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
 
       - name: End-to-end tests
-        run: npm run e2e:run
-
-      - name: End-to-end teardown
-        if: always()
-        run: npm run e2e:teardown
+        run: npm run e2e

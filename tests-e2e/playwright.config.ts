@@ -9,12 +9,10 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   workers: 1,
-  reporter: 'list',
+  reporter: 'line',
   use: {
-    baseURL: process.env.FBM_E2E_BASE_URL ?? 'http://127.0.0.1:8889',
     headless: true,
     viewport: { width: 1280, height: 720 },
-    ignoreHTTPSErrors: true,
     screenshot: 'off',
     video: 'off',
     trace: 'off',

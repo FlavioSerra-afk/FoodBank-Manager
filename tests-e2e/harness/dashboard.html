@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FBM Staff Dashboard Harness</title>
+    <style>
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        margin: 2rem;
+        color: #1d2327;
+      }
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
+      }
+      .fbm-staff-dashboard__status[data-fbm-tone='success'] {
+        color: #047857;
+      }
+      .fbm-staff-dashboard__status[data-fbm-tone='warning'] {
+        color: #b45309;
+      }
+      .fbm-staff-dashboard__status[data-fbm-tone='error'] {
+        color: #dc2626;
+      }
+      .fbm-staff-dashboard__override[hidden] {
+        display: none;
+      }
+      [hidden] {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>FoodBank Manager — Staff Dashboard Harness</h1>
+      <div class="fbm-staff-dashboard" data-fbm-staff-dashboard="1">
+        <div class="fbm-staff-dashboard__today" data-fbm-today>
+          <div class="fbm-staff-dashboard__today-item">
+            <span class="fbm-staff-dashboard__today-label">Collections today</span>
+            <span class="fbm-staff-dashboard__today-value" data-fbm-today-success>0</span>
+          </div>
+          <div class="fbm-staff-dashboard__today-item">
+            <span class="fbm-staff-dashboard__today-label">Duplicate attempts</span>
+            <span class="fbm-staff-dashboard__today-value" data-fbm-today-duplicate>0</span>
+          </div>
+          <div class="fbm-staff-dashboard__today-item">
+            <span class="fbm-staff-dashboard__today-label">Overrides recorded</span>
+            <span class="fbm-staff-dashboard__today-value" data-fbm-today-override>0</span>
+          </div>
+        </div>
+        <section class="fbm-staff-dashboard__section" data-fbm-scanner data-fbm-scanner-module>
+          <h2 class="fbm-staff-dashboard__subheading" id="fbm-scanner-heading">Camera scanning</h2>
+          <p class="fbm-staff-dashboard__helper" data-fbm-scanner-feedback role="status" aria-live="polite"></p>
+          <p
+            class="fbm-staff-dashboard__helper fbm-staff-dashboard__helper--muted"
+            data-fbm-scanner-fallback
+            role="status"
+            aria-live="polite"
+            hidden
+          >
+            Camera scanning is not available on this device. Use manual entry below.
+          </p>
+          <div class="fbm-staff-dashboard__scanner-controls" data-fbm-scanner-controls hidden>
+            <fieldset aria-labelledby="fbm-scanner-heading">
+              <legend class="screen-reader-text">Camera controls</legend>
+              <label class="fbm-staff-dashboard__field fbm-staff-dashboard__field--inline" data-fbm-scanner-select-wrapper hidden>
+                <span class="fbm-staff-dashboard__label">Camera source</span>
+                <select class="fbm-staff-dashboard__input" data-fbm-scanner-select>
+                  <option value="">Default camera</option>
+                </select>
+              </label>
+              <button type="button" class="fbm-staff-dashboard__action fbm-staff-dashboard__action--secondary" data-fbm-scanner-torch hidden aria-pressed="false">
+                Turn torch on
+              </button>
+            </fieldset>
+          </div>
+          <div class="fbm-staff-dashboard__camera-wrapper" data-fbm-scanner-wrapper hidden>
+            <div class="fbm-staff-dashboard__camera-frame" data-fbm-scanner-frame aria-hidden="true">
+              <video class="fbm-staff-dashboard__camera" data-fbm-scanner-video playsinline muted></video>
+              <div class="fbm-staff-dashboard__camera-overlay" data-fbm-scanner-overlay aria-hidden="true"></div>
+            </div>
+            <div class="fbm-staff-dashboard__scanner-actions">
+              <button type="button" class="fbm-staff-dashboard__action fbm-staff-dashboard__action--secondary" data-fbm-scanner-stop>
+                Stop scanning
+              </button>
+            </div>
+          </div>
+          <button type="button" class="fbm-staff-dashboard__action" data-fbm-scanner-start>
+            Start camera scan
+          </button>
+        </section>
+        <form class="fbm-staff-dashboard__section" data-fbm-manual>
+          <h2 class="fbm-staff-dashboard__subheading" id="fbm-manual-heading">Manual entry</h2>
+          <fieldset>
+            <legend class="screen-reader-text">Manual entry controls</legend>
+            <label class="fbm-staff-dashboard__field" for="fbm-manual-reference">
+              <span class="fbm-staff-dashboard__label">Member reference</span>
+              <input
+                type="text"
+                id="fbm-manual-reference"
+                class="fbm-staff-dashboard__input"
+                name="code"
+                data-fbm-reference
+                autocomplete="off"
+              />
+            </label>
+            <input type="hidden" name="fbm_staff_manual_nonce" value="e2e-nonce" />
+            <button type="submit" class="fbm-staff-dashboard__action" data-fbm-checkin="manual">
+              Record manual collection
+            </button>
+          </fieldset>
+        </form>
+        <div class="fbm-staff-dashboard__override" data-fbm-override hidden>
+          <fieldset>
+            <legend class="screen-reader-text">Manager override confirmation</legend>
+            <p class="fbm-staff-dashboard__helper" data-fbm-override-message role="status" aria-live="polite">
+              This member collected within the last week. Only managers can continue by recording an override with a justification.
+            </p>
+            <label class="fbm-staff-dashboard__field" for="fbm-override-note">
+              <span class="fbm-staff-dashboard__label">Override note</span>
+              <textarea id="fbm-override-note" class="fbm-staff-dashboard__input fbm-staff-dashboard__input--textarea" rows="3" data-fbm-override-note></textarea>
+            </label>
+            <div class="fbm-staff-dashboard__override-actions">
+              <button type="button" class="fbm-staff-dashboard__action" data-fbm-confirm-override>Record override</button>
+              <button type="button" class="fbm-staff-dashboard__action fbm-staff-dashboard__action--secondary" data-fbm-cancel-override>
+                Cancel override
+              </button>
+            </div>
+          </fieldset>
+        </div>
+        <div class="fbm-staff-dashboard__status" data-fbm-status role="status" aria-live="polite" aria-atomic="true"></div>
+      </div>
+    </main>
+    <script src="./wp-shim.js"></script>
+    <script>
+      window.fbmStaffDashboard = {
+        restUrl: window.FBM.restUrl,
+        nonce: window.FBM.nonce,
+        schedule: {
+          labels: {
+            notice: 'Collections run on Thursday 11:00–14:30.',
+          },
+        },
+        strings: {
+          ready: 'Ready to record collections.',
+          loading: 'Recording collection…',
+          success: 'Collection recorded.',
+          override_success: 'Override recorded successfully.',
+          recent_warning: 'Only managers can continue with a justified override.',
+          already: 'Member already collected today.',
+          duplicate_day: 'Member already collected today.',
+          throttled: 'Please wait a moment before trying again.',
+          invalid: 'Enter a valid collection code.',
+          revoked: 'This code has been revoked.',
+          error: 'Unable to record collection. Please try again.',
+          override_prompt: 'Member %s collected within the last week.',
+          override_requirements: 'Only managers can continue with a justified override.',
+          reference_required: 'Enter a member reference before recording.',
+          override_note_required: 'An override note is required.',
+          scanner_ready: 'Camera starting…',
+          scanner_active: 'Scanning for QR codes…',
+          scanner_error: 'Unable to start the camera. Try manual entry instead.',
+          scanner_unsupported: 'Camera scanning is not supported on this device.',
+          scanner_permission: 'Camera permission denied. Use manual entry instead.',
+          scanner_hold_steady: 'Hold steady, avoid glare.',
+          scanner_camera_label: 'Camera source',
+          scanner_camera_default: 'Default camera',
+          scanner_torch_on: 'Turn torch on',
+          scanner_torch_off: 'Turn torch off',
+          collection_window_notice: 'Collections run on Thursday 11:00–14:30.',
+          out_of_window: 'Collections are currently outside the active window.',
+        },
+      };
+    </script>
+    <script src="../../assets/js/fbm-scanner.js"></script>
+    <script src="../../assets/js/staff-dashboard.js"></script>
+  </body>
+</html>
