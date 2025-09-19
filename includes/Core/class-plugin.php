@@ -14,8 +14,11 @@ use FoodBankManager\Core\Install;
 
 use FBM\CLI\CryptoCommand;
 use FBM\CLI\TokenCommand;
+use FoodBankManager\Admin\DashboardPage;
 use FoodBankManager\Admin\DiagnosticsPage;
 use FoodBankManager\Admin\MembersPage;
+use FoodBankManager\Admin\Menu;
+use FoodBankManager\Admin\RegistrationFormPage;
 use FoodBankManager\Admin\ReportsPage;
 use FoodBankManager\Admin\SchedulePage;
 use FoodBankManager\Admin\SettingsPage;
@@ -38,19 +41,22 @@ use function get_role;
  * Main plugin orchestrator.
  */
 final class Plugin {
-	public const VERSION = '1.3.0';
+	public const VERSION = '1.3.1';
 
 	/**
 	 * Register runtime hooks.
 	 */
 	public static function boot(): void {
-		Assets::setup();
-		DiagnosticsPage::register();
-		MembersPage::register();
-		ReportsPage::register();
-		SchedulePage::register();
-		SettingsPage::register();
-		ThemePage::register();
+				Assets::setup();
+				Menu::register();
+				DiagnosticsPage::register();
+				MembersPage::register();
+				RegistrationFormPage::register();
+				ReportsPage::register();
+				SchedulePage::register();
+				SettingsPage::register();
+				ThemePage::register();
+				DashboardPage::register();
 		RegistrationForm::register();
 		StaffDashboard::register();
 		Privacy::register();

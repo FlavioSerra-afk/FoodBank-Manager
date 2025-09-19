@@ -25,7 +25,7 @@ use wpdb;
 use function __;
 use function add_action;
 use function absint;
-use function add_menu_page;
+use function add_submenu_page;
 use function add_query_arg;
 use function admin_url;
 use function array_key_exists;
@@ -93,14 +93,14 @@ final class DiagnosticsPage {
 	 * Register the diagnostics admin menu entry.
 	 */
 	public static function register_menu(): void {
-			add_menu_page(
-				__( 'Food Bank Diagnostics', 'foodbank-manager' ),
-				__( 'Food Bank Diagnostics', 'foodbank-manager' ),
-				'fbm_manage', // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability registered during activation.
-				self::MENU_SLUG,
-				array( __CLASS__, 'render' ),
-				'dashicons-shield-alt'
-			);
+		add_submenu_page(
+			Menu::SLUG,
+			__( 'Food Bank Diagnostics', 'foodbank-manager' ),
+			__( 'Diagnostics', 'foodbank-manager' ),
+			'fbm_manage', // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability registered during activation.
+			self::MENU_SLUG,
+			array( __CLASS__, 'render' )
+		);
 	}
 
 	/**

@@ -14,6 +14,157 @@
         return;
     }
 
+    var parseBool = function (value, fallback) {
+        if (typeof value === 'boolean') {
+            return value;
+        }
+
+        if (typeof value === 'number') {
+            return value !== 0;
+        }
+
+        if (typeof value === 'string') {
+            var normalized = value.toLowerCase().trim();
+            if (normalized === '1' || normalized === 'true' || normalized === 'yes' || normalized === 'on') {
+                return true;
+            }
+            if (normalized === '0' || normalized === 'false' || normalized === 'no' || normalized === 'off') {
+                return false;
+            }
+        }
+
+        return fallback;
+    };
+
+    var clampInt = function (value, fallback, min, max) {
+        var parsed = parseInt(value, 10);
+
+        if (isNaN(parsed)) {
+            parsed = typeof fallback === 'number' ? fallback : 0;
+        }
+
+        if (typeof min === 'number' && parsed < min) {
+            parsed = min;
+        }
+
+        if (typeof max === 'number' && parsed > max) {
+            parsed = max;
+        }
+
+        return parsed;
+    };
+
+    var baseConfig = {
+        showCounters: true,
+        allowOverride: true,
+        scanner: {
+            preferTorch: false,
+            roi: 80,
+            decodeDebounce: 1200
+        }
+    };
+
+    var localizedConfig = settings.config;
+    if (localizedConfig && typeof localizedConfig === 'object') {
+        if (Object.prototype.hasOwnProperty.call(localizedConfig, 'show_counters')) {
+            baseConfig.showCounters = parseBool(localizedConfig.show_counters, baseConfig.showCounters);
+        }
+        if (Object.prototype.hasOwnProperty.call(localizedConfig, 'allow_override')) {
+            baseConfig.allowOverride = parseBool(localizedConfig.allow_override, baseConfig.allowOverride);
+        }
+        if (localizedConfig.scanner && typeof localizedConfig.scanner === 'object') {
+            var scanner = localizedConfig.scanner;
+            if (Object.prototype.hasOwnProperty.call(scanner, 'prefer_torch')) {
+                baseConfig.scanner.preferTorch = parseBool(scanner.prefer_torch, baseConfig.scanner.preferTorch);
+            }
+            if (Object.prototype.hasOwnProperty.call(scanner, 'roi')) {
+                baseConfig.scanner.roi = clampInt(scanner.roi, baseConfig.scanner.roi, 30, 100);
+            }
+            if (Object.prototype.hasOwnProperty.call(scanner, 'decode_debounce')) {
+                baseConfig.scanner.decodeDebounce = clampInt(scanner.decode_debounce, baseConfig.scanner.decodeDebounce, 0, 5000);
+            }
+        }
+    }
+
+    var cloneConfig = function () {
+        return {
+            showCounters: baseConfig.showCounters,
+            allowOverride: baseConfig.allowOverride,
+            scanner: {
+                preferTorch: baseConfig.scanner.preferTorch,
+                roi: baseConfig.scanner.roi,
+                decodeDebounce: baseConfig.scanner.decodeDebounce
+            }
+        };
+    };
+
+    var resolveRoot = function (element) {
+        if (!element) {
+            return null;
+        }
+
+        if (typeof element.hasAttribute === 'function' && element.hasAttribute('data-fbm-staff-dashboard')) {
+            return element;
+        }
+
+        if (element.dataset && element.dataset.fbmStaffDashboard) {
+            return element;
+        }
+
+        if (typeof element.closest === 'function') {
+            var candidate = element.closest('[data-fbm-staff-dashboard]');
+            if (candidate) {
+                return candidate;
+            }
+        }
+
+        return null;
+    };
+
+    var applyDatasetConfig = function (config, root) {
+        if (!root || !root.dataset) {
+            return;
+        }
+
+        var data = root.dataset;
+
+        if (Object.prototype.hasOwnProperty.call(data, 'fbmShowCounters')) {
+            config.showCounters = parseBool(data.fbmShowCounters, config.showCounters);
+        }
+
+        if (Object.prototype.hasOwnProperty.call(data, 'fbmAllowOverride')) {
+            config.allowOverride = parseBool(data.fbmAllowOverride, config.allowOverride);
+        }
+
+        if (Object.prototype.hasOwnProperty.call(data, 'fbmScannerTorch')) {
+            config.scanner.preferTorch = parseBool(data.fbmScannerTorch, config.scanner.preferTorch);
+        }
+
+        if (Object.prototype.hasOwnProperty.call(data, 'fbmScannerRoi')) {
+            config.scanner.roi = clampInt(data.fbmScannerRoi, config.scanner.roi, 30, 100);
+        }
+
+        if (Object.prototype.hasOwnProperty.call(data, 'fbmScannerDebounce')) {
+            config.scanner.decodeDebounce = clampInt(data.fbmScannerDebounce, config.scanner.decodeDebounce, 0, 5000);
+        }
+    };
+
+    var getContainerConfig = function (element) {
+        var root = resolveRoot(element);
+
+        if (!root) {
+            return cloneConfig();
+        }
+
+        if (!root.__fbmConfig) {
+            var merged = cloneConfig();
+            applyDatasetConfig(merged, root);
+            root.__fbmConfig = merged;
+        }
+
+        return root.__fbmConfig;
+    };
+
     var ZXing = window.ZXingBrowser || window.ZXing || null;
     var requestFrame = window.requestAnimationFrame || function (callback) {
         return window.setTimeout(callback, 1000 / 30);
@@ -92,6 +243,11 @@
             return;
         }
 
+        var config = getContainerConfig(container);
+        if (!config.showCounters) {
+            return;
+        }
+
         if (!container.__fbmState) {
             container.__fbmState = {};
         }
@@ -149,6 +305,11 @@
             return;
         }
 
+        var config = getContainerConfig(container);
+        if (!config.allowOverride) {
+            return;
+        }
+
         if (!container.__fbmState) {
             container.__fbmState = {};
         }
@@ -185,6 +346,7 @@
 
         var strings = settings.strings;
         var statusEl = container.querySelector('[data-fbm-status]');
+        var config = getContainerConfig(container);
 
         updateStatus(statusEl, strings.loading, 'info');
 
@@ -246,12 +408,15 @@
             } else if (statusKey === 'recent_warning') {
                 message = strings.recent_warning;
                 tone = 'warning';
-                if (context && context.reference) {
+                if (config.allowOverride && context && context.reference) {
                     showOverride(container, {
                         reference: context.reference,
                         mode: context.mode,
                         method: context.method
                     }, strings);
+                } else {
+                    message = strings.override_disabled || message;
+                    hideOverride(container);
                 }
             } else if (statusKey === 'throttled') {
                 message = (data && typeof data.message === 'string') ? data.message : (strings.throttled || strings.error);
@@ -339,6 +504,23 @@
         var selectWrapper = section.querySelector('[data-fbm-scanner-select-wrapper]');
         var select = section.querySelector('[data-fbm-scanner-select]');
         var torchButton = section.querySelector('[data-fbm-scanner-torch]');
+        var frameEl = section.querySelector('[data-fbm-scanner-frame]');
+        var overlayEl = section.querySelector('[data-fbm-scanner-overlay]');
+
+        var config = getContainerConfig(container);
+        var scannerOptions = config.scanner || {};
+        var roi = clampInt(scannerOptions.roi, baseConfig.scanner.roi, 30, 100);
+        var decodeDelay = clampInt(scannerOptions.decodeDebounce, baseConfig.scanner.decodeDebounce, 0, 5000);
+        var preferTorch = !!scannerOptions.preferTorch;
+
+        if (overlayEl) {
+            overlayEl.style.width = roi + '%';
+            overlayEl.style.height = roi + '%';
+        }
+
+        if (frameEl && frameEl.style && typeof frameEl.style.setProperty === 'function') {
+            frameEl.style.setProperty('--fbm-scanner-roi', roi + '%');
+        }
 
         var reader = createReader();
         var canvas = document.createElement('canvas');
@@ -350,8 +532,6 @@
 
         var frameId = null;
         var decodePending = false;
-        var decodeCounter = 0;
-        var decodeInterval = 3;
         var active = false;
         var lastResult = '';
         var tipShown = false;
@@ -361,6 +541,7 @@
         var startPromise = null;
         var torchSupported = false;
         var torchEnabled = false;
+        var lastDecodeAt = 0;
 
         if (video) {
             video.setAttribute('playsinline', 'true');
@@ -430,8 +611,8 @@
             }
 
             decodePending = false;
-            decodeCounter = 0;
             tipShown = false;
+            lastDecodeAt = 0;
 
             if (reader && typeof reader.reset === 'function') {
                 try {
@@ -594,6 +775,15 @@
                     return;
                 }
 
+                if (decodePending) {
+                    return;
+                }
+
+                var now = Date.now();
+                if (decodeDelay > 0 && now - lastDecodeAt < decodeDelay) {
+                    return;
+                }
+
                 var videoWidth = video.videoWidth || 0;
                 var videoHeight = video.videoHeight || 0;
 
@@ -601,12 +791,8 @@
                     return;
                 }
 
-                decodeCounter += 1;
-                if (decodeCounter % decodeInterval !== 0 || decodePending) {
-                    return;
-                }
-
                 decodePending = true;
+                lastDecodeAt = now;
 
                 try {
                     var size = Math.min(videoWidth, videoHeight);
@@ -614,6 +800,8 @@
                         decodePending = false;
                         return;
                     }
+                    var roiRatio = roi / 100;
+                    size = Math.max(40, Math.floor(size * roiRatio));
                     var offsetX = Math.max(0, Math.floor((videoWidth - size) / 2));
                     var offsetY = Math.max(0, Math.floor((videoHeight - size) / 2));
                     context.drawImage(video, offsetX, offsetY, size, size, 0, 0, canvas.width, canvas.height);
@@ -740,6 +928,16 @@
 
                     torchSupported = !!(capabilities && Object.prototype.hasOwnProperty.call(capabilities, 'torch') && capabilities.torch);
                     torchEnabled = false;
+                    if (torchSupported && preferTorch && typeof currentTrack.applyConstraints === 'function') {
+                        currentTrack.applyConstraints({ advanced: [{ torch: true }] }).then(function () {
+                            torchEnabled = true;
+                            updateTorchButton();
+                        }).catch(function () {
+                            torchSupported = false;
+                            torchEnabled = false;
+                            updateTorchButton();
+                        });
+                    }
                 } else {
                     torchSupported = false;
                     torchEnabled = false;
@@ -761,9 +959,9 @@
 
                 active = true;
                 lastResult = '';
-                decodeCounter = 0;
                 decodePending = false;
                 tipShown = false;
+                lastDecodeAt = 0;
 
                 scheduleDecoding();
 

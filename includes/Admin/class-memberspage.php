@@ -19,7 +19,7 @@ use wpdb;
 use function __;
 use function absint;
 use function add_action;
-use function add_menu_page;
+use function add_submenu_page;
 use function add_query_arg;
 use function admin_url;
 use function apply_filters;
@@ -81,8 +81,8 @@ final class MembersPage {
 		 * Register WordPress hooks.
 		 */
 	public static function register(): void {
-					add_action( 'admin_menu', array( __CLASS__, 'register_menu' ) );
-					add_action( 'admin_init', array( __CLASS__, 'handle_actions' ) );
+		add_action( 'admin_menu', array( __CLASS__, 'register_menu' ) );
+		add_action( 'admin_init', array( __CLASS__, 'handle_actions' ) );
 	}
 
 		/**
@@ -100,14 +100,14 @@ final class MembersPage {
 		 * Register the admin menu entry.
 		 */
 	public static function register_menu(): void {
-			add_menu_page(
-				__( 'Food Bank Members', 'foodbank-manager' ),
-				__( 'Food Bank Members', 'foodbank-manager' ),
-				'fbm_manage', // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability registered during activation.
-				self::MENU_SLUG,
-				array( __CLASS__, 'render' ),
-				'dashicons-groups'
-			);
+		add_submenu_page(
+			Menu::SLUG,
+			__( 'Food Bank Members', 'foodbank-manager' ),
+			__( 'Members', 'foodbank-manager' ),
+			'fbm_manage', // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability registered during activation.
+			self::MENU_SLUG,
+			array( __CLASS__, 'render' )
+		);
 	}
 
 		/**

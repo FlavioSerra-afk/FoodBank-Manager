@@ -25,6 +25,7 @@ use function is_user_logged_in;
 use function is_string;
 use function ob_get_clean;
 use function ob_start;
+use function get_option;
 use function get_current_user_id;
 use function status_header;
 use function strtolower;
@@ -40,6 +41,7 @@ use function wp_verify_nonce;
 final class StaffDashboard {
 
 	private const SHORTCODE           = 'fbm_staff_dashboard';
+	private const OPTION_SETTINGS     = 'fbm_staff_dashboard_settings';
 	private const MANUAL_NONCE_ACTION = 'fbm_staff_manual_entry';
 	private const MANUAL_NONCE_FIELD  = 'fbm_staff_manual_nonce';
 
@@ -68,19 +70,74 @@ final class StaffDashboard {
 					. '</div>';
 		}
 
-				Assets::mark_staff_dashboard();
+								Assets::mark_staff_dashboard();
 
-				$manual_entry = self::maybe_handle_manual_entry();
+								$manual_entry       = self::maybe_handle_manual_entry();
+								$dashboard_settings = self::settings();
 
-				ob_start();
-				$template = FBM_PATH . 'templates/public/staff-dashboard.php';
+								ob_start();
+								$template = FBM_PATH . 'templates/public/staff-dashboard.php';
 		if ( is_readable( $template ) ) {
-				include $template;
+						$settings = $dashboard_settings;
+						include $template;
 		}
 
 			$output = ob_get_clean();
 
 				return is_string( $output ) ? $output : '';
+	}
+
+		/**
+		 * Retrieve sanitized dashboard settings.
+		 *
+		 * @return array{show_counters:bool,allow_override:bool,scanner:array{prefer_torch:bool,roi:int,decode_debounce:int}}
+		 */
+	public static function settings(): array {
+			$defaults = self::default_settings();
+
+			$stored = get_option( self::OPTION_SETTINGS, array() );
+		if ( ! is_array( $stored ) ) {
+				$stored = array();
+		}
+
+			$show_counters  = isset( $stored['show_counters'] ) ? self::to_bool( $stored['show_counters'] ) : $defaults['show_counters'];
+			$allow_override = isset( $stored['allow_override'] ) ? self::to_bool( $stored['allow_override'] ) : $defaults['allow_override'];
+
+			$scanner = isset( $stored['scanner'] ) && is_array( $stored['scanner'] ) ? $stored['scanner'] : array();
+
+			$prefer_torch = isset( $scanner['prefer_torch'] ) ? self::to_bool( $scanner['prefer_torch'] ) : $defaults['scanner']['prefer_torch'];
+			$roi          = isset( $scanner['roi'] ) ? (int) $scanner['roi'] : $defaults['scanner']['roi'];
+			$debounce     = isset( $scanner['decode_debounce'] ) ? (int) $scanner['decode_debounce'] : $defaults['scanner']['decode_debounce'];
+
+			$roi      = max( 30, min( 100, $roi ) );
+			$debounce = max( 0, min( 5000, $debounce ) );
+
+			return array(
+				'show_counters'  => $show_counters,
+				'allow_override' => $allow_override,
+				'scanner'        => array(
+					'prefer_torch'    => $prefer_torch,
+					'roi'             => $roi,
+					'decode_debounce' => $debounce,
+				),
+			);
+	}
+
+		/**
+		 * Default dashboard configuration.
+		 *
+		 * @return array{show_counters:bool,allow_override:bool,scanner:array{prefer_torch:bool,roi:int,decode_debounce:int}}
+		 */
+	public static function default_settings(): array {
+			return array(
+				'show_counters'  => true,
+				'allow_override' => true,
+				'scanner'        => array(
+					'prefer_torch'    => false,
+					'roi'             => 80,
+					'decode_debounce' => 1200,
+				),
+			);
 	}
 
 		/**
@@ -203,15 +260,38 @@ final class StaffDashboard {
 		 * @param array<string,mixed> $extra   Additional response context.
 		 */
 	private static function manual_response( string $status, string $message, array $extra = array() ): array {
-			$payload = array(
-				'status'  => $status,
-				'message' => $message,
-			);
+					$payload = array(
+						'status'  => $status,
+						'message' => $message,
+					);
 
-			foreach ( $extra as $key => $value ) {
-					$payload[ $key ] = $value;
-			}
+					foreach ( $extra as $key => $value ) {
+									$payload[ $key ] = $value;
+					}
 
-			return $payload;
+					return $payload;
+	}
+
+		/**
+		 * Normalize checkbox-style values into booleans.
+		 *
+		 * @param mixed $value Raw submitted value.
+		 */
+	private static function to_bool( $value ): bool {
+		if ( is_bool( $value ) ) {
+				return $value;
+		}
+
+		if ( is_numeric( $value ) ) {
+				return (bool) (int) $value;
+		}
+
+		if ( is_string( $value ) ) {
+				$value = strtolower( trim( $value ) );
+
+				return in_array( $value, array( '1', 'true', 'yes', 'on' ), true );
+		}
+
+			return false;
 	}
 }
