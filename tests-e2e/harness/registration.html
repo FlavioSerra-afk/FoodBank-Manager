@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FBM Registration Harness</title>
+    <style>
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        margin: 2rem;
+        color: #1d2327;
+      }
+      .fbm-registration-form__notice {
+        padding: 1rem;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+      }
+      .fbm-registration-form__notice--success {
+        background: #ecfdf5;
+        border: 1px solid #047857;
+      }
+      .fbm-registration-form__notice--error {
+        background: #fef2f2;
+        border: 1px solid #dc2626;
+      }
+      .fbm-registration-form__errors {
+        padding-left: 1.25rem;
+        margin-bottom: 1.5rem;
+      }
+      .fbm-registration-form__field {
+        margin-bottom: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+      .fbm-registration-form__submit {
+        padding: 0.75rem 1.5rem;
+        background: #2563eb;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        font-size: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>FoodBank Manager — Registration Harness</h1>
+      <div class="fbm-registration-form" data-fbm-component="registration-form">
+        <div
+          class="fbm-registration-form__notice fbm-registration-form__notice--success"
+          role="status"
+          data-fbm-registration-success
+          hidden
+        >
+          Thank you for registering. We have emailed your check-in QR code.
+        </div>
+        <div
+          class="fbm-registration-form__notice fbm-registration-form__notice--error"
+          role="alert"
+          data-fbm-registration-error
+          hidden
+        >
+          Please correct the errors below and try again.
+        </div>
+        <ul class="fbm-registration-form__errors" data-fbm-registration-errors hidden></ul>
+        <form class="fbm-registration-form__form" method="post" novalidate>
+          <input type="hidden" name="fbm_registration_nonce" value="e2e-nonce" />
+          <input type="hidden" name="fbm_registration_submitted" value="1" />
+          <input type="hidden" name="fbm_registration_time" value="1700000000" />
+          <div class="fbm-registration-form__field">
+            <label for="fbm_first_name">First name</label>
+            <input type="text" id="fbm_first_name" name="fbm_first_name" autocomplete="given-name" />
+          </div>
+          <div class="fbm-registration-form__field">
+            <label for="fbm_last_initial">Last initial</label>
+            <input
+              type="text"
+              id="fbm_last_initial"
+              name="fbm_last_initial"
+              maxlength="1"
+              pattern="[A-Za-z]"
+            />
+          </div>
+          <div class="fbm-registration-form__field">
+            <label for="fbm_email">Email address</label>
+            <input type="email" id="fbm_email" name="fbm_email" autocomplete="email" />
+          </div>
+          <div class="fbm-registration-form__field">
+            <label for="fbm_household_size">Household size</label>
+            <input
+              type="number"
+              id="fbm_household_size"
+              name="fbm_household_size"
+              min="1"
+              max="12"
+              inputmode="numeric"
+            />
+          </div>
+          <div class="fbm-registration-form__field fbm-registration-form__field--consent">
+            <p class="fbm-registration-form__consent-copy">
+              You can opt in to receive occasional updates about service hours or urgent notices.
+            </p>
+            <label class="fbm-registration-form__consent" for="fbm_registration_consent">
+              <input type="checkbox" id="fbm_registration_consent" name="fbm_registration_consent" value="1" />
+              Yes, I consent to Food Bank Manager contacting me with these updates.
+            </label>
+          </div>
+          <div
+            class="fbm-registration-form__honeypot"
+            aria-hidden="true"
+            style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden;"
+          >
+            <label for="fbm_registration_hp">If you are human, leave this field empty.</label>
+            <input type="text" id="fbm_registration_hp" name="fbm_registration_hp" tabindex="-1" autocomplete="off" />
+          </div>
+          <button type="submit" class="fbm-registration-form__submit">Submit registration</button>
+        </form>
+      </div>
+    </main>
+    <script src="./wp-shim.js"></script>
+    <script>
+      window.fbmStaffDashboard = window.fbmStaffDashboard || {
+        restUrl: window.FBM.restUrl,
+        nonce: window.FBM.nonce,
+        strings: {
+          ready: 'Ready to record collections.',
+          loading: 'Recording collection…',
+          success: 'Collection recorded.',
+          recent_warning: 'Only managers can continue with a justified override.',
+          already: 'Member already collected today.',
+          duplicate_day: 'Member already collected today.',
+          throttled: 'Please wait a moment before trying again.',
+          invalid: 'Enter a valid collection code.',
+          revoked: 'This code has been revoked.',
+          error: 'Unable to record collection. Please try again.',
+          override_prompt: 'Member %s collected within the last week.',
+          override_requirements: 'Only managers can continue with a justified override.',
+          override_success: 'Override recorded successfully.',
+          scanner_ready: 'Camera starting…',
+          scanner_active: 'Scanning for QR codes…',
+          scanner_error: 'Unable to start the camera. Try manual entry instead.',
+          scanner_unsupported: 'Camera scanning is not supported on this device.',
+          scanner_permission: 'Camera permission denied. Use manual entry instead.',
+          scanner_hold_steady: 'Hold steady, avoid glare.',
+          scanner_camera_label: 'Camera source',
+          scanner_camera_default: 'Default camera',
+          scanner_torch_on: 'Turn torch on',
+          scanner_torch_off: 'Turn torch off',
+          reference_required: 'Enter a member reference before recording.',
+          override_note_required: 'An override note is required.',
+          collection_window_notice: 'Collections run on Thursday 11:00–14:30.',
+          out_of_window: 'Collections are currently outside the active window.',
+        },
+        schedule: {
+          labels: {
+            notice: 'Collections run on Thursday 11:00–14:30.',
+          },
+        },
+      };
+    </script>
+    <script src="../../assets/js/fbm-scanner.js"></script>
+    <script src="../../assets/js/staff-dashboard.js"></script>
+    <script>
+      (function () {
+        const container = document.querySelector('.fbm-registration-form');
+        if (!container) {
+          return;
+        }
+
+        const form = container.querySelector('.fbm-registration-form__form');
+        const successNotice = container.querySelector('[data-fbm-registration-success]');
+        const errorNotice = container.querySelector('[data-fbm-registration-error]');
+        const errorsList = container.querySelector('[data-fbm-registration-errors]');
+
+        if (!form || !successNotice || !errorNotice || !errorsList) {
+          return;
+        }
+
+        const fields = {
+          first: form.querySelector('input[name="fbm_first_name"]'),
+          last: form.querySelector('input[name="fbm_last_initial"]'),
+          email: form.querySelector('input[name="fbm_email"]'),
+          household: form.querySelector('input[name="fbm_household_size"]'),
+          honeypot: form.querySelector('input[name="fbm_registration_hp"]'),
+        };
+
+        form.addEventListener('submit', (event) => {
+          event.preventDefault();
+
+          successNotice.hidden = true;
+          errorNotice.hidden = true;
+          errorsList.hidden = true;
+          errorsList.innerHTML = '';
+
+          const errors = [];
+
+          if (!fields.first || !fields.first.value.trim()) {
+            errors.push('First name is required.');
+          }
+
+          if (!fields.last || fields.last.value.trim().length !== 1) {
+            errors.push('Last initial must be a single letter.');
+          }
+
+          const emailValue = fields.email ? fields.email.value.trim() : '';
+          if (!emailValue || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(emailValue)) {
+            errors.push('A valid email address is required.');
+          }
+
+          const householdValue = fields.household ? fields.household.value.trim() : '';
+          if (!householdValue || Number.isNaN(Number.parseInt(householdValue, 10))) {
+            errors.push('Household size must be a number.');
+          }
+
+          if (fields.honeypot && fields.honeypot.value.trim() !== '') {
+            errors.push('Spam detected.');
+          }
+
+          if (errors.length > 0) {
+            errorNotice.hidden = false;
+            errorsList.hidden = false;
+            errors.forEach((message) => {
+              const item = document.createElement('li');
+              item.textContent = message;
+              errorsList.appendChild(item);
+            });
+            return;
+          }
+
+          form.hidden = true;
+          successNotice.hidden = false;
+        });
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FBM Diagnostics Harness</title>
+    <style>
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        margin: 2rem;
+        color: #1d2327;
+      }
+      textarea {
+        font: inherit;
+        width: 100%;
+      }
+      pre {
+        background: #111827;
+        color: #f9fafb;
+        padding: 1rem;
+        border-radius: 4px;
+        overflow-x: auto;
+      }
+      .notice {
+        padding: 1rem;
+        border-left: 4px solid transparent;
+        margin-bottom: 1rem;
+      }
+      .notice-error {
+        background: #fef2f2;
+        border-color: #dc2626;
+      }
+      .notice-success {
+        background: #ecfdf5;
+        border-color: #047857;
+      }
+      .fbm-token-probe__result[hidden] {
+        display: none;
+      }
+      [hidden] {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <h1>Food Bank Diagnostics</h1>
+      <div class="notice notice-info" role="status" data-fbm-diagnostics-notice hidden>
+        <p data-fbm-diagnostics-notice-text></p>
+      </div>
+      <section class="fbm-token-probe" aria-labelledby="fbm-token-probe-heading">
+        <h2 id="fbm-token-probe-heading">Token Probe (redacted)</h2>
+        <p class="description">
+          Submit a token payload to check signature validity and revocation status without exposing the raw value.
+        </p>
+        <form data-fbm-token-probe>
+          <input type="hidden" name="action" value="fbm_token_probe" />
+          <input type="hidden" name="fbm_token_probe_nonce" value="e2e-nonce" />
+          <p>
+            <label for="fbm-token-probe-payload" class="screen-reader-text">Token payload</label>
+            <textarea id="fbm-token-probe-payload" name="fbm_token_probe_payload" rows="3" placeholder="FBM1:XXXX..."></textarea>
+          </p>
+          <p>
+            <button type="submit" class="button button-primary">Probe token</button>
+          </p>
+        </form>
+        <div class="fbm-token-probe__result" data-fbm-token-output hidden>
+          <pre class="fbm-token-probe__output"><code></code></pre>
+        </div>
+      </section>
+      <section class="fbm-mail-failures" aria-labelledby="fbm-mail-failures-heading">
+        <h2 id="fbm-mail-failures-heading">Token Resend Failures</h2>
+        <table class="widefat striped">
+          <thead>
+            <tr>
+              <th>Recorded</th>
+              <th>Member reference</th>
+              <th>Email</th>
+              <th>Context</th>
+              <th>Error</th>
+              <th>Attempts</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>2025-09-15 11:32</td>
+              <td>FBM-E2EFAIL</td>
+              <td>failure@example.com</td>
+              <td>diagnostics</td>
+              <td>MAIL</td>
+              <td>3</td>
+              <td>
+                <button type="button" class="button button-small" data-fbm-diagnostics-resend>Resend</button>
+                <span class="description" data-fbm-diagnostics-resend-hint hidden>Available after 15 minutes.</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+    <script src="./wp-shim.js"></script>
+    <script>
+      window.fbmStaffDashboard = window.fbmStaffDashboard || {
+        restUrl: window.FBM.restUrl,
+        nonce: window.FBM.nonce,
+        strings: {
+          ready: 'Ready to record collections.',
+          loading: 'Recording collection…',
+          success: 'Collection recorded.',
+          recent_warning: 'Only managers can continue with a justified override.',
+          already: 'Member already collected today.',
+          duplicate_day: 'Member already collected today.',
+          throttled: 'Please wait a moment before trying again.',
+          invalid: 'Enter a valid collection code.',
+          revoked: 'This code has been revoked.',
+          error: 'Unable to record collection. Please try again.',
+          override_prompt: 'Member %s collected within the last week.',
+          override_requirements: 'Only managers can continue with a justified override.',
+        },
+      };
+    </script>
+    <script src="../../assets/js/fbm-scanner.js"></script>
+    <script src="../../assets/js/staff-dashboard.js"></script>
+    <script>
+      (function () {
+        const notice = document.querySelector('[data-fbm-diagnostics-notice]');
+        const noticeText = document.querySelector('[data-fbm-diagnostics-notice-text]');
+        const form = document.querySelector('[data-fbm-token-probe]');
+        const outputContainer = document.querySelector('[data-fbm-token-output]');
+        const outputCode = outputContainer ? outputContainer.querySelector('code') : null;
+        const resendButton = document.querySelector('[data-fbm-diagnostics-resend]');
+        const resendHint = document.querySelector('[data-fbm-diagnostics-resend-hint]');
+
+        function toQueryString(formElement) {
+          const data = new FormData(formElement);
+          const params = new URLSearchParams();
+          for (const [key, value] of data.entries()) {
+            params.append(key, typeof value === 'string' ? value : String(value));
+          }
+          return params.toString();
+        }
+
+        async function postAjax(body) {
+          const response = await fetch(window.FBM.ajaxUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+              'X-WP-Nonce': window.FBM.nonce,
+            },
+            body,
+          });
+
+          if (!response.ok) {
+            throw new Error('Request failed');
+          }
+
+          return response.json();
+        }
+
+        if (form && outputContainer && outputCode) {
+          form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            outputContainer.hidden = true;
+            outputCode.textContent = '';
+
+            try {
+              const result = await postAjax(toQueryString(form));
+              if (result && result.success && result.data && result.data.result) {
+                outputCode.textContent = JSON.stringify(result.data.result, null, 2);
+                outputContainer.hidden = false;
+                outputContainer.removeAttribute('hidden');
+                if (notice && noticeText) {
+                  notice.hidden = true;
+                  noticeText.textContent = '';
+                }
+              } else if (result && result.data && result.data.error) {
+                if (notice && noticeText) {
+                  notice.className = 'notice notice-error';
+                  noticeText.textContent = result.data.error;
+                  notice.hidden = false;
+                }
+              }
+            } catch (error) {
+              if (notice && noticeText) {
+                notice.className = 'notice notice-error';
+                noticeText.textContent = 'Token diagnostics are temporarily unavailable.';
+                notice.hidden = false;
+              }
+            }
+          });
+        }
+
+        if (resendButton) {
+          resendButton.addEventListener('click', async () => {
+            resendButton.disabled = true;
+            try {
+              const response = await postAjax(
+                new URLSearchParams({
+                  action: 'fbm_mail_resend',
+                  entry: 'FBM-E2EFAIL',
+                }).toString(),
+              );
+
+              if (response && response.success) {
+                if (notice && noticeText) {
+                  notice.className = 'notice notice-success';
+                  noticeText.textContent = 'Resent the welcome email.';
+                  notice.hidden = false;
+                }
+                if (resendHint) {
+                  resendHint.hidden = true;
+                }
+              } else if (response && response.data) {
+                if (notice && noticeText) {
+                  notice.className = 'notice notice-error';
+                  noticeText.textContent = response.data.message || 'Resend unavailable.';
+                  notice.hidden = false;
+                }
+                if (resendHint) {
+                  resendHint.hidden = false;
+                  resendHint.textContent = response.data.hint || 'Available after 15 minutes.';
+                }
+              }
+            } catch (error) {
+              if (notice && noticeText) {
+                notice.className = 'notice notice-error';
+                noticeText.textContent = 'Resend unavailable.';
+                notice.hidden = false;
+              }
+            } finally {
+              resendButton.disabled = false;
+            }
+          });
+        }
+      })();
+    </script>
+  </body>
+</html>

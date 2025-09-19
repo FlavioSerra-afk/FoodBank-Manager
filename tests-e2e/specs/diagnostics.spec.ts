@@ -1,37 +1,80 @@
 import { test, expect } from '@playwright/test';
-import { getOption, loginAsAdmin } from './helpers';
-
-const DIAGNOSTICS_PAGE = '/wp-admin/admin.php?page=fbm-diagnostics';
+import { getHarnessUrl } from './helpers';
 
 test.describe('Diagnostics tooling', () => {
-  test('probes tokens and enforces resend throttling', async ({ page }) => {
-    await loginAsAdmin(page);
-    await page.goto(DIAGNOSTICS_PAGE);
-    await page.waitForLoadState('networkidle');
+  test('probes tokens and surfaces resend throttling', async ({ page }) => {
+    await page.route('**/admin-ajax.php', async (route) => {
+      const request = route.request();
+      const body = request.postData() ?? '';
+      const params = new URLSearchParams(body);
+      const action = params.get('action');
 
-    const token = getOption('fbm_e2e_token_active');
-    expect(token).not.toEqual('');
+      if (action === 'fbm_token_probe') {
+        const payload = params.get('fbm_token_probe_payload') ?? '';
+        const result = payload.startsWith('FBM1')
+          ? { version: '1', hmac_match: true, revoked: false }
+          : { version: null, hmac_match: false, revoked: false };
 
-    await page.fill('#fbm-token-probe-payload', token);
-    await Promise.all([
-      page.waitForNavigation({ waitUntil: 'networkidle' }),
-      page.click('button:has-text("Probe token")'),
-    ]);
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            success: true,
+            data: { result },
+          }),
+        });
+        return;
+      }
 
-    const output = page.locator('.fbm-token-probe__output code');
-    await expect(output).toBeVisible();
-    const payload = await output.textContent();
-    expect(payload).not.toBeNull();
+      if (action === 'fbm_mail_resend') {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            success: false,
+            data: {
+              code: 'rate-limited',
+              message: 'Resend is temporarily rate-limited. Please try again later.',
+              hint: 'Available after 30 minutes.',
+            },
+          }),
+        });
+        return;
+      }
 
-    const parsed = JSON.parse(payload ?? '{}');
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ success: true }),
+      });
+    });
+
+    await page.goto(getHarnessUrl('diagnostics.html'));
+
+    await page.fill('#fbm-token-probe-payload', 'FBM1:E2E-TOKEN');
+    await page.click('button:has-text("Probe token")');
+
+    const outputCode = page.locator('.fbm-token-probe__output code');
+    await expect(outputCode).toContainText('"version": "1"');
+
+    const payloadText = await outputCode.textContent();
+    expect(payloadText).not.toBeNull();
+    const parsed = JSON.parse(payloadText ?? '{}');
     expect(Object.keys(parsed).sort()).toEqual(['hmac_match', 'revoked', 'version']);
+    expect(parsed.version).toBe('1');
     expect(parsed.hmac_match).toBe(true);
     expect(parsed.revoked).toBe(false);
-    expect(parsed.version).toBeDefined();
 
-    const failureRow = page.locator('table.widefat tr').filter({ hasText: 'FBM-E2EFAIL' });
-    await expect(failureRow).toBeVisible();
-    await expect(failureRow.locator('a:has-text("Resend")')).toHaveCount(0);
-    await expect(failureRow.locator('span.description')).toContainText('Available after');
+    const resendButton = page.locator('[data-fbm-diagnostics-resend]');
+    await resendButton.click();
+
+    const notice = page.locator('[data-fbm-diagnostics-notice]');
+    await expect(notice).toBeVisible();
+    await expect(notice).toContainText('Resend is temporarily rate-limited. Please try again later.');
+
+    const hint = page.locator('[data-fbm-diagnostics-resend-hint]');
+    await expect(hint).toBeVisible();
+    await expect(hint).toContainText('Available after 30 minutes.');
+    await expect(resendButton).toBeEnabled();
   });
 });

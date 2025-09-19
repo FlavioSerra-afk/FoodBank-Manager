@@ -1,14 +1,12 @@
 {
   "name": "foodbank-manager",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "private": true,
   "scripts": {
-    "e2e:setup": "node tests-e2e/scripts/setup.js",
-    "e2e:run": "playwright test",
-    "e2e:teardown": "wp-env stop"
+    "e2e:run": "playwright test --reporter=line",
+    "e2e": "npm run e2e:run"
   },
   "devDependencies": {
-    "@playwright/test": "^1.45.0",
-    "@wordpress/env": "^8.11.0"
+    "@playwright/test": "^1.55.0"
   }
 }

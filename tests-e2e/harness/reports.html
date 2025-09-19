@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FBM Reports Harness</title>
+    <style>
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        margin: 2rem;
+        color: #1d2327;
+      }
+      button,
+      input,
+      select {
+        font: inherit;
+      }
+      .notice {
+        padding: 1rem;
+        border-left: 4px solid transparent;
+        margin-bottom: 1rem;
+      }
+      .notice-info {
+        background: #eff6ff;
+        border-color: #2563eb;
+      }
+      .fbm-quick-range button[aria-pressed='true'] {
+        background: #2563eb;
+        color: #fff;
+      }
+      .fbm-quick-range button {
+        margin-right: 0.5rem;
+      }
+      [hidden] {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <h1>Food Bank Reports</h1>
+      <p class="description">Collections run on Thursday 11:00–14:30 (Europe/London).</p>
+      <div class="fbm-cache-status notice notice-info" role="status" aria-live="polite">
+        <p>
+          <span data-fbm-cache-message>Fresh results generated moments ago.</span>
+          <button type="button" class="button button-secondary" data-fbm-cache-refresh>Refresh</button>
+        </p>
+      </div>
+      <section class="fbm-filter-controls">
+        <div class="fbm-quick-range" role="toolbar" aria-label="Quick ranges">
+          <button type="button" class="button button-primary" data-quick-range="last7" aria-pressed="true">Last 7 days</button>
+          <button type="button" class="button button-secondary" data-quick-range="last30" aria-pressed="false">Last 30 days</button>
+          <button type="button" class="button button-secondary" data-quick-range="custom" aria-pressed="false">Custom</button>
+        </div>
+        <form class="fbm-custom-range">
+          <label for="fbm-report-start">Start date</label>
+          <input type="date" id="fbm-report-start" name="fbm_report_start" value="2025-09-01" />
+          <label for="fbm-report-end">End date</label>
+          <input type="date" id="fbm-report-end" name="fbm_report_end" value="2025-09-21" />
+          <label for="fbm-report-per-page">Rows per page</label>
+          <select id="fbm-report-per-page" name="fbm_report_per_page">
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+          <p class="description">Maximum 500 rows per page.</p>
+          <button type="submit" class="button button-primary">Update results</button>
+        </form>
+      </section>
+      <section class="fbm-reports-results">
+        <table class="widefat striped">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Collections</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>2025-09-14</td>
+              <td>42</td>
+            </tr>
+            <tr>
+              <td>2025-09-15</td>
+              <td>38</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="tablenav">
+          <div class="tablenav-pages">
+            <span class="displaying-num">1–25 of 40</span>
+            <span class="pagination-links">
+              <a class="prev-page" href="#" aria-disabled="true">‹</a>
+              <span class="paging-input">Page 1 of 2</span>
+              <a class="next-page" href="#">›</a>
+            </span>
+          </div>
+        </div>
+        <form class="fbm-export-form">
+          <button type="submit" class="button button-secondary">Export CSV</button>
+        </form>
+        <p class="description" data-fbm-export-status hidden></p>
+      </section>
+    </main>
+    <script src="./wp-shim.js"></script>
+    <script>
+      window.fbmStaffDashboard = window.fbmStaffDashboard || {
+        restUrl: window.FBM.restUrl,
+        nonce: window.FBM.nonce,
+        strings: {
+          ready: 'Ready to record collections.',
+          loading: 'Recording collection…',
+          success: 'Collection recorded.',
+          recent_warning: 'Only managers can continue with a justified override.',
+          already: 'Member already collected today.',
+          duplicate_day: 'Member already collected today.',
+          throttled: 'Please wait a moment before trying again.',
+          invalid: 'Enter a valid collection code.',
+          revoked: 'This code has been revoked.',
+          error: 'Unable to record collection. Please try again.',
+          override_prompt: 'Member %s collected within the last week.',
+          override_requirements: 'Only managers can continue with a justified override.',
+        },
+      };
+    </script>
+    <script src="../../assets/js/fbm-scanner.js"></script>
+    <script src="../../assets/js/staff-dashboard.js"></script>
+    <script>
+      (function () {
+        const quickButtons = Array.from(document.querySelectorAll('[data-quick-range]'));
+        const cacheMessage = document.querySelector('[data-fbm-cache-message]');
+        const refreshButton = document.querySelector('[data-fbm-cache-refresh]');
+        const exportForm = document.querySelector('.fbm-export-form');
+        const exportStatus = document.querySelector('[data-fbm-export-status]');
+
+        let currentRange = 'last7';
+        let lastGenerated = Date.now();
+
+        function markFresh() {
+          lastGenerated = Date.now();
+          if (cacheMessage) {
+            cacheMessage.textContent = 'Fresh results generated moments ago.';
+          }
+        }
+
+        function markCached() {
+          const seconds = Math.max(1, Math.round((Date.now() - lastGenerated) / 1000));
+          if (cacheMessage) {
+            cacheMessage.textContent = `Using cached results (cached ${seconds} seconds ago).`;
+          }
+        }
+
+        quickButtons.forEach((button) => {
+          button.addEventListener('click', () => {
+            const range = button.getAttribute('data-quick-range');
+            quickButtons.forEach((item) => {
+              const isActive = item === button;
+              item.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+              item.classList.toggle('button-primary', isActive);
+              item.classList.toggle('button-secondary', !isActive);
+            });
+
+            if (range === currentRange) {
+              markCached();
+            } else {
+              currentRange = range || 'last7';
+              markFresh();
+            }
+          });
+        });
+
+        if (refreshButton) {
+          refreshButton.addEventListener('click', async () => {
+            refreshButton.disabled = true;
+            try {
+              await fetch(window.FBM.ajaxUrl, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                  'X-WP-Nonce': window.FBM.nonce,
+                },
+                body: 'action=fbm_reports_invalidate',
+              });
+              markFresh();
+            } finally {
+              refreshButton.disabled = false;
+            }
+          });
+        }
+
+        if (exportForm && exportStatus) {
+          exportForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            exportStatus.hidden = true;
+            try {
+              const exportUrl = `${window.FBM.exportsBase}/attendance.csv`;
+              const response = await fetch(exportUrl);
+              if (response.ok) {
+                exportStatus.textContent = 'Export ready.';
+                exportStatus.hidden = false;
+              } else {
+                throw new Error('Export failed');
+              }
+            } catch (error) {
+              exportStatus.textContent = 'Export failed. Try again later.';
+              exportStatus.hidden = false;
+            }
+          });
+        }
+      })();
+    </script>
+  </body>
+</html>
