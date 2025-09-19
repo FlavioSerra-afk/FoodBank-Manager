@@ -1,6 +1,10 @@
 (function (window, document) {
     'use strict';
 
+    const { __, _x, _n, sprintf } = wp.i18n;
+    const requestFailedMessage = __('Request failed.', 'foodbank-manager');
+    const invalidResponseMessage = __('Invalid response.', 'foodbank-manager');
+
     if (!window || !document) {
         return;
     }
@@ -157,13 +161,13 @@
         }
 
         var message = container.querySelector('[data-fbm-override-message]');
-        if (message && strings && strings.override_prompt && context && context.reference) {
+        if (message && strings && typeof strings.override_prompt === 'string' && context && context.reference) {
             var prompt = strings.override_prompt;
             if (prompt.indexOf('%s') !== -1) {
-                prompt = prompt.replace('%s', context.reference);
+                prompt = sprintf(prompt, context.reference);
             }
             if (strings.override_requirements && typeof strings.override_requirements === 'string') {
-                prompt += ' ' + strings.override_requirements;
+                prompt = prompt + ' ' + strings.override_requirements;
             }
             message.textContent = prompt;
         }
@@ -194,7 +198,7 @@
             body: JSON.stringify(payload)
         }).then(function (response) {
             if (!response) {
-                throw new Error('request failed');
+                throw new Error(requestFailedMessage);
             }
 
             return response.json().catch(function () {
@@ -202,10 +206,10 @@
             }).then(function (data) {
                 if (!data || typeof data.status !== 'string') {
                     if (!response.ok) {
-                        throw new Error('request failed');
+                        throw new Error(requestFailedMessage);
                     }
 
-                    throw new Error('invalid');
+                    throw new Error(invalidResponseMessage);
                 }
 
                 data.__responseOk = !!response.ok;
@@ -214,7 +218,7 @@
             });
         }).then(function (data) {
             if (!data || typeof data.status !== 'string') {
-                throw new Error('invalid');
+                throw new Error(invalidResponseMessage);
             }
 
             var statusKey = data.status;

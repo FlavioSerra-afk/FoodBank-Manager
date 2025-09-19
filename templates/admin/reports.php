@@ -128,25 +128,28 @@ $summary = array_merge( $summary_defaults, $summary );
 		</div>
 
 		<div class="fbm-filter-controls">
-				<form method="get" action="<?php echo esc_url( $filter_action ); ?>" class="fbm-quick-range" role="group" aria-label="<?php esc_attr_e( 'Quick ranges', 'foodbank-manager' ); ?>">
-						<input type="hidden" name="page" value="<?php echo esc_attr( $page_slug ); ?>" />
-						<input type="hidden" name="<?php echo esc_attr( $per_page_param ); ?>" value="<?php echo esc_attr( (string) $rows_per_page ); ?>" />
-						<input type="hidden" name="<?php echo esc_attr( $page_param ); ?>" value="1" />
-						<?php
-						foreach ( $quick_ranges as $range_option ) :
-							if ( ! is_array( $range_option ) ) {
-									continue;
-							}
+				<form method="get" action="<?php echo esc_url( $filter_action ); ?>" class="fbm-quick-range">
+								<input type="hidden" name="page" value="<?php echo esc_attr( $page_slug ); ?>" />
+								<input type="hidden" name="<?php echo esc_attr( $per_page_param ); ?>" value="<?php echo esc_attr( (string) $rows_per_page ); ?>" />
+								<input type="hidden" name="<?php echo esc_attr( $page_param ); ?>" value="1" />
+								<fieldset>
+												<legend class="screen-reader-text"><?php esc_html_e( 'Quick ranges', 'foodbank-manager' ); ?></legend>
+												<?php
+												foreach ( $quick_ranges as $range_option ) :
+													if ( ! is_array( $range_option ) ) {
+																	continue;
+													}
 
-								$value     = isset( $range_option['value'] ) ? (string) $range_option['value'] : '';
-								$label     = isset( $range_option['label'] ) ? (string) $range_option['label'] : '';
-								$is_active = $value === $quick_range;
-								$class     = $is_active ? 'button button-primary' : 'button button-secondary';
-							?>
-								<button type="submit" class="<?php echo esc_attr( $class ); ?>" name="<?php echo esc_attr( $quick_range_param ); ?>" value="<?php echo esc_attr( $value ); ?>" aria-pressed="<?php echo $is_active ? 'true' : 'false'; ?>">
-										<?php echo esc_html( $label ); ?>
-								</button>
-						<?php endforeach; ?>
+																$value     = isset( $range_option['value'] ) ? (string) $range_option['value'] : '';
+																$label     = isset( $range_option['label'] ) ? (string) $range_option['label'] : '';
+																$is_active = $value === $quick_range;
+																$class     = $is_active ? 'button button-primary' : 'button button-secondary';
+													?>
+																<button type="submit" class="<?php echo esc_attr( $class ); ?>" name="<?php echo esc_attr( $quick_range_param ); ?>" value="<?php echo esc_attr( $value ); ?>" aria-pressed="<?php echo $is_active ? 'true' : 'false'; ?>">
+																				<?php echo esc_html( $label ); ?>
+																</button>
+												<?php endforeach; ?>
+								</fieldset>
 				</form>
 
 				<form method="get" action="<?php echo esc_url( $filter_action ); ?>" class="fbm-custom-range">
@@ -198,8 +201,9 @@ $summary = array_merge( $summary_defaults, $summary );
 		</div>
 
 		<h2><?php esc_html_e( 'Summary', 'foodbank-manager' ); ?></h2>
-		<table class="widefat striped">
-				<tbody>
+				<table class="widefat striped">
+								<caption class="screen-reader-text"><?php esc_html_e( 'Attendance summary metrics', 'foodbank-manager' ); ?></caption>
+								<tbody>
 						<tr>
 								<th scope="row"><?php esc_html_e( 'Date range', 'foodbank-manager' ); ?></th>
 								<td>
@@ -273,8 +277,9 @@ $summary = array_merge( $summary_defaults, $summary );
 				<?php endif; ?>
 		</div>
 
-		<table class="widefat striped">
-				<thead>
+				<table class="widefat striped">
+								<caption class="screen-reader-text"><?php esc_html_e( 'Attendance records table', 'foodbank-manager' ); ?></caption>
+								<thead>
 						<tr>
 								<th scope="col"><?php esc_html_e( 'Collected date', 'foodbank-manager' ); ?></th>
 								<th scope="col"><?php esc_html_e( 'Collected time', 'foodbank-manager' ); ?></th>

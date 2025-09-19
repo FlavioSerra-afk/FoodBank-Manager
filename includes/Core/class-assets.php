@@ -16,6 +16,7 @@ use function esc_url_raw;
 use function function_exists;
 use function get_current_screen;
 use function is_user_logged_in;
+use function plugin_dir_path;
 use function plugins_url;
 use function rest_url;
 use function sprintf;
@@ -130,9 +131,15 @@ final class Assets {
 		wp_register_style( self::STAFF_STYLE, $style, array(), $version );
 		wp_enqueue_style( self::STAFF_STYLE );
 
-		wp_register_script( self::STAFF_HANDLE, $script, array(), $version, true );
-		wp_register_script( self::ZXING_HANDLE, $zxing_script, array(), '0.1.5', true );
-		wp_register_script( self::SCANNER_HANDLE, $scanner_script, array( self::STAFF_HANDLE, self::ZXING_HANDLE ), $version, true );
+				wp_register_script( self::STAFF_HANDLE, $script, array( 'wp-i18n' ), $version, true );
+				wp_register_script( self::ZXING_HANDLE, $zxing_script, array(), '0.1.5', true );
+				wp_register_script(
+					self::SCANNER_HANDLE,
+					$scanner_script,
+					array( 'wp-i18n', self::STAFF_HANDLE, self::ZXING_HANDLE ),
+					$version,
+					true
+				);
 
 		$data = array(
 			'restUrl'  => esc_url_raw( rest_url( 'fbm/v1/checkin' ) ),
@@ -173,8 +180,10 @@ final class Assets {
 			),
 		);
 
-		wp_localize_script( self::STAFF_HANDLE, 'fbmStaffDashboard', $data );
-		wp_set_script_translations( self::STAFF_HANDLE, 'foodbank-manager' );
+				wp_localize_script( self::STAFF_HANDLE, 'fbmStaffDashboard', $data );
+				$translations_path = plugin_dir_path( FBM_FILE ) . 'languages';
+				wp_set_script_translations( self::STAFF_HANDLE, 'foodbank-manager', $translations_path );
+				wp_set_script_translations( self::SCANNER_HANDLE, 'foodbank-manager', $translations_path );
 		wp_enqueue_script( self::STAFF_HANDLE );
 		wp_enqueue_script( self::ZXING_HANDLE );
 		wp_enqueue_script( self::SCANNER_HANDLE );

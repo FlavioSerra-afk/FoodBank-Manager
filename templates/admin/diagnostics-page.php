@@ -38,15 +38,15 @@ if ( isset( $data['rate_limit_seconds'] ) ) {
 }
 
 if ( isset( $data['health_badges'] ) && is_array( $data['health_badges'] ) ) {
-                                $health_badges = $data['health_badges'];
+								$health_badges = $data['health_badges'];
 }
 
 if ( isset( $data['token_probe'] ) && is_array( $data['token_probe'] ) ) {
-                                $token_probe = $data['token_probe'];
+								$token_probe = $data['token_probe'];
 }
 
 if ( isset( $data['token_failures'] ) && is_array( $data['token_failures'] ) ) {
-                                $token_failures = $data['token_failures'];
+								$token_failures = $data['token_failures'];
 }
 
 $rate_limit_minutes = max( 1, (int) floor( $rate_limit_seconds / 60 ) );
@@ -113,11 +113,11 @@ printf(
 $token_template = FBM_PATH . 'templates/admin/diagnostics-token.php';
 
 if ( is_readable( $token_template ) ) {
-        include $token_template;
+		include $token_template;
 }
 ?>
 
-                                <table class="widefat striped">
+								<table class="widefat striped">
 								<thead>
 												<tr>
 								<th scope="col"><?php esc_html_e( 'Recorded', 'foodbank-manager' ); ?></th>

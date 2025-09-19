@@ -98,5 +98,7 @@ Cross-Cutting
 
 ✅ Packaging excludes dev artifacts from release archives
 
+✅ JS i18n & A11y complete; admin/templates WPCS reduced
+
 ⬜ Performance checks (assets, indexes, streaming)
 
