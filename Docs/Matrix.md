@@ -8,17 +8,17 @@
 
 | Feature | Admin | Manager | Staff | Public | Mobile | A11y | Security | PHPCS | PHPStan | Unit | Integration | E2E | Docs | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Forms (shortcode) | 🟨 | 🟨 | 🟨 | ✅ | [ ] | [ ] | ✅ | ✅ | ✅ | ⚠️ | [ ] | [ ] | [ ] | [Tasks](Tasks.md) |
-| Emails (log/resend) | 🟨 | 🟨 | 🟨 | 🟨 | 🟨 | 🟨 | 🟨 | ✅ | ✅ | ⚠️ | 🟨 | 🟨 | 🟨 | [Task](Tasks.md#permanent-qr-issuance-in-applicant-email-revoke-regenerate-admin-tool) |
-| Front-end Dashboard (auth) | 🟨 | 🟨 | 🟨 | [ ] | [ ] | [ ] | ✅ | ✅ | ✅ | ⚠️ | [ ] | [ ] | [ ] | [Task](Tasks.md#public-dashboard-removal--guards) |
-| Staff Check-in | 🟨 | 🟨 | 🟨 | [ ] | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | [ ] | [Task](Tasks.md#u3--staff-front-end-dashboard); Final audit 2025-09-17 |
-| Attendance Scan | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ⚠️ | [ ] | [ ] | [ ] | [Events](Tasks.md#replace-remove-events-references-in-code--db-migrator), [Policy](Tasks.md#rest--ui-updates-for-fixed-window-policy) |
-| Attendance Manual | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | [ ] | [Events](Tasks.md#replace-remove-events-references-in-code--db-migrator), [Policy](Tasks.md#rest--ui-updates-for-fixed-window-policy); Final audit 2025-09-17 |
+| Forms (shortcode) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | ✅ | v1.1.1: shortcode hardened + admin approval/resend coverage |
+| Emails (log/resend) | ✅ | ✅ | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | ✅ | v1.1.1: diagnostics resend log with rate limiting |
+| Front-end Dashboard (auth) | ✅ | ✅ | ✅ | [ ] | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | ✅ | v1.1.1: scanner UI + REST nonce/throttle coverage |
+| Staff Check-in | ✅ | ✅ | ✅ | [ ] | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | [ ] | ✅ | v1.1.1: /fbm/checkin throttling + override audit |
+| Attendance Scan | ✅ | ✅ | ✅ | [ ] | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | ✅ | v1.1.1: camera module + duplicate feedback |
+| Attendance Manual | ✅ | ✅ | ✅ | [ ] | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | [ ] | ✅ | v1.1.1: manual fallback + manager override workflow |
 | Exports CSV/XLSX/PDF | ✅ | ✅ | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | ✅ | v1.0.10: streaming CSV with cache + BOM |
-| Diagnostics | ✅ | [ ] | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | [ ] | Token probe (redacted) + mail failure log. |
+| Diagnostics | ✅ | ✅ | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | ✅ | Token probe, mail failure log, resend gating |
 | WP-CLI (fbm version) | ✅ | [ ] | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | ✅ | [Tasks](Tasks.md) |
 | GDPR (Consent/SAR/Retention) | ✅ | ✅ | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | ✅ | v1.0.10: WP privacy exporter/eraser hooks + policy text. |
-| Packaging Guard | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | [Runbook](Runbooks/Release.md) | [Task](Tasks.md#packaging-guard-verification-upgrade-replaces-in-place) |
+| Packaging Guard | ✅ | [ ] | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | ✅ | [ ] | ✅ | v1.1.1: bin/package.sh manifest + version alignment |
 | Encryption (at rest) | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ⚠️ | [ ] | [ ] | [ ] | [Tasks](Tasks.md) |
 
 
@@ -66,7 +66,7 @@ U3 — Staff Front-End Dashboard
 
 ✅ Weekly repeat block requires manager override + note audit
 
-⬜ “Today” counters & feedback
+✅ “Today” counters & feedback
 
 U4 — Internal Summaries & Export
 
@@ -78,11 +78,11 @@ U4 — Internal Summaries & Export
 
 U5 — Diagnostics & Release
 
-⬜ Mail failures + resend
+✅ Mail failures + resend
 
-⬜ Packaging + version alignment
+✅ Packaging + version alignment
 
-⬜ Changelog + Release
+✅ Changelog + Release
 
 
 Cross-Cutting
