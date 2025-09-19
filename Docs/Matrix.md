@@ -14,7 +14,7 @@
 | Staff Check-in | 🟨 | 🟨 | 🟨 | [ ] | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | [ ] | [Task](Tasks.md#u3--staff-front-end-dashboard); Final audit 2025-09-17 |
 | Attendance Scan | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ⚠️ | [ ] | [ ] | [ ] | [Events](Tasks.md#replace-remove-events-references-in-code--db-migrator), [Policy](Tasks.md#rest--ui-updates-for-fixed-window-policy) |
 | Attendance Manual | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | [ ] | [Events](Tasks.md#replace-remove-events-references-in-code--db-migrator), [Policy](Tasks.md#rest--ui-updates-for-fixed-window-policy); Final audit 2025-09-17 |
-| Exports CSV/XLSX/PDF | ✅ | ✅ | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | ✅ | [Tasks](Tasks.md) |
+| Exports CSV/XLSX/PDF | ✅ | ✅ | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | ✅ | v1.0.9: streaming CSV with cache + BOM |
 | Diagnostics | ✅ | [ ] | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | [ ] | Token probe (redacted) + mail failure log. |
 | WP-CLI (fbm version) | ✅ | [ ] | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | ✅ | [Tasks](Tasks.md) |
 | GDPR (Consent/SAR/Retention) | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] | ✅ | ✅ | ⚠️ | [ ] | [ ] | [ ] | [Tasks](Tasks.md) |

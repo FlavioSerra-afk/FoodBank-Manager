@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: FoodBank Manager 1.0.0\n"
+"Project-Id-Version: FoodBank Manager 1.0.9\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/FoodBank-Manager\n"
 "POT-Creation-Date: 2025-09-11T12:34:16+00:00\n"
 "Language: en_GB\n"

@@ -33,7 +33,7 @@ use function do_action;
  */
 final class Plugin {
 
-	public const VERSION = '1.0.7';
+	public const VERSION = '1.0.9';
 
 
 	/**
