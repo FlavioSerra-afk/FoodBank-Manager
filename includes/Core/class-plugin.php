@@ -34,7 +34,7 @@ use function get_role;
  */
 final class Plugin {
 
-	public const VERSION = '1.1.1';
+	public const VERSION = '1.2.0';
 
 		/**
 		 * Register runtime hooks.
