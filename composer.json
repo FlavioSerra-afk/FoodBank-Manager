@@ -13,6 +13,9 @@
             "FBM\\": "includes/",
             "FoodBankManager\\": "includes/"
         },
+        "classmap": [
+            "wp-cli/class-cryptocommand.php"
+        ],
         "exclude-from-classmap": [
             "tests/"
         ]
@@ -90,5 +93,5 @@
         "sort-packages": true,
         "optimize-autoloader": true
     },
-    "version": "1.2.1"
+    "version": "1.3.0"
 }

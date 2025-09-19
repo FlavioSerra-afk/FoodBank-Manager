@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0] - 2025-09-24
+
+### Added
+- AES-256-GCM envelope encryption for member first names, last initials, and diagnostics mail log addresses with HKDF-derived master key wrapping.
+- Diagnostics admin encryption panel with migrate/rotate controls, resumable batching, and dry-run support.
+- `wp fbm crypto` CLI command for status, migrate, rotate, and verify operations with batching flags.
+- Settings toggle to enable encryption for new writes (default on for fresh installs).
+
 ## [1.1.1] - 2025-09-23
 
 ### Added

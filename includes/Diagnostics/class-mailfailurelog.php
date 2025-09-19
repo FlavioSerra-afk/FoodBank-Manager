@@ -10,6 +10,9 @@ declare(strict_types=1);
 namespace FoodBankManager\Diagnostics;
 
 use Exception;
+use FoodBankManager\Crypto\Adapters\MailFailLogAdapter;
+use FoodBankManager\Crypto\Crypto;
+use FoodBankManager\Crypto\EncryptionSettings;
 use function array_slice;
 use function array_values;
 use function bin2hex;
@@ -49,6 +52,22 @@ final class MailFailureLog {
 	private const RATE_LIMIT_INTERVAL = 900; // 15 minutes.
 
 		/**
+		 * Encryption adapter for persisted email values.
+		 *
+		 * @var MailFailLogAdapter
+		 */
+	private MailFailLogAdapter $encryption;
+
+		/**
+		 * Constructor.
+		 *
+		 * @param MailFailLogAdapter|null $encryption Optional encryption adapter.
+		 */
+	public function __construct( ?MailFailLogAdapter $encryption = null ) {
+			$this->encryption = $encryption ?? new MailFailLogAdapter();
+	}
+
+		/**
 		 * Record a welcome email failure for later review.
 		 *
 		 * @param int    $member_id        Member identifier.
@@ -71,23 +90,23 @@ final class MailFailureLog {
 		}
 
 		if ( null !== $existing_key ) {
-				$entries[ $existing_key ]['recorded_at']      = $now;
-				$entries[ $existing_key ]['context']          = $context;
-				$entries[ $existing_key ]['error']            = $error;
-				$entries[ $existing_key ]['member_reference'] = $member_reference;
-				$entries[ $existing_key ]['email']            = self::redact_email( $email );
+				$entries[ $existing_key ]['recorded_at']                      = $now;
+				$entries[ $existing_key ]['context']                          = $context;
+				$entries[ $existing_key ]['error']                            = $error;
+								$entries[ $existing_key ]['member_reference'] = $member_reference;
+								$entries[ $existing_key ]['email']            = $email;
 		} else {
-				$entries[] = array(
-					'id'               => $this->generate_id(),
-					'member_id'        => $member_id,
-					'member_reference' => $member_reference,
-					'email'            => self::redact_email( $email ),
-					'context'          => $context,
-					'error'            => $error,
-					'recorded_at'      => $now,
-					'last_attempt_at'  => null,
-					'attempts'         => 0,
-				);
+						$entries[] = array(
+							'id'               => $this->generate_id(),
+							'member_id'        => $member_id,
+							'member_reference' => $member_reference,
+							'email'            => $email,
+							'context'          => $context,
+							'error'            => $error,
+							'recorded_at'      => $now,
+							'last_attempt_at'  => null,
+							'attempts'         => 0,
+						);
 		}
 
 			$entries = $this->sort_and_trim( $entries );
@@ -120,7 +139,21 @@ final class MailFailureLog {
 		 * @return array<int, array<string, mixed>>
 		 */
 	public function entries(): array {
-			return $this->sort_and_trim( $this->load() );
+					$entries = $this->sort_and_trim( $this->load() );
+
+		foreach ( $entries as &$entry ) {
+			if ( isset( $entry['email'] ) && is_string( $entry['email'] ) ) {
+								$entry['email'] = self::redact_email( $entry['email'] );
+			}
+
+			if ( isset( $entry['raw_email'] ) ) {
+							unset( $entry['raw_email'] );
+			}
+		}
+
+					unset( $entry );
+
+					return $entries;
 	}
 
 		/**
@@ -285,49 +318,91 @@ final class MailFailureLog {
 		 * @return array<int, array<string, mixed>>
 		 */
 	private function load(): array {
-			$raw = get_option( self::OPTION_KEY, array() );
+					$raw = get_option( self::OPTION_KEY, array() );
 
 		if ( ! is_array( $raw ) ) {
-				return array();
+						return array();
 		}
 
-			$sanitized = array();
+					$sanitized = array();
 
 		foreach ( $raw as $entry ) {
 			if ( ! is_array( $entry ) ) {
-					continue;
+							continue;
 			}
 
-				$sanitized[] = array(
-					'id'               => isset( $entry['id'] ) ? (string) $entry['id'] : $this->generate_id(),
-					'member_id'        => isset( $entry['member_id'] ) ? (int) $entry['member_id'] : 0,
-					'member_reference' => isset( $entry['member_reference'] ) ? (string) $entry['member_reference'] : '',
-					'email'            => isset( $entry['email'] ) ? (string) $entry['email'] : '',
-					'context'          => isset( $entry['context'] ) ? (string) $entry['context'] : '',
-					'error'            => isset( $entry['error'] ) ? (string) $entry['error'] : '',
-					'recorded_at'      => isset( $entry['recorded_at'] ) && is_numeric( $entry['recorded_at'] ) ? (int) $entry['recorded_at'] : time(),
-					'last_attempt_at'  => isset( $entry['last_attempt_at'] ) && is_numeric( $entry['last_attempt_at'] ) ? (int) $entry['last_attempt_at'] : null,
-					'attempts'         => isset( $entry['attempts'] ) && is_numeric( $entry['attempts'] ) ? (int) $entry['attempts'] : 0,
-				);
+						$entry_id  = isset( $entry['id'] ) ? (string) $entry['id'] : $this->generate_id();
+						$raw_email = isset( $entry['email'] ) ? (string) $entry['email'] : '';
+						$decoded   = $this->encryption->decrypt_email( $entry_id, $raw_email );
+
+						$sanitized[] = array(
+							'id'               => $entry_id,
+							'member_id'        => isset( $entry['member_id'] ) ? (int) $entry['member_id'] : 0,
+							'member_reference' => isset( $entry['member_reference'] ) ? (string) $entry['member_reference'] : '',
+							'email'            => null !== $decoded ? $decoded : $raw_email,
+							'raw_email'        => $raw_email,
+							'context'          => isset( $entry['context'] ) ? (string) $entry['context'] : '',
+							'error'            => isset( $entry['error'] ) ? (string) $entry['error'] : '',
+							'recorded_at'      => isset( $entry['recorded_at'] ) && is_numeric( $entry['recorded_at'] ) ? (int) $entry['recorded_at'] : time(),
+							'last_attempt_at'  => isset( $entry['last_attempt_at'] ) && is_numeric( $entry['last_attempt_at'] ) ? (int) $entry['last_attempt_at'] : null,
+							'attempts'         => isset( $entry['attempts'] ) && is_numeric( $entry['attempts'] ) ? (int) $entry['attempts'] : 0,
+						);
 		}
 
-			return $this->sort_and_trim( $sanitized );
+					return $this->sort_and_trim( $sanitized );
 	}
 
 		/**
 		 * Persist entries to the option store.
 		 *
-		 * @param array<int, array<string, mixed>> $entries Failure entries.
+		 * @param array<int, mixed> $entries Failure entries.
 		 */
 	private function persist( array $entries ): void {
-			$entries = $this->sort_and_trim( $entries );
+					$filtered = array();
 
-		if ( count( $entries ) > 0 ) {
-				update_option( self::OPTION_KEY, array_values( $entries ), false );
+		foreach ( $entries as $entry ) {
+			if ( is_array( $entry ) ) {
+				$filtered[] = $entry;
+			}
+		}
+
+			$entries = $this->sort_and_trim( $filtered );
+
+		if ( empty( $entries ) ) {
+				delete_option( self::OPTION_KEY );
+
 				return;
 		}
 
-			delete_option( self::OPTION_KEY );
+					$stored = array();
+
+		foreach ( $entries as $entry ) {
+						$entry_id = isset( $entry['id'] ) ? (string) $entry['id'] : $this->generate_id();
+						$email    = isset( $entry['email'] ) ? (string) $entry['email'] : '';
+						$raw      = isset( $entry['raw_email'] ) ? (string) $entry['raw_email'] : '';
+
+						$should_encrypt = EncryptionSettings::encrypt_new_writes_enabled();
+
+			if ( ! $should_encrypt && '' !== $raw && Crypto::is_envelope( $raw ) ) {
+				$should_encrypt = true;
+			}
+
+			if ( $should_encrypt && '' !== $email ) {
+				$entry['email'] = $this->encryption->encrypt_email( $entry_id, $email );
+			} else {
+					$entry['email'] = $email;
+			}
+
+						$entry['id'] = $entry_id;
+
+			if ( isset( $entry['raw_email'] ) ) {
+					unset( $entry['raw_email'] );
+			}
+
+						$stored[] = $entry;
+		}
+
+					update_option( self::OPTION_KEY, array_values( $stored ), false );
 	}
 
 		/**

@@ -16,7 +16,21 @@ if ( ! defined( 'ARRAY_A' ) ) {
 }
 
 if ( ! defined( 'FBM_TESTING' ) ) {
-		define( 'FBM_TESTING', true );
+                define( 'FBM_TESTING', true );
+}
+
+if ( ! defined( 'AUTH_KEY' ) ) {
+        define( 'AUTH_KEY', 'fbm-test-auth-key' );
+}
+
+if ( ! defined( 'SECURE_AUTH_KEY' ) ) {
+        define( 'SECURE_AUTH_KEY', 'fbm-test-secure-key' );
+}
+
+if ( ! function_exists( 'site_url' ) ) {
+        function site_url(): string {
+                return 'https://example.test';
+        }
 }
 
 if ( ! isset( $GLOBALS['fbm_current_caps'] ) ) {
@@ -143,21 +157,28 @@ if ( ! class_exists( 'wpdb', false ) ) {
 		 *
 		 * @return array<string,mixed>
 		 */
-		private function normalize_member_row( array $member ): array {
-			return array(
-				'id'                  => (int) ( $member['id'] ?? 0 ),
-				'member_reference'    => (string) ( $member['member_reference'] ?? '' ),
-				'first_name'          => (string) ( $member['first_name'] ?? '' ),
-				'last_initial'        => (string) ( $member['last_initial'] ?? '' ),
-				'email'               => (string) ( $member['email'] ?? '' ),
-				'status'              => (string) ( $member['status'] ?? '' ),
-				'household_size'      => (int) ( $member['household_size'] ?? 0 ),
-				'created_at'          => $member['created_at'] ?? null,
-				'updated_at'          => $member['updated_at'] ?? null,
-				'activated_at'        => $member['activated_at'] ?? null,
-				'consent_recorded_at' => $member['consent_recorded_at'] ?? null,
-			);
-		}
+                private function normalize_member_row( array $member ): array {
+                        return array(
+                                'id'                  => (int) ( $member['id'] ?? 0 ),
+                                'member_reference'    => (string) ( $member['member_reference'] ?? '' ),
+                                'first_name'          => (string) ( $member['first_name'] ?? '' ),
+                                'last_initial'        => (string) ( $member['last_initial'] ?? '' ),
+                                'email'               => (string) ( $member['email'] ?? '' ),
+                                'status'              => (string) ( $member['status'] ?? '' ),
+                                'household_size'      => (int) ( $member['household_size'] ?? 0 ),
+                                'created_at'          => $member['created_at'] ?? null,
+                                'updated_at'          => $member['updated_at'] ?? null,
+                                'activated_at'        => $member['activated_at'] ?? null,
+                                'consent_recorded_at' => $member['consent_recorded_at'] ?? null,
+                        );
+                }
+
+                /**
+                 * Determine whether a stored value is an encryption envelope.
+                 */
+                private function is_envelope_value( string $value ): bool {
+                        return str_starts_with( $value, '{"v":"1","alg":"AES-256-GCM"' );
+                }
 
 		public function get_charset_collate(): string {
 				return 'DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci';
@@ -235,8 +256,30 @@ if ( ! class_exists( 'wpdb', false ) ) {
 					return null;
 			}
 
-				$sql  = $this->last_prepare['query'];
-				$args = $this->last_prepare['args'];
+                        $sql  = $this->last_prepare['query'];
+                        $args = $this->last_prepare['args'];
+
+                        if (
+                                str_contains( $sql, 'fbm_members' )
+                                && str_contains( $sql, 'SUM(CASE WHEN first_name LIKE %s AND last_initial LIKE %s' )
+                        ) {
+                                $total     = count( $this->members );
+                                $encrypted = 0;
+
+                                foreach ( $this->members as $member ) {
+                                        $first = (string) ( $member['first_name'] ?? '' );
+                                        $last  = (string) ( $member['last_initial'] ?? '' );
+
+                                        if ( $this->is_envelope_value( $first ) && $this->is_envelope_value( $last ) ) {
+                                                ++$encrypted;
+                                        }
+                                }
+
+                                return array(
+                                        'total'     => $total,
+                                        'encrypted' => $encrypted,
+                                );
+                        }
 
 			if (
 						str_contains( $sql, 'fbm_tokens' )
@@ -361,11 +404,59 @@ if ( ! class_exists( 'wpdb', false ) ) {
 					return $latest;
 			}
 
-			if (
-						str_contains( $sql, 'fbm_attendance' )
-						&& str_contains( $sql, 'member_reference = %s' )
-						&& str_contains( $sql, 'collected_date = %s' )
-				) {
+                        if (
+                                str_contains( $sql, 'fbm_members' )
+                                && str_contains( $sql, 'first_name NOT LIKE %s OR last_initial NOT LIKE %s' )
+                        ) {
+                                $cursor = (int) ( $args[0] ?? 0 );
+
+                                foreach ( $this->members as $member ) {
+                                        $member_id = (int) ( $member['id'] ?? 0 );
+
+                                        if ( $member_id <= $cursor ) {
+                                                continue;
+                                        }
+
+                                        $first = (string) ( $member['first_name'] ?? '' );
+                                        $last  = (string) ( $member['last_initial'] ?? '' );
+
+                                        if ( ! $this->is_envelope_value( $first ) || ! $this->is_envelope_value( $last ) ) {
+                                                return $member_id;
+                                        }
+                                }
+
+                                return null;
+                        }
+
+                        if (
+                                str_contains( $sql, 'fbm_members' )
+                                && str_contains( $sql, 'first_name LIKE %s AND last_initial LIKE %s' )
+                        ) {
+                                $cursor = (int) ( $args[0] ?? 0 );
+
+                                foreach ( $this->members as $member ) {
+                                        $member_id = (int) ( $member['id'] ?? 0 );
+
+                                        if ( $member_id <= $cursor ) {
+                                                continue;
+                                        }
+
+                                        $first = (string) ( $member['first_name'] ?? '' );
+                                        $last  = (string) ( $member['last_initial'] ?? '' );
+
+                                        if ( $this->is_envelope_value( $first ) && $this->is_envelope_value( $last ) ) {
+                                                return $member_id;
+                                        }
+                                }
+
+                                return null;
+                        }
+
+                        if (
+                                                str_contains( $sql, 'fbm_attendance' )
+                                                && str_contains( $sql, 'member_reference = %s' )
+                                                && str_contains( $sql, 'collected_date = %s' )
+                                ) {
 					$reference = (string) ( $args[0] ?? '' );
 					$date      = (string) ( $args[1] ?? '' );
 
@@ -464,8 +555,96 @@ if ( ! class_exists( 'wpdb', false ) ) {
 					return array();
 			}
 
-				$sql  = $this->last_prepare['query'];
-				$args = $this->last_prepare['args'];
+                        $sql  = $this->last_prepare['query'];
+                        $args = $this->last_prepare['args'];
+
+                       if (
+                               str_contains( $sql, 'fbm_members' )
+                               && str_contains( $sql, 'WHERE id > %d' )
+                               && str_contains( $sql, 'first_name NOT LIKE %s OR last_initial NOT LIKE %s' )
+                       ) {
+                                $cursor = (int) ( $args[0] ?? 0 );
+                                $limit  = (int) ( $args[3] ?? 0 );
+                                $rows   = array();
+
+                                foreach ( $this->members as $member ) {
+                                        $member_id = (int) ( $member['id'] ?? 0 );
+
+                                        if ( $member_id <= $cursor ) {
+                                                continue;
+                                        }
+
+                                        $first = (string) ( $member['first_name'] ?? '' );
+                                        $last  = (string) ( $member['last_initial'] ?? '' );
+
+                                        if ( $this->is_envelope_value( $first ) && $this->is_envelope_value( $last ) ) {
+                                                continue;
+                                        }
+
+                                        $rows[] = array(
+                                                'id'           => $member_id,
+                                                'first_name'   => $first,
+                                                'last_initial' => $last,
+                                        );
+
+                                        if ( $limit > 0 && count( $rows ) >= $limit ) {
+                                                break;
+                                        }
+                                }
+
+                                usort(
+                                        $rows,
+                                        static function ( array $a, array $b ): int {
+                                                return ( $a['id'] ?? 0 ) <=> ( $b['id'] ?? 0 );
+                                        }
+                                );
+
+                                return $rows;
+                        }
+
+                       if (
+                               str_contains( $sql, 'fbm_members' )
+                               && str_contains( $sql, 'WHERE id > %d' )
+                               && str_contains( $sql, 'first_name LIKE %s AND last_initial LIKE %s' )
+                       ) {
+                                $cursor = (int) ( $args[0] ?? 0 );
+                                $limit  = (int) ( $args[3] ?? 0 );
+                                $rows   = array();
+
+                                foreach ( $this->members as $member ) {
+                                        $member_id = (int) ( $member['id'] ?? 0 );
+
+                                        if ( $member_id <= $cursor ) {
+                                                continue;
+                                        }
+
+                                        $first = (string) ( $member['first_name'] ?? '' );
+                                        $last  = (string) ( $member['last_initial'] ?? '' );
+
+                                        if ( ! $this->is_envelope_value( $first ) || ! $this->is_envelope_value( $last ) ) {
+                                                continue;
+                                        }
+
+                                        $rows[] = array(
+                                                'id'           => $member_id,
+                                                'first_name'   => $first,
+                                                'last_initial' => $last,
+                                        );
+
+                                        if ( $limit > 0 && count( $rows ) >= $limit ) {
+                                                break;
+                                        }
+                                }
+
+                                usort(
+                                        $rows,
+                                        static function ( array $a, array $b ): int {
+                                                return ( $a['id'] ?? 0 ) <=> ( $b['id'] ?? 0 );
+                                        }
+                                );
+
+                                return $rows;
+                        }
 
                        if (
                                str_contains( $sql, 'fbm_attendance' )
@@ -1336,6 +1515,12 @@ require_once __DIR__ . '/../includes/Core/class-install.php';
 require_once __DIR__ . '/../includes/Core/class-assets.php';
 require_once __DIR__ . '/../includes/Core/class-cache.php';
 require_once __DIR__ . '/../includes/Core/class-schedule.php';
+require_once __DIR__ . '/../includes/Crypto/class-crypto.php';
+require_once __DIR__ . '/../includes/Crypto/class-encryptionadapter.php';
+require_once __DIR__ . '/../includes/Crypto/class-encryptionmanager.php';
+require_once __DIR__ . '/../includes/Crypto/class-encryptionsettings.php';
+require_once __DIR__ . '/../includes/Crypto/Adapters/class-memberspiiadapter.php';
+require_once __DIR__ . '/../includes/Crypto/Adapters/class-mailfaillogadapter.php';
 require_once __DIR__ . '/../includes/Attendance/class-attendancerepository.php';
 require_once __DIR__ . '/../includes/Attendance/class-checkinservice.php';
 require_once __DIR__ . '/../includes/Token/class-tokenrepository.php';

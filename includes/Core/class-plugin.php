@@ -9,6 +9,10 @@ declare(strict_types=1);
 
 namespace FoodBankManager\Core;
 
+use FoodBankManager\Core\Assets;
+use FoodBankManager\Core\Install;
+
+use FBM\CLI\CryptoCommand;
 use FBM\CLI\TokenCommand;
 use FoodBankManager\Admin\DiagnosticsPage;
 use FoodBankManager\Admin\MembersPage;
@@ -17,6 +21,7 @@ use FoodBankManager\Admin\SchedulePage;
 use FoodBankManager\Admin\SettingsPage;
 use FoodBankManager\Admin\ThemePage;
 use FoodBankManager\Auth\Capabilities;
+use FoodBankManager\Crypto\EncryptionSettings;
 use FoodBankManager\Privacy\Privacy;
 use FoodBankManager\Rest\CheckinController;
 use FoodBankManager\Shortcodes\RegistrationForm;
@@ -33,31 +38,30 @@ use function get_role;
  * Main plugin orchestrator.
  */
 final class Plugin {
+	public const VERSION = '1.3.0';
 
-	public const VERSION = '1.2.1';
-
-		/**
-		 * Register runtime hooks.
-		 */
+	/**
+	 * Register runtime hooks.
+	 */
 	public static function boot(): void {
-			Assets::setup();
-			DiagnosticsPage::register();
-			MembersPage::register();
-			ReportsPage::register();
-			SchedulePage::register();
-			SettingsPage::register();
-			ThemePage::register();
-			RegistrationForm::register();
-			StaffDashboard::register();
-			Privacy::register();
+		Assets::setup();
+		DiagnosticsPage::register();
+		MembersPage::register();
+		ReportsPage::register();
+		SchedulePage::register();
+		SettingsPage::register();
+		ThemePage::register();
+		RegistrationForm::register();
+		StaffDashboard::register();
+		Privacy::register();
 
-			add_action( 'rest_api_init', array( CheckinController::class, 'register_routes' ) );
+		add_action( 'rest_api_init', array( CheckinController::class, 'register_routes' ) );
 
 		if ( defined( 'WP_CLI' ) && WP_CLI && class_exists( '\\WP_CLI' ) ) {
-				self::register_cli_commands();
+			self::register_cli_commands();
 		}
 
-			do_action( 'fbm_booted' );
+		do_action( 'fbm_booted' );
 	}
 
 	/**
@@ -96,6 +100,7 @@ final class Plugin {
 		}
 
 		Install::ensure_tables();
+		EncryptionSettings::bootstrap_on_activation();
 		do_action( 'fbm_activated' );
 	}
 
@@ -103,20 +108,21 @@ final class Plugin {
 	 * Perform deactivation cleanup.
 	 */
 	public static function deactivate(): void {
-			do_action( 'fbm_deactivated' );
+		do_action( 'fbm_deactivated' );
 	}
 
-		/**
-		 * Register WP-CLI commands under the fbm namespace.
-		 */
+	/**
+	 * Register WP-CLI commands under the fbm namespace.
+	 */
 	public static function register_cli_commands(): void {
-			\WP_CLI::add_command(
-				'fbm version',
-				static function (): void {
-							\WP_CLI::log( self::VERSION );
-				}
-			);
+		\WP_CLI::add_command(
+			'fbm version',
+			static function (): void {
+				\WP_CLI::log( self::VERSION );
+			}
+		);
 
-			\WP_CLI::add_command( 'fbm token', TokenCommand::class );
+		\WP_CLI::add_command( 'fbm token', TokenCommand::class );
+		\WP_CLI::add_command( 'fbm crypto', CryptoCommand::class );
 	}
 }

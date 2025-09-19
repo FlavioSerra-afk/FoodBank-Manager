@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace FoodBankManager\Admin;
 
+use FoodBankManager\Crypto\EncryptionAdapter;
+use FoodBankManager\Crypto\EncryptionManager;
+use FoodBankManager\Crypto\EncryptionSettings;
 use FoodBankManager\Diagnostics\HealthStatus;
 use FoodBankManager\Diagnostics\MailFailureLog;
 use FoodBankManager\Diagnostics\TokenProbeService;
@@ -21,21 +24,25 @@ use RuntimeException;
 use wpdb;
 use function __;
 use function add_action;
+use function absint;
 use function add_menu_page;
 use function add_query_arg;
 use function admin_url;
+use function array_key_exists;
+use function array_slice;
 use function check_admin_referer;
 use function current_user_can;
 use function esc_html__;
 use function filter_input;
-use function array_key_exists;
-use function array_slice;
 use function gmdate;
 use function is_array;
 use function is_scalar;
 use function is_readable;
-use function sanitize_textarea_field;
+use function rawurlencode;
+use function rawurldecode;
+use function sanitize_key;
 use function sanitize_text_field;
+use function sanitize_textarea_field;
 use function sprintf;
 use function strtoupper;
 use function str_repeat;
@@ -55,30 +62,36 @@ use const INPUT_POST;
  * Presents diagnostic information including mail failures.
  */
 final class DiagnosticsPage {
-	private const MENU_SLUG            = 'fbm-diagnostics';
-	private const TEMPLATE             = 'templates/admin/diagnostics-page.php';
-	private const ACTION_PARAM         = 'fbm_diag_action';
-	private const ENTRY_PARAM          = 'fbm_diag_entry';
-	private const STATUS_PARAM         = 'fbm_diag_status';
-	private const CODE_PARAM           = 'fbm_diag_code';
-	private const MEMBER_PARAM         = 'fbm_diag_member';
-	private const ACTION_RESEND        = 'resend';
-	private const TOKEN_PROBE_FIELD    = 'fbm_token_probe_payload';
-	private const TOKEN_PROBE_NONCE    = 'fbm_token_probe_nonce';
-	private const TOKEN_PROBE_ACTION   = 'fbm_token_probe';
-	private const TOKEN_FAILURES_LIMIT = 10;
+	private const MENU_SLUG                = 'fbm-diagnostics';
+	private const TEMPLATE                 = 'templates/admin/diagnostics-page.php';
+	private const ACTION_PARAM             = 'fbm_diag_action';
+	private const ENTRY_PARAM              = 'fbm_diag_entry';
+	private const STATUS_PARAM             = 'fbm_diag_status';
+	private const CODE_PARAM               = 'fbm_diag_code';
+	private const MEMBER_PARAM             = 'fbm_diag_member';
+	private const ACTION_RESEND            = 'resend';
+	private const TOKEN_PROBE_FIELD        = 'fbm_token_probe_payload';
+	private const TOKEN_PROBE_NONCE        = 'fbm_token_probe_nonce';
+	private const TOKEN_PROBE_ACTION       = 'fbm_token_probe';
+	private const TOKEN_FAILURES_LIMIT     = 10;
+	private const ENCRYPTION_FORM_ACTION   = 'fbm_crypto_manage';
+	private const ENCRYPTION_NONCE_NAME    = 'fbm_crypto_nonce';
+	private const ENCRYPTION_NONCE_ACTION  = 'fbm_crypto_manage';
+	private const ENCRYPTION_STATUS_PARAM  = 'fbm_crypto_status';
+	private const ENCRYPTION_MESSAGE_PARAM = 'fbm_crypto_message';
 
-				/**
-				 * Register WordPress hooks.
-				 */
+	/**
+	 * Register WordPress hooks.
+	 */
 	public static function register(): void {
-		add_action( 'admin_menu', array( __CLASS__, 'register_menu' ) );
-		add_action( 'admin_init', array( __CLASS__, 'handle_actions' ) );
+				add_action( 'admin_menu', array( __CLASS__, 'register_menu' ) );
+				add_action( 'admin_init', array( __CLASS__, 'handle_actions' ) );
+				add_action( 'admin_post_' . self::ENCRYPTION_FORM_ACTION, array( __CLASS__, 'handle_encryption_action' ) );
 	}
 
-		/**
-		 * Register the diagnostics admin menu entry.
-		 */
+	/**
+	 * Register the diagnostics admin menu entry.
+	 */
 	public static function register_menu(): void {
 			add_menu_page(
 				__( 'Food Bank Diagnostics', 'foodbank-manager' ),
@@ -90,9 +103,9 @@ final class DiagnosticsPage {
 			);
 	}
 
-		/**
-		 * Render the diagnostics dashboard.
-		 */
+	/**
+	 * Render the diagnostics dashboard.
+	 */
 	public static function render(): void {
 		if ( ! current_user_can( 'fbm_manage' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
 			wp_die( esc_html__( 'You do not have permission to access this page.', 'foodbank-manager' ) );
@@ -131,6 +144,7 @@ final class DiagnosticsPage {
 
 				$token_probe    = self::prepare_token_probe();
 				$token_failures = self::collect_token_failures( $raw );
+				$encryption     = self::prepare_encryption_panel();
 
 						$template = FBM_PATH . self::TEMPLATE;
 
@@ -138,30 +152,31 @@ final class DiagnosticsPage {
 						wp_die( esc_html__( 'Diagnostics template is missing.', 'foodbank-manager' ) );
 		}
 
-												$data = array(
-													'entries'            => $entries,
-													'notices'            => $notices,
-													'rate_limit_seconds' => $rate,
-													'page_slug'          => self::MENU_SLUG,
-													'health_badges'      => $badges,
-													'token_probe'        => array(
-														'field'       => self::TOKEN_PROBE_FIELD,
-														'nonce_field' => self::TOKEN_PROBE_NONCE,
-														'nonce_action' => self::TOKEN_PROBE_ACTION,
-														'payload'     => $token_probe['payload'],
-														'submitted'   => $token_probe['submitted'],
-														'result'      => $token_probe['result'],
-														'error'       => $token_probe['error'],
-													),
-													'token_failures'     => $token_failures,
-												);
+								$data = array(
+									'entries'            => $entries,
+									'notices'            => $notices,
+									'rate_limit_seconds' => $rate,
+									'page_slug'          => self::MENU_SLUG,
+									'health_badges'      => $badges,
+									'token_probe'        => array(
+										'field'        => self::TOKEN_PROBE_FIELD,
+										'nonce_field'  => self::TOKEN_PROBE_NONCE,
+										'nonce_action' => self::TOKEN_PROBE_ACTION,
+										'payload'      => $token_probe['payload'],
+										'submitted'    => $token_probe['submitted'],
+										'result'       => $token_probe['result'],
+										'error'        => $token_probe['error'],
+									),
+									'encryption'         => $encryption,
+									'token_failures'     => $token_failures,
+								);
 
 												include $template;
 	}
 
-		/**
-		 * Handle resend attempts triggered from the diagnostics view.
-		 */
+	/**
+	 * Handle resend attempts triggered from the diagnostics view.
+	 */
 	public static function handle_actions(): void {
 		if ( ! current_user_can( 'fbm_manage' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
 			return;
@@ -202,11 +217,11 @@ final class DiagnosticsPage {
 			self::redirect_with_outcome( $outcome );
 	}
 
-		/**
-		 * Collect queued notice messages from query parameters.
-		 *
-		 * @return array<int, array{type:string,message:string}>
-		 */
+	/**
+	 * Collect queued notice messages from query parameters.
+	 *
+	 * @return array<int, array{type:string,message:string}>
+	 */
 	private static function collect_notices(): array {
 		$notices = array();
 
@@ -278,11 +293,11 @@ final class DiagnosticsPage {
 			return $notices;
 	}
 
-		/**
-		 * Process token probe submissions.
-		 *
-		 * @return array{payload:string,submitted:bool,result:?array{version:?string,hmac_match:bool,revoked:bool},error:?string}
-		 */
+	/**
+	 * Process token probe submissions.
+	 *
+	 * @return array{payload:string,submitted:bool,result:?array{version:?string,hmac_match:bool,revoked:bool},error:?string}
+	 */
 	private static function prepare_token_probe(): array {
 				$method_input = filter_input( INPUT_SERVER, 'REQUEST_METHOD', FILTER_UNSAFE_RAW );
 				$raw_method   = is_string( $method_input ) ? $method_input : '';
@@ -329,12 +344,12 @@ final class DiagnosticsPage {
 		);
 	}
 
-		/**
-		 * Limit the token probe output to redacted fields.
-		 *
-		 * @param array<string,mixed> $result Raw probe result.
-		 * @return array{version:?string,hmac_match:bool,revoked:bool}
-		 */
+	/**
+	 * Limit the token probe output to redacted fields.
+	 *
+	 * @param array<string,mixed> $result Raw probe result.
+	 * @return array{version:?string,hmac_match:bool,revoked:bool}
+	 */
 	private static function filter_token_probe_result( array $result ): array {
 			$version = null;
 
@@ -349,9 +364,9 @@ final class DiagnosticsPage {
 			);
 	}
 
-		/**
-		 * Instantiate the token probe service when the database layer is available.
-		 */
+	/**
+	 * Instantiate the token probe service when the database layer is available.
+	 */
 	private static function build_token_probe_service(): ?TokenProbeService {
 			global $wpdb;
 
@@ -364,15 +379,15 @@ final class DiagnosticsPage {
 			return new TokenProbeService( $token );
 	}
 
-		/**
-		 * Collect recent token resend failures for diagnostics display.
-		 *
-		 * @param array<int,mixed> $entries Raw mail failure entries.
-		 *
-		 * @return array<int,array<string,mixed>>
-		 */
+	/**
+	 * Collect recent token resend failures for diagnostics display.
+	 *
+	 * @param array<int,mixed> $entries Raw mail failure entries.
+	 *
+	 * @return array<int,array<string,mixed>>
+	 */
 	private static function collect_token_failures( array $entries ): array {
-			$failures = array();
+					$failures = array();
 
 		foreach ( $entries as $entry ) {
 			if ( ! is_array( $entry ) ) {
@@ -383,30 +398,80 @@ final class DiagnosticsPage {
 					continue;
 			}
 
-				$recorded_at = isset( $entry['recorded_at'] ) ? (int) $entry['recorded_at'] : 0;
+			$recorded_at = isset( $entry['recorded_at'] ) ? (int) $entry['recorded_at'] : 0;
 
-				$failures[] = array(
-					'member_reference' => self::redact_member_reference( isset( $entry['member_reference'] ) ? (string) $entry['member_reference'] : '' ),
-					'recorded_at'      => $recorded_at > 0 ? gmdate( 'Y-m-d H:i:s \U\T\C', $recorded_at ) : '',
-					'context'          => self::context_label( isset( $entry['context'] ) ? (string) $entry['context'] : '' ),
-					'attempts'         => isset( $entry['attempts'] ) ? (int) $entry['attempts'] : 0,
-				);
+			$failures[] = array(
+				'member_reference' => self::redact_member_reference( isset( $entry['member_reference'] ) ? (string) $entry['member_reference'] : '' ),
+				'recorded_at'      => $recorded_at > 0 ? gmdate( 'Y-m-d H:i:s \U\T\C', $recorded_at ) : '',
+				'context'          => self::context_label( isset( $entry['context'] ) ? (string) $entry['context'] : '' ),
+				'attempts'         => isset( $entry['attempts'] ) ? (int) $entry['attempts'] : 0,
+			);
 		}
 
 		if ( empty( $failures ) ) {
-				return array();
+			return array();
 		}
 
 			return array_slice( $failures, 0, self::TOKEN_FAILURES_LIMIT );
 	}
 
-				/**
-				 * Process the resend action for a specific failure entry.
-				 *
-				 * @param string $entry_id Failure entry identifier.
-				 *
-				 * @return array{status:bool,code:string,member_reference?:string}
-				 */
+	/**
+	 * Prepare encryption adapter data for diagnostics rendering.
+	 *
+	 * @return array<string,mixed>
+	 */
+	private static function prepare_encryption_panel(): array {
+			$adapters = EncryptionManager::adapters();
+			$rows     = array();
+
+		foreach ( $adapters as $adapter ) {
+			if ( ! $adapter instanceof EncryptionAdapter ) {
+				continue;
+			}
+
+				$rows[] = array(
+					'id'     => $adapter->id(),
+					'label'  => $adapter->label(),
+					'status' => $adapter->status(),
+				);
+		}
+
+			$status_param  = self::read_query_arg( self::ENCRYPTION_STATUS_PARAM );
+			$message_param = self::read_query_arg( self::ENCRYPTION_MESSAGE_PARAM );
+
+			$status  = '' !== $status_param ? sanitize_key( wp_unslash( $status_param ) ) : '';
+			$message = '' !== $message_param ? sanitize_text_field( rawurldecode( $message_param ) ) : '';
+
+			$notice = array();
+
+		if ( '' !== $message ) {
+				$notice = array(
+					'status'  => '' !== $status ? $status : 'info',
+					'message' => $message,
+				);
+		}
+
+			return array(
+				'adapters'           => $rows,
+				'form'               => array(
+					'action'       => self::ENCRYPTION_FORM_ACTION,
+					'nonce_name'   => self::ENCRYPTION_NONCE_NAME,
+					'nonce_action' => self::ENCRYPTION_NONCE_ACTION,
+					'url'          => admin_url( 'admin-post.php' ),
+					'limit'        => 50,
+				),
+				'notice'             => $notice,
+				'encrypt_new_writes' => EncryptionSettings::encrypt_new_writes_enabled(),
+			);
+	}
+
+			/**
+			 * Process the resend action for a specific failure entry.
+			 *
+			 * @param string $entry_id Failure entry identifier.
+			 *
+			 * @return array{status:bool,code:string,member_reference?:string}
+			 */
 	private static function process_resend( string $entry_id ): array {
 			$log   = new MailFailureLog();
 			$entry = $log->find( $entry_id );
@@ -472,20 +537,115 @@ final class DiagnosticsPage {
 				);
 		}
 
-			$log->resolve( $entry_id );
+						$log->resolve( $entry_id );
 
-			return array(
-				'status'           => true,
-				'code'             => 'resent',
-				'member_reference' => $member['member_reference'],
-			);
+						return array(
+							'status'           => true,
+							'code'             => 'resent',
+							'member_reference' => $member['member_reference'],
+						);
 	}
 
-		/**
-		 * Redirect back to the diagnostics page with an encoded outcome.
-		 *
-		 * @param array{status:bool,code:string,member_reference?:string} $outcome Outcome descriptor.
-		 */
+	/**
+	 * Handle admin-triggered encryption migration and rotation requests.
+	 */
+	public static function handle_encryption_action(): void {
+		if ( ! current_user_can( 'fbm_manage' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
+				wp_die( esc_html__( 'You do not have permission to manage encryption.', 'foodbank-manager' ) );
+		}
+
+				check_admin_referer( self::ENCRYPTION_NONCE_ACTION, self::ENCRYPTION_NONCE_NAME );
+
+				$adapter_param   = filter_input( INPUT_POST, 'fbm_crypto_adapter', FILTER_UNSAFE_RAW );
+				$operation_param = filter_input( INPUT_POST, 'fbm_crypto_operation', FILTER_UNSAFE_RAW );
+				$limit_param     = filter_input( INPUT_POST, 'fbm_crypto_limit', FILTER_UNSAFE_RAW );
+				$dry_param       = filter_input( INPUT_POST, 'fbm_crypto_dry_run', FILTER_UNSAFE_RAW );
+
+				$adapter_id = is_string( $adapter_param ) ? sanitize_key( $adapter_param ) : '';
+				$operation  = is_string( $operation_param ) ? sanitize_key( $operation_param ) : '';
+				$limit      = is_string( $limit_param ) ? absint( $limit_param ) : 0;
+				$dry_run    = is_string( $dry_param ) && ( '1' === $dry_param || 'on' === strtolower( $dry_param ) );
+
+		if ( $limit <= 0 ) {
+				$limit = 50;
+		}
+
+				$status  = 'success';
+				$message = '';
+
+				$adapter = EncryptionManager::get( $adapter_id );
+
+		if ( null === $adapter ) {
+				$status  = 'error';
+				$message = esc_html__( 'Selected encryption adapter is unavailable.', 'foodbank-manager' );
+		} else {
+			switch ( $operation ) {
+				case 'migrate':
+					$result = $adapter->migrate( $limit, $dry_run );
+					break;
+				case 'rotate':
+					$result = $adapter->rotate( $limit, $dry_run );
+					break;
+				default:
+						$result  = null;
+						$status  = 'error';
+						$message = esc_html__( 'Unknown encryption operation.', 'foodbank-manager' );
+					break;
+			}
+
+			if ( is_array( $result ) ) {
+							$changed   = isset( $result['changed'] ) ? (int) $result['changed'] : 0;
+							$processed = isset( $result['processed'] ) ? (int) $result['processed'] : 0;
+							$label     = $adapter->label();
+
+				if ( $dry_run ) {
+					$message = sprintf(
+					/* translators: 1: adapter label, 2: processed count, 3: changed count. */
+						__( '%1$s dry-run: %2$d records inspected, %3$d would change.', 'foodbank-manager' ),
+						$label,
+						$processed,
+						$changed
+					);
+				} else {
+					$message = sprintf(
+					/* translators: 1: adapter label, 2: processed count, 3: changed count. */
+						__( '%1$s: %2$d records processed, %3$d updated.', 'foodbank-manager' ),
+						$label,
+						$processed,
+						$changed
+					);
+				}
+
+				if ( ! empty( $result['failures'] ) && is_array( $result['failures'] ) ) {
+						$status  = 'warning';
+						$message = $message . ' ' . esc_html__( 'Some records could not be updated.', 'foodbank-manager' );
+				}
+			}
+		}
+
+				$redirect = add_query_arg(
+					array(
+						'page'                         => self::MENU_SLUG,
+						self::ENCRYPTION_STATUS_PARAM  => $status,
+						self::ENCRYPTION_MESSAGE_PARAM => rawurlencode( $message ),
+					),
+					admin_url( 'admin.php' )
+				);
+
+				wp_safe_redirect( $redirect );
+
+		if ( defined( 'FBM_TESTING' ) && FBM_TESTING ) {
+				return;
+		}
+
+				exit;
+	}
+
+			/**
+			 * Redirect back to the diagnostics page with an encoded outcome.
+			 *
+			 * @param array{status:bool,code:string,member_reference?:string} $outcome Outcome descriptor.
+			 */
 	private static function redirect_with_outcome( array $outcome ): void {
 			$args = array(
 				'page'             => self::MENU_SLUG,
@@ -503,11 +663,11 @@ final class DiagnosticsPage {
 			exit;
 	}
 
-		/**
-		 * Build a nonce-protected resend URL.
-		 *
-		 * @param string $entry_id Failure entry identifier.
-		 */
+	/**
+	 * Build a nonce-protected resend URL.
+	 *
+	 * @param string $entry_id Failure entry identifier.
+	 */
 	private static function build_action_url( string $entry_id ): string {
 			$url = add_query_arg(
 				array(
@@ -521,20 +681,20 @@ final class DiagnosticsPage {
 			return wp_nonce_url( $url, self::resend_nonce_action( $entry_id ) );
 	}
 
-		/**
-		 * Compute the nonce action string for a resend request.
-		 *
-		 * @param string $entry_id Failure entry identifier.
-		 */
+	/**
+	 * Compute the nonce action string for a resend request.
+	 *
+	 * @param string $entry_id Failure entry identifier.
+	 */
 	private static function resend_nonce_action( string $entry_id ): string {
 			return 'fbm_diag_resend_' . $entry_id;
 	}
 
-		/**
-		 * Map context identifiers to localized labels.
-		 *
-		 * @param string $context Context key.
-		 */
+	/**
+	 * Map context identifiers to localized labels.
+	 *
+	 * @param string $context Context key.
+	 */
 	private static function context_label( string $context ): string {
 		switch ( $context ) {
 			case MailFailureLog::CONTEXT_ADMIN_RESEND:
@@ -548,11 +708,11 @@ final class DiagnosticsPage {
 		}
 	}
 
-		/**
-		 * Map error identifiers to localized labels.
-		 *
-		 * @param string $error Error key.
-		 */
+	/**
+	 * Map error identifiers to localized labels.
+	 *
+	 * @param string $error Error key.
+	 */
 	private static function error_label( string $error ): string {
 		switch ( $error ) {
 			case MailFailureLog::ERROR_TOKEN:
@@ -566,12 +726,12 @@ final class DiagnosticsPage {
 		}
 	}
 
-		/**
-		 * Retrieve a POSTed field with sanitization.
-		 *
-		 * @param string $field Field name to read.
-		 * @return string Sanitized field value.
-		 */
+	/**
+	 * Retrieve a POSTed field with sanitization.
+	 *
+	 * @param string $field Field name to read.
+	 * @return string Sanitized field value.
+	 */
 	private static function read_post_field( string $field ): string {
 			$value = filter_input( INPUT_POST, $field, FILTER_UNSAFE_RAW );
 
@@ -582,12 +742,12 @@ final class DiagnosticsPage {
 		return sanitize_textarea_field( wp_unslash( (string) $value ) );
 	}
 
-		/**
-		 * Redact a member reference to avoid exposing identifiers.
-		 *
-		 * @param string $reference Raw member reference value.
-		 * @return string Redacted reference string.
-		 */
+	/**
+	 * Redact a member reference to avoid exposing identifiers.
+	 *
+	 * @param string $reference Raw member reference value.
+	 * @return string Redacted reference string.
+	 */
 	private static function redact_member_reference( string $reference ): string {
 			$reference = trim( $reference );
 
@@ -606,12 +766,12 @@ final class DiagnosticsPage {
 
 		return $prefix . '…' . $suffix;
 	}
-		/**
-		 * Retrieve a query argument with CLI-compatible fallback.
-		 *
-		 * @param string $param Query parameter name.
-		 * @return string Sanitized parameter value.
-		 */
+	/**
+	 * Retrieve a query argument with CLI-compatible fallback.
+	 *
+	 * @param string $param Query parameter name.
+	 * @return string Sanitized parameter value.
+	 */
 	private static function read_query_arg( string $param ): string {
 			$value = filter_input( INPUT_GET, $param, FILTER_UNSAFE_RAW );
 

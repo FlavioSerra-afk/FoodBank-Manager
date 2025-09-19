@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace FoodBankManager\Admin;
 
+use FoodBankManager\Crypto\EncryptionSettings;
 use FoodBankManager\Registration\RegistrationSettings;
 use FoodBankManager\Privacy\Eraser;
 use WP_Error;
@@ -24,6 +25,7 @@ use function filter_input;
 use function function_exists;
 use function get_option;
 use function is_array;
+use function in_array;
 use function is_readable;
 use function implode;
 use function is_email;
@@ -106,7 +108,8 @@ final class SettingsPage {
 				$registration_settings = $stored['registration'];
 		}
 
-			$registration = RegistrationSettings::normalize_registration_settings( $registration_settings );
+						$registration       = RegistrationSettings::normalize_registration_settings( $registration_settings );
+						$encrypt_new_writes = EncryptionSettings::encrypt_new_writes_enabled();
 
 			$status_input  = filter_input( INPUT_GET, self::STATUS_PARAM, FILTER_UNSAFE_RAW );
 			$message_input = filter_input( INPUT_GET, self::MESSAGE_PARAM, FILTER_UNSAFE_RAW );
@@ -153,32 +156,35 @@ final class SettingsPage {
 				),
 			);
 
-			$data = array(
-				'settings'     => array(
-					'registration' => $registration,
-				),
-				'form_action'  => self::FORM_ACTION,
-				'nonce_action' => self::FORM_ACTION,
-				'nonce_name'   => self::NONCE_NAME,
-				'status'       => $status,
-				'message'      => $message,
-				'uninstall'    => array(
-					'enabled'      => $destructive_enabled,
-					'constant'     => $destructive_constant,
-					'summary'      => $summary,
-					'form_action'  => self::UNINSTALL_FORM_ACTION,
-					'nonce_action' => self::UNINSTALL_FORM_ACTION,
-					'nonce_name'   => self::UNINSTALL_NONCE_NAME,
-					'eraser'       => array(
-						'form_action'  => self::ERASE_FORM_ACTION,
-						'nonce_action' => self::ERASE_FORM_ACTION,
-						'nonce_name'   => self::ERASE_NONCE_NAME,
-					),
-				),
-			);
+						$data = array(
+							'settings'     => array(
+								'registration' => $registration,
+							),
+							'encryption'   => array(
+								'encrypt_new_writes' => $encrypt_new_writes,
+							),
+							'form_action'  => self::FORM_ACTION,
+							'nonce_action' => self::FORM_ACTION,
+							'nonce_name'   => self::NONCE_NAME,
+							'status'       => $status,
+							'message'      => $message,
+							'uninstall'    => array(
+								'enabled'      => $destructive_enabled,
+								'constant'     => $destructive_constant,
+								'summary'      => $summary,
+								'form_action'  => self::UNINSTALL_FORM_ACTION,
+								'nonce_action' => self::UNINSTALL_FORM_ACTION,
+								'nonce_name'   => self::UNINSTALL_NONCE_NAME,
+								'eraser'       => array(
+									'form_action'  => self::ERASE_FORM_ACTION,
+									'nonce_action' => self::ERASE_FORM_ACTION,
+									'nonce_name'   => self::ERASE_NONCE_NAME,
+								),
+							),
+						);
 
-			$context = $data;
-			include $template;
+						$context = $data;
+						include $template;
 	}
 
 		/**
@@ -197,7 +203,13 @@ final class SettingsPage {
 				$raw = wp_unslash( $_POST['fbm_settings'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized below.
 		}
 
-			$sanitized = self::sanitize( $raw );
+						$sanitized = self::sanitize( $raw );
+
+						$encrypt_input = filter_input( INPUT_POST, 'fbm_encrypt_new_writes', FILTER_UNSAFE_RAW );
+						$encrypt_value = is_string( $encrypt_input ) ? sanitize_text_field( wp_unslash( $encrypt_input ) ) : '';
+						$encrypt_flag  = in_array( $encrypt_value, array( '1', 'on' ), true );
+
+						EncryptionSettings::update_encrypt_new_writes( $encrypt_flag );
 
 			$status  = 'error';
 			$message = esc_html__( 'Settings could not be saved.', 'foodbank-manager' );
