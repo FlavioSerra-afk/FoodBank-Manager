@@ -1,7 +1,7 @@
 Docs-Revision: 2025-09-22 (v1.0.0 alignment)
 # FoodBank Manager Plugin
 
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.2
@@ -22,6 +22,11 @@ Attendance summaries remain restricted to administrators (or users granted the `
 * Sanitize filenames with `sanitize_file_name()` using the requested date range.
 * Emit UTF-8 BOM + localized column headers for spreadsheet compatibility.
 * Require a nonce tied to the selected date range before streaming.
+* Offer a one-click **Invalidate cache** button that clears `fbm:reports` transients after data imports or overrides.
+
+## Performance & caching
+
+Staff dashboard readiness states cache for 60–180 seconds so scanners stay responsive without stale notices. Report summaries, totals, and paginated rows cache for 300 seconds to keep CSV previews fast. Admins can trigger cache invalidation directly from Reports when fresh data is required.
 
 ## Multisite notes
 

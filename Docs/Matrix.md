@@ -23,6 +23,9 @@
 
 
 
+Release readiness & CI: ✅
+
+
 Legend: ⬜ Planned | 🟨 In Progress | ✅ Done | ⚠️ Blocked/Error
 
 U1 — Foundations

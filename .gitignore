@@ -9,6 +9,7 @@ build/
 
 # Ignore common binaries
 *.png
+!assets/*.png
 *.jpg
 *.jpeg
 *.gif
