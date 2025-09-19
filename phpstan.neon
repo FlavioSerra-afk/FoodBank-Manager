@@ -21,6 +21,7 @@ parameters:
 
   bootstrapFiles:
     - vendor/autoload.php
+    - phpstan-bootstrap.php
 
   # WordPress environment assumptions
   # Keep false positives down

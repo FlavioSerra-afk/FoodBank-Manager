@@ -61,9 +61,6 @@ final class Assets {
 
 	/**
 	 * Restrict admin assets to FBM screens.
-	 */
-	/**
-	 * Restrict admin assets to FBM screens.
 	 *
 	 * @param string $hook_suffix Current admin page hook suffix.
 	 */
@@ -86,8 +83,8 @@ final class Assets {
 			return;
 		}
 
-			$version = defined( 'FBM_VER' ) ? FBM_VER : '1.0.9';
-		$style       = plugins_url( 'assets/css/admin.css', FBM_FILE );
+				$version = defined( 'FBM_VER' ) ? FBM_VER : Plugin::VERSION;
+		$style           = plugins_url( 'assets/css/admin.css', FBM_FILE );
 
 		wp_enqueue_style( 'fbm-admin', $style, array(), $version );
 	}
@@ -110,13 +107,13 @@ final class Assets {
 			return;
 		}
 
-			$version    = defined( 'FBM_VER' ) ? FBM_VER : '1.0.9';
-		$style          = plugins_url( 'assets/css/staff-dashboard.css', FBM_FILE );
-		$script         = plugins_url( 'assets/js/staff-dashboard.js', FBM_FILE );
-		$scanner_script = plugins_url( 'assets/js/fbm-scanner.js', FBM_FILE );
-		$zxing_script   = plugins_url( 'assets/vendor/zxing-browser.min.js', FBM_FILE );
-		$window         = ( new Schedule() )->current_window();
-		$labels         = Schedule::window_labels( $window );
+				$version = defined( 'FBM_VER' ) ? FBM_VER : Plugin::VERSION;
+		$style           = plugins_url( 'assets/css/staff-dashboard.css', FBM_FILE );
+		$script          = plugins_url( 'assets/js/staff-dashboard.js', FBM_FILE );
+		$scanner_script  = plugins_url( 'assets/js/fbm-scanner.js', FBM_FILE );
+		$zxing_script    = plugins_url( 'assets/vendor/zxing-browser.min.js', FBM_FILE );
+		$window          = ( new Schedule() )->current_window();
+		$labels          = Schedule::window_labels( $window );
 
 		$ready_message = sprintf(
 			/* translators: %s: Description of the scheduled collection window. */
