@@ -3,7 +3,7 @@ Contributors: portuguese-community-centre-london
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.2
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -19,7 +19,17 @@ It stores data in encrypted tables, enforces least-privilege access, and offers 
 * `[fbm_registration_form]` shortcode — secure public registration with validation, nonce checks, and anti-spam traps.
 * `[fbm_staff_dashboard]` shortcode — staff dashboard (login + FBM capability required) for scanning QR codes or recording manual attendance within the configured window.
 * Admin-only attendance summaries and CSV exports with sanitized filenames, UTF-8 BOM, and localized headers (nonce + capability enforced).
+* Reports cache tools include a manager-only **Invalidate cache** button that clears all cached `fbm:reports` keys after exports or data corrections.
 * Settings → Uninstall & Privacy: manager-controlled destructive uninstall opt-in plus shortcuts into WordPress privacy exporter/eraser tools.
+
+== Performance ==
+Staff dashboards and reports rely on time-boxed transients so pages stay fast without serving stale data. Scanner status and totals cache for 60–180 seconds, while CSV preview totals and paginated report pages cache for 300 seconds. Administrators can invalidate report caches on demand from Reports → Invalidate cache when new data lands.
+
+== Screenshots ==
+1. Registration form with validation and consent controls.
+2. Staff dashboard showing QR scanner, manual entry, and session status.
+3. Attendance reports with cached summaries, pagination, and CSV export.
+4. Diagnostics page with mail log, health indicators, and cache tools.
 
 == Multisite ==
 FBM capabilities are granted per site via activation (Administrators retain full access). Options such as theme, schedule, and migration markers store per site. Destructive uninstall remains opt-in so reinstalls can reuse existing data unless explicitly dropped.

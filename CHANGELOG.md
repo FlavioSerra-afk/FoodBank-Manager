@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.1.1] - 2025-09-23
+
+### Added
+- WordPress.org-ready icons, banners, and four focused screenshots for registration, staff dashboard, reporting, and diagnostics.
+- Release workflow that validates readme headers, regenerates translation catalogs, builds the distribution zip, and optionally deploys to WordPress.org on tagged releases.
+- PHP unit coverage for readme metadata, JavaScript translation loading, and cache expiry/invalidations.
+
+### Changed
+- Documented cache TTL expectations and manager cache invalidation controls in readme files.
+- Bundled JavaScript translation dependencies ensure `wp_set_script_translations()` points at the plugin language directory for scanner assets.
+
 # [1.0.6] - 2025-09-22
 
 ### Added

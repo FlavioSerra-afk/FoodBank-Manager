@@ -4,6 +4,8 @@
     <testsuite name="Unit">
       <directory suffix="Test.php">tests/Unit</directory>
       <directory suffix="Test.php">tests/Reports</directory>
+      <directory suffix="Test.php">tests/Cache</directory>
+      <directory suffix="Test.php">tests/I18n</directory>
       <file>tests/Admin/SchedulePageTest.php</file>
       <directory suffix="Test.php">tests/Privacy</directory>
       <directory suffix="Test.php">tests/Uninstall</directory>
@@ -12,6 +14,7 @@
       <file>tests/Rest/CheckinEndpointTest.php</file>
       <file>tests/Shortcodes/StaffDashboardManualEntryTest.php</file>
       <file>tests/Registration/RegistrationEmailTest.php</file>
+      <directory suffix="Test.php">tests/Release</directory>
     </testsuite>
   </testsuites>
   <coverage>

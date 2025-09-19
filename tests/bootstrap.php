@@ -1829,17 +1829,30 @@ if ( ! function_exists( 'esc_url_raw' ) ) {
 }
 
 if ( ! function_exists( 'plugins_url' ) ) {
-		/**
-		 * Generate plugin asset URLs for tests.
-		 *
-		 * @param string $path        Relative asset path.
-		 * @param string $plugin_file Plugin file reference.
-		 */
-	function plugins_url( string $path, string $plugin_file ): string { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals
-			unset( $plugin_file );
+                /**
+                 * Generate plugin asset URLs for tests.
+                 *
+                 * @param string $path        Relative asset path.
+                 * @param string $plugin_file Plugin file reference.
+                 */
+        function plugins_url( string $path, string $plugin_file ): string { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals
+                        unset( $plugin_file );
 
-			return 'https://example.test/plugin/' . ltrim( $path, '/' );
-	}
+                        return 'https://example.test/plugin/' . ltrim( $path, '/' );
+        }
+}
+
+if ( ! function_exists( 'plugin_dir_path' ) ) {
+               /**
+                * Provide plugin directory paths during tests.
+                *
+                * @param string $file File reference.
+                */
+       function plugin_dir_path( string $file ): string { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals
+                       $normalized = str_replace( '\\', '/', dirname( $file ) );
+
+                       return rtrim( $normalized, '/' ) . '/';
+       }
 }
 
 if ( ! function_exists( 'rest_url' ) ) {
@@ -1921,15 +1934,19 @@ if ( ! function_exists( 'wp_localize_script' ) ) {
 }
 
 if ( ! function_exists( 'wp_set_script_translations' ) ) {
-		/**
-		 * Record translation domain associations.
-		 *
-		 * @param string $handle Script handle.
-		 * @param string $domain Text domain.
-		 */
-	function wp_set_script_translations( string $handle, string $domain ): void { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals
-			$GLOBALS['fbm_script_translations'][ $handle ] = $domain;
-	}
+               /**
+                * Record translation domain associations.
+                *
+                * @param string $handle Script handle.
+                * @param string $domain Text domain.
+                * @param string $path   Language directory path.
+                */
+       function wp_set_script_translations( string $handle, string $domain, string $path = '' ): void { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals
+                       $GLOBALS['fbm_script_translations'][ $handle ] = array(
+                               'domain' => $domain,
+                               'path'   => $path,
+                       );
+       }
 }
 
 if ( ! function_exists( 'wp_enqueue_script' ) ) {
