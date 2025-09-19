@@ -367,7 +367,7 @@ final class ThemePage {
 	/**
 	 * Ensure the fbm_theme option is on the allowed options list.
 	 *
- * @param array<string,mixed> $options Allowed options map.
+	 * @param array<string,mixed> $options Allowed options map.
 	 *
 	 * @return array<string,array<int,string>>
 	 */

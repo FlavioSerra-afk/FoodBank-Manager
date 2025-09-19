@@ -24,6 +24,13 @@
     border-radius: 8px;
 }
 
+.fbm-staff-dashboard__fieldset {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-inline-size: auto;
+}
+
 .fbm-staff-dashboard__subheading {
     margin: 0 0 0.5rem;
     font-size: 1.25rem;
