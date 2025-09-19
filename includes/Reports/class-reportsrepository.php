@@ -192,35 +192,35 @@ WHERE a.collected_date BETWEEN %%s AND %%s%3$s',
 		 *
 		 * @return array<int,array<string,mixed>>
 		 */
-        public function get_rows( DateTimeImmutable $start, DateTimeImmutable $end, array $filters, int $limit, int $offset ): array {
-                $clauses = $this->build_filters( $filters );
+	public function get_rows( DateTimeImmutable $start, DateTimeImmutable $end, array $filters, int $limit, int $offset ): array {
+			$clauses = $this->build_filters( $filters );
 
-                $args = array_merge(
-                        array(
-                                $start->format( 'Y-m-d' ),
-				$end->format( 'Y-m-d' ),
-			),
-			$clauses['params'],
-			array( $limit, $offset )
-		);
+			$args = array_merge(
+				array(
+					$start->format( 'Y-m-d' ),
+					$end->format( 'Y-m-d' ),
+				),
+				$clauses['params'],
+				array( $limit, $offset )
+			);
 
-				$query = sprintf(
-                                        'SELECT a.member_reference, a.collected_at, a.collected_date, a.method, a.note, a.recorded_by, m.status, m.first_name, m.last_initial
+			$query = sprintf(
+				'SELECT a.member_reference, a.collected_at, a.collected_date, a.method, a.note, a.recorded_by, m.status, m.first_name, m.last_initial
 FROM `%1$s` a
 LEFT JOIN `%2$s` m ON m.member_reference = a.member_reference
 WHERE a.collected_date BETWEEN %%s AND %%s%3$s
 ORDER BY a.collected_at ASC
 LIMIT %%d OFFSET %%d',
-					$this->attendance_table,
-					$this->members_table,
-					$clauses['where']
-				);
+				$this->attendance_table,
+				$this->members_table,
+				$clauses['where']
+			);
 
-                // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.ReplacementsMismatch -- Table names injected safely; filters validated.
-				$sql = $this->wpdb->prepare(
-					$query, // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQL.NotPrepared -- Table names injected safely.
-					$args
-				);
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQLPlaceholders.ReplacementsMismatch -- Table names injected safely; filters validated.
+			$sql = $this->wpdb->prepare(
+				$query, // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQL.NotPrepared -- Table names injected safely.
+				$args
+			);
 
 		if ( ! is_string( $sql ) ) {
 				return array();
@@ -231,7 +231,7 @@ LIMIT %%d OFFSET %%d',
 		 *
 		 * @var array<int,array<string,mixed>>|null $rows
 		 */
-				$rows = $this->wpdb->get_results( $sql, ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Prepared in $sql.
+			$rows = $this->wpdb->get_results( $sql, ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Prepared in $sql.
 
 		if ( ! is_array( $rows ) ) {
 				return array();
@@ -244,131 +244,148 @@ LIMIT %%d OFFSET %%d',
 					continue;
 			}
 
-                                        $normalized[] = array(
-                                                'member_reference' => isset( $row['member_reference'] ) ? (string) $row['member_reference'] : '',
-                                                'collected_at'     => isset( $row['collected_at'] ) ? (string) $row['collected_at'] : '',
-                                                'collected_date'   => isset( $row['collected_date'] ) ? (string) $row['collected_date'] : '',
-                                                'method'           => isset( $row['method'] ) ? (string) $row['method'] : '',
-                                                'note'             => array_key_exists( 'note', $row ) ? ( null !== $row['note'] ? (string) $row['note'] : null ) : null,
-                                                'recorded_by'      => array_key_exists( 'recorded_by', $row ) && null !== $row['recorded_by'] ? (int) $row['recorded_by'] : null,
-                                                'status'           => isset( $row['status'] ) ? (string) $row['status'] : '',
-                                                'first_name'       => isset( $row['first_name'] ) ? (string) $row['first_name'] : '',
-                                                'last_initial'     => isset( $row['last_initial'] ) ? (string) $row['last_initial'] : '',
-                                        );
-                }
+										$normalized[] = array(
+											'member_reference' => isset( $row['member_reference'] ) ? (string) $row['member_reference'] : '',
+											'collected_at' => isset( $row['collected_at'] ) ? (string) $row['collected_at'] : '',
+											'collected_date' => isset( $row['collected_date'] ) ? (string) $row['collected_date'] : '',
+											'method'       => isset( $row['method'] ) ? (string) $row['method'] : '',
+											'note'         => array_key_exists( 'note', $row ) ? ( null !== $row['note'] ? (string) $row['note'] : null ) : null,
+											'recorded_by'  => array_key_exists( 'recorded_by', $row ) && null !== $row['recorded_by'] ? (int) $row['recorded_by'] : null,
+											'status'       => isset( $row['status'] ) ? (string) $row['status'] : '',
+											'first_name'   => isset( $row['first_name'] ) ? (string) $row['first_name'] : '',
+											'last_initial' => isset( $row['last_initial'] ) ? (string) $row['last_initial'] : '',
+										);
+		}
 
-                return $normalized;
-        }
+			return $normalized;
+	}
 
-        /**
-         * Retrieve historical attendance rows for a specific member.
-         *
-         * @param string $member_reference Canonical member reference string.
-         * @param int    $limit            Maximum rows to return.
-         *
-         * @return array{member:array<string,string>|null,rows:array<int,array<string,mixed>>}
-         */
-        public function get_member_history( string $member_reference, int $limit = 50 ): array {
-                $reference = trim( $member_reference );
+		/**
+		 * Retrieve historical attendance rows for a specific member.
+		 *
+		 * @param string $member_reference Canonical member reference string.
+		 * @param int    $limit            Maximum rows to return.
+		 *
+		 * @return array{member:array<string,string>|null,rows:array<int,array<string,mixed>>}
+		 */
+	public function get_member_history( string $member_reference, int $limit = 50 ): array {
+			$reference = trim( $member_reference );
 
-                if ( '' === $reference ) {
-                        return array(
-                                'member' => null,
-                                'rows'   => array(),
-                        );
-                }
+		if ( '' === $reference ) {
+				return array(
+					'member' => null,
+					'rows'   => array(),
+				);
+		}
 
-                $member_sql = $this->wpdb->prepare(
-                        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name injected safely.
-                        sprintf(
-                                'SELECT member_reference, first_name, last_initial, status FROM `%s` WHERE member_reference = %%s LIMIT 1',
-                                $this->members_table
-                        ),
-                        $reference
-                );
+		$member_query = sprintf(
+			'SELECT member_reference, first_name, last_initial, status FROM `%s` WHERE member_reference = %%s LIMIT 1',
+			$this->members_table
+		);
 
-                $member = null;
+		$member_sql = $this->wpdb->prepare(
+                // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- Table name injected safely prior to prepare().
+			$member_query,
+			$reference
+		);
 
-                if ( is_string( $member_sql ) ) {
-                        /**
-                         * @var array<string,mixed>|null $member_row
-                         */
-                        $member_row = $this->wpdb->get_row( $member_sql, ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Prepared in $member_sql.
+			$member = null;
 
-                        if ( is_array( $member_row ) ) {
-                                $member = array(
-                                        'member_reference' => isset( $member_row['member_reference'] ) ? (string) $member_row['member_reference'] : $reference,
-                                        'first_name'       => isset( $member_row['first_name'] ) ? (string) $member_row['first_name'] : '',
-                                        'last_initial'     => isset( $member_row['last_initial'] ) ? (string) $member_row['last_initial'] : '',
-                                        'status'           => isset( $member_row['status'] ) ? (string) $member_row['status'] : '',
-                                );
-                        }
-                }
+		if ( is_string( $member_sql ) ) {
+				/**
+				 * Raw member row returned from the database.
+				 *
+				 * @var array<string,mixed>|null $member_row
+				 */
+				$member_row = $this->wpdb->get_row( $member_sql, ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Prepared in $member_sql.
 
-                if ( $limit <= 0 ) {
-                        $limit = 50;
-                }
+			if ( is_array( $member_row ) ) {
+				$member = array(
+					'member_reference' => isset( $member_row['member_reference'] ) ? (string) $member_row['member_reference'] : $reference,
+					'first_name'       => isset( $member_row['first_name'] ) ? (string) $member_row['first_name'] : '',
+					'last_initial'     => isset( $member_row['last_initial'] ) ? (string) $member_row['last_initial'] : '',
+					'status'           => isset( $member_row['status'] ) ? (string) $member_row['status'] : '',
+				);
+			}
+		}
 
-                $history_sql = $this->wpdb->prepare(
-                        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name injected safely.
-                        sprintf(
-                                'SELECT collected_at, collected_date, method, note, recorded_by FROM `%s` WHERE member_reference = %%s ORDER BY collected_at DESC LIMIT %%d',
-                                $this->attendance_table
-                        ),
-                        $reference,
-                        $limit
-                );
+		if ( null === $member ) {
+				$member = array(
+					'member_reference' => $reference,
+					'first_name'       => '',
+					'last_initial'     => '',
+					'status'           => '',
+				);
+		}
 
-                if ( ! is_string( $history_sql ) ) {
-                        return array(
-                                'member' => $member,
-                                'rows'   => array(),
-                        );
-                }
+		if ( $limit <= 0 ) {
+				$limit = 50;
+		}
 
-                /**
-                 * @var array<int,array<string,mixed>>|null $history_rows
-                 */
-                $history_rows = $this->wpdb->get_results( $history_sql, ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Prepared in $history_sql.
+		$history_query = sprintf(
+			'SELECT collected_at, collected_date, method, note, recorded_by FROM `%s` WHERE member_reference = %%s ORDER BY collected_at DESC LIMIT %%d',
+			$this->attendance_table
+		);
 
-                if ( ! is_array( $history_rows ) ) {
-                        return array(
-                                'member' => $member,
-                                'rows'   => array(),
-                        );
-                }
+		$history_sql = $this->wpdb->prepare(
+                // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- Table name injected safely prior to prepare().
+			$history_query,
+			$reference,
+			$limit
+		);
 
-                usort(
-                        $history_rows,
-                        static function ( $a, $b ): int {
-                                $left  = isset( $a['collected_at'] ) ? (string) $a['collected_at'] : '';
-                                $right = isset( $b['collected_at'] ) ? (string) $b['collected_at'] : '';
+		if ( ! is_string( $history_sql ) ) {
+				return array(
+					'member' => $member,
+					'rows'   => array(),
+				);
+		}
 
-                                return strcmp( $right, $left );
-                        }
-                );
+				/**
+				 * Historical attendance rows keyed sequentially.
+				 *
+				 * @var array<int,array<string,mixed>>|null $history_rows
+				 */
+			$history_rows = $this->wpdb->get_results( $history_sql, ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- Prepared in $history_sql.
 
-                $normalized = array();
+		if ( ! is_array( $history_rows ) ) {
+				return array(
+					'member' => $member,
+					'rows'   => array(),
+				);
+		}
 
-                foreach ( $history_rows as $row ) {
-                        if ( ! is_array( $row ) ) {
-                                continue;
-                        }
+			usort(
+				$history_rows,
+				static function ( $a, $b ): int {
+							$left  = isset( $a['collected_at'] ) ? (string) $a['collected_at'] : '';
+							$right = isset( $b['collected_at'] ) ? (string) $b['collected_at'] : '';
 
-                        $normalized[] = array(
-                                'collected_at'   => isset( $row['collected_at'] ) ? (string) $row['collected_at'] : '',
-                                'collected_date' => isset( $row['collected_date'] ) ? (string) $row['collected_date'] : '',
-                                'method'         => isset( $row['method'] ) ? (string) $row['method'] : '',
-                                'note'           => array_key_exists( 'note', $row ) ? ( null !== $row['note'] ? (string) $row['note'] : null ) : null,
-                                'recorded_by'    => array_key_exists( 'recorded_by', $row ) && null !== $row['recorded_by'] ? (int) $row['recorded_by'] : null,
-                        );
-                }
+							return strcmp( $right, $left );
+				}
+			);
 
-                return array(
-                        'member' => $member,
-                        'rows'   => $normalized,
-                );
-        }
+			$normalized = array();
+
+		foreach ( $history_rows as $row ) {
+			if ( ! is_array( $row ) ) {
+				continue;
+			}
+
+				$normalized[] = array(
+					'collected_at'   => isset( $row['collected_at'] ) ? (string) $row['collected_at'] : '',
+					'collected_date' => isset( $row['collected_date'] ) ? (string) $row['collected_date'] : '',
+					'method'         => isset( $row['method'] ) ? (string) $row['method'] : '',
+					'note'           => array_key_exists( 'note', $row ) ? ( null !== $row['note'] ? (string) $row['note'] : null ) : null,
+					'recorded_by'    => array_key_exists( 'recorded_by', $row ) && null !== $row['recorded_by'] ? (int) $row['recorded_by'] : null,
+				);
+		}
+
+			return array(
+				'member' => $member,
+				'rows'   => $normalized,
+			);
+	}
 
 		/**
 		 * Stream rows in batches and invoke the provided callback for each chunk.

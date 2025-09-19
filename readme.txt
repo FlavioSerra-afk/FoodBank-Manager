@@ -3,7 +3,7 @@ Contributors: portuguese-community-centre-london
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.2
-Stable tag: 1.4.0
+Stable tag: 1.5.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -60,6 +60,10 @@ FoodBank Manager registers with the WordPress privacy exporter/eraser registry a
 First stable cut with readme polish and release checksums.
 
 == Changelog ==
+= 1.5.0 =
+* Registration editor toolbar inserts validated CF7 tags for each supported field type and preview responses return sanitized markup with modal nonces.
+* Front-end submissions clamp household size to template bounds, treat any checked consent value as affirmative, and enforce single sanitized uploads via WordPress APIs.
+* Hardened welcome and notification emails and refreshed reports member detail view with fallback context and reverse-chronological history.
 = 1.4.0 =
 * Registration editor preview now opens in an accessible modal with sanitized markup and improved toolbar snippets.
 * Hardened registration submissions with consent timestamp persistence, stricter household size clamps, and secured upload handling.

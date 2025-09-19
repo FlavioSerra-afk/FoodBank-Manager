@@ -4,6 +4,19 @@
 
 - _No changes yet._
 
+## [1.5.0] - 2025-09-26
+
+### Added
+- Expanded unit coverage for editor toolbar snippets, upload validation, notification dispatch, and reports history fallbacks.
+
+### Changed
+- Registration editor toolbar now assembles CF7-style snippets for all supported field types and preview responses sanitize warnings while issuing modal-specific nonces.
+- Public submissions clamp household sizes to template ranges with a safe cap, treat any checked consent value as affirmative with timestamps, and enforce single sanitized uploads through core WordPress APIs.
+- Hardened welcome and notification emails (escaped QR payloads, safe admin review links) and enriched reports member detail views with fallback context and clearer guidance.
+
+### Fixed
+- Rejected multi-file upload payloads that previously bypassed field guards and sanitized preview warnings returned to the admin UI.
+
 ## [1.4.0] - 2025-09-25
 
 ### Added
