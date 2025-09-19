@@ -265,8 +265,9 @@ if ( ! class_exists( 'wpdb', false ) ) {
 					return null;
 			}
 
-			if ( str_contains( $sql, 'token_hash = %s' ) && str_contains( $sql, 'fbm_tokens' ) ) {
-					$hash            = (string) ( $args[0] ?? '' );
+                        if ( str_contains( $sql, 'token_hash = %s' ) && str_contains( $sql, 'fbm_tokens' ) ) {
+                                        $hash            = (string) ( $args[0] ?? '' );
+                                        $GLOBALS['fbm_last_token_lookup_hash'] = $hash;
 					$include_revoked = str_contains( $sql, 'revoked_at' );
 
 				foreach ( $this->tokens as $record ) {
@@ -1950,12 +1951,44 @@ if ( ! function_exists( 'wp_set_script_translations' ) ) {
 }
 
 if ( ! function_exists( 'wp_enqueue_script' ) ) {
-		/**
-		 * Record enqueued scripts.
-		 *
-		 * @param string $handle Script handle.
-		 */
-	function wp_enqueue_script( string $handle ): void { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals
-			$GLOBALS['fbm_enqueued_scripts'][] = $handle;
-	}
+                /**
+                 * Record enqueued scripts.
+                 *
+                 * @param string $handle Script handle.
+                 */
+        function wp_enqueue_script( string $handle ): void { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals
+                        $GLOBALS['fbm_enqueued_scripts'][] = $handle;
+        }
+}
+
+if ( class_exists( 'php_user_filter' ) && ! class_exists( 'FBM_TempStreamCaptureFilter' ) ) {
+        /**
+         * Capture php://temp stream output for assertions.
+         */
+        class FBM_TempStreamCaptureFilter extends php_user_filter {
+                /**
+                 * @inheritDoc
+                 */
+                public function filter( $in, $out, &$consumed, bool $closing ): int {
+                        unset( $closing );
+
+                        while ( $bucket = stream_bucket_make_writeable( $in ) ) {
+                                $consumed += $bucket->datalen;
+
+                                if ( ! isset( $GLOBALS['fbm_last_csv_stream'] ) || ! is_string( $GLOBALS['fbm_last_csv_stream'] ) ) {
+                                        $GLOBALS['fbm_last_csv_stream'] = '';
+                                }
+
+                                $GLOBALS['fbm_last_csv_stream'] .= $bucket->data;
+
+                                stream_bucket_append( $out, $bucket );
+                        }
+
+                        return PSFS_PASS_ON;
+                }
+        }
+
+        if ( function_exists( 'stream_filter_register' ) ) {
+                @stream_filter_register( 'fbm.capture', FBM_TempStreamCaptureFilter::class );
+        }
 }
