@@ -313,136 +313,145 @@ $summary = array_merge( $summary_defaults, $summary );
 											continue;
 									}
 
-										$collected_date = isset( $row['collected_date'] ) ? (string) $row['collected_date'] : '';
-										$collected_time = isset( $row['collected_at'] ) ? (string) $row['collected_at'] : '';
-                                                                                $reference      = isset( $row['member_reference'] ) ? (string) $row['member_reference'] : '';
-                                                                                $first_name     = isset( $row['first_name'] ) ? (string) $row['first_name'] : '';
-                                                                                $last_initial   = isset( $row['last_initial'] ) ? (string) $row['last_initial'] : '';
-                                                                                $name_parts     = array();
-                                                                                if ( '' !== $first_name ) {
-                                                                                        $name_parts[] = $first_name;
-                                                                                }
-                                                                                if ( '' !== $last_initial ) {
-                                                                                        $name_parts[] = rtrim( $last_initial, '.' ) . '.';
-                                                                                }
-                                                                                $member_label   = trim( implode( ' ', $name_parts ) );
-                                                                                $link_label     = '' !== $member_label ? $member_label : $reference;
-                                                                                $detail_link    = '' !== $detail_base_url && '' !== $reference ? add_query_arg( $detail_param, $reference, $detail_base_url ) : '';
-                                                                                $reference_html = '';
-                                                                                if ( '' !== $member_label && '' !== $reference ) {
-                                                                                        $reference_html = ' <span class="fbm-report-member-reference">(' . esc_html( $reference ) . ')</span>';
-                                                                                }
-                                                                                $row_status     = isset( $row['status'] ) ? (string) $row['status'] : '';
-                                                                                $method         = isset( $row['method'] ) ? (string) $row['method'] : '';
-                                                                                $note           = isset( $row['note'] ) ? (string) $row['note'] : '';
-                                                                                $user           = isset( $row['recorded_by'] ) ? (string) $row['recorded_by'] : '';
-                                                                        ?>
-                                                                                <tr>
-                                                                                                <td><?php echo esc_html( $collected_date ); ?></td>
-                                                                                                <td><?php echo esc_html( $collected_time ); ?></td>
-                                                                                                <td>
-                                                                                                        <?php if ( '' !== $detail_link ) : ?>
-                                                                                                                <a href="<?php echo esc_url( $detail_link ); ?>" class="fbm-report-member-link"><?php echo esc_html( $link_label ); ?></a><?php echo $reference_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Sanitized above ?>
-                                                                                                        <?php else : ?>
-                                                                                                                <?php echo esc_html( $link_label ); ?><?php if ( '' !== $reference_html ) { echo $reference_html; } // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Sanitized above ?>
-                                                                                                        <?php endif; ?>
-                                                                                                </td>
-                                                                                                <td><?php echo esc_html( $row_status ); ?></td>
-                                                                                                <td><?php echo esc_html( $method ); ?></td>
-                                                                                                <td><?php echo esc_html( $note ); ?></td>
-                                                                                                <td><?php echo esc_html( $user ); ?></td>
-                                                                                </tr>
+										$collected_date                                       = isset( $row['collected_date'] ) ? (string) $row['collected_date'] : '';
+										$collected_time                                       = isset( $row['collected_at'] ) ? (string) $row['collected_at'] : '';
+																				$reference    = isset( $row['member_reference'] ) ? (string) $row['member_reference'] : '';
+																				$first_name   = isset( $row['first_name'] ) ? (string) $row['first_name'] : '';
+																				$last_initial = isset( $row['last_initial'] ) ? (string) $row['last_initial'] : '';
+																				$name_parts   = array();
+									if ( '' !== $first_name ) {
+											$name_parts[] = $first_name;
+									}
+									if ( '' !== $last_initial ) {
+											$name_parts[] = rtrim( $last_initial, '.' ) . '.';
+									}
+																				$member_label   = trim( implode( ' ', $name_parts ) );
+																				$link_label     = '' !== $member_label ? $member_label : $reference;
+																				$detail_link    = '' !== $detail_base_url && '' !== $reference ? add_query_arg( $detail_param, $reference, $detail_base_url ) : '';
+																				$reference_html = '';
+									if ( '' !== $member_label && '' !== $reference ) {
+											$reference_html = ' <span class="fbm-report-member-reference">(' . esc_html( $reference ) . ')</span>';
+									}
+																				$row_status = isset( $row['status'] ) ? (string) $row['status'] : '';
+																				$method     = isset( $row['method'] ) ? (string) $row['method'] : '';
+																				$note       = isset( $row['note'] ) ? (string) $row['note'] : '';
+																				$user       = isset( $row['recorded_by'] ) ? (string) $row['recorded_by'] : '';
+									?>
+																				<tr>
+																								<td><?php echo esc_html( $collected_date ); ?></td>
+																								<td><?php echo esc_html( $collected_time ); ?></td>
+																								<td>
+																										<?php if ( '' !== $detail_link ) : ?>
+																												<a href="<?php echo esc_url( $detail_link ); ?>" class="fbm-report-member-link"><?php echo esc_html( $link_label ); ?></a><?php echo $reference_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Sanitized above ?>
+																										<?php else : ?>
+																												<?php echo esc_html( $link_label ); ?>
+																												<?php
+																												if ( '' !== $reference_html ) {
+																													echo $reference_html; } // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Sanitized above 
+																												?>
+																										<?php endif; ?>
+																								</td>
+																								<td><?php echo esc_html( $row_status ); ?></td>
+																								<td><?php echo esc_html( $method ); ?></td>
+																								<td><?php echo esc_html( $note ); ?></td>
+																								<td><?php echo esc_html( $user ); ?></td>
+																				</tr>
 								<?php endforeach; ?>
 						<?php endif; ?>
 				</tbody>
-                </table>
+				</table>
 
-                <?php if ( $detail_selected ) : ?>
-                        <?php
-                        $detail_first_name = isset( $detail_member['first_name'] ) ? (string) $detail_member['first_name'] : '';
-                        $detail_last       = isset( $detail_member['last_initial'] ) ? (string) $detail_member['last_initial'] : '';
-                        $detail_status     = isset( $detail_member['status'] ) ? (string) $detail_member['status'] : '';
-                        $detail_name_parts = array();
-                        if ( '' !== $detail_first_name ) {
-                                $detail_name_parts[] = $detail_first_name;
-                        }
-                        if ( '' !== $detail_last ) {
-                                $detail_name_parts[] = rtrim( $detail_last, '.' ) . '.';
-                        }
-                        $detail_display_name   = trim( implode( ' ', $detail_name_parts ) );
-                        $detail_reference_safe = '' !== $detail_reference ? $detail_reference : ( isset( $detail_member['member_reference'] ) ? (string) $detail_member['member_reference'] : '' );
-                        $detail_label          = '' !== $detail_display_name ? $detail_display_name : $detail_reference_safe;
-                        $history_count         = count( $detail_rows );
-                        ?>
-                        <section class="fbm-report-detail">
-                                <h2><?php esc_html_e( 'Member check-in history', 'foodbank-manager' ); ?></h2>
-                                <p>
-                                        <?php
-                                        printf(
-                                                /* translators: 1: Number of rows, 2: Member label, 3: Member reference. */
-                                                esc_html__( 'Showing %1$s check-in(s) for %2$s (%3$s).', 'foodbank-manager' ),
-                                                esc_html( number_format_i18n( $history_count ) ),
-                                                esc_html( $detail_label ),
-                                                esc_html( $detail_reference_safe )
-                                        );
+				<?php if ( $detail_selected ) : ?>
+						<?php
+						$detail_first_name = isset( $detail_member['first_name'] ) ? (string) $detail_member['first_name'] : '';
+						$detail_last       = isset( $detail_member['last_initial'] ) ? (string) $detail_member['last_initial'] : '';
+						$detail_status     = isset( $detail_member['status'] ) ? (string) $detail_member['status'] : '';
+						$detail_name_parts = array();
+						if ( '' !== $detail_first_name ) {
+								$detail_name_parts[] = $detail_first_name;
+						}
+						if ( '' !== $detail_last ) {
+								$detail_name_parts[] = rtrim( $detail_last, '.' ) . '.';
+						}
+						$detail_display_name   = trim( implode( ' ', $detail_name_parts ) );
+						$detail_reference_safe = '' !== $detail_reference ? $detail_reference : ( isset( $detail_member['member_reference'] ) ? (string) $detail_member['member_reference'] : '' );
+						$detail_label          = '' !== $detail_display_name ? $detail_display_name : ( '' !== $detail_reference_safe ? $detail_reference_safe : esc_html__( 'Member', 'foodbank-manager' ) );
+						$history_count         = count( $detail_rows );
+						?>
+						<section class="fbm-report-detail">
+								<h2><?php esc_html_e( 'Member check-in history', 'foodbank-manager' ); ?></h2>
+								<p>
+										<?php
+										printf(
+												/* translators: 1: Number of rows, 2: Member label, 3: Member reference. */
+											esc_html__( 'Showing %1$s check-in(s) for %2$s (%3$s).', 'foodbank-manager' ),
+											esc_html( number_format_i18n( $history_count ) ),
+											esc_html( $detail_label ),
+											esc_html( $detail_reference_safe )
+										);
 
-                                        if ( '' !== $detail_status ) {
-                                                echo ' ';
-                                                printf(
-                                                        /* translators: %s: Member status label. */
-                                                        esc_html__( 'Status: %s.', 'foodbank-manager' ),
-                                                        esc_html( ucfirst( $detail_status ) )
-                                                );
-                                        }
-                                        ?>
-                                        <?php if ( '' !== $detail_clear_url ) : ?>
-                                                <a href="<?php echo esc_url( $detail_clear_url ); ?>" class="button button-secondary" style="margin-left:1em;">
-                                                        <?php esc_html_e( 'Clear selection', 'foodbank-manager' ); ?>
-                                                </a>
-                                        <?php endif; ?>
-                                </p>
+										if ( '' !== $detail_status ) {
+												echo ' ';
+												printf(
+														/* translators: %s: Member status label. */
+													esc_html__( 'Status: %s.', 'foodbank-manager' ),
+													esc_html( ucfirst( $detail_status ) )
+												);
+										}
+										?>
+										<?php if ( '' !== $detail_clear_url ) : ?>
+												<a href="<?php echo esc_url( $detail_clear_url ); ?>" class="button button-secondary" style="margin-left:1em;">
+														<?php esc_html_e( 'Clear selection', 'foodbank-manager' ); ?>
+												</a>
+										<?php endif; ?>
+								</p>
 
-                                <?php if ( empty( $detail_rows ) ) : ?>
-                                        <p><?php esc_html_e( 'No attendance records found for this member.', 'foodbank-manager' ); ?></p>
-                                <?php else : ?>
-                                        <table class="widefat striped">
-                                                <caption class="screen-reader-text"><?php esc_html_e( 'Selected member attendance history', 'foodbank-manager' ); ?></caption>
-                                                <thead>
-                                                        <tr>
-                                                                <th scope="col"><?php esc_html_e( 'Collected date', 'foodbank-manager' ); ?></th>
-                                                                <th scope="col"><?php esc_html_e( 'Collected time', 'foodbank-manager' ); ?></th>
-                                                                <th scope="col"><?php esc_html_e( 'Method', 'foodbank-manager' ); ?></th>
-                                                                <th scope="col"><?php esc_html_e( 'Note', 'foodbank-manager' ); ?></th>
-                                                                <th scope="col"><?php esc_html_e( 'Recorded by', 'foodbank-manager' ); ?></th>
-                                                        </tr>
-                                                </thead>
-                                                <tbody>
-                                                        <?php foreach ( $detail_rows as $history_row ) :
-                                                                if ( ! is_array( $history_row ) ) {
-                                                                        continue;
-                                                                }
+								<?php if ( empty( $detail_member ) ) : ?>
+										<p class="description"><?php esc_html_e( 'Member record not found. Displaying history by reference only.', 'foodbank-manager' ); ?></p>
+								<?php endif; ?>
 
-                                                                $history_date = isset( $history_row['collected_date'] ) ? (string) $history_row['collected_date'] : '';
-                                                                $history_time = isset( $history_row['collected_at'] ) ? (string) $history_row['collected_at'] : '';
-                                                                $history_method = isset( $history_row['method'] ) ? (string) $history_row['method'] : '';
-                                                                $history_note   = isset( $history_row['note'] ) ? (string) $history_row['note'] : '';
-                                                                $history_user   = isset( $history_row['recorded_by'] ) ? (string) $history_row['recorded_by'] : '';
-                                                                ?>
-                                                                <tr>
-                                                                        <td><?php echo esc_html( $history_date ); ?></td>
-                                                                        <td><?php echo esc_html( $history_time ); ?></td>
-                                                                        <td><?php echo esc_html( $history_method ); ?></td>
-                                                                        <td><?php echo esc_html( $history_note ); ?></td>
-                                                                        <td><?php echo esc_html( $history_user ); ?></td>
-                                                                </tr>
-                                                        <?php endforeach; ?>
-                                                </tbody>
-                                        </table>
-                                <?php endif; ?>
-                        </section>
-                <?php endif; ?>
+								<?php if ( empty( $detail_rows ) ) : ?>
+										<p><?php esc_html_e( 'No attendance records found for this member.', 'foodbank-manager' ); ?></p>
+								<?php else : ?>
+										<table class="widefat striped">
+												<caption class="screen-reader-text"><?php esc_html_e( 'Selected member attendance history', 'foodbank-manager' ); ?></caption>
+												<thead>
+														<tr>
+																<th scope="col"><?php esc_html_e( 'Collected date', 'foodbank-manager' ); ?></th>
+																<th scope="col"><?php esc_html_e( 'Collected time', 'foodbank-manager' ); ?></th>
+																<th scope="col"><?php esc_html_e( 'Method', 'foodbank-manager' ); ?></th>
+																<th scope="col"><?php esc_html_e( 'Note', 'foodbank-manager' ); ?></th>
+																<th scope="col"><?php esc_html_e( 'Recorded by', 'foodbank-manager' ); ?></th>
+														</tr>
+												</thead>
+												<tbody>
+														<?php
+														foreach ( $detail_rows as $history_row ) :
+															if ( ! is_array( $history_row ) ) {
+																	continue;
+															}
 
-                <nav class="tablenav" aria-label="<?php esc_attr_e( 'Pagination', 'foodbank-manager' ); ?>">
+																$history_date   = isset( $history_row['collected_date'] ) ? (string) $history_row['collected_date'] : '';
+																$history_time   = isset( $history_row['collected_at'] ) ? (string) $history_row['collected_at'] : '';
+																$history_method = isset( $history_row['method'] ) ? (string) $history_row['method'] : '';
+																$history_note   = isset( $history_row['note'] ) ? (string) $history_row['note'] : '';
+																$history_user   = isset( $history_row['recorded_by'] ) ? (string) $history_row['recorded_by'] : '';
+															?>
+																<tr>
+																		<td><?php echo esc_html( $history_date ); ?></td>
+																		<td><?php echo esc_html( $history_time ); ?></td>
+																		<td><?php echo esc_html( $history_method ); ?></td>
+																		<td><?php echo esc_html( $history_note ); ?></td>
+																		<td><?php echo esc_html( $history_user ); ?></td>
+																</tr>
+														<?php endforeach; ?>
+												</tbody>
+										</table>
+								<?php endif; ?>
+						</section>
+				<?php endif; ?>
+
+				<nav class="tablenav" aria-label="<?php esc_attr_e( 'Pagination', 'foodbank-manager' ); ?>">
 				<div class="tablenav-pages">
 						<span class="displaying-num">
 								<?php

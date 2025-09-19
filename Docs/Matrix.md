@@ -2,14 +2,14 @@
 > This is 1 of 4 canonical docs (Specs, Plan, Tasks, Matrix).
 > Codex MUST read & update these BEFORE any work, every prompt.
 > Any other files in /Docs are historical and must not drive scope.
-> Docs-Revision: 2025-09-25 (registration editor wave)
+> Docs-Revision: 2025-09-26 (registration editor wave)
 
 # Matrix
 
 | Feature | Admin | Manager | Staff | Public | Mobile | A11y | Security | PHPCS | PHPStan | Unit | Integration | E2E | Docs | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Forms (shortcode) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | [ ] | ✅ | v1.1.1: shortcode hardened + admin approval/resend coverage; v1.4.0 editor modal preview + upload/consent hardening |
-| Emails (log/resend) | ✅ | ✅ | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | ✅ | v1.1.1: diagnostics resend log with rate limiting |
+| Forms (shortcode) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | [ ] | ✅ | v1.1.1: shortcode hardened + admin approval/resend coverage; v1.4.0 editor modal preview + upload/consent hardening; v1.5.0 toolbar coverage + sanitized preview warnings |
+| Emails (log/resend) | ✅ | ✅ | [ ] | [ ] | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | ✅ | v1.1.1: diagnostics resend log with rate limiting; v1.5.0: welcome/admin emails escaped + review link guards |
 | Front-end Dashboard (auth) | ✅ | ✅ | ✅ | [ ] | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | ✅ | v1.1.1: scanner UI + REST nonce/throttle coverage |
 | Staff Check-in | ✅ | ✅ | ✅ | [ ] | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | [ ] | ✅ | v1.1.1: /fbm/checkin throttling + override audit |
 | Attendance Scan | ✅ | ✅ | ✅ | [ ] | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | [ ] | [ ] | ✅ | v1.1.1: camera module + duplicate feedback |

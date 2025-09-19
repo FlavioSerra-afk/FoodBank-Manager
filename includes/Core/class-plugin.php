@@ -42,7 +42,7 @@ use function get_role;
  * Main plugin orchestrator.
  */
 final class Plugin {
-    public const VERSION = '1.4.0';
+	public const VERSION = '1.5.0';
 
 	/**
 	 * Register runtime hooks.
@@ -52,7 +52,7 @@ final class Plugin {
 				Menu::register();
 				DiagnosticsPage::register();
 				MembersPage::register();
-                RegistrationEditorPage::register();
+				RegistrationEditorPage::register();
 				ReportsPage::register();
 				SchedulePage::register();
 				SettingsPage::register();
@@ -62,8 +62,8 @@ final class Plugin {
 		StaffDashboard::register();
 		Privacy::register();
 
-                add_action( 'rest_api_init', array( CheckinController::class, 'register_routes' ) );
-                add_action( 'rest_api_init', array( RegistrationPreviewController::class, 'register_routes' ) );
+				add_action( 'rest_api_init', array( CheckinController::class, 'register_routes' ) );
+				add_action( 'rest_api_init', array( RegistrationPreviewController::class, 'register_routes' ) );
 
 		if ( defined( 'WP_CLI' ) && WP_CLI && class_exists( '\\WP_CLI' ) ) {
 			self::register_cli_commands();

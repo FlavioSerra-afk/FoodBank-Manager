@@ -2,14 +2,14 @@
 # This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: FoodBank Manager 1.4.0\n"
+"Project-Id-Version: FoodBank Manager 1.5.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/FoodBank-Manager\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-09-19T20:25:13+00:00\n"
+"POT-Creation-Date: 2025-09-19T21:49:49+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: foodbank-manager\n"
@@ -47,7 +47,7 @@ msgstr ""
 #: includes/Admin/class-schedulepage.php:79
 #: includes/Admin/class-settingspage.php:90
 #: includes/Admin/class-themepage.php:208
-#: includes/Admin/RegistrationEditorPage.php:136
+#: includes/Admin/RegistrationEditorPage.php:138
 msgid "You do not have permission to access this page."
 msgstr ""
 
@@ -111,7 +111,7 @@ msgid "The selected mail failure entry could not be processed."
 msgstr ""
 
 #: includes/Admin/class-diagnosticspage.php:324
-#: includes/Shortcodes/class-registrationform.php:278
+#: includes/Shortcodes/class-registrationform.php:283
 #: includes/Shortcodes/class-staffdashboard.php:161
 #: includes/Shortcodes/class-staffdashboard.php:167
 msgid "Security check failed. Please try again."
@@ -682,116 +682,116 @@ msgstr ""
 msgid "Glass border width must be an integer."
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:98
-#: includes/Admin/RegistrationEditorPage.php:99
+#: includes/Admin/RegistrationEditorPage.php:100
+#: includes/Admin/RegistrationEditorPage.php:101
 #: templates/admin/registration-editor.php:50
 msgid "Registration Form"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:141
+#: includes/Admin/RegistrationEditorPage.php:143
 msgid "Registration editor template is missing."
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:238
+#: includes/Admin/RegistrationEditorPage.php:244
 #: templates/admin/registration-editor.php:173
 msgid "Template Preview"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:239
+#: includes/Admin/RegistrationEditorPage.php:245
 msgid "Unable to load the preview. Please save first or try again."
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:240
+#: includes/Admin/RegistrationEditorPage.php:246
 #: templates/admin/registration-editor.php:174
 #: templates/admin/registration-editor.php:176
 msgid "Close preview"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:241
-#: includes/Rest/RegistrationPreviewController.php:76
+#: includes/Admin/RegistrationEditorPage.php:247
+#: includes/Rest/RegistrationPreviewController.php:78
 #: templates/admin/registration-editor.php:180
 msgid "Preview only. Form controls are disabled."
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:339
+#: includes/Admin/RegistrationEditorPage.php:348
 msgid "You do not have permission to modify the registration form."
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:351
+#: includes/Admin/RegistrationEditorPage.php:360
 msgid "Registration form reset to defaults."
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:365
+#: includes/Admin/RegistrationEditorPage.php:374
 msgid "You do not have permission to export the registration form."
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:377
+#: includes/Admin/RegistrationEditorPage.php:386
 msgid "Unable to export registration form."
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:392
+#: includes/Admin/RegistrationEditorPage.php:401
 msgid "You do not have permission to import the registration form."
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:408
+#: includes/Admin/RegistrationEditorPage.php:417
 msgid "Import failed. Ensure the JSON file is valid."
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:423
+#: includes/Admin/RegistrationEditorPage.php:432
 msgid "Registration form imported."
 msgstr ""
 
 #. translators: %s: Missing canonical field label.
-#: includes/Admin/RegistrationEditorPage.php:484
+#: includes/Admin/RegistrationEditorPage.php:493
 #, php-format
 msgid "Template is missing the required %s field."
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:529
+#: includes/Admin/RegistrationEditorPage.php:538
 msgid "Text field"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:533
+#: includes/Admin/RegistrationEditorPage.php:547
 msgid "Email field"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:537
+#: includes/Admin/RegistrationEditorPage.php:556
 msgid "Telephone field"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:541
+#: includes/Admin/RegistrationEditorPage.php:564
 msgid "Date field"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:545
+#: includes/Admin/RegistrationEditorPage.php:572
 msgid "Number field"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:549
+#: includes/Admin/RegistrationEditorPage.php:581
 msgid "Textarea"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:553
-msgid "Radio options"
+#: includes/Admin/RegistrationEditorPage.php:589
+msgid "Radio group"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:557
+#: includes/Admin/RegistrationEditorPage.php:598
 msgid "Checkbox group"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:561
-msgid "Select field"
-msgstr ""
-
-#: includes/Admin/RegistrationEditorPage.php:565
-msgid "File upload"
-msgstr ""
-
-#: includes/Admin/RegistrationEditorPage.php:569
+#: includes/Admin/RegistrationEditorPage.php:611
 msgid "Consent checkbox"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:573
+#: includes/Admin/RegistrationEditorPage.php:619
+msgid "Select field"
+msgstr ""
+
+#: includes/Admin/RegistrationEditorPage.php:628
+msgid "File upload"
+msgstr ""
+
+#: includes/Admin/RegistrationEditorPage.php:632
 msgid "Submit button"
 msgstr ""
 
@@ -989,42 +989,42 @@ msgstr ""
 msgid "Token salts should be updated in wp-config.php."
 msgstr ""
 
-#: includes/Email/class-registrationnotificationmailer.php:41
+#: includes/Email/class-registrationnotificationmailer.php:42
 msgid "New food bank registration submitted"
 msgstr ""
 
-#: includes/Email/class-registrationnotificationmailer.php:44
+#: includes/Email/class-registrationnotificationmailer.php:45
 msgid "Auto-approved"
 msgstr ""
 
-#: includes/Email/class-registrationnotificationmailer.php:45
+#: includes/Email/class-registrationnotificationmailer.php:46
 msgid "Pending review"
 msgstr ""
 
-#: includes/Email/class-registrationnotificationmailer.php:48
+#: includes/Email/class-registrationnotificationmailer.php:49
 msgid "A new registration has been received."
 msgstr ""
 
 #. translators: %s: Registration status label.
-#: includes/Email/class-registrationnotificationmailer.php:51
+#: includes/Email/class-registrationnotificationmailer.php:52
 #, php-format
 msgid "Status: %s"
 msgstr ""
 
 #. translators: %s: Canonical member reference identifier.
-#: includes/Email/class-registrationnotificationmailer.php:56
+#: includes/Email/class-registrationnotificationmailer.php:57
 #, php-format
 msgid "Member reference: %s"
 msgstr ""
 
 #. translators: 1: Member first name, 2: Member last initial.
-#: includes/Email/class-registrationnotificationmailer.php:64
+#: includes/Email/class-registrationnotificationmailer.php:65
 #, php-format
 msgid "Name: %1$s %2$s."
 msgstr ""
 
 #. translators: %s: Admin URL for reviewing the application.
-#: includes/Email/class-registrationnotificationmailer.php:73
+#: includes/Email/class-registrationnotificationmailer.php:76
 #, php-format
 msgid "Review the application: %s"
 msgstr ""
@@ -1133,7 +1133,7 @@ msgstr ""
 #: includes/Privacy/class-exporter.php:305
 #: includes/Reports/class-csvexporter.php:120
 #: templates/admin/reports.php:297
-#: templates/admin/reports.php:414
+#: templates/admin/reports.php:422
 msgid "Method"
 msgstr ""
 
@@ -1183,51 +1183,56 @@ msgid "Field"
 msgstr ""
 
 #: includes/Registration/Editor/TemplateDefaults.php:77
-#: includes/Shortcodes/class-registrationform.php:515
+#: includes/Shortcodes/class-registrationform.php:526
 msgid "Thank you for registering. We have emailed your check-in QR code."
 msgstr ""
 
 #: includes/Registration/Editor/TemplateDefaults.php:78
-#: includes/Shortcodes/class-registrationform.php:519
+#: includes/Shortcodes/class-registrationform.php:530
 #: templates/admin/registration-editor.php:36
 msgid "Thank you for registering. Our team will review your application and send your QR code once approved."
 msgstr ""
 
-#: includes/Registration/Uploads.php:145
-#: includes/Registration/Uploads.php:309
+#: includes/Registration/Uploads.php:120
+#: includes/Registration/Uploads.php:131
+msgid "Only one file may be uploaded."
+msgstr ""
+
+#: includes/Registration/Uploads.php:171
+#: includes/Registration/Uploads.php:335
 msgid "Uploaded file exceeds the allowed size."
 msgstr ""
 
-#: includes/Registration/Uploads.php:169
+#: includes/Registration/Uploads.php:195
 msgid "File type is not permitted."
 msgstr ""
 
-#: includes/Registration/Uploads.php:198
+#: includes/Registration/Uploads.php:224
 msgid "Unable to store uploaded file."
 msgstr ""
 
-#: includes/Registration/Uploads.php:311
+#: includes/Registration/Uploads.php:337
 msgid "File upload was interrupted. Please try again."
 msgstr ""
 
-#: includes/Registration/Uploads.php:313
+#: includes/Registration/Uploads.php:339
 msgid "No file was uploaded."
 msgstr ""
 
-#: includes/Registration/Uploads.php:315
+#: includes/Registration/Uploads.php:341
 msgid "Missing temporary folder. Contact the administrator."
 msgstr ""
 
-#: includes/Registration/Uploads.php:317
+#: includes/Registration/Uploads.php:343
 msgid "Failed to write uploaded file to disk."
 msgstr ""
 
-#: includes/Registration/Uploads.php:319
+#: includes/Registration/Uploads.php:345
 msgid "File upload stopped by extension."
 msgstr ""
 
-#: includes/Registration/Uploads.php:321
-#: includes/Shortcodes/class-registrationform.php:328
+#: includes/Registration/Uploads.php:347
+#: includes/Shortcodes/class-registrationform.php:333
 msgid "Unable to process the uploaded file."
 msgstr ""
 
@@ -1249,7 +1254,7 @@ msgstr ""
 
 #: includes/Reports/class-csvexporter.php:121
 #: templates/admin/reports.php:298
-#: templates/admin/reports.php:415
+#: templates/admin/reports.php:423
 msgid "Note"
 msgstr ""
 
@@ -1269,60 +1274,60 @@ msgstr ""
 msgid "This member is not currently active."
 msgstr ""
 
-#: includes/Shortcodes/class-registrationform.php:286
-#: includes/Shortcodes/class-registrationform.php:296
+#: includes/Shortcodes/class-registrationform.php:291
+#: includes/Shortcodes/class-registrationform.php:301
 msgid "Invalid submission. Please try again."
 msgstr ""
 
-#: includes/Shortcodes/class-registrationform.php:319
+#: includes/Shortcodes/class-registrationform.php:324
 msgid "This file is required."
 msgstr ""
 
-#: includes/Shortcodes/class-registrationform.php:367
+#: includes/Shortcodes/class-registrationform.php:372
 msgid "This field is required."
 msgstr ""
 
-#: includes/Shortcodes/class-registrationform.php:392
-#: includes/Shortcodes/class-registrationform.php:424
+#: includes/Shortcodes/class-registrationform.php:397
+#: includes/Shortcodes/class-registrationform.php:429
 msgid "First name is required."
 msgstr ""
 
-#: includes/Shortcodes/class-registrationform.php:395
-#: includes/Shortcodes/class-registrationform.php:428
+#: includes/Shortcodes/class-registrationform.php:400
+#: includes/Shortcodes/class-registrationform.php:433
 msgid "Last initial must be a single letter."
 msgstr ""
 
-#: includes/Shortcodes/class-registrationform.php:398
-#: includes/Shortcodes/class-registrationform.php:432
+#: includes/Shortcodes/class-registrationform.php:403
+#: includes/Shortcodes/class-registrationform.php:437
 msgid "A valid email address is required."
 msgstr ""
 
-#: includes/Shortcodes/class-registrationform.php:411
+#: includes/Shortcodes/class-registrationform.php:416
 msgid "Please correct the errors below and try again."
 msgstr ""
 
-#: includes/Shortcodes/class-registrationform.php:453
-#: includes/Shortcodes/class-registrationform.php:454
+#: includes/Shortcodes/class-registrationform.php:464
+#: includes/Shortcodes/class-registrationform.php:465
 msgid "Please wait before submitting again."
 msgstr ""
 
-#: includes/Shortcodes/class-registrationform.php:466
+#: includes/Shortcodes/class-registrationform.php:477
 msgid "Service temporarily unavailable. Please try again later."
 msgstr ""
 
-#: includes/Shortcodes/class-registrationform.php:488
+#: includes/Shortcodes/class-registrationform.php:499
 msgid "We could not save your registration. Please try again later."
 msgstr ""
 
-#: includes/Shortcodes/class-registrationform.php:584
+#: includes/Shortcodes/class-registrationform.php:595
 msgid "Enter a valid email address."
 msgstr ""
 
-#: includes/Shortcodes/class-registrationform.php:598
+#: includes/Shortcodes/class-registrationform.php:616
 msgid "Enter a valid number."
 msgstr ""
 
-#: includes/Shortcodes/class-registrationform.php:616
+#: includes/Shortcodes/class-registrationform.php:637
 msgid "Choose a valid option."
 msgstr ""
 
@@ -1746,17 +1751,17 @@ msgid "Attendance records table"
 msgstr ""
 
 #: templates/admin/reports.php:293
-#: templates/admin/reports.php:412
+#: templates/admin/reports.php:420
 msgid "Collected date"
 msgstr ""
 
 #: templates/admin/reports.php:294
-#: templates/admin/reports.php:413
+#: templates/admin/reports.php:421
 msgid "Collected time"
 msgstr ""
 
 #: templates/admin/reports.php:299
-#: templates/admin/reports.php:416
+#: templates/admin/reports.php:424
 msgid "Recorded by"
 msgstr ""
 
@@ -1765,52 +1770,60 @@ msgid "No attendance records found for this range."
 msgstr ""
 
 #: templates/admin/reports.php:378
+msgid "Member"
+msgstr ""
+
+#: templates/admin/reports.php:382
 msgid "Member check-in history"
 msgstr ""
 
 #. translators: 1: Number of rows, 2: Member label, 3: Member reference.
-#: templates/admin/reports.php:383
+#: templates/admin/reports.php:387
 #, php-format
 msgid "Showing %1$s check-in(s) for %2$s (%3$s)."
 msgstr ""
 
 #. translators: %s: Member status label.
-#: templates/admin/reports.php:393
+#: templates/admin/reports.php:397
 #, php-format
 msgid "Status: %s."
 msgstr ""
 
-#: templates/admin/reports.php:400
+#: templates/admin/reports.php:404
 msgid "Clear selection"
 msgstr ""
 
-#: templates/admin/reports.php:406
+#: templates/admin/reports.php:410
+msgid "Member record not found. Displaying history by reference only."
+msgstr ""
+
+#: templates/admin/reports.php:414
 msgid "No attendance records found for this member."
 msgstr ""
 
-#: templates/admin/reports.php:409
+#: templates/admin/reports.php:417
 msgid "Selected member attendance history"
 msgstr ""
 
-#: templates/admin/reports.php:445
+#: templates/admin/reports.php:454
 msgid "Pagination"
 msgstr ""
 
 #. translators: 1: First row number, 2: Last row number, 3: Total rows.
-#: templates/admin/reports.php:451
+#: templates/admin/reports.php:460
 #, php-format
 msgid "Showing %1$s–%2$s of %3$s rows"
 msgstr ""
 
-#: templates/admin/reports.php:461
+#: templates/admin/reports.php:470
 msgid "Previous page"
 msgstr ""
 
-#: templates/admin/reports.php:470
+#: templates/admin/reports.php:479
 msgid "of"
 msgstr ""
 
-#: templates/admin/reports.php:476
+#: templates/admin/reports.php:485
 msgid "Next page"
 msgstr ""
 
@@ -1961,12 +1974,12 @@ msgstr ""
 msgid "Food bank check-in QR code"
 msgstr ""
 
-#: templates/emails/welcome.php:63
-#: templates/emails/welcome.php:71
+#: templates/emails/welcome.php:66
+#: templates/emails/welcome.php:74
 msgid "If you cannot scan the QR code, share this reference code with a volunteer:"
 msgstr ""
 
-#: templates/emails/welcome.php:80
+#: templates/emails/welcome.php:83
 msgid "See you soon!"
 msgstr ""
 
