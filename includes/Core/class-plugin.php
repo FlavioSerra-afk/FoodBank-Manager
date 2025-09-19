@@ -18,7 +18,7 @@ use FoodBankManager\Admin\DashboardPage;
 use FoodBankManager\Admin\DiagnosticsPage;
 use FoodBankManager\Admin\MembersPage;
 use FoodBankManager\Admin\Menu;
-use FoodBankManager\Admin\RegistrationFormPage;
+use FoodBankManager\Admin\RegistrationEditorPage;
 use FoodBankManager\Admin\ReportsPage;
 use FoodBankManager\Admin\SchedulePage;
 use FoodBankManager\Admin\SettingsPage;
@@ -27,6 +27,7 @@ use FoodBankManager\Auth\Capabilities;
 use FoodBankManager\Crypto\EncryptionSettings;
 use FoodBankManager\Privacy\Privacy;
 use FoodBankManager\Rest\CheckinController;
+use FoodBankManager\Rest\RegistrationPreviewController;
 use FoodBankManager\Shortcodes\RegistrationForm;
 use FoodBankManager\Shortcodes\StaffDashboard;
 use WP_Role;
@@ -51,7 +52,7 @@ final class Plugin {
 				Menu::register();
 				DiagnosticsPage::register();
 				MembersPage::register();
-				RegistrationFormPage::register();
+                RegistrationEditorPage::register();
 				ReportsPage::register();
 				SchedulePage::register();
 				SettingsPage::register();
@@ -61,7 +62,8 @@ final class Plugin {
 		StaffDashboard::register();
 		Privacy::register();
 
-		add_action( 'rest_api_init', array( CheckinController::class, 'register_routes' ) );
+                add_action( 'rest_api_init', array( CheckinController::class, 'register_routes' ) );
+                add_action( 'rest_api_init', array( RegistrationPreviewController::class, 'register_routes' ) );
 
 		if ( defined( 'WP_CLI' ) && WP_CLI && class_exists( '\\WP_CLI' ) ) {
 			self::register_cli_commands();

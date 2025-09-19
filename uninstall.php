@@ -74,9 +74,12 @@ function fbm_drop_tables( \wpdb $wpdb ): void {
 			$wpdb->prefix . 'fbm_members',
 		);
 
-		if ( defined( 'ABSPATH' ) ) {
-				require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-		}
+        if ( defined( 'ABSPATH' ) ) {
+                $upgrade_file = ABSPATH . 'wp-admin/includes/upgrade.php';
+                if ( is_string( $upgrade_file ) && is_readable( $upgrade_file ) ) {
+                                require_once $upgrade_file;
+                }
+        }
 
 		foreach ( $tables as $table ) {
 			if ( ! preg_match( '/^[A-Za-z0-9_]+$/', $table ) ) {

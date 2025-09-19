@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace FBM\Tests\Registration;
 
+use FoodBankManager\Registration\Editor\TemplateDefaults;
 use FoodBankManager\Registration\MembersRepository;
 use FoodBankManager\Shortcodes\RegistrationForm;
 use PHPUnit\Framework\TestCase;
@@ -144,11 +145,11 @@ final class RegistrationFormTest extends TestCase {
                         'Thank you for registering. We have emailed your check-in QR code.',
                         $result['message']
                 );
-                $this->assertSame( '', $result['values']['first_name'] );
-                $this->assertSame( '', $result['values']['last_initial'] );
-                $this->assertSame( '', $result['values']['email'] );
-                $this->assertSame( '1', $result['values']['household_size'] );
-                $this->assertSame( '', $result['values']['consent'] );
+                $this->assertSame( '', $result['values']['fbm_first_name'] );
+                $this->assertSame( '', $result['values']['fbm_last_initial'] );
+                $this->assertSame( '', $result['values']['fbm_email'] );
+                $this->assertSame( '', $result['values']['fbm_household_size'] );
+                $this->assertSame( array(), $result['values']['fbm_registration_consent'] );
 
                 $this->assertCount( 1, $this->wpdb->members );
                 $member = reset( $this->wpdb->members );
@@ -264,14 +265,14 @@ final class RegistrationFormTest extends TestCase {
                                 'fbm_last_initial'           => 'k',
                                 'fbm_email'                  => 'jordan@example.com',
                                 'fbm_registration_time'      => (string) ( time() - 60 ),
-                                'fbm_registration_consent'   => '1',
+                                'fbm_registration_consent'   => $this->consent_option_value(),
                         )
                 );
 
                 $result = $this->invoke_handle_submission();
 
                 $this->assertTrue( $result['success'] );
-                $this->assertSame( '', $result['values']['consent'] );
+                $this->assertSame( array(), $result['values']['fbm_registration_consent'] );
 
                 $this->assertCount( 1, $this->wpdb->members );
                 $member = reset( $this->wpdb->members );
@@ -312,8 +313,27 @@ final class RegistrationFormTest extends TestCase {
                 $method = new ReflectionMethod( RegistrationForm::class, 'handle_submission' );
                 $method->setAccessible( true );
 
+                $schema    = $this->schema();
+                $fields    = $schema['fields'];
+                $settings  = TemplateDefaults::settings();
+
                 /** @var array{success:bool,errors:array<int,string>,message:string,values:array<string,string>} */
-                return $method->invoke( null );
+                return $method->invoke( null, $fields, $settings );
+        }
+
+        /**
+         * Resolve the default schema for tests.
+         *
+         * @return array{template:string,fields:array<string,array<string,mixed>>,warnings:array<int,string>}
+         */
+        private function schema(): array {
+                $method = new ReflectionMethod( RegistrationForm::class, 'resolve_schema' );
+                $method->setAccessible( true );
+
+                /** @var array{template:string,fields:array<string,array<string,mixed>>,warnings:array<int,string>} $schema */
+                $schema = $method->invoke( null, TemplateDefaults::template() );
+
+                return $schema;
         }
 
         /**
@@ -340,5 +360,23 @@ final class RegistrationFormTest extends TestCase {
                         ),
                         $overrides
                 );
+        }
+
+        /**
+         * Resolve the canonical consent value from the default template.
+         */
+        private function consent_option_value(): string {
+                $schema = $this->schema();
+
+                if (
+                        isset( $schema['fields']['fbm_registration_consent'] )
+                        && is_array( $schema['fields']['fbm_registration_consent'] )
+                        && isset( $schema['fields']['fbm_registration_consent']['options'][0]['value'] )
+                        && is_string( $schema['fields']['fbm_registration_consent']['options'][0]['value'] )
+                ) {
+                        return $schema['fields']['fbm_registration_consent']['options'][0]['value'];
+                }
+
+                return '1';
         }
 }

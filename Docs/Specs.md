@@ -2,7 +2,7 @@
 > This is 1 of 4 canonical docs (Specs, Plan, Tasks, Matrix).
 > Codex MUST read & update these BEFORE any work, every prompt.
 > Any other files in /Docs are historical and must not drive scope.
-> Docs-Revision: 2025-09-22 (v1.0.0 alignment)
+> Docs-Revision: 2025-09-25 (registration editor wave)
 
 # Specs
 
@@ -59,6 +59,8 @@ Features:
 Validation, nonce, anti-spam (honeypot + time trap).
 
 Minimal PII collection; strict sanitize/normalize; prepared SQL writes.
+
+Single-template editor in admin (CodeMirror-backed) manages the registration markup with CF7-style tags; templates sanitized via `wp_kses` allow-list. Admin preview endpoint (`/fbm/v1/registration/preview`, manager-only nonce/cap) renders safe HTML for review.
 
 On approval (or instant, per config), send Welcome Email including the user’s persistent QR code and a fallback alphanumeric code.
 
@@ -119,6 +121,8 @@ Filters: by date range + status; allow-listed server side.
 CSV export (UTF-8 BOM, sanitized filename, localized headers) behind fbm_export + nonce.
 
 No public analytics pages.
+
+Attendance table links to per-member history detail showing reverse-chronological check-ins (method + timestamps) for managers/admins.
 
 E) Diagnostics
 

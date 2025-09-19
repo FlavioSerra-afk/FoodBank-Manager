@@ -1,5 +1,14 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- Registration form editor with CodeMirror toolbar snippets, REST preview, and stricter template sanitization.
+- Admin notification email on new registrations plus reports member-detail view with historical check-ins.
+
+### Changed
+- Public registration shortcode now renders stored templates through the new parser/renderer pipeline with expanded unit coverage.
+
 ## [1.3.0] - 2025-09-24
 
 ### Added
