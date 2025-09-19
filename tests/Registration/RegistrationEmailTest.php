@@ -86,6 +86,8 @@ final class RegistrationEmailTest extends TestCase {
 
                 SpyWelcomeMailer::reset();
 
+                unset( $GLOBALS['fbm_mail_log'] );
+
                 global $wpdb;
                 $wpdb = new \wpdb();
                 $GLOBALS['fbm_users'] = array();
@@ -132,13 +134,13 @@ final class RegistrationEmailTest extends TestCase {
                 $mailer = new \FoodBankManager\Email\WelcomeMailer();
                 $this->assertTrue( $mailer->send( 'alice@example.com', 'Alice', $outcome['member_reference'], $outcome['token'] ) );
 
-                $this->assertCount( 1, SpyWelcomeMailer::$sent );
-                $captured = SpyWelcomeMailer::$sent[0];
+                $log = $GLOBALS['fbm_mail_log'] ?? array();
+                $this->assertCount( 1, $log );
+                $entry = $log[0];
 
-                $this->assertSame( 'alice@example.com', $captured['email'] );
-                $this->assertSame( 'Alice', $captured['first_name'] );
-                $this->assertSame( $outcome['member_reference'], $captured['member_reference'] );
-                $this->assertSame( $outcome['token'], $captured['token'] );
+                $this->assertSame( 'alice@example.com', $entry['to'] );
+                $this->assertStringContainsString( 'Alice', $entry['message'] );
+                $this->assertStringContainsString( $outcome['token'], $entry['message'] );
         }
 
         /**
@@ -201,6 +203,7 @@ final class RegistrationEmailTest extends TestCase {
                 $original_hash = $wpdb->tokens[ $member_id ]['token_hash'] ?? '';
 
                 SpyWelcomeMailer::reset();
+                unset( $GLOBALS['fbm_mail_log'] );
 
                 $method = new ReflectionMethod( MembersPage::class, 'process_resend' );
                 $method->setAccessible( true );
@@ -210,10 +213,11 @@ final class RegistrationEmailTest extends TestCase {
                 $this->assertSame( 'resent', $result['notice'] );
                 $this->assertArrayHasKey( 'token_hash', $result );
 
-                $this->assertCount( 1, SpyWelcomeMailer::$sent );
-                $resent_token = SpyWelcomeMailer::$sent[0]['token'];
+                $log = $GLOBALS['fbm_mail_log'] ?? array();
+                $this->assertCount( 1, $log );
+                $entry = $log[0];
 
-                $this->assertSame( $original_token, $resent_token );
+                $this->assertStringContainsString( $original_token, $entry['message'] );
                 $this->assertSame( $member_id, $tokens->verify( $original_token ) );
                 $this->assertSame( $original_hash, $wpdb->tokens[ $member_id ]['token_hash'] ?? '' );
                 $this->assertSame( $original_hash, $result['token_hash'] );

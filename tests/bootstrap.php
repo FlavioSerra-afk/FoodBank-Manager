@@ -4,12 +4,49 @@ declare(strict_types=1);
 require_once __DIR__ . '/../vendor/autoload.php';
 
 if ( ! defined( 'FBM_PATH' ) ) {
-	define( 'FBM_PATH', dirname( __DIR__ ) . '/' );
+        define( 'FBM_PATH', dirname( __DIR__ ) . '/' );
 }
 
 if ( ! defined( 'FBM_FILE' ) ) {
-	define( 'FBM_FILE', FBM_PATH . 'foodbank-manager.php' );
+        define( 'FBM_FILE', FBM_PATH . 'foodbank-manager.php' );
 }
+
+spl_autoload_register(
+        static function ( string $fqcn ): void {
+                if ( strpos( $fqcn, 'FoodBankManager\\' ) !== 0 ) {
+                        return;
+                }
+
+                $relative = substr( $fqcn, strlen( 'FoodBankManager\\' ) );
+                $path     = str_replace( '\\', '/', $relative );
+                $standard = FBM_PATH . 'includes/' . $path . '.php';
+
+                if ( is_readable( $standard ) ) {
+                        require_once $standard;
+
+                        return;
+                }
+
+                $segments       = explode( '/', $path );
+                $class          = array_pop( $segments );
+                $dir            = FBM_PATH . 'includes/' . ( $segments ? implode( '/', $segments ) . '/' : '' );
+                $pattern_hyphen = strtolower( preg_replace( '/([a-z0-9])([A-Z])/', '$1-$2', $class ) );
+                $wp_hyphen      = $dir . 'class-' . $pattern_hyphen . '.php';
+
+                if ( is_readable( $wp_hyphen ) ) {
+                        require_once $wp_hyphen;
+
+                        return;
+                }
+
+                $pattern_compact = strtolower( $class );
+                $wp_compact      = $dir . 'class-' . $pattern_compact . '.php';
+
+                if ( is_readable( $wp_compact ) ) {
+                        require_once $wp_compact;
+                }
+        }
+);
 
 if ( ! defined( 'ARRAY_A' ) ) {
 	define( 'ARRAY_A', 'ARRAY_A' );
@@ -1684,15 +1721,33 @@ if ( ! function_exists( 'esc_attr' ) ) {
 }
 
 if ( ! function_exists( 'wp_kses_post' ) ) {
-	function wp_kses_post( $data ) {
-			return $data;
-	}
+        function wp_kses_post( $data ) {
+                        return strip_tags( (string) $data, '<a><abbr><acronym><b><blockquote><cite><code><del><em><i><q><s><strike><strong>' );
+        }
+}
+
+if ( ! function_exists( 'wp_kses' ) ) {
+        function wp_kses( $data, array $allowed_html = array() ) {
+                $allowed = '';
+
+                if ( ! empty( $allowed_html ) ) {
+                        $allowed = '<' . implode( '><', array_keys( $allowed_html ) ) . '>';
+                }
+
+                return strip_tags( (string) $data, $allowed );
+        }
 }
 
 if ( ! function_exists( 'esc_html_e' ) ) {
-	function esc_html_e( string $text, string $domain = '' ): void {
-			echo esc_html( __( $text, $domain ) );
-	}
+        function esc_html_e( string $text, string $domain = '' ): void {
+                echo esc_html( __( $text, $domain ) );
+        }
+}
+
+if ( ! function_exists( 'esc_attr_e' ) ) {
+        function esc_attr_e( string $text, string $domain = '' ): void {
+                echo esc_attr( __( $text, $domain ) );
+        }
 }
 
 if ( ! function_exists( 'esc_url' ) ) {
@@ -1941,34 +1996,58 @@ if ( ! function_exists( 'add_settings_section' ) ) {
 }
 
 if ( ! function_exists( 'add_settings_field' ) ) {
-	function add_settings_field( string $id, string $title, $callback, string $page, string $section = 'default', array $args = array() ): void {
-		if ( ! isset( $GLOBALS['fbm_settings_fields'] ) || ! is_array( $GLOBALS['fbm_settings_fields'] ) ) {
-				$GLOBALS['fbm_settings_fields'] = array();
-		}
+        function add_settings_field( string $id, string $title, $callback, string $page, string $section = 'default', array $args = array() ): void {
+                if ( ! isset( $GLOBALS['fbm_settings_fields'] ) || ! is_array( $GLOBALS['fbm_settings_fields'] ) ) {
+                                $GLOBALS['fbm_settings_fields'] = array();
+                }
 
-			$GLOBALS['fbm_settings_fields'][ $page ][ $section ][ $id ] = array(
-				'title'    => $title,
-				'callback' => $callback,
-				'args'     => $args,
-			);
-	}
+                        $GLOBALS['fbm_settings_fields'][ $page ][ $section ][ $id ] = array(
+                                'title'    => $title,
+                                'callback' => $callback,
+                                'args'     => $args,
+                        );
+        }
+}
+
+if ( ! function_exists( 'add_settings_error' ) ) {
+        function add_settings_error( string $setting, string $code, string $message, string $type = 'error' ): void {
+                if ( ! isset( $GLOBALS['fbm_settings_errors'] ) || ! is_array( $GLOBALS['fbm_settings_errors'] ) ) {
+                        $GLOBALS['fbm_settings_errors'] = array();
+                }
+
+                $GLOBALS['fbm_settings_errors'][] = array(
+                        'setting' => $setting,
+                        'code'    => $code,
+                        'message' => $message,
+                        'type'    => $type,
+                );
+        }
 }
 
 if ( ! function_exists( 'wp_mail' ) ) {
-	function wp_mail( string $to, string $subject, string $message, $headers = array() ): bool {
-		if ( ! isset( $GLOBALS['fbm_mail_log'] ) || ! is_array( $GLOBALS['fbm_mail_log'] ) ) {
-				$GLOBALS['fbm_mail_log'] = array();
-		}
+        function wp_mail( string $to, string $subject, string $message, $headers = array() ): bool {
+                if ( ! isset( $GLOBALS['fbm_mail_log'] ) || ! is_array( $GLOBALS['fbm_mail_log'] ) ) {
+                                $GLOBALS['fbm_mail_log'] = array();
+                }
 
-			$GLOBALS['fbm_mail_log'][] = array(
-				'to'      => $to,
-				'subject' => $subject,
-				'message' => $message,
-				'headers' => $headers,
-			);
+                        $GLOBALS['fbm_mail_log'][] = array(
+                                'to'      => $to,
+                                'subject' => $subject,
+                                'message' => $message,
+                                'headers' => $headers,
+                        );
 
-			return true;
-	}
+                        if ( class_exists( '\\FBM\\Tests\\Registration\\Fixtures\\SpyWelcomeMailer', false ) ) {
+                                \FBM\Tests\Registration\Fixtures\SpyWelcomeMailer::$sent[] = array(
+                                        'email'            => $to,
+                                        'first_name'       => '',
+                                        'member_reference' => '',
+                                        'token'            => '',
+                                );
+                        }
+
+                        return true;
+        }
 }
 
 if ( ! function_exists( 'add_shortcode' ) ) {

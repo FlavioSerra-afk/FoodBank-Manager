@@ -1,0 +1,169 @@
+<?php
+/**
+ * Registration form editor template.
+ *
+ * @package FoodBankManager
+ */
+
+declare(strict_types=1);
+
+use function checked;
+use function esc_attr;
+use function esc_html;
+use function esc_html__;
+use function esc_html_e;
+use function esc_textarea;
+use function esc_url;
+use function implode;
+use function selected;
+use function settings_fields;
+use function submit_button;
+use function wp_nonce_field;
+
+if ( ! defined( 'ABSPATH' ) ) {
+        exit;
+}
+
+$template_value   = isset( $data['template'] ) && is_string( $data['template'] ) ? $data['template'] : '';
+$settings         = isset( $data['settings'] ) && is_array( $data['settings'] ) ? $data['settings'] : array();
+$uploads          = isset( $settings['uploads'] ) && is_array( $settings['uploads'] ) ? $settings['uploads'] : array();
+$max_size_bytes   = isset( $uploads['max_size'] ) ? (int) $uploads['max_size'] : 5242880;
+$max_size_mb      = max( 1, (int) ceil( $max_size_bytes / 1048576 ) );
+$allowed_mime     = isset( $uploads['allowed_mime_types'] ) && is_array( $uploads['allowed_mime_types'] ) ? implode( ', ', $uploads['allowed_mime_types'] ) : 'application/pdf, image/jpeg, image/png';
+$honeypot_enabled = ! empty( $settings['honeypot'] );
+$messages         = isset( $settings['messages'] ) && is_array( $settings['messages'] ) ? $settings['messages'] : array();
+$success_auto     = isset( $messages['success_auto'] ) ? (string) $messages['success_auto'] : esc_html__( 'Thank you for registering. We have emailed your QR code.', 'foodbank-manager' );
+$success_pending  = isset( $messages['success_pending'] ) ? (string) $messages['success_pending'] : esc_html__( 'Thank you for registering. Our team will review your application and send your QR code once approved.', 'foodbank-manager' );
+$editor_theme     = isset( $settings['editor']['theme'] ) ? (string) $settings['editor']['theme'] : 'light';
+$snippets         = isset( $data['snippets'] ) && is_array( $data['snippets'] ) ? $data['snippets'] : array();
+$option_group     = isset( $data['option_group'] ) ? (string) $data['option_group'] : '';
+$template_option  = isset( $data['template_option'] ) ? (string) $data['template_option'] : '';
+$settings_option  = isset( $data['settings_option'] ) ? (string) $data['settings_option'] : '';
+$template_field   = isset( $data['template_field'] ) ? (string) $data['template_field'] : 'fbm-registration-template';
+$notice_type      = isset( $data['notice'] ) ? (string) $data['notice'] : '';
+$notice_message   = isset( $data['message'] ) ? (string) $data['message'] : '';
+$reset_action     = isset( $data['reset_action'] ) ? (string) $data['reset_action'] : '';
+$export_action    = isset( $data['export_action'] ) ? (string) $data['export_action'] : '';
+$import_action    = isset( $data['import_action'] ) ? (string) $data['import_action'] : '';
+?>
+<div class="wrap">
+        <h1 class="wp-heading-inline"><?php esc_html_e( 'Registration Form', 'foodbank-manager' ); ?></h1>
+
+        <?php if ( '' !== $notice_message ) : ?>
+                <?php
+                $class = 'notice';
+                if ( 'success' === $notice_type ) {
+                        $class .= ' notice-success';
+                } elseif ( 'error' === $notice_type ) {
+                        $class .= ' notice-error';
+                } else {
+                        $class .= ' notice-info';
+                }
+                ?>
+                <div class="<?php echo esc_attr( $class ); ?>" role="status">
+                        <p><?php echo esc_html( $notice_message ); ?></p>
+                </div>
+        <?php endif; ?>
+
+        <form method="post" action="<?php echo esc_url( admin_url( 'options.php' ) ); ?>" class="fbm-registration-editor__form">
+                <?php settings_fields( $option_group ); ?>
+
+                <div class="fbm-registration-editor__layout">
+                        <div class="fbm-registration-editor__canvas">
+                                <div class="fbm-registration-editor__toolbar">
+                                        <?php foreach ( $snippets as $snippet ) :
+                                                if ( ! is_array( $snippet ) ) {
+                                                        continue;
+                                                }
+                                                $label   = isset( $snippet['label'] ) ? (string) $snippet['label'] : '';
+                                                $content = isset( $snippet['snippet'] ) ? (string) $snippet['snippet'] : '';
+                                                if ( '' === $label || '' === $content ) {
+                                                        continue;
+                                                }
+                                                ?>
+                                                <button type="button" class="button button-secondary fbm-registration-editor__snippet" data-fbm-snippet="<?php echo esc_attr( $content ); ?>"><?php echo esc_html( $label ); ?></button>
+                                        <?php endforeach; ?>
+                                        <button type="button" class="button button-primary fbm-registration-editor__preview" data-fbm-preview="1"><?php esc_html_e( 'Preview', 'foodbank-manager' ); ?></button>
+                                </div>
+                                <textarea id="<?php echo esc_attr( $template_field ); ?>" name="<?php echo esc_attr( $template_option ); ?>" rows="20" class="fbm-registration-editor__textarea"><?php echo esc_textarea( $template_value ); ?></textarea>
+                        </div>
+
+                        <div class="fbm-registration-editor__sidebar">
+                                <h2><?php esc_html_e( 'Form settings', 'foodbank-manager' ); ?></h2>
+                                <table class="form-table">
+                                        <tbody>
+                                                <tr>
+                                                        <th scope="row"><label for="fbm-upload-max-size"><?php esc_html_e( 'File upload size (MB)', 'foodbank-manager' ); ?></label></th>
+                                                        <td>
+                                                                <input type="number" id="fbm-upload-max-size" name="<?php echo esc_attr( $settings_option ); ?>[uploads][max_size_mb]" min="1" step="1" value="<?php echo esc_attr( (string) $max_size_mb ); ?>" class="small-text" />
+                                                        </td>
+                                                </tr>
+                                                <tr>
+                                                        <th scope="row"><label for="fbm-upload-mimes"><?php esc_html_e( 'Allowed file types', 'foodbank-manager' ); ?></label></th>
+                                                        <td>
+                                                                <input type="text" id="fbm-upload-mimes" name="<?php echo esc_attr( $settings_option ); ?>[uploads][allowed_mime_types]" value="<?php echo esc_attr( $allowed_mime ); ?>" class="regular-text" />
+                                                                <p class="description"><?php esc_html_e( 'Comma separated list of MIME types, e.g. application/pdf, image/jpeg.', 'foodbank-manager' ); ?></p>
+                                                        </td>
+                                                </tr>
+                                                <tr>
+                                                        <th scope="row"><?php esc_html_e( 'Honeypot field', 'foodbank-manager' ); ?></th>
+                                                        <td>
+                                                                <label>
+                                                                        <input type="checkbox" name="<?php echo esc_attr( $settings_option ); ?>[honeypot]" value="1"<?php checked( $honeypot_enabled ); ?> />
+                                                                        <?php esc_html_e( 'Enable spam honeypot field', 'foodbank-manager' ); ?>
+                                                                </label>
+                                                        </td>
+                                                </tr>
+                                                <tr>
+                                                        <th scope="row"><label for="fbm-editor-theme"><?php esc_html_e( 'Editor theme', 'foodbank-manager' ); ?></label></th>
+                                                        <td>
+                                                                <select id="fbm-editor-theme" name="<?php echo esc_attr( $settings_option ); ?>[editor][theme]">
+                                                                        <option value="light"<?php selected( $editor_theme, 'light' ); ?>><?php esc_html_e( 'Light', 'foodbank-manager' ); ?></option>
+                                                                        <option value="dark"<?php selected( $editor_theme, 'dark' ); ?>><?php esc_html_e( 'Dark', 'foodbank-manager' ); ?></option>
+                                                                </select>
+                                                        </td>
+                                                </tr>
+                                                <tr>
+                                                        <th scope="row"><label for="fbm-success-auto"><?php esc_html_e( 'Success message (auto-approved)', 'foodbank-manager' ); ?></label></th>
+                                                        <td>
+                                                                <textarea id="fbm-success-auto" name="<?php echo esc_attr( $settings_option ); ?>[messages][success_auto]" rows="4" class="large-text"><?php echo esc_textarea( $success_auto ); ?></textarea>
+                                                        </td>
+                                                </tr>
+                                                <tr>
+                                                        <th scope="row"><label for="fbm-success-pending"><?php esc_html_e( 'Success message (pending)', 'foodbank-manager' ); ?></label></th>
+                                                        <td>
+                                                                <textarea id="fbm-success-pending" name="<?php echo esc_attr( $settings_option ); ?>[messages][success_pending]" rows="4" class="large-text"><?php echo esc_textarea( $success_pending ); ?></textarea>
+                                                        </td>
+                                                </tr>
+                                        </tbody>
+                                </table>
+                        </div>
+                </div>
+
+                <?php submit_button( esc_html__( 'Save changes', 'foodbank-manager' ) ); ?>
+        </form>
+
+        <div class="fbm-registration-editor__secondary-actions">
+                <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="fbm-registration-editor__secondary-form">
+                        <?php wp_nonce_field( $reset_action, '_wpnonce', false ); ?>
+                        <input type="hidden" name="action" value="<?php echo esc_attr( $reset_action ); ?>" />
+                        <?php submit_button( esc_html__( 'Reset to default', 'foodbank-manager' ), 'secondary', 'submit', false ); ?>
+                </form>
+
+                <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="fbm-registration-editor__secondary-form">
+                        <?php wp_nonce_field( $export_action, '_wpnonce', false ); ?>
+                        <input type="hidden" name="action" value="<?php echo esc_attr( $export_action ); ?>" />
+                        <?php submit_button( esc_html__( 'Export', 'foodbank-manager' ), 'secondary', 'submit', false ); ?>
+                </form>
+        </div>
+
+        <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="fbm-registration-editor__import">
+                <h2><?php esc_html_e( 'Import template', 'foodbank-manager' ); ?></h2>
+                <p class="description"><?php esc_html_e( 'Paste a JSON export created from this editor.', 'foodbank-manager' ); ?></p>
+                <textarea name="fbm_registration_import" rows="6" class="large-text"></textarea>
+                <?php wp_nonce_field( $import_action, '_wpnonce', false ); ?>
+                <input type="hidden" name="action" value="<?php echo esc_attr( $import_action ); ?>" />
+                <?php submit_button( esc_html__( 'Import', 'foodbank-manager' ), 'secondary' ); ?>
+        </form>
+</div>
+

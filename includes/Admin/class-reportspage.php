@@ -46,6 +46,7 @@ use function wp_safe_redirect;
 use function wp_unslash;
 use function wp_verify_nonce;
 use function count;
+use function remove_query_arg;
 
 /**
  * Presents attendance summaries and CSV export controls.
@@ -69,9 +70,10 @@ final class ReportsPage {
 	private const RANGE_LAST7            = 'last7';
 	private const RANGE_LAST30           = 'last30';
 	private const RANGE_CUSTOM           = 'custom';
-	private const DEFAULT_PER_PAGE       = 25;
-	private const MAX_PER_PAGE           = 500;
-	private const MAX_RANGE_DAYS         = 180;
+        private const DEFAULT_PER_PAGE       = 25;
+        private const MAX_PER_PAGE           = 500;
+        private const MAX_RANGE_DAYS         = 180;
+        private const DETAIL_PARAM           = 'fbm_report_member';
 
 		/**
 		 * Register WordPress hooks.
@@ -110,8 +112,8 @@ final class ReportsPage {
 				wp_die( esc_html__( 'Database connection unavailable.', 'foodbank-manager' ) );
 		}
 
-			$request = self::parse_request();
-			$notices = $request['notices'];
+                        $request = self::parse_request();
+                        $notices = $request['notices'];
 
 			$per_page = max( 1, (int) $request['per_page'] );
 
@@ -162,8 +164,28 @@ final class ReportsPage {
 				);
 		}
 
-			$rows_info = $builder->get_rows( $start, $end, $filters, $page, $per_page, $force_refresh );
-			$rows      = $rows_info['rows'];
+                        $rows_info = $builder->get_rows( $start, $end, $filters, $page, $per_page, $force_refresh );
+                        $rows      = $rows_info['rows'];
+
+                        $detail_reference = (string) $request['member'];
+                        $detail_history   = array(
+                                'member' => null,
+                                'rows'   => array(),
+                        );
+
+                if ( '' !== $detail_reference ) {
+                                $history = $repository->get_member_history( $detail_reference );
+
+                                if ( is_array( $history ) ) {
+                                        $detail_history = array_merge(
+                                                $detail_history,
+                                                array(
+                                                        'member' => $history['member'] ?? null,
+                                                        'rows'   => $history['rows'],
+                                                )
+                                        );
+                                }
+                }
 
 			$cache_hit    = $summary_info['cache_hit'] || $total_info['cache_hit'] || $rows_info['cache_hit'];
 			$generated_at = max( $summary_info['generated_at'], $total_info['generated_at'], $rows_info['generated_at'] );
@@ -187,8 +209,8 @@ final class ReportsPage {
 				self::PER_PAGE_PARAM    => $per_page,
 			);
 
-			$prev_url = '';
-			$next_url = '';
+                        $prev_url = '';
+                        $next_url = '';
 
 			if ( $page > 1 ) {
 					$prev_url = add_query_arg( array_merge( $pagination_base, array( self::PAGE_PARAM => $page - 1 ) ), admin_url( 'admin.php' ) );
@@ -198,12 +220,12 @@ final class ReportsPage {
 					$next_url = add_query_arg( array_merge( $pagination_base, array( self::PAGE_PARAM => $page + 1 ) ), admin_url( 'admin.php' ) );
 			}
 
-			$refresh_url = add_query_arg(
-				array_merge(
-					$pagination_base,
-					array(
-						self::PAGE_PARAM          => $page,
-						self::REFRESH_PARAM       => '1',
+                        $refresh_url = add_query_arg(
+                                array_merge(
+                                        $pagination_base,
+                                        array(
+                                                self::PAGE_PARAM          => $page,
+                                                self::REFRESH_PARAM       => '1',
 						self::REFRESH_NONCE_FIELD => wp_create_nonce( 'fbm_report_refresh' ),
 					)
 				),
@@ -226,10 +248,22 @@ final class ReportsPage {
 				sort( $per_page_options );
 		}
 
-			$context = array(
-				'page_slug'              => self::MENU_SLUG,
-				'start_param'            => self::START_PARAM,
-				'end_param'              => self::END_PARAM,
+                        $detail_base_args = array_merge(
+                                $pagination_base,
+                                array(
+                                        self::PAGE_PARAM => $page,
+                                )
+                        );
+
+                        $detail_base_url = remove_query_arg(
+                                self::DETAIL_PARAM,
+                                add_query_arg( $detail_base_args, admin_url( 'admin.php' ) )
+                        );
+
+                        $context = array(
+                                'page_slug'              => self::MENU_SLUG,
+                                'start_param'            => self::START_PARAM,
+                                'end_param'              => self::END_PARAM,
 				'quick_range_param'      => self::QUICK_RANGE_PARAM,
 				'page_param'             => self::PAGE_PARAM,
 				'per_page_param'         => self::PER_PAGE_PARAM,
@@ -272,24 +306,33 @@ final class ReportsPage {
 				),
 				'filter_action'          => admin_url( 'admin.php' ),
 				'per_page_max'           => self::MAX_PER_PAGE,
-				'manager_can_invalidate' => current_user_can( 'fbm_manage' ), // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
-					'invalidate_form'    => array(
-							'action'      => admin_url( 'admin-post.php' ),
-							'nonce_field' => wp_nonce_field( 'fbm_reports_invalidate', self::INVALIDATE_NONCE_FIELD, true, false ),
-					),
-					'invalidate_action'  => self::INVALIDATE_ACTION,
-					'quick_ranges'       => array(
-							array(
-									'value' => self::RANGE_LAST7,
-									'label' => esc_html__( 'Last 7 days', 'foodbank-manager' ),
-							),
-							array(
-									'value' => self::RANGE_LAST30,
-									'label' => esc_html__( 'Last 30 days', 'foodbank-manager' ),
-							),
-					),
-					'custom_range_label' => esc_html__( 'Custom range', 'foodbank-manager' ),
-			);
+                                'manager_can_invalidate' => current_user_can( 'fbm_manage' ), // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability.
+                                        'invalidate_form'    => array(
+                                                        'action'      => admin_url( 'admin-post.php' ),
+                                                        'nonce_field' => wp_nonce_field( 'fbm_reports_invalidate', self::INVALIDATE_NONCE_FIELD, true, false ),
+                                        ),
+                                        'invalidate_action'  => self::INVALIDATE_ACTION,
+                                        'quick_ranges'       => array(
+                                                        array(
+                                                                        'value' => self::RANGE_LAST7,
+                                                                        'label' => esc_html__( 'Last 7 days', 'foodbank-manager' ),
+                                                        ),
+                                                        array(
+                                                                        'value' => self::RANGE_LAST30,
+                                                                        'label' => esc_html__( 'Last 30 days', 'foodbank-manager' ),
+                                                        ),
+                                        ),
+                                        'custom_range_label' => esc_html__( 'Custom range', 'foodbank-manager' ),
+                                'detail'                 => array(
+                                                'param'     => self::DETAIL_PARAM,
+                                                'reference' => $detail_reference,
+                                                'member'    => $detail_history['member'],
+                                                'rows'      => $detail_history['rows'],
+                                                'base_url'  => $detail_base_url,
+                                                'clear_url' => $detail_base_url,
+                                                'selected'  => '' !== $detail_reference,
+                                ),
+                        );
 
 			$template = FBM_PATH . self::TEMPLATE;
 
@@ -382,21 +425,24 @@ final class ReportsPage {
 		/**
 		 * Parse incoming request parameters.
 		 *
-		 * @return array{
-		 *     start:string,
-		 *     end:string,
-		 *     quick_range:string,
-		 *     page:int,
-		 *     per_page:int,
-		 *     refresh:bool,
-		 *     notices:array<int,array{type:string,text:string}>
-		 * }
-		 */
-	private static function parse_request(): array {
-			$notices = array();
+         * @return array{
+         *     start:string,
+         *     end:string,
+         *     quick_range:string,
+         *     page:int,
+         *     per_page:int,
+         *     refresh:bool,
+         *     notices:array<int,array{type:string,text:string}>,
+         *     member:string
+         * }
+         */
+        private static function parse_request(): array {
+                        $notices = array();
 
-			$start = isset( $_GET[ self::START_PARAM ] ) ? sanitize_text_field( wp_unslash( (string) $_GET[ self::START_PARAM ] ) ) : '';
-			$end   = isset( $_GET[ self::END_PARAM ] ) ? sanitize_text_field( wp_unslash( (string) $_GET[ self::END_PARAM ] ) ) : '';
+                        $start = isset( $_GET[ self::START_PARAM ] ) ? sanitize_text_field( wp_unslash( (string) $_GET[ self::START_PARAM ] ) ) : '';
+                        $end   = isset( $_GET[ self::END_PARAM ] ) ? sanitize_text_field( wp_unslash( (string) $_GET[ self::END_PARAM ] ) ) : '';
+
+                        $detail = isset( $_GET[ self::DETAIL_PARAM ] ) ? sanitize_text_field( wp_unslash( (string) $_GET[ self::DETAIL_PARAM ] ) ) : '';
 
 			$quick_range = isset( $_GET[ self::QUICK_RANGE_PARAM ] ) ? sanitize_key( wp_unslash( (string) $_GET[ self::QUICK_RANGE_PARAM ] ) ) : self::RANGE_LAST7;
 			$allowed     = array( self::RANGE_LAST7, self::RANGE_LAST30, self::RANGE_CUSTOM );
@@ -423,16 +469,17 @@ final class ReportsPage {
 			}
 		}
 
-			return array(
-				'start'       => $start,
-				'end'         => $end,
-				'quick_range' => $quick_range,
-				'page'        => $page > 0 ? $page : 1,
-				'per_page'    => $per_page > 0 ? $per_page : self::DEFAULT_PER_PAGE,
-				'refresh'     => $refresh,
-				'notices'     => $notices,
-			);
-	}
+                        return array(
+                                'start'       => $start,
+                                'end'         => $end,
+                                'quick_range' => $quick_range,
+                                'page'        => $page > 0 ? $page : 1,
+                                'per_page'    => $per_page > 0 ? $per_page : self::DEFAULT_PER_PAGE,
+                                'refresh'     => $refresh,
+                                'notices'     => $notices,
+                                'member'      => $detail,
+                        );
+        }
 
 		/**
 		 * Resolve the normalized date range and related metadata.
