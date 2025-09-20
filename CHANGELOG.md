@@ -4,6 +4,11 @@
 
 - _No changes yet._
 
+## [1.9.2] - 2025-09-21
+
+### Fixed
+- Registration editor toolbar buttons now insert snippets at the active caret for both CodeMirror and textarea modes, updating the global editor handle and restoring focus after each insertion.
+
 ## [1.9.1] - 2025-09-20
 
 ### Fixed

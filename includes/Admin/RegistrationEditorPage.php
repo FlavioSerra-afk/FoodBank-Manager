@@ -455,7 +455,7 @@ final class RegistrationEditorPage {
                         );
                 if ( ! empty( $code_editor_settings ) ) {
                         $initialization = sprintf(
-                                'window.fbmRegistrationEditorCodeEditor=window.fbmRegistrationEditorCodeEditor||{};window.fbmRegistrationEditorCodeEditor.settings=%1$s;(function(){if(!window.wp||!window.wp.codeEditor){return;}var fbmEditor=wp.codeEditor.initialize(%2$s, window.fbmRegistrationEditorCodeEditor.settings);window.fbmRegistrationEditorCodeEditor.instance=fbmEditor;window.fbmRegistrationEditorCodeEditor.codemirror=fbmEditor&&fbmEditor.codemirror?fbmEditor.codemirror:null;}());',
+                                'window.fbmRegistrationEditorCodeEditor=window.fbmRegistrationEditorCodeEditor||{};window.fbmRegistrationEditorCodeEditor.settings=%1$s;window.FBM_REG_EDITOR=null;(function(){if(!window.wp||!window.wp.codeEditor){return;}var fbmEditor=wp.codeEditor.initialize(%2$s, window.fbmRegistrationEditorCodeEditor.settings);var fbmCodemirror=fbmEditor&&fbmEditor.codemirror?fbmEditor.codemirror:null;window.fbmRegistrationEditorCodeEditor.instance=fbmEditor;window.fbmRegistrationEditorCodeEditor.codemirror=fbmCodemirror;window.FBM_REG_EDITOR=fbmCodemirror;}());',
                                 wp_json_encode( $code_editor_settings ),
                                 wp_json_encode( self::TEMPLATE_FIELD )
                         );
