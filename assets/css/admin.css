@@ -245,6 +245,68 @@ body.fbm-registration-editor--modal-open {
     font-weight: 500;
 }
 
+.fbm-registration-editor__conditions-toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+@media (min-width: 720px) {
+    .fbm-registration-editor__conditions-toolbar {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+}
+
+.fbm-registration-editor__conditions-actions,
+.fbm-registration-editor__conditions-tools {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.fbm-registration-editor__conditions-announcer {
+    font-size: 13px;
+    color: #50575e;
+    min-height: 20px;
+}
+
+.fbm-registration-editor__presets {
+    position: relative;
+}
+
+.fbm-registration-editor__presets-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    min-width: 220px;
+    background: #ffffff;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+    padding: 8px 0;
+    z-index: 1000;
+}
+
+.fbm-registration-editor__presets-menu button {
+    width: 100%;
+    display: block;
+    text-align: left;
+    padding: 8px 16px;
+    background: transparent;
+    border: 0;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.fbm-registration-editor__presets-menu button:hover,
+.fbm-registration-editor__presets-menu button:focus-visible {
+    background: #f0f0f1;
+    outline: none;
+}
+
 .fbm-registration-editor__conditions-empty {
     font-style: italic;
     color: #50575e;
@@ -298,6 +360,17 @@ body.fbm-registration-editor--modal-open {
     align-items: end;
 }
 
+.fbm-registration-editor__conditions-row-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    justify-self: flex-start;
+}
+
+.fbm-registration-editor__conditions-row-controls .button {
+    width: 100%;
+}
+
 .fbm-registration-editor__conditions-row:focus-within,
 .fbm-registration-editor__conditions-action:focus-within {
     border-color: #2271b1;
@@ -347,4 +420,124 @@ body.fbm-registration-editor--modal-open {
 .fbm-registration-editor__conditions-report ul {
     margin: 0;
     padding-left: 20px;
+}
+
+.fbm-registration-editor__hidden-form {
+    display: none;
+}
+
+.fbm-registration-editor__import-modal[hidden],
+.fbm-registration-editor__preset-modal[hidden] {
+    display: none;
+}
+
+.fbm-registration-editor__import-modal,
+.fbm-registration-editor__preset-modal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 100000;
+}
+
+.fbm-registration-editor__import-backdrop,
+.fbm-registration-editor__preset-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.fbm-registration-editor__import-dialog,
+.fbm-registration-editor__preset-dialog {
+    position: relative;
+    z-index: 100001;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.35);
+    max-height: 90vh;
+    overflow-y: auto;
+    width: min(720px, 90%);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.fbm-registration-editor__preset-dialog {
+    width: min(480px, 90%);
+}
+
+.fbm-registration-editor__import-header,
+.fbm-registration-editor__preset-header,
+.fbm-registration-editor__import-footer,
+.fbm-registration-editor__preset-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.fbm-registration-editor__import-body,
+.fbm-registration-editor__preset-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.fbm-registration-editor__import-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.fbm-registration-editor__import-results {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.fbm-registration-editor__import-mapping table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.fbm-registration-editor__import-mapping th,
+.fbm-registration-editor__import-mapping td {
+    border: 1px solid #dcdcde;
+    padding: 6px 8px;
+    text-align: left;
+    font-size: 13px;
+}
+
+.fbm-registration-editor__import-analysis {
+    background: #fef8e6;
+    border: 1px solid #ffb900;
+    border-radius: 4px;
+    padding: 12px 16px;
+    font-size: 13px;
+}
+
+.fbm-registration-editor__import-analysis ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.fbm-registration-editor__preset-body form {
+    display: grid;
+    gap: 12px;
+}
+
+.fbm-registration-editor__preset-body label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.fbm-registration-editor__preset-body select,
+.fbm-registration-editor__preset-body input[type="text"] {
+    width: 100%;
 }

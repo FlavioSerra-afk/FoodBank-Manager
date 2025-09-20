@@ -10,14 +10,18 @@ declare(strict_types=1);
 namespace FoodBankManager\Rest;
 
 use FoodBankManager\Admin\RegistrationEditorPage;
+use FoodBankManager\Registration\Editor\Conditions;
 use FoodBankManager\Registration\Editor\EditorState;
+use FoodBankManager\Registration\Editor\TemplateDefaults;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
 use function current_user_can;
 use function esc_html__;
+use function get_option;
 use function is_array;
 use function is_string;
+use function json_decode;
 use function register_rest_route;
 use function rest_ensure_response;
 use function sanitize_key;
@@ -74,6 +78,24 @@ final class RegistrationEditorController {
                                         'methods'             => 'GET',
                                         'callback'            => array( __CLASS__, 'handle_restore' ),
                                         'permission_callback' => array( __CLASS__, 'permissions_check' ),
+                                ),
+                        )
+                );
+
+                register_rest_route(
+                        'fbm/v1',
+                        '/registration/editor/conditions/preview',
+                        array(
+                                array(
+                                        'methods'             => 'POST',
+                                        'callback'            => array( __CLASS__, 'handle_conditions_preview' ),
+                                        'permission_callback' => array( __CLASS__, 'permissions_check' ),
+                                        'args'                => array(
+                                                'payload' => array(
+                                                        'type'     => 'string',
+                                                        'required' => true,
+                                                ),
+                                        ),
                                 ),
                         )
                 );
@@ -174,6 +196,43 @@ final class RegistrationEditorController {
                         array(
                                 'template' => $revision['template'],
                                 'settings' => $revision['settings'],
+                        )
+                );
+        }
+
+        /**
+         * Provide a preview summary for rule imports.
+         *
+         * @param WP_REST_Request $request Incoming request.
+         *
+         * @return WP_REST_Response|WP_Error
+         */
+        public static function handle_conditions_preview( WP_REST_Request $request ) {
+                $payload_raw = (string) $request->get_param( 'payload' );
+                $decoded     = json_decode( $payload_raw, true );
+
+                if ( ! is_array( $decoded ) ) {
+                        return rest_ensure_response(
+                                new WP_Error( 'fbm_invalid_import', esc_html__( 'Unable to parse import payload.', 'foodbank-manager' ), array( 'status' => 400 ) )
+                        );
+                }
+
+                $template = get_option( 'fbm_registration_template', TemplateDefaults::template() );
+                if ( ! is_string( $template ) ) {
+                        $template = TemplateDefaults::template();
+                }
+
+                $fields  = RegistrationEditorPage::field_catalog( $template );
+                $preview = Conditions::preview_import( $decoded, $fields );
+
+                return rest_ensure_response(
+                        array(
+                                'schemaVersion' => $preview['schemaVersion'],
+                                'currentSchema' => Conditions::SCHEMA_VERSION,
+                                'enabled'       => $preview['enabled'],
+                                'groups'        => $preview['groups'],
+                                'fields'        => $preview['fields'],
+                                'analysis'      => $preview['analysis'],
                         )
                 );
         }

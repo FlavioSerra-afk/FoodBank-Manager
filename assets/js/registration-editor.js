@@ -8,6 +8,7 @@
         var settings = window.fbmRegistrationEditor;
         var Conditions = window.fbmRegistrationConditions || null;
         var rootForm = document.querySelector( '.fbm-registration-editor__form' );
+        var announcer = null;
 
         if ( ! rootForm ) {
                 return;
@@ -18,6 +19,83 @@
         var codeEditor = null;
         var i18n = settings.i18n || {};
         var idCounter = 0;
+        var raf = window.requestAnimationFrame || function ( callback ) {
+                return window.setTimeout( callback, 16 );
+        };
+        var caf = window.cancelAnimationFrame || window.clearTimeout;
+        var debounce = function ( fn, wait ) {
+                var timer = null;
+
+                return function () {
+                        var context = this;
+                        var args = arguments;
+
+                        if ( timer ) {
+                                window.clearTimeout( timer );
+                        }
+
+                        timer = window.setTimeout( function () {
+                                timer = null;
+                                fn.apply( context, args );
+                        }, wait );
+                };
+        };
+        var defer = function ( fn ) {
+                if ( 'function' !== typeof fn ) {
+                        return null;
+                }
+
+                if ( 'function' === typeof window.requestIdleCallback ) {
+                        return window.requestIdleCallback( fn, { timeout: 300 } );
+                }
+
+                return window.setTimeout( fn, 0 );
+        };
+        var cancelDefer = function ( handle ) {
+                if ( ! handle ) {
+                        return;
+                }
+
+                if ( 'function' === typeof window.cancelIdleCallback ) {
+                        window.cancelIdleCallback( handle );
+                } else {
+                        window.clearTimeout( handle );
+                }
+        };
+        var attachReorderKeys = function ( element, callback ) {
+                if ( ! element || 'function' !== typeof callback ) {
+                        return;
+                }
+
+                element.addEventListener( 'keydown', function ( event ) {
+                        if ( ! event.altKey ) {
+                                return;
+                        }
+
+                        if ( 'ArrowUp' === event.key ) {
+                                event.preventDefault();
+                                callback( -1 );
+                        } else if ( 'ArrowDown' === event.key ) {
+                                event.preventDefault();
+                                callback( 1 );
+                        }
+                } );
+        };
+        var announce = function ( message ) {
+                if ( ! announcer || 'string' !== typeof message ) {
+                        return;
+                }
+
+                var text = message.trim();
+                if ( '' === text ) {
+                        return;
+                }
+
+                announcer.textContent = '';
+                defer( function () {
+                        announcer.textContent = text;
+                } );
+        };
 
         var format = function ( template ) {
                 if ( typeof template !== 'string' ) {
@@ -205,6 +283,10 @@
                 this.groups = [];
                 this.enabled = true;
                 this.disableUi = this.fields.length === 0;
+                this.renderHandle = null;
+                this.storageHandle = null;
+                this.changeHandle = null;
+                this.lastFocusToken = null;
 
                 for ( var i = 0; i < this.fields.length; i += 1 ) {
                         var field = this.fields[ i ];
@@ -245,7 +327,7 @@
                 if ( this.enabledToggle ) {
                         this.enabledToggle.addEventListener( 'change', function () {
                                 self.enabled = self.enabledToggle.checked;
-                                self.onChange();
+                                self.scheduleChange();
                         } );
                 }
         };
@@ -257,8 +339,8 @@
                 }
 
                 this.groups = this.normalizeGroups( groups );
-                this.render();
-                this.updateStorage();
+                this.performRender();
+                this.updateStorageImmediate();
         };
 
         ConditionManager.prototype.normalizeGroups = function ( groups ) {
@@ -318,11 +400,56 @@
                 return normalized;
         };
 
-        ConditionManager.prototype.render = function () {
+        ConditionManager.prototype.captureFocus = function () {
+                var active = document.activeElement;
+
+                if ( ! active || ! this.root.contains( active ) ) {
+                        return null;
+                }
+
+                var token = active.getAttribute( 'data-fbm-focus-target' );
+                if ( token ) {
+                        return { type: 'control', token: token };
+                }
+
+                var groupEl = active.closest( '[data-fbm-group]' );
+                if ( groupEl ) {
+                        return { type: 'group', id: groupEl.getAttribute( 'data-fbm-group' ) };
+                }
+
+                return null;
+        };
+
+        ConditionManager.prototype.restoreFocus = function ( focus ) {
+                if ( ! focus ) {
+                        return;
+                }
+
+                if ( 'control' === focus.type && focus.token ) {
+                        var control = this.root.querySelector( '[data-fbm-focus-target="' + focus.token + '"]' );
+                        if ( control && 'function' === typeof control.focus ) {
+                                control.focus();
+                                return;
+                        }
+                }
+
+                if ( 'group' === focus.type && focus.id ) {
+                        var group = this.root.querySelector( '[data-fbm-group="' + focus.id + '"]' );
+                        if ( group ) {
+                                var focusable = group.querySelector( 'select, input, button' );
+                                if ( focusable && 'function' === typeof focusable.focus ) {
+                                        focusable.focus();
+                                }
+                        }
+                }
+        };
+
+        ConditionManager.prototype.performRender = function () {
                 if ( ! this.groupsWrap ) {
                         return;
                 }
 
+                var focusToken = this.captureFocus();
                 this.groupsWrap.innerHTML = '';
 
                 if ( this.groups.length === 0 ) {
@@ -337,9 +464,25 @@
                         this.emptyState.setAttribute( 'hidden', 'hidden' );
                 }
 
+                var fragment = document.createDocumentFragment();
                 for ( var i = 0; i < this.groups.length; i += 1 ) {
-                        this.groupsWrap.appendChild( this.renderGroup( this.groups[ i ], i ) );
+                        fragment.appendChild( this.renderGroup( this.groups[ i ], i ) );
                 }
+
+                this.groupsWrap.appendChild( fragment );
+                this.restoreFocus( focusToken );
+        };
+
+        ConditionManager.prototype.render = function () {
+                if ( this.renderHandle ) {
+                        return;
+                }
+
+                var self = this;
+                this.renderHandle = raf( function () {
+                        self.renderHandle = null;
+                        self.performRender();
+                } );
         };
 
         ConditionManager.prototype.renderGroup = function ( group, index ) {
@@ -380,9 +523,19 @@
                         operatorSelect.appendChild( opt );
                 } );
 
+                operatorSelect.setAttribute( 'data-fbm-focus-target', 'group-operator-' + group.id );
+                attachReorderKeys( operatorSelect, function ( direction ) {
+                        if ( direction < 0 ) {
+                                self.moveGroup( group.id, -1 );
+                        } else {
+                                self.moveGroup( group.id, 1 );
+                        }
+                } );
+
                 operatorSelect.addEventListener( 'change', function () {
                         group.operator = operatorSelect.value === 'or' ? 'or' : 'and';
-                        self.onChange();
+                        self.updateStorage();
+                        self.scheduleChange();
                 } );
 
                 operatorWrap.appendChild( operatorSelect );
@@ -410,6 +563,32 @@
                         self.addAction( group );
                 } );
                 groupActions.appendChild( addAction );
+
+                var moveUp = document.createElement( 'button' );
+                moveUp.type = 'button';
+                moveUp.className = 'button button-secondary';
+                moveUp.textContent = this.i18n.moveGroupUp || 'Move up';
+                if ( index === 0 ) {
+                        moveUp.setAttribute( 'disabled', 'disabled' );
+                }
+                moveUp.addEventListener( 'click', function ( event ) {
+                        event.preventDefault();
+                        self.moveGroup( group.id, -1 );
+                } );
+                groupActions.appendChild( moveUp );
+
+                var moveDown = document.createElement( 'button' );
+                moveDown.type = 'button';
+                moveDown.className = 'button button-secondary';
+                moveDown.textContent = this.i18n.moveGroupDown || 'Move down';
+                if ( index === this.groups.length - 1 ) {
+                        moveDown.setAttribute( 'disabled', 'disabled' );
+                }
+                moveDown.addEventListener( 'click', function ( event ) {
+                        event.preventDefault();
+                        self.moveGroup( group.id, 1 );
+                } );
+                groupActions.appendChild( moveDown );
 
                 var removeGroup = document.createElement( 'button' );
                 removeGroup.type = 'button';
@@ -490,14 +669,21 @@
                         fieldSelect.appendChild( opt );
                 } );
 
+                fieldSelect.setAttribute( 'data-fbm-focus-target', 'condition-field-' + condition.id );
+                attachReorderKeys( fieldSelect, function ( direction ) {
+                        if ( direction < 0 ) {
+                                self.moveCondition( group, condition.id, -1 );
+                        } else {
+                                self.moveCondition( group, condition.id, 1 );
+                        }
+                } );
+
                 fieldSelect.addEventListener( 'change', function () {
                         condition.field = fieldSelect.value;
                         if ( ! self.fieldMap[ condition.field ] ) {
                                 condition.field = '';
                         }
-                        self.render();
-                        self.updateStorage();
-                        self.onChange();
+                        self.afterMutate();
                 } );
 
                 fieldWrap.appendChild( fieldSelect );
@@ -522,14 +708,21 @@
                         operatorSelect.appendChild( opt );
                 }
 
+                operatorSelect.setAttribute( 'data-fbm-focus-target', 'condition-operator-' + condition.id );
+                attachReorderKeys( operatorSelect, function ( direction ) {
+                        if ( direction < 0 ) {
+                                self.moveCondition( group, condition.id, -1 );
+                        } else {
+                                self.moveCondition( group, condition.id, 1 );
+                        }
+                } );
+
                 operatorSelect.addEventListener( 'change', function () {
                         condition.operator = operatorSelect.value;
                         if ( 'empty' === condition.operator || 'not_empty' === condition.operator ) {
                                 condition.value = '';
                         }
-                        self.render();
-                        self.updateStorage();
-                        self.onChange();
+                        self.afterMutate();
                 } );
 
                 operatorWrap.appendChild( operatorSelect );
@@ -546,6 +739,14 @@
                 valueInput.type = ( 'number' === fieldType ) ? 'number' : ( 'date' === fieldType ? 'date' : 'text' );
                 valueInput.value = condition.value || '';
                 valueInput.placeholder = this.i18n.conditionValuePlaceholder || 'Enter a value';
+                valueInput.setAttribute( 'data-fbm-focus-target', 'condition-value-' + condition.id );
+                attachReorderKeys( valueInput, function ( direction ) {
+                        if ( direction < 0 ) {
+                                self.moveCondition( group, condition.id, -1 );
+                        } else {
+                                self.moveCondition( group, condition.id, 1 );
+                        }
+                } );
 
                 if ( 'empty' === condition.operator || 'not_empty' === condition.operator ) {
                         valueWrap.setAttribute( 'data-fbm-value-hidden', '1' );
@@ -557,11 +758,45 @@
                 valueInput.addEventListener( 'input', function () {
                         condition.value = valueInput.value;
                         self.updateStorage();
-                        self.onChange();
+                        self.scheduleChange();
                 } );
 
                 valueWrap.appendChild( valueInput );
                 row.appendChild( valueWrap );
+
+                var moveControls = document.createElement( 'div' );
+                moveControls.className = 'fbm-registration-editor__conditions-row-controls';
+                var conditionIndex = group.conditions.indexOf( condition );
+
+                var moveConditionUp = document.createElement( 'button' );
+                moveConditionUp.type = 'button';
+                moveConditionUp.className = 'button button-secondary';
+                moveConditionUp.textContent = this.i18n.moveConditionUp || 'Move up';
+                if ( conditionIndex <= 0 ) {
+                        moveConditionUp.setAttribute( 'disabled', 'disabled' );
+                }
+                moveConditionUp.setAttribute( 'data-fbm-focus-target', 'condition-move-up-' + condition.id );
+                moveConditionUp.addEventListener( 'click', function ( event ) {
+                        event.preventDefault();
+                        self.moveCondition( group, condition.id, -1 );
+                } );
+                moveControls.appendChild( moveConditionUp );
+
+                var moveConditionDown = document.createElement( 'button' );
+                moveConditionDown.type = 'button';
+                moveConditionDown.className = 'button button-secondary';
+                moveConditionDown.textContent = this.i18n.moveConditionDown || 'Move down';
+                if ( conditionIndex === group.conditions.length - 1 ) {
+                        moveConditionDown.setAttribute( 'disabled', 'disabled' );
+                }
+                moveConditionDown.setAttribute( 'data-fbm-focus-target', 'condition-move-down-' + condition.id );
+                moveConditionDown.addEventListener( 'click', function ( event ) {
+                        event.preventDefault();
+                        self.moveCondition( group, condition.id, 1 );
+                } );
+                moveControls.appendChild( moveConditionDown );
+
+                row.appendChild( moveControls );
 
                 var remove = document.createElement( 'button' );
                 remove.type = 'button';
@@ -609,10 +844,19 @@
                         typeSelect.appendChild( opt );
                 } );
 
+                typeSelect.setAttribute( 'data-fbm-focus-target', 'action-type-' + action.id );
+                attachReorderKeys( typeSelect, function ( direction ) {
+                        if ( direction < 0 ) {
+                                self.moveAction( group, action.id, -1 );
+                        } else {
+                                self.moveAction( group, action.id, 1 );
+                        }
+                } );
+
                 typeSelect.addEventListener( 'change', function () {
                         action.type = typeSelect.value;
                         self.updateStorage();
-                        self.onChange();
+                        self.scheduleChange();
                 } );
 
                 typeWrap.appendChild( typeSelect );
@@ -635,17 +879,60 @@
                         targetSelect.appendChild( opt );
                 } );
 
+                targetSelect.setAttribute( 'data-fbm-focus-target', 'action-target-' + action.id );
+                attachReorderKeys( targetSelect, function ( direction ) {
+                        if ( direction < 0 ) {
+                                self.moveAction( group, action.id, -1 );
+                        } else {
+                                self.moveAction( group, action.id, 1 );
+                        }
+                } );
+
                 targetSelect.addEventListener( 'change', function () {
                         action.target = targetSelect.value;
                         if ( ! self.fieldMap[ action.target ] ) {
                                 action.target = '';
                         }
                         self.updateStorage();
-                        self.onChange();
+                        self.scheduleChange();
                 } );
 
                 targetWrap.appendChild( targetSelect );
                 row.appendChild( targetWrap );
+
+                var actionControls = document.createElement( 'div' );
+                actionControls.className = 'fbm-registration-editor__conditions-row-controls';
+                var actionIndex = group.actions.indexOf( action );
+
+                var moveActionUp = document.createElement( 'button' );
+                moveActionUp.type = 'button';
+                moveActionUp.className = 'button button-secondary';
+                moveActionUp.textContent = this.i18n.moveActionUp || 'Move up';
+                if ( actionIndex <= 0 ) {
+                        moveActionUp.setAttribute( 'disabled', 'disabled' );
+                }
+                moveActionUp.setAttribute( 'data-fbm-focus-target', 'action-move-up-' + action.id );
+                moveActionUp.addEventListener( 'click', function ( event ) {
+                        event.preventDefault();
+                        self.moveAction( group, action.id, -1 );
+                } );
+                actionControls.appendChild( moveActionUp );
+
+                var moveActionDown = document.createElement( 'button' );
+                moveActionDown.type = 'button';
+                moveActionDown.className = 'button button-secondary';
+                moveActionDown.textContent = this.i18n.moveActionDown || 'Move down';
+                if ( actionIndex === group.actions.length - 1 ) {
+                        moveActionDown.setAttribute( 'disabled', 'disabled' );
+                }
+                moveActionDown.setAttribute( 'data-fbm-focus-target', 'action-move-down-' + action.id );
+                moveActionDown.addEventListener( 'click', function ( event ) {
+                        event.preventDefault();
+                        self.moveAction( group, action.id, 1 );
+                } );
+                actionControls.appendChild( moveActionDown );
+
+                row.appendChild( actionControls );
 
                 var remove = document.createElement( 'button' );
                 remove.type = 'button';
@@ -686,18 +973,14 @@
                 };
 
                 this.groups.push( group );
-                this.render();
-                this.updateStorage();
-                this.onChange();
+                this.afterMutate();
         };
         ConditionManager.prototype.removeGroup = function ( groupId ) {
                 this.groups = this.groups.filter( function ( group ) {
                         return group.id !== groupId;
                 } );
 
-                this.render();
-                this.updateStorage();
-                this.onChange();
+                this.afterMutate();
         };
 
         ConditionManager.prototype.addCondition = function ( group ) {
@@ -708,9 +991,7 @@
                         operator: 'equals',
                         value: '',
                 } );
-                this.render();
-                this.updateStorage();
-                this.onChange();
+                this.afterMutate();
         };
 
         ConditionManager.prototype.removeCondition = function ( group, conditionId ) {
@@ -722,9 +1003,7 @@
                         return condition.id !== conditionId;
                 } );
 
-                this.render();
-                this.updateStorage();
-                this.onChange();
+                this.afterMutate();
         };
 
         ConditionManager.prototype.addAction = function ( group ) {
@@ -734,9 +1013,7 @@
                         type: 'show',
                         target: defaultField,
                 } );
-                this.render();
-                this.updateStorage();
-                this.onChange();
+                this.afterMutate();
         };
 
         ConditionManager.prototype.removeAction = function ( group, actionId ) {
@@ -748,12 +1025,73 @@
                         return action.id !== actionId;
                 } );
 
-                this.render();
-                this.updateStorage();
-                this.onChange();
+                this.afterMutate();
         };
 
-        ConditionManager.prototype.updateStorage = function () {
+        ConditionManager.prototype.moveGroup = function ( groupId, offset ) {
+                if ( 0 === offset ) {
+                        return;
+                }
+
+                for ( var i = 0; i < this.groups.length; i += 1 ) {
+                        if ( this.groups[ i ].id === groupId ) {
+                                var target = i + offset;
+                                if ( target < 0 || target >= this.groups.length ) {
+                                        return;
+                                }
+
+                                var temp = this.groups[ target ];
+                                this.groups[ target ] = this.groups[ i ];
+                                this.groups[ i ] = temp;
+                                this.afterMutate();
+                                return;
+                        }
+                }
+        };
+
+        ConditionManager.prototype.moveCondition = function ( group, conditionId, offset ) {
+                if ( ! group || 0 === offset ) {
+                        return;
+                }
+
+                for ( var i = 0; i < group.conditions.length; i += 1 ) {
+                        if ( group.conditions[ i ].id === conditionId ) {
+                                var target = i + offset;
+                                if ( target < 0 || target >= group.conditions.length ) {
+                                        return;
+                                }
+
+                                var temp = group.conditions[ target ];
+                                group.conditions[ target ] = group.conditions[ i ];
+                                group.conditions[ i ] = temp;
+                                this.afterMutate();
+                                return;
+                        }
+                }
+        };
+
+        ConditionManager.prototype.moveAction = function ( group, actionId, offset ) {
+                if ( ! group || 0 === offset ) {
+                        return;
+                }
+
+                for ( var i = 0; i < group.actions.length; i += 1 ) {
+                        if ( group.actions[ i ].id === actionId ) {
+                                var target = i + offset;
+                                if ( target < 0 || target >= group.actions.length ) {
+                                        return;
+                                }
+
+                                var temp = group.actions[ target ];
+                                group.actions[ target ] = group.actions[ i ];
+                                group.actions[ i ] = temp;
+                                this.afterMutate();
+                                return;
+                        }
+                }
+        };
+
+        ConditionManager.prototype.updateStorageImmediate = function () {
                 if ( ! this.storage ) {
                         return;
                 }
@@ -765,6 +1103,18 @@
                 } catch ( err ) {
                         this.storage.value = '[]';
                 }
+        };
+
+        ConditionManager.prototype.updateStorage = function () {
+                if ( this.storageHandle ) {
+                        return;
+                }
+
+                var self = this;
+                this.storageHandle = defer( function () {
+                        self.storageHandle = null;
+                        self.updateStorageImmediate();
+                } );
         };
 
         ConditionManager.prototype.getCanonical = function () {
@@ -788,6 +1138,24 @@
                 } );
         };
 
+        ConditionManager.prototype.scheduleChange = function () {
+                if ( this.changeHandle ) {
+                        return;
+                }
+
+                var self = this;
+                this.changeHandle = defer( function () {
+                        self.changeHandle = null;
+                        self.onChange();
+                } );
+        };
+
+        ConditionManager.prototype.afterMutate = function () {
+                this.render();
+                this.updateStorage();
+                this.scheduleChange();
+        };
+
         ConditionManager.prototype.isEnabled = function () {
                 return this.enabled;
         };
@@ -797,14 +1165,29 @@
                 if ( this.enabledToggle ) {
                         this.enabledToggle.checked = this.enabled;
                 }
-                this.onChange();
+                this.scheduleChange();
         };
 
         ConditionManager.prototype.replace = function ( groups, enabled ) {
                 this.groups = this.normalizeGroups( groups );
                 this.setEnabled( enabled );
-                this.render();
-                this.updateStorage();
+                this.performRender();
+                this.updateStorageImmediate();
+        };
+
+        ConditionManager.prototype.appendGroups = function ( groups ) {
+                var appended = this.normalizeGroups( groups );
+                if ( appended.length === 0 ) {
+                        return;
+                }
+
+                Array.prototype.push.apply( this.groups, appended );
+
+                if ( ! this.enabled ) {
+                        this.setEnabled( true );
+                }
+
+                this.afterMutate();
         };
 
         ConditionManager.prototype.getFieldLabel = function ( name ) {
@@ -923,6 +1306,7 @@
         var autosaveManager = null;
         if ( conditionsRoot ) {
                 var initialFields = Array.isArray( settings.fields ) ? settings.fields : [];
+                announcer = conditionsRoot.querySelector( '[data-fbm-conditions-announcer]' );
                 conditionManager = new ConditionManager( conditionsRoot, initialFields, {
                         onChange: function () {
                                 notifyDirty();
@@ -934,6 +1318,1035 @@
                 var enabled = settings.conditions && settings.conditions.enabled;
                 conditionManager.setInitialState( initialGroups, enabled );
         }
+
+        var fieldCatalog = Array.isArray( settings.fields ) ? settings.fields : [];
+        var fieldMap = {};
+        fieldCatalog.forEach( function ( field ) {
+                if ( field && field.name ) {
+                        fieldMap[ field.name ] = field;
+                }
+        } );
+
+        var submitForm = function ( form ) {
+                if ( ! form ) {
+                        return;
+                }
+
+                if ( 'function' === typeof form.requestSubmit ) {
+                        form.requestSubmit();
+                } else {
+                        form.submit();
+                }
+        };
+
+        var exportButton = document.querySelector( '[data-fbm-conditions-export]' );
+        var exportForm = document.getElementById( 'fbm-registration-conditions-export' );
+
+        if ( exportButton && exportForm ) {
+                exportButton.addEventListener( 'click', function ( event ) {
+                        event.preventDefault();
+                        if ( i18n.exportAnnouncement ) {
+                                announce( i18n.exportAnnouncement );
+                        }
+                        submitForm( exportForm );
+                } );
+        }
+
+        var importButton = document.querySelector( '[data-fbm-conditions-import]' );
+        var importForm = document.getElementById( 'fbm-registration-conditions-import' );
+        var importField = importForm ? importForm.querySelector( '[data-fbm-import-field]' ) : null;
+        var importModal = document.querySelector( '[data-fbm-import-modal]' );
+        var importDialog = importModal ? importModal.querySelector( '[data-fbm-import-dialog]' ) : null;
+        var importStep = importModal ? importModal.querySelector( '[data-fbm-import-step]' ) : null;
+        var importResults = importModal ? importModal.querySelector( '[data-fbm-import-results]' ) : null;
+        var importInput = importModal ? importModal.querySelector( '[data-fbm-import-input]' ) : null;
+        var importSummary = importModal ? importModal.querySelector( '[data-fbm-import-summary]' ) : null;
+        var importMappingWrap = importModal ? importModal.querySelector( '[data-fbm-import-mapping]' ) : null;
+        var importAnalysisWrap = importModal ? importModal.querySelector( '[data-fbm-import-analysis]' ) : null;
+        var importPreviewButton = importModal ? importModal.querySelector( '[data-fbm-import-preview]' ) : null;
+        var importConfirmButton = importModal ? importModal.querySelector( '[data-fbm-import-confirm]' ) : null;
+        var importAutoButton = importModal ? importModal.querySelector( '[data-fbm-import-autofill]' ) : null;
+        var importCancelButtons = importModal ? importModal.querySelectorAll( '[data-fbm-import-close],[data-fbm-import-cancel]' ) : [];
+        var importState = {
+                original: null,
+                preview: null,
+                mappingInputs: [],
+                schemaOk: false,
+        };
+        var importLastFocused = null;
+        var importKeydownHandler = null;
+
+        var getFocusableElements = function ( container ) {
+                if ( ! container ) {
+                        return [];
+                }
+
+                var nodes = container.querySelectorAll( 'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])' );
+
+                return Array.prototype.slice.call( nodes );
+        };
+
+        var resetImportModal = function () {
+                importState.original = null;
+                importState.preview = null;
+                importState.mappingInputs = [];
+                importState.schemaOk = false;
+
+                if ( importInput ) {
+                        importInput.value = '';
+                }
+
+                if ( importSummary ) {
+                        importSummary.textContent = '';
+                }
+
+                if ( importMappingWrap ) {
+                        importMappingWrap.innerHTML = '';
+                }
+
+                if ( importAnalysisWrap ) {
+                        importAnalysisWrap.innerHTML = '';
+                        importAnalysisWrap.setAttribute( 'hidden', 'hidden' );
+                }
+
+                if ( importResults ) {
+                        importResults.setAttribute( 'hidden', 'hidden' );
+                }
+
+                if ( importStep ) {
+                        importStep.removeAttribute( 'hidden' );
+                }
+
+                if ( importConfirmButton ) {
+                        importConfirmButton.setAttribute( 'disabled', 'disabled' );
+                }
+
+                if ( importAutoButton ) {
+                        importAutoButton.setAttribute( 'disabled', 'disabled' );
+                }
+        };
+
+        var updateImportConfirmState = function () {
+                if ( ! importConfirmButton ) {
+                        return;
+                }
+
+                if ( ! importState.preview || ! importState.schemaOk ) {
+                        importConfirmButton.setAttribute( 'disabled', 'disabled' );
+                        return;
+                }
+
+                var groups = Array.isArray( importState.preview.groups ) ? importState.preview.groups.length : 0;
+                if ( groups === 0 ) {
+                        importConfirmButton.setAttribute( 'disabled', 'disabled' );
+                        return;
+                }
+
+                importConfirmButton.removeAttribute( 'disabled' );
+        };
+
+        var renderImportSummary = function ( preview ) {
+                if ( ! importSummary ) {
+                        return;
+                }
+
+                if ( ! preview ) {
+                        importSummary.textContent = '';
+                        return;
+                }
+
+                importState.schemaOk = preview.schemaVersion === preview.currentSchema;
+
+                if ( ! importState.schemaOk ) {
+                        importSummary.textContent = i18n.importSchemaMismatch || 'Import file uses an incompatible schema.';
+                        return;
+                }
+
+                var totalGroups = Array.isArray( preview.groups ) ? preview.groups.length : 0;
+
+                if ( totalGroups === 0 ) {
+                        importSummary.textContent = i18n.importEmpty || 'No groups were found in the import file.';
+                        return;
+                }
+
+                var issues = 0;
+                if ( Array.isArray( preview.analysis ) ) {
+                        preview.analysis.forEach( function ( item ) {
+                                if ( item && Array.isArray( item.missing ) && item.missing.length > 0 ) {
+                                        issues += 1;
+                                }
+                        } );
+                }
+
+                var message = format( i18n.importSummaryReady || '%1$d groups will be imported.', totalGroups );
+                if ( issues > 0 ) {
+                        message += ' ' + format( i18n.importSummaryMissing || '%1$d groups need field mapping.', issues );
+                }
+
+                importSummary.textContent = message;
+        };
+
+        var renderImportAnalysis = function ( preview ) {
+                if ( ! importAnalysisWrap ) {
+                        return;
+                }
+
+                importAnalysisWrap.innerHTML = '';
+
+                if ( ! preview || ! Array.isArray( preview.analysis ) ) {
+                        importAnalysisWrap.setAttribute( 'hidden', 'hidden' );
+                        return;
+                }
+
+                var list = document.createElement( 'ul' );
+
+                preview.analysis.forEach( function ( item ) {
+                        if ( ! item || ! Array.isArray( item.missing ) || item.missing.length === 0 ) {
+                                return;
+                        }
+
+                        var li = document.createElement( 'li' );
+                        var missingText = item.missing.join( ', ' );
+                        li.textContent = format( i18n.importGroupMissing || 'Group %1$d missing: %2$s', ( item.index || 0 ) + 1, missingText );
+                        list.appendChild( li );
+                } );
+
+                if ( list.childElementCount > 0 ) {
+                        importAnalysisWrap.appendChild( list );
+                        importAnalysisWrap.removeAttribute( 'hidden' );
+                } else {
+                        importAnalysisWrap.setAttribute( 'hidden', 'hidden' );
+                }
+        };
+
+        var renderImportMapping = function ( preview ) {
+                if ( ! importMappingWrap ) {
+                        return;
+                }
+
+                importMappingWrap.innerHTML = '';
+                importState.mappingInputs = [];
+
+                if ( ! preview || ! preview.fields || ! Array.isArray( preview.fields.incoming ) ) {
+                        return;
+                }
+
+                if ( fieldCatalog.length === 0 ) {
+                        var notice = document.createElement( 'p' );
+                        notice.textContent = i18n.importNoFields || 'Add form fields before importing rules.';
+                        importMappingWrap.appendChild( notice );
+                        return;
+                }
+
+                var table = document.createElement( 'table' );
+                table.className = 'widefat striped';
+                var tbody = document.createElement( 'tbody' );
+
+                preview.fields.incoming.forEach( function ( incoming ) {
+                        if ( ! incoming || ! incoming.name ) {
+                                return;
+                        }
+
+                        var row = document.createElement( 'tr' );
+                        var labelCell = document.createElement( 'th' );
+                        labelCell.scope = 'row';
+                        var labelText = incoming.label || incoming.name;
+                        labelCell.textContent = labelText + ' (' + incoming.name + ')';
+                        row.appendChild( labelCell );
+
+                        var selectCell = document.createElement( 'td' );
+                        var select = document.createElement( 'select' );
+                        select.setAttribute( 'data-fbm-import-map', incoming.name );
+
+                        var placeholderOption = document.createElement( 'option' );
+                        placeholderOption.value = '';
+                        placeholderOption.textContent = i18n.importSelectPlaceholder || 'Select a field…';
+                        select.appendChild( placeholderOption );
+
+                        fieldCatalog.forEach( function ( field ) {
+                                var option = document.createElement( 'option' );
+                                option.value = field.name;
+                                option.textContent = field.label || field.name;
+                                select.appendChild( option );
+                        } );
+
+                        var suggested = preview.fields.suggested && preview.fields.suggested[ incoming.name ] ? preview.fields.suggested[ incoming.name ] : '';
+                        if ( suggested && fieldMap[ suggested ] ) {
+                                select.value = suggested;
+                        }
+
+                        select.addEventListener( 'change', updateImportConfirmState );
+
+                        selectCell.appendChild( select );
+                        row.appendChild( selectCell );
+                        tbody.appendChild( row );
+                        importState.mappingInputs.push( select );
+                } );
+
+                table.appendChild( tbody );
+                importMappingWrap.appendChild( table );
+
+                if ( importAutoButton ) {
+                        importAutoButton.removeAttribute( 'disabled' );
+                }
+        };
+
+        var gatherImportMapping = function () {
+                var mapping = {};
+
+                importState.mappingInputs.forEach( function ( input ) {
+                        if ( ! input ) {
+                                return;
+                        }
+
+                        var key = input.getAttribute( 'data-fbm-import-map' );
+                        var value = input.value;
+
+                        if ( key && value && fieldMap[ value ] ) {
+                                mapping[ key ] = value;
+                        }
+                } );
+
+                return mapping;
+        };
+
+        var applySuggestedMapping = function () {
+                if ( ! importState.preview || ! importState.preview.fields || ! importState.preview.fields.suggested ) {
+                        return;
+                }
+
+                importState.mappingInputs.forEach( function ( input ) {
+                        if ( ! input ) {
+                                return;
+                        }
+
+                        var key = input.getAttribute( 'data-fbm-import-map' );
+                        var suggestion = importState.preview.fields.suggested[ key ];
+                        if ( suggestion && fieldMap[ suggestion ] ) {
+                                input.value = suggestion;
+                        }
+                } );
+
+                updateImportConfirmState();
+        };
+
+        var closeImportModal = function () {
+                if ( ! importModal || importModal.hasAttribute( 'hidden' ) ) {
+                        return;
+                }
+
+                importModal.setAttribute( 'hidden', 'hidden' );
+                document.body.classList.remove( 'fbm-registration-editor--modal-open' );
+
+                if ( importKeydownHandler ) {
+                        document.removeEventListener( 'keydown', importKeydownHandler, true );
+                        importKeydownHandler = null;
+                }
+
+                if ( importLastFocused && 'function' === typeof importLastFocused.focus ) {
+                        importLastFocused.focus();
+                }
+
+                importLastFocused = null;
+
+                if ( importInput ) {
+                        importInput.value = '';
+                }
+
+                resetImportModal();
+        };
+
+        var handleImportKeydown = function ( event ) {
+                if ( ! importModal || importModal.hasAttribute( 'hidden' ) ) {
+                        return;
+                }
+
+                if ( 'Escape' === event.key ) {
+                        event.preventDefault();
+                        closeImportModal();
+                        return;
+                }
+
+                if ( 'Tab' !== event.key ) {
+                        return;
+                }
+
+                var focusable = getFocusableElements( importModal );
+                if ( focusable.length === 0 ) {
+                        event.preventDefault();
+                        return;
+                }
+
+                var first = focusable[ 0 ];
+                var last = focusable[ focusable.length - 1 ];
+
+                if ( event.shiftKey ) {
+                        if ( document.activeElement === first ) {
+                                event.preventDefault();
+                                last.focus();
+                        }
+                        return;
+                }
+
+                if ( document.activeElement === last ) {
+                        event.preventDefault();
+                        first.focus();
+                }
+        };
+
+        var openImportModal = function () {
+                if ( ! importModal ) {
+                        return;
+                }
+
+                resetImportModal();
+                importModal.removeAttribute( 'hidden' );
+                document.body.classList.add( 'fbm-registration-editor--modal-open' );
+                importLastFocused = document.activeElement;
+
+                if ( importDialog && 'function' === typeof importDialog.focus ) {
+                        importDialog.focus();
+                }
+
+                importKeydownHandler = handleImportKeydown;
+                document.addEventListener( 'keydown', importKeydownHandler, true );
+        };
+
+        var handleImportPreview = function () {
+                if ( ! importInput ) {
+                        return;
+                }
+
+                var raw = importInput.value.trim();
+
+                if ( '' === raw ) {
+                        if ( importSummary ) {
+                                importSummary.textContent = i18n.importInvalid || 'Unable to parse import JSON.';
+                        }
+                        return;
+                }
+
+                var parsed;
+                try {
+                        parsed = JSON.parse( raw );
+                } catch ( err ) {
+                        if ( importSummary ) {
+                                importSummary.textContent = i18n.importInvalid || 'Unable to parse import JSON.';
+                        }
+                        return;
+                }
+
+                if ( importPreviewButton ) {
+                        importPreviewButton.setAttribute( 'disabled', 'disabled' );
+                }
+
+                if ( importAutoButton ) {
+                        importAutoButton.setAttribute( 'disabled', 'disabled' );
+                }
+
+                if ( importConfirmButton ) {
+                        importConfirmButton.setAttribute( 'disabled', 'disabled' );
+                }
+
+                var headers = { 'Content-Type': 'application/json' };
+                if ( settings.restNonce ) {
+                        headers[ 'X-WP-Nonce' ] = settings.restNonce;
+                } else if ( settings.previewNonce ) {
+                        headers[ 'X-WP-Nonce' ] = settings.previewNonce;
+                }
+
+                if ( ! settings.importPreviewUrl ) {
+                        if ( importSummary ) {
+                                importSummary.textContent = i18n.importInvalid || 'Unable to parse import JSON.';
+                        }
+                        updateImportConfirmState();
+                        if ( importPreviewButton ) {
+                                importPreviewButton.removeAttribute( 'disabled' );
+                        }
+                        return;
+                }
+
+                window.fetch( settings.importPreviewUrl, {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: headers,
+                        body: JSON.stringify( { payload: raw } ),
+                } ).then( function ( response ) {
+                        if ( ! response.ok ) {
+                                throw new Error( 'Request failed' );
+                        }
+
+                        return response.json();
+                } ).then( function ( body ) {
+                        importState.original = parsed;
+                        importState.preview = body || null;
+
+                        if ( importStep ) {
+                                importStep.setAttribute( 'hidden', 'hidden' );
+                        }
+
+                        if ( importResults ) {
+                                importResults.removeAttribute( 'hidden' );
+                        }
+
+                        renderImportSummary( body );
+                        renderImportMapping( body );
+                        renderImportAnalysis( body );
+                        updateImportConfirmState();
+                } ).catch( function () {
+                        importState.original = null;
+                        importState.preview = null;
+                        importState.schemaOk = false;
+
+                        if ( importSummary ) {
+                                importSummary.textContent = i18n.importInvalid || 'Unable to parse import JSON.';
+                        }
+
+                        if ( importResults ) {
+                                importResults.setAttribute( 'hidden', 'hidden' );
+                        }
+
+                        if ( importStep ) {
+                                importStep.removeAttribute( 'hidden' );
+                        }
+                } ).finally( function () {
+                        if ( importPreviewButton ) {
+                                importPreviewButton.removeAttribute( 'disabled' );
+                        }
+
+                        updateImportConfirmState();
+                } );
+        };
+
+        if ( importButton && importModal ) {
+                importButton.addEventListener( 'click', function ( event ) {
+                        event.preventDefault();
+                        openImportModal();
+                } );
+        }
+
+        if ( importPreviewButton ) {
+                importPreviewButton.addEventListener( 'click', function ( event ) {
+                        event.preventDefault();
+                        handleImportPreview();
+                } );
+        }
+
+        if ( importAutoButton ) {
+                importAutoButton.addEventListener( 'click', function ( event ) {
+                        event.preventDefault();
+                        applySuggestedMapping();
+                } );
+        }
+
+        if ( importConfirmButton && importForm && importField ) {
+                importConfirmButton.addEventListener( 'click', function ( event ) {
+                        event.preventDefault();
+
+                        if ( ! importState.preview || ! importState.schemaOk || ! importState.original ) {
+                                return;
+                        }
+
+                        var payload = {
+                                original: importState.original,
+                                mapping: gatherImportMapping(),
+                        };
+
+                        try {
+                                importField.value = JSON.stringify( payload );
+                        } catch ( err ) {
+                                return;
+                        }
+
+                        if ( i18n.importAnnouncement ) {
+                                announce( i18n.importAnnouncement );
+                        }
+
+                        submitForm( importForm );
+                        closeImportModal();
+                } );
+        }
+
+        if ( importCancelButtons.length > 0 ) {
+                Array.prototype.forEach.call( importCancelButtons, function ( button ) {
+                        button.addEventListener( 'click', function ( event ) {
+                                event.preventDefault();
+                                closeImportModal();
+                        } );
+                } );
+        }
+
+        if ( importModal ) {
+                importModal.addEventListener( 'click', function ( event ) {
+                        if ( event.target && event.target.hasAttribute( 'data-fbm-import-close' ) ) {
+                                event.preventDefault();
+                                closeImportModal();
+                        }
+                } );
+        }
+
+        var presetsData = Array.isArray( settings.presets ) ? settings.presets : [];
+        var presetsContainer = document.querySelector( '[data-fbm-presets]' );
+        var presetsToggle = presetsContainer ? presetsContainer.querySelector( '[data-fbm-presets-toggle]' ) : null;
+        var presetsMenu = presetsContainer ? presetsContainer.querySelector( '[data-fbm-presets-menu]' ) : null;
+        var presetsOpen = false;
+        var presetMenuItems = [];
+        var presetMenuIndex = 0;
+        var presetModal = document.querySelector( '[data-fbm-preset-modal]' );
+        var presetDialog = presetModal ? presetModal.querySelector( '[data-fbm-preset-dialog]' ) : null;
+        var presetDescription = presetModal ? presetModal.querySelector( '[data-fbm-preset-description]' ) : null;
+        var presetForm = presetModal ? presetModal.querySelector( '[data-fbm-preset-form]' ) : null;
+        var presetApplyButton = presetModal ? presetModal.querySelector( '[data-fbm-preset-apply]' ) : null;
+        var presetCancelButtons = presetModal ? presetModal.querySelectorAll( '[data-fbm-preset-close]' ) : [];
+        var presetState = { preset: null, controls: [] };
+        var presetLastFocused = null;
+        var presetKeydownHandler = null;
+
+        var closePresetsMenu = function () {
+                if ( ! presetsMenu || ! presetsToggle ) {
+                        return;
+                }
+
+                presetsMenu.setAttribute( 'hidden', 'hidden' );
+                presetsToggle.setAttribute( 'aria-expanded', 'false' );
+                presetsOpen = false;
+        };
+
+        var focusPresetMenuItem = function ( index ) {
+                if ( index < 0 || index >= presetMenuItems.length ) {
+                        return;
+                }
+
+                presetMenuIndex = index;
+
+                var target = presetMenuItems[ presetMenuIndex ];
+                presetMenuItems.forEach( function ( item, itemIndex ) {
+                        if ( item ) {
+                                item.setAttribute( 'tabindex', itemIndex === presetMenuIndex ? '0' : '-1' );
+                        }
+                } );
+
+                if ( target && 'function' === typeof target.focus ) {
+                        target.focus();
+                }
+        };
+
+        var openPresetsMenu = function () {
+                if ( ! presetsMenu || ! presetsToggle || presetsData.length === 0 ) {
+                        return;
+                }
+
+                presetsMenu.removeAttribute( 'hidden' );
+                presetsToggle.setAttribute( 'aria-expanded', 'true' );
+                presetsOpen = true;
+                focusPresetMenuItem( 0 );
+        };
+
+        var handlePresetMenuKeydown = function ( event ) {
+                if ( ! presetsOpen ) {
+                        return;
+                }
+
+                if ( 'Escape' === event.key ) {
+                        event.preventDefault();
+                        closePresetsMenu();
+                        if ( presetsToggle && 'function' === typeof presetsToggle.focus ) {
+                                presetsToggle.focus();
+                        }
+                        return;
+                }
+
+                if ( 'ArrowDown' === event.key ) {
+                        event.preventDefault();
+                        focusPresetMenuItem( ( presetMenuIndex + 1 ) % presetMenuItems.length );
+                } else if ( 'ArrowUp' === event.key ) {
+                        event.preventDefault();
+                        focusPresetMenuItem( ( presetMenuIndex - 1 + presetMenuItems.length ) % presetMenuItems.length );
+                } else if ( 'Home' === event.key ) {
+                        event.preventDefault();
+                        focusPresetMenuItem( 0 );
+                } else if ( 'End' === event.key ) {
+                        event.preventDefault();
+                        focusPresetMenuItem( presetMenuItems.length - 1 );
+                }
+        };
+
+        var renderPresetsMenu = function () {
+                if ( ! presetsMenu || ! presetsToggle ) {
+                        return;
+                }
+
+                presetsMenu.innerHTML = '';
+                presetMenuItems = [];
+                presetsMenuIndex = 0;
+
+                if ( presetsData.length === 0 ) {
+                        presetsToggle.setAttribute( 'disabled', 'disabled' );
+                        presetsToggle.setAttribute( 'aria-disabled', 'true' );
+                        var emptyMessage = document.createElement( 'p' );
+                        emptyMessage.textContent = i18n.presetsEmpty || 'No presets available yet.';
+                        presetsMenu.appendChild( emptyMessage );
+                        return;
+                }
+
+                presetsToggle.removeAttribute( 'disabled' );
+                presetsToggle.removeAttribute( 'aria-disabled' );
+
+                presetsData.forEach( function ( preset, index ) {
+                        if ( ! preset || ! preset.id ) {
+                                return;
+                        }
+
+                        var button = document.createElement( 'button' );
+                        button.type = 'button';
+                        button.className = 'button button-secondary';
+                        button.textContent = preset.label || preset.id;
+                        button.setAttribute( 'role', 'menuitem' );
+                        button.setAttribute( 'tabindex', '-1' );
+                        button.addEventListener( 'click', function ( event ) {
+                                event.preventDefault();
+                                closePresetsMenu();
+                                presetLastFocused = event.currentTarget;
+                                openPresetModal( preset );
+                        } );
+                        presetsMenu.appendChild( button );
+                        presetMenuItems.push( button );
+
+                        if ( index === 0 ) {
+                                button.setAttribute( 'tabindex', '0' );
+                        }
+                } );
+        };
+
+        var resetPresetState = function () {
+                presetState.preset = null;
+                presetState.controls = [];
+
+                if ( presetDescription ) {
+                        presetDescription.textContent = '';
+                }
+
+                if ( presetForm ) {
+                        presetForm.innerHTML = '';
+                }
+
+                if ( presetApplyButton ) {
+                        presetApplyButton.setAttribute( 'disabled', 'disabled' );
+                }
+        };
+
+        var getPresetFocusableElements = function () {
+                return getFocusableElements( presetModal );
+        };
+
+        var updatePresetApplyState = function () {
+                if ( ! presetApplyButton ) {
+                        return;
+                }
+
+                if ( ! presetState.preset ) {
+                        presetApplyButton.setAttribute( 'disabled', 'disabled' );
+                        return;
+                }
+
+                var ready = true;
+
+                presetState.controls.forEach( function ( control ) {
+                        if ( 'field' === control.type ) {
+                                if ( ! control.element.value || ! fieldMap[ control.element.value ] ) {
+                                        ready = false;
+                                }
+                        }
+                } );
+
+                if ( ready ) {
+                        presetApplyButton.removeAttribute( 'disabled' );
+                } else {
+                        presetApplyButton.setAttribute( 'disabled', 'disabled' );
+                }
+        };
+
+        var gatherPresetMapping = function () {
+                var mapping = {};
+
+                presetState.controls.forEach( function ( control ) {
+                        if ( 'field' === control.type ) {
+                                if ( control.element.value && fieldMap[ control.element.value ] ) {
+                                        mapping[ control.key ] = control.element.value;
+                                }
+                        } else {
+                                var value = control.element.value.trim();
+                                if ( '' === value && control.default ) {
+                                        value = control.default;
+                                }
+                                mapping[ control.key ] = value;
+                        }
+                } );
+
+                return mapping;
+        };
+
+        var buildPresetGroups = function ( preset, mapping ) {
+                var groups = Array.isArray( preset.groups ) ? JSON.parse( JSON.stringify( preset.groups ) ) : [];
+                var replaceTokens = function ( value ) {
+                        if ( 'string' !== typeof value ) {
+                                return value;
+                        }
+
+                        return value.replace( /{{\s*([a-zA-Z0-9_-]+)\s*}}/g, function ( match, key ) {
+                                return mapping[ key ] || '';
+                        } );
+                };
+
+                groups.forEach( function ( group ) {
+                        if ( Array.isArray( group.conditions ) ) {
+                                group.conditions.forEach( function ( condition ) {
+                                        condition.field = replaceTokens( condition.field );
+                                        condition.value = replaceTokens( condition.value );
+                                } );
+                        }
+
+                        if ( Array.isArray( group.actions ) ) {
+                                group.actions.forEach( function ( action ) {
+                                        action.target = replaceTokens( action.target );
+                                } );
+                        }
+                } );
+
+                return groups;
+        };
+
+        var closePresetModal = function () {
+                if ( ! presetModal || presetModal.hasAttribute( 'hidden' ) ) {
+                        return;
+                }
+
+                presetModal.setAttribute( 'hidden', 'hidden' );
+                document.body.classList.remove( 'fbm-registration-editor--modal-open' );
+
+                if ( presetKeydownHandler ) {
+                        document.removeEventListener( 'keydown', presetKeydownHandler, true );
+                        presetKeydownHandler = null;
+                }
+
+                if ( presetLastFocused && 'function' === typeof presetLastFocused.focus ) {
+                        presetLastFocused.focus();
+                }
+
+                presetLastFocused = null;
+                resetPresetState();
+        };
+
+        var handlePresetKeydown = function ( event ) {
+                if ( ! presetModal || presetModal.hasAttribute( 'hidden' ) ) {
+                        return;
+                }
+
+                if ( 'Escape' === event.key ) {
+                        event.preventDefault();
+                        closePresetModal();
+                        return;
+                }
+
+                if ( 'Tab' !== event.key ) {
+                        return;
+                }
+
+                var focusable = getPresetFocusableElements();
+                if ( focusable.length === 0 ) {
+                        event.preventDefault();
+                        return;
+                }
+
+                var first = focusable[ 0 ];
+                var last = focusable[ focusable.length - 1 ];
+
+                if ( event.shiftKey ) {
+                        if ( document.activeElement === first ) {
+                                event.preventDefault();
+                                last.focus();
+                        }
+                        return;
+                }
+
+                if ( document.activeElement === last ) {
+                        event.preventDefault();
+                        first.focus();
+                }
+        };
+
+        var renderPresetForm = function ( preset ) {
+                resetPresetState();
+                presetState.preset = preset;
+
+                if ( presetDescription ) {
+                        presetDescription.textContent = preset.description || '';
+                }
+
+                if ( ! presetForm ) {
+                        return;
+                }
+
+                var placeholders = Array.isArray( preset.placeholders ) ? preset.placeholders : [];
+
+                placeholders.forEach( function ( placeholder ) {
+                        if ( ! placeholder || ! placeholder.key ) {
+                                return;
+                        }
+
+                        var wrapper = document.createElement( 'div' );
+                        var label = document.createElement( 'label' );
+                        var controlId = uniqueId( 'fbm-preset-' + placeholder.key );
+                        label.setAttribute( 'for', controlId );
+                        label.textContent = placeholder.label || placeholder.key;
+                        wrapper.appendChild( label );
+
+                        if ( 'field' === placeholder.type ) {
+                                var select = document.createElement( 'select' );
+                                select.id = controlId;
+                                var blank = document.createElement( 'option' );
+                                blank.value = '';
+                                blank.textContent = i18n.importSelectPlaceholder || 'Select a field…';
+                                select.appendChild( blank );
+
+                                fieldCatalog.forEach( function ( field ) {
+                                        var option = document.createElement( 'option' );
+                                        option.value = field.name;
+                                        option.textContent = field.label || field.name;
+                                        select.appendChild( option );
+                                } );
+
+                                select.addEventListener( 'change', updatePresetApplyState );
+                                wrapper.appendChild( select );
+                                presetState.controls.push( { key: placeholder.key, type: 'field', element: select, default: '' } );
+                        } else {
+                                var input = document.createElement( 'input' );
+                                input.type = 'text';
+                                input.id = controlId;
+                                input.value = placeholder.default || '';
+                                input.addEventListener( 'input', updatePresetApplyState );
+                                wrapper.appendChild( input );
+                                presetState.controls.push( { key: placeholder.key, type: 'value', element: input, default: placeholder.default || '' } );
+                        }
+
+                        presetForm.appendChild( wrapper );
+                } );
+
+                updatePresetApplyState();
+        };
+
+        var openPresetModal = function ( preset ) {
+                if ( ! presetModal ) {
+                        return;
+                }
+
+                var requiresFields = false;
+                if ( Array.isArray( preset.placeholders ) ) {
+                        preset.placeholders.forEach( function ( placeholder ) {
+                                if ( placeholder && 'field' === placeholder.type ) {
+                                        requiresFields = true;
+                                }
+                        } );
+                }
+
+                if ( requiresFields && fieldCatalog.length === 0 ) {
+                        announce( i18n.presetMissingFields || 'Add form fields before inserting a preset.' );
+                        return;
+                }
+
+                renderPresetForm( preset );
+
+                presetModal.removeAttribute( 'hidden' );
+                document.body.classList.add( 'fbm-registration-editor--modal-open' );
+                presetLastFocused = presetsToggle;
+
+                if ( presetDialog && 'function' === typeof presetDialog.focus ) {
+                        presetDialog.focus();
+                }
+
+                presetKeydownHandler = handlePresetKeydown;
+                document.addEventListener( 'keydown', presetKeydownHandler, true );
+
+                var focusable = getPresetFocusableElements();
+                if ( focusable.length > 0 && 'function' === typeof focusable[ 0 ].focus ) {
+                        focusable[ 0 ].focus();
+                }
+        };
+
+        if ( presetApplyButton && conditionManager ) {
+                presetApplyButton.addEventListener( 'click', function ( event ) {
+                        event.preventDefault();
+
+                        if ( ! presetState.preset ) {
+                                return;
+                        }
+
+                        var mapping = gatherPresetMapping();
+                        var groups = buildPresetGroups( presetState.preset, mapping );
+
+                        if ( groups.length === 0 ) {
+                                return;
+                        }
+
+                        conditionManager.appendGroups( groups );
+                        closePresetModal();
+
+                        if ( i18n.presetAnnouncement ) {
+                                announce( i18n.presetAnnouncement );
+                        }
+                } );
+        }
+
+        if ( presetCancelButtons.length > 0 ) {
+                Array.prototype.forEach.call( presetCancelButtons, function ( button ) {
+                        button.addEventListener( 'click', function ( event ) {
+                                event.preventDefault();
+                                closePresetModal();
+                        } );
+                } );
+        }
+
+        if ( presetModal ) {
+                presetModal.addEventListener( 'click', function ( event ) {
+                        if ( event.target && event.target.hasAttribute( 'data-fbm-preset-close' ) ) {
+                                event.preventDefault();
+                                closePresetModal();
+                        }
+                } );
+        }
+
+        if ( presetsToggle ) {
+                presetsToggle.addEventListener( 'click', function ( event ) {
+                        event.preventDefault();
+
+                        if ( presetsOpen ) {
+                                closePresetsMenu();
+                        } else {
+                                openPresetsMenu();
+                        }
+                } );
+                presetsToggle.addEventListener( 'keydown', function ( event ) {
+                        if ( presetsOpen && 'Escape' === event.key ) {
+                                event.preventDefault();
+                                closePresetsMenu();
+                                presetsToggle.focus();
+                        }
+                } );
+        }
+
+        if ( presetsMenu ) {
+                presetsMenu.addEventListener( 'keydown', handlePresetMenuKeydown );
+        }
+
+        if ( presetsContainer ) {
+                document.addEventListener( 'click', function ( event ) {
+                        if ( presetsOpen && ! presetsContainer.contains( event.target ) ) {
+                                closePresetsMenu();
+                        }
+                } );
+        }
+
+        renderPresetsMenu();
 
         var AutosaveManager = function ( config ) {
                 this.endpoint = config.endpoint || '';

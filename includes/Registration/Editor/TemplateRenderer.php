@@ -218,22 +218,26 @@ final class TemplateRenderer {
 				$error_messages[] = $errors;
 		}
 
-			$error_html = '';
-		if ( ! empty( $error_messages ) ) {
-				$error_html = '<span class="fbm-field-error" role="alert">' . esc_html( implode( ' ', $error_messages ) ) . '</span>';
+						$error_id   = $id . '-error';
+						$has_error  = ! empty( $error_messages );
+						$error_html = '';
+		if ( $has_error ) {
+						$error_html = '<span class="fbm-field-error" id="' . esc_attr( $error_id ) . '" role="alert">' . esc_html( implode( ' ', $error_messages ) ) . '</span>';
+		} else {
+						$error_id = '';
 		}
 
 		switch ( $type ) {
 			case 'textarea':
-				return $this->render_textarea( $name, $id, $label, $value, $input_classes, $required, $wrap_label, $placeholder, $autocomplete ) . $error_html;
+				return $this->render_textarea( $name, $id, $label, $value, $input_classes, $required, $wrap_label, $placeholder, $autocomplete, $error_id, $has_error ) . $error_html;
 			case 'radio':
-				return $this->render_choice_group( 'radio', $name, $id, $label, $options, $value, $input_classes, $required ) . $error_html;
+				return $this->render_choice_group( 'radio', $name, $id, $label, $options, $value, $input_classes, $required, $error_id, $has_error ) . $error_html;
 			case 'checkbox':
-				return $this->render_checkbox_group( $name, $id, $label, $options, $value, $input_classes, $required ) . $error_html;
+				return $this->render_checkbox_group( $name, $id, $label, $options, $value, $input_classes, $required, $error_id, $has_error ) . $error_html;
 			case 'select':
-				return $this->render_select( $name, $id, $label, $options, $value, $input_classes, $required, $multiple, $wrap_label ) . $error_html;
+				return $this->render_select( $name, $id, $label, $options, $value, $input_classes, $required, $multiple, $wrap_label, $error_id, $has_error ) . $error_html;
 			case 'file':
-				return $this->render_file_input( $name, $id, $label, $input_classes, $required, $wrap_label, $autocomplete ) . $error_html;
+				return $this->render_file_input( $name, $id, $label, $input_classes, $required, $wrap_label, $autocomplete, $error_id, $has_error ) . $error_html;
 			case 'submit':
 				return $this->render_submit( $name, $label, $input_classes );
 			case 'date':
@@ -242,7 +246,7 @@ final class TemplateRenderer {
 			case 'tel':
 			case 'text':
 			default:
-				return $this->render_input( $type, $name, $id, $label, $value, $input_classes, $required, $wrap_label, $placeholder, $autocomplete, $range ) . $error_html;
+				return $this->render_input( $type, $name, $id, $label, $value, $input_classes, $required, $wrap_label, $placeholder, $autocomplete, $range, $error_id, $has_error ) . $error_html;
 		}
 	}
 
@@ -260,12 +264,14 @@ final class TemplateRenderer {
 		 * @param string              $placeholder  Placeholder text.
 		 * @param string              $autocomplete Autocomplete hint.
 		 * @param array<string,mixed> $range        Range attributes (min/max/step).
+		 * @param string              $error_id     Error element identifier.
+		 * @param bool                $has_error    Whether the field currently has an error.
 		 */
-	private function render_input( string $type, string $name, string $id, string $label, $value, array $classes, bool $required, bool $wrap_label, string $placeholder, string $autocomplete, array $range ): string {
-			$value = is_string( $value ) ? $value : '';
+	private function render_input( string $type, string $name, string $id, string $label, $value, array $classes, bool $required, bool $wrap_label, string $placeholder, string $autocomplete, array $range, string $error_id = '', bool $has_error = false ): string {
+				$value = is_string( $value ) ? $value : '';
 
-			$attributes  = $this->build_common_attributes( $name, $id, $classes, $required );
-			$attributes .= ' type="' . esc_attr( $type ) . '"';
+				$attributes  = $this->build_common_attributes( $name, $id, $classes, $required, $error_id, $has_error );
+				$attributes .= ' type="' . esc_attr( $type ) . '"';
 
 		if ( '' !== $value ) {
 				$attributes .= ' value="' . esc_attr( $value ) . '"';
@@ -285,15 +291,15 @@ final class TemplateRenderer {
 			}
 		}
 
-			$input = '<input' . $attributes . ' />';
+		$input = '<input' . $attributes . ' />';
 
 		if ( $wrap_label ) {
 				return '<label class="fbm-field-label">' . esc_html( $label ) . ' ' . $input . '</label>';
 		}
 
-			$label_html = '<label class="fbm-field-label" for="' . esc_attr( $id ) . '">' . esc_html( $label ) . '</label>';
+		$label_html = '<label class="fbm-field-label" for="' . esc_attr( $id ) . '">' . esc_html( $label ) . '</label>';
 
-			return $label_html . $input;
+		return $label_html . $input;
 	}
 
 		/**
@@ -308,11 +314,13 @@ final class TemplateRenderer {
 		 * @param bool              $wrap_label   Wrap textarea in label.
 		 * @param string            $placeholder  Placeholder text.
 		 * @param string            $autocomplete Autocomplete attribute.
+		 * @param string            $error_id     Error element identifier.
+		 * @param bool              $has_error    Whether the field currently has an error.
 		 */
-	private function render_textarea( string $name, string $id, string $label, $value, array $classes, bool $required, bool $wrap_label, string $placeholder, string $autocomplete ): string {
-			$value = is_string( $value ) ? $value : '';
+	private function render_textarea( string $name, string $id, string $label, $value, array $classes, bool $required, bool $wrap_label, string $placeholder, string $autocomplete, string $error_id = '', bool $has_error = false ): string {
+				$value = is_string( $value ) ? $value : '';
 
-			$attributes = $this->build_common_attributes( $name, $id, $classes, $required );
+				$attributes = $this->build_common_attributes( $name, $id, $classes, $required, $error_id, $has_error );
 
 		if ( '' !== $placeholder ) {
 				$attributes .= ' placeholder="' . esc_attr( $placeholder ) . '"';
@@ -322,15 +330,15 @@ final class TemplateRenderer {
 				$attributes .= ' autocomplete="' . esc_attr( $autocomplete ) . '"';
 		}
 
-			$textarea = '<textarea' . $attributes . '>' . esc_html( $value ) . '</textarea>';
+		$textarea = '<textarea' . $attributes . '>' . esc_html( $value ) . '</textarea>';
 
 		if ( $wrap_label ) {
 				return '<label class="fbm-field-label">' . esc_html( $label ) . ' ' . $textarea . '</label>';
 		}
 
-			$label_html = '<label class="fbm-field-label" for="' . esc_attr( $id ) . '">' . esc_html( $label ) . '</label>';
+		$label_html = '<label class="fbm-field-label" for="' . esc_attr( $id ) . '">' . esc_html( $label ) . '</label>';
 
-			return $label_html . $textarea;
+		return $label_html . $textarea;
 	}
 
 		/**
@@ -345,9 +353,11 @@ final class TemplateRenderer {
 		 * @param bool              $required   Required state.
 		 * @param bool              $multiple   Multiple selection.
 		 * @param bool              $wrap_label Wrap select within label.
+		 * @param string            $error_id   Error element identifier.
+		 * @param bool              $has_error  Whether the field currently has an error.
 		 */
-	private function render_select( string $name, string $id, string $label, array $options, $value, array $classes, bool $required, bool $multiple, bool $wrap_label ): string {
-			$selected_values = array();
+	private function render_select( string $name, string $id, string $label, array $options, $value, array $classes, bool $required, bool $multiple, bool $wrap_label, string $error_id = '', bool $has_error = false ): string {
+				$selected_values = array();
 
 		if ( is_array( $value ) ) {
 			foreach ( $value as $item ) {
@@ -359,13 +369,13 @@ final class TemplateRenderer {
 				$selected_values[] = $value;
 		}
 
-			$attributes = $this->build_common_attributes( $name . ( $multiple ? '[]' : '' ), $id, $classes, $required );
+				$attributes = $this->build_common_attributes( $name . ( $multiple ? '[]' : '' ), $id, $classes, $required, $error_id, $has_error );
 
 		if ( $multiple ) {
 				$attributes .= ' multiple="multiple"';
 		}
 
-			$options_html = '';
+		$options_html = '';
 		foreach ( $options as $index => $option ) {
 			if ( ! is_array( $option ) ) {
 					continue;
@@ -378,15 +388,15 @@ final class TemplateRenderer {
 				$options_html .= '<option value="' . esc_attr( $option_value ) . '"' . $selected . '>' . esc_html( $option_label ) . '</option>';
 		}
 
-			$select = '<select' . $attributes . '>' . $options_html . '</select>';
+		$select = '<select' . $attributes . '>' . $options_html . '</select>';
 
 		if ( $wrap_label ) {
 				return '<label class="fbm-field-label">' . esc_html( $label ) . ' ' . $select . '</label>';
 		}
 
-			$label_html = '<label class="fbm-field-label" for="' . esc_attr( $id ) . '">' . esc_html( $label ) . '</label>';
+		$label_html = '<label class="fbm-field-label" for="' . esc_attr( $id ) . '">' . esc_html( $label ) . '</label>';
 
-			return $label_html . $select;
+		return $label_html . $select;
 	}
 
 		/**
@@ -400,9 +410,11 @@ final class TemplateRenderer {
 		 * @param mixed             $value      Submitted value(s).
 		 * @param array<int,string> $classes    CSS classes.
 		 * @param bool              $required   Required state.
+		 * @param string            $error_id   Error element identifier.
+		 * @param bool              $has_error  Whether the first option should carry the error state.
 		 */
-	private function render_choice_group( string $type, string $name, string $id, string $label, array $options, $value, array $classes, bool $required ): string {
-			$selected_values = array();
+	private function render_choice_group( string $type, string $name, string $id, string $label, array $options, $value, array $classes, bool $required, string $error_id = '', bool $has_error = false ): string {
+		$selected_values = array();
 
 		if ( is_array( $value ) ) {
 			foreach ( $value as $item ) {
@@ -414,7 +426,7 @@ final class TemplateRenderer {
 				$selected_values[] = $value;
 		}
 
-			$controls = '';
+		$controls = '';
 		foreach ( $options as $index => $option ) {
 			if ( ! is_array( $option ) ) {
 					continue;
@@ -424,8 +436,8 @@ final class TemplateRenderer {
 				$option_label = isset( $option['label'] ) ? (string) $option['label'] : $option_value;
 				$control_id   = $id . '-' . (string) $index;
 
-				$attributes  = $this->build_common_attributes( $name, $control_id, $classes, $required && 0 === $index );
-				$attributes .= ' type="' . esc_attr( $type ) . '" value="' . esc_attr( $option_value ) . '"';
+								$attributes = $this->build_common_attributes( $name, $control_id, $classes, $required && 0 === $index, $error_id, $has_error && 0 === $index );
+				$attributes                .= ' type="' . esc_attr( $type ) . '" value="' . esc_attr( $option_value ) . '"';
 
 			if ( in_array( $option_value, $selected_values, true ) ) {
 					$attributes .= ' checked="checked"';
@@ -434,7 +446,12 @@ final class TemplateRenderer {
 				$controls .= '<label class="fbm-field-option"><input' . $attributes . ' /> ' . esc_html( $option_label ) . '</label>';
 		}
 
-			return '<fieldset class="fbm-fieldset"><legend class="fbm-field-legend">' . esc_html( $label ) . '</legend>' . $controls . '</fieldset>';
+				$fieldset_attrs = '';
+		if ( '' !== $error_id ) {
+						$fieldset_attrs = ' aria-describedby="' . esc_attr( $error_id ) . '"';
+		}
+
+				return '<fieldset class="fbm-fieldset"' . $fieldset_attrs . '><legend class="fbm-field-legend">' . esc_html( $label ) . '</legend>' . $controls . '</fieldset>';
 	}
 
 		/**
@@ -447,8 +464,10 @@ final class TemplateRenderer {
 		 * @param mixed             $value    Submitted value(s).
 		 * @param array<int,string> $classes  CSS classes.
 		 * @param bool              $required Required state.
+		 * @param string            $error_id Error element identifier.
+		 * @param bool              $has_error Whether the field currently has an error.
 		 */
-	private function render_checkbox_group( string $name, string $id, string $label, array $options, $value, array $classes, bool $required ): string {
+	private function render_checkbox_group( string $name, string $id, string $label, array $options, $value, array $classes, bool $required, string $error_id = '', bool $has_error = false ): string {
 		if ( empty( $options ) ) {
 				$options = array(
 					array(
@@ -458,7 +477,7 @@ final class TemplateRenderer {
 				);
 		}
 
-			$selected_values = array();
+		$selected_values = array();
 
 		if ( is_array( $value ) ) {
 			foreach ( $value as $item ) {
@@ -476,8 +495,8 @@ final class TemplateRenderer {
 				$option_label = isset( $option['label'] ) ? (string) $option['label'] : $label;
 				$control_id   = $id . '-single';
 
-				$attributes  = $this->build_common_attributes( $name, $control_id, $classes, $required );
-				$attributes .= ' type="checkbox" value="' . esc_attr( $option_value ) . '"';
+								$attributes = $this->build_common_attributes( $name, $control_id, $classes, $required, $error_id, $has_error );
+				$attributes                .= ' type="checkbox" value="' . esc_attr( $option_value ) . '"';
 
 			if ( in_array( $option_value, $selected_values, true ) ) {
 					$attributes .= ' checked="checked"';
@@ -486,7 +505,7 @@ final class TemplateRenderer {
 				return '<label class="fbm-field-option"><input' . $attributes . ' /> ' . esc_html( $option_label ) . '</label>';
 		}
 
-			$controls = '';
+		$controls = '';
 		foreach ( $options as $index => $option ) {
 			if ( ! is_array( $option ) ) {
 					continue;
@@ -496,8 +515,8 @@ final class TemplateRenderer {
 				$option_label = isset( $option['label'] ) ? (string) $option['label'] : $option_value;
 				$control_id   = $id . '-' . (string) $index;
 
-				$attributes  = $this->build_common_attributes( $name . '[]', $control_id, $classes, $required && 0 === $index );
-				$attributes .= ' type="checkbox" value="' . esc_attr( $option_value ) . '"';
+								$attributes = $this->build_common_attributes( $name . '[]', $control_id, $classes, $required && 0 === $index, $error_id, $has_error && 0 === $index );
+				$attributes                .= ' type="checkbox" value="' . esc_attr( $option_value ) . '"';
 
 			if ( in_array( $option_value, $selected_values, true ) ) {
 					$attributes .= ' checked="checked"';
@@ -506,7 +525,12 @@ final class TemplateRenderer {
 				$controls .= '<label class="fbm-field-option"><input' . $attributes . ' /> ' . esc_html( $option_label ) . '</label>';
 		}
 
-			return '<fieldset class="fbm-fieldset"><legend class="fbm-field-legend">' . esc_html( $label ) . '</legend>' . $controls . '</fieldset>';
+				$fieldset_attrs = '';
+		if ( '' !== $error_id ) {
+						$fieldset_attrs = ' aria-describedby="' . esc_attr( $error_id ) . '"';
+		}
+
+				return '<fieldset class="fbm-fieldset"' . $fieldset_attrs . '><legend class="fbm-field-legend">' . esc_html( $label ) . '</legend>' . $controls . '</fieldset>';
 	}
 
 		/**
@@ -519,24 +543,26 @@ final class TemplateRenderer {
 		 * @param bool              $required     Required flag.
 		 * @param bool              $wrap_label   Wrap control in label.
 		 * @param string            $autocomplete Autocomplete attribute.
+		 * @param string            $error_id     Error element identifier.
+		 * @param bool              $has_error    Whether the field currently has an error.
 		 */
-	private function render_file_input( string $name, string $id, string $label, array $classes, bool $required, bool $wrap_label, string $autocomplete ): string {
-			$attributes  = $this->build_common_attributes( $name, $id, $classes, $required );
-			$attributes .= ' type="file"';
+	private function render_file_input( string $name, string $id, string $label, array $classes, bool $required, bool $wrap_label, string $autocomplete, string $error_id = '', bool $has_error = false ): string {
+				$attributes = $this->build_common_attributes( $name, $id, $classes, $required, $error_id, $has_error );
+		$attributes        .= ' type="file"';
 
 		if ( '' !== $autocomplete ) {
 				$attributes .= ' autocomplete="' . esc_attr( $autocomplete ) . '"';
 		}
 
-			$input = '<input' . $attributes . ' />';
+		$input = '<input' . $attributes . ' />';
 
 		if ( $wrap_label ) {
 				return '<label class="fbm-field-label">' . esc_html( $label ) . ' ' . $input . '</label>';
 		}
 
-			$label_html = '<label class="fbm-field-label" for="' . esc_attr( $id ) . '">' . esc_html( $label ) . '</label>';
+		$label_html = '<label class="fbm-field-label" for="' . esc_attr( $id ) . '">' . esc_html( $label ) . '</label>';
 
-			return $label_html . $input;
+		return $label_html . $input;
 	}
 
 		/**
@@ -564,15 +590,23 @@ final class TemplateRenderer {
 		 * @param string            $id       Identifier.
 		 * @param array<int,string> $classes  CSS classes.
 		 * @param bool              $required Required flag.
+		 * @param string            $error_id Error element identifier.
+		 * @param bool              $has_error Whether the field currently has an error.
 		 */
-	private function build_common_attributes( string $name, string $id, array $classes, bool $required ): string {
-			$attributes = ' name="' . esc_attr( $name ) . '" id="' . esc_attr( $id ) . '" class="' . esc_attr( implode( ' ', $classes ) ) . '"';
+	private function build_common_attributes( string $name, string $id, array $classes, bool $required, string $error_id = '', bool $has_error = false ): string {
+				$attributes = ' name="' . esc_attr( $name ) . '" id="' . esc_attr( $id ) . '" class="' . esc_attr( implode( ' ', $classes ) ) . '"';
 
 		if ( $required ) {
-				$attributes .= ' required aria-required="true"';
+						$attributes .= ' required aria-required="true"';
 		}
 
-			return $attributes;
+		if ( $has_error && '' !== $error_id ) {
+						$attributes .= ' aria-invalid="true" aria-errormessage="' . esc_attr( $error_id ) . '" aria-describedby="' . esc_attr( $error_id ) . '"';
+		} elseif ( '' !== $error_id ) {
+						$attributes .= ' aria-describedby="' . esc_attr( $error_id ) . '"';
+		}
+
+				return $attributes;
 	}
 
 		/**
