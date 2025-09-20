@@ -16,7 +16,18 @@
 
         var textareaId = settings.textareaId || '';
         var textarea = textareaId ? document.getElementById( textareaId ) : null;
-        var codeEditor = null;
+        var syncEditorHandle = function ( editor ) {
+                var instance = editor || null;
+
+                if ( typeof window !== 'undefined' ) {
+                        window.FBM_REG_EDITOR = instance;
+                }
+
+                return instance;
+        };
+        var codeEditor = syncEditorHandle(
+                typeof window !== 'undefined' && window.FBM_REG_EDITOR ? window.FBM_REG_EDITOR : null
+        );
         var i18n = settings.i18n || {};
         var restNonce = '';
         if ( settings.restNonce ) {
@@ -169,7 +180,7 @@
 
         var inlineEditor = window.fbmRegistrationEditorCodeEditor || null;
         if ( inlineEditor && inlineEditor.codemirror ) {
-                codeEditor = inlineEditor.codemirror;
+                codeEditor = syncEditorHandle( inlineEditor.codemirror );
         } else if ( textarea && window.wp && window.wp.codeEditor ) {
                 var editorSettings = inlineEditor && inlineEditor.settings ? inlineEditor.settings : settings.codeEditor || {};
                 if ( editorSettings && 'object' === typeof editorSettings ) {
@@ -181,7 +192,7 @@
                         if ( Object.keys( editorSettings ).length > 0 ) {
                                 var editor = window.wp.codeEditor.initialize( textarea, editorSettings );
                                 if ( editor && editor.codemirror ) {
-                                        codeEditor = editor.codemirror;
+                                        codeEditor = syncEditorHandle( editor.codemirror );
                                         if ( inlineEditor ) {
                                                 inlineEditor.codemirror = codeEditor;
                                         }
@@ -3060,20 +3071,39 @@
                         return;
                 }
 
-                if ( codeEditor ) {
-                        codeEditor.replaceSelection( snippet + '\n' );
-                        codeEditor.focus();
-                        notifyDirty();
+                var cm = ( typeof window !== 'undefined' && window.FBM_REG_EDITOR ) ? window.FBM_REG_EDITOR : codeEditor;
+                if ( cm && 'function' === typeof cm.getDoc ) {
+                        if ( 'function' === typeof cm.focus ) {
+                                cm.focus();
+                        }
+
+                        var doc = cm.getDoc();
+                        if ( doc && 'function' === typeof doc.replaceSelection ) {
+                                doc.replaceSelection( snippet );
+                                notifyDirty();
+                        }
 
                         return;
                 }
 
                 if ( textarea ) {
-                        var start = textarea.selectionStart || 0;
-                        var end = textarea.selectionEnd || 0;
+                        if ( 'function' === typeof textarea.focus ) {
+                                textarea.focus();
+                        }
+
                         var value = textarea.value || '';
-                        textarea.value = value.slice( 0, start ) + snippet + '\n' + value.slice( end );
-                        textarea.focus();
+                        var start = 'number' === typeof textarea.selectionStart ? textarea.selectionStart : value.length;
+                        var end = 'number' === typeof textarea.selectionEnd ? textarea.selectionEnd : value.length;
+                        textarea.value = value.slice( 0, start ) + snippet + value.slice( end );
+
+                        var caret = start + snippet.length;
+                        if ( 'function' === typeof textarea.setSelectionRange ) {
+                                textarea.setSelectionRange( caret, caret );
+                        } else {
+                                textarea.selectionStart = caret;
+                                textarea.selectionEnd = caret;
+                        }
+
                         notifyDirty();
                 }
         } );
