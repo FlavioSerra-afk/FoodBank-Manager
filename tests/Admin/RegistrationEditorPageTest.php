@@ -77,9 +77,9 @@ final class RegistrationEditorPageTest extends TestCase {
 			$this->assertNotEmpty( $GLOBALS['fbm_settings_errors'] );
 	}
 
-	public function test_toolbar_snippets_cover_supported_tags(): void {
-			$method = new ReflectionMethod( RegistrationEditorPage::class, 'toolbar_snippets' );
-			$method->setAccessible( true );
+        public function test_toolbar_snippets_cover_supported_tags(): void {
+                        $method = new ReflectionMethod( RegistrationEditorPage::class, 'toolbar_snippets' );
+                        $method->setAccessible( true );
 
 			/** @var array<int,array<string,string>> $snippets */
 			$snippets = $method->invoke( null );
@@ -110,8 +110,89 @@ final class RegistrationEditorPageTest extends TestCase {
 				'[submit fbm_submit_button "Submit registration"]',
 			);
 
-			foreach ( $expected as $tag ) {
-					$this->assertContains( $tag, $catalogue );
-			}
-	}
+                        foreach ( $expected as $tag ) {
+                                        $this->assertContains( $tag, $catalogue );
+                        }
+        }
+
+        public function test_sanitize_settings_enables_conditions_with_valid_rules(): void {
+                        $raw = array(
+                                'conditions' => array(
+                                        'enabled' => '1',
+                                        'rules'   => array(
+                                                array(
+                                                        'if_field' => 'fbm_first_name',
+                                                        'operator' => 'equals',
+                                                        'value'    => 'YES',
+                                                        'action'   => 'show',
+                                                        'target'   => 'fbm_registration_consent',
+                                                ),
+                                                array(
+                                                        'if_field' => 'missing_field',
+                                                        'operator' => 'equals',
+                                                        'value'    => '',
+                                                        'action'   => 'hide',
+                                                        'target'   => 'fbm_household_size',
+                                                ),
+                                        ),
+                                ),
+                        );
+
+                        $settings = RegistrationEditorPage::sanitize_settings( $raw );
+
+                        $this->assertTrue( $settings['conditions']['enabled'] );
+                        $this->assertSame(
+                                array(
+                                        array(
+                                                'if_field' => 'fbm_first_name',
+                                                'operator' => 'equals',
+                                                'value'    => 'YES',
+                                                'action'   => 'show',
+                                                'target'   => 'fbm_registration_consent',
+                                        ),
+                                ),
+                                $settings['conditions']['rules']
+                        );
+        }
+
+        public function test_sanitize_condition_rules_accepts_json_payload(): void {
+                        $method = new ReflectionMethod( RegistrationEditorPage::class, 'sanitize_condition_rules' );
+                        $method->setAccessible( true );
+
+                        $raw = json_encode(
+                                array(
+                                        array(
+                                                'if_field' => 'fbm_email',
+                                                'operator' => 'contains',
+                                                'value'    => '@example.com',
+                                                'action'   => 'hide',
+                                                'target'   => 'fbm_registration_consent',
+                                        ),
+                                        array(
+                                                'if_field' => '',
+                                                'operator' => 'equals',
+                                                'value'    => 'ignored',
+                                                'action'   => 'show',
+                                                'target'   => 'fbm_first_name',
+                                        ),
+                                )
+                        );
+
+                        $this->assertIsString( $raw );
+
+                        $result = $method->invoke( null, $raw );
+
+                        $this->assertSame(
+                                array(
+                                        array(
+                                                'if_field' => 'fbm_email',
+                                                'operator' => 'contains',
+                                                'value'    => '@example.com',
+                                                'action'   => 'hide',
+                                                'target'   => 'fbm_registration_consent',
+                                        ),
+                                ),
+                                $result
+                        );
+        }
 }

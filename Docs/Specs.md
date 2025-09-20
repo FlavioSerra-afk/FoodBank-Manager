@@ -60,7 +60,7 @@ Validation, nonce, anti-spam (honeypot + time trap).
 
 Minimal PII collection; strict sanitize/normalize; prepared SQL writes.
 
-Single-template editor in admin (CodeMirror-backed) manages the registration markup with CF7-style tags; templates sanitized via a `wp_kses` allow-list that preserves fieldsets, headings, lists, and safe `aria-`/`data-` attributes while stripping scripts. Admin preview endpoint (`/fbm/v1/registration/preview`, manager-only nonce/cap) returns sanitized HTML, scrubbed warnings, and a transient nonce for an accessible modal preview (focus trap + ESC close).
+Single-template editor in admin (CodeMirror-backed) manages the registration markup with CF7-style tags; templates sanitized via a `wp_kses` allow-list that preserves fieldsets, headings, lists, and safe `aria-`/`data-` attributes while stripping scripts. Simple conditional visibility rules (phase-1) let administrators show or hide fields based on other field values; rules are stored with the template, progressively enhance the editor preview, and are re-validated on submission so hidden inputs are treated as absent. Admin preview endpoint (`/fbm/v1/registration/preview`, manager-only nonce/cap) returns sanitized HTML, scrubbed warnings, and a transient nonce for an accessible modal preview (focus trap + ESC close).
 
 On approval (or instant, per config), send Welcome Email including the user’s persistent QR code and a fallback alphanumeric code.
 

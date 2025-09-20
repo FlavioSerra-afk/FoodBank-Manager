@@ -19,6 +19,7 @@ use function selected;
 use function settings_fields;
 use function submit_button;
 use function wp_nonce_field;
+use function wp_json_encode;
 
 if ( ! defined( 'ABSPATH' ) ) {
         exit;
@@ -45,6 +46,16 @@ $notice_message   = isset( $data['message'] ) ? (string) $data['message'] : '';
 $reset_action     = isset( $data['reset_action'] ) ? (string) $data['reset_action'] : '';
 $export_action    = isset( $data['export_action'] ) ? (string) $data['export_action'] : '';
 $import_action    = isset( $data['import_action'] ) ? (string) $data['import_action'] : '';
+$fields_list      = isset( $data['fields'] ) && is_array( $data['fields'] ) ? $data['fields'] : array();
+$matrix_url       = isset( $data['matrix_url'] ) ? (string) $data['matrix_url'] : '';
+
+$conditions_settings = isset( $settings['conditions'] ) && is_array( $settings['conditions'] ) ? $settings['conditions'] : array();
+$conditions_enabled  = ! empty( $conditions_settings['enabled'] );
+$conditions_rules    = isset( $conditions_settings['rules'] ) && is_array( $conditions_settings['rules'] ) ? array_values( $conditions_settings['rules'] ) : array();
+$conditions_rules_json = wp_json_encode( $conditions_rules );
+if ( ! is_string( $conditions_rules_json ) ) {
+        $conditions_rules_json = '[]';
+}
 ?>
 <div class="wrap">
         <h1 class="wp-heading-inline"><?php esc_html_e( 'Registration Form', 'foodbank-manager' ); ?></h1>
@@ -132,11 +143,41 @@ $import_action    = isset( $data['import_action'] ) ? (string) $data['import_act
                                                 <tr>
                                                         <th scope="row"><label for="fbm-success-pending"><?php esc_html_e( 'Success message (pending)', 'foodbank-manager' ); ?></label></th>
                                                         <td>
-                                                                <textarea id="fbm-success-pending" name="<?php echo esc_attr( $settings_option ); ?>[messages][success_pending]" rows="4" class="large-text"><?php echo esc_textarea( $success_pending ); ?></textarea>
-                                                        </td>
-                                                </tr>
-                                        </tbody>
+                                                <textarea id="fbm-success-pending" name="<?php echo esc_attr( $settings_option ); ?>[messages][success_pending]" rows="4" class="large-text"><?php echo esc_textarea( $success_pending ); ?></textarea>
+                                                </td>
+                                        </tr>
+                                </tbody>
                                 </table>
+
+                                <details class="fbm-registration-editor__conditions" data-fbm-conditions<?php if ( $conditions_enabled ) : ?> open<?php endif; ?>>
+                                        <summary class="fbm-registration-editor__conditions-summary"><?php esc_html_e( 'Conditional Visibility (Beta)', 'foodbank-manager' ); ?></summary>
+                                        <div class="fbm-registration-editor__conditions-body">
+                                                <p class="description">
+                                                        <?php esc_html_e( 'Show or hide fields when another field matches a value.', 'foodbank-manager' ); ?>
+                                                        <?php if ( '' !== $matrix_url ) : ?>
+                                                                <a href="<?php echo esc_url( $matrix_url ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Registration template matrix', 'foodbank-manager' ); ?></a>
+                                                        <?php endif; ?>
+                                                </p>
+                                                <label class="fbm-registration-editor__conditions-toggle">
+                                                        <input type="checkbox" name="<?php echo esc_attr( $settings_option ); ?>[conditions][enabled]" value="1" data-fbm-conditions-enabled<?php checked( $conditions_enabled ); ?> />
+                                                        <?php esc_html_e( 'Enable conditional visibility rules', 'foodbank-manager' ); ?>
+                                                </label>
+                                                <div class="fbm-registration-editor__conditions-rules" data-fbm-conditions-list>
+                                                        <div class="fbm-registration-editor__conditions-empty" data-fbm-conditions-empty<?php if ( ! empty( $conditions_rules ) && ! empty( $fields_list ) ) : ?> hidden<?php endif; ?>>
+                                                                <?php if ( empty( $fields_list ) ) : ?>
+                                                                        <?php esc_html_e( 'Add form fields to create conditions.', 'foodbank-manager' ); ?>
+                                                                <?php else : ?>
+                                                                        <?php esc_html_e( 'No conditions yet.', 'foodbank-manager' ); ?>
+                                                                <?php endif; ?>
+                                                        </div>
+                                                </div>
+                                                <button type="button" class="button fbm-registration-editor__conditions-add" data-fbm-conditions-add><?php esc_html_e( 'Add condition', 'foodbank-manager' ); ?></button>
+                                                <input type="hidden" name="<?php echo esc_attr( $settings_option ); ?>[conditions][rules]" value="<?php echo esc_attr( $conditions_rules_json ); ?>" data-fbm-conditions-storage />
+                                                <noscript>
+                                                        <p class="description"><?php esc_html_e( 'Conditional visibility editing requires JavaScript.', 'foodbank-manager' ); ?></p>
+                                                </noscript>
+                                        </div>
+                                </details>
                         </div>
                 </div>
 
@@ -177,7 +218,7 @@ $import_action    = isset( $data['import_action'] ) ? (string) $data['import_act
                                 </button>
                         </div>
                         <div class="fbm-registration-editor__preview-body" data-fbm-preview-body>
-                                <p class="fbm-registration-editor__preview-note" data-fbm-preview-note><?php esc_html_e( 'Preview only. Form controls are disabled.', 'foodbank-manager' ); ?></p>
+                                <p class="fbm-registration-editor__preview-note" data-fbm-preview-note aria-live="polite"><?php esc_html_e( 'Preview only. Form controls are disabled.', 'foodbank-manager' ); ?></p>
                                 <div class="fbm-registration-editor__preview-content" data-fbm-preview-content></div>
                         </div>
                         <div class="fbm-registration-editor__preview-warnings" data-fbm-preview-warnings hidden>

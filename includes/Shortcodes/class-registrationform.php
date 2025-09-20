@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace FoodBankManager\Shortcodes;
 
+use FoodBankManager\Core\Plugin;
 use FoodBankManager\Diagnostics\MailFailureLog;
 use FoodBankManager\Email\RegistrationNotificationMailer;
 use FoodBankManager\Email\WelcomeMailer;
@@ -48,10 +49,15 @@ use function sanitize_text_field;
 use function sanitize_textarea_field;
 use function set_transient;
 use function strtolower;
+use function str_contains;
 use function substr;
 use function time;
 use function trim;
+use function plugins_url;
 use function wp_nonce_field;
+use function wp_enqueue_script;
+use function wp_enqueue_style;
+use function wp_localize_script;
 use function wp_verify_nonce;
 use const FILTER_SANITIZE_EMAIL;
 use const FILTER_SANITIZE_FULL_SPECIAL_CHARS;
@@ -152,6 +158,13 @@ final class RegistrationForm {
 			$renderer      = self::renderer();
 			$rendered_form = $renderer->render( $schema['template'], $submission['values'], $submission['field_errors'] );
 
+			self::enqueue_assets_for_form(
+				array(
+					'fields' => $rendered_form['fields'],
+				),
+				$settings
+			);
+
 			$context = array(
 				'success'        => $submission['success'],
 				'errors'         => $submission['errors'],
@@ -216,13 +229,20 @@ final class RegistrationForm {
 		}
 
 		if ( ! isset( $settings['conditions'] ) || ! is_array( $settings['conditions'] ) ) {
-				$settings['conditions'] = $defaults['conditions'];
+						$settings['conditions'] = $defaults['conditions'];
 		}
 
-			$settings['uploads']  = Uploads::normalize_settings( $settings['uploads'] );
-			$settings['honeypot'] = isset( $settings['honeypot'] ) ? (bool) $settings['honeypot'] : true;
+		if ( ! isset( $settings['conditions']['rules'] ) || ! is_array( $settings['conditions']['rules'] ) ) {
+						$settings['conditions']['rules'] = array();
+		}
 
-			return $settings;
+						$settings['conditions']['rules']   = array_values( $settings['conditions']['rules'] );
+						$settings['conditions']['enabled'] = ! empty( $settings['conditions']['enabled'] );
+
+						$settings['uploads']  = Uploads::normalize_settings( $settings['uploads'] );
+						$settings['honeypot'] = isset( $settings['honeypot'] ) ? (bool) $settings['honeypot'] : true;
+
+						return $settings;
 	}
 
 		/**
@@ -311,75 +331,123 @@ final class RegistrationForm {
 				'consent'        => false,
 			);
 
-			$uploads     = array();
-			$stored_meta = array();
+						$uploads         = array();
+						$stored_meta     = array();
+						$condition_rules = self::prepare_condition_rules( $settings['conditions'] ?? array(), $fields );
+						$field_states    = array();
+						$hidden_uploads  = array();
 
 			foreach ( $fields as $name => $definition ) {
 					$type = isset( $definition['type'] ) ? (string) $definition['type'] : 'text';
 
+				$state = array(
+					'definition'    => $definition,
+					'type'          => $type,
+					'required'      => ! empty( $definition['required'] ),
+					'value'         => $values[ $name ],
+					'errors'        => array(),
+					'stored_upload' => null,
+					'stored_meta'   => null,
+					'missing_file'  => null,
+				);
+
 				if ( 'file' === $type ) {
-						$file = self::read_file_input( $name );
+						$state['value'] = '';
+						$file           = self::read_file_input( $name );
+
 					if ( null === $file ) {
-						if ( ! empty( $definition['required'] ) ) {
-								$result['field_errors'][ $name ][] = esc_html__( 'This file is required.', 'foodbank-manager' );
+									$state['missing_file'] = true;
+					} else {
+										$state['missing_file'] = false;
+										$upload                = Uploads::process( $name, $file, $settings['uploads'] );
+
+						if ( 'error' === $upload['status'] ) {
+							$state['errors'][] = isset( $upload['error'] ) ? (string) $upload['error'] : esc_html__( 'Unable to process the uploaded file.', 'foodbank-manager' );
+						} elseif ( 'stored' === $upload['status'] ) {
+								$state['stored_upload'] = array(
+									'attachment_id' => (int) $upload['attachment_id'],
+									'path'          => (string) $upload['path'],
+								);
+								$state['stored_meta']   = array(
+									'attachment_id' => (int) $upload['attachment_id'],
+									'url'           => (string) $upload['url'],
+									'type'          => (string) $upload['type'],
+								);
 						}
+					}
+				} else {
+						$raw_value       = self::read_input( INPUT_POST, $name, FILTER_UNSAFE_RAW );
+						$sanitized       = self::sanitize_field_value( $definition, $raw_value );
+						$state['value']  = $sanitized['value'];
+						$values[ $name ] = $sanitized['value'];
 
-						continue;
+					if ( ! empty( $sanitized['errors'] ) ) {
+									$state['errors'] = array_values( array_unique( $sanitized['errors'] ) );
+					}
+				}
+
+				if ( ! empty( $state['errors'] ) ) {
+						$result['field_errors'][ $name ] = array_unique( array_merge( $result['field_errors'][ $name ], $state['errors'] ) );
+				}
+
+					$field_states[ $name ] = $state;
+			}
+
+						$visibility = self::evaluate_condition_visibility( $condition_rules, $fields, $values );
+
+			foreach ( $field_states as $name => $state ) {
+					$visible = isset( $visibility[ $name ] ) ? $visibility[ $name ] : true;
+
+				if ( ! $visible ) {
+								$values[ $name ]                 = self::default_value_for_field( $state['definition'] );
+								$result['field_errors'][ $name ] = array();
+
+					if ( is_array( $state['stored_upload'] ) ) {
+						$hidden_uploads[] = $state['stored_upload'];
 					}
 
-						$upload = Uploads::process( $name, $file, $settings['uploads'] );
+								continue;
+				}
 
-					if ( 'error' === $upload['status'] ) {
-							$result['field_errors'][ $name ][] = isset( $upload['error'] ) ? (string) $upload['error'] : esc_html__( 'Unable to process the uploaded file.', 'foodbank-manager' );
-					} elseif ( 'stored' === $upload['status'] ) {
-							$uploads[]     = array(
-								'attachment_id' => (int) $upload['attachment_id'],
-								'path'          => (string) $upload['path'],
-							);
-							$stored_meta[] = array(
-								'attachment_id' => (int) $upload['attachment_id'],
-								'url'           => (string) $upload['url'],
-								'type'          => (string) $upload['type'],
-							);
+					$has_errors = ! empty( $result['field_errors'][ $name ] );
+
+				if ( 'file' === $state['type'] ) {
+					if ( is_array( $state['stored_upload'] ) ) {
+						$uploads[] = $state['stored_upload'];
+						if ( is_array( $state['stored_meta'] ) ) {
+									$stored_meta[] = $state['stored_meta'];
+						}
+					} elseif ( $state['required'] ) {
+						$result['field_errors'][ $name ][] = esc_html__( 'This file is required.', 'foodbank-manager' );
 					}
 
+									continue;
+				}
+
+				if ( $state['required'] ) {
+					if ( self::is_field_value_empty( $state['value'] ) ) {
+										$result['field_errors'][ $name ][] = esc_html__( 'This field is required.', 'foodbank-manager' );
+										continue;
+					}
+				} elseif ( self::is_field_value_empty( $state['value'] ) ) {
 						continue;
 				}
 
-					$raw_value = self::read_input( INPUT_POST, $name, FILTER_UNSAFE_RAW );
-
-					$sanitized       = self::sanitize_field_value( $definition, $raw_value );
-					$values[ $name ] = $sanitized['value'];
-
-				if ( ! empty( $sanitized['errors'] ) ) {
-						$result['field_errors'][ $name ] = array_unique( array_merge( $result['field_errors'][ $name ], $sanitized['errors'] ) );
-				}
-
-				if ( empty( $definition['required'] ) && empty( $sanitized['value'] ) ) {
+				if ( $has_errors ) {
 						continue;
 				}
 
-				if ( empty( $definition['required'] ) && empty( $sanitized['errors'] ) ) {
-						self::maybe_map_canonical( $normalized, $definition, $sanitized['value'] );
-						continue;
-				}
+										self::maybe_map_canonical( $normalized, $state['definition'], $state['value'] );
+			}
 
-				if ( empty( $definition['required'] ) ) {
-						continue;
-				}
-
-				if ( empty( $sanitized['value'] ) ) {
-						$result['field_errors'][ $name ][] = esc_html__( 'This field is required.', 'foodbank-manager' );
-						continue;
-				}
-
-					self::maybe_map_canonical( $normalized, $definition, $sanitized['value'] );
+			if ( ! empty( $hidden_uploads ) ) {
+					Uploads::cleanup( $hidden_uploads );
 			}
 
 			if ( ! empty( $result['errors'] ) ) {
-					Uploads::cleanup( $uploads );
+							Uploads::cleanup( $uploads );
 
-					return $result;
+							return $result;
 			}
 
 			$has_field_errors = false;
@@ -722,17 +790,279 @@ final class RegistrationForm {
 						break;
 				}
 
-					$normalized['consent'] = (bool) $value;
+								$normalized['consent'] = (bool) $value;
 				break;
 		}
 	}
 
-		/**
-		 * Clamp numeric values to the configured range, guarding negatives.
-		 *
-		 * @param int                 $value      Raw numeric value.
-		 * @param array<string,mixed> $definition Field definition containing an optional range map.
-		 */
+				/**
+				 * Normalize conditional rules against the parsed field definitions.
+				 *
+				 * @param array<string,mixed>               $conditions Raw condition settings.
+				 * @param array<string,array<string,mixed>> $fields     Parsed field definitions.
+				 *
+				 * @return array<int,array<string,string>>
+				 */
+	private static function prepare_condition_rules( array $conditions, array $fields ): array {
+					$enabled = isset( $conditions['enabled'] ) ? (bool) $conditions['enabled'] : false;
+
+		if ( ! $enabled ) {
+						return array();
+		}
+
+					$rules             = isset( $conditions['rules'] ) && is_array( $conditions['rules'] ) ? $conditions['rules'] : array();
+					$prepared          = array();
+					$allowed_operators = array( 'equals', 'not_equals', 'contains', 'empty', 'not_empty' );
+					$allowed_actions   = array( 'show', 'hide' );
+
+		foreach ( $rules as $rule ) {
+			if ( ! is_array( $rule ) ) {
+					continue;
+			}
+
+						$source   = isset( $rule['if_field'] ) ? (string) $rule['if_field'] : '';
+						$target   = isset( $rule['target'] ) ? (string) $rule['target'] : '';
+						$operator = isset( $rule['operator'] ) ? (string) $rule['operator'] : '';
+						$action   = isset( $rule['action'] ) ? (string) $rule['action'] : '';
+						$value    = isset( $rule['value'] ) ? (string) $rule['value'] : '';
+
+			if ( '' === $source || '' === $target ) {
+					continue;
+			}
+
+			if ( ! isset( $fields[ $source ], $fields[ $target ] ) ) {
+					continue;
+			}
+
+			if ( isset( $fields[ $target ]['type'] ) && 'submit' === (string) $fields[ $target ]['type'] ) {
+					continue;
+			}
+
+			if ( ! in_array( $operator, $allowed_operators, true ) ) {
+					continue;
+			}
+
+			if ( ! in_array( $action, $allowed_actions, true ) ) {
+					continue;
+			}
+
+			if ( in_array( $operator, array( 'equals', 'not_equals', 'contains' ), true ) && '' === trim( $value ) ) {
+					continue;
+			}
+
+						$prepared[] = array(
+							'if_field' => $source,
+							'operator' => $operator,
+							'value'    => $value,
+							'action'   => $action,
+							'target'   => $target,
+						);
+
+						if ( count( $prepared ) >= 50 ) {
+									break;
+						}
+		}
+
+					return $prepared;
+	}
+
+				/**
+				 * Evaluate visibility map for conditional rules.
+				 *
+				 * @param array<int,array<string,string>>   $rules   Prepared rule set.
+				 * @param array<string,array<string,mixed>> $fields  Field definitions.
+				 * @param array<string,mixed>               $values  Current field values.
+				 *
+				 * @return array<string,bool>
+				 */
+	private static function evaluate_condition_visibility( array $rules, array $fields, array $values ): array {
+		if ( empty( $rules ) ) {
+			return array();
+		}
+
+					$visibility    = array();
+					$requires_show = array();
+					$forced_hidden = array();
+
+		foreach ( $fields as $name => $definition ) {
+			if ( ! is_array( $definition ) ) {
+					continue;
+			}
+
+						$type = isset( $definition['type'] ) ? (string) $definition['type'] : '';
+			if ( 'submit' === $type ) {
+							continue;
+			}
+
+						$visibility[ $name ] = true;
+		}
+
+		foreach ( $rules as $rule ) {
+			if ( 'show' === $rule['action'] ) {
+					$requires_show[ $rule['target'] ] = true;
+			}
+		}
+
+		foreach ( array_keys( $requires_show ) as $target ) {
+			if ( ! array_key_exists( $target, $visibility ) ) {
+				continue;
+			}
+
+			$visibility[ $target ] = false;
+		}
+
+		foreach ( $rules as $rule ) {
+						$source_value = $values[ $rule['if_field'] ] ?? null;
+
+			if ( ! self::condition_matches( $rule['operator'], $source_value, $rule['value'] ) ) {
+					continue;
+			}
+
+			if ( 'hide' === $rule['action'] ) {
+				if ( isset( $visibility[ $rule['target'] ] ) ) {
+						$visibility[ $rule['target'] ]    = false;
+						$forced_hidden[ $rule['target'] ] = true;
+				}
+
+					continue;
+			}
+
+			if ( 'show' === $rule['action'] && empty( $forced_hidden[ $rule['target'] ] ) && isset( $visibility[ $rule['target'] ] ) ) {
+					$visibility[ $rule['target'] ] = true;
+			}
+		}
+
+					return $visibility;
+	}
+
+				/**
+				 * Determine if a conditional rule matches the provided value.
+				 *
+				 * @param string $operator   Operator keyword.
+				 * @param mixed  $current    Current field value.
+				 * @param string $comparison Comparison value.
+				 */
+	private static function condition_matches( string $operator, $current, string $comparison ): bool {
+					$normalized_value = self::normalize_condition_string( $comparison );
+					$value_set        = self::normalize_condition_values( $current );
+
+		switch ( $operator ) {
+			case 'equals':
+				return in_array( $normalized_value, $value_set, true );
+			case 'not_equals':
+				return ! in_array( $normalized_value, $value_set, true );
+			case 'contains':
+				if ( ! empty( $value_set ) ) {
+						return in_array( $normalized_value, $value_set, true );
+				}
+
+					$single = self::normalize_condition_string( $current );
+
+				return '' !== $normalized_value && '' !== $single && str_contains( $single, $normalized_value );
+			case 'empty':
+				return self::is_field_value_empty( $current );
+			case 'not_empty':
+				return ! self::is_field_value_empty( $current );
+			default:
+				return false;
+		}
+	}
+
+				/**
+				 * Normalize conditional comparison values to lowercase strings.
+				 *
+				 * @param mixed $value Raw field value.
+				 *
+				 * @return array<int,string>
+				 */
+	private static function normalize_condition_values( $value ): array {
+		if ( is_array( $value ) ) {
+				$normalized = array();
+			foreach ( $value as $item ) {
+				$string = self::normalize_condition_string( $item );
+				if ( '' !== $string ) {
+						$normalized[] = $string;
+				}
+			}
+
+				return $normalized;
+		}
+
+			$string = self::normalize_condition_string( $value );
+
+		if ( '' === $string ) {
+				return array();
+		}
+
+			return array( $string );
+	}
+
+				/**
+				 * Normalize any scalar into a lowercase string for condition comparisons.
+				 *
+				 * @param mixed $value Raw value.
+				 */
+	private static function normalize_condition_string( $value ): string {
+		if ( null === $value ) {
+				return '';
+		}
+
+		if ( is_bool( $value ) ) {
+				return $value ? '1' : '0';
+		}
+
+		if ( is_numeric( $value ) ) {
+				return strtolower( (string) $value );
+		}
+
+		if ( is_string( $value ) ) {
+				return strtolower( trim( $value ) );
+		}
+
+			return strtolower( trim( (string) $value ) );
+	}
+
+				/**
+				 * Determine whether a field value should be treated as empty for validation.
+				 *
+				 * @param mixed $value Field value.
+				 */
+	private static function is_field_value_empty( $value ): bool {
+		if ( is_array( $value ) ) {
+			foreach ( $value as $item ) {
+				if ( '' !== self::normalize_condition_string( $item ) ) {
+						return false;
+				}
+			}
+
+				return true;
+		}
+
+		if ( null === $value ) {
+				return true;
+		}
+
+		if ( is_bool( $value ) ) {
+			return false === $value;
+		}
+
+		if ( is_numeric( $value ) ) {
+				return false;
+		}
+
+		if ( is_string( $value ) ) {
+				return '' === trim( $value );
+		}
+
+			return '' === trim( (string) $value );
+	}
+
+				/**
+				 * Clamp numeric values to the configured range, guarding negatives.
+				 *
+				 * @param int                 $value      Raw numeric value.
+				 * @param array<string,mixed> $definition Field definition containing an optional range map.
+				 */
 	private static function clamp_numeric_value( int $value, array $definition ): int {
 			$range = isset( $definition['range'] ) && is_array( $definition['range'] ) ? $definition['range'] : array();
 
@@ -1021,10 +1351,10 @@ final class RegistrationForm {
 		 * @param array<string, mixed> $context Template context.
 		 */
 	private static function render_template( array $context ): string {
-			$template = FBM_PATH . 'templates/public/registration-form.php';
+					$template = FBM_PATH . 'templates/public/registration-form.php';
 
 		if ( ! is_readable( $template ) ) {
-				return '';
+						return '';
 		}
 
 			ob_start();
@@ -1032,10 +1362,70 @@ final class RegistrationForm {
 			$data = $context;
 			include $template;
 
-			$output = ob_get_clean();
+					$output = ob_get_clean();
 
-			return is_string( $output ) ? $output : '';
+					return is_string( $output ) ? $output : '';
 	}
+
+				/**
+				 * Enqueue front-end assets for the registration form when conditional rules are present.
+				 *
+				 * @param array<string,mixed> $schema   Parsed template schema.
+				 * @param array<string,mixed> $settings Registration settings.
+				 */
+	private static function enqueue_assets_for_form( array $schema, array $settings ): void {
+		if ( ! function_exists( 'wp_enqueue_script' ) ) {
+			return;
+		}
+
+		$fields     = isset( $schema['fields'] ) && is_array( $schema['fields'] ) ? $schema['fields'] : array();
+		$conditions = isset( $settings['conditions'] ) && is_array( $settings['conditions'] ) ? $settings['conditions'] : array();
+		$rules      = self::prepare_condition_rules( $conditions, $fields );
+
+		if ( empty( $rules ) ) {
+			return;
+		}
+
+		$version = defined( 'FBM_VER' ) ? FBM_VER : Plugin::VERSION;
+		$style   = plugins_url( 'assets/css/registration-form.css', FBM_FILE );
+		$script  = plugins_url( 'assets/js/registration-form.js', FBM_FILE );
+
+		wp_enqueue_style( 'fbm-registration-form', $style, array(), $version );
+		wp_enqueue_script( 'fbm-registration-form', $script, array(), $version, true );
+
+		$field_catalog = array();
+		foreach ( $fields as $name => $definition ) {
+			if ( ! is_array( $definition ) ) {
+				continue;
+			}
+
+			$type = isset( $definition['type'] ) ? (string) $definition['type'] : '';
+			if ( 'submit' === $type ) {
+				continue;
+			}
+
+			$label           = isset( $definition['label'] ) ? (string) $definition['label'] : (string) $name;
+			$field_catalog[] = array(
+				'name'  => (string) $name,
+				'label' => $label,
+				'type'  => $type,
+			);
+		}
+
+		wp_localize_script(
+			'fbm-registration-form',
+			'fbmRegistrationForm',
+			array(
+				'conditions'  => array(
+					'enabled' => true,
+					'rules'   => $rules,
+				),
+				'fields'      => $field_catalog,
+				'hiddenClass' => 'fbm-field--hidden',
+			)
+		);
+	}
+
 
 		/**
 		 * Resolve a shared template renderer instance.

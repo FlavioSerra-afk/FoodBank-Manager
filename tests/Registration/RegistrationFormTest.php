@@ -60,10 +60,10 @@ final class RegistrationFormTest extends TestCase {
 	private SpyWelcomeMailer $mailer;
 	private SpyNotificationMailer $notification;
 
-	protected function setUp(): void {
-			parent::setUp();
+        protected function setUp(): void {
+                        parent::setUp();
 
-			$this->wpdb                  = new \wpdb();
+                        $this->wpdb                  = new \wpdb();
 			$GLOBALS['wpdb']             = $this->wpdb;
 			$GLOBALS['fbm_users']        = array();
 			$GLOBALS['fbm_roles']        = array();
@@ -72,10 +72,15 @@ final class RegistrationFormTest extends TestCase {
 				'fbm_registration_submit' => 'valid-nonce',
 			);
 
-			$GLOBALS['fbm_options'] = array();
+                        $GLOBALS['fbm_options'] = array();
+                        $GLOBALS['fbm_enqueued_styles']     = array();
+                        $GLOBALS['fbm_registered_styles']   = array();
+                        $GLOBALS['fbm_enqueued_scripts']    = array();
+                        $GLOBALS['fbm_registered_scripts']  = array();
+                        $GLOBALS['fbm_localized_scripts']   = array();
 
-			$_SERVER                   = array();
-			$_POST                     = array();
+                        $_SERVER                   = array();
+                        $_POST                     = array();
 			$GLOBALS['fbm_transients'] = array();
 
 			$this->mailer = new SpyWelcomeMailer();
@@ -91,12 +96,13 @@ final class RegistrationFormTest extends TestCase {
 
 	protected function tearDown(): void {
 			RegistrationForm::set_mailer_override( null );
-			RegistrationForm::set_notification_override( null );
+                        RegistrationForm::set_notification_override( null );
 
-			unset( $GLOBALS['wpdb'], $GLOBALS['fbm_test_nonces'], $GLOBALS['fbm_users'], $GLOBALS['fbm_roles'], $GLOBALS['fbm_next_user_id'], $GLOBALS['fbm_options'] );
+                        unset( $GLOBALS['wpdb'], $GLOBALS['fbm_test_nonces'], $GLOBALS['fbm_users'], $GLOBALS['fbm_roles'], $GLOBALS['fbm_next_user_id'], $GLOBALS['fbm_options'] );
+                        unset( $GLOBALS['fbm_enqueued_styles'], $GLOBALS['fbm_registered_styles'], $GLOBALS['fbm_enqueued_scripts'], $GLOBALS['fbm_registered_scripts'], $GLOBALS['fbm_localized_scripts'] );
 
-			$_SERVER                   = array();
-			$_POST                     = array();
+                        $_SERVER                   = array();
+                        $_POST                     = array();
 			$GLOBALS['fbm_transients'] = array();
 
 			parent::tearDown();
@@ -322,11 +328,11 @@ final class RegistrationFormTest extends TestCase {
 			$this->assertSame( 'active', $this->notification->last_args[4] );
 	}
 
-	public function test_household_size_negative_values_clamped(): void {
-			$this->prepare_valid_submission(
-				array(
-					'fbm_household_size'    => '-5',
-					'fbm_registration_time' => (string) ( time() - 120 ),
+        public function test_household_size_negative_values_clamped(): void {
+                        $this->prepare_valid_submission(
+                                array(
+                                        'fbm_household_size'    => '-5',
+                                        'fbm_registration_time' => (string) ( time() - 120 ),
 				)
 			);
 
@@ -354,29 +360,278 @@ final class RegistrationFormTest extends TestCase {
 			$fingerprint = strtolower( 'taylor@example.com' ) . '|203.0.113.10';
 			$transient   = 'fbm_registration_cooldown_' . md5( $fingerprint );
 
-			set_transient( $transient, time(), 120 );
+                        set_transient( $transient, time(), 120 );
 
-			$result = $this->invoke_handle_submission();
+                        $result = $this->invoke_handle_submission();
 
-			$this->assertFalse( $result['success'] );
-			$this->assertContains( 'Please wait before submitting again.', $result['errors'] );
-			$this->assertSame( 'Please wait before submitting again.', $result['message'] );
-	}
+                        $this->assertFalse( $result['success'] );
+                        $this->assertContains( 'Please wait before submitting again.', $result['errors'] );
+                        $this->assertSame( 'Please wait before submitting again.', $result['message'] );
+        }
+
+        public function test_prepare_condition_rules_filters_invalid_rules(): void {
+                        $method = new ReflectionMethod( RegistrationForm::class, 'prepare_condition_rules' );
+                        $method->setAccessible( true );
+
+                        $fields = array(
+                                'fbm_first_name'      => array( 'name' => 'fbm_first_name', 'type' => 'text', 'required' => true ),
+                                'fbm_extra_question'  => array( 'name' => 'fbm_extra_question', 'type' => 'text' ),
+                                'fbm_submit_button'   => array( 'name' => 'fbm_submit_button', 'type' => 'submit' ),
+                        );
+
+                        $conditions = array(
+                                'enabled' => true,
+                                'rules'   => array(
+                                        array(
+                                                'if_field' => 'fbm_first_name',
+                                                'operator' => 'equals',
+                                                'value'    => 'Yes',
+                                                'action'   => 'show',
+                                                'target'   => 'fbm_extra_question',
+                                        ),
+                                        array(
+                                                'if_field' => 'fbm_first_name',
+                                                'operator' => 'equals',
+                                                'value'    => '',
+                                                'action'   => 'hide',
+                                                'target'   => 'fbm_extra_question',
+                                        ),
+                                        array(
+                                                'if_field' => 'fbm_unknown',
+                                                'operator' => 'equals',
+                                                'value'    => 'Yes',
+                                                'action'   => 'show',
+                                                'target'   => 'fbm_extra_question',
+                                        ),
+                                        array(
+                                                'if_field' => 'fbm_first_name',
+                                                'operator' => 'contains',
+                                                'value'    => 'maybe',
+                                                'action'   => 'hide',
+                                                'target'   => 'fbm_submit_button',
+                                        ),
+                                ),
+                        );
+
+                        $result = $method->invoke( null, $conditions, $fields );
+
+                        $this->assertSame(
+                                array(
+                                        array(
+                                                'if_field' => 'fbm_first_name',
+                                                'operator' => 'equals',
+                                                'value'    => 'Yes',
+                                                'action'   => 'show',
+                                                'target'   => 'fbm_extra_question',
+                                        ),
+                                ),
+                                $result
+                        );
+        }
+
+        public function test_evaluate_condition_visibility_handles_operators(): void {
+                        $prepare = new ReflectionMethod( RegistrationForm::class, 'prepare_condition_rules' );
+                        $prepare->setAccessible( true );
+
+                        $evaluate = new ReflectionMethod( RegistrationForm::class, 'evaluate_condition_visibility' );
+                        $evaluate->setAccessible( true );
+
+                        $fields = array(
+                                'controller'        => array( 'name' => 'controller', 'type' => 'text' ),
+                                'toggle_show'       => array( 'name' => 'toggle_show', 'type' => 'text' ),
+                                'toggle_hide'       => array( 'name' => 'toggle_hide', 'type' => 'text' ),
+                                'color_target'      => array( 'name' => 'color_target', 'type' => 'text' ),
+                                'optional_hidden'   => array( 'name' => 'optional_hidden', 'type' => 'text' ),
+                                'optional_visible'  => array( 'name' => 'optional_visible', 'type' => 'text' ),
+                                'multi_field'       => array( 'name' => 'multi_field', 'type' => 'checkbox' ),
+                                'optional_field'    => array( 'name' => 'optional_field', 'type' => 'text' ),
+                        );
+
+                        $conditions = array(
+                                'enabled' => true,
+                                'rules'   => array(
+                                        array(
+                                                'if_field' => 'controller',
+                                                'operator' => 'equals',
+                                                'value'    => 'ready',
+                                                'action'   => 'show',
+                                                'target'   => 'toggle_show',
+                                        ),
+                                        array(
+                                                'if_field' => 'controller',
+                                                'operator' => 'not_equals',
+                                                'value'    => 'blocked',
+                                                'action'   => 'hide',
+                                                'target'   => 'toggle_hide',
+                                        ),
+                                        array(
+                                                'if_field' => 'multi_field',
+                                                'operator' => 'contains',
+                                                'value'    => 'blue',
+                                                'action'   => 'hide',
+                                                'target'   => 'color_target',
+                                        ),
+                                        array(
+                                                'if_field' => 'optional_field',
+                                                'operator' => 'empty',
+                                                'value'    => '',
+                                                'action'   => 'hide',
+                                                'target'   => 'optional_hidden',
+                                        ),
+                                        array(
+                                                'if_field' => 'optional_field',
+                                                'operator' => 'not_empty',
+                                                'value'    => '',
+                                                'action'   => 'show',
+                                                'target'   => 'optional_visible',
+                                        ),
+                                ),
+                        );
+
+                        $rules = $prepare->invoke( null, $conditions, $fields );
+
+                        $values = array(
+                                'controller'      => 'READY',
+                                'multi_field'     => array( 'green', 'blue' ),
+                                'optional_field'  => '',
+                        );
+
+                        $visibility = $evaluate->invoke( null, $rules, $fields, $values );
+
+                        $this->assertTrue( $visibility['toggle_show'] );
+                        $this->assertFalse( $visibility['toggle_hide'] );
+                        $this->assertFalse( $visibility['color_target'] );
+                        $this->assertFalse( $visibility['optional_hidden'] );
+                        $this->assertFalse( $visibility['optional_visible'] );
+
+                        $values['multi_field'] = array( 'red' );
+                        $values['optional_field'] = 'filled';
+
+                        $updated = $evaluate->invoke( null, $rules, $fields, $values );
+
+                        $this->assertTrue( $updated['toggle_show'] );
+                        $this->assertFalse( $updated['toggle_hide'] );
+                        $this->assertTrue( $updated['color_target'] );
+                        $this->assertTrue( $updated['optional_visible'] );
+                        $this->assertTrue( $updated['optional_hidden'] );
+        }
+
+        public function test_hidden_field_submission_ignored_when_rule_hides_target(): void {
+                        $settings = TemplateDefaults::settings();
+                        $settings['conditions'] = array(
+                                'enabled' => true,
+                                'rules'   => array(
+                                        array(
+                                                'if_field' => 'fbm_first_name',
+                                                'operator' => 'equals',
+                                                'value'    => 'hide',
+                                                'action'   => 'hide',
+                                                'target'   => 'fbm_household_size',
+                                        ),
+                                ),
+                        );
+
+                        $this->prepare_valid_submission(
+                                array(
+                                        'fbm_first_name'        => 'Hide',
+                                        'fbm_household_size'    => '9',
+                                        'fbm_registration_time' => (string) ( time() - 120 ),
+                                )
+                        );
+
+                        $result = $this->invoke_handle_submission( null, $settings );
+
+                        $this->assertTrue( $result['success'] );
+                        $member = reset( $this->wpdb->members );
+                        $this->assertSame( 1, $member['household_size'] );
+        }
+
+        public function test_required_field_shown_by_rule_requires_value(): void {
+                        $schema = $this->schema();
+                        $fields = $schema['fields'];
+                        $fields['fbm_registration_consent']['required'] = true;
+                        $fields['fbm_registration_consent']['type']      = 'checkbox';
+
+                        $settings = TemplateDefaults::settings();
+                        $settings['conditions'] = array(
+                                'enabled' => true,
+                                'rules'   => array(
+                                        array(
+                                                'if_field' => 'fbm_first_name',
+                                                'operator' => 'equals',
+                                                'value'    => 'show',
+                                                'action'   => 'show',
+                                                'target'   => 'fbm_registration_consent',
+                                        ),
+                                ),
+                        );
+
+                        $this->prepare_valid_submission(
+                                array(
+                                        'fbm_first_name'        => 'show',
+                                        'fbm_registration_time' => (string) ( time() - 120 ),
+                                )
+                        );
+                        unset( $_POST['fbm_registration_consent'] );
+
+                        $result = $this->invoke_handle_submission( $fields, $settings );
+
+                        $this->assertFalse( $result['success'] );
+                        $this->assertArrayHasKey( 'fbm_registration_consent', $result['field_errors'] );
+                        $this->assertContains( 'This field is required.', $result['field_errors']['fbm_registration_consent'] );
+        }
+
+        public function test_enqueue_assets_for_form_localizes_conditions(): void {
+                        $method = new ReflectionMethod( RegistrationForm::class, 'enqueue_assets_for_form' );
+                        $method->setAccessible( true );
+
+                        $schema = array(
+                                'fields' => array(
+                                        'fbm_first_name' => array( 'name' => 'fbm_first_name', 'type' => 'text' ),
+                                        'fbm_extra'      => array( 'name' => 'fbm_extra', 'type' => 'text' ),
+                                ),
+                        );
+
+                        $settings = TemplateDefaults::settings();
+                        $settings['conditions'] = array(
+                                'enabled' => true,
+                                'rules'   => array(
+                                        array(
+                                                'if_field' => 'fbm_first_name',
+                                                'operator' => 'equals',
+                                                'value'    => 'trigger',
+                                                'action'   => 'hide',
+                                                'target'   => 'fbm_extra',
+                                        ),
+                                ),
+                        );
+
+                        $method->invoke( null, $schema, $settings );
+
+                        $this->assertContains( 'fbm-registration-form', $GLOBALS['fbm_enqueued_scripts'] );
+                        $this->assertContains( 'fbm-registration-form', $GLOBALS['fbm_enqueued_styles'] );
+                        $this->assertArrayHasKey( 'fbm-registration-form', $GLOBALS['fbm_localized_scripts'] );
+
+                        $localized = $GLOBALS['fbm_localized_scripts']['fbm-registration-form'];
+                        $this->assertSame( 'fbmRegistrationForm', $localized['name'] );
+                        $this->assertTrue( $localized['data']['conditions']['enabled'] );
+                        $this->assertSame( 'fbm_extra', $localized['data']['conditions']['rules'][0]['target'] );
+        }
 
 		/**
 		 * Invoke the private handle_submission helper via reflection.
 		 */
-	private function invoke_handle_submission(): array {
-			$method = new ReflectionMethod( RegistrationForm::class, 'handle_submission' );
-			$method->setAccessible( true );
+        private function invoke_handle_submission( ?array $fields = null, ?array $settings = null ): array {
+                        $method = new ReflectionMethod( RegistrationForm::class, 'handle_submission' );
+                        $method->setAccessible( true );
 
-			$schema   = $this->schema();
-			$fields   = $schema['fields'];
-			$settings = TemplateDefaults::settings();
+                        $schema = $this->schema();
+                        $fields = $fields ?? $schema['fields'];
+                        $settings = $settings ?? TemplateDefaults::settings();
 
-			/** @var array{success:bool,errors:array<int,string>,message:string,values:array<string,string>} */
-			return $method->invoke( null, $fields, $settings );
-	}
+                        /** @var array{success:bool,errors:array<int,string>,message:string,values:array<string,string>} */
+                        return $method->invoke( null, $fields, $settings );
+        }
 
 		/**
 		 * Resolve the default schema for tests.

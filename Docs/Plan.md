@@ -36,6 +36,8 @@ Member creation (pending|active per config); email template engine.
 
 Welcome Email with attached QR image and fallback code; regenerate on re-send.
 
+Registration editor delivers simple conditional visibility rules (phase-1) with server enforcement and publishes the template tag matrix for administrators.
+
 ### Public User Flow
 
 1. Visitor submits the public registration form (shortcode) with validated fields.
