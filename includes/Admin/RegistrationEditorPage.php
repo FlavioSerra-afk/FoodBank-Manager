@@ -45,11 +45,11 @@ use function settings_errors;
 use function settings_fields;
 use function submit_button;
 use function update_option;
+use function wp_add_inline_script;
 use function wp_create_nonce;
 use function wp_die;
 use function wp_enqueue_code_editor;
 use function wp_enqueue_script;
-use function wp_enqueue_style;
 use function wp_json_encode;
 use function wp_kses_post;
 use function wp_localize_script;
@@ -203,30 +203,28 @@ final class RegistrationEditorPage {
 		 *
 		 * @param string $hook_suffix Current admin page hook.
 		 */
-	public static function enqueue_assets( string $hook_suffix ): void {
-			unset( $hook_suffix );
+        public static function enqueue_assets( string $hook_suffix ): void {
+                        $screen_id = self::screen_id();
 
-		if ( ! function_exists( 'get_current_screen' ) ) {
-				return;
-		}
+                if ( $screen_id !== $hook_suffix ) {
+                        if ( ! function_exists( 'get_current_screen' ) ) {
+                                        return;
+                        }
 
-			$screen = get_current_screen();
-		if ( ! $screen || self::screen_id() !== $screen->id ) {
-				return;
-		}
+                                $screen = get_current_screen();
+                        if ( ! $screen || $screen_id !== (string) $screen->id ) {
+                                        return;
+                        }
+                }
 
-			$editor_settings = wp_enqueue_code_editor( array( 'type' => 'text/html' ) );
+                        $defaults        = TemplateDefaults::settings();
+                        $stored_settings = get_option( self::SETTINGS_OPTION, $defaults );
+                if ( ! is_array( $stored_settings ) ) {
+                                $stored_settings = $defaults;
+                }
 
-		if ( ! empty( $editor_settings ) ) {
-				wp_enqueue_script( 'code-editor' );
-				wp_enqueue_style( 'code-editor' );
-		} else {
-				$editor_settings = array();
-		}
-
-                        $stored_settings = get_option( self::SETTINGS_OPTION, TemplateDefaults::settings() );
-                        $theme           = 'light';
-                if ( is_array( $stored_settings ) && isset( $stored_settings['editor']['theme'] ) && is_string( $stored_settings['editor']['theme'] ) ) {
+                        $theme = 'light';
+                if ( isset( $stored_settings['editor']['theme'] ) && is_string( $stored_settings['editor']['theme'] ) ) {
                                 $candidate = sanitize_key( $stored_settings['editor']['theme'] );
                         if ( in_array( $candidate, array( 'light', 'dark' ), true ) ) {
                                         $theme = $candidate;
@@ -239,8 +237,8 @@ final class RegistrationEditorPage {
                 }
 
                         $fields         = self::field_catalog( $template );
-                        $settings       = wp_parse_args( is_array( $stored_settings ) ? $stored_settings : array(), TemplateDefaults::settings() );
-                        $conditions     = isset( $settings['conditions'] ) && is_array( $settings['conditions'] ) ? $settings['conditions'] : TemplateDefaults::settings()['conditions'];
+                        $settings       = wp_parse_args( $stored_settings, $defaults );
+                        $conditions     = isset( $settings['conditions'] ) && is_array( $settings['conditions'] ) ? $settings['conditions'] : $defaults['conditions'];
                         $groups         = isset( $conditions['groups'] ) && is_array( $conditions['groups'] ) ? array_values( $conditions['groups'] ) : array();
                         $current_user_id = function_exists( 'get_current_user_id' ) ? (int) get_current_user_id() : 0;
                         $autosave_state  = EditorState::get_autosave( $current_user_id );
@@ -252,8 +250,20 @@ final class RegistrationEditorPage {
                         );
 
                         $matrix_url = plugins_url( 'Docs/Registration-Template-Matrix.md', FBM_FILE );
+                        $version    = defined( 'FBM_VER' ) ? FBM_VER : Plugin::VERSION;
 
-                        $version = defined( 'FBM_VER' ) ? FBM_VER : Plugin::VERSION;
+                        $editor_settings      = wp_enqueue_code_editor( array( 'type' => 'text/html' ) );
+                        $code_editor_settings = array();
+                if ( is_array( $editor_settings ) ) {
+                                $code_editor_settings = $editor_settings;
+
+                        if ( ! isset( $code_editor_settings['codemirror'] ) || ! is_array( $code_editor_settings['codemirror'] ) ) {
+                                        $code_editor_settings['codemirror'] = array();
+                        }
+
+                                $code_editor_settings['codemirror']['theme'] = $theme;
+                }
+
                         wp_enqueue_script( 'jquery' );
 
         $conditions_handle = 'fbm-registration-conditions';
@@ -267,7 +277,7 @@ final class RegistrationEditorPage {
         $handle       = 'fbm-registration-editor';
         $script       = plugins_url( 'assets/js/registration-editor.js', FBM_FILE );
         $dependencies = array( 'jquery', $conditions_handle, $trace_handle );
-                if ( ! empty( $editor_settings ) ) {
+                if ( ! empty( $code_editor_settings ) ) {
                         $dependencies[] = 'code-editor';
                 }
                         wp_register_script( $handle, $script, $dependencies, $version, true );
@@ -283,7 +293,7 @@ final class RegistrationEditorPage {
                                         'importDiffUrl'     => esc_url_raw( rest_url( 'fbm/v1/registration/editor/conditions/diff' ) ),
                                         'textareaId'        => self::TEMPLATE_FIELD,
                                         'settingsField'     => self::SETTINGS_FIELD,
-                                        'codeEditor'        => $editor_settings,
+                                        'codeEditor'        => $code_editor_settings,
                                         'editorTheme'       => $theme,
                                         'conditionSchema'   => Conditions::SCHEMA_VERSION,
                                         'fields'            => Conditions::normalize_fields( $fields ),
@@ -443,9 +453,18 @@ final class RegistrationEditorPage {
                                         ),
                                 )
                         );
+                if ( ! empty( $code_editor_settings ) ) {
+                        $initialization = sprintf(
+                                'window.fbmRegistrationEditorCodeEditor=window.fbmRegistrationEditorCodeEditor||{};window.fbmRegistrationEditorCodeEditor.settings=%1$s;(function(){if(!window.wp||!window.wp.codeEditor){return;}var fbmEditor=wp.codeEditor.initialize(%2$s, window.fbmRegistrationEditorCodeEditor.settings);window.fbmRegistrationEditorCodeEditor.instance=fbmEditor;window.fbmRegistrationEditorCodeEditor.codemirror=fbmEditor&&fbmEditor.codemirror?fbmEditor.codemirror:null;}());',
+                                wp_json_encode( $code_editor_settings ),
+                                wp_json_encode( self::TEMPLATE_FIELD )
+                        );
+
+                        wp_add_inline_script( $handle, $initialization, 'before' );
+                }
                         wp_enqueue_script( $conditions_handle );
                         wp_enqueue_script( $handle );
-	}
+        }
 
 		/**
 		 * Sanitize the template payload.

@@ -18,17 +18,74 @@ use ReflectionMethod;
  * @covers \FoodBankManager\Admin\RegistrationEditorPage
  */
 final class RegistrationEditorPageTest extends TestCase {
-	protected function setUp(): void {
-			parent::setUp();
+        protected function setUp(): void {
+                        parent::setUp();
 
-			$GLOBALS['fbm_settings_errors'] = array();
-	}
+                        $GLOBALS['fbm_settings_errors'] = array();
+                        $GLOBALS['fbm_registered_scripts'] = array();
+                        $GLOBALS['fbm_enqueued_scripts']  = array();
+                        $GLOBALS['fbm_localized_scripts'] = array();
+                        $GLOBALS['fbm_inline_scripts']    = array();
+                        $GLOBALS['fbm_code_editor_requests'] = array();
+                        $GLOBALS['fbm_current_screen']        = null;
+                        unset( $GLOBALS['fbm_code_editor_disabled'], $GLOBALS['fbm_code_editor_response'] );
+        }
 
-	protected function tearDown(): void {
-			$GLOBALS['fbm_settings_errors'] = array();
+        protected function tearDown(): void {
+                        $GLOBALS['fbm_settings_errors'] = array();
+                        $GLOBALS['fbm_registered_scripts'] = array();
+                        $GLOBALS['fbm_enqueued_scripts']  = array();
+                        $GLOBALS['fbm_localized_scripts'] = array();
+                        $GLOBALS['fbm_inline_scripts']    = array();
+                        $GLOBALS['fbm_code_editor_requests'] = array();
+                        $GLOBALS['fbm_current_screen']        = null;
+                        unset( $GLOBALS['fbm_code_editor_disabled'], $GLOBALS['fbm_code_editor_response'] );
 
-			parent::tearDown();
-	}
+                        parent::tearDown();
+        }
+
+        public function test_enqueue_assets_ignores_other_screens(): void {
+                        $GLOBALS['fbm_current_screen'] = (object) array( 'id' => 'fbm-admin_page_other' );
+
+                        RegistrationEditorPage::enqueue_assets( 'fbm-admin_page_other' );
+
+                        $this->assertArrayNotHasKey( 'fbm-registration-editor', $GLOBALS['fbm_registered_scripts'] );
+                        $this->assertSame( array(), $GLOBALS['fbm_code_editor_requests'] );
+        }
+
+        public function test_enqueue_assets_initializes_code_editor(): void {
+                        $GLOBALS['fbm_current_screen'] = (object) array( 'id' => 'fbm-admin_page_fbm-registration-form' );
+
+                        RegistrationEditorPage::enqueue_assets( 'fbm-admin_page_fbm-registration-form' );
+
+                        $this->assertArrayHasKey( 'fbm-registration-editor', $GLOBALS['fbm_registered_scripts'] );
+                        $this->assertContains( 'fbm-registration-editor', $GLOBALS['fbm_enqueued_scripts'] );
+                        $this->assertNotEmpty( $GLOBALS['fbm_code_editor_requests'] );
+
+                        $this->assertArrayHasKey( 'fbm-registration-editor', $GLOBALS['fbm_localized_scripts'] );
+                        $localized = $GLOBALS['fbm_localized_scripts']['fbm-registration-editor'];
+                        $this->assertSame( 'fbmRegistrationEditor', $localized['name'] );
+                        $this->assertSame( 'nonce-wp_rest', $localized['data']['restNonce'] );
+                        $this->assertNotEmpty( $localized['data']['codeEditor'] );
+
+                        $inline = $GLOBALS['fbm_inline_scripts']['fbm-registration-editor']['before'] ?? array();
+                        $this->assertNotEmpty( $inline );
+                        $this->assertStringContainsString( 'wp.codeEditor.initialize', $inline[0] );
+                        $this->assertStringContainsString( 'fbm_registration_template_field', $inline[0] );
+        }
+
+        public function test_enqueue_assets_without_code_editor_uses_textarea(): void {
+                        $GLOBALS['fbm_code_editor_disabled'] = true;
+                        $GLOBALS['fbm_current_screen']        = (object) array( 'id' => 'fbm-admin_page_fbm-registration-form' );
+
+                        RegistrationEditorPage::enqueue_assets( 'fbm-admin_page_fbm-registration-form' );
+
+                        $this->assertNotEmpty( $GLOBALS['fbm_code_editor_requests'] );
+                        $this->assertArrayHasKey( 'fbm-registration-editor', $GLOBALS['fbm_localized_scripts'] );
+                        $data = $GLOBALS['fbm_localized_scripts']['fbm-registration-editor']['data'];
+                        $this->assertSame( array(), $data['codeEditor'] );
+                        $this->assertArrayNotHasKey( 'fbm-registration-editor', $GLOBALS['fbm_inline_scripts'] );
+        }
 
 	public function test_sanitize_template_strips_disallowed_markup(): void {
 			$template = '<div class="wrap" data-info="example">[text* first-name]</div><script>alert(1)</script>';

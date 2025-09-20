@@ -4,6 +4,11 @@
 
 - _No changes yet._
 
+## [1.9.1] - 2025-09-20
+
+### Fixed
+- Gated the registration editor assets to the editor screen, initialised the CodeMirror editor at full width, and wired toolbar insertions and previews with REST nonces.
+
 ## [1.9.0] - 2025-09-30
 
 ### Added
