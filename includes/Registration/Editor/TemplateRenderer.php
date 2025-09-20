@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:disable WordPress.Files.FileName.InvalidClassFileName,WordPress.Files.FileName.NotHyphenatedLowercase
 /**
  * Registration template renderer.
  *
@@ -174,7 +174,10 @@ final class TemplateRenderer {
 						return $markup;
 		}
 
-					return '<div class="fbm-field" data-fbm-field="' . esc_attr( $name ) . '" data-fbm-field-type="' . esc_attr( $type ) . '">' . $markup . '</div>';
+										$required_flag = ! empty( $definition['required'] ) ? '1' : '0';
+										$id            = 'fbm-field-' . $name;
+
+										return '<div class="fbm-field" id="' . esc_attr( $id ) . '" data-fbm-field="' . esc_attr( $name ) . '" data-fbm-field-type="' . esc_attr( $type ) . '" data-fbm-field-required="' . esc_attr( $required_flag ) . '">' . $markup . '</div>';
 	}
 
 				/**
@@ -389,7 +392,7 @@ final class TemplateRenderer {
 		/**
 		 * Render a set of radio buttons.
 		 *
-		 * @param string            $type       radio|checkbox
+		 * @param string            $type       radio|checkbox.
 		 * @param string            $name       Field name.
 		 * @param string            $id         Base identifier.
 		 * @param string            $label      Legend label.
@@ -589,3 +592,5 @@ final class TemplateRenderer {
 			return $base . '-input';
 	}
 }
+
+// phpcs:enable WordPress.Files.FileName.InvalidClassFileName,WordPress.Files.FileName.NotHyphenatedLowercase

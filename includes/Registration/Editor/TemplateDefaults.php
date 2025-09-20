@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:disable WordPress.Files.FileName.InvalidClassFileName,WordPress.Files.FileName.NotHyphenatedLowercase
 /**
  * Registration template defaults.
  *
@@ -15,11 +15,11 @@ use function __;
  * Provides default template and settings payloads.
  */
 final class TemplateDefaults {
-        /**
-         * Default HTML+tag template for the registration form.
-         */
-        public static function template(): string {
-                return <<<HTML
+		/**
+		 * Default HTML+tag template for the registration form.
+		 */
+	public static function template(): string {
+			return <<<'HTML'
 <div class="fbm-registration-editor__wrap">
         <fieldset class="fbm-registration-editor__section">
                 <legend class="fbm-registration-editor__legend">Register for weekly collection</legend>
@@ -48,35 +48,37 @@ final class TemplateDefaults {
         </div>
 </div>
 HTML;
-        }
+	}
 
-        /**
-         * Default registration editor settings payload.
-         *
-         * @return array<string,mixed>
-         */
-        public static function settings(): array {
-                return array(
-                        'uploads'    => array(
-                                'max_size'           => 5242880,
-                                'allowed_mime_types' => array(
-                                        'application/pdf',
-                                        'image/jpeg',
-                                        'image/png',
-                                ),
-                        ),
-                        'conditions' => array(
-                                'enabled' => false,
-                                'rules'   => array(),
-                        ),
-                        'editor'     => array(
-                                'theme' => 'light',
-                        ),
-                        'honeypot'   => true,
-                        'messages'   => array(
-                                'success_auto'    => __( 'Thank you for registering. We have emailed your check-in QR code.', 'foodbank-manager' ),
-                                'success_pending' => __( 'Thank you for registering. Our team will review your application and send your QR code once approved.', 'foodbank-manager' ),
-                        ),
-                );
-        }
+		/**
+		 * Default registration editor settings payload.
+		 *
+		 * @return array<string,mixed>
+		 */
+	public static function settings(): array {
+			return array(
+				'uploads'    => array(
+					'max_size'           => 5242880,
+					'allowed_mime_types' => array(
+						'application/pdf',
+						'image/jpeg',
+						'image/png',
+					),
+				),
+				'conditions' => array(
+					'enabled' => false,
+					'groups'  => array(),
+				),
+				'editor'     => array(
+					'theme' => 'light',
+				),
+				'honeypot'   => true,
+				'messages'   => array(
+					'success_auto'    => __( 'Thank you for registering. We have emailed your check-in QR code.', 'foodbank-manager' ),
+					'success_pending' => __( 'Thank you for registering. Our team will review your application and send your QR code once approved.', 'foodbank-manager' ),
+				),
+			);
+	}
 }
+
+// phpcs:enable WordPress.Files.FileName.InvalidClassFileName,WordPress.Files.FileName.NotHyphenatedLowercase

@@ -369,71 +369,101 @@ final class RegistrationFormTest extends TestCase {
                         $this->assertSame( 'Please wait before submitting again.', $result['message'] );
         }
 
-        public function test_prepare_condition_rules_filters_invalid_rules(): void {
-                        $method = new ReflectionMethod( RegistrationForm::class, 'prepare_condition_rules' );
+        public function test_prepare_condition_groups_filters_invalid_entries(): void {
+                        $method = new ReflectionMethod( RegistrationForm::class, 'prepare_condition_groups' );
                         $method->setAccessible( true );
 
                         $fields = array(
-                                'fbm_first_name'      => array( 'name' => 'fbm_first_name', 'type' => 'text', 'required' => true ),
-                                'fbm_extra_question'  => array( 'name' => 'fbm_extra_question', 'type' => 'text' ),
-                                'fbm_submit_button'   => array( 'name' => 'fbm_submit_button', 'type' => 'submit' ),
+                                'controller'        => array( 'name' => 'controller', 'type' => 'text', 'required' => true ),
+                                'target_visible'    => array( 'name' => 'target_visible', 'type' => 'text' ),
+                                'target_required'   => array( 'name' => 'target_required', 'type' => 'number' ),
+                                'fbm_submit_button' => array( 'name' => 'fbm_submit_button', 'type' => 'submit' ),
                         );
 
                         $conditions = array(
                                 'enabled' => true,
-                                'rules'   => array(
+                                'groups'  => array(
                                         array(
-                                                'if_field' => 'fbm_first_name',
-                                                'operator' => 'equals',
-                                                'value'    => 'Yes',
-                                                'action'   => 'show',
-                                                'target'   => 'fbm_extra_question',
-                                        ),
-                                        array(
-                                                'if_field' => 'fbm_first_name',
-                                                'operator' => 'equals',
-                                                'value'    => '',
-                                                'action'   => 'hide',
-                                                'target'   => 'fbm_extra_question',
-                                        ),
-                                        array(
-                                                'if_field' => 'fbm_unknown',
-                                                'operator' => 'equals',
-                                                'value'    => 'Yes',
-                                                'action'   => 'show',
-                                                'target'   => 'fbm_extra_question',
-                                        ),
-                                        array(
-                                                'if_field' => 'fbm_first_name',
-                                                'operator' => 'contains',
-                                                'value'    => 'maybe',
-                                                'action'   => 'hide',
-                                                'target'   => 'fbm_submit_button',
+                                                'operator'   => 'invalid',
+                                                'conditions' => array(
+                                                        array(
+                                                                'field'    => 'controller',
+                                                                'operator' => 'equals',
+                                                                'value'    => 'Yes',
+                                                        ),
+                                                        array(
+                                                                'field'    => 'controller',
+                                                                'operator' => 'equals',
+                                                                'value'    => '',
+                                                        ),
+                                                        array(
+                                                                'field'    => 'missing',
+                                                                'operator' => 'equals',
+                                                                'value'    => 'ignored',
+                                                        ),
+                                                        array(
+                                                                'field'    => 'controller',
+                                                                'operator' => 'empty',
+                                                                'value'    => 'ignored',
+                                                        ),
+                                                ),
+                                                'actions'    => array(
+                                                        array(
+                                                                'type'   => 'show',
+                                                                'target' => 'target_visible',
+                                                        ),
+                                                        array(
+                                                                'type'   => 'hide',
+                                                                'target' => 'fbm_submit_button',
+                                                        ),
+                                                        array(
+                                                                'type'   => 'optional',
+                                                                'target' => 'unknown_target',
+                                                        ),
+                                                ),
                                         ),
                                 ),
                         );
 
+                        /** @var array<int,array<string,mixed>> $result */
                         $result = $method->invoke( null, $conditions, $fields );
 
                         $this->assertSame(
                                 array(
                                         array(
-                                                'if_field' => 'fbm_first_name',
-                                                'operator' => 'equals',
-                                                'value'    => 'Yes',
-                                                'action'   => 'show',
-                                                'target'   => 'fbm_extra_question',
+                                                'operator'   => 'and',
+                                                'conditions' => array(
+                                                        array(
+                                                                'field'      => 'controller',
+                                                                'operator'   => 'equals',
+                                                                'value'      => 'Yes',
+                                                                'field_type' => 'text',
+                                                        ),
+                                                        array(
+                                                                'field'      => 'controller',
+                                                                'operator'   => 'empty',
+                                                                'value'      => '',
+                                                                'field_type' => 'text',
+                                                        ),
+                                                ),
+                                                'actions'    => array(
+                                                        array(
+                                                                'type'        => 'show',
+                                                                'target'      => 'target_visible',
+                                                                'target_type' => 'text',
+                                                        ),
+                                                ),
                                         ),
                                 ),
                                 $result
                         );
         }
 
-        public function test_evaluate_condition_visibility_handles_operators(): void {
-                        $prepare = new ReflectionMethod( RegistrationForm::class, 'prepare_condition_rules' );
+        public function test_evaluate_condition_state_handles_operators(): void {
+                        $prepare = new ReflectionMethod( RegistrationForm::class, 'prepare_condition_groups' );
                         $prepare->setAccessible( true );
 
-                        $evaluate = new ReflectionMethod( RegistrationForm::class, 'evaluate_condition_visibility' );
+                        $evaluate = new ReflectionMethod( RegistrationForm::class, 'evaluate_condition_state' );
                         $evaluate->setAccessible( true );
 
                         $fields = array(
@@ -449,46 +479,89 @@ final class RegistrationFormTest extends TestCase {
 
                         $conditions = array(
                                 'enabled' => true,
-                                'rules'   => array(
+                                'groups'  => array(
                                         array(
-                                                'if_field' => 'controller',
-                                                'operator' => 'equals',
-                                                'value'    => 'ready',
-                                                'action'   => 'show',
-                                                'target'   => 'toggle_show',
+                                                'operator'   => 'and',
+                                                'conditions' => array(
+                                                        array(
+                                                                'field'    => 'controller',
+                                                                'operator' => 'equals',
+                                                                'value'    => 'ready',
+                                                        ),
+                                                ),
+                                                'actions'    => array(
+                                                        array(
+                                                                'type'   => 'show',
+                                                                'target' => 'toggle_show',
+                                                        ),
+                                                ),
                                         ),
                                         array(
-                                                'if_field' => 'controller',
-                                                'operator' => 'not_equals',
-                                                'value'    => 'blocked',
-                                                'action'   => 'hide',
-                                                'target'   => 'toggle_hide',
+                                                'operator'   => 'and',
+                                                'conditions' => array(
+                                                        array(
+                                                                'field'    => 'controller',
+                                                                'operator' => 'not_equals',
+                                                                'value'    => 'blocked',
+                                                        ),
+                                                ),
+                                                'actions'    => array(
+                                                        array(
+                                                                'type'   => 'hide',
+                                                                'target' => 'toggle_hide',
+                                                        ),
+                                                ),
                                         ),
                                         array(
-                                                'if_field' => 'multi_field',
-                                                'operator' => 'contains',
-                                                'value'    => 'blue',
-                                                'action'   => 'hide',
-                                                'target'   => 'color_target',
+                                                'operator'   => 'and',
+                                                'conditions' => array(
+                                                        array(
+                                                                'field'    => 'multi_field',
+                                                                'operator' => 'contains',
+                                                                'value'    => 'blue',
+                                                        ),
+                                                ),
+                                                'actions'    => array(
+                                                        array(
+                                                                'type'   => 'hide',
+                                                                'target' => 'color_target',
+                                                        ),
+                                                ),
                                         ),
                                         array(
-                                                'if_field' => 'optional_field',
-                                                'operator' => 'empty',
-                                                'value'    => '',
-                                                'action'   => 'hide',
-                                                'target'   => 'optional_hidden',
+                                                'operator'   => 'and',
+                                                'conditions' => array(
+                                                        array(
+                                                                'field'    => 'optional_field',
+                                                                'operator' => 'empty',
+                                                        ),
+                                                ),
+                                                'actions'    => array(
+                                                        array(
+                                                                'type'   => 'hide',
+                                                                'target' => 'optional_hidden',
+                                                        ),
+                                                ),
                                         ),
                                         array(
-                                                'if_field' => 'optional_field',
-                                                'operator' => 'not_empty',
-                                                'value'    => '',
-                                                'action'   => 'show',
-                                                'target'   => 'optional_visible',
+                                                'operator'   => 'and',
+                                                'conditions' => array(
+                                                        array(
+                                                                'field'    => 'optional_field',
+                                                                'operator' => 'not_empty',
+                                                        ),
+                                                ),
+                                                'actions'    => array(
+                                                        array(
+                                                                'type'   => 'show',
+                                                                'target' => 'optional_visible',
+                                                        ),
+                                                ),
                                         ),
                                 ),
                         );
 
-                        $rules = $prepare->invoke( null, $conditions, $fields );
+                        $groups = $prepare->invoke( null, $conditions, $fields );
 
                         $values = array(
                                 'controller'      => 'READY',
@@ -496,37 +569,324 @@ final class RegistrationFormTest extends TestCase {
                                 'optional_field'  => '',
                         );
 
-                        $visibility = $evaluate->invoke( null, $rules, $fields, $values );
+                        /** @var array<string,array<string,bool>> $visibility */
+                        $visibility = $evaluate->invoke( null, $groups, $fields, $values );
 
-                        $this->assertTrue( $visibility['toggle_show'] );
-                        $this->assertFalse( $visibility['toggle_hide'] );
-                        $this->assertFalse( $visibility['color_target'] );
-                        $this->assertFalse( $visibility['optional_hidden'] );
-                        $this->assertFalse( $visibility['optional_visible'] );
+                        $this->assertTrue( $visibility['toggle_show']['visible'] );
+                        $this->assertFalse( $visibility['toggle_hide']['visible'] );
+                        $this->assertFalse( $visibility['color_target']['visible'] );
+                        $this->assertFalse( $visibility['optional_hidden']['visible'] );
+                        $this->assertFalse( $visibility['optional_visible']['visible'] );
 
-                        $values['multi_field'] = array( 'red' );
+                        $values['multi_field']    = array( 'red' );
                         $values['optional_field'] = 'filled';
 
-                        $updated = $evaluate->invoke( null, $rules, $fields, $values );
+                        /** @var array<string,array<string,bool>> $updated */
+                        $updated = $evaluate->invoke( null, $groups, $fields, $values );
 
-                        $this->assertTrue( $updated['toggle_show'] );
-                        $this->assertFalse( $updated['toggle_hide'] );
-                        $this->assertTrue( $updated['color_target'] );
-                        $this->assertTrue( $updated['optional_visible'] );
-                        $this->assertTrue( $updated['optional_hidden'] );
+                        $this->assertTrue( $updated['toggle_show']['visible'] );
+                        $this->assertFalse( $updated['toggle_hide']['visible'] );
+                        $this->assertTrue( $updated['color_target']['visible'] );
+                        $this->assertTrue( $updated['optional_visible']['visible'] );
+                        $this->assertTrue( $updated['optional_hidden']['visible'] );
+        }
+
+        public function test_evaluate_condition_state_supports_numeric_and_date_comparisons(): void {
+                        $prepare = new ReflectionMethod( RegistrationForm::class, 'prepare_condition_groups' );
+                        $prepare->setAccessible( true );
+
+                        $evaluate = new ReflectionMethod( RegistrationForm::class, 'evaluate_condition_state' );
+                        $evaluate->setAccessible( true );
+
+                        $fields = array(
+                                'numeric_field'   => array( 'name' => 'numeric_field', 'type' => 'number' ),
+                                'date_field'      => array( 'name' => 'date_field', 'type' => 'date' ),
+                                'target_numeric'  => array( 'name' => 'target_numeric', 'type' => 'text' ),
+                                'target_date'     => array( 'name' => 'target_date', 'type' => 'text' ),
+                        );
+
+                        $conditions = array(
+                                'enabled' => true,
+                                'groups'  => array(
+                                        array(
+                                                'operator'   => 'and',
+                                                'conditions' => array(
+                                                        array(
+                                                                'field'    => 'numeric_field',
+                                                                'operator' => 'gt',
+                                                                'value'    => '10',
+                                                        ),
+                                                ),
+                                                'actions'    => array(
+                                                        array(
+                                                                'type'   => 'show',
+                                                                'target' => 'target_numeric',
+                                                        ),
+                                                ),
+                                        ),
+                                        array(
+                                                'operator'   => 'and',
+                                                'conditions' => array(
+                                                        array(
+                                                                'field'    => 'date_field',
+                                                                'operator' => 'lte',
+                                                                'value'    => '2024-12-31',
+                                                        ),
+                                                ),
+                                                'actions'    => array(
+                                                        array(
+                                                                'type'   => 'show',
+                                                                'target' => 'target_date',
+                                                        ),
+                                                ),
+                                        ),
+                                ),
+                        );
+
+                        $groups = $prepare->invoke( null, $conditions, $fields );
+
+                        $values = array(
+                                'numeric_field' => '9',
+                                'date_field'    => '2024-10-10',
+                        );
+
+                        /** @var array<string,array<string,bool>> $state */
+                        $state = $evaluate->invoke( null, $groups, $fields, $values );
+
+                        $this->assertFalse( $state['target_numeric']['visible'] );
+                        $this->assertTrue( $state['target_date']['visible'] );
+
+                        $values['numeric_field'] = '12';
+                        $values['date_field']    = '2025-01-01';
+
+                        /** @var array<string,array<string,bool>> $updated */
+                        $updated = $evaluate->invoke( null, $groups, $fields, $values );
+
+                        $this->assertTrue( $updated['target_numeric']['visible'] );
+                        $this->assertFalse( $updated['target_date']['visible'] );
+        }
+
+        public function test_evaluate_condition_state_handles_or_groups(): void {
+                        $prepare = new ReflectionMethod( RegistrationForm::class, 'prepare_condition_groups' );
+                        $prepare->setAccessible( true );
+
+                        $evaluate = new ReflectionMethod( RegistrationForm::class, 'evaluate_condition_state' );
+                        $evaluate->setAccessible( true );
+
+                        $fields = array(
+                                'switch'       => array( 'name' => 'switch', 'type' => 'text' ),
+                                'or_target'    => array( 'name' => 'or_target', 'type' => 'text' ),
+                        );
+
+                        $conditions = array(
+                                'enabled' => true,
+                                'groups'  => array(
+                                        array(
+                                                'operator'   => 'or',
+                                                'conditions' => array(
+                                                        array(
+                                                                'field'    => 'switch',
+                                                                'operator' => 'equals',
+                                                                'value'    => 'yes',
+                                                        ),
+                                                        array(
+                                                                'field'    => 'switch',
+                                                                'operator' => 'equals',
+                                                                'value'    => 'maybe',
+                                                        ),
+                                                ),
+                                                'actions'    => array(
+                                                        array(
+                                                                'type'   => 'show',
+                                                                'target' => 'or_target',
+                                                        ),
+                                                ),
+                                        ),
+                                ),
+                        );
+
+                        $groups = $prepare->invoke( null, $conditions, $fields );
+
+                        /** @var array<string,array<string,bool>> $state */
+                        $state = $evaluate->invoke( null, $groups, $fields, array( 'switch' => 'no' ) );
+                        $this->assertFalse( $state['or_target']['visible'] );
+
+                        /** @var array<string,array<string,bool>> $updated */
+                        $updated = $evaluate->invoke( null, $groups, $fields, array( 'switch' => 'maybe' ) );
+                        $this->assertTrue( $updated['or_target']['visible'] );
+        }
+
+        public function test_evaluate_condition_state_applies_conflict_resolution(): void {
+                        $prepare = new ReflectionMethod( RegistrationForm::class, 'prepare_condition_groups' );
+                        $prepare->setAccessible( true );
+
+                        $evaluate = new ReflectionMethod( RegistrationForm::class, 'evaluate_condition_state' );
+                        $evaluate->setAccessible( true );
+
+                        $fields = array(
+                                'state'       => array( 'name' => 'state', 'type' => 'text' ),
+                                'mode'        => array( 'name' => 'mode', 'type' => 'text' ),
+                                'target'      => array( 'name' => 'target', 'type' => 'text', 'required' => true ),
+                        );
+
+                        $conditions = array(
+                                'enabled' => true,
+                                'groups'  => array(
+                                        array(
+                                                'operator'   => 'and',
+                                                'conditions' => array(
+                                                        array(
+                                                                'field'    => 'state',
+                                                                'operator' => 'equals',
+                                                                'value'    => 'on',
+                                                        ),
+                                                ),
+                                                'actions'    => array(
+                                                        array(
+                                                                'type'   => 'show',
+                                                                'target' => 'target',
+                                                        ),
+                                                ),
+                                        ),
+                                        array(
+                                                'operator'   => 'and',
+                                                'conditions' => array(
+                                                        array(
+                                                                'field'    => 'state',
+                                                                'operator' => 'equals',
+                                                                'value'    => 'on',
+                                                        ),
+                                                ),
+                                                'actions'    => array(
+                                                        array(
+                                                                'type'   => 'hide',
+                                                                'target' => 'target',
+                                                        ),
+                                                ),
+                                        ),
+                                        array(
+                                                'operator'   => 'and',
+                                                'conditions' => array(
+                                                        array(
+                                                                'field'    => 'mode',
+                                                                'operator' => 'equals',
+                                                                'value'    => 'require',
+                                                        ),
+                                                ),
+                                                'actions'    => array(
+                                                        array(
+                                                                'type'   => 'require',
+                                                                'target' => 'target',
+                                                        ),
+                                                ),
+                                        ),
+                                        array(
+                                                'operator'   => 'and',
+                                                'conditions' => array(
+                                                        array(
+                                                                'field'    => 'mode',
+                                                                'operator' => 'equals',
+                                                                'value'    => 'require',
+                                                        ),
+                                                ),
+                                                'actions'    => array(
+                                                        array(
+                                                                'type'   => 'optional',
+                                                                'target' => 'target',
+                                                        ),
+                                                ),
+                                        ),
+                                ),
+                        );
+
+                        $groups = $prepare->invoke( null, $conditions, $fields );
+
+                        /** @var array<string,array<string,bool>> $state */
+                        $state = $evaluate->invoke( null, $groups, $fields, array( 'state' => 'on', 'mode' => 'require' ) );
+
+                        $this->assertFalse( $state['target']['visible'] );
+                        $this->assertFalse( $state['target']['required'] );
+        }
+
+        public function test_optional_action_makes_field_optional(): void {
+                        $schema = $this->schema();
+                        $fields = $schema['fields'];
+                        $fields['fbm_registration_consent']['required'] = true;
+                        $fields['fbm_registration_consent']['type']      = 'checkbox';
+
+                        $settings = TemplateDefaults::settings();
+                        $settings['conditions'] = array(
+                                'enabled' => true,
+                                'groups'  => array(
+                                        array(
+                                                'operator'   => 'and',
+                                                'conditions' => array(
+                                                        array(
+                                                                'field'    => 'fbm_first_name',
+                                                                'operator' => 'equals',
+                                                                'value'    => 'optional',
+                                                        ),
+                                                ),
+                                                'actions'    => array(
+                                                        array(
+                                                                'type'   => 'show',
+                                                                'target' => 'fbm_registration_consent',
+                                                        ),
+                                                ),
+                                        ),
+                                        array(
+                                                'operator'   => 'and',
+                                                'conditions' => array(
+                                                        array(
+                                                                'field'    => 'fbm_first_name',
+                                                                'operator' => 'equals',
+                                                                'value'    => 'optional',
+                                                        ),
+                                                ),
+                                                'actions'    => array(
+                                                        array(
+                                                                'type'   => 'optional',
+                                                                'target' => 'fbm_registration_consent',
+                                                        ),
+                                                ),
+                                        ),
+                                ),
+                        );
+
+                        $this->prepare_valid_submission(
+                                array(
+                                        'fbm_first_name'        => 'optional',
+                                        'fbm_registration_time' => (string) ( time() - 120 ),
+                                )
+                        );
+                        unset( $_POST['fbm_registration_consent'] );
+
+                        $result = $this->invoke_handle_submission( $fields, $settings );
+
+                        $this->assertTrue( $result['success'] );
+                        $this->assertArrayNotHasKey( 'fbm_registration_consent', array_filter( $result['field_errors'] ) );
         }
 
         public function test_hidden_field_submission_ignored_when_rule_hides_target(): void {
                         $settings = TemplateDefaults::settings();
                         $settings['conditions'] = array(
                                 'enabled' => true,
-                                'rules'   => array(
+                                'groups'  => array(
                                         array(
-                                                'if_field' => 'fbm_first_name',
-                                                'operator' => 'equals',
-                                                'value'    => 'hide',
-                                                'action'   => 'hide',
-                                                'target'   => 'fbm_household_size',
+                                                'operator'   => 'and',
+                                                'conditions' => array(
+                                                        array(
+                                                                'field'    => 'fbm_first_name',
+                                                                'operator' => 'equals',
+                                                                'value'    => 'hide',
+                                                        ),
+                                                ),
+                                                'actions'    => array(
+                                                        array(
+                                                                'type'   => 'hide',
+                                                                'target' => 'fbm_household_size',
+                                                        ),
+                                                ),
                                         ),
                                 ),
                         );
@@ -555,13 +915,22 @@ final class RegistrationFormTest extends TestCase {
                         $settings = TemplateDefaults::settings();
                         $settings['conditions'] = array(
                                 'enabled' => true,
-                                'rules'   => array(
+                                'groups'  => array(
                                         array(
-                                                'if_field' => 'fbm_first_name',
-                                                'operator' => 'equals',
-                                                'value'    => 'show',
-                                                'action'   => 'show',
-                                                'target'   => 'fbm_registration_consent',
+                                                'operator'   => 'and',
+                                                'conditions' => array(
+                                                        array(
+                                                                'field'    => 'fbm_first_name',
+                                                                'operator' => 'equals',
+                                                                'value'    => 'show',
+                                                        ),
+                                                ),
+                                                'actions'    => array(
+                                                        array(
+                                                                'type'   => 'show',
+                                                                'target' => 'fbm_registration_consent',
+                                                        ),
+                                                ),
                                         ),
                                 ),
                         );
@@ -595,13 +964,22 @@ final class RegistrationFormTest extends TestCase {
                         $settings = TemplateDefaults::settings();
                         $settings['conditions'] = array(
                                 'enabled' => true,
-                                'rules'   => array(
+                                'groups'  => array(
                                         array(
-                                                'if_field' => 'fbm_first_name',
-                                                'operator' => 'equals',
-                                                'value'    => 'trigger',
-                                                'action'   => 'hide',
-                                                'target'   => 'fbm_extra',
+                                                'operator'   => 'and',
+                                                'conditions' => array(
+                                                        array(
+                                                                'field'    => 'fbm_first_name',
+                                                                'operator' => 'equals',
+                                                                'value'    => 'trigger',
+                                                        ),
+                                                ),
+                                                'actions'    => array(
+                                                        array(
+                                                                'type'   => 'hide',
+                                                                'target' => 'fbm_extra',
+                                                        ),
+                                                ),
                                         ),
                                 ),
                         );
@@ -615,7 +993,7 @@ final class RegistrationFormTest extends TestCase {
                         $localized = $GLOBALS['fbm_localized_scripts']['fbm-registration-form'];
                         $this->assertSame( 'fbmRegistrationForm', $localized['name'] );
                         $this->assertTrue( $localized['data']['conditions']['enabled'] );
-                        $this->assertSame( 'fbm_extra', $localized['data']['conditions']['rules'][0]['target'] );
+                        $this->assertSame( 'fbm_extra', $localized['data']['conditions']['groups'][0]['actions'][0]['target'] );
         }
 
 		/**

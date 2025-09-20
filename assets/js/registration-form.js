@@ -5,169 +5,134 @@
                 return;
         }
 
-        var settings = window.fbmRegistrationForm;
-        var conditions = settings.conditions || {};
-        var rules = Array.isArray( conditions.rules ) ? conditions.rules.slice( 0 ) : [];
-
-        if ( ! conditions.enabled || rules.length === 0 ) {
+        if ( typeof window.fbmRegistrationConditions === 'undefined' ) {
                 return;
         }
 
-        var hiddenClass = settings.hiddenClass || 'fbm-field--hidden';
+        var settings = window.fbmRegistrationForm;
+        var conditions = settings.conditions || {};
+        var groupsRaw = Array.isArray( conditions.groups ) ? conditions.groups : [];
+
+        if ( ! conditions.enabled || groupsRaw.length === 0 ) {
+                return;
+        }
+
         var forms = document.querySelectorAll( '[data-fbm-component="registration-form"]' );
 
         if ( forms.length === 0 ) {
                 return;
         }
 
-        var normalizeRule = function ( rule ) {
-                if ( ! rule || 'object' !== typeof rule ) {
-                        return null;
-                }
+        var Conditions = window.fbmRegistrationConditions;
+        var normalizedGroups = Conditions.normalizeGroups( groupsRaw );
 
-                var operator = rule.operator || 'equals';
-                var action = rule.action || 'show';
-                var ifField = rule.if_field || '';
-                var target = rule.target || '';
+        var summary = document.querySelector( '[data-fbm-error-summary]' );
+        if ( summary && typeof summary.focus === 'function' ) {
+                summary.focus();
+        }
 
-                if ( ! ifField || ! target ) {
-                        return null;
-                }
+        if ( summary ) {
+                summary.addEventListener( 'click', function ( event ) {
+                        var link = event.target.closest( 'a[data-fbm-error-link]' );
+                        if ( ! link ) {
+                                return;
+                        }
 
-                if ( [ 'equals', 'not_equals', 'contains', 'empty', 'not_empty' ].indexOf( operator ) === -1 ) {
-                        return null;
-                }
+                        event.preventDefault();
+                        var targetId = link.getAttribute( 'href' ) || '';
+                        if ( targetId.charAt( 0 ) === '#' ) {
+                                targetId = targetId.slice( 1 );
+                        }
 
-                if ( [ 'show', 'hide' ].indexOf( action ) === -1 ) {
-                        return null;
-                }
+                        if ( ! targetId ) {
+                                return;
+                        }
 
-                return {
-                        if_field: ifField,
-                        operator: operator,
-                        value: rule.value || '',
-                        action: action,
-                        target: target,
-                };
-        };
+                        var target = document.getElementById( targetId );
+                        if ( ! target ) {
+                                return;
+                        }
 
-        var normalizeString = function ( value ) {
-                if ( value === null || value === undefined ) {
+                        target.scrollIntoView( { behavior: 'smooth', block: 'start' } );
+
+                        window.setTimeout( function () {
+                                var focusable = target.querySelector( 'input, select, textarea, button' );
+                                if ( focusable && typeof focusable.focus === 'function' ) {
+                                        focusable.focus();
+                                }
+                        }, 120 );
+                } );
+        }
+
+        var hiddenClass = settings.hiddenClass || 'fbm-field--hidden';
+
+        var readFieldValue = function ( entry ) {
+                if ( ! entry ) {
                         return '';
                 }
 
-                return String( value ).trim().toLowerCase();
-        };
-
-        var valueAsArray = function ( value ) {
-                if ( Array.isArray( value ) ) {
-                        return value.map( normalizeString ).filter( function ( item ) {
-                                return item !== '';
-                        } );
-                }
-
-                var stringValue = normalizeString( value );
-
-                if ( '' === stringValue ) {
-                        return [];
-                }
-
-                return [ stringValue ];
-        };
-
-        var isEmptyValue = function ( value ) {
-                if ( Array.isArray( value ) ) {
-                        return value.length === 0;
-                }
-
-                if ( value === null || value === undefined ) {
-                        return true;
-                }
-
-                if ( 'boolean' === typeof value ) {
-                        return value === false;
-                }
-
-                if ( 'number' === typeof value ) {
-                        return false;
-                }
-
-                return '' === normalizeString( value );
-        };
-
-        var ruleMatches = function ( rule, values ) {
-                        var current = values[ rule.if_field ];
-
-                        switch ( rule.operator ) {
-                                case 'equals':
-                                        return valueAsArray( current ).indexOf( normalizeString( rule.value ) ) !== -1;
-                                case 'not_equals':
-                                        return valueAsArray( current ).indexOf( normalizeString( rule.value ) ) === -1;
-                                case 'contains': {
-                                        var haystack = valueAsArray( current );
-                                        var needle = normalizeString( rule.value );
-
-                                        if ( haystack.length > 0 ) {
-                                                return haystack.indexOf( needle ) !== -1;
-                                        }
-
-                                        var single = normalizeString( current );
-                                        return '' !== needle && single.indexOf( needle ) !== -1;
+                if ( entry.type === 'checkbox' ) {
+                        var selected = [];
+                        entry.controls.forEach( function ( control ) {
+                                if ( control.checked ) {
+                                        selected.push( control.value );
                                 }
-                                case 'empty':
-                                        return isEmptyValue( current );
-                                case 'not_empty':
-                                        return ! isEmptyValue( current );
-                                default:
-                                        return false;
+                        } );
+
+                        return selected;
+                }
+
+                if ( entry.type === 'radio' ) {
+                        for ( var i = 0; i < entry.controls.length; i += 1 ) {
+                                if ( entry.controls[ i ].checked ) {
+                                        return entry.controls[ i ].value;
+                                }
                         }
+
+                        return '';
+                }
+
+                if ( entry.type === 'select' ) {
+                        var control = entry.controls[ 0 ];
+                        if ( ! control ) {
+                                return '';
+                        }
+
+                        if ( control.multiple ) {
+                                var values = [];
+                                Array.prototype.slice.call( control.options ).forEach( function ( option ) {
+                                        if ( option.selected ) {
+                                                values.push( option.value );
+                                        }
+                                } );
+
+                                return values;
+                        }
+
+                        return control.value;
+                }
+
+                if ( entry.controls.length > 0 ) {
+                        return entry.controls[ 0 ].value;
+                }
+
+                return '';
         };
 
-        var getFieldEntry = function ( fieldMap, name ) {
-                return fieldMap[name] || null;
-        };
-
-        var evaluateVisibility = function ( fieldMap, activeRules, values ) {
-                var visibility = {};
-                var requiresShow = {};
-                var forcedHidden = {};
+        var readValues = function ( fieldMap ) {
+                var values = {};
 
                 Object.keys( fieldMap ).forEach( function ( name ) {
-                        visibility[ name ] = true;
+                        values[ name ] = readFieldValue( fieldMap[ name ] );
                 } );
 
-                activeRules.forEach( function ( rule ) {
-                        if ( 'show' === rule.action ) {
-                                requiresShow[ rule.target ] = true;
-                        }
-                } );
-
-                Object.keys( requiresShow ).forEach( function ( name ) {
-                        visibility[ name ] = false;
-                } );
-
-                activeRules.forEach( function ( rule ) {
-                        if ( ! ruleMatches( rule, values ) ) {
-                                return;
-                        }
-
-                        if ( 'hide' === rule.action ) {
-                                visibility[ rule.target ] = false;
-                                forcedHidden[ rule.target ] = true;
-                                return;
-                        }
-
-                        if ( 'show' === rule.action && ! forcedHidden[ rule.target ] ) {
-                                visibility[ rule.target ] = true;
-                        }
-                } );
-
-                return visibility;
+                return values;
         };
 
         Array.prototype.forEach.call( forms, function ( form ) {
                 var fieldContainers = form.querySelectorAll( '[data-fbm-field]' );
                 var fieldMap = {};
+                var defaultsMap = {};
 
                 Array.prototype.forEach.call( fieldContainers, function ( container ) {
                         var name = container.getAttribute( 'data-fbm-field' );
@@ -176,99 +141,63 @@
                         }
 
                         var controls = Array.prototype.slice.call( container.querySelectorAll( 'input, select, textarea' ) );
-
                         controls.forEach( function ( control ) {
                                 if ( control.disabled ) {
                                         control.setAttribute( 'data-fbm-original-disabled', '1' );
                                 }
                         } );
 
+                        var type = container.getAttribute( 'data-fbm-field-type' ) || 'text';
+                        var requiredDefault = container.getAttribute( 'data-fbm-field-required' ) === '1';
+
                         fieldMap[ name ] = {
                                 container: container,
                                 controls: controls,
-                                type: container.getAttribute( 'data-fbm-field-type' ) || 'text',
+                                type: type,
+                                defaultRequired: requiredDefault
+                        };
+
+                        defaultsMap[ name ] = {
+                                required: requiredDefault
                         };
                 } );
 
-                var activeRules = rules.map( normalizeRule ).filter( function ( rule ) {
-                        if ( null === rule ) {
-                                return false;
-                        }
-
-                        return getFieldEntry( fieldMap, rule.if_field ) && getFieldEntry( fieldMap, rule.target );
-                } );
-
-                if ( activeRules.length === 0 ) {
+                if ( Object.keys( fieldMap ).length === 0 ) {
                         return;
                 }
 
-                var readValue = function ( entry ) {
-                        if ( ! entry ) {
-                                return '';
-                        }
+                var groups = normalizedGroups.map( function ( group ) {
+                        return {
+                                operator: group.operator,
+                                conditions: group.conditions.filter( function ( condition ) {
+                                        return !! fieldMap[ condition.field ];
+                                } ),
+                                actions: group.actions.filter( function ( action ) {
+                                        return !! fieldMap[ action.target ];
+                                } )
+                        };
+                } ).filter( function ( group ) {
+                        return group.conditions.length > 0 && group.actions.length > 0;
+                } );
 
-                        if ( 'checkbox' === entry.type ) {
-                                var selected = [];
-                                entry.controls.forEach( function ( control ) {
-                                        if ( control.checked ) {
-                                                selected.push( control.value );
-                                        }
-                                } );
+                if ( groups.length === 0 ) {
+                        return;
+                }
 
-                                return selected;
-                        }
-
-                        if ( 'radio' === entry.type ) {
-                                for ( var i = 0; i < entry.controls.length; i += 1 ) {
-                                        if ( entry.controls[ i ].checked ) {
-                                                return entry.controls[ i ].value;
-                                        }
-                                }
-
-                                return '';
-                        }
-
-                        if ( 'select' === entry.type ) {
-                                var control = entry.controls[0];
-                                if ( control && control.multiple ) {
-                                        var values = [];
-                                        Array.prototype.slice.call( control.options ).forEach( function ( option ) {
-                                                if ( option.selected ) {
-                                                        values.push( option.value );
-                                                }
-                                        } );
-                                        return values;
-                                }
-
-                                return control ? control.value : '';
-                        }
-
-                        if ( entry.controls.length > 0 ) {
-                                return entry.controls[0].value;
-                        }
-
-                        return '';
-                };
-
-                var readValues = function () {
-                        var values = {};
-
-                        Object.keys( fieldMap ).forEach( function ( name ) {
-                                values[ name ] = readValue( fieldMap[ name ] );
-                        } );
-
-                        return values;
-                };
-
-                var applyVisibility = function () {
-                        var values = readValues();
-                        var visibility = evaluateVisibility( fieldMap, activeRules, values );
+                var applyState = function () {
+                        var values = readValues( fieldMap );
+                        var state = Conditions.evaluate( groups, values, defaultsMap );
 
                         Object.keys( fieldMap ).forEach( function ( name ) {
                                 var entry = fieldMap[ name ];
-                                var shouldHide = visibility[ name ] === false;
+                                var current = state[ name ] || {
+                                        visible: true,
+                                        required: entry.defaultRequired
+                                };
 
-                                if ( shouldHide ) {
+                                entry.container.setAttribute( 'data-fbm-required-state', current.required ? 'required' : 'optional' );
+
+                                if ( current.visible === false ) {
                                         entry.container.classList.add( hiddenClass );
                                         entry.container.setAttribute( 'hidden', 'hidden' );
                                         entry.container.setAttribute( 'aria-hidden', 'true' );
@@ -298,9 +227,9 @@
                         } );
                 };
 
-                applyVisibility();
+                applyState();
 
-                form.addEventListener( 'change', applyVisibility );
-                form.addEventListener( 'input', applyVisibility );
+                form.addEventListener( 'change', applyState );
+                form.addEventListener( 'input', applyState );
         } );
 })();

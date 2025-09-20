@@ -33,3 +33,102 @@ Additional notes:
 - Numeric inputs honour `min:`, `max:`, and `step:` values. Server-side clamps also enforce a maximum household size and reject negative values.
 - File uploads remain single-file only and are validated against the configured MIME/type limits.
 - Conditional visibility rules operate on the sanitized field catalog produced by these tags.
+
+## Conditional Visibility Groups
+
+Conditional logic now supports grouped rules with AND/OR operators, multiple conditions, and more than one action per group. Rules always operate on the sanitized field catalog parsed from the template. The UI and REST payload share the same structure:
+
+```json
+{
+  "enabled": true,
+  "groups": [
+    {
+      "operator": "and",
+      "conditions": [
+        {"field": "fbm_first_name", "operator": "equals", "value": "yes"}
+      ],
+      "actions": [
+        {"type": "show", "target": "fbm_extra_question"}
+      ]
+    }
+  ]
+}
+```
+
+### Supported operators
+
+| Operator | Description |
+| --- | --- |
+| `equals` / `not_equals` | Case-insensitive string comparison against the normalized field value. |
+| `contains` | Matches when the value (or any multi-select option) contains the provided substring. |
+| `empty` / `not_empty` | Checks whether the field has any non-empty input. |
+| `lt`, `lte`, `gt`, `gte` | Numeric or date comparisons. For dates the comparison uses ISO-8601 parsing (e.g. `2024-12-31`). |
+
+### Supported actions
+
+| Action | Effect |
+| --- | --- |
+| `show` | Hides the target by default and reveals it when the group matches. |
+| `hide` | Hides the target whenever the group matches. |
+| `require` | Marks the target as required while the group matches (server-side validation enforces it). |
+| `optional` | Clears the required flag while the group matches, even if the template marks the field as required. |
+
+Groups are evaluated in the stored order. When multiple groups target the same field, the last matching action wins. The public form and server use the same evaluator to keep behaviour consistent, and hidden fields are ignored on submit.
+
+### Examples
+
+1. **Show file upload when proof required**
+
+```json
+{
+  "operator": "and",
+  "conditions": [
+    {"field": "fbm_proof_required", "operator": "equals", "value": "yes"}
+  ],
+  "actions": [
+    {"type": "show", "target": "fbm_proof_of_address"}
+  ]
+}
+```
+
+2. **Require pickup date when has children = yes**
+
+```json
+{
+  "operator": "and",
+  "conditions": [
+    {"field": "fbm_has_children", "operator": "equals", "value": "yes"}
+  ],
+  "actions": [
+    {"type": "show", "target": "fbm_preferred_date"},
+    {"type": "require", "target": "fbm_preferred_date"}
+  ]
+}
+```
+
+3. **Multi-action with conflict resolution**
+
+```json
+[
+  {
+    "operator": "and",
+    "conditions": [
+      {"field": "fbm_status", "operator": "equals", "value": "paused"}
+    ],
+    "actions": [
+      {"type": "show", "target": "fbm_pause_reason"}
+    ]
+  },
+  {
+    "operator": "and",
+    "conditions": [
+      {"field": "fbm_status", "operator": "equals", "value": "paused"}
+    ],
+    "actions": [
+      {"type": "optional", "target": "fbm_pause_reason"}
+    ]
+  }
+]
+```
+
+The second group runs after the first, so the field stays visible but the optional action overrides any previous requirement.
