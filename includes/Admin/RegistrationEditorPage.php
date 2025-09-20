@@ -143,17 +143,19 @@ final class RegistrationEditorPage {
 				wp_die( esc_html__( 'Registration editor template is missing.', 'foodbank-manager' ) );
 		}
 
-			$template = get_option( self::TEMPLATE_OPTION, TemplateDefaults::template() );
-		if ( ! is_string( $template ) ) {
-				$template = TemplateDefaults::template();
-		}
+                        $template = get_option( self::TEMPLATE_OPTION, TemplateDefaults::template() );
+                if ( ! is_string( $template ) ) {
+                                $template = TemplateDefaults::template();
+                }
 
-			$settings = get_option( self::SETTINGS_OPTION, TemplateDefaults::settings() );
-		if ( ! is_array( $settings ) ) {
-				$settings = TemplateDefaults::settings();
-		}
+                        $settings = get_option( self::SETTINGS_OPTION, TemplateDefaults::settings() );
+                if ( ! is_array( $settings ) ) {
+                                $settings = TemplateDefaults::settings();
+                }
 
-			$query_notice  = filter_input( INPUT_GET, self::NOTICE_PARAM, FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+                        $fields = self::field_catalog( $template );
+
+                        $query_notice  = filter_input( INPUT_GET, self::NOTICE_PARAM, FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 			$query_message = filter_input( INPUT_GET, self::MESSAGE_PARAM, FILTER_UNSAFE_RAW );
 
 			$notice  = is_string( $query_notice ) ? sanitize_key( $query_notice ) : '';
@@ -164,21 +166,23 @@ final class RegistrationEditorPage {
 				'template_option' => self::TEMPLATE_OPTION,
 				'settings_option' => self::SETTINGS_OPTION,
 				'template'        => $template,
-				'settings'        => wp_parse_args( $settings, TemplateDefaults::settings() ),
-				'menu_slug'       => self::MENU_SLUG,
-				'reset_action'    => self::RESET_ACTION,
-				'export_action'   => self::EXPORT_ACTION,
-				'import_action'   => self::IMPORT_ACTION,
-				'reset_nonce'     => wp_create_nonce( self::RESET_ACTION ),
-				'import_nonce'    => wp_create_nonce( self::IMPORT_ACTION ),
-				'export_nonce'    => wp_create_nonce( self::EXPORT_ACTION ),
-				'preview_nonce'   => wp_create_nonce( self::PREVIEW_NONCE ),
-				'notice'          => $notice,
-				'message'         => $message,
-				'template_field'  => self::TEMPLATE_FIELD,
-				'settings_field'  => self::SETTINGS_FIELD,
-				'snippets'        => self::toolbar_snippets(),
-			);
+                                'settings'        => wp_parse_args( $settings, TemplateDefaults::settings() ),
+                                'menu_slug'       => self::MENU_SLUG,
+                                'reset_action'    => self::RESET_ACTION,
+                                'export_action'   => self::EXPORT_ACTION,
+                                'import_action'   => self::IMPORT_ACTION,
+                                'reset_nonce'     => wp_create_nonce( self::RESET_ACTION ),
+                                'import_nonce'    => wp_create_nonce( self::IMPORT_ACTION ),
+                                'export_nonce'    => wp_create_nonce( self::EXPORT_ACTION ),
+                                'preview_nonce'   => wp_create_nonce( self::PREVIEW_NONCE ),
+                                'notice'          => $notice,
+                                'message'         => $message,
+                                'template_field'  => self::TEMPLATE_FIELD,
+                                'settings_field'  => self::SETTINGS_FIELD,
+                                'snippets'        => self::toolbar_snippets(),
+                                'fields'          => $fields,
+                                'matrix_url'      => plugins_url( 'Docs/Registration-Template-Matrix.md', FBM_FILE ),
+                        );
 
 			settings_errors( self::OPTION_GROUP );
 
@@ -212,17 +216,34 @@ final class RegistrationEditorPage {
 				$editor_settings = array();
 		}
 
-			$stored_settings = get_option( self::SETTINGS_OPTION, TemplateDefaults::settings() );
-			$theme           = 'light';
-		if ( is_array( $stored_settings ) && isset( $stored_settings['editor']['theme'] ) && is_string( $stored_settings['editor']['theme'] ) ) {
-				$candidate = sanitize_key( $stored_settings['editor']['theme'] );
-			if ( in_array( $candidate, array( 'light', 'dark' ), true ) ) {
-					$theme = $candidate;
-			}
-		}
+                        $stored_settings = get_option( self::SETTINGS_OPTION, TemplateDefaults::settings() );
+                        $theme           = 'light';
+                if ( is_array( $stored_settings ) && isset( $stored_settings['editor']['theme'] ) && is_string( $stored_settings['editor']['theme'] ) ) {
+                                $candidate = sanitize_key( $stored_settings['editor']['theme'] );
+                        if ( in_array( $candidate, array( 'light', 'dark' ), true ) ) {
+                                        $theme = $candidate;
+                        }
+                }
 
-			$version = defined( 'FBM_VER' ) ? FBM_VER : Plugin::VERSION;
-			wp_enqueue_script( 'jquery' );
+                        $template = get_option( self::TEMPLATE_OPTION, TemplateDefaults::template() );
+                if ( ! is_string( $template ) ) {
+                                $template = TemplateDefaults::template();
+                }
+
+                        $fields    = self::field_catalog( $template );
+                        $settings  = wp_parse_args( is_array( $stored_settings ) ? $stored_settings : array(), TemplateDefaults::settings() );
+                        $conditions = isset( $settings['conditions'] ) && is_array( $settings['conditions'] ) ? $settings['conditions'] : TemplateDefaults::settings()['conditions'];
+                        $rules      = isset( $conditions['rules'] ) && is_array( $conditions['rules'] ) ? array_values( $conditions['rules'] ) : array();
+
+                        $conditions_payload = array(
+                                'enabled' => ! empty( $conditions['enabled'] ) && ! empty( $rules ),
+                                'rules'   => $rules,
+                        );
+
+                        $matrix_url = plugins_url( 'Docs/Registration-Template-Matrix.md', FBM_FILE );
+
+                        $version = defined( 'FBM_VER' ) ? FBM_VER : Plugin::VERSION;
+                        wp_enqueue_script( 'jquery' );
 
 			$handle       = 'fbm-registration-editor';
 			$script       = plugins_url( 'assets/js/registration-editor.js', FBM_FILE );
@@ -235,19 +256,41 @@ final class RegistrationEditorPage {
 				$handle,
 				'fbmRegistrationEditor',
 				array(
-					'previewNonce' => wp_create_nonce( 'wp_rest' ),
-					'previewUrl'   => esc_url( rest_url( 'fbm/v1/registration/preview' ) ),
-					'textareaId'   => self::TEMPLATE_FIELD,
-					'codeEditor'   => $editor_settings,
-					'editorTheme'  => $theme,
-					'i18n'         => array(
-						'previewTitle'     => esc_html__( 'Template Preview', 'foodbank-manager' ),
-						'previewError'     => esc_html__( 'Unable to load the preview. Please save first or try again.', 'foodbank-manager' ),
-						'closeLabel'       => esc_html__( 'Close preview', 'foodbank-manager' ),
-						'modalDescription' => esc_html__( 'Preview only. Form controls are disabled.', 'foodbank-manager' ),
-					),
-				)
-			);
+                                        'previewNonce' => wp_create_nonce( 'wp_rest' ),
+                                        'previewUrl'   => esc_url( rest_url( 'fbm/v1/registration/preview' ) ),
+                                        'textareaId'   => self::TEMPLATE_FIELD,
+                                        'codeEditor'   => $editor_settings,
+                                        'editorTheme'  => $theme,
+                                        'fields'       => $fields,
+                                        'conditions'   => $conditions_payload,
+                                        'matrixUrl'    => esc_url( $matrix_url ),
+                                        'i18n'         => array(
+                                                'previewTitle'     => esc_html__( 'Template Preview', 'foodbank-manager' ),
+                                                'previewError'     => esc_html__( 'Unable to load the preview. Please save first or try again.', 'foodbank-manager' ),
+                                                'closeLabel'       => esc_html__( 'Close preview', 'foodbank-manager' ),
+                                                'modalDescription' => esc_html__( 'Preview only. Form controls are disabled.', 'foodbank-manager' ),
+                                                'conditionsHeading' => esc_html__( 'Conditional Visibility (Beta)', 'foodbank-manager' ),
+                                                'conditionsDescription' => esc_html__( 'Show or hide fields based on other field values. Rules apply after saving.', 'foodbank-manager' ),
+                                                'conditionsAdd'     => esc_html__( 'Add condition', 'foodbank-manager' ),
+                                                'conditionsRemove'  => esc_html__( 'Remove', 'foodbank-manager' ),
+                                                'conditionsIfField' => esc_html__( 'If field', 'foodbank-manager' ),
+                                                'conditionsOperator' => esc_html__( 'Operator', 'foodbank-manager' ),
+                                                'conditionsValue'   => esc_html__( 'Value', 'foodbank-manager' ),
+                                                'conditionsThen'    => esc_html__( 'Then', 'foodbank-manager' ),
+                                                'conditionsTarget'  => esc_html__( 'Field', 'foodbank-manager' ),
+                                                'conditionsEmptyPlaceholder' => esc_html__( 'Enter a value', 'foodbank-manager' ),
+                                                'conditionsHelpLabel' => esc_html__( 'Registration template matrix', 'foodbank-manager' ),
+                                                'conditionsNoFields' => esc_html__( 'Add fields to the template to create conditions.', 'foodbank-manager' ),
+                                                'operatorEquals'    => esc_html__( 'is', 'foodbank-manager' ),
+                                                'operatorNotEquals' => esc_html__( 'is not', 'foodbank-manager' ),
+                                                'operatorContains'  => esc_html__( 'contains', 'foodbank-manager' ),
+                                                'operatorEmpty'     => esc_html__( 'is empty', 'foodbank-manager' ),
+                                                'operatorNotEmpty'  => esc_html__( 'is not empty', 'foodbank-manager' ),
+                                                'actionShow'        => esc_html__( 'show', 'foodbank-manager' ),
+                                                'actionHide'        => esc_html__( 'hide', 'foodbank-manager' ),
+                                        ),
+                                )
+                        );
 			wp_enqueue_script( $handle );
 	}
 
@@ -284,61 +327,132 @@ final class RegistrationEditorPage {
 		 *
 		 * @return array<string,mixed>
 		 */
-	public static function sanitize_settings( $value ): array {
-			$defaults = TemplateDefaults::settings();
+        public static function sanitize_settings( $value ): array {
+                        $defaults = TemplateDefaults::settings();
 
-		if ( ! is_array( $value ) ) {
-				$value = array();
-		}
+                if ( ! is_array( $value ) ) {
+                                $value = array();
+                }
 
-			$uploads    = isset( $value['uploads'] ) && is_array( $value['uploads'] ) ? $value['uploads'] : array();
-			$max_size   = isset( $uploads['max_size_mb'] ) ? (int) $uploads['max_size_mb'] : (int) ( $defaults['uploads']['max_size'] / 1048576 );
-			$max_size   = $max_size > 0 ? $max_size : (int) ( $defaults['uploads']['max_size'] / 1048576 );
-			$mime_raw   = isset( $uploads['allowed_mime_types'] ) ? sanitize_textarea_field( (string) $uploads['allowed_mime_types'] ) : '';
-			$mime_parts = array();
-		if ( '' !== $mime_raw ) {
-				$candidates = array_map( 'trim', explode( ',', $mime_raw ) );
-			foreach ( $candidates as $candidate ) {
-				if ( '' !== $candidate ) {
-					$mime_parts[] = strtolower( $candidate );
-				}
-			}
-		}
+                        $uploads    = isset( $value['uploads'] ) && is_array( $value['uploads'] ) ? $value['uploads'] : array();
+                        $max_size   = isset( $uploads['max_size_mb'] ) ? (int) $uploads['max_size_mb'] : (int) ( $defaults['uploads']['max_size'] / 1048576 );
+                        $max_size   = $max_size > 0 ? $max_size : (int) ( $defaults['uploads']['max_size'] / 1048576 );
+                        $mime_raw   = isset( $uploads['allowed_mime_types'] ) ? sanitize_textarea_field( (string) $uploads['allowed_mime_types'] ) : '';
+                        $mime_parts = array();
+                if ( '' !== $mime_raw ) {
+                                $candidates = array_map( 'trim', explode( ',', $mime_raw ) );
+                        foreach ( $candidates as $candidate ) {
+                                if ( '' !== $candidate ) {
+                                        $mime_parts[] = strtolower( $candidate );
+                                }
+                        }
+                }
 
-			$uploads_settings = array(
-				'max_size'           => max( 1, $max_size ) * 1048576,
-				'allowed_mime_types' => ! empty( $mime_parts ) ? $mime_parts : $defaults['uploads']['allowed_mime_types'],
-			);
+                        $uploads_settings = array(
+                                'max_size'           => max( 1, $max_size ) * 1048576,
+                                'allowed_mime_types' => ! empty( $mime_parts ) ? $mime_parts : $defaults['uploads']['allowed_mime_types'],
+                        );
 
-			$conditions_enabled = isset( $value['conditions']['enabled'] ) ? self::to_bool( $value['conditions']['enabled'] ) : (bool) $defaults['conditions']['enabled'];
+                        $conditions      = isset( $value['conditions'] ) && is_array( $value['conditions'] ) ? $value['conditions'] : array();
+                        $rules           = isset( $conditions['rules'] ) ? $conditions['rules'] : array();
+                        $conditions_rules = self::sanitize_condition_rules( $rules );
+                        $conditions_enabled = isset( $conditions['enabled'] ) ? self::to_bool( $conditions['enabled'] ) : (bool) $defaults['conditions']['enabled'];
 
-			$editor_theme = isset( $value['editor']['theme'] ) && is_string( $value['editor']['theme'] ) ? sanitize_key( $value['editor']['theme'] ) : 'light';
-			if ( ! in_array( $editor_theme, array( 'light', 'dark' ), true ) ) {
-					$editor_theme = 'light';
-			}
+                        if ( empty( $conditions_rules ) ) {
+                                $conditions_enabled = false;
+                        }
 
-			$messages = isset( $value['messages'] ) && is_array( $value['messages'] ) ? $value['messages'] : array();
-			$messages = array_merge(
-				$defaults['messages'],
-				array(
-					'success_auto'    => isset( $messages['success_auto'] ) ? wp_kses_post( (string) $messages['success_auto'] ) : $defaults['messages']['success_auto'],
-					'success_pending' => isset( $messages['success_pending'] ) ? wp_kses_post( (string) $messages['success_pending'] ) : $defaults['messages']['success_pending'],
-				)
-			);
+                        $editor_theme = isset( $value['editor']['theme'] ) && is_string( $value['editor']['theme'] ) ? sanitize_key( $value['editor']['theme'] ) : 'light';
+                        if ( ! in_array( $editor_theme, array( 'light', 'dark' ), true ) ) {
+                                        $editor_theme = 'light';
+                        }
 
-			return array(
-				'uploads'    => Uploads::normalize_settings( $uploads_settings ),
-				'conditions' => array(
-					'enabled' => $conditions_enabled,
-					'rules'   => array(),
-				),
-				'editor'     => array(
-					'theme' => $editor_theme,
-				),
-				'honeypot'   => isset( $value['honeypot'] ) ? self::to_bool( $value['honeypot'] ) : (bool) $defaults['honeypot'],
-				'messages'   => $messages,
-			);
-	}
+                        $messages = isset( $value['messages'] ) && is_array( $value['messages'] ) ? $value['messages'] : array();
+                        $messages = array_merge(
+                                $defaults['messages'],
+                                array(
+                                        'success_auto'    => isset( $messages['success_auto'] ) ? wp_kses_post( (string) $messages['success_auto'] ) : $defaults['messages']['success_auto'],
+                                        'success_pending' => isset( $messages['success_pending'] ) ? wp_kses_post( (string) $messages['success_pending'] ) : $defaults['messages']['success_pending'],
+                                )
+                        );
+
+                        return array(
+                                'uploads'    => Uploads::normalize_settings( $uploads_settings ),
+                                'conditions' => array(
+                                        'enabled' => $conditions_enabled,
+                                        'rules'   => $conditions_rules,
+                                ),
+                                'editor'     => array(
+                                        'theme' => $editor_theme,
+                                ),
+                                'honeypot'   => isset( $value['honeypot'] ) ? self::to_bool( $value['honeypot'] ) : (bool) $defaults['honeypot'],
+                                'messages'   => $messages,
+                        );
+        }
+
+        /**
+         * Sanitize condition rule definitions from the settings payload.
+         *
+         * @param mixed $rules Raw rules payload.
+         *
+         * @return array<int,array<string,string>>
+         */
+        private static function sanitize_condition_rules( $rules ): array {
+                if ( is_string( $rules ) ) {
+                        $decoded = json_decode( $rules, true );
+                        $rules   = is_array( $decoded ) ? $decoded : array();
+                }
+
+                if ( ! is_array( $rules ) ) {
+                        return array();
+                }
+
+                        $sanitized = array();
+                        $allowed_operators = array( 'equals', 'not_equals', 'contains', 'empty', 'not_empty' );
+                        $allowed_actions   = array( 'show', 'hide' );
+
+                foreach ( $rules as $rule ) {
+                        if ( ! is_array( $rule ) ) {
+                                continue;
+                        }
+
+                                $source   = isset( $rule['if_field'] ) ? sanitize_key( (string) $rule['if_field'] ) : '';
+                                $target   = isset( $rule['target'] ) ? sanitize_key( (string) $rule['target'] ) : '';
+                                $operator = isset( $rule['operator'] ) ? sanitize_key( (string) $rule['operator'] ) : '';
+                                $action   = isset( $rule['action'] ) ? sanitize_key( (string) $rule['action'] ) : '';
+                                $value    = isset( $rule['value'] ) ? sanitize_text_field( (string) $rule['value'] ) : '';
+
+                        if ( '' === $source || '' === $target ) {
+                                continue;
+                        }
+
+                        if ( ! in_array( $operator, $allowed_operators, true ) ) {
+                                continue;
+                        }
+
+                        if ( ! in_array( $action, $allowed_actions, true ) ) {
+                                continue;
+                        }
+
+                        if ( in_array( $operator, array( 'equals', 'not_equals', 'contains' ), true ) && '' === $value ) {
+                                continue;
+                        }
+
+                                $sanitized[] = array(
+                                        'if_field' => $source,
+                                        'operator' => $operator,
+                                        'value'    => $value,
+                                        'action'   => $action,
+                                        'target'   => $target,
+                                );
+
+                        if ( count( $sanitized ) >= 50 ) {
+                                        break;
+                        }
+                }
+
+                        return $sanitized;
+        }
 
 		/**
 		 * Handle reset to default action.
@@ -504,10 +618,10 @@ final class RegistrationEditorPage {
 		 *
 		 * @param string $name Field name.
 		 */
-	private static function canonical_key( string $name ): ?string {
-			$normalized = strtolower( preg_replace( '/[^a-z0-9]+/', '_', $name ) ?? '' );
+        private static function canonical_key( string $name ): ?string {
+                        $normalized = strtolower( preg_replace( '/[^a-z0-9]+/', '_', $name ) ?? '' );
 
-		switch ( $normalized ) {
+                switch ( $normalized ) {
 			case 'fbm_first_name':
 			case 'first_name':
 				return 'first_name';
@@ -524,15 +638,51 @@ final class RegistrationEditorPage {
 				return 'household_size';
 			default:
 				return null;
-		}
-	}
+                }
+        }
 
-		/**
-		 * Toolbar snippets for quick insertion.
-		 *
-		 * @return array<int,array<string,string>>
-		 */
-	private static function toolbar_snippets(): array {
+                /**
+                 * Build a simplified field catalogue for UI components.
+                 *
+                 * @param string $template Template markup.
+                 *
+                 * @return array<int,array<string,string>>
+                 */
+		private static function field_catalog( string $template ): array {
+			$parser = new TagParser();
+			$parsed = $parser->parse( $template );
+			$fields = $parsed['fields'];
+
+			$catalog = array();
+
+			foreach ( $fields as $name => $definition ) {
+				if ( ! is_array( $definition ) ) {
+					continue;
+				}
+
+				$type = isset( $definition['type'] ) ? (string) $definition['type'] : '';
+				if ( 'submit' === $type ) {
+					continue;
+				}
+
+				$label = isset( $definition['label'] ) ? (string) $definition['label'] : (string) $name;
+
+				$catalog[] = array(
+					'name'  => (string) $name,
+					'label' => $label,
+					'type'  => $type,
+				);
+			}
+
+			return $catalog;
+		}
+
+                /**
+                 * Toolbar snippets for quick insertion.
+                 *
+                 * @return array<int,array<string,string>>
+                 */
+        private static function toolbar_snippets(): array {
 			return array(
 				array(
 					'label'   => __( 'Text field', 'foodbank-manager' ),

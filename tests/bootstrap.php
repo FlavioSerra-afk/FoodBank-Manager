@@ -2324,14 +2324,20 @@ if ( ! function_exists( 'wp_register_style' ) ) {
 }
 
 if ( ! function_exists( 'wp_enqueue_style' ) ) {
-		/**
-		 * Record enqueued styles.
-		 *
-		 * @param string $handle Style handle.
-		 */
-	function wp_enqueue_style( string $handle ): void { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals
-			$GLOBALS['fbm_enqueued_styles'][] = $handle;
-	}
+                /**
+                 * Record enqueued styles.
+                 *
+                 * @param string      $handle Style handle.
+                 * @param string|bool $src    Optional source URL.
+                 * @param array       $deps   Optional dependencies.
+                 * @param string|bool $ver    Optional version string.
+                 * @param string|bool $media  Optional media target.
+                 */
+        function wp_enqueue_style( string $handle, $src = false, array $deps = array(), $ver = false, $media = false ): void { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals
+                        unset( $src, $deps, $ver, $media );
+
+                        $GLOBALS['fbm_enqueued_styles'][] = $handle;
+        }
 }
 
 if ( ! function_exists( 'wp_register_script' ) ) {
@@ -2385,9 +2391,15 @@ if ( ! function_exists( 'wp_enqueue_script' ) ) {
                 /**
                  * Record enqueued scripts.
                  *
-                 * @param string $handle Script handle.
+                 * @param string      $handle Script handle.
+                 * @param string|bool $src    Optional source URL.
+                 * @param array       $deps   Optional dependencies.
+                 * @param string|bool $ver    Optional version string.
+                 * @param bool        $in_footer Optional footer flag.
                  */
-        function wp_enqueue_script( string $handle ): void { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals
+        function wp_enqueue_script( string $handle, $src = false, array $deps = array(), $ver = false, $in_footer = false ): void { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals
+                        unset( $src, $deps, $ver, $in_footer );
+
                         $GLOBALS['fbm_enqueued_scripts'][] = $handle;
         }
 }

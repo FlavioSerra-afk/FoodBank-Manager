@@ -4,6 +4,16 @@
 
 - _No changes yet._
 
+## [1.6.0] - 2025-09-27
+
+### Added
+- Phase-1 conditional visibility builder for the registration editor, including a help link to the new template tag matrix.
+- Front-end assets that progressively enhance the public registration form and toggle field visibility without requiring custom code.
+
+### Changed
+- Registration submissions now re-validate conditional rules server-side, ignore tampered hidden values, and clean up hidden uploads.
+- Admin preview and condition UI received accessibility polish (focus management, aria-live messaging, and clearer keyboard focus states).
+
 ## [1.5.0] - 2025-09-26
 
 ### Added
