@@ -1526,14 +1526,31 @@ if ( ! function_exists( 'wp_generate_password' ) ) {
 }
 
 if ( ! function_exists( 'get_current_user_id' ) ) {
-	function get_current_user_id(): int {
-			return 1;
-	}
+        function get_current_user_id(): int {
+                        return 1;
+        }
+}
+
+if ( ! function_exists( 'wp_get_current_user' ) ) {
+        function wp_get_current_user(): WP_User {
+                $user_id = get_current_user_id();
+                $users   = $GLOBALS['fbm_users'] ?? array();
+
+                if ( isset( $users[ $user_id ] ) && is_array( $users[ $user_id ] ) ) {
+                        return new WP_User( $user_id, $users[ $user_id ] );
+                }
+
+                if ( $user_id > 0 ) {
+                        return new WP_User( $user_id );
+                }
+
+                return new WP_User();
+        }
 }
 
 if ( ! function_exists( 'get_option' ) ) {
-	function get_option( string $name, $default = false ) {
-			$options = $GLOBALS['fbm_options'] ?? array();
+        function get_option( string $name, $default = false ) {
+                        $options = $GLOBALS['fbm_options'] ?? array();
 
 			return $options[ $name ] ?? $default;
 	}

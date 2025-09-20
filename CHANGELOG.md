@@ -4,6 +4,17 @@
 
 - _No changes yet._
 
+## [1.7.0] - 2025-09-28
+
+### Added
+- Conditional visibility phase-2 with grouped AND/OR logic, numeric/date operators, and multi-action targets, including an admin rule debugger.
+- Registration editor autosave and revision history with restore controls, keyboard shortcuts, and a shared conditions evaluator consumed by the editor and public form.
+- Public registration form error summary with focus management and aria-live status messaging.
+
+### Changed
+- Server-side validation now mirrors the JavaScript evaluator to enforce show/hide/require/optional rules consistently and ignore hidden field submissions.
+- Documentation expanded with operator tables, grouped rule examples, and updated specs/matrix notes for phase-2.
+
 ## [1.6.0] - 2025-09-27
 
 ### Added

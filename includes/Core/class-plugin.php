@@ -27,6 +27,7 @@ use FoodBankManager\Auth\Capabilities;
 use FoodBankManager\Crypto\EncryptionSettings;
 use FoodBankManager\Privacy\Privacy;
 use FoodBankManager\Rest\CheckinController;
+use FoodBankManager\Rest\RegistrationEditorController;
 use FoodBankManager\Rest\RegistrationPreviewController;
 use FoodBankManager\Shortcodes\RegistrationForm;
 use FoodBankManager\Shortcodes\StaffDashboard;
@@ -42,7 +43,7 @@ use function get_role;
  * Main plugin orchestrator.
  */
 final class Plugin {
-	public const VERSION = '1.6.0';
+	public const VERSION = '1.7.0';
 
 	/**
 	 * Register runtime hooks.
@@ -62,8 +63,9 @@ final class Plugin {
 		StaffDashboard::register();
 		Privacy::register();
 
-				add_action( 'rest_api_init', array( CheckinController::class, 'register_routes' ) );
-				add_action( 'rest_api_init', array( RegistrationPreviewController::class, 'register_routes' ) );
+						add_action( 'rest_api_init', array( CheckinController::class, 'register_routes' ) );
+						add_action( 'rest_api_init', array( RegistrationPreviewController::class, 'register_routes' ) );
+						add_action( 'rest_api_init', array( RegistrationEditorController::class, 'register_routes' ) );
 
 		if ( defined( 'WP_CLI' ) && WP_CLI && class_exists( '\\WP_CLI' ) ) {
 			self::register_cli_commands();

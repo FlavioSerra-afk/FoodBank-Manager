@@ -2,21 +2,21 @@
 # This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: FoodBank Manager 1.6.0\n"
+"Project-Id-Version: FoodBank Manager 1.7.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/FoodBank-Manager\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-09-19T23:00:10+00:00\n"
+"POT-Creation-Date: 2025-09-20T11:23:52+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: foodbank-manager\n"
 
 #. Plugin Name of the plugin
 #: foodbank-manager.php
-#: includes/Core/class-plugin.php:87
+#: includes/Core/class-plugin.php:89
 #: includes/Privacy/class-privacy.php:41
 #: includes/Privacy/class-privacy.php:57
 #: includes/Privacy/class-privacy.php:84
@@ -47,7 +47,7 @@ msgstr ""
 #: includes/Admin/class-schedulepage.php:79
 #: includes/Admin/class-settingspage.php:90
 #: includes/Admin/class-themepage.php:208
-#: includes/Admin/RegistrationEditorPage.php:138
+#: includes/Admin/RegistrationEditorPage.php:140
 msgid "You do not have permission to access this page."
 msgstr ""
 
@@ -111,7 +111,7 @@ msgid "The selected mail failure entry could not be processed."
 msgstr ""
 
 #: includes/Admin/class-diagnosticspage.php:324
-#: includes/Shortcodes/class-registrationform.php:303
+#: includes/Shortcodes/class-registrationform.php:305
 #: includes/Shortcodes/class-staffdashboard.php:161
 #: includes/Shortcodes/class-staffdashboard.php:167
 msgid "Security check failed. Please try again."
@@ -649,12 +649,12 @@ msgid "Glass"
 msgstr ""
 
 #: includes/Admin/class-themepage.php:436
-#: templates/admin/registration-editor.php:132
+#: templates/admin/registration-editor.php:181
 msgid "Light"
 msgstr ""
 
 #: includes/Admin/class-themepage.php:437
-#: templates/admin/registration-editor.php:133
+#: templates/admin/registration-editor.php:182
 msgid "Dark"
 msgstr ""
 
@@ -682,196 +682,377 @@ msgstr ""
 msgid "Glass border width must be an integer."
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:100
-#: includes/Admin/RegistrationEditorPage.php:101
-#: templates/admin/registration-editor.php:61
+#: includes/Admin/RegistrationEditorPage.php:102
+#: includes/Admin/RegistrationEditorPage.php:103
+#: templates/admin/registration-editor.php:63
 msgid "Registration Form"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:143
+#: includes/Admin/RegistrationEditorPage.php:145
 msgid "Registration editor template is missing."
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:268
-#: templates/admin/registration-editor.php:214
-msgid "Template Preview"
-msgstr ""
-
-#: includes/Admin/RegistrationEditorPage.php:269
+#: includes/Admin/RegistrationEditorPage.php:293
 msgid "Unable to load the preview. Please save first or try again."
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:270
-#: templates/admin/registration-editor.php:215
-#: templates/admin/registration-editor.php:217
+#: includes/Admin/RegistrationEditorPage.php:294
+#: templates/admin/registration-editor.php:280
+#: templates/admin/registration-editor.php:282
 msgid "Close preview"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:271
+#: includes/Admin/RegistrationEditorPage.php:295
 #: includes/Rest/RegistrationPreviewController.php:78
-#: templates/admin/registration-editor.php:221
+#: templates/admin/registration-editor.php:286
 msgid "Preview only. Form controls are disabled."
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:272
-#: templates/admin/registration-editor.php:153
-msgid "Conditional Visibility (Beta)"
+#. translators: %s: Group index.
+#: includes/Admin/RegistrationEditorPage.php:297
+#, php-format
+msgid "Group %s"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:273
-msgid "Show or hide fields based on other field values. Rules apply after saving."
+#: includes/Admin/RegistrationEditorPage.php:298
+msgid "Match when"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:274
-#: templates/admin/registration-editor.php:174
+#: includes/Admin/RegistrationEditorPage.php:299
+#: includes/Admin/RegistrationEditorPage.php:341
+msgid "All conditions match"
+msgstr ""
+
+#: includes/Admin/RegistrationEditorPage.php:300
+#: includes/Admin/RegistrationEditorPage.php:342
+msgid "Any condition matches"
+msgstr ""
+
+#: includes/Admin/RegistrationEditorPage.php:301
 msgid "Add condition"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:275
-msgid "Remove"
+#: includes/Admin/RegistrationEditorPage.php:302
+msgid "Add action"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:276
-msgid "If field"
+#: includes/Admin/RegistrationEditorPage.php:303
+msgid "Remove group"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:277
-msgid "Operator"
-msgstr ""
-
-#: includes/Admin/RegistrationEditorPage.php:278
-msgid "Value"
-msgstr ""
-
-#: includes/Admin/RegistrationEditorPage.php:279
-msgid "Then"
-msgstr ""
-
-#: includes/Admin/RegistrationEditorPage.php:280
+#: includes/Admin/RegistrationEditorPage.php:304
+#: includes/Admin/RegistrationEditorPage.php:314
 #: includes/Registration/Editor/TagParser.php:517
 msgid "Field"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:281
+#: includes/Admin/RegistrationEditorPage.php:305
+msgid "Operator"
+msgstr ""
+
+#: includes/Admin/RegistrationEditorPage.php:306
+msgid "Value"
+msgstr ""
+
+#: includes/Admin/RegistrationEditorPage.php:307
 msgid "Enter a value"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:282
-#: templates/admin/registration-editor.php:158
-msgid "Registration template matrix"
+#: includes/Admin/RegistrationEditorPage.php:308
+msgid "Remove condition"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:283
-msgid "Add fields to the template to create conditions."
+#: includes/Admin/RegistrationEditorPage.php:309
+#: templates/admin/diagnostics-page.php:286
+msgid "Action"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:284
+#: includes/Admin/RegistrationEditorPage.php:310
+#: includes/Admin/RegistrationEditorPage.php:352
+msgid "Show"
+msgstr ""
+
+#: includes/Admin/RegistrationEditorPage.php:311
+#: includes/Admin/RegistrationEditorPage.php:353
+msgid "Hide"
+msgstr ""
+
+#: includes/Admin/RegistrationEditorPage.php:312
+#: includes/Admin/RegistrationEditorPage.php:354
+msgid "Require"
+msgstr ""
+
+#: includes/Admin/RegistrationEditorPage.php:313
+#: includes/Admin/RegistrationEditorPage.php:355
+msgid "Optional"
+msgstr ""
+
+#: includes/Admin/RegistrationEditorPage.php:315
+msgid "Remove action"
+msgstr ""
+
+#: includes/Admin/RegistrationEditorPage.php:316
+msgid "No groups defined yet."
+msgstr ""
+
+#. translators: 1: Group label, 2: missing field slug.
+#: includes/Admin/RegistrationEditorPage.php:318
+#, php-format
+msgid "%1$s references a missing field (%2$s)."
+msgstr ""
+
+#. translators: 1: Group label, 2: missing target field slug.
+#: includes/Admin/RegistrationEditorPage.php:320
+#, php-format
+msgid "%1$s targets an unknown field (%2$s)."
+msgstr ""
+
+#. translators: 1: Group label, 2: field slug causing a circular reference.
+#: includes/Admin/RegistrationEditorPage.php:322
+#, php-format
+msgid "%1$s both listens to and targets %2$s."
+msgstr ""
+
+#. translators: 1: Group label, 2: field slug involved in mutually exclusive conditions.
+#: includes/Admin/RegistrationEditorPage.php:324
+#, php-format
+msgid "%1$s contains conditions that cannot all be true for %2$s."
+msgstr ""
+
+#: includes/Admin/RegistrationEditorPage.php:325
+msgid "No issues found."
+msgstr ""
+
+#. translators: %s: Issue count.
+#: includes/Admin/RegistrationEditorPage.php:327
+#, php-format
+msgid "%s issues found."
+msgstr ""
+
+#: includes/Admin/RegistrationEditorPage.php:328
+#: templates/admin/registration-editor.php:110
+msgid "Restore revision…"
+msgstr ""
+
+#. translators: %s: Autosave timestamp.
+#: includes/Admin/RegistrationEditorPage.php:330
+#, php-format
+msgid "Autosave — %s"
+msgstr ""
+
+#: includes/Admin/RegistrationEditorPage.php:331
+msgid "Autosave"
+msgstr ""
+
+#: includes/Admin/RegistrationEditorPage.php:332
+msgid "Saving…"
+msgstr ""
+
+#: includes/Admin/RegistrationEditorPage.php:333
+msgid "Saved."
+msgstr ""
+
+#: includes/Admin/RegistrationEditorPage.php:334
+msgid "Autosave failed."
+msgstr ""
+
+#: includes/Admin/RegistrationEditorPage.php:335
+msgid "Revision restored."
+msgstr ""
+
+#: includes/Admin/RegistrationEditorPage.php:336
+msgid "Restoring…"
+msgstr ""
+
+#: includes/Admin/RegistrationEditorPage.php:337
+#: templates/admin/registration-editor.php:294
+msgid "Show rule debugger"
+msgstr ""
+
+#: includes/Admin/RegistrationEditorPage.php:338
+msgid "Hide rule debugger"
+msgstr ""
+
+#. translators: 1: Group index, 2: operator label.
+#: includes/Admin/RegistrationEditorPage.php:340
+#, php-format
+msgid "Group %1$s (%2$s)"
+msgstr ""
+
+#: includes/Admin/RegistrationEditorPage.php:343
+msgid "Matched"
+msgstr ""
+
+#: includes/Admin/RegistrationEditorPage.php:344
+msgid "Not matched"
+msgstr ""
+
+#. translators: 1: Field label, 2: operator label, 3: comparison value, 4: match result.
+#: includes/Admin/RegistrationEditorPage.php:346
+#, php-format
+msgid "%1$s %2$s %3$s — %4$s"
+msgstr ""
+
+#: includes/Admin/RegistrationEditorPage.php:347
+msgid "matched"
+msgstr ""
+
+#: includes/Admin/RegistrationEditorPage.php:348
+msgid "not matched"
+msgstr ""
+
+#: includes/Admin/RegistrationEditorPage.php:349
+#: templates/admin/diagnostics-page.php:182
+#: templates/admin/members-page.php:63
+msgid "Actions"
+msgstr ""
+
+#. translators: 1: Action label, 2: target field label, 3: resulting state.
+#: includes/Admin/RegistrationEditorPage.php:351
+#, php-format
+msgid "%1$s — %2$s (%3$s)"
+msgstr ""
+
+#: includes/Admin/RegistrationEditorPage.php:356
+msgid "final state: visible"
+msgstr ""
+
+#: includes/Admin/RegistrationEditorPage.php:357
+msgid "final state: hidden"
+msgstr ""
+
+#: includes/Admin/RegistrationEditorPage.php:358
+msgid "final state: required"
+msgstr ""
+
+#: includes/Admin/RegistrationEditorPage.php:359
+msgid "final state: optional"
+msgstr ""
+
+#: includes/Admin/RegistrationEditorPage.php:360
+#: includes/Admin/RegistrationEditorPage.php:369
 msgid "is"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:285
+#: includes/Admin/RegistrationEditorPage.php:361
+#: includes/Admin/RegistrationEditorPage.php:370
 msgid "is not"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:286
+#: includes/Admin/RegistrationEditorPage.php:362
+#: includes/Admin/RegistrationEditorPage.php:371
 msgid "contains"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:287
+#: includes/Admin/RegistrationEditorPage.php:363
+#: includes/Admin/RegistrationEditorPage.php:372
 msgid "is empty"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:288
+#: includes/Admin/RegistrationEditorPage.php:364
+#: includes/Admin/RegistrationEditorPage.php:373
 msgid "is not empty"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:289
-msgid "show"
+#: includes/Admin/RegistrationEditorPage.php:365
+#: includes/Admin/RegistrationEditorPage.php:374
+msgid "is less than"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:290
-msgid "hide"
+#: includes/Admin/RegistrationEditorPage.php:366
+#: includes/Admin/RegistrationEditorPage.php:375
+msgid "is less than or equal to"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:462
+#: includes/Admin/RegistrationEditorPage.php:367
+#: includes/Admin/RegistrationEditorPage.php:376
+msgid "is greater than"
+msgstr ""
+
+#: includes/Admin/RegistrationEditorPage.php:368
+#: includes/Admin/RegistrationEditorPage.php:377
+msgid "is greater than or equal to"
+msgstr ""
+
+#: includes/Admin/RegistrationEditorPage.php:637
 msgid "You do not have permission to modify the registration form."
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:474
+#: includes/Admin/RegistrationEditorPage.php:649
 msgid "Registration form reset to defaults."
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:488
+#: includes/Admin/RegistrationEditorPage.php:663
 msgid "You do not have permission to export the registration form."
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:500
+#: includes/Admin/RegistrationEditorPage.php:675
 msgid "Unable to export registration form."
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:515
+#: includes/Admin/RegistrationEditorPage.php:690
 msgid "You do not have permission to import the registration form."
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:531
+#: includes/Admin/RegistrationEditorPage.php:706
 msgid "Import failed. Ensure the JSON file is valid."
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:546
+#: includes/Admin/RegistrationEditorPage.php:721
 msgid "Registration form imported."
 msgstr ""
 
 #. translators: %s: Missing canonical field label.
-#: includes/Admin/RegistrationEditorPage.php:607
+#: includes/Admin/RegistrationEditorPage.php:782
 #, php-format
 msgid "Template is missing the required %s field."
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:688
+#: includes/Admin/RegistrationEditorPage.php:863
 msgid "Text field"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:697
+#: includes/Admin/RegistrationEditorPage.php:872
 msgid "Email field"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:706
+#: includes/Admin/RegistrationEditorPage.php:881
 msgid "Telephone field"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:714
+#: includes/Admin/RegistrationEditorPage.php:889
 msgid "Date field"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:722
+#: includes/Admin/RegistrationEditorPage.php:897
 msgid "Number field"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:731
+#: includes/Admin/RegistrationEditorPage.php:906
 msgid "Textarea"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:739
+#: includes/Admin/RegistrationEditorPage.php:914
 msgid "Radio group"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:748
+#: includes/Admin/RegistrationEditorPage.php:923
 msgid "Checkbox group"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:761
+#: includes/Admin/RegistrationEditorPage.php:936
 msgid "Consent checkbox"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:769
+#: includes/Admin/RegistrationEditorPage.php:944
 msgid "Select field"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:778
+#: includes/Admin/RegistrationEditorPage.php:953
 msgid "File upload"
 msgstr ""
 
-#: includes/Admin/RegistrationEditorPage.php:782
+#: includes/Admin/RegistrationEditorPage.php:957
 msgid "Submit button"
 msgstr ""
 
@@ -1006,11 +1187,11 @@ msgstr ""
 msgid "Override prompts are disabled for this dashboard."
 msgstr ""
 
-#: includes/Core/class-plugin.php:83
+#: includes/Core/class-plugin.php:85
 msgid "FoodBank Member"
 msgstr ""
 
-#: includes/Core/class-plugin.php:91
+#: includes/Core/class-plugin.php:93
 msgid "FoodBank Staff"
 msgstr ""
 
@@ -1254,17 +1435,17 @@ msgid "Unrecognised token \"%s\" ignored."
 msgstr ""
 
 #: includes/Registration/Editor/TagParser.php:510
-#: includes/Registration/Editor/TemplateRenderer.php:548
+#: includes/Registration/Editor/TemplateRenderer.php:551
 msgid "Submit"
 msgstr ""
 
 #: includes/Registration/Editor/TemplateDefaults.php:77
-#: includes/Shortcodes/class-registrationform.php:594
+#: includes/Shortcodes/class-registrationform.php:600
 msgid "Thank you for registering. We have emailed your check-in QR code."
 msgstr ""
 
 #: includes/Registration/Editor/TemplateDefaults.php:78
-#: includes/Shortcodes/class-registrationform.php:598
+#: includes/Shortcodes/class-registrationform.php:604
 #: templates/admin/registration-editor.php:37
 msgid "Thank you for registering. Our team will review your application and send your QR code once approved."
 msgstr ""
@@ -1308,7 +1489,7 @@ msgid "File upload stopped by extension."
 msgstr ""
 
 #: includes/Registration/Uploads.php:347
-#: includes/Shortcodes/class-registrationform.php:365
+#: includes/Shortcodes/class-registrationform.php:367
 msgid "Unable to process the uploaded file."
 msgstr ""
 
@@ -1350,60 +1531,65 @@ msgstr ""
 msgid "This member is not currently active."
 msgstr ""
 
-#: includes/Shortcodes/class-registrationform.php:311
-#: includes/Shortcodes/class-registrationform.php:321
+#: includes/Rest/RegistrationEditorController.php:162
+#: includes/Rest/RegistrationEditorController.php:169
+msgid "Revision not found."
+msgstr ""
+
+#: includes/Shortcodes/class-registrationform.php:313
+#: includes/Shortcodes/class-registrationform.php:323
 msgid "Invalid submission. Please try again."
 msgstr ""
 
-#: includes/Shortcodes/class-registrationform.php:421
+#: includes/Shortcodes/class-registrationform.php:427
 msgid "This file is required."
 msgstr ""
 
-#: includes/Shortcodes/class-registrationform.php:429
+#: includes/Shortcodes/class-registrationform.php:435
 msgid "This field is required."
 msgstr ""
 
-#: includes/Shortcodes/class-registrationform.php:465
-#: includes/Shortcodes/class-registrationform.php:497
+#: includes/Shortcodes/class-registrationform.php:471
+#: includes/Shortcodes/class-registrationform.php:503
 msgid "First name is required."
 msgstr ""
 
-#: includes/Shortcodes/class-registrationform.php:468
-#: includes/Shortcodes/class-registrationform.php:501
+#: includes/Shortcodes/class-registrationform.php:474
+#: includes/Shortcodes/class-registrationform.php:507
 msgid "Last initial must be a single letter."
 msgstr ""
 
-#: includes/Shortcodes/class-registrationform.php:471
-#: includes/Shortcodes/class-registrationform.php:505
+#: includes/Shortcodes/class-registrationform.php:477
+#: includes/Shortcodes/class-registrationform.php:511
 msgid "A valid email address is required."
 msgstr ""
 
-#: includes/Shortcodes/class-registrationform.php:484
+#: includes/Shortcodes/class-registrationform.php:490
 msgid "Please correct the errors below and try again."
 msgstr ""
 
-#: includes/Shortcodes/class-registrationform.php:532
-#: includes/Shortcodes/class-registrationform.php:533
+#: includes/Shortcodes/class-registrationform.php:538
+#: includes/Shortcodes/class-registrationform.php:539
 msgid "Please wait before submitting again."
 msgstr ""
 
-#: includes/Shortcodes/class-registrationform.php:545
+#: includes/Shortcodes/class-registrationform.php:551
 msgid "Service temporarily unavailable. Please try again later."
 msgstr ""
 
-#: includes/Shortcodes/class-registrationform.php:567
+#: includes/Shortcodes/class-registrationform.php:573
 msgid "We could not save your registration. Please try again later."
 msgstr ""
 
-#: includes/Shortcodes/class-registrationform.php:663
+#: includes/Shortcodes/class-registrationform.php:669
 msgid "Enter a valid email address."
 msgstr ""
 
-#: includes/Shortcodes/class-registrationform.php:684
+#: includes/Shortcodes/class-registrationform.php:690
 msgid "Enter a valid number."
 msgstr ""
 
-#: includes/Shortcodes/class-registrationform.php:705
+#: includes/Shortcodes/class-registrationform.php:711
 msgid "Choose a valid option."
 msgstr ""
 
@@ -1509,11 +1695,6 @@ msgstr ""
 msgid "Progress"
 msgstr ""
 
-#: templates/admin/diagnostics-page.php:182
-#: templates/admin/members-page.php:63
-msgid "Actions"
-msgstr ""
-
 #. translators: 1: processing mode, 2: cursor identifier.
 #: templates/admin/diagnostics-page.php:201
 #, php-format
@@ -1568,10 +1749,6 @@ msgstr ""
 
 #: templates/admin/diagnostics-page.php:285
 msgid "Attempts"
-msgstr ""
-
-#: templates/admin/diagnostics-page.php:286
-msgid "Action"
 msgstr ""
 
 #: templates/admin/diagnostics-page.php:293
@@ -1662,92 +1839,146 @@ msgstr ""
 msgid "Thank you for registering. We have emailed your QR code."
 msgstr ""
 
-#: templates/admin/registration-editor.php:97
+#: templates/admin/registration-editor.php:100
 msgid "Preview"
 msgstr ""
 
-#: templates/admin/registration-editor.php:103
-msgid "Form settings"
+#: templates/admin/registration-editor.php:108
+msgid "Restore revision"
 msgstr ""
 
-#: templates/admin/registration-editor.php:107
-msgid "File upload size (MB)"
+#: templates/admin/registration-editor.php:133
+msgid "Restore"
 msgstr ""
 
-#: templates/admin/registration-editor.php:113
-msgid "Allowed file types"
+#: templates/admin/registration-editor.php:136
+#: templates/admin/registration-editor.php:141
+msgid "Keyboard shortcuts"
 msgstr ""
 
-#: templates/admin/registration-editor.php:116
-msgid "Comma separated list of MIME types, e.g. application/pdf, image/jpeg."
-msgstr ""
-
-#: templates/admin/registration-editor.php:120
-msgid "Honeypot field"
-msgstr ""
-
-#: templates/admin/registration-editor.php:124
-msgid "Enable spam honeypot field"
-msgstr ""
-
-#: templates/admin/registration-editor.php:129
-msgid "Editor theme"
-msgstr ""
-
-#: templates/admin/registration-editor.php:138
-msgid "Success message (auto-approved)"
-msgstr ""
-
-#: templates/admin/registration-editor.php:144
-msgid "Success message (pending)"
-msgstr ""
-
-#: templates/admin/registration-editor.php:156
-msgid "Show or hide fields when another field matches a value."
-msgstr ""
-
-#: templates/admin/registration-editor.php:163
-msgid "Enable conditional visibility rules"
-msgstr ""
-
-#: templates/admin/registration-editor.php:168
-msgid "Add form fields to create conditions."
-msgstr ""
-
-#: templates/admin/registration-editor.php:170
-msgid "No conditions yet."
-msgstr ""
-
-#: templates/admin/registration-editor.php:177
-msgid "Conditional visibility editing requires JavaScript."
-msgstr ""
-
-#: templates/admin/registration-editor.php:184
+#: templates/admin/registration-editor.php:143
+#: templates/admin/registration-editor.php:249
 msgid "Save changes"
 msgstr ""
 
-#: templates/admin/registration-editor.php:191
+#: templates/admin/registration-editor.php:144
+msgid "Open preview"
+msgstr ""
+
+#: templates/admin/registration-editor.php:145
+msgid "Focus field palette"
+msgstr ""
+
+#: templates/admin/registration-editor.php:152
+msgid "Form settings"
+msgstr ""
+
+#: templates/admin/registration-editor.php:156
+msgid "File upload size (MB)"
+msgstr ""
+
+#: templates/admin/registration-editor.php:162
+msgid "Allowed file types"
+msgstr ""
+
+#: templates/admin/registration-editor.php:165
+msgid "Comma separated list of MIME types, e.g. application/pdf, image/jpeg."
+msgstr ""
+
+#: templates/admin/registration-editor.php:169
+msgid "Honeypot field"
+msgstr ""
+
+#: templates/admin/registration-editor.php:173
+msgid "Enable spam honeypot field"
+msgstr ""
+
+#: templates/admin/registration-editor.php:178
+msgid "Editor theme"
+msgstr ""
+
+#: templates/admin/registration-editor.php:187
+msgid "Success message (auto-approved)"
+msgstr ""
+
+#: templates/admin/registration-editor.php:193
+msgid "Success message (pending)"
+msgstr ""
+
+#: templates/admin/registration-editor.php:206
+msgid "Conditional Visibility (Beta)"
+msgstr ""
+
+#: templates/admin/registration-editor.php:209
+msgid "Show or hide fields when another field matches a value."
+msgstr ""
+
+#: templates/admin/registration-editor.php:211
+msgid "Registration template matrix"
+msgstr ""
+
+#: templates/admin/registration-editor.php:216
+msgid "Enable conditional visibility rules"
+msgstr ""
+
+#: templates/admin/registration-editor.php:219
+msgid "Add group"
+msgstr ""
+
+#: templates/admin/registration-editor.php:220
+msgid "Validate rules"
+msgstr ""
+
+#: templates/admin/registration-editor.php:224
+msgid "Validation results"
+msgstr ""
+
+#: templates/admin/registration-editor.php:234
+msgid "Add form fields to build conditional rules."
+msgstr ""
+
+#: templates/admin/registration-editor.php:236
+msgid "No condition groups defined yet."
+msgstr ""
+
+#: templates/admin/registration-editor.php:242
+msgid "Conditional visibility editing requires JavaScript."
+msgstr ""
+
+#: templates/admin/registration-editor.php:256
 msgid "Reset to default"
 msgstr ""
 
-#: templates/admin/registration-editor.php:197
+#: templates/admin/registration-editor.php:262
 msgid "Export"
 msgstr ""
 
-#: templates/admin/registration-editor.php:202
+#: templates/admin/registration-editor.php:267
 msgid "Import template"
 msgstr ""
 
-#: templates/admin/registration-editor.php:203
+#: templates/admin/registration-editor.php:268
 msgid "Paste a JSON export created from this editor."
 msgstr ""
 
-#: templates/admin/registration-editor.php:207
+#: templates/admin/registration-editor.php:272
 msgid "Import"
 msgstr ""
 
-#: templates/admin/registration-editor.php:225
+#: templates/admin/registration-editor.php:279
+msgid "Template Preview"
+msgstr ""
+
+#: templates/admin/registration-editor.php:290
 msgid "Template warnings"
+msgstr ""
+
+#: templates/admin/registration-editor.php:297
+msgid "Rule debugger"
+msgstr ""
+
+#: templates/admin/registration-editor.php:298
+msgid "No rules evaluated for the current preview state."
 msgstr ""
 
 #. translators: 1: Day and time window, 2: Timezone.
@@ -2079,7 +2310,11 @@ msgstr ""
 msgid "See you soon!"
 msgstr ""
 
-#: templates/public/registration-form.php:61
+#: templates/public/registration-form.php:62
+msgid "Please review these fields:"
+msgstr ""
+
+#: templates/public/registration-form.php:100
 msgid "If you are human, leave this field empty."
 msgstr ""
 

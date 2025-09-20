@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace FoodBankManager\Admin;
 
 use FoodBankManager\Core\Plugin;
+use FoodBankManager\Registration\Editor\EditorState;
 use FoodBankManager\Registration\Editor\TemplateDefaults;
 use FoodBankManager\Registration\Editor\TemplateRenderer;
 use FoodBankManager\Registration\Editor\TagParser;
@@ -26,6 +27,7 @@ use function esc_html__;
 use function esc_url;
 use function explode;
 use function get_current_screen;
+use function get_current_user_id;
 use function get_option;
 use function in_array;
 use function is_array;
@@ -153,7 +155,10 @@ final class RegistrationEditorPage {
                                 $settings = TemplateDefaults::settings();
                 }
 
-                        $fields = self::field_catalog( $template );
+                        $fields         = self::field_catalog( $template );
+                        $current_user_id = function_exists( 'get_current_user_id' ) ? (int) get_current_user_id() : 0;
+                        $autosave_state  = EditorState::get_autosave( $current_user_id );
+                        $revisions       = EditorState::list_revisions();
 
                         $query_notice  = filter_input( INPUT_GET, self::NOTICE_PARAM, FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 			$query_message = filter_input( INPUT_GET, self::MESSAGE_PARAM, FILTER_UNSAFE_RAW );
@@ -182,6 +187,8 @@ final class RegistrationEditorPage {
                                 'snippets'        => self::toolbar_snippets(),
                                 'fields'          => $fields,
                                 'matrix_url'      => plugins_url( 'Docs/Registration-Template-Matrix.md', FBM_FILE ),
+                                'revisions'       => $revisions,
+                                'autosave'        => $autosave_state,
                         );
 
 			settings_errors( self::OPTION_GROUP );
@@ -230,14 +237,17 @@ final class RegistrationEditorPage {
                                 $template = TemplateDefaults::template();
                 }
 
-                        $fields    = self::field_catalog( $template );
-                        $settings  = wp_parse_args( is_array( $stored_settings ) ? $stored_settings : array(), TemplateDefaults::settings() );
-                        $conditions = isset( $settings['conditions'] ) && is_array( $settings['conditions'] ) ? $settings['conditions'] : TemplateDefaults::settings()['conditions'];
-                        $rules      = isset( $conditions['rules'] ) && is_array( $conditions['rules'] ) ? array_values( $conditions['rules'] ) : array();
+                        $fields         = self::field_catalog( $template );
+                        $settings       = wp_parse_args( is_array( $stored_settings ) ? $stored_settings : array(), TemplateDefaults::settings() );
+                        $conditions     = isset( $settings['conditions'] ) && is_array( $settings['conditions'] ) ? $settings['conditions'] : TemplateDefaults::settings()['conditions'];
+                        $groups         = isset( $conditions['groups'] ) && is_array( $conditions['groups'] ) ? array_values( $conditions['groups'] ) : array();
+                        $current_user_id = function_exists( 'get_current_user_id' ) ? (int) get_current_user_id() : 0;
+                        $autosave_state  = EditorState::get_autosave( $current_user_id );
+                        $revisions       = EditorState::list_revisions();
 
                         $conditions_payload = array(
-                                'enabled' => ! empty( $conditions['enabled'] ) && ! empty( $rules ),
-                                'rules'   => $rules,
+                                'enabled' => ! empty( $conditions['enabled'] ) && ! empty( $groups ),
+                                'groups'  => $groups,
                         );
 
                         $matrix_url = plugins_url( 'Docs/Registration-Template-Matrix.md', FBM_FILE );
@@ -245,53 +255,131 @@ final class RegistrationEditorPage {
                         $version = defined( 'FBM_VER' ) ? FBM_VER : Plugin::VERSION;
                         wp_enqueue_script( 'jquery' );
 
-			$handle       = 'fbm-registration-editor';
-			$script       = plugins_url( 'assets/js/registration-editor.js', FBM_FILE );
-			$dependencies = array( 'jquery' );
-		if ( ! empty( $editor_settings ) ) {
-			$dependencies[] = 'code-editor';
-		}
-			wp_register_script( $handle, $script, $dependencies, $version, true );
-			wp_localize_script(
-				$handle,
-				'fbmRegistrationEditor',
-				array(
-                                        'previewNonce' => wp_create_nonce( 'wp_rest' ),
+                        $conditions_handle = 'fbm-registration-conditions';
+                        $conditions_script = plugins_url( 'assets/js/registration-conditions.js', FBM_FILE );
+                        wp_register_script( $conditions_handle, $conditions_script, array(), $version, true );
+
+                        $handle       = 'fbm-registration-editor';
+                        $script       = plugins_url( 'assets/js/registration-editor.js', FBM_FILE );
+                        $dependencies = array( 'jquery', $conditions_handle );
+                if ( ! empty( $editor_settings ) ) {
+                        $dependencies[] = 'code-editor';
+                }
+                        wp_register_script( $handle, $script, $dependencies, $version, true );
+                        $rest_nonce = wp_create_nonce( 'wp_rest' );
+                        wp_localize_script(
+                                $handle,
+                                'fbmRegistrationEditor',
+                                array(
+                                        'previewNonce' => $rest_nonce,
+                                        'restNonce'   => $rest_nonce,
                                         'previewUrl'   => esc_url( rest_url( 'fbm/v1/registration/preview' ) ),
                                         'textareaId'   => self::TEMPLATE_FIELD,
+                                        'settingsField' => self::SETTINGS_FIELD,
                                         'codeEditor'   => $editor_settings,
                                         'editorTheme'  => $theme,
                                         'fields'       => $fields,
                                         'conditions'   => $conditions_payload,
                                         'matrixUrl'    => esc_url( $matrix_url ),
+                                        'autosave'     => array(
+                                                'endpoint'        => esc_url_raw( rest_url( 'fbm/v1/registration/editor/autosave' ) ),
+                                                'revisions'       => $revisions,
+                                                'payload'         => $autosave_state,
+                                                'restoreBase'     => esc_url_raw( rest_url( 'fbm/v1/registration/editor/revisions/' ) ),
+                                                'revisionsEndpoint' => esc_url_raw( rest_url( 'fbm/v1/registration/editor/revisions' ) ),
+                                                'interval'        => 30000,
+                                        ),
                                         'i18n'         => array(
-                                                'previewTitle'     => esc_html__( 'Template Preview', 'foodbank-manager' ),
                                                 'previewError'     => esc_html__( 'Unable to load the preview. Please save first or try again.', 'foodbank-manager' ),
                                                 'closeLabel'       => esc_html__( 'Close preview', 'foodbank-manager' ),
                                                 'modalDescription' => esc_html__( 'Preview only. Form controls are disabled.', 'foodbank-manager' ),
-                                                'conditionsHeading' => esc_html__( 'Conditional Visibility (Beta)', 'foodbank-manager' ),
-                                                'conditionsDescription' => esc_html__( 'Show or hide fields based on other field values. Rules apply after saving.', 'foodbank-manager' ),
-                                                'conditionsAdd'     => esc_html__( 'Add condition', 'foodbank-manager' ),
-                                                'conditionsRemove'  => esc_html__( 'Remove', 'foodbank-manager' ),
-                                                'conditionsIfField' => esc_html__( 'If field', 'foodbank-manager' ),
-                                                'conditionsOperator' => esc_html__( 'Operator', 'foodbank-manager' ),
-                                                'conditionsValue'   => esc_html__( 'Value', 'foodbank-manager' ),
-                                                'conditionsThen'    => esc_html__( 'Then', 'foodbank-manager' ),
-                                                'conditionsTarget'  => esc_html__( 'Field', 'foodbank-manager' ),
-                                                'conditionsEmptyPlaceholder' => esc_html__( 'Enter a value', 'foodbank-manager' ),
-                                                'conditionsHelpLabel' => esc_html__( 'Registration template matrix', 'foodbank-manager' ),
-                                                'conditionsNoFields' => esc_html__( 'Add fields to the template to create conditions.', 'foodbank-manager' ),
+/* translators: %s: Group index. */
+'groupLabel'        => esc_html__( 'Group %s', 'foodbank-manager' ),
+                                                'groupOperatorLabel' => esc_html__( 'Match when', 'foodbank-manager' ),
+                                                'groupOperatorAnd'  => esc_html__( 'All conditions match', 'foodbank-manager' ),
+                                                'groupOperatorOr'   => esc_html__( 'Any condition matches', 'foodbank-manager' ),
+                                                'addCondition'      => esc_html__( 'Add condition', 'foodbank-manager' ),
+                                                'addAction'         => esc_html__( 'Add action', 'foodbank-manager' ),
+                                                'removeGroup'       => esc_html__( 'Remove group', 'foodbank-manager' ),
+                                                'conditionFieldLabel' => esc_html__( 'Field', 'foodbank-manager' ),
+                                                'conditionOperatorLabel' => esc_html__( 'Operator', 'foodbank-manager' ),
+                                                'conditionValueLabel' => esc_html__( 'Value', 'foodbank-manager' ),
+                                                'conditionValuePlaceholder' => esc_html__( 'Enter a value', 'foodbank-manager' ),
+                                                'removeCondition'   => esc_html__( 'Remove condition', 'foodbank-manager' ),
+                                                'actionTypeLabel'   => esc_html__( 'Action', 'foodbank-manager' ),
+                                                'actionShow'        => esc_html__( 'Show', 'foodbank-manager' ),
+                                                'actionHide'        => esc_html__( 'Hide', 'foodbank-manager' ),
+                                                'actionRequire'     => esc_html__( 'Require', 'foodbank-manager' ),
+                                                'actionOptional'    => esc_html__( 'Optional', 'foodbank-manager' ),
+                                                'actionTargetLabel' => esc_html__( 'Field', 'foodbank-manager' ),
+                                                'removeAction'      => esc_html__( 'Remove action', 'foodbank-manager' ),
+                                                'validationEmpty'   => esc_html__( 'No groups defined yet.', 'foodbank-manager' ),
+/* translators: 1: Group label, 2: missing field slug. */
+'validationMissingField' => esc_html__( '%1$s references a missing field (%2$s).', 'foodbank-manager' ),
+/* translators: 1: Group label, 2: missing target field slug. */
+'validationMissingTarget' => esc_html__( '%1$s targets an unknown field (%2$s).', 'foodbank-manager' ),
+/* translators: 1: Group label, 2: field slug causing a circular reference. */
+'validationCircular' => esc_html__( '%1$s both listens to and targets %2$s.', 'foodbank-manager' ),
+/* translators: 1: Group label, 2: field slug involved in mutually exclusive conditions. */
+'validationUnreachable' => esc_html__( '%1$s contains conditions that cannot all be true for %2$s.', 'foodbank-manager' ),
+'validationPassed'  => esc_html__( 'No issues found.', 'foodbank-manager' ),
+/* translators: %s: Issue count. */
+'validationHasIssues' => esc_html__( '%s issues found.', 'foodbank-manager' ),
+'revisionPlaceholder' => esc_html__( 'Restore revision…', 'foodbank-manager' ),
+/* translators: %s: Autosave timestamp. */
+'revisionAutosave'  => esc_html__( 'Autosave — %s', 'foodbank-manager' ),
+'revisionUnknown'   => esc_html__( 'Autosave', 'foodbank-manager' ),
+                                                'autosaveSaving'    => esc_html__( 'Saving…', 'foodbank-manager' ),
+                                                'autosaveSaved'     => esc_html__( 'Saved.', 'foodbank-manager' ),
+                                                'autosaveError'     => esc_html__( 'Autosave failed.', 'foodbank-manager' ),
+                                                'autosaveRestored'  => esc_html__( 'Revision restored.', 'foodbank-manager' ),
+                                                'autosaveRestoring' => esc_html__( 'Restoring…', 'foodbank-manager' ),
+                                                'debugToggleShow'   => esc_html__( 'Show rule debugger', 'foodbank-manager' ),
+                                                'debugToggleHide'   => esc_html__( 'Hide rule debugger', 'foodbank-manager' ),
+/* translators: 1: Group index, 2: operator label. */
+'debugGroupTitle'   => esc_html__( 'Group %1$s (%2$s)', 'foodbank-manager' ),
+                                                'debugOperatorAnd'  => esc_html__( 'All conditions match', 'foodbank-manager' ),
+                                                'debugOperatorOr'   => esc_html__( 'Any condition matches', 'foodbank-manager' ),
+                                                'debugGroupMatched' => esc_html__( 'Matched', 'foodbank-manager' ),
+                                                'debugGroupNotMatched' => esc_html__( 'Not matched', 'foodbank-manager' ),
+/* translators: 1: Field label, 2: operator label, 3: comparison value, 4: match result. */
+'debugConditionRow' => esc_html__( '%1$s %2$s %3$s — %4$s', 'foodbank-manager' ),
+                                                'debugConditionMatched' => esc_html__( 'matched', 'foodbank-manager' ),
+                                                'debugConditionNotMatched' => esc_html__( 'not matched', 'foodbank-manager' ),
+                                                'debugActionsHeading' => esc_html__( 'Actions', 'foodbank-manager' ),
+/* translators: 1: Action label, 2: target field label, 3: resulting state. */
+'debugActionRow'    => esc_html__( '%1$s — %2$s (%3$s)', 'foodbank-manager' ),
+                                                'debugAction_show'  => esc_html__( 'Show', 'foodbank-manager' ),
+                                                'debugAction_hide'  => esc_html__( 'Hide', 'foodbank-manager' ),
+                                                'debugAction_require' => esc_html__( 'Require', 'foodbank-manager' ),
+                                                'debugAction_optional' => esc_html__( 'Optional', 'foodbank-manager' ),
+                                                'debugFinalVisible' => esc_html__( 'final state: visible', 'foodbank-manager' ),
+                                                'debugFinalHidden'  => esc_html__( 'final state: hidden', 'foodbank-manager' ),
+                                                'debugFinalRequired' => esc_html__( 'final state: required', 'foodbank-manager' ),
+                                                'debugFinalOptional' => esc_html__( 'final state: optional', 'foodbank-manager' ),
+                                                'debugOp_equals'    => esc_html__( 'is', 'foodbank-manager' ),
+                                                'debugOp_not_equals' => esc_html__( 'is not', 'foodbank-manager' ),
+                                                'debugOp_contains'  => esc_html__( 'contains', 'foodbank-manager' ),
+                                                'debugOp_empty'     => esc_html__( 'is empty', 'foodbank-manager' ),
+                                                'debugOp_not_empty' => esc_html__( 'is not empty', 'foodbank-manager' ),
+                                                'debugOp_lt'        => esc_html__( 'is less than', 'foodbank-manager' ),
+                                                'debugOp_lte'       => esc_html__( 'is less than or equal to', 'foodbank-manager' ),
+                                                'debugOp_gt'        => esc_html__( 'is greater than', 'foodbank-manager' ),
+                                                'debugOp_gte'       => esc_html__( 'is greater than or equal to', 'foodbank-manager' ),
                                                 'operatorEquals'    => esc_html__( 'is', 'foodbank-manager' ),
                                                 'operatorNotEquals' => esc_html__( 'is not', 'foodbank-manager' ),
                                                 'operatorContains'  => esc_html__( 'contains', 'foodbank-manager' ),
                                                 'operatorEmpty'     => esc_html__( 'is empty', 'foodbank-manager' ),
                                                 'operatorNotEmpty'  => esc_html__( 'is not empty', 'foodbank-manager' ),
-                                                'actionShow'        => esc_html__( 'show', 'foodbank-manager' ),
-                                                'actionHide'        => esc_html__( 'hide', 'foodbank-manager' ),
+                                                'operatorLt'        => esc_html__( 'is less than', 'foodbank-manager' ),
+                                                'operatorLte'       => esc_html__( 'is less than or equal to', 'foodbank-manager' ),
+                                                'operatorGt'        => esc_html__( 'is greater than', 'foodbank-manager' ),
+                                                'operatorGte'       => esc_html__( 'is greater than or equal to', 'foodbank-manager' ),
                                         ),
                                 )
                         );
-			wp_enqueue_script( $handle );
+                        wp_enqueue_script( $conditions_handle );
+                        wp_enqueue_script( $handle );
 	}
 
 		/**
@@ -353,12 +441,18 @@ final class RegistrationEditorPage {
                                 'allowed_mime_types' => ! empty( $mime_parts ) ? $mime_parts : $defaults['uploads']['allowed_mime_types'],
                         );
 
-                        $conditions      = isset( $value['conditions'] ) && is_array( $value['conditions'] ) ? $value['conditions'] : array();
-                        $rules           = isset( $conditions['rules'] ) ? $conditions['rules'] : array();
-                        $conditions_rules = self::sanitize_condition_rules( $rules );
+                        $conditions         = isset( $value['conditions'] ) && is_array( $value['conditions'] ) ? $value['conditions'] : array();
+                        $groups_source      = array();
+                        if ( isset( $conditions['groups'] ) ) {
+                                $groups_source = $conditions['groups'];
+                        } elseif ( isset( $conditions['rules'] ) ) {
+                                $groups_source = $conditions['rules'];
+                        }
+
+                        $condition_groups  = self::sanitize_condition_groups( $groups_source );
                         $conditions_enabled = isset( $conditions['enabled'] ) ? self::to_bool( $conditions['enabled'] ) : (bool) $defaults['conditions']['enabled'];
 
-                        if ( empty( $conditions_rules ) ) {
+                        if ( empty( $condition_groups ) ) {
                                 $conditions_enabled = false;
                         }
 
@@ -380,7 +474,7 @@ final class RegistrationEditorPage {
                                 'uploads'    => Uploads::normalize_settings( $uploads_settings ),
                                 'conditions' => array(
                                         'enabled' => $conditions_enabled,
-                                        'rules'   => $conditions_rules,
+                                        'groups'  => $condition_groups,
                                 ),
                                 'editor'     => array(
                                         'theme' => $editor_theme,
@@ -391,67 +485,148 @@ final class RegistrationEditorPage {
         }
 
         /**
-         * Sanitize condition rule definitions from the settings payload.
+         * Sanitize conditional visibility groups from the settings payload.
          *
-         * @param mixed $rules Raw rules payload.
+         * @param mixed $groups Raw group payload (array or JSON).
          *
-         * @return array<int,array<string,string>>
+         * @return array<int,array<string,mixed>>
          */
-        private static function sanitize_condition_rules( $rules ): array {
-                if ( is_string( $rules ) ) {
-                        $decoded = json_decode( $rules, true );
-                        $rules   = is_array( $decoded ) ? $decoded : array();
+        private static function sanitize_condition_groups( $groups ): array {
+                if ( is_string( $groups ) ) {
+                        $decoded = json_decode( $groups, true );
+                        $groups  = is_array( $decoded ) ? $decoded : array();
                 }
 
-                if ( ! is_array( $rules ) ) {
+                if ( ! is_array( $groups ) ) {
                         return array();
                 }
 
-                        $sanitized = array();
-                        $allowed_operators = array( 'equals', 'not_equals', 'contains', 'empty', 'not_empty' );
-                        $allowed_actions   = array( 'show', 'hide' );
+                $sanitized          = array();
+                $allowed_conditions = array( 'equals', 'not_equals', 'contains', 'empty', 'not_empty', 'lt', 'lte', 'gt', 'gte' );
+                $allowed_actions    = array( 'show', 'hide', 'require', 'optional' );
 
-                foreach ( $rules as $rule ) {
-                        if ( ! is_array( $rule ) ) {
+                foreach ( $groups as $group ) {
+                        if ( ! is_array( $group ) ) {
                                 continue;
                         }
 
-                                $source   = isset( $rule['if_field'] ) ? sanitize_key( (string) $rule['if_field'] ) : '';
-                                $target   = isset( $rule['target'] ) ? sanitize_key( (string) $rule['target'] ) : '';
-                                $operator = isset( $rule['operator'] ) ? sanitize_key( (string) $rule['operator'] ) : '';
-                                $action   = isset( $rule['action'] ) ? sanitize_key( (string) $rule['action'] ) : '';
-                                $value    = isset( $rule['value'] ) ? sanitize_text_field( (string) $rule['value'] ) : '';
+                        // Back-compat: convert single-rule structures to a group definition.
+                        if ( isset( $group['if_field'], $group['action'], $group['target'] ) ) {
+                                $group = array(
+                                        'operator'   => 'and',
+                                        'conditions' => array(
+                                                array(
+                                                        'field'    => $group['if_field'],
+                                                        'operator' => $group['operator'] ?? 'equals',
+                                                        'value'    => $group['value'] ?? '',
+                                                ),
+                                        ),
+                                        'actions'    => array(
+                                                array(
+                                                        'type'   => $group['action'],
+                                                        'target' => $group['target'],
+                                                ),
+                                        ),
+                                );
+                        }
 
-                        if ( '' === $source || '' === $target ) {
+                        $operator = isset( $group['operator'] ) ? sanitize_key( (string) $group['operator'] ) : 'and';
+                        if ( ! in_array( $operator, array( 'and', 'or' ), true ) ) {
+                                $operator = 'and';
+                        }
+
+                        $conditions_raw = $group['conditions'] ?? array();
+                        if ( is_string( $conditions_raw ) ) {
+                                $decoded        = json_decode( $conditions_raw, true );
+                                $conditions_raw = is_array( $decoded ) ? $decoded : array();
+                        }
+
+                        $actions_raw = $group['actions'] ?? array();
+                        if ( is_string( $actions_raw ) ) {
+                                $decoded     = json_decode( $actions_raw, true );
+                                $actions_raw = is_array( $decoded ) ? $decoded : array();
+                        }
+
+                        if ( ! is_array( $conditions_raw ) || ! is_array( $actions_raw ) ) {
                                 continue;
                         }
 
-                        if ( ! in_array( $operator, $allowed_operators, true ) ) {
-                                continue;
-                        }
+                        $conditions = array();
+                        foreach ( $conditions_raw as $condition ) {
+                                if ( ! is_array( $condition ) ) {
+                                        continue;
+                                }
 
-                        if ( ! in_array( $action, $allowed_actions, true ) ) {
-                                continue;
-                        }
+                                $field    = isset( $condition['field'] ) ? sanitize_key( (string) $condition['field'] ) : '';
+                                $operator_key = isset( $condition['operator'] ) ? sanitize_key( (string) $condition['operator'] ) : '';
+                                $value    = isset( $condition['value'] ) ? sanitize_text_field( (string) $condition['value'] ) : '';
 
-                        if ( in_array( $operator, array( 'equals', 'not_equals', 'contains' ), true ) && '' === $value ) {
-                                continue;
-                        }
+                                if ( '' === $field || ! in_array( $operator_key, $allowed_conditions, true ) ) {
+                                        continue;
+                                }
 
-                                $sanitized[] = array(
-                                        'if_field' => $source,
-                                        'operator' => $operator,
+                                if ( in_array( $operator_key, array( 'empty', 'not_empty' ), true ) ) {
+                                        $value = '';
+                                }
+
+                                if ( in_array( $operator_key, array( 'equals', 'not_equals', 'contains', 'lt', 'lte', 'gt', 'gte' ), true ) && '' === trim( $value ) ) {
+                                        continue;
+                                }
+
+                                $conditions[] = array(
+                                        'field'    => $field,
+                                        'operator' => $operator_key,
                                         'value'    => $value,
-                                        'action'   => $action,
-                                        'target'   => $target,
                                 );
 
-                        if ( count( $sanitized ) >= 50 ) {
+                                if ( count( $conditions ) >= 10 ) {
                                         break;
+                                }
+                        }
+
+                        $actions = array();
+                        foreach ( $actions_raw as $action ) {
+                                if ( ! is_array( $action ) ) {
+                                        continue;
+                                }
+
+                                $type   = isset( $action['type'] ) ? sanitize_key( (string) $action['type'] ) : '';
+                                $target = isset( $action['target'] ) ? sanitize_key( (string) $action['target'] ) : '';
+
+                                if ( '' === $type || '' === $target ) {
+                                        continue;
+                                }
+
+                                if ( ! in_array( $type, $allowed_actions, true ) ) {
+                                        continue;
+                                }
+
+                                $actions[] = array(
+                                        'type'   => $type,
+                                        'target' => $target,
+                                );
+
+                                if ( count( $actions ) >= 10 ) {
+                                        break;
+                                }
+                        }
+
+                        if ( empty( $conditions ) || empty( $actions ) ) {
+                                continue;
+                        }
+
+                        $sanitized[] = array(
+                                'operator'   => $operator,
+                                'conditions' => $conditions,
+                                'actions'    => $actions,
+                        );
+
+                        if ( count( $sanitized ) >= 25 ) {
+                                break;
                         }
                 }
 
-                        return $sanitized;
+                return $sanitized;
         }
 
 		/**

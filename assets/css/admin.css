@@ -95,6 +95,118 @@ body.fbm-registration-editor--modal-open {
     list-style: disc;
 }
 
+.fbm-registration-editor__preview-footer {
+    margin-top: 16px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.fbm-registration-editor__preview-debug {
+    margin-top: 16px;
+    border-top: 1px solid #dcdcde;
+    padding-top: 12px;
+}
+
+.fbm-registration-editor__preview-debug h3 {
+    margin-top: 0;
+    font-size: 16px;
+}
+
+.fbm-registration-editor__preview-debug ul {
+    margin: 12px 0 0;
+    padding-left: 20px;
+    list-style: disc;
+}
+
+.fbm-registration-editor__preview-debug-empty {
+    margin: 0;
+    color: #50575e;
+    font-style: italic;
+}
+
+/* Registration editor status and shortcuts */
+.fbm-registration-editor__status-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 12px 0;
+}
+
+.fbm-registration-editor__status-left {
+    min-height: 20px;
+    color: #50575e;
+    font-size: 13px;
+}
+
+.fbm-registration-editor__status-right {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.fbm-registration-editor__revisions select {
+    min-width: 220px;
+}
+
+.fbm-registration-editor__revision-restore:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.fbm-registration-editor__shortcuts-toggle {
+    border: 0;
+    background: #2271b1;
+    color: #fff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-weight: 600;
+    line-height: 32px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.fbm-registration-editor__shortcuts-popover {
+    margin: 8px 0 16px;
+    padding: 12px 16px;
+    border: 1px solid #dcdcde;
+    border-radius: 6px;
+    background: #ffffff;
+    max-width: 280px;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+}
+
+.fbm-registration-editor__shortcuts-popover h3 {
+    margin: 0 0 8px;
+    font-size: 15px;
+}
+
+.fbm-registration-editor__shortcuts-popover ul {
+    margin: 0;
+    padding-left: 18px;
+    font-size: 13px;
+}
+
+.fbm-registration-editor__shortcuts-popover kbd {
+    font-family: inherit;
+    background: #f0f0f1;
+    padding: 1px 4px;
+    border-radius: 3px;
+    border: 1px solid #dcdcde;
+}
+
+.fbm-registration-editor__toolbar .button:focus-visible,
+.fbm-registration-editor__shortcuts-toggle:focus-visible,
+.fbm-registration-editor__conditions button:focus-visible,
+.fbm-registration-editor__conditions select:focus-visible,
+.fbm-registration-editor__conditions input:focus-visible {
+    outline: 2px solid #2271b1;
+    outline-offset: 2px;
+}
+
 /* Registration editor conditional visibility */
 .fbm-registration-editor__conditions {
     margin-top: 24px;
@@ -133,63 +245,106 @@ body.fbm-registration-editor--modal-open {
     font-weight: 500;
 }
 
-.fbm-registration-editor__conditions-rules {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
 .fbm-registration-editor__conditions-empty {
     font-style: italic;
     color: #50575e;
 }
 
-.fbm-registration-editor__conditions-rule {
-    display: grid;
-    gap: 12px;
-    padding: 12px;
-    border: 1px solid #dcdcde;
-    border-radius: 4px;
-    background: #f9f9f9;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    align-items: flex-end;
+.fbm-registration-editor__conditions-groups {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
-.fbm-registration-editor__conditions-rule:focus-within {
+.fbm-registration-editor__conditions-group {
+    border: 1px solid #dcdcde;
+    border-radius: 6px;
+    background: #f9f9f9;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.fbm-registration-editor__conditions-group-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.fbm-registration-editor__conditions-group-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.fbm-registration-editor__conditions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.fbm-registration-editor__conditions-row,
+.fbm-registration-editor__conditions-action {
+    display: grid;
+    gap: 12px;
+    background: #ffffff;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+    padding: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    align-items: end;
+}
+
+.fbm-registration-editor__conditions-row:focus-within,
+.fbm-registration-editor__conditions-action:focus-within {
     border-color: #2271b1;
     box-shadow: 0 0 0 1px #2271b1;
 }
 
-.fbm-registration-editor__conditions-field {
+.fbm-registration-editor__conditions-field,
+.fbm-registration-editor__conditions-operator,
+.fbm-registration-editor__conditions-value,
+.fbm-registration-editor__conditions-action-type,
+.fbm-registration-editor__conditions-action-target {
     display: flex;
     flex-direction: column;
     gap: 4px;
-}
-
-.fbm-registration-editor__conditions-label {
-    font-weight: 600;
     font-size: 13px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
 }
 
-.fbm-registration-editor__conditions-input {
-    width: 100%;
+.fbm-registration-editor__conditions-field label,
+.fbm-registration-editor__conditions-operator label,
+.fbm-registration-editor__conditions-value label,
+.fbm-registration-editor__conditions-action-type label,
+.fbm-registration-editor__conditions-action-target label {
+    font-weight: 600;
 }
 
 .fbm-registration-editor__conditions-remove {
     justify-self: flex-start;
-    margin-top: 4px;
 }
 
-.fbm-registration-editor__conditions-add {
-    align-self: flex-start;
+.fbm-registration-editor__conditions-status {
+    font-size: 13px;
+    color: #50575e;
 }
 
-.fbm-registration-editor__toolbar .button:focus-visible,
-.fbm-registration-editor__conditions-add:focus-visible,
-.fbm-registration-editor__conditions-remove:focus-visible {
-    outline: 2px solid #2271b1;
-    outline-offset: 2px;
+.fbm-registration-editor__conditions-report {
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+    background: #fef8e6;
+    padding: 12px 16px;
+}
+
+.fbm-registration-editor__conditions-report h3 {
+    margin: 0 0 8px;
+    font-size: 15px;
+}
+
+.fbm-registration-editor__conditions-report ul {
+    margin: 0;
+    padding-left: 20px;
 }

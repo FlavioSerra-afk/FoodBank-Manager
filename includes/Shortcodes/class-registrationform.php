@@ -48,6 +48,7 @@ use function sanitize_email;
 use function sanitize_text_field;
 use function sanitize_textarea_field;
 use function set_transient;
+use function strtotime;
 use function strtolower;
 use function str_contains;
 use function substr;
@@ -183,6 +184,7 @@ final class RegistrationForm {
 					'template_warnings' => array_merge( $schema['warnings'], $rendered_form['warnings'] ),
 				),
 				'variant'        => $submission['variant'],
+				'fields_schema'  => $rendered_form['fields'],
 			);
 
 			return self::render_template( $context );
@@ -232,12 +234,12 @@ final class RegistrationForm {
 						$settings['conditions'] = $defaults['conditions'];
 		}
 
-		if ( ! isset( $settings['conditions']['rules'] ) || ! is_array( $settings['conditions']['rules'] ) ) {
-						$settings['conditions']['rules'] = array();
+		if ( ! isset( $settings['conditions']['groups'] ) || ! is_array( $settings['conditions']['groups'] ) ) {
+										$settings['conditions']['groups'] = array();
 		}
 
-						$settings['conditions']['rules']   = array_values( $settings['conditions']['rules'] );
-						$settings['conditions']['enabled'] = ! empty( $settings['conditions']['enabled'] );
+												$settings['conditions']['groups']  = array_values( $settings['conditions']['groups'] );
+												$settings['conditions']['enabled'] = ! empty( $settings['conditions']['enabled'] );
 
 						$settings['uploads']  = Uploads::normalize_settings( $settings['uploads'] );
 						$settings['honeypot'] = isset( $settings['honeypot'] ) ? (bool) $settings['honeypot'] : true;
@@ -331,11 +333,11 @@ final class RegistrationForm {
 				'consent'        => false,
 			);
 
-						$uploads         = array();
-						$stored_meta     = array();
-						$condition_rules = self::prepare_condition_rules( $settings['conditions'] ?? array(), $fields );
-						$field_states    = array();
-						$hidden_uploads  = array();
+						$uploads                                  = array();
+						$stored_meta                              = array();
+												$condition_groups = self::prepare_condition_groups( $settings['conditions'] ?? array(), $fields );
+												$field_states     = array();
+												$hidden_uploads   = array();
 
 			foreach ( $fields as $name => $definition ) {
 					$type = isset( $definition['type'] ) ? (string) $definition['type'] : 'text';
@@ -393,41 +395,45 @@ final class RegistrationForm {
 					$field_states[ $name ] = $state;
 			}
 
-						$visibility = self::evaluate_condition_visibility( $condition_rules, $fields, $values );
+												$condition_state = self::evaluate_condition_state( $condition_groups, $fields, $values );
 
 			foreach ( $field_states as $name => $state ) {
-					$visible = isset( $visibility[ $name ] ) ? $visibility[ $name ] : true;
+				$state_entry = $condition_state[ $name ] ?? array();
+				$visible     = isset( $state_entry['visible'] ) ? (bool) $state_entry['visible'] : true;
+				$required    = isset( $state_entry['required'] ) ? (bool) $state_entry['required'] : (bool) $state['required'];
 
 				if ( ! $visible ) {
-								$values[ $name ]                 = self::default_value_for_field( $state['definition'] );
-								$result['field_errors'][ $name ] = array();
+														$values[ $name ]                   = self::default_value_for_field( $state['definition'] );
+														$result['field_errors'][ $name ]   = array();
+														$field_states[ $name ]['required'] = false;
 
 					if ( is_array( $state['stored_upload'] ) ) {
 						$hidden_uploads[] = $state['stored_upload'];
 					}
 
-								continue;
+														continue;
 				}
 
-					$has_errors = ! empty( $result['field_errors'][ $name ] );
+							$field_states[ $name ]['required'] = $required;
+							$has_errors                        = ! empty( $result['field_errors'][ $name ] );
 
 				if ( 'file' === $state['type'] ) {
 					if ( is_array( $state['stored_upload'] ) ) {
 						$uploads[] = $state['stored_upload'];
 						if ( is_array( $state['stored_meta'] ) ) {
-									$stored_meta[] = $state['stored_meta'];
+													$stored_meta[] = $state['stored_meta'];
 						}
-					} elseif ( $state['required'] ) {
+					} elseif ( $required ) {
 						$result['field_errors'][ $name ][] = esc_html__( 'This file is required.', 'foodbank-manager' );
 					}
 
-									continue;
+																	continue;
 				}
 
-				if ( $state['required'] ) {
+				if ( $required ) {
 					if ( self::is_field_value_empty( $state['value'] ) ) {
-										$result['field_errors'][ $name ][] = esc_html__( 'This field is required.', 'foodbank-manager' );
-										continue;
+																	$result['field_errors'][ $name ][] = esc_html__( 'This field is required.', 'foodbank-manager' );
+																	continue;
 					}
 				} elseif ( self::is_field_value_empty( $state['value'] ) ) {
 						continue;
@@ -437,7 +443,7 @@ final class RegistrationForm {
 						continue;
 				}
 
-										self::maybe_map_canonical( $normalized, $state['definition'], $state['value'] );
+																	self::maybe_map_canonical( $normalized, $state['definition'], $state['value'] );
 			}
 
 			if ( ! empty( $hidden_uploads ) ) {
@@ -803,166 +809,465 @@ final class RegistrationForm {
 				 *
 				 * @return array<int,array<string,string>>
 				 */
-	private static function prepare_condition_rules( array $conditions, array $fields ): array {
-					$enabled = isset( $conditions['enabled'] ) ? (bool) $conditions['enabled'] : false;
+	private static function prepare_condition_groups( array $conditions, array $fields ): array {
+									$enabled = isset( $conditions['enabled'] ) ? (bool) $conditions['enabled'] : false;
 
 		if ( ! $enabled ) {
-						return array();
+										return array();
 		}
 
-					$rules             = isset( $conditions['rules'] ) && is_array( $conditions['rules'] ) ? $conditions['rules'] : array();
-					$prepared          = array();
-					$allowed_operators = array( 'equals', 'not_equals', 'contains', 'empty', 'not_empty' );
-					$allowed_actions   = array( 'show', 'hide' );
-
-		foreach ( $rules as $rule ) {
-			if ( ! is_array( $rule ) ) {
-					continue;
-			}
-
-						$source   = isset( $rule['if_field'] ) ? (string) $rule['if_field'] : '';
-						$target   = isset( $rule['target'] ) ? (string) $rule['target'] : '';
-						$operator = isset( $rule['operator'] ) ? (string) $rule['operator'] : '';
-						$action   = isset( $rule['action'] ) ? (string) $rule['action'] : '';
-						$value    = isset( $rule['value'] ) ? (string) $rule['value'] : '';
-
-			if ( '' === $source || '' === $target ) {
-					continue;
-			}
-
-			if ( ! isset( $fields[ $source ], $fields[ $target ] ) ) {
-					continue;
-			}
-
-			if ( isset( $fields[ $target ]['type'] ) && 'submit' === (string) $fields[ $target ]['type'] ) {
-					continue;
-			}
-
-			if ( ! in_array( $operator, $allowed_operators, true ) ) {
-					continue;
-			}
-
-			if ( ! in_array( $action, $allowed_actions, true ) ) {
-					continue;
-			}
-
-			if ( in_array( $operator, array( 'equals', 'not_equals', 'contains' ), true ) && '' === trim( $value ) ) {
-					continue;
-			}
-
-						$prepared[] = array(
-							'if_field' => $source,
-							'operator' => $operator,
-							'value'    => $value,
-							'action'   => $action,
-							'target'   => $target,
-						);
-
-						if ( count( $prepared ) >= 50 ) {
-									break;
-						}
+									$raw_groups = array();
+		if ( isset( $conditions['groups'] ) && is_array( $conditions['groups'] ) ) {
+										$raw_groups = $conditions['groups'];
+		} elseif ( isset( $conditions['rules'] ) && is_array( $conditions['rules'] ) ) {
+										$raw_groups = $conditions['rules'];
 		}
 
-					return $prepared;
-	}
+									$prepared          = array();
+									$allowed_operators = array( 'equals', 'not_equals', 'contains', 'empty', 'not_empty', 'lt', 'lte', 'gt', 'gte' );
+									$allowed_actions   = array( 'show', 'hide', 'require', 'optional' );
 
-				/**
-				 * Evaluate visibility map for conditional rules.
-				 *
-				 * @param array<int,array<string,string>>   $rules   Prepared rule set.
-				 * @param array<string,array<string,mixed>> $fields  Field definitions.
-				 * @param array<string,mixed>               $values  Current field values.
-				 *
-				 * @return array<string,bool>
-				 */
-	private static function evaluate_condition_visibility( array $rules, array $fields, array $values ): array {
-		if ( empty( $rules ) ) {
-			return array();
-		}
-
-					$visibility    = array();
-					$requires_show = array();
-					$forced_hidden = array();
-
-		foreach ( $fields as $name => $definition ) {
-			if ( ! is_array( $definition ) ) {
-					continue;
-			}
-
-						$type = isset( $definition['type'] ) ? (string) $definition['type'] : '';
-			if ( 'submit' === $type ) {
+		foreach ( $raw_groups as $group ) {
+			if ( ! is_array( $group ) ) {
 							continue;
 			}
 
-						$visibility[ $name ] = true;
+			if ( isset( $group['if_field'], $group['action'], $group['target'] ) ) {
+				$group = array(
+					'operator'   => 'and',
+					'conditions' => array(
+						array(
+							'field'    => $group['if_field'],
+							'operator' => $group['operator'] ?? 'equals',
+							'value'    => $group['value'] ?? '',
+						),
+					),
+					'actions'    => array(
+						array(
+							'type'   => $group['action'],
+							'target' => $group['target'],
+						),
+					),
+				);
+			}
+
+										$operator = isset( $group['operator'] ) ? sanitize_key( (string) $group['operator'] ) : 'and';
+			if ( ! in_array( $operator, array( 'and', 'or' ), true ) ) {
+											$operator = 'and';
+			}
+
+										$conditions_raw = $group['conditions'] ?? array();
+			if ( is_string( $conditions_raw ) ) {
+											$decoded        = json_decode( $conditions_raw, true );
+											$conditions_raw = is_array( $decoded ) ? $decoded : array();
+			}
+
+										$actions_raw = $group['actions'] ?? array();
+			if ( is_string( $actions_raw ) ) {
+											$decoded     = json_decode( $actions_raw, true );
+											$actions_raw = is_array( $decoded ) ? $decoded : array();
+			}
+
+			if ( ! is_array( $conditions_raw ) || ! is_array( $actions_raw ) ) {
+											continue;
+			}
+
+										$conditions_prepared = array();
+			foreach ( $conditions_raw as $condition ) {
+				if ( ! is_array( $condition ) ) {
+												continue;
+				}
+
+											$field_name   = isset( $condition['field'] ) ? sanitize_key( (string) $condition['field'] ) : '';
+											$operator_key = isset( $condition['operator'] ) ? sanitize_key( (string) $condition['operator'] ) : '';
+											$value        = isset( $condition['value'] ) ? sanitize_text_field( (string) $condition['value'] ) : '';
+
+				if ( '' === $field_name || ! in_array( $operator_key, $allowed_operators, true ) ) {
+												continue;
+				}
+
+				if ( ! isset( $fields[ $field_name ] ) ) {
+												continue;
+				}
+
+											$field_type = isset( $fields[ $field_name ]['type'] ) ? (string) $fields[ $field_name ]['type'] : 'text';
+				if ( 'submit' === $field_type ) {
+												continue;
+				}
+
+				if ( in_array( $operator_key, array( 'equals', 'not_equals', 'contains', 'lt', 'lte', 'gt', 'gte' ), true ) && '' === trim( $value ) ) {
+												continue;
+				}
+
+				if ( in_array( $operator_key, array( 'empty', 'not_empty' ), true ) ) {
+												$value = '';
+				}
+
+											$conditions_prepared[] = array(
+												'field'    => $field_name,
+												'operator' => $operator_key,
+												'value'    => $value,
+												'field_type' => $field_type,
+											);
+
+											if ( count( $conditions_prepared ) >= 10 ) {
+													break;
+											}
+			}
+
+										$actions_prepared = array();
+			foreach ( $actions_raw as $action ) {
+				if ( ! is_array( $action ) ) {
+												continue;
+				}
+
+											$type   = isset( $action['type'] ) ? sanitize_key( (string) $action['type'] ) : '';
+											$target = isset( $action['target'] ) ? sanitize_key( (string) $action['target'] ) : '';
+
+				if ( '' === $type || '' === $target ) {
+												continue;
+				}
+
+				if ( ! in_array( $type, $allowed_actions, true ) ) {
+												continue;
+				}
+
+				if ( ! isset( $fields[ $target ] ) ) {
+												continue;
+				}
+
+											$target_type = isset( $fields[ $target ]['type'] ) ? (string) $fields[ $target ]['type'] : 'text';
+				if ( 'submit' === $target_type ) {
+												continue;
+				}
+
+											$actions_prepared[] = array(
+												'type'   => $type,
+												'target' => $target,
+												'target_type' => $target_type,
+											);
+
+											if ( count( $actions_prepared ) >= 10 ) {
+													break;
+											}
+			}
+
+			if ( empty( $conditions_prepared ) || empty( $actions_prepared ) ) {
+											continue;
+			}
+
+										$prepared[] = array(
+											'operator'   => $operator,
+											'conditions' => $conditions_prepared,
+											'actions'    => $actions_prepared,
+										);
+
+										if ( count( $prepared ) >= 25 ) {
+																break;
+										}
 		}
 
-		foreach ( $rules as $rule ) {
-			if ( 'show' === $rule['action'] ) {
-					$requires_show[ $rule['target'] ] = true;
+									return $prepared;
+	}
+
+	/**
+	 * Evaluate visibility map for conditional rules.
+	 *
+	 * @param array<int,array<string,mixed>>    $groups  Prepared group set.
+	 * @param array<string,array<string,mixed>> $fields  Field definitions.
+	 * @param array<string,mixed>               $values  Current field values.
+	 *
+	 * @return array<string,array{visible:bool,required:bool}>
+	 */
+	private static function evaluate_condition_state( array $groups, array $fields, array $values ): array {
+		$state = array();
+
+		foreach ( $fields as $name => $definition ) {
+			if ( ! is_array( $definition ) ) {
+				continue;
+			}
+
+			$type = isset( $definition['type'] ) ? (string) $definition['type'] : '';
+			if ( 'submit' === $type ) {
+				continue;
+			}
+
+			$state[ $name ] = array(
+				'visible'  => true,
+				'required' => ! empty( $definition['required'] ),
+			);
+		}
+
+		if ( empty( $groups ) ) {
+			return $state;
+		}
+
+		$requires_show = array();
+
+		foreach ( $groups as $group ) {
+			if ( ! is_array( $group ) ) {
+				continue;
+			}
+
+			$actions = isset( $group['actions'] ) && is_array( $group['actions'] ) ? $group['actions'] : array();
+
+			foreach ( $actions as $action ) {
+				if ( ! is_array( $action ) ) {
+					continue;
+				}
+
+				if ( 'show' === ( $action['type'] ?? '' ) ) {
+					$target = (string) ( $action['target'] ?? '' );
+
+					if ( '' !== $target && isset( $state[ $target ] ) ) {
+						$requires_show[ $target ] = true;
+					}
+				}
 			}
 		}
 
 		foreach ( array_keys( $requires_show ) as $target ) {
-			if ( ! array_key_exists( $target, $visibility ) ) {
+			if ( isset( $state[ $target ] ) ) {
+				$state[ $target ]['visible'] = false;
+			}
+		}
+
+		foreach ( $groups as $group ) {
+			if ( ! is_array( $group ) ) {
 				continue;
 			}
 
-			$visibility[ $target ] = false;
-		}
-
-		foreach ( $rules as $rule ) {
-						$source_value = $values[ $rule['if_field'] ] ?? null;
-
-			if ( ! self::condition_matches( $rule['operator'], $source_value, $rule['value'] ) ) {
-					continue;
+			if ( ! self::group_matches( $group, $fields, $values ) ) {
+				continue;
 			}
 
-			if ( 'hide' === $rule['action'] ) {
-				if ( isset( $visibility[ $rule['target'] ] ) ) {
-						$visibility[ $rule['target'] ]    = false;
-						$forced_hidden[ $rule['target'] ] = true;
+			$actions = isset( $group['actions'] ) && is_array( $group['actions'] ) ? $group['actions'] : array();
+
+			foreach ( $actions as $action ) {
+				if ( ! is_array( $action ) ) {
+					continue;
 				}
 
+				$target = (string) ( $action['target'] ?? '' );
+				if ( '' === $target || ! isset( $state[ $target ] ) ) {
 					continue;
-			}
+				}
 
-			if ( 'show' === $rule['action'] && empty( $forced_hidden[ $rule['target'] ] ) && isset( $visibility[ $rule['target'] ] ) ) {
-					$visibility[ $rule['target'] ] = true;
+				$entry    = $state[ $target ];
+				$visible  = $entry['visible'];
+				$required = $entry['required'];
+
+				$type = (string) ( $action['type'] ?? '' );
+
+				switch ( $type ) {
+					case 'show':
+						$visible = true;
+						break;
+					case 'hide':
+						$visible = false;
+						break;
+					case 'require':
+						$required = true;
+						break;
+					case 'optional':
+						$required = false;
+						break;
+				}
+
+				$state[ $target ]['visible']  = $visible;
+				$state[ $target ]['required'] = $required;
 			}
 		}
 
-					return $visibility;
+		return $state;
 	}
 
-				/**
-				 * Determine if a conditional rule matches the provided value.
-				 *
-				 * @param string $operator   Operator keyword.
-				 * @param mixed  $current    Current field value.
-				 * @param string $comparison Comparison value.
-				 */
-	private static function condition_matches( string $operator, $current, string $comparison ): bool {
-					$normalized_value = self::normalize_condition_string( $comparison );
-					$value_set        = self::normalize_condition_values( $current );
+	/**
+	 * Determine whether a group of conditions matches the provided values.
+	 *
+	 * @param array<string,mixed>               $group  Group definition.
+	 * @param array<string,array<string,mixed>> $fields Field definitions.
+	 * @param array<string,mixed>               $values Current field values.
+	 */
+	private static function group_matches( array $group, array $fields, array $values ): bool {
+				$conditions = isset( $group['conditions'] ) && is_array( $group['conditions'] ) ? $group['conditions'] : array();
+		if ( empty( $conditions ) ) {
+				return false;
+		}
 
+			$operator = isset( $group['operator'] ) ? (string) $group['operator'] : 'and';
+			$operator = in_array( $operator, array( 'or', 'and' ), true ) ? $operator : 'and';
+
+		foreach ( $conditions as $condition ) {
+			if ( ! is_array( $condition ) ) {
+					continue;
+			}
+
+				$field        = (string) ( $condition['field'] ?? '' );
+				$comparison   = (string) ( $condition['value'] ?? '' );
+				$operator_key = (string) ( $condition['operator'] ?? 'equals' );
+				$field_type   = isset( $condition['field_type'] ) ? (string) $condition['field_type'] : (string) ( $fields[ $field ]['type'] ?? 'text' );
+
+				$current = $values[ $field ] ?? null;
+
+				$matched = self::condition_matches( $operator_key, $current, $comparison, $field_type );
+
+			if ( 'and' === $operator && ! $matched ) {
+					return false;
+			}
+
+			if ( 'or' === $operator && $matched ) {
+					return true;
+			}
+		}
+
+			return 'and' === $operator;
+	}
+
+		/**
+		 * Determine if a conditional rule matches the provided value.
+		 *
+		 * @param string $operator   Operator keyword.
+		 * @param mixed  $current    Current field value.
+		 * @param string $comparison Comparison value.
+		 * @param string $field_type Field type from the template schema.
+		 */
+	private static function condition_matches( string $operator, $current, string $comparison, string $field_type ): bool {
 		switch ( $operator ) {
 			case 'equals':
-				return in_array( $normalized_value, $value_set, true );
+				return in_array( self::normalize_condition_string( $comparison ), self::normalize_condition_values( $current ), true );
 			case 'not_equals':
-				return ! in_array( $normalized_value, $value_set, true );
+				return ! in_array( self::normalize_condition_string( $comparison ), self::normalize_condition_values( $current ), true );
 			case 'contains':
+					$value_set = self::normalize_condition_values( $current );
+					$needle    = self::normalize_condition_string( $comparison );
+
 				if ( ! empty( $value_set ) ) {
-						return in_array( $normalized_value, $value_set, true );
+						return in_array( $needle, $value_set, true );
 				}
 
 					$single = self::normalize_condition_string( $current );
 
-				return '' !== $normalized_value && '' !== $single && str_contains( $single, $normalized_value );
+				return '' !== $needle && '' !== $single && str_contains( $single, $needle );
 			case 'empty':
 				return self::is_field_value_empty( $current );
 			case 'not_empty':
 				return ! self::is_field_value_empty( $current );
+			case 'lt':
+			case 'lte':
+			case 'gt':
+			case 'gte':
+				return self::compare_numeric_or_date( $operator, $current, $comparison, $field_type );
+			default:
+				return false;
+		}
+	}
+
+		/**
+		 * Compare numeric or date values for conditional rules.
+		 *
+		 * @param string $operator   Operator keyword.
+		 * @param mixed  $current    Current field value.
+		 * @param string $comparison Comparison value.
+		 * @param string $field_type Field type.
+		 */
+	private static function compare_numeric_or_date( string $operator, $current, string $comparison, string $field_type ): bool {
+		if ( 'date' === $field_type ) {
+				$current_date    = self::normalize_date_value( $current );
+				$comparison_date = self::normalize_date_value( $comparison );
+
+			if ( null === $current_date || null === $comparison_date ) {
+				return false;
+			}
+
+				return self::compare_numbers( $operator, (float) $current_date, (float) $comparison_date );
+		}
+
+			$current_numbers = self::normalize_numeric_values( $current );
+		if ( empty( $current_numbers ) ) {
+				return false;
+		}
+
+			$comparison_string = self::normalize_condition_string( $comparison );
+		if ( '' === $comparison_string || ! is_numeric( $comparison_string ) ) {
+				return false;
+		}
+
+			$comparison_value = (float) $comparison_string;
+
+		foreach ( $current_numbers as $number ) {
+			if ( self::compare_numbers( $operator, $number, $comparison_value ) ) {
+					return true;
+			}
+		}
+
+			return false;
+	}
+
+		/**
+		 * Normalize numeric values from a field payload.
+		 *
+		 * @param mixed $value Raw field value.
+		 *
+		 * @return array<int,float>
+		 */
+	private static function normalize_numeric_values( $value ): array {
+		if ( is_array( $value ) ) {
+				$numbers = array();
+			foreach ( $value as $item ) {
+				$normalized = self::normalize_condition_string( $item );
+				if ( '' === $normalized || ! is_numeric( $normalized ) ) {
+						continue;
+				}
+
+				$numbers[] = (float) $normalized;
+			}
+
+				return $numbers;
+		}
+
+			$normalized = self::normalize_condition_string( $value );
+		if ( '' === $normalized || ! is_numeric( $normalized ) ) {
+				return array();
+		}
+
+			return array( (float) $normalized );
+	}
+
+		/**
+		 * Normalize a date comparison value into a Unix timestamp.
+		 *
+		 * @param mixed $value Raw value.
+		 */
+	private static function normalize_date_value( $value ): ?int {
+			$string = self::normalize_condition_string( $value );
+
+		if ( '' === $string ) {
+				return null;
+		}
+
+			$timestamp = strtotime( $string );
+
+			return false !== $timestamp ? (int) $timestamp : null;
+	}
+
+		/**
+		 * Compare two numeric values using the supplied operator.
+		 *
+		 * @param string $operator Operator keyword.
+		 * @param float  $left     Current value.
+		 * @param float  $right    Comparison value.
+		 */
+	private static function compare_numbers( string $operator, float $left, float $right ): bool {
+		switch ( $operator ) {
+			case 'lt':
+				return $left < $right;
+			case 'lte':
+				return $left <= $right;
+			case 'gt':
+				return $left > $right;
+			case 'gte':
+				return $left >= $right;
 			default:
 				return false;
 		}
@@ -1378,20 +1683,24 @@ final class RegistrationForm {
 			return;
 		}
 
-		$fields     = isset( $schema['fields'] ) && is_array( $schema['fields'] ) ? $schema['fields'] : array();
-		$conditions = isset( $settings['conditions'] ) && is_array( $settings['conditions'] ) ? $settings['conditions'] : array();
-		$rules      = self::prepare_condition_rules( $conditions, $fields );
+		$fields        = isset( $schema['fields'] ) && is_array( $schema['fields'] ) ? $schema['fields'] : array();
+		$conditions    = isset( $settings['conditions'] ) && is_array( $settings['conditions'] ) ? $settings['conditions'] : array();
+				$rules = self::prepare_condition_groups( $conditions, $fields );
 
 		if ( empty( $rules ) ) {
 			return;
 		}
 
-		$version = defined( 'FBM_VER' ) ? FBM_VER : Plugin::VERSION;
-		$style   = plugins_url( 'assets/css/registration-form.css', FBM_FILE );
-		$script  = plugins_url( 'assets/js/registration-form.js', FBM_FILE );
+				$version           = defined( 'FBM_VER' ) ? FBM_VER : Plugin::VERSION;
+				$style             = plugins_url( 'assets/css/registration-form.css', FBM_FILE );
+				$script            = plugins_url( 'assets/js/registration-form.js', FBM_FILE );
+				$conditions_handle = 'fbm-registration-conditions';
+				$conditions_script = plugins_url( 'assets/js/registration-conditions.js', FBM_FILE );
 
-		wp_enqueue_style( 'fbm-registration-form', $style, array(), $version );
-		wp_enqueue_script( 'fbm-registration-form', $script, array(), $version, true );
+				wp_enqueue_style( 'fbm-registration-form', $style, array(), $version );
+				wp_register_script( $conditions_handle, $conditions_script, array(), $version, true );
+				wp_enqueue_script( $conditions_handle );
+				wp_enqueue_script( 'fbm-registration-form', $script, array( $conditions_handle ), $version, true );
 
 		$field_catalog = array();
 		foreach ( $fields as $name => $definition ) {
@@ -1404,26 +1713,28 @@ final class RegistrationForm {
 				continue;
 			}
 
-			$label           = isset( $definition['label'] ) ? (string) $definition['label'] : (string) $name;
-			$field_catalog[] = array(
-				'name'  => (string) $name,
-				'label' => $label,
-				'type'  => $type,
-			);
+						$label           = isset( $definition['label'] ) ? (string) $definition['label'] : (string) $name;
+						$required        = ! empty( $definition['required'] );
+						$field_catalog[] = array(
+							'name'     => (string) $name,
+							'label'    => $label,
+							'type'     => $type,
+							'required' => $required,
+						);
 		}
 
-		wp_localize_script(
-			'fbm-registration-form',
-			'fbmRegistrationForm',
-			array(
-				'conditions'  => array(
-					'enabled' => true,
-					'rules'   => $rules,
-				),
-				'fields'      => $field_catalog,
-				'hiddenClass' => 'fbm-field--hidden',
-			)
-		);
+				wp_localize_script(
+					'fbm-registration-form',
+					'fbmRegistrationForm',
+					array(
+						'conditions'  => array(
+							'enabled' => true,
+							'groups'  => $rules,
+						),
+						'fields'      => $field_catalog,
+						'hiddenClass' => 'fbm-field--hidden',
+					)
+				);
 	}
 
 

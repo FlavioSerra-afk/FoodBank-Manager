@@ -3,7 +3,7 @@ Contributors: portuguese-community-centre-london
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.2
-Stable tag: 1.6.0
+Stable tag: 1.7.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -60,6 +60,10 @@ FoodBank Manager registers with the WordPress privacy exporter/eraser registry a
 First stable cut with readme polish and release checksums.
 
 == Changelog ==
+= 1.7.0 =
+* Conditional visibility phase-2 adds grouped AND/OR logic, numeric/date operators, and a rule debugger shared between the editor and preview.
+* Registration editor now autosaves every 30 seconds, keeps the last five revisions with restore controls, and exposes keyboard shortcuts for save/preview.
+* Public form gains an accessible error summary with focus management and aria-live status updates; server validation mirrors the new rule evaluator.
 = 1.6.0 =
 * Added phase-1 conditional visibility builder for the registration editor with a help link to the template tag matrix.
 * Registration submissions now enforce visibility rules server-side and clean hidden uploads while the public form toggles fields without custom code.
