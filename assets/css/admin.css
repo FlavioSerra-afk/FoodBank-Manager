@@ -124,6 +124,54 @@ body.fbm-registration-editor--modal-open {
     font-style: italic;
 }
 
+.fbm-registration-editor__preview-trace-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.fbm-registration-editor__preview-trace-controls label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #1d2327;
+}
+
+.fbm-registration-editor__preview-trace {
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+    background: #f6f7f7;
+    padding: 12px;
+    margin-bottom: 16px;
+}
+
+.fbm-registration-editor__preview-trace h4 {
+    margin: 0 0 8px;
+    font-size: 14px;
+}
+
+.fbm-registration-editor__preview-trace-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.fbm-registration-editor__preview-trace-table th,
+.fbm-registration-editor__preview-trace-table td {
+    border: 1px solid #dcdcde;
+    padding: 6px 8px;
+    text-align: left;
+}
+
+.fbm-registration-editor__preview-trace-empty {
+    margin: 0;
+    color: #50575e;
+    font-size: 13px;
+}
+
 /* Registration editor status and shortcuts */
 .fbm-registration-editor__status-bar {
     display: flex;
@@ -496,6 +544,59 @@ body.fbm-registration-editor--modal-open {
     display: flex;
     flex-direction: column;
     gap: 16px;
+}
+
+.fbm-registration-editor__import-diff {
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+    background: #f6f7f7;
+    padding: 16px;
+    font-size: 13px;
+}
+
+.fbm-registration-editor__import-diff-status {
+    margin: 0 0 12px;
+    color: #50575e;
+}
+
+.fbm-registration-editor__import-diff-columns {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    margin-bottom: 16px;
+}
+
+.fbm-registration-editor__import-diff-column h3 {
+    margin: 0 0 8px;
+    font-size: 15px;
+}
+
+.fbm-registration-editor__import-diff-column pre {
+    margin: 0;
+    background: #ffffff;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+    padding: 12px;
+    max-height: 240px;
+    overflow: auto;
+    font-size: 12px;
+}
+
+.fbm-registration-editor__import-diff-summary {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.fbm-registration-editor__import-diff-summary h4 {
+    margin: 0 0 8px;
+    font-size: 14px;
+}
+
+.fbm-registration-editor__import-diff-summary ul {
+    margin: 0;
+    padding-left: 20px;
+    list-style: disc;
 }
 
 .fbm-registration-editor__import-mapping table {

@@ -1361,6 +1361,12 @@
         var importResults = importModal ? importModal.querySelector( '[data-fbm-import-results]' ) : null;
         var importInput = importModal ? importModal.querySelector( '[data-fbm-import-input]' ) : null;
         var importSummary = importModal ? importModal.querySelector( '[data-fbm-import-summary]' ) : null;
+        var importDiffWrap = importModal ? importModal.querySelector( '[data-fbm-import-diff]' ) : null;
+        var importDiffStatus = importModal ? importModal.querySelector( '[data-fbm-import-diff-status]' ) : null;
+        var importDiffOriginal = importModal ? importModal.querySelector( '[data-fbm-import-original]' ) : null;
+        var importDiffResolved = importModal ? importModal.querySelector( '[data-fbm-import-resolved]' ) : null;
+        var importSummaryImportList = importModal ? importModal.querySelector( '[data-fbm-import-summary-import]' ) : null;
+        var importSummarySkipList = importModal ? importModal.querySelector( '[data-fbm-import-summary-skip]' ) : null;
         var importMappingWrap = importModal ? importModal.querySelector( '[data-fbm-import-mapping]' ) : null;
         var importAnalysisWrap = importModal ? importModal.querySelector( '[data-fbm-import-analysis]' ) : null;
         var importPreviewButton = importModal ? importModal.querySelector( '[data-fbm-import-preview]' ) : null;
@@ -1372,7 +1378,10 @@
                 preview: null,
                 mappingInputs: [],
                 schemaOk: false,
+                diff: null,
+                diffBusy: false,
         };
+        var importDiffRequestId = 0;
         var importLastFocused = null;
         var importKeydownHandler = null;
 
@@ -1386,11 +1395,253 @@
                 return Array.prototype.slice.call( nodes );
         };
 
+        var resetImportDiff = function ( messageKey ) {
+                if ( importDiffWrap ) {
+                        importDiffWrap.setAttribute( 'hidden', 'hidden' );
+                }
+
+                if ( importDiffOriginal ) {
+                        importDiffOriginal.textContent = '';
+                }
+
+                if ( importDiffResolved ) {
+                        importDiffResolved.textContent = '';
+                }
+
+                if ( importSummaryImportList ) {
+                        importSummaryImportList.innerHTML = '';
+                }
+
+                if ( importSummarySkipList ) {
+                        importSummarySkipList.innerHTML = '';
+                }
+
+                if ( importDiffStatus ) {
+                        var statusMessage = messageKey && i18n[ messageKey ] ? i18n[ messageKey ] : '';
+                        importDiffStatus.textContent = statusMessage;
+
+                        if ( statusMessage ) {
+                                importDiffStatus.removeAttribute( 'hidden' );
+                        } else {
+                                importDiffStatus.setAttribute( 'hidden', 'hidden' );
+                        }
+                }
+        };
+
+        var describeSkipReason = function ( entry ) {
+                if ( ! entry ) {
+                        return i18n.importDiffSkipUnknown || 'Skipped for an unknown reason.';
+                }
+
+                if ( entry.reason === 'missing_field' && Array.isArray( entry.missing ) && entry.missing.length > 0 ) {
+                        return format( i18n.importDiffSkipMissing || 'Missing fields: %s', entry.missing.join( ', ' ) );
+                }
+
+                if ( entry.reason === 'empty' ) {
+                        return i18n.importDiffSkipEmpty || 'Group has no valid conditions or actions.';
+                }
+
+                if ( entry.reason && 'missing_field' !== entry.reason && 'empty' !== entry.reason ) {
+                        return entry.reason;
+                }
+
+                return i18n.importDiffSkipUnknown || 'Skipped for an unknown reason.';
+        };
+
+        var renderImportSummaryLists = function ( payload ) {
+                if ( ! importSummaryImportList || ! importSummarySkipList ) {
+                        return;
+                }
+
+                var importEntries = payload && payload.summary && Array.isArray( payload.summary.import ) ? payload.summary.import : [];
+                var skipEntries = payload && payload.summary && Array.isArray( payload.summary.skip ) ? payload.summary.skip : [];
+
+                importSummaryImportList.innerHTML = '';
+                importSummarySkipList.innerHTML = '';
+
+                if ( importEntries.length === 0 ) {
+                        var emptyImport = document.createElement( 'li' );
+                        emptyImport.textContent = i18n.importDiffNoneImport || 'No groups ready to import yet.';
+                        importSummaryImportList.appendChild( emptyImport );
+                } else {
+                        importEntries.forEach( function ( entry ) {
+                                if ( ! entry || ! entry.label ) {
+                                        return;
+                                }
+
+                                var item = document.createElement( 'li' );
+                                var conditions = parseInt( entry.conditions || 0, 10 ) || 0;
+                                var actions = parseInt( entry.actions || 0, 10 ) || 0;
+                                item.textContent = format( i18n.importDiffImportEntry || '%1$s — %2$d conditions, %3$d actions', entry.label, conditions, actions );
+                                importSummaryImportList.appendChild( item );
+                        } );
+                }
+
+                if ( skipEntries.length === 0 ) {
+                        var emptySkip = document.createElement( 'li' );
+                        emptySkip.textContent = i18n.importDiffNoneSkip || 'No groups will be skipped.';
+                        importSummarySkipList.appendChild( emptySkip );
+                } else {
+                        skipEntries.forEach( function ( entry ) {
+                                if ( ! entry || ! entry.label ) {
+                                        return;
+                                }
+
+                                var item = document.createElement( 'li' );
+                                var reason = describeSkipReason( entry );
+                                item.textContent = format( i18n.importDiffSkipEntry || '%1$s — %2$s', entry.label, reason );
+                                importSummarySkipList.appendChild( item );
+                        } );
+                }
+        };
+
+        var renderImportDiff = function ( payload ) {
+                if ( ! importDiffWrap ) {
+                        return;
+                }
+
+                if ( ! payload ) {
+                        resetImportDiff( importState.preview ? 'importDiffWaiting' : '' );
+
+                        return;
+                }
+
+                resetImportDiff( '' );
+
+                var diff = Array.isArray( payload.diff ) ? payload.diff : [];
+                var originalView = [];
+                var resolvedView = [];
+
+                diff.forEach( function ( entry ) {
+                        if ( entry && entry.original ) {
+                                originalView.push( entry.original );
+                        }
+
+                        if ( entry && entry.status === 'skip' ) {
+                                resolvedView.push( {
+                                        status: entry.status,
+                                        reason: entry.reason || '',
+                                        missing: Array.isArray( entry.missing ) ? entry.missing : []
+                                } );
+                        } else if ( entry && entry.resolved ) {
+                                resolvedView.push( entry.resolved );
+                        }
+                } );
+
+                if ( importDiffOriginal ) {
+                        try {
+                                importDiffOriginal.textContent = JSON.stringify( originalView, null, 2 );
+                        } catch ( err ) {
+                                importDiffOriginal.textContent = '';
+                        }
+                }
+
+                if ( importDiffResolved ) {
+                        try {
+                                importDiffResolved.textContent = JSON.stringify( resolvedView, null, 2 );
+                        } catch ( err ) {
+                                importDiffResolved.textContent = '';
+                        }
+                }
+
+                renderImportSummaryLists( payload );
+
+                importDiffWrap.removeAttribute( 'hidden' );
+        };
+
+        var refreshImportDiff = function () {
+                if ( importState.diffBusy ) {
+                        return;
+                }
+
+                if ( ! importState.preview || ! importState.original || ! importState.schemaOk ) {
+                        importState.diff = null;
+                        resetImportDiff( importState.preview ? 'importDiffWaiting' : '' );
+                        updateImportConfirmState();
+
+                        return;
+                }
+
+                if ( ! settings.importDiffUrl || ! window.fetch ) {
+                        importState.diff = null;
+                        resetImportDiff( 'importDiffError' );
+                        updateImportConfirmState();
+
+                        return;
+                }
+
+                importState.diffBusy = true;
+                importState.diff = null;
+                importDiffRequestId += 1;
+
+                resetImportDiff( 'importDiffLoading' );
+
+                var payload = {
+                        original: importState.original,
+                        mapping: gatherImportMapping(),
+                };
+
+                var headers = {
+                        'Content-Type': 'application/json',
+                };
+
+                if ( settings.restNonce ) {
+                        headers[ 'X-WP-Nonce' ] = settings.restNonce;
+                }
+
+                var currentRequest = importDiffRequestId;
+
+                window.fetch( settings.importDiffUrl, {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: headers,
+                        body: JSON.stringify( payload ),
+                } ).then( function ( response ) {
+                        if ( currentRequest !== importDiffRequestId ) {
+                                throw new Error( 'stale' );
+                        }
+
+                        if ( ! response.ok ) {
+                                throw new Error( 'Request failed' );
+                        }
+
+                        return response.json();
+                } ).then( function ( body ) {
+                        if ( currentRequest !== importDiffRequestId ) {
+                                return;
+                        }
+
+                        importState.diff = body || null;
+                        renderImportDiff( body );
+                } ).catch( function () {
+                        if ( currentRequest !== importDiffRequestId ) {
+                                return;
+                        }
+
+                        importState.diff = null;
+                        resetImportDiff( 'importDiffError' );
+                } ).finally( function () {
+                        if ( currentRequest !== importDiffRequestId ) {
+                                return;
+                        }
+
+                        importState.diffBusy = false;
+                        updateImportConfirmState();
+                } );
+        };
+
+        var scheduleDiffRefresh = debounce( function () {
+                refreshImportDiff();
+        }, 200 );
+
         var resetImportModal = function () {
                 importState.original = null;
                 importState.preview = null;
                 importState.mappingInputs = [];
                 importState.schemaOk = false;
+                importState.diff = null;
+                importState.diffBusy = false;
+                importDiffRequestId = 0;
 
                 if ( importInput ) {
                         importInput.value = '';
@@ -1399,6 +1650,8 @@
                 if ( importSummary ) {
                         importSummary.textContent = '';
                 }
+
+                resetImportDiff( '' );
 
                 if ( importMappingWrap ) {
                         importMappingWrap.innerHTML = '';
@@ -1431,14 +1684,28 @@
                         return;
                 }
 
-                if ( ! importState.preview || ! importState.schemaOk ) {
+                if ( ! importState.preview || ! importState.schemaOk || importState.diffBusy || ! importState.original ) {
                         importConfirmButton.setAttribute( 'disabled', 'disabled' );
+
                         return;
                 }
 
-                var groups = Array.isArray( importState.preview.groups ) ? importState.preview.groups.length : 0;
-                if ( groups === 0 ) {
+                if ( ! importState.diff || ! Array.isArray( importState.diff.diff ) ) {
                         importConfirmButton.setAttribute( 'disabled', 'disabled' );
+
+                        return;
+                }
+
+                var importable = 0;
+                importState.diff.diff.forEach( function ( entry ) {
+                        if ( entry && entry.status === 'import' ) {
+                                importable += 1;
+                        }
+                } );
+
+                if ( importable === 0 ) {
+                        importConfirmButton.setAttribute( 'disabled', 'disabled' );
+
                         return;
                 }
 
@@ -1459,6 +1726,10 @@
 
                 if ( ! importState.schemaOk ) {
                         importSummary.textContent = i18n.importSchemaMismatch || 'Import file uses an incompatible schema.';
+                        importState.diff = null;
+                        importState.diffBusy = false;
+                        resetImportDiff( 'importSchemaMismatch' );
+                        updateImportConfirmState();
                         return;
                 }
 
@@ -1466,6 +1737,10 @@
 
                 if ( totalGroups === 0 ) {
                         importSummary.textContent = i18n.importEmpty || 'No groups were found in the import file.';
+                        importState.diff = null;
+                        importState.diffBusy = false;
+                        resetImportDiff( 'importDiffNoneImport' );
+                        updateImportConfirmState();
                         return;
                 }
 
@@ -1575,7 +1850,10 @@
                                 select.value = suggested;
                         }
 
-                        select.addEventListener( 'change', updateImportConfirmState );
+                        select.addEventListener( 'change', function () {
+                                updateImportConfirmState();
+                                scheduleDiffRefresh();
+                        } );
 
                         selectCell.appendChild( select );
                         row.appendChild( selectCell );
@@ -1589,6 +1867,8 @@
                 if ( importAutoButton ) {
                         importAutoButton.removeAttribute( 'disabled' );
                 }
+
+                scheduleDiffRefresh();
         };
 
         var gatherImportMapping = function () {
@@ -1628,6 +1908,7 @@
                 } );
 
                 updateImportConfirmState();
+                scheduleDiffRefresh();
         };
 
         var closeImportModal = function () {
@@ -1792,11 +2073,17 @@
                         renderImportSummary( body );
                         renderImportMapping( body );
                         renderImportAnalysis( body );
+                        importState.diff = null;
+                        importState.diffBusy = false;
+                        renderImportDiff( null );
+                        scheduleDiffRefresh();
                         updateImportConfirmState();
                 } ).catch( function () {
                         importState.original = null;
                         importState.preview = null;
                         importState.schemaOk = false;
+                        importState.diff = null;
+                        importState.diffBusy = false;
 
                         if ( importSummary ) {
                                 importSummary.textContent = i18n.importInvalid || 'Unable to parse import JSON.';
@@ -1809,6 +2096,8 @@
                         if ( importStep ) {
                                 importStep.removeAttribute( 'hidden' );
                         }
+
+                        resetImportDiff( 'importDiffError' );
                 } ).finally( function () {
                         if ( importPreviewButton ) {
                                 importPreviewButton.removeAttribute( 'disabled' );
@@ -2880,6 +3169,22 @@
         var debugPanel = modal ? modal.querySelector( '[data-fbm-preview-debug]' ) : null;
         var debugList = debugPanel ? debugPanel.querySelector( '[data-fbm-preview-debug-groups]' ) : null;
         var debugEmpty = debugPanel ? debugPanel.querySelector( '[data-fbm-preview-debug-empty]' ) : null;
+        var debugTraceWrap = modal ? modal.querySelector( '[data-fbm-preview-trace]' ) : null;
+        var debugTraceToggle = modal ? modal.querySelector( '[data-fbm-preview-trace-toggle]' ) : null;
+        var debugTraceTable = modal ? modal.querySelector( '[data-fbm-preview-trace-table]' ) : null;
+        var debugTraceBody = debugTraceTable ? debugTraceTable.querySelector( 'tbody' ) : null;
+        var debugTraceEmpty = modal ? modal.querySelector( '[data-fbm-preview-trace-empty]' ) : null;
+        var debugTraceExport = modal ? modal.querySelector( '[data-fbm-preview-trace-export]' ) : null;
+        var traceFactory = window.fbmRegistrationDebugTrace || null;
+        var traceTracker = traceFactory && traceFactory.createTracker ? traceFactory.createTracker( { maxSamples: 40 } ) : null;
+        var traceState = {
+                enabled: false,
+                renderHandle: null,
+        };
+
+        if ( debugTraceExport && ! traceTracker ) {
+                debugTraceExport.setAttribute( 'disabled', 'disabled' );
+        }
         var lastFocused = null;
         var keydownHandler = null;
 
@@ -2918,6 +3223,146 @@
                 if ( warningsList.childElementCount > 0 ) {
                         warningsWrapper.removeAttribute( 'hidden' );
                 }
+        };
+
+        var renderTraceTable = function () {
+                if ( ! traceTracker || ! debugTraceBody ) {
+                        return;
+                }
+
+                var stats = traceTracker.stats();
+                var phases = [ 'parse', 'schema', 'evaluate', 'apply' ];
+                debugTraceBody.innerHTML = '';
+                var hasRows = false;
+
+                phases.forEach( function ( phase ) {
+                        if ( ! stats[ phase ] ) {
+                                return;
+                        }
+
+                        hasRows = true;
+
+                        var row = document.createElement( 'tr' );
+                        var label = document.createElement( 'th' );
+                        label.scope = 'row';
+                        label.textContent = phase.charAt( 0 ).toUpperCase() + phase.slice( 1 );
+                        row.appendChild( label );
+
+                        var average = document.createElement( 'td' );
+                        average.textContent = stats[ phase ].average.toFixed( 2 );
+                        row.appendChild( average );
+
+                        var fastest = document.createElement( 'td' );
+                        fastest.textContent = stats[ phase ].min.toFixed( 2 );
+                        row.appendChild( fastest );
+
+                        var slowest = document.createElement( 'td' );
+                        slowest.textContent = stats[ phase ].max.toFixed( 2 );
+                        row.appendChild( slowest );
+
+                        var runs = document.createElement( 'td' );
+                        runs.textContent = String( stats[ phase ].count || 0 );
+                        row.appendChild( runs );
+
+                        debugTraceBody.appendChild( row );
+                } );
+
+                if ( debugTraceEmpty ) {
+                        if ( hasRows ) {
+                                debugTraceEmpty.setAttribute( 'hidden', 'hidden' );
+                        } else {
+                                debugTraceEmpty.removeAttribute( 'hidden' );
+                        }
+                }
+
+                if ( debugTraceWrap ) {
+                        if ( hasRows ) {
+                                debugTraceWrap.removeAttribute( 'hidden' );
+                        } else {
+                                debugTraceWrap.setAttribute( 'hidden', 'hidden' );
+                        }
+                }
+
+                if ( debugTraceExport ) {
+                        if ( traceTracker.history().length > 0 ) {
+                                debugTraceExport.removeAttribute( 'disabled' );
+                        } else {
+                                debugTraceExport.setAttribute( 'disabled', 'disabled' );
+                        }
+                }
+        };
+
+        var scheduleTraceRender = function () {
+                if ( ! traceTracker ) {
+                        return;
+                }
+
+                if ( traceState.renderHandle ) {
+                                cancelDefer( traceState.renderHandle );
+                }
+
+                traceState.renderHandle = defer( function () {
+                        traceState.renderHandle = null;
+                        renderTraceTable();
+                } );
+        };
+
+        var clearTraceData = function () {
+                if ( traceTracker && traceTracker.clear ) {
+                        traceTracker.clear();
+                }
+
+                if ( debugTraceBody ) {
+                        debugTraceBody.innerHTML = '';
+                }
+
+                if ( debugTraceWrap ) {
+                        debugTraceWrap.setAttribute( 'hidden', 'hidden' );
+                }
+
+                if ( debugTraceEmpty ) {
+                        debugTraceEmpty.removeAttribute( 'hidden' );
+                }
+
+                if ( debugTraceExport ) {
+                        debugTraceExport.setAttribute( 'disabled', 'disabled' );
+                }
+        };
+
+        var exportTraceData = function () {
+                if ( ! traceTracker || ! debugTraceExport ) {
+                        return;
+                }
+
+                var history = traceTracker.history();
+                if ( history.length === 0 || ! window.Blob || ! window.URL || ! window.URL.createObjectURL ) {
+                        return;
+                }
+
+                var payload = {
+                        capturedAt: new Date().toISOString(),
+                        window: traceTracker.window ? traceTracker.window() : 0,
+                        samples: history,
+                };
+
+                var json;
+                try {
+                        json = JSON.stringify( payload, null, 2 );
+                } catch ( err ) {
+                        return;
+                }
+
+                var blob = new window.Blob( [ json ], { type: 'application/json' } );
+                var link = document.createElement( 'a' );
+                var url = window.URL.createObjectURL( blob );
+                link.href = url;
+                link.download = i18n.debugTraceExportFilename || 'fbm-debug-trace.json';
+                document.body.appendChild( link );
+                link.click();
+                document.body.removeChild( link );
+                window.setTimeout( function () {
+                        window.URL.revokeObjectURL( url );
+                }, 1000 );
         };
 
         var disablePreviewControls = function () {
@@ -2995,14 +3440,20 @@
                         return;
                 }
 
+                var perfEnabled = traceState.enabled && traceTracker && window.performance && 'function' === typeof window.performance.now;
+                var parseStart = perfEnabled ? window.performance.now() : 0;
                 var groups = conditionManager.getCanonical();
+                var parseEnd = perfEnabled ? window.performance.now() : 0;
+                var schemaStart = perfEnabled ? parseEnd : 0;
                 var normalized = Conditions.normalizeGroups( groups );
+                var schemaEnd = perfEnabled ? window.performance.now() : 0;
 
                 if ( normalized.length === 0 ) {
                         debugList.innerHTML = '';
                         if ( debugEmpty ) {
                                 debugEmpty.removeAttribute( 'hidden' );
                         }
+
                         return;
                 }
 
@@ -3014,9 +3465,12 @@
                 var values = stateData.values;
                 var defaults = stateData.defaults;
 
+                var evaluateStart = perfEnabled ? schemaEnd : 0;
                 var evaluationState = Conditions.evaluate ? Conditions.evaluate( normalized, values, defaults ) : {};
+                var evaluateEnd = perfEnabled ? window.performance.now() : 0;
 
                 debugList.innerHTML = '';
+                var applyStart = perfEnabled ? evaluateEnd : 0;
 
                 normalized.forEach( function ( group, index ) {
                         var item = document.createElement( 'li' );
@@ -3072,6 +3526,24 @@
 
                         debugList.appendChild( item );
                 } );
+
+                if ( perfEnabled ) {
+                        var applyEnd = window.performance.now();
+                        traceTracker.record( {
+                                parse: parseEnd - parseStart,
+                                schema: schemaEnd - schemaStart,
+                                evaluate: evaluateEnd - evaluateStart,
+                                apply: applyEnd - applyStart
+                        }, {
+                                groups: normalized.length,
+                                timestamp: Date.now()
+                        } );
+                        scheduleTraceRender();
+
+                        if ( i18n.debugTraceAnnouncement ) {
+                                announce( i18n.debugTraceAnnouncement );
+                        }
+                }
         };
 
         var openModal = function ( markup, warnings, nonce ) {
@@ -3235,6 +3707,34 @@
                                 debugToggle.setAttribute( 'aria-expanded', 'false' );
                                 debugToggle.textContent = i18n.debugToggleShow || 'Show rule debugger';
                         }
+                } );
+        }
+
+        if ( debugTraceToggle ) {
+                if ( ! traceTracker ) {
+                        debugTraceToggle.setAttribute( 'disabled', 'disabled' );
+                }
+
+                debugTraceToggle.addEventListener( 'change', function () {
+                        if ( ! traceTracker ) {
+                                debugTraceToggle.checked = false;
+                                return;
+                        }
+
+                        traceState.enabled = debugTraceToggle.checked;
+
+                        if ( traceState.enabled ) {
+                                clearTraceData();
+                        } else {
+                                clearTraceData();
+                        }
+                } );
+        }
+
+        if ( debugTraceExport ) {
+                debugTraceExport.addEventListener( 'click', function ( event ) {
+                        event.preventDefault();
+                        exportTraceData();
                 } );
         }
 

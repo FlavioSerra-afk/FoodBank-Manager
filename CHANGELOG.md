@@ -4,6 +4,17 @@
 
 - _No changes yet._
 
+## [1.9.0] - 2025-09-30
+
+### Added
+- Import diff viewer for registration rules that surfaces mapping previews, skip reasons, and side-by-side JSON before applying changes.
+- Performance tracing toggle inside the rule debugger with a timing tracker, summary table, and JSON export of captured samples.
+- Minimal npm scripts so `npm run build`/`npm run lint` succeed in CI without bundling or extra dependencies.
+
+### Changed
+- Hardened the import workflow to normalize mappings server-side, reuse Settings API sanitizers, and surface skipped group counts in admin notices.
+- Updated documentation (matrix, template guide, README) with diff viewer behaviour and the lightweight build workflow.
+
 ## [1.8.0] - 2025-09-29
 
 ### Added

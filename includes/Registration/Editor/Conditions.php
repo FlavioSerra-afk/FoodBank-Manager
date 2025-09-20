@@ -309,112 +309,112 @@ final class Conditions {
 			);
 	}
 
-       /**
-        * Apply mappings to imported payload.
-        *
-        * @param array<string,mixed>             $payload        Raw decoded JSON payload.
-        * @param array<string,string>            $mapping        Incoming field => current field mapping.
-        * @param array<int,array<string,string>> $current_fields Current field catalogue.
-        *
-        * @return array{
-        *     enabled: bool,
-        *     groups: array<int, array{
-        *         operator: string,
-        *         conditions: array<int, array{field: string, operator: string, value: string, field_type: string}>,
-        *         actions: array<int, array{type: string, target: string}>
-        *     }>,
-        *     skipped: array<int, array{position: string, reason: string, missing: array<int, string>}>}
-        */
-       public static function apply_import( array $payload, array $mapping, array $current_fields ): array {
-			$conditions_raw = isset( $payload['conditions'] ) && is_array( $payload['conditions'] ) ? $payload['conditions'] : array();
-			$groups         = self::sanitize_groups( $conditions_raw['groups'] ?? array() );
-			$enabled        = ! empty( $conditions_raw['enabled'] );
+	/**
+	 * Apply mappings to imported payload.
+	 *
+	 * @param array<string,mixed>             $payload        Raw decoded JSON payload.
+	 * @param array<string,string>            $mapping        Incoming field => current field mapping.
+	 * @param array<int,array<string,string>> $current_fields Current field catalogue.
+	 *
+	 * @return array{
+	 *     enabled: bool,
+	 *     groups: array<int, array{
+	 *         operator: string,
+	 *         conditions: array<int, array{field: string, operator: string, value: string, field_type: string}>,
+	 *         actions: array<int, array{type: string, target: string}>
+	 *     }>,
+	 *     skipped: array<int, array{position: string, reason: string, missing: array<int, string>}>}
+	 */
+	public static function apply_import( array $payload, array $mapping, array $current_fields ): array {
+		$conditions_raw = isset( $payload['conditions'] ) && is_array( $payload['conditions'] ) ? $payload['conditions'] : array();
+		$groups         = self::sanitize_groups( $conditions_raw['groups'] ?? array() );
+		$enabled        = ! empty( $conditions_raw['enabled'] );
 
-			$current_map = array();
+		$current_map = array();
 		foreach ( self::normalize_fields( $current_fields ) as $field ) {
-				$current_map[ $field['name'] ] = $field;
+			$current_map[ $field['name'] ] = $field;
 		}
 
-			$mapped   = array();
-			$skipped  = array();
-			$position = 1;
+		$mapped   = array();
+		$skipped  = array();
+		$position = 1;
 
 		foreach ( $groups as $group ) {
-				$missing    = array();
-				$conditions = array();
-				$actions    = array();
-				$skip       = false;
+			$missing    = array();
+			$conditions = array();
+			$actions    = array();
+			$skip       = false;
 
-                       foreach ( $group['conditions'] as $condition ) {
-                                       $source = isset( $condition['field'] ) ? sanitize_key( (string) $condition['field'] ) : '';
-                                       $target = isset( $mapping[ $source ] ) ? sanitize_key( (string) $mapping[ $source ] ) : '';
+			foreach ( $group['conditions'] as $condition ) {
+				$source = isset( $condition['field'] ) ? sanitize_key( (string) $condition['field'] ) : '';
+				$target = isset( $mapping[ $source ] ) ? sanitize_key( (string) $mapping[ $source ] ) : '';
 
-                               if ( '' === $source || '' === $target || ! isset( $current_map[ $target ] ) ) {
-                                        $missing[] = $source;
-                                        $skip      = true;
-                                        break;
-                               }
+				if ( '' === $source || '' === $target || ! isset( $current_map[ $target ] ) ) {
+					$missing[] = $source;
+					$skip      = true;
+					break;
+				}
 
-                               $conditions[] = array(
-                                       'field'      => $target,
-                                       'operator'   => isset( $condition['operator'] ) ? (string) $condition['operator'] : '',
-                                       'value'      => isset( $condition['value'] ) ? (string) $condition['value'] : '',
-                                       'field_type' => $current_map[ $target ]['type'] ?? '',
-                               );
-                       }
+				$conditions[] = array(
+					'field'      => $target,
+					'operator'   => isset( $condition['operator'] ) ? (string) $condition['operator'] : '',
+					'value'      => isset( $condition['value'] ) ? (string) $condition['value'] : '',
+					'field_type' => $current_map[ $target ]['type'] ?? '',
+				);
+			}
 
 			if ( $skip ) {
-					$skipped[] = array(
-						'position' => (string) $position,
-						'reason'   => 'missing_field',
-						'missing'  => self::clean_missing( $missing ),
-					);
-					++$position;
-					continue;
+				$skipped[] = array(
+					'position' => (string) $position,
+					'reason'   => 'missing_field',
+					'missing'  => self::clean_missing( $missing ),
+				);
+				++$position;
+				continue;
 			}
 
-                       foreach ( $group['actions'] as $action ) {
-                                       $source = isset( $action['target'] ) ? sanitize_key( (string) $action['target'] ) : '';
-                                       $target = isset( $mapping[ $source ] ) ? sanitize_key( (string) $mapping[ $source ] ) : '';
+			foreach ( $group['actions'] as $action ) {
+				$source = isset( $action['target'] ) ? sanitize_key( (string) $action['target'] ) : '';
+				$target = isset( $mapping[ $source ] ) ? sanitize_key( (string) $mapping[ $source ] ) : '';
 
-                               if ( '' === $source || '' === $target || ! isset( $current_map[ $target ] ) ) {
-                                               $missing[] = $source;
-                                               $skip      = true;
-                                               break;
-                               }
+				if ( '' === $source || '' === $target || ! isset( $current_map[ $target ] ) ) {
+					$missing[] = $source;
+					$skip      = true;
+					break;
+				}
 
-                               $actions[] = array(
-                                       'type'   => isset( $action['type'] ) ? (string) $action['type'] : '',
-                                       'target' => $target,
-                               );
-                       }
+				$actions[] = array(
+					'type'   => isset( $action['type'] ) ? (string) $action['type'] : '',
+					'target' => $target,
+				);
+			}
 
 			if ( $skip || empty( $conditions ) || empty( $actions ) ) {
-					$skipped[] = array(
-						'position' => (string) $position,
-						'reason'   => $skip ? 'missing_field' : 'empty',
-						'missing'  => self::clean_missing( $missing ),
-					);
-					++$position;
-					continue;
+				$skipped[] = array(
+					'position' => (string) $position,
+					'reason'   => $skip ? 'missing_field' : 'empty',
+					'missing'  => self::clean_missing( $missing ),
+				);
+				++$position;
+				continue;
 			}
 
-                               $mapped[] = array(
-                                       'operator'   => isset( $group['operator'] ) ? (string) $group['operator'] : 'and',
-                                       'conditions' => $conditions,
-                                       'actions'    => $actions,
-                               );
+			$mapped[] = array(
+				'operator'   => isset( $group['operator'] ) ? (string) $group['operator'] : 'and',
+				'conditions' => $conditions,
+				'actions'    => $actions,
+			);
 
-				++$position;
+			++$position;
 		}
 
-			$enabled = $enabled && ! empty( $mapped );
+		$enabled = $enabled && ! empty( $mapped );
 
-			return array(
-				'enabled' => $enabled,
-				'groups'  => $mapped,
-				'skipped' => $skipped,
-			);
+		return array(
+			'enabled' => $enabled,
+			'groups'  => $mapped,
+			'skipped' => $skipped,
+		);
 	}
 
 
