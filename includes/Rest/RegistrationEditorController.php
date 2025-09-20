@@ -99,6 +99,28 @@ final class RegistrationEditorController {
                                 ),
                         )
                 );
+
+                register_rest_route(
+                        'fbm/v1',
+                        '/registration/editor/conditions/diff',
+                        array(
+                                array(
+                                        'methods'             => 'POST',
+                                        'callback'            => array( __CLASS__, 'handle_conditions_diff' ),
+                                        'permission_callback' => array( __CLASS__, 'permissions_check' ),
+                                        'args'                => array(
+                                                'original' => array(
+                                                        'type'     => 'object',
+                                                        'required' => true,
+                                                ),
+                                                'mapping'  => array(
+                                                        'type'     => 'object',
+                                                        'required' => true,
+                                                ),
+                                        ),
+                                ),
+                        )
+                );
         }
 
         /**
@@ -233,6 +255,148 @@ final class RegistrationEditorController {
                                 'groups'        => $preview['groups'],
                                 'fields'        => $preview['fields'],
                                 'analysis'      => $preview['analysis'],
+                        )
+                );
+        }
+
+        /**
+         * Provide a diff summary for import payloads with a mapping.
+         *
+         * @param WP_REST_Request $request Incoming request.
+         *
+         * @return WP_REST_Response|WP_Error
+         */
+    public static function handle_conditions_diff( WP_REST_Request $request ): WP_REST_Response|WP_Error {
+                $original = $request->get_param( 'original' );
+                $mapping  = $request->get_param( 'mapping' );
+
+                if ( ! is_array( $original ) || ! is_array( $mapping ) ) {
+                        return rest_ensure_response(
+                                new WP_Error( 'fbm_invalid_import', esc_html__( 'Import payload is invalid.', 'foodbank-manager' ), array( 'status' => 400 ) )
+                        );
+                }
+
+                $schema_version = isset( $original['schema']['version'] ) ? (int) $original['schema']['version'] : 0;
+                if ( Conditions::SCHEMA_VERSION !== $schema_version ) {
+                        return rest_ensure_response(
+                                new WP_Error( 'fbm_invalid_schema', esc_html__( 'Import failed. The export file is from an incompatible version.', 'foodbank-manager' ), array( 'status' => 400 ) )
+                        );
+                }
+
+                $template = get_option( 'fbm_registration_template', TemplateDefaults::template() );
+                if ( ! is_string( $template ) ) {
+                        $template = TemplateDefaults::template();
+                }
+
+                $fields      = RegistrationEditorPage::field_catalog( $template );
+                $preview     = Conditions::preview_import( $original, $fields );
+                $normalized  = array();
+                foreach ( $mapping as $incoming => $target ) {
+                        if ( is_array( $target ) || is_object( $target ) ) {
+                                continue;
+                        }
+
+                        $source = sanitize_key( (string) $incoming );
+                        $mapped = sanitize_key( (string) $target );
+
+                        if ( '' === $source || '' === $mapped ) {
+                                continue;
+                        }
+
+                        $normalized[ $source ] = $mapped;
+                }
+
+        $result         = Conditions::apply_import( $original, $normalized, $fields );
+        $preview_groups = array_values( (array) $preview['groups'] );
+        $skipped_index  = array();
+        $skipped_list   = (array) $result['skipped'];
+
+        foreach ( $skipped_list as $skip ) {
+                if ( ! is_array( $skip ) ) {
+                        continue;
+                }
+
+                $position = (int) $skip['position'];
+                if ( $position <= 0 ) {
+                        continue;
+                }
+
+                $missing = array_values( (array) $skip['missing'] );
+                $reason  = (string) $skip['reason'];
+
+                $skipped_index[ $position ] = array(
+                        'reason'  => $reason,
+                        'missing' => $missing,
+                );
+        }
+
+                $diff           = array();
+                $summary_import = array();
+                $summary_skip   = array();
+                $resolved_index = 0;
+
+                foreach ( $preview_groups as $index => $group ) {
+                        $position = $index + 1;
+                        /* translators: %d: Group number displayed in the import diff. */
+                        $label    = sprintf( esc_html__( 'Group %d', 'foodbank-manager' ), $position );
+
+                        if ( isset( $skipped_index[ $position ] ) ) {
+                                $skip_data = $skipped_index[ $position ];
+                                $diff[]    = array(
+                                        'index'    => $index,
+                                        'status'   => 'skip',
+                                        'reason'   => $skip_data['reason'],
+                                        'missing'  => $skip_data['missing'],
+                                        'original' => $group,
+                                        'resolved' => array(),
+                                );
+
+                                $summary_skip[] = array(
+                                        'label'   => $label,
+                                        'reason'  => $skip_data['reason'],
+                                        'missing' => $skip_data['missing'],
+                                );
+                                continue;
+                        }
+
+        $resolved_group = $result['groups'][ $resolved_index ] ?? array(
+                'conditions' => array(),
+                'actions'    => array(),
+        );
+        ++$resolved_index;
+
+        $diff[] = array(
+                                'index'    => $index,
+                                'status'   => 'import',
+                                'reason'   => '',
+                                'missing'  => array(),
+                                'original' => $group,
+                                'resolved' => $resolved_group,
+                        );
+
+        $conditions_count = count( $resolved_group['conditions'] );
+        $actions_count    = count( $resolved_group['actions'] );
+
+        $summary_import[] = array(
+                'label'      => $label,
+                'conditions' => $conditions_count,
+                'actions'    => $actions_count,
+        );
+                }
+
+                return rest_ensure_response(
+                        array(
+                                'schemaVersion' => $preview['schemaVersion'],
+                                'currentSchema' => Conditions::SCHEMA_VERSION,
+                                'enabled'       => array(
+                                        'incoming' => ! empty( $preview['enabled'] ),
+                                        'resolved' => ! empty( $result['enabled'] ),
+                                ),
+                                'diff'          => $diff,
+                                'summary'       => array(
+                                        'import' => $summary_import,
+                                        'skip'   => $summary_skip,
+                                ),
                         )
                 );
         }

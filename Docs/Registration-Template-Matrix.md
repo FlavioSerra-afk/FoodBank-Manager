@@ -170,6 +170,16 @@ Exports generated from the editor include the current rule schema version, a nor
 - **Group analysis** – The preview response highlights groups with missing field mappings so they can be corrected before committing. Unmapped conditions or actions cause the affected group to be skipped during the server-side import step.
 - **Import flow** – JSON is validated and sanitized on the server. Only mapped groups with at least one condition and one action are retained. The import action updates `fbm_registration_settings['conditions']` and reports the number of groups skipped.
 
+### Import diff viewer
+
+The import modal now renders a side-by-side diff before any rules are saved:
+
+- **Incoming JSON** – The left panel shows the sanitized payload from the export, preserving group order so administrators can confirm intent.
+- **Resolved mapping** – The right panel displays the result of applying the chosen mappings to the current field catalogue. Missing fields are highlighted in the summary list below the diff.
+- **Summary** – Separate lists detail which groups will import and which will be skipped, including reasons such as `missing_field` or `empty`. Skipped groups never reach the settings option.
+
+Diff generation uses the new `/registration/editor/conditions/diff` endpoint which enforces the REST nonce and `fbm_manage` capability. The modal keeps the **Apply import** button disabled until at least one group can be imported, ensuring administrators acknowledge the diff output before committing changes.
+
 ### Guided presets
 
 The editor exposes a curated set of six presets sourced from `TemplateDefaults::presets()`. Each preset ships with:

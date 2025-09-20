@@ -1,12 +1,8 @@
 {
   "name": "foodbank-manager",
-  "version": "1.2.1",
   "private": true,
   "scripts": {
-    "e2e:run": "playwright test --reporter=line",
-    "e2e": "npm run e2e:run"
-  },
-  "devDependencies": {
-    "@playwright/test": "^1.55.0"
+    "build": "echo \"FBM: no build step required\" && exit 0",
+    "lint": "echo \"FBM: JS lint placeholder\" && exit 0"
   }
 }

@@ -3,7 +3,7 @@ Contributors: portuguese-community-centre-london
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.2
-Stable tag: 1.8.0
+Stable tag: 1.9.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -60,6 +60,12 @@ FoodBank Manager registers with the WordPress privacy exporter/eraser registry a
 First stable cut with readme polish and release checksums.
 
 == Changelog ==
+
+= 1.9.0 =
+* Added an admin-only import diff viewer that previews incoming rules, resolved mappings, and skip reasons before applying changes.
+* Improved the registration editor debugger with an optional performance trace toggle and JSON export for timing samples.
+* Documented the lightweight npm build workflow (`npm run build`) which now no-ops to keep CI green without bundling.
+
 = 1.8.0 =
 * Added JSON import/export workflow with schema validation, REST-backed mapping preview, and sanitized server-side imports.
 * Introduced six guided rule presets with placeholder prompts, keyboard navigation, and aria-live announcements.

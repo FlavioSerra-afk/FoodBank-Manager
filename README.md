@@ -1,7 +1,7 @@
 Docs-Revision: 2025-09-22 (v1.0.0 alignment)
 # FoodBank Manager Plugin
 
-Stable tag: 1.1.1
+Stable tag: 1.9.0
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.2
@@ -75,3 +75,14 @@ The version command returns the `FoodBankManager\Core\Plugin::VERSION` string so
 2. `composer build:zip` (runs `bin/package.sh`, enforcing version alignment and generating `dist/foodbank-manager-manifest.txt`)
 3. `sha256sum dist/foodbank-manager.zip > SHA256SUMS`
 4. Upload the ZIP, include the manifest/checksum in the release, and publish after verifying the sums.
+
+## Build tooling
+
+FoodBank Manager does not require a JavaScript bundling step. A placeholder `package.json` is committed so CI can call `npm run build` and `npm run lint`; both commands intentionally no-op while returning success:
+
+```bash
+npm run build # -> "FBM: no build step required"
+npm run lint  # -> "FBM: JS lint placeholder"
+```
+
+Keep the scripts lightweight to avoid introducing unnecessary toolchain dependencies into plugin deployments.

@@ -93,5 +93,5 @@
         "sort-packages": true,
         "optimize-autoloader": true
     },
-    "version": "1.7.0"
+    "version": "1.9.0"
 }

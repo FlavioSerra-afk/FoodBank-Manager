@@ -256,13 +256,17 @@ final class RegistrationEditorPage {
                         $version = defined( 'FBM_VER' ) ? FBM_VER : Plugin::VERSION;
                         wp_enqueue_script( 'jquery' );
 
-                        $conditions_handle = 'fbm-registration-conditions';
-                        $conditions_script = plugins_url( 'assets/js/registration-conditions.js', FBM_FILE );
-                        wp_register_script( $conditions_handle, $conditions_script, array(), $version, true );
+        $conditions_handle = 'fbm-registration-conditions';
+        $conditions_script = plugins_url( 'assets/js/registration-conditions.js', FBM_FILE );
+        wp_register_script( $conditions_handle, $conditions_script, array(), $version, true );
 
-                        $handle       = 'fbm-registration-editor';
-                        $script       = plugins_url( 'assets/js/registration-editor.js', FBM_FILE );
-                        $dependencies = array( 'jquery', $conditions_handle );
+        $trace_handle = 'fbm-registration-debugger';
+        $trace_script = plugins_url( 'assets/js/registration-debugger-perf.js', FBM_FILE );
+        wp_register_script( $trace_handle, $trace_script, array(), $version, true );
+
+        $handle       = 'fbm-registration-editor';
+        $script       = plugins_url( 'assets/js/registration-editor.js', FBM_FILE );
+        $dependencies = array( 'jquery', $conditions_handle, $trace_handle );
                 if ( ! empty( $editor_settings ) ) {
                         $dependencies[] = 'code-editor';
                 }
@@ -276,6 +280,7 @@ final class RegistrationEditorPage {
                                         'restNonce'         => $rest_nonce,
                                         'previewUrl'        => esc_url_raw( rest_url( 'fbm/v1/registration/preview' ) ),
                                         'importPreviewUrl'  => esc_url_raw( rest_url( 'fbm/v1/registration/editor/conditions/preview' ) ),
+                                        'importDiffUrl'     => esc_url_raw( rest_url( 'fbm/v1/registration/editor/conditions/diff' ) ),
                                         'textareaId'        => self::TEMPLATE_FIELD,
                                         'settingsField'     => self::SETTINGS_FIELD,
                                         'codeEditor'        => $editor_settings,
@@ -361,6 +366,17 @@ final class RegistrationEditorPage {
                                                 'debugFinalHidden'  => esc_html__( 'final state: hidden', 'foodbank-manager' ),
                                                 'debugFinalRequired' => esc_html__( 'final state: required', 'foodbank-manager' ),
                                                 'debugFinalOptional' => esc_html__( 'final state: optional', 'foodbank-manager' ),
+                                                'debugTraceToggle'   => esc_html__( 'Record timings', 'foodbank-manager' ),
+                                                'debugTraceExport'   => esc_html__( 'Export trace (JSON)', 'foodbank-manager' ),
+                                                'debugTraceHeading'  => esc_html__( 'Recent timing averages', 'foodbank-manager' ),
+                                                'debugTraceEmpty'    => esc_html__( 'No timing data captured yet.', 'foodbank-manager' ),
+                                                'debugTracePhase'    => esc_html__( 'Phase', 'foodbank-manager' ),
+                                                'debugTraceAverage'  => esc_html__( 'Average (ms)', 'foodbank-manager' ),
+                                                'debugTraceMin'      => esc_html__( 'Fastest (ms)', 'foodbank-manager' ),
+                                                'debugTraceMax'      => esc_html__( 'Slowest (ms)', 'foodbank-manager' ),
+                                                'debugTraceCount'    => esc_html__( 'Runs', 'foodbank-manager' ),
+                                                'debugTraceAnnouncement' => esc_html__( 'Timing sample recorded.', 'foodbank-manager' ),
+                                                'debugTraceExportFilename' => esc_html__( 'fbm-debug-trace.json', 'foodbank-manager' ),
                                                 'debugOp_equals'    => esc_html__( 'is', 'foodbank-manager' ),
                                                 'debugOp_not_equals' => esc_html__( 'is not', 'foodbank-manager' ),
                                                 'debugOp_contains'  => esc_html__( 'contains', 'foodbank-manager' ),
@@ -381,19 +397,37 @@ final class RegistrationEditorPage {
                                                 'operatorGte'       => esc_html__( 'is greater than or equal to', 'foodbank-manager' ),
                                                 'importInvalid'     => esc_html__( 'Unable to parse import JSON.', 'foodbank-manager' ),
                                                 'importEmpty'       => esc_html__( 'No groups were found in the import file.', 'foodbank-manager' ),
-							'importPreviewHeading' => esc_html__( 'Preview', 'foodbank-manager' ),
-							/* translators: %d: number of groups that will be imported. */
-							'importSummaryReady'   => esc_html__( '%1$d groups will be imported.', 'foodbank-manager' ),
-							/* translators: %d: number of groups that require manual field mapping. */
-							'importSummaryMissing' => esc_html__( '%1$d groups need field mapping.', 'foodbank-manager' ),
-							'importSchemaMismatch' => esc_html__( 'Import failed. The export file is from an incompatible version.', 'foodbank-manager' ),
-							/* translators: 1: group number in the import file, 2: comma-separated missing field slugs. */
-							'importGroupMissing'   => esc_html__( 'Group %1$d missing: %2$s', 'foodbank-manager' ),
+                                                        'importPreviewHeading' => esc_html__( 'Preview', 'foodbank-manager' ),
+                                                        /* translators: %d: number of groups that will be imported. */
+                                                        'importSummaryReady'   => esc_html__( '%1$d groups will be imported.', 'foodbank-manager' ),
+                                                        /* translators: %d: number of groups that require manual field mapping. */
+                                                        'importSummaryMissing' => esc_html__( '%1$d groups need field mapping.', 'foodbank-manager' ),
+                                                        'importSchemaMismatch' => esc_html__( 'Import failed. The export file is from an incompatible version.', 'foodbank-manager' ),
+                                                        /* translators: 1: group number in the import file, 2: comma-separated missing field slugs. */
+                                                        'importGroupMissing'   => esc_html__( 'Group %1$d missing: %2$s', 'foodbank-manager' ),
+                                                'importDiffHeading'    => esc_html__( 'Import diff', 'foodbank-manager' ),
+                                                'importDiffIncoming'   => esc_html__( 'Incoming groups', 'foodbank-manager' ),
+                                                'importDiffResolved'   => esc_html__( 'Resolved mapping', 'foodbank-manager' ),
+                                                'importDiffImportList' => esc_html__( 'Will import', 'foodbank-manager' ),
+                                                'importDiffSkipList'   => esc_html__( 'Will skip', 'foodbank-manager' ),
+                                                /* translators: %s: Comma-separated list of missing field slugs. */
+                                                'importDiffSkipMissing' => esc_html__( 'Missing fields: %s', 'foodbank-manager' ),
+                                                'importDiffSkipEmpty'  => esc_html__( 'Group has no valid conditions or actions.', 'foodbank-manager' ),
+                                                'importDiffSkipUnknown' => esc_html__( 'Skipped for an unknown reason.', 'foodbank-manager' ),
+                                                'importDiffNoneImport' => esc_html__( 'No groups ready to import yet.', 'foodbank-manager' ),
+                                                'importDiffNoneSkip'   => esc_html__( 'No groups will be skipped.', 'foodbank-manager' ),
+                                                'importDiffError'      => esc_html__( 'Unable to load diff. Check mappings and try again.', 'foodbank-manager' ),
+                                                'importDiffLoading'    => esc_html__( 'Calculating diff…', 'foodbank-manager' ),
+                                                'importDiffWaiting'    => esc_html__( 'Provide mappings to generate a diff.', 'foodbank-manager' ),
+                                                /* translators: 1: group label, 2: condition count, 3: action count. */
+                                                'importDiffImportEntry' => esc_html__( '%1$s — %2$d conditions, %3$d actions', 'foodbank-manager' ),
+                                                /* translators: 1: group label, 2: skip reason. */
+                                                'importDiffSkipEntry'   => esc_html__( '%1$s — %2$s', 'foodbank-manager' ),
                                                 'importSelectPlaceholder' => esc_html__( 'Select a field…', 'foodbank-manager' ),
                                                 'importNoFields'       => esc_html__( 'Add form fields before importing rules.', 'foodbank-manager' ),
                                                 /* translators: %s: Number of groups skipped during import. */
                                                 'importSkippedNotice'   => esc_html__( '%s groups could not be imported because their fields were not mapped.', 'foodbank-manager' ),
-                                                'importConfirm'        => esc_html__( 'Import rules', 'foodbank-manager' ),
+                                                'importConfirm'        => esc_html__( 'Apply import', 'foodbank-manager' ),
                                                 'importAutoMap'        => esc_html__( 'Auto-map fields', 'foodbank-manager' ),
                                                 'importAnnouncement'   => esc_html__( 'Rules imported. Remember to save changes.', 'foodbank-manager' ),
                                                 'presetAnnouncement'   => esc_html__( 'Preset added to the rule editor.', 'foodbank-manager' ),
@@ -620,8 +654,24 @@ final class RegistrationEditorPage {
 
                         $fields = self::field_catalog( $template );
 
-                        $original = is_array( $payload['original'] ) ? $payload['original'] : array();
-                        $mapping  = is_array( $payload['mapping'] ) ? $payload['mapping'] : array();
+        $original = is_array( $payload['original'] ) ? $payload['original'] : array();
+        $mapping     = array();
+        $raw_mapping = is_array( $payload['mapping'] ) ? $payload['mapping'] : array();
+
+        foreach ( $raw_mapping as $incoming => $target ) {
+                if ( is_array( $target ) || is_object( $target ) ) {
+                        continue;
+                }
+
+                $source_key = sanitize_key( (string) $incoming );
+                $target_key = sanitize_key( (string) $target );
+
+                if ( '' === $source_key || '' === $target_key ) {
+                        continue;
+                }
+
+                $mapping[ $source_key ] = $target_key;
+        }
 
                         $schema_version = isset( $original['schema']['version'] ) ? (int) $original['schema']['version'] : 0;
 
@@ -638,7 +688,7 @@ final class RegistrationEditorPage {
                                 exit;
                 }
 
-                        $result = Conditions::apply_import( $original, $mapping, $fields );
+        $result = Conditions::apply_import( $original, $mapping, $fields );
 
                         $settings['conditions'] = array(
                                 'enabled' => $result['enabled'],
