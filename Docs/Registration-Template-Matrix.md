@@ -132,3 +132,50 @@ Groups are evaluated in the stored order. When multiple groups target the same f
 ```
 
 The second group runs after the first, so the field stays visible but the optional action overrides any previous requirement.
+
+## Import/Export & Presets
+
+Exports generated from the editor include the current rule schema version, a normalized field catalogue, and the sanitized condition groups. The payload mirrors the REST preview response used during imports:
+
+```json
+{
+  "schema": {
+    "version": 1,
+    "generated_at": "2024-05-15T12:00:00Z"
+  },
+  "fields": [
+    {"name": "fbm_first_name", "label": "First name", "type": "text"},
+    {"name": "fbm_household_size", "label": "Household size", "type": "number"}
+  ],
+  "conditions": {
+    "enabled": true,
+    "groups": [
+      {
+        "operator": "and",
+        "conditions": [
+          {"field": "fbm_household_size", "operator": "gt", "value": "4"}
+        ],
+        "actions": [
+          {"type": "show", "target": "fbm_children_ages"},
+          {"type": "optional", "target": "fbm_children_ages"}
+        ]
+      }
+    ]
+  }
+}
+```
+
+- **Schema version** – Import checks `schema.version` against the editor's `Conditions::SCHEMA_VERSION`. Mismatched versions are rejected before any mapping occurs.
+- **Field catalogue** – The importer creates suggested mappings by comparing incoming `name` and `label` values with the current template. Administrators can auto-map from these suggestions or adjust manually.
+- **Group analysis** – The preview response highlights groups with missing field mappings so they can be corrected before committing. Unmapped conditions or actions cause the affected group to be skipped during the server-side import step.
+- **Import flow** – JSON is validated and sanitized on the server. Only mapped groups with at least one condition and one action are retained. The import action updates `fbm_registration_settings['conditions']` and reports the number of groups skipped.
+
+### Guided presets
+
+The editor exposes a curated set of six presets sourced from `TemplateDefaults::presets()`. Each preset ships with:
+
+- A stable identifier, label, and description shown in the presets menu.
+- Placeholder tokens for fields or comparison values (e.g. `{{childrenCountField}}`). The modal prompts the administrator to select real fields or provide values before insertion.
+- One or more sanitized groups that are merged into the existing rule set when applied. Placeholders are replaced with the selected mappings before the groups are appended.
+
+Presets are JSON-backed and version-agnostic so the catalogue can grow without touching editor logic. Administrators can edit the inserted groups before saving, and the aria-live announcer confirms when a preset has been added.

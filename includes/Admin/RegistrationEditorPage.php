@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace FoodBankManager\Admin;
 
 use FoodBankManager\Core\Plugin;
+use FoodBankManager\Registration\Editor\Conditions;
 use FoodBankManager\Registration\Editor\EditorState;
 use FoodBankManager\Registration\Editor\TemplateDefaults;
 use FoodBankManager\Registration\Editor\TemplateRenderer;
@@ -271,25 +272,28 @@ final class RegistrationEditorPage {
                                 $handle,
                                 'fbmRegistrationEditor',
                                 array(
-                                        'previewNonce' => $rest_nonce,
-                                        'restNonce'   => $rest_nonce,
-                                        'previewUrl'   => esc_url( rest_url( 'fbm/v1/registration/preview' ) ),
-                                        'textareaId'   => self::TEMPLATE_FIELD,
-                                        'settingsField' => self::SETTINGS_FIELD,
-                                        'codeEditor'   => $editor_settings,
-                                        'editorTheme'  => $theme,
-                                        'fields'       => $fields,
-                                        'conditions'   => $conditions_payload,
-                                        'matrixUrl'    => esc_url( $matrix_url ),
-                                        'autosave'     => array(
-                                                'endpoint'        => esc_url_raw( rest_url( 'fbm/v1/registration/editor/autosave' ) ),
-                                                'revisions'       => $revisions,
-                                                'payload'         => $autosave_state,
-                                                'restoreBase'     => esc_url_raw( rest_url( 'fbm/v1/registration/editor/revisions/' ) ),
+                                        'previewNonce'      => $rest_nonce,
+                                        'restNonce'         => $rest_nonce,
+                                        'previewUrl'        => esc_url_raw( rest_url( 'fbm/v1/registration/preview' ) ),
+                                        'importPreviewUrl'  => esc_url_raw( rest_url( 'fbm/v1/registration/editor/conditions/preview' ) ),
+                                        'textareaId'        => self::TEMPLATE_FIELD,
+                                        'settingsField'     => self::SETTINGS_FIELD,
+                                        'codeEditor'        => $editor_settings,
+                                        'editorTheme'       => $theme,
+                                        'conditionSchema'   => Conditions::SCHEMA_VERSION,
+                                        'fields'            => Conditions::normalize_fields( $fields ),
+                                        'conditions'        => $conditions_payload,
+                                        'presets'           => TemplateDefaults::presets(),
+                                        'matrixUrl'         => esc_url( $matrix_url ),
+                                        'autosave'          => array(
+                                                'endpoint'          => esc_url_raw( rest_url( 'fbm/v1/registration/editor/autosave' ) ),
+                                                'revisions'         => $revisions,
+                                                'payload'           => $autosave_state,
+                                                'restoreBase'       => esc_url_raw( rest_url( 'fbm/v1/registration/editor/revisions/' ) ),
                                                 'revisionsEndpoint' => esc_url_raw( rest_url( 'fbm/v1/registration/editor/revisions' ) ),
-                                                'interval'        => 30000,
+                                                'interval'          => 30000,
                                         ),
-                                        'i18n'         => array(
+                                        'i18n'              => array(
                                                 'previewError'     => esc_html__( 'Unable to load the preview. Please save first or try again.', 'foodbank-manager' ),
                                                 'closeLabel'       => esc_html__( 'Close preview', 'foodbank-manager' ),
                                                 'modalDescription' => esc_html__( 'Preview only. Form controls are disabled.', 'foodbank-manager' ),
@@ -375,6 +379,33 @@ final class RegistrationEditorPage {
                                                 'operatorLte'       => esc_html__( 'is less than or equal to', 'foodbank-manager' ),
                                                 'operatorGt'        => esc_html__( 'is greater than', 'foodbank-manager' ),
                                                 'operatorGte'       => esc_html__( 'is greater than or equal to', 'foodbank-manager' ),
+                                                'importInvalid'     => esc_html__( 'Unable to parse import JSON.', 'foodbank-manager' ),
+                                                'importEmpty'       => esc_html__( 'No groups were found in the import file.', 'foodbank-manager' ),
+							'importPreviewHeading' => esc_html__( 'Preview', 'foodbank-manager' ),
+							/* translators: %d: number of groups that will be imported. */
+							'importSummaryReady'   => esc_html__( '%1$d groups will be imported.', 'foodbank-manager' ),
+							/* translators: %d: number of groups that require manual field mapping. */
+							'importSummaryMissing' => esc_html__( '%1$d groups need field mapping.', 'foodbank-manager' ),
+							'importSchemaMismatch' => esc_html__( 'Import failed. The export file is from an incompatible version.', 'foodbank-manager' ),
+							/* translators: 1: group number in the import file, 2: comma-separated missing field slugs. */
+							'importGroupMissing'   => esc_html__( 'Group %1$d missing: %2$s', 'foodbank-manager' ),
+                                                'importSelectPlaceholder' => esc_html__( 'Select a field…', 'foodbank-manager' ),
+                                                'importNoFields'       => esc_html__( 'Add form fields before importing rules.', 'foodbank-manager' ),
+                                                /* translators: %s: Number of groups skipped during import. */
+                                                'importSkippedNotice'   => esc_html__( '%s groups could not be imported because their fields were not mapped.', 'foodbank-manager' ),
+                                                'importConfirm'        => esc_html__( 'Import rules', 'foodbank-manager' ),
+                                                'importAutoMap'        => esc_html__( 'Auto-map fields', 'foodbank-manager' ),
+                                                'importAnnouncement'   => esc_html__( 'Rules imported. Remember to save changes.', 'foodbank-manager' ),
+                                                'presetAnnouncement'   => esc_html__( 'Preset added to the rule editor.', 'foodbank-manager' ),
+                                                'presetMissingFields'  => esc_html__( 'Add form fields before inserting a preset.', 'foodbank-manager' ),
+                                                'presetsEmpty'         => esc_html__( 'No presets available yet.', 'foodbank-manager' ),
+                                                'moveGroupUp'          => esc_html__( 'Move group up', 'foodbank-manager' ),
+                                                'moveGroupDown'        => esc_html__( 'Move group down', 'foodbank-manager' ),
+                                                'moveConditionUp'      => esc_html__( 'Move condition up', 'foodbank-manager' ),
+                                                'moveConditionDown'    => esc_html__( 'Move condition down', 'foodbank-manager' ),
+                                                'moveActionUp'         => esc_html__( 'Move action up', 'foodbank-manager' ),
+                                                'moveActionDown'       => esc_html__( 'Move action down', 'foodbank-manager' ),
+                                                'exportAnnouncement'   => esc_html__( 'Export ready. Download should begin shortly.', 'foodbank-manager' ),
                                         ),
                                 )
                         );
@@ -449,7 +480,7 @@ final class RegistrationEditorPage {
                                 $groups_source = $conditions['rules'];
                         }
 
-                        $condition_groups  = self::sanitize_condition_groups( $groups_source );
+                        $condition_groups  = Conditions::sanitize_groups( $groups_source );
                         $conditions_enabled = isset( $conditions['enabled'] ) ? self::to_bool( $conditions['enabled'] ) : (bool) $defaults['conditions']['enabled'];
 
                         if ( empty( $condition_groups ) ) {
@@ -484,150 +515,7 @@ final class RegistrationEditorPage {
                         );
         }
 
-        /**
-         * Sanitize conditional visibility groups from the settings payload.
-         *
-         * @param mixed $groups Raw group payload (array or JSON).
-         *
-         * @return array<int,array<string,mixed>>
-         */
-        private static function sanitize_condition_groups( $groups ): array {
-                if ( is_string( $groups ) ) {
-                        $decoded = json_decode( $groups, true );
-                        $groups  = is_array( $decoded ) ? $decoded : array();
-                }
-
-                if ( ! is_array( $groups ) ) {
-                        return array();
-                }
-
-                $sanitized          = array();
-                $allowed_conditions = array( 'equals', 'not_equals', 'contains', 'empty', 'not_empty', 'lt', 'lte', 'gt', 'gte' );
-                $allowed_actions    = array( 'show', 'hide', 'require', 'optional' );
-
-                foreach ( $groups as $group ) {
-                        if ( ! is_array( $group ) ) {
-                                continue;
-                        }
-
-                        // Back-compat: convert single-rule structures to a group definition.
-                        if ( isset( $group['if_field'], $group['action'], $group['target'] ) ) {
-                                $group = array(
-                                        'operator'   => 'and',
-                                        'conditions' => array(
-                                                array(
-                                                        'field'    => $group['if_field'],
-                                                        'operator' => $group['operator'] ?? 'equals',
-                                                        'value'    => $group['value'] ?? '',
-                                                ),
-                                        ),
-                                        'actions'    => array(
-                                                array(
-                                                        'type'   => $group['action'],
-                                                        'target' => $group['target'],
-                                                ),
-                                        ),
-                                );
-                        }
-
-                        $operator = isset( $group['operator'] ) ? sanitize_key( (string) $group['operator'] ) : 'and';
-                        if ( ! in_array( $operator, array( 'and', 'or' ), true ) ) {
-                                $operator = 'and';
-                        }
-
-                        $conditions_raw = $group['conditions'] ?? array();
-                        if ( is_string( $conditions_raw ) ) {
-                                $decoded        = json_decode( $conditions_raw, true );
-                                $conditions_raw = is_array( $decoded ) ? $decoded : array();
-                        }
-
-                        $actions_raw = $group['actions'] ?? array();
-                        if ( is_string( $actions_raw ) ) {
-                                $decoded     = json_decode( $actions_raw, true );
-                                $actions_raw = is_array( $decoded ) ? $decoded : array();
-                        }
-
-                        if ( ! is_array( $conditions_raw ) || ! is_array( $actions_raw ) ) {
-                                continue;
-                        }
-
-                        $conditions = array();
-                        foreach ( $conditions_raw as $condition ) {
-                                if ( ! is_array( $condition ) ) {
-                                        continue;
-                                }
-
-                                $field    = isset( $condition['field'] ) ? sanitize_key( (string) $condition['field'] ) : '';
-                                $operator_key = isset( $condition['operator'] ) ? sanitize_key( (string) $condition['operator'] ) : '';
-                                $value    = isset( $condition['value'] ) ? sanitize_text_field( (string) $condition['value'] ) : '';
-
-                                if ( '' === $field || ! in_array( $operator_key, $allowed_conditions, true ) ) {
-                                        continue;
-                                }
-
-                                if ( in_array( $operator_key, array( 'empty', 'not_empty' ), true ) ) {
-                                        $value = '';
-                                }
-
-                                if ( in_array( $operator_key, array( 'equals', 'not_equals', 'contains', 'lt', 'lte', 'gt', 'gte' ), true ) && '' === trim( $value ) ) {
-                                        continue;
-                                }
-
-                                $conditions[] = array(
-                                        'field'    => $field,
-                                        'operator' => $operator_key,
-                                        'value'    => $value,
-                                );
-
-                                if ( count( $conditions ) >= 10 ) {
-                                        break;
-                                }
-                        }
-
-                        $actions = array();
-                        foreach ( $actions_raw as $action ) {
-                                if ( ! is_array( $action ) ) {
-                                        continue;
-                                }
-
-                                $type   = isset( $action['type'] ) ? sanitize_key( (string) $action['type'] ) : '';
-                                $target = isset( $action['target'] ) ? sanitize_key( (string) $action['target'] ) : '';
-
-                                if ( '' === $type || '' === $target ) {
-                                        continue;
-                                }
-
-                                if ( ! in_array( $type, $allowed_actions, true ) ) {
-                                        continue;
-                                }
-
-                                $actions[] = array(
-                                        'type'   => $type,
-                                        'target' => $target,
-                                );
-
-                                if ( count( $actions ) >= 10 ) {
-                                        break;
-                                }
-                        }
-
-                        if ( empty( $conditions ) || empty( $actions ) ) {
-                                continue;
-                        }
-
-                        $sanitized[] = array(
-                                'operator'   => $operator,
-                                'conditions' => $conditions,
-                                'actions'    => $actions,
-                        );
-
-                        if ( count( $sanitized ) >= 25 ) {
-                                break;
-                        }
-                }
-
-                return $sanitized;
-        }
+        
 
 		/**
 		 * Handle reset to default action.
@@ -658,70 +546,124 @@ final class RegistrationEditorPage {
 		/**
 		 * Handle export action.
 		 */
-	public static function handle_export(): void {
-		if ( ! current_user_can( 'fbm_manage' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability registered on activation.
-				wp_die( esc_html__( 'You do not have permission to export the registration form.', 'foodbank-manager' ) );
-		}
+        public static function handle_export(): void {
+                if ( ! current_user_can( 'fbm_manage' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability registered on activation.
+                                wp_die( esc_html__( 'You do not have permission to export the registration form.', 'foodbank-manager' ) );
+                }
 
-			check_admin_referer( self::EXPORT_ACTION );
+                        check_admin_referer( self::EXPORT_ACTION );
 
-			$payload = array(
-				'template' => get_option( self::TEMPLATE_OPTION, TemplateDefaults::template() ),
-				'settings' => get_option( self::SETTINGS_OPTION, TemplateDefaults::settings() ),
-			);
+                        $template = get_option( self::TEMPLATE_OPTION, TemplateDefaults::template() );
+                if ( ! is_string( $template ) ) {
+                                $template = TemplateDefaults::template();
+                }
 
-			$json = wp_json_encode( $payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
-			if ( ! is_string( $json ) ) {
-					wp_die( esc_html__( 'Unable to export registration form.', 'foodbank-manager' ) );
-			}
+                        $settings = get_option( self::SETTINGS_OPTION, TemplateDefaults::settings() );
+                if ( ! is_array( $settings ) ) {
+                                $settings = TemplateDefaults::settings();
+                }
 
-			nocache_headers();
-			header( 'Content-Type: application/json; charset=utf-8' );
-			header( 'Content-Disposition: attachment; filename="fbm-registration-template.json"' );
-			echo $json; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON output.
-			exit;
-	}
+                        $fields     = self::field_catalog( $template );
+                        $conditions = isset( $settings['conditions'] ) && is_array( $settings['conditions'] ) ? $settings['conditions'] : array();
+                        $payload    = Conditions::export_payload( $fields, $conditions );
+
+                        $json = wp_json_encode( $payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
+                        if ( ! is_string( $json ) ) {
+                                        wp_die( esc_html__( 'Unable to export registration form.', 'foodbank-manager' ) );
+                        }
+
+                        nocache_headers();
+                        header( 'Content-Type: application/json; charset=utf-8' );
+                        header( 'Content-Disposition: attachment; filename="fbm-registration-conditions.json"' );
+                        echo $json; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON output.
+                        exit;
+        }
 
 		/**
 		 * Handle import action.
 		 */
-	public static function handle_import(): void {
-		if ( ! current_user_can( 'fbm_manage' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability registered on activation.
-				wp_die( esc_html__( 'You do not have permission to import the registration form.', 'foodbank-manager' ) );
-		}
+        public static function handle_import(): void {
+                if ( ! current_user_can( 'fbm_manage' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown -- Custom capability registered on activation.
+                                wp_die( esc_html__( 'You do not have permission to import the registration form.', 'foodbank-manager' ) );
+                }
 
-			check_admin_referer( self::IMPORT_ACTION );
+                        check_admin_referer( self::IMPORT_ACTION );
 
-			$payload = array();
-		if ( isset( $_POST['fbm_registration_import'] ) ) {
-				$raw     = wp_unslash( $_POST['fbm_registration_import'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized below.
-				$payload = json_decode( sanitize_textarea_field( (string) $raw ), true );
-		}
+                        $payload = array();
+                if ( isset( $_POST['fbm_registration_import'] ) ) {
+                                $raw     = wp_unslash( $_POST['fbm_registration_import'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized below.
+                                $payload = json_decode( sanitize_textarea_field( (string) $raw ), true );
+                }
 
-		if ( ! is_array( $payload ) || empty( $payload['template'] ) || empty( $payload['settings'] ) ) {
-				$redirect = add_query_arg(
-					array(
-						'page'              => self::MENU_SLUG,
-						self::NOTICE_PARAM  => 'error',
-						self::MESSAGE_PARAM => sanitize_text_field( __( 'Import failed. Ensure the JSON file is valid.', 'foodbank-manager' ) ),
-					),
-					admin_url( 'admin.php' )
-				);
-				wp_safe_redirect( $redirect );
-				exit;
-		}
+                if ( ! is_array( $payload ) || empty( $payload['original'] ) || empty( $payload['mapping'] ) ) {
+                                $redirect = add_query_arg(
+                                        array(
+                                                'page'              => self::MENU_SLUG,
+                                                self::NOTICE_PARAM  => 'error',
+                                                self::MESSAGE_PARAM => sanitize_text_field( __( 'Import failed. Ensure the JSON file is valid.', 'foodbank-manager' ) ),
+                                        ),
+                                        admin_url( 'admin.php' )
+                                );
+                                wp_safe_redirect( $redirect );
+                                exit;
+                }
 
-			update_option( self::TEMPLATE_OPTION, TemplateRenderer::sanitize_template( (string) $payload['template'] ) );
-			update_option( self::SETTINGS_OPTION, self::sanitize_settings( $payload['settings'] ) );
+                        $template = get_option( self::TEMPLATE_OPTION, TemplateDefaults::template() );
+                if ( ! is_string( $template ) ) {
+                                $template = TemplateDefaults::template();
+                }
 
-			$redirect = add_query_arg(
-				array(
-					'page'              => self::MENU_SLUG,
-					self::NOTICE_PARAM  => 'success',
-					self::MESSAGE_PARAM => sanitize_text_field( __( 'Registration form imported.', 'foodbank-manager' ) ),
-				),
-				admin_url( 'admin.php' )
-			);
+                        $settings = get_option( self::SETTINGS_OPTION, TemplateDefaults::settings() );
+                if ( ! is_array( $settings ) ) {
+                                $settings = TemplateDefaults::settings();
+                }
+
+                        $fields = self::field_catalog( $template );
+
+                        $original = is_array( $payload['original'] ) ? $payload['original'] : array();
+                        $mapping  = is_array( $payload['mapping'] ) ? $payload['mapping'] : array();
+
+                        $schema_version = isset( $original['schema']['version'] ) ? (int) $original['schema']['version'] : 0;
+
+                if ( Conditions::SCHEMA_VERSION !== $schema_version ) {
+                                $redirect = add_query_arg(
+                                        array(
+                                                'page'              => self::MENU_SLUG,
+                                                self::NOTICE_PARAM  => 'error',
+                                                self::MESSAGE_PARAM => sanitize_text_field( __( 'Import failed. The export file is from an incompatible version.', 'foodbank-manager' ) ),
+                                        ),
+                                        admin_url( 'admin.php' )
+                                );
+                                wp_safe_redirect( $redirect );
+                                exit;
+                }
+
+                        $result = Conditions::apply_import( $original, $mapping, $fields );
+
+                        $settings['conditions'] = array(
+                                'enabled' => $result['enabled'],
+                                'groups'  => $result['groups'],
+                        );
+
+                        update_option( self::SETTINGS_OPTION, self::sanitize_settings( $settings ) );
+
+                        $imported = count( $result['groups'] );
+                        $skipped  = count( $result['skipped'] );
+                        $message  = sprintf(
+                                /* translators: 1: Imported group count, 2: Skipped group count. */
+                                __( 'Imported %1$d rule groups. %2$d skipped.', 'foodbank-manager' ),
+                                $imported,
+                                $skipped
+                        );
+
+                        $redirect = add_query_arg(
+                                array(
+                                        'page'              => self::MENU_SLUG,
+                                        self::NOTICE_PARAM  => 'success',
+                                        self::MESSAGE_PARAM => sanitize_text_field( $message ),
+                                ),
+                                admin_url( 'admin.php' )
+                        );
 
 			wp_safe_redirect( $redirect );
 			exit;
@@ -823,7 +765,7 @@ final class RegistrationEditorPage {
                  *
                  * @return array<int,array<string,string>>
                  */
-		private static function field_catalog( string $template ): array {
+        public static function field_catalog( string $template ): array {
 			$parser = new TagParser();
 			$parsed = $parser->parse( $template );
 			$fields = $parsed['fields'];

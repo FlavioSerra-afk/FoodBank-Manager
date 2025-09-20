@@ -3,7 +3,7 @@ Contributors: portuguese-community-centre-london
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.2
-Stable tag: 1.7.0
+Stable tag: 1.8.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -60,6 +60,10 @@ FoodBank Manager registers with the WordPress privacy exporter/eraser registry a
 First stable cut with readme polish and release checksums.
 
 == Changelog ==
+= 1.8.0 =
+* Added JSON import/export workflow with schema validation, REST-backed mapping preview, and sanitized server-side imports.
+* Introduced six guided rule presets with placeholder prompts, keyboard navigation, and aria-live announcements.
+* Debounced rule evaluation in the editor and public form with batched DOM updates plus refreshed error summary focus handling.
 = 1.7.0 =
 * Conditional visibility phase-2 adds grouped AND/OR logic, numeric/date operators, and a rule debugger shared between the editor and preview.
 * Registration editor now autosaves every 30 seconds, keeps the last five revisions with restore controls, and exposes keyboard shortcuts for save/preview.

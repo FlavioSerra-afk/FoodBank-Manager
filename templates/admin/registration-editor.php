@@ -215,14 +215,25 @@ $autosave_state = isset( $data['autosave'] ) && is_array( $data['autosave'] ) ? 
 														<input type="checkbox" name="<?php echo esc_attr( $settings_option ); ?>[conditions][enabled]" value="1" data-fbm-conditions-enabled<?php checked( $conditions_enabled ); ?> />
 														<?php esc_html_e( 'Enable conditional visibility rules', 'foodbank-manager' ); ?>
 												</label>
-												<div class="fbm-registration-editor__conditions-toolbar">
-														<button type="button" class="button fbm-registration-editor__conditions-add-group" data-fbm-conditions-add-group><?php esc_html_e( 'Add group', 'foodbank-manager' ); ?></button>
-														<button type="button" class="button fbm-registration-editor__conditions-validate" data-fbm-conditions-validate><?php esc_html_e( 'Validate rules', 'foodbank-manager' ); ?></button>
-														<div class="fbm-registration-editor__conditions-status" data-fbm-conditions-status aria-live="polite"></div>
-												</div>
-												<div class="fbm-registration-editor__conditions-report" data-fbm-conditions-report hidden>
-														<h3><?php esc_html_e( 'Validation results', 'foodbank-manager' ); ?></h3>
-														<ul></ul>
+																								<div class="fbm-registration-editor__conditions-toolbar">
+																												<div class="fbm-registration-editor__conditions-actions">
+																																<button type="button" class="button fbm-registration-editor__conditions-add-group" data-fbm-conditions-add-group><?php esc_html_e( 'Add group', 'foodbank-manager' ); ?></button>
+																																<button type="button" class="button fbm-registration-editor__conditions-validate" data-fbm-conditions-validate><?php esc_html_e( 'Validate rules', 'foodbank-manager' ); ?></button>
+																																<div class="fbm-registration-editor__conditions-status" data-fbm-conditions-status aria-live="polite"></div>
+																												</div>
+																												<div class="fbm-registration-editor__conditions-tools">
+																																<div class="fbm-registration-editor__conditions-announcer" data-fbm-conditions-announcer aria-live="polite"></div>
+																																<button type="button" class="button button-secondary" data-fbm-conditions-import><?php esc_html_e( 'Import', 'foodbank-manager' ); ?></button>
+																																<button type="button" class="button button-secondary" data-fbm-conditions-export><?php esc_html_e( 'Export', 'foodbank-manager' ); ?></button>
+																																<div class="fbm-registration-editor__presets" data-fbm-presets>
+																																				<button type="button" class="button button-secondary" data-fbm-presets-toggle aria-haspopup="true" aria-expanded="false" aria-controls="fbm-registration-presets-menu"><?php esc_html_e( 'Presets', 'foodbank-manager' ); ?></button>
+																																				<div class="fbm-registration-editor__presets-menu" id="fbm-registration-presets-menu" data-fbm-presets-menu role="menu" hidden></div>
+																																</div>
+																												</div>
+																								</div>
+																								<div class="fbm-registration-editor__conditions-report" data-fbm-conditions-report hidden>
+																												<h3><?php esc_html_e( 'Validation results', 'foodbank-manager' ); ?></h3>
+																												<ul></ul>
 												</div>
 												<div class="fbm-registration-editor__conditions-groups" data-fbm-conditions-groups>
 														<div class="fbm-registration-editor__conditions-empty" data-fbm-conditions-empty
@@ -249,28 +260,78 @@ $autosave_state = isset( $data['autosave'] ) && is_array( $data['autosave'] ) ? 
 				<?php submit_button( esc_html__( 'Save changes', 'foodbank-manager' ) ); ?>
 		</form>
 
-		<div class="fbm-registration-editor__secondary-actions">
-				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="fbm-registration-editor__secondary-form">
-						<?php wp_nonce_field( $reset_action, '_wpnonce', false ); ?>
-						<input type="hidden" name="action" value="<?php echo esc_attr( $reset_action ); ?>" />
-						<?php submit_button( esc_html__( 'Reset to default', 'foodbank-manager' ), 'secondary', 'submit', false ); ?>
+				<div class="fbm-registration-editor__secondary-actions">
+								<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="fbm-registration-editor__secondary-form">
+												<?php wp_nonce_field( $reset_action, '_wpnonce', false ); ?>
+												<input type="hidden" name="action" value="<?php echo esc_attr( $reset_action ); ?>" />
+												<?php submit_button( esc_html__( 'Reset to default', 'foodbank-manager' ), 'secondary', 'submit', false ); ?>
+								</form>
+				</div>
+
+				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" id="fbm-registration-conditions-export" class="fbm-registration-editor__hidden-form" hidden>
+								<?php wp_nonce_field( $export_action, '_wpnonce', false ); ?>
+								<input type="hidden" name="action" value="<?php echo esc_attr( $export_action ); ?>" />
 				</form>
 
-				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="fbm-registration-editor__secondary-form">
-						<?php wp_nonce_field( $export_action, '_wpnonce', false ); ?>
-						<input type="hidden" name="action" value="<?php echo esc_attr( $export_action ); ?>" />
-						<?php submit_button( esc_html__( 'Export', 'foodbank-manager' ), 'secondary', 'submit', false ); ?>
+				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" id="fbm-registration-conditions-import" class="fbm-registration-editor__hidden-form" hidden>
+								<?php wp_nonce_field( $import_action, '_wpnonce', false ); ?>
+								<input type="hidden" name="action" value="<?php echo esc_attr( $import_action ); ?>" />
+								<input type="hidden" name="fbm_registration_import" value="" data-fbm-import-field />
 				</form>
-		</div>
 
-		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="fbm-registration-editor__import">
-				<h2><?php esc_html_e( 'Import template', 'foodbank-manager' ); ?></h2>
-				<p class="description"><?php esc_html_e( 'Paste a JSON export created from this editor.', 'foodbank-manager' ); ?></p>
-				<textarea name="fbm_registration_import" rows="6" class="large-text"></textarea>
-				<?php wp_nonce_field( $import_action, '_wpnonce', false ); ?>
-				<input type="hidden" name="action" value="<?php echo esc_attr( $import_action ); ?>" />
-				<?php submit_button( esc_html__( 'Import', 'foodbank-manager' ), 'secondary' ); ?>
-		</form>
+				<div class="fbm-registration-editor__import-modal" data-fbm-import-modal hidden>
+								<div class="fbm-registration-editor__import-backdrop" data-fbm-import-close></div>
+								<div class="fbm-registration-editor__import-dialog" role="dialog" aria-modal="true" aria-labelledby="fbm-registration-import-title" tabindex="-1" data-fbm-import-dialog>
+												<div class="fbm-registration-editor__import-header">
+																<h2 id="fbm-registration-import-title"><?php esc_html_e( 'Import rules', 'foodbank-manager' ); ?></h2>
+																<button type="button" class="fbm-registration-editor__import-close button-link" data-fbm-import-close aria-label="<?php esc_attr_e( 'Close import dialog', 'foodbank-manager' ); ?>">
+																				<span aria-hidden="true">&times;</span>
+																				<span class="screen-reader-text"><?php esc_html_e( 'Close import dialog', 'foodbank-manager' ); ?></span>
+																</button>
+												</div>
+												<div class="fbm-registration-editor__import-body">
+																<div class="fbm-registration-editor__import-step" data-fbm-import-step>
+																				<p class="description"><?php esc_html_e( 'Paste the JSON export generated by the editor to review rule mappings before applying them.', 'foodbank-manager' ); ?></p>
+																				<textarea rows="8" class="large-text" data-fbm-import-input></textarea>
+																				<div class="fbm-registration-editor__import-actions">
+																								<button type="button" class="button button-primary" data-fbm-import-preview><?php esc_html_e( 'Preview import', 'foodbank-manager' ); ?></button>
+																								<button type="button" class="button" data-fbm-import-cancel><?php esc_html_e( 'Cancel', 'foodbank-manager' ); ?></button>
+																				</div>
+																</div>
+																<div class="fbm-registration-editor__import-results" data-fbm-import-results hidden>
+																				<div class="fbm-registration-editor__import-summary" data-fbm-import-summary aria-live="polite"></div>
+																				<div class="fbm-registration-editor__import-mapping" data-fbm-import-mapping></div>
+																				<div class="fbm-registration-editor__import-analysis" data-fbm-import-analysis></div>
+																</div>
+												</div>
+												<div class="fbm-registration-editor__import-footer">
+																<button type="button" class="button button-primary" data-fbm-import-confirm disabled><?php esc_html_e( 'Import rules', 'foodbank-manager' ); ?></button>
+																<button type="button" class="button" data-fbm-import-autofill><?php esc_html_e( 'Auto-map fields', 'foodbank-manager' ); ?></button>
+																<button type="button" class="button button-secondary" data-fbm-import-cancel><?php esc_html_e( 'Close', 'foodbank-manager' ); ?></button>
+												</div>
+								</div>
+				</div>
+
+				<div class="fbm-registration-editor__preset-modal" data-fbm-preset-modal hidden>
+								<div class="fbm-registration-editor__preset-backdrop" data-fbm-preset-close></div>
+								<div class="fbm-registration-editor__preset-dialog" role="dialog" aria-modal="true" aria-labelledby="fbm-registration-preset-title" tabindex="-1" data-fbm-preset-dialog>
+												<div class="fbm-registration-editor__preset-header">
+																<h2 id="fbm-registration-preset-title"><?php esc_html_e( 'Insert preset', 'foodbank-manager' ); ?></h2>
+																<button type="button" class="fbm-registration-editor__preset-close button-link" data-fbm-preset-close aria-label="<?php esc_attr_e( 'Close presets dialog', 'foodbank-manager' ); ?>">
+																				<span aria-hidden="true">&times;</span>
+																				<span class="screen-reader-text"><?php esc_html_e( 'Close presets dialog', 'foodbank-manager' ); ?></span>
+																</button>
+												</div>
+												<div class="fbm-registration-editor__preset-body">
+																<p class="description" data-fbm-preset-description></p>
+																<form data-fbm-preset-form></form>
+												</div>
+												<div class="fbm-registration-editor__preset-footer">
+																<button type="button" class="button button-primary" data-fbm-preset-apply disabled><?php esc_html_e( 'Add preset', 'foodbank-manager' ); ?></button>
+																<button type="button" class="button button-secondary" data-fbm-preset-close><?php esc_html_e( 'Cancel', 'foodbank-manager' ); ?></button>
+												</div>
+								</div>
+				</div>
 
 		<div class="fbm-registration-editor__preview-modal" data-fbm-preview-modal hidden>
 				<div class="fbm-registration-editor__preview-backdrop" data-fbm-preview-close></div>

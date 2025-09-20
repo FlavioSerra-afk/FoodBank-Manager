@@ -43,7 +43,7 @@ use function get_role;
  * Main plugin orchestrator.
  */
 final class Plugin {
-	public const VERSION = '1.7.0';
+	public const VERSION = '1.8.0';
 
 	/**
 	 * Register runtime hooks.

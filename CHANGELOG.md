@@ -4,6 +4,18 @@
 
 - _No changes yet._
 
+## [1.8.0] - 2025-09-29
+
+### Added
+- JSON import/export tooling for registration rules with schema versioning, REST preview endpoints, and server-side sanitization.
+- Guided preset catalogue with six curated recipes, placeholder prompts, and aria-live announcements for insertions.
+- PHP unit coverage for the new Conditions helper and template preset catalogue.
+
+### Changed
+- Debounced registration editor recomputations and public form evaluation, batching DOM updates with idle time fallbacks.
+- Enhanced accessibility across the rule editor with keyboard move controls, persistent focus management, and linked error summaries.
+- Documentation updates covering import/export schema details, presets workflow, and updated matrix/spec notes for Wave 6.
+
 ## [1.7.0] - 2025-09-28
 
 ### Added
