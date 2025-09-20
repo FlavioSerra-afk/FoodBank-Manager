@@ -18,6 +18,12 @@
         var textarea = textareaId ? document.getElementById( textareaId ) : null;
         var codeEditor = null;
         var i18n = settings.i18n || {};
+        var restNonce = '';
+        if ( settings.restNonce ) {
+                restNonce = settings.restNonce;
+        } else if ( settings.previewNonce ) {
+                restNonce = settings.previewNonce;
+        }
         var idCounter = 0;
         var raf = window.requestAnimationFrame || function ( callback ) {
                 return window.setTimeout( callback, 16 );
@@ -161,16 +167,26 @@
 
         var notifyDirty = function () {};
 
-        if ( textarea && window.wp && window.wp.codeEditor ) {
-                var editorSettings = settings.codeEditor || {};
-                editorSettings.codemirror = editorSettings.codemirror || {};
-                if ( settings.editorTheme ) {
-                        editorSettings.codemirror.theme = settings.editorTheme;
-                }
+        var inlineEditor = window.fbmRegistrationEditorCodeEditor || null;
+        if ( inlineEditor && inlineEditor.codemirror ) {
+                codeEditor = inlineEditor.codemirror;
+        } else if ( textarea && window.wp && window.wp.codeEditor ) {
+                var editorSettings = inlineEditor && inlineEditor.settings ? inlineEditor.settings : settings.codeEditor || {};
+                if ( editorSettings && 'object' === typeof editorSettings ) {
+                        editorSettings.codemirror = editorSettings.codemirror || {};
+                        if ( settings.editorTheme && ! editorSettings.codemirror.theme ) {
+                                editorSettings.codemirror.theme = settings.editorTheme;
+                        }
 
-                var editor = window.wp.codeEditor.initialize( textarea, editorSettings );
-                if ( editor && editor.codemirror ) {
-                        codeEditor = editor.codemirror;
+                        if ( Object.keys( editorSettings ).length > 0 ) {
+                                var editor = window.wp.codeEditor.initialize( textarea, editorSettings );
+                                if ( editor && editor.codemirror ) {
+                                        codeEditor = editor.codemirror;
+                                        if ( inlineEditor ) {
+                                                inlineEditor.codemirror = codeEditor;
+                                        }
+                                }
+                        }
                 }
         }
 
@@ -1585,8 +1601,8 @@
                         'Content-Type': 'application/json',
                 };
 
-                if ( settings.restNonce ) {
-                        headers[ 'X-WP-Nonce' ] = settings.restNonce;
+                if ( restNonce ) {
+                        headers[ 'X-WP-Nonce' ] = restNonce;
                 }
 
                 var currentRequest = importDiffRequestId;
@@ -2030,10 +2046,8 @@
                 }
 
                 var headers = { 'Content-Type': 'application/json' };
-                if ( settings.restNonce ) {
-                        headers[ 'X-WP-Nonce' ] = settings.restNonce;
-                } else if ( settings.previewNonce ) {
-                        headers[ 'X-WP-Nonce' ] = settings.previewNonce;
+                if ( restNonce ) {
+                        headers[ 'X-WP-Nonce' ] = restNonce;
                 }
 
                 if ( ! settings.importPreviewUrl ) {
@@ -2992,7 +3006,7 @@
                         endpoint: autosaveConfig.endpoint || '',
                         restoreBase: autosaveConfig.restoreBase || '',
                         revisionsEndpoint: autosaveConfig.revisionsEndpoint || '',
-                        nonce: settings.restNonce || settings.previewNonce || '',
+                        nonce: restNonce,
                         interval: autosaveConfig.interval || 30000,
                         payload: autosaveConfig.payload || null,
                         revisions: autosaveConfig.revisions || [],
@@ -3648,7 +3662,7 @@
                         return;
                 }
 
-                if ( ! settings.previewUrl || ! settings.previewNonce ) {
+                if ( ! settings.previewUrl || ! restNonce ) {
                         window.alert( i18n.previewError || 'Unable to load the preview. Please save first or try again.' );
                         return;
                 }
@@ -3664,7 +3678,7 @@
                         credentials: 'same-origin',
                         headers: {
                                 'Content-Type': 'application/json',
-                                'X-WP-Nonce': settings.previewNonce,
+                                'X-WP-Nonce': restNonce,
                         },
                         body: JSON.stringify( payload ),
                 } ).then( function ( response ) {

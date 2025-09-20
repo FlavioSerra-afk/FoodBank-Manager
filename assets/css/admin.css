@@ -3,6 +3,24 @@ body.fbm-registration-editor--modal-open {
     overflow: hidden;
 }
 
+.fbm-registration-editor__textarea {
+    width: 100%;
+    max-width: 100%;
+    min-height: 24rem;
+}
+
+.fbm-registration-editor__canvas .CodeMirror,
+.fbm-registration-editor__canvas .CodeMirror-scroll,
+.fbm-registration-editor__canvas .CodeMirror-wrap {
+    width: 100%;
+    max-width: 100%;
+}
+
+.fbm-registration-editor__canvas .CodeMirror {
+    height: auto;
+    min-height: 24rem;
+}
+
 .fbm-registration-editor__preview-modal[hidden] {
     display: none;
 }

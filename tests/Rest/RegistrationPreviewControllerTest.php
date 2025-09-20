@@ -1,4 +1,5 @@
 <?php
+// phpcs:ignoreFile
 /**
  * Registration preview controller tests.
  *
@@ -45,6 +46,7 @@ final class RegistrationPreviewControllerTest extends TestCase {
                 );
 
                 $response = RegistrationPreviewController::handle_preview( $request );
+                $this->assertSame( 200, $response->get_status() );
                 $data     = $response->get_data();
 
                 $this->assertArrayHasKey( 'markup', $data );

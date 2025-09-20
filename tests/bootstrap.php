@@ -1531,6 +1531,12 @@ if ( ! function_exists( 'get_current_user_id' ) ) {
         }
 }
 
+if ( ! function_exists( 'get_current_screen' ) ) {
+        function get_current_screen() {
+                return $GLOBALS['fbm_current_screen'] ?? null;
+        }
+}
+
 if ( ! function_exists( 'wp_get_current_user' ) ) {
         function wp_get_current_user(): WP_User {
                 $user_id = get_current_user_id();
@@ -1912,9 +1918,31 @@ if ( ! function_exists( 'wp_unslash' ) ) {
 }
 
 if ( ! function_exists( 'wp_json_encode' ) ) {
-	function wp_json_encode( $data, int $options = 0, int $depth = 512 ) {
-			return json_encode( $data, $options | JSON_UNESCAPED_SLASHES, $depth );
-	}
+        function wp_json_encode( $data, int $options = 0, int $depth = 512 ) {
+                        return json_encode( $data, $options | JSON_UNESCAPED_SLASHES, $depth );
+        }
+}
+
+if ( ! function_exists( 'wp_parse_args' ) ) {
+        function wp_parse_args( $args, $defaults = array() ) {
+                if ( is_object( $args ) ) {
+                                $args = get_object_vars( $args );
+                }
+
+                if ( ! is_array( $args ) ) {
+                                $args = array();
+                }
+
+                if ( is_object( $defaults ) ) {
+                                $defaults = get_object_vars( $defaults );
+                }
+
+                if ( ! is_array( $defaults ) ) {
+                                $defaults = array();
+                }
+
+                        return array_merge( $defaults, $args );
+        }
 }
 
 if ( ! function_exists( 'wp_verify_nonce' ) ) {
@@ -2373,19 +2401,49 @@ if ( ! function_exists( 'wp_register_script' ) ) {
 }
 
 if ( ! function_exists( 'wp_localize_script' ) ) {
-		/**
-		 * Record localized script data.
-		 *
-		 * @param string $handle      Script handle.
-		 * @param string $object_name Exposed object name.
-		 * @param array  $l10n        Data payload.
-		 */
-	function wp_localize_script( string $handle, string $object_name, array $l10n ): void { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals
-			$GLOBALS['fbm_localized_scripts'][ $handle ] = array(
-				'name' => $object_name,
-				'data' => $l10n,
-			);
-	}
+                /**
+                 * Record localized script data.
+                 *
+                 * @param string $handle      Script handle.
+                 * @param string $object_name Exposed object name.
+                 * @param array  $l10n        Data payload.
+                 */
+        function wp_localize_script( string $handle, string $object_name, array $l10n ): void { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals
+                        $GLOBALS['fbm_localized_scripts'][ $handle ] = array(
+                                'name' => $object_name,
+                                'data' => $l10n,
+                        );
+        }
+}
+
+if ( ! function_exists( 'wp_add_inline_script' ) ) {
+                /**
+                 * Capture inline script injections for assertions.
+                 *
+                 * @param string $handle   Script handle.
+                 * @param string $data     Inline script contents.
+                 * @param string $position Position relative to the script tag.
+                 */
+        function wp_add_inline_script( string $handle, string $data, string $position = 'after' ): bool { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals
+                if ( ! isset( $GLOBALS['fbm_inline_scripts'] ) || ! is_array( $GLOBALS['fbm_inline_scripts'] ) ) {
+                                $GLOBALS['fbm_inline_scripts'] = array();
+                }
+
+                if ( ! isset( $GLOBALS['fbm_inline_scripts'][ $handle ] ) || ! is_array( $GLOBALS['fbm_inline_scripts'][ $handle ] ) ) {
+                                $GLOBALS['fbm_inline_scripts'][ $handle ] = array(
+                                        'before' => array(),
+                                        'after'  => array(),
+                                );
+                }
+
+                        if ( ! isset( $GLOBALS['fbm_inline_scripts'][ $handle ][ $position ] ) || ! is_array( $GLOBALS['fbm_inline_scripts'][ $handle ][ $position ] ) ) {
+                                $GLOBALS['fbm_inline_scripts'][ $handle ][ $position ] = array();
+                }
+
+                        $GLOBALS['fbm_inline_scripts'][ $handle ][ $position ][] = $data;
+
+                        return true;
+        }
 }
 
 if ( ! function_exists( 'wp_set_script_translations' ) ) {
@@ -2418,6 +2476,36 @@ if ( ! function_exists( 'wp_enqueue_script' ) ) {
                         unset( $src, $deps, $ver, $in_footer );
 
                         $GLOBALS['fbm_enqueued_scripts'][] = $handle;
+        }
+}
+
+if ( ! function_exists( 'wp_enqueue_code_editor' ) ) {
+                /**
+                 * Capture code editor enqueue requests for assertions.
+                 *
+                 * @param array $settings Requested settings.
+                 */
+        function wp_enqueue_code_editor( array $settings = array() ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals
+                if ( ! isset( $GLOBALS['fbm_code_editor_requests'] ) || ! is_array( $GLOBALS['fbm_code_editor_requests'] ) ) {
+                                $GLOBALS['fbm_code_editor_requests'] = array();
+                }
+
+                        $GLOBALS['fbm_code_editor_requests'][] = $settings;
+
+                if ( ! empty( $GLOBALS['fbm_code_editor_disabled'] ) ) {
+                                return false;
+                }
+
+                if ( isset( $GLOBALS['fbm_code_editor_response'] ) && is_array( $GLOBALS['fbm_code_editor_response'] ) ) {
+                                return $GLOBALS['fbm_code_editor_response'];
+                }
+
+                        return array(
+                                'codemirror' => array(
+                                        'mode'       => 'text/html',
+                                        'indentUnit' => 2,
+                                ),
+                        );
         }
 }
 
